@@ -137,17 +137,17 @@ Para máxima portabilidade e desempenho, o **Exitus** adota uma arquitetura em c
 
 Nossa documentação está organizada para guiar você desde a configuração inicial até o deploy:
 
-| Módulo | Título | Link |
-| :--- | :--- | :--- |
-| **Módulo 0** | Preparação do Ambiente | [docs/docs\_modulo0.md](https://www.google.com/search?q=docs/docs_modulo0.md) |
-| **Módulo 1** | Estrutura do Banco de Dados | [docs/docs\_modulo1.md](https://www.google.com/search?q=docs/docs_modulo1.md) |
-| **Módulo 2** | Backend - Autenticação e Usuários | [docs/docs\_modulo2.md](https://www.google.com/search?q=docs/docs_modulo2.md) |
-| **Módulo 3** | Backend - Gestão de Ativos | [docs/docs\_modulo3.md](https://www.google.com/search?q=docs/docs_modulo3.md) |
-| **Módulo 4** | Backend - Transações e Portfólio | [docs/docs\_modulo4.md](https://www.google.com/search?q=docs/docs_modulo4.md) |
-| **Módulo 5** | Backend - APIs de Integração | [docs/docs\_modulo5.md](https://www.google.com/search?q=docs/docs_modulo5.md) |
-| **Módulo 6** | Frontend - Interface do Usuário | [docs/docs\_modulo6.md](https://www.google.com/search?q=docs/docs_modulo6.md) |
-| **Módulo 7** | Testes e Validação | [docs/docs\_modulo7.md](https://www.google.com/search?q=docs/docs_modulo7.md) |
-| **Módulo 8** | Deploy e Monitoramento | [docs/docs\_modulo8.md](https://www.google.com/search?q=docs/docs_modulo8.md) |
+## Documentação dos Módulos
+
+- [Módulo 0: Preparação do Ambiente](docs/docs_modulo0.md)
+- [Módulo 1: Estrutura do Banco de Dados](docs/docs_modulo1.md)
+- [Módulo 2: Backend - Autenticação e Usuários](docs/docs_modulo2.md)
+- [Módulo 3: Backend - Gestão de Ativos](docs/docs_modulo3.md)
+- [Módulo 4: Backend - Transações e Portfólio](docs/docs_modulo4.md)
+- [Módulo 5: Backend - APIs de Integração](docs/docs_modulo5.md)
+- [Módulo 6: Frontend - Interface do Usuário](docs/docs_modulo6.md)
+- [Módulo 7: Testes e Validação](docs/docs_modulo7.md)
+- [Módulo 8: Deploy e Monitoramento](docs/docs_modulo8.md)
 
 -----
 
