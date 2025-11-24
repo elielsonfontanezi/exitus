@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+.env*
+instance/
+db.sqlite3
+# logs
+logs/
+*.log
+# Docker
+*.pid
+*.db
+backups/
+
+# IDEs/editors
+.vscode/
+.idea/
+*.swp
+
+# Test files
+*.coverage
+htmlcov/
+.tox/
+*.cache
+pytest_cache/
+.mypy_cache/
+coverage.xml
+
+# Container artifacts
+exitus-backend/
+exitus-frontend/
+exitus-db/
+
+# OS files
+.DS_Store
+Thumbs.db
