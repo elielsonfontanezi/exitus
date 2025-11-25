@@ -3,11 +3,10 @@
 
 set -e
 
-# Remover containers existentes se houver
+# Remover containers existentes
 echo "Removendo containers antigos (se existirem)..."
 podman stop exitus-db exitus-backend exitus-frontend 2>/dev/null || true
 podman rm exitus-db exitus-backend exitus-frontend 2>/dev/null || true
-
 
 echo "=== Setup Exitus - Módulo 0 ==="
 
@@ -20,6 +19,22 @@ echo "Criando volumes..."
 podman volume create exitus-pgdata 2>/dev/null || echo "Volume pgdata já existe"
 podman volume create exitus-backend-logs 2>/dev/null || echo "Volume backend-logs já existe"
 podman volume create exitus-frontend-logs 2>/dev/null || echo "Volume frontend-logs já existe"
+
+# Criar arquivos .env a partir dos exemplos (se não existirem)
+echo "Criando arquivos .env..."
+if [ ! -f backend/.env ]; then
+    cp backend/.env.example backend/.env
+    echo "✓ backend/.env criado a partir do .env.example"
+else
+    echo "✓ backend/.env já existe"
+fi
+
+if [ ! -f frontend/.env ]; then
+    cp frontend/.env.example frontend/.env
+    echo "✓ frontend/.env criado a partir do .env.example"
+else
+    echo "✓ frontend/.env já existe"
+fi
 
 # Build das imagens
 echo "Building backend image..."
@@ -39,13 +54,13 @@ podman run -d --name exitus-db   --network exitus-net   -v exitus-pgdata:/var/li
 echo "Aguardando PostgreSQL inicializar..."
 sleep 10
 
-# Criar container Backend
+# Criar container Backend (usando .env)
 echo "Criando container Backend..."
-podman run -d --name exitus-backend   --network exitus-net   -p 5000:5000   -v ./backend:/app:Z   -v exitus-backend-logs:/app/logs:Z   -e POSTGRES_HOST=exitus-db   -e POSTGRES_USER=exitus   -e POSTGRES_PASSWORD=exitus123   -e POSTGRES_DB=exitusdb   -e TZ=America/Sao_Paulo   exitus-backend:latest
+podman run -d --name exitus-backend   --network exitus-net   -p 5000:5000   -v ./backend:/app:Z   -v exitus-backend-logs:/app/logs:Z   --env-file ./backend/.env   exitus-backend:latest
 
-# Criar container Frontend
+# Criar container Frontend (usando .env)
 echo "Criando container Frontend..."
-podman run -d --name exitus-frontend   --network exitus-net   -p 8080:8080   -v ./frontend:/app:Z   -v exitus-frontend-logs:/app/logs:Z   -e BACKEND_API_URL=http://exitus-backend:5000   -e TZ=America/Sao_Paulo   exitus-frontend:latest
+podman run -d --name exitus-frontend   --network exitus-net   -p 8080:8080   -v ./frontend:/app:Z   -v exitus-frontend-logs:/app/logs:Z   --env-file ./frontend/.env   exitus-frontend:latest
 
 echo ""
 echo "=== Setup concluído! ==="

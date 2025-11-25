@@ -3,14 +3,14 @@
 
 echo "Iniciando serviços Exitus..."
 
-podman start exitus-db
+podman start exitus-db || true
 echo "PostgreSQL iniciado"
 sleep 5
 
-podman start exitus-backend
+podman start exitus-backend || true
 echo "Backend iniciado"
 
-podman start exitus-frontend
+podman start exitus-frontend || true
 echo "Frontend iniciado"
 
 echo ""

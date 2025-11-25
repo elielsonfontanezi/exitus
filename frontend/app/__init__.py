@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
-"""
-Exitus Frontend - Application Factory
-"""
+"""Exitus Frontend - Application Factory"""
 
 from flask import Flask, render_template_string
+from .config import Config
+
 
 def create_app():
     """Cria e configura a aplicação Flask"""
     app = Flask(__name__)
 
-    # Configurações
-    app.config['SECRET_KEY'] = 'dev-secret-key'
+    # Carrega configurações
+    app.config.from_object(Config)
 
-    # Rota inicial
+    # Rota inicial simples (será substituída em módulos futuros)
     @app.route('/')
     def index():
         html = """
@@ -29,9 +29,13 @@ def create_app():
         """
         return render_template_string(html)
 
-    # Health check route
+    # Health check
     @app.route('/health')
     def health():
-        return {'status': 'ok', 'service': 'exitus-frontend'}, 200
+        return {
+            'status': 'ok',
+            'service': 'exitus-frontend',
+            'env': app.config.get('FLASK_ENV', 'unknown')
+        }, 200
 
     return app

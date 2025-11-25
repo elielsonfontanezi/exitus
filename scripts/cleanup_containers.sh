@@ -18,3 +18,7 @@ podman rm exitus-db 2>/dev/null || true
 echo "Containers removidos!"
 echo ""
 
+echo "Para remover também volumes e network, execute manualmente (cuidado!):"
+echo "  podman volume rm exitus-pgdata exitus-backend-logs exitus-frontend-logs"
+echo "  podman network rm exitus-net"
+echo ""

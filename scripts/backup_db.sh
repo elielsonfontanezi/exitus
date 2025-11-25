@@ -2,7 +2,7 @@
 # Backup do banco de dados PostgreSQL
 
 BACKUP_DIR="./backups"
-mkdir -p $BACKUP_DIR
+mkdir -p "$BACKUP_DIR"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 echo "Criando backup do banco de dados..."
