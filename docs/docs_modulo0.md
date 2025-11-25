@@ -150,6 +150,7 @@ psycopg2-binary==2.9.9
 python-dotenv==1.0.0
 requests==2.31.0
 pytest==7.4.3
+gunicorn==21.2.0
 ```
 
 ### 2.3 backend/.env.example (template base)
@@ -296,8 +297,11 @@ RUN if [ ! -f .env ]; then cp .env.example .env; fi
 # Expõe porta
 EXPOSE 5000
 
-# Comando de inicialização
-CMD ["python", "run.py"]
+# Comando anterior
+# CMD ["python", "run.py"]
+
+# Novo comando
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "run:app", "--reload"]
 ```
 
 ## 3. Criação da Estrutura Frontend
@@ -318,6 +322,7 @@ Flask==3.0.0
 requests==2.31.0
 python-dotenv==1.0.0
 pytest==7.4.3
+gunicorn==21.2.0
 ```
 
 ### 3.3 frontend/.env.example
@@ -459,8 +464,12 @@ RUN if [ ! -f .env ]; then cp .env.example .env; fi
 # Expõe porta
 EXPOSE 8080
 
-# Comando de inicialização
-CMD ["python", "run.py"]
+# Comando anterior
+# CMD ["python", "run.py"]
+
+# Novo comando
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "run:app", "--reload"]
+
 ```
 
 ## 4. Instalação do Podman (Ubuntu)
