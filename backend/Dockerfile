@@ -18,5 +18,9 @@ RUN if [ ! -f .env ]; then cp .env.example .env; fi
 # Expõe porta
 EXPOSE 5000
 
-# Comando de inicialização
-CMD ["python", "run.py"]
+# Comando anterior
+# CMD ["python", "run.py"]
+
+# Novo comando
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "run:app", "--reload"]
+

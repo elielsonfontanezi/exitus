@@ -15,6 +15,8 @@ podman rm exitus-frontend 2>/dev/null || true
 podman rm exitus-backend 2>/dev/null || true
 podman rm exitus-db 2>/dev/null || true
 
+pkill -9 containers-rootlessport || true
+
 echo "Containers removidos!"
 echo ""
 
