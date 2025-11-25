@@ -778,20 +778,26 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-
-# Env files (nunca versionar .env reais)
+*.env
 .env
 .env.*
-!.env.example
-!.env.development.example
-!.env.staging.example
-!.env.production.example
-
-# Logs
+!.env.example    # Permite apenas .env.example
+instance/
+db.sqlite3
+# logs
 logs/
 *.log
+# Docker
+*.pid
+*.db
+backups/
 
-# Testes
+# IDEs/editors
+.vscode/
+.idea/
+*.swp
+
+# Test files
 *.coverage
 htmlcov/
 .tox/
@@ -800,13 +806,10 @@ pytest_cache/
 .mypy_cache/
 coverage.xml
 
-# Backups
-backups/
-
-# IDEs/editors
-.vscode/
-.idea/
-*.swp
+# Container artifacts
+exitus-backend/
+exitus-frontend/
+exitus-db/
 
 # OS files
 .DS_Store
