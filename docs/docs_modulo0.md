@@ -153,7 +153,7 @@ Nossa documentação está organizada para guiar você desde a configuração in
 
 ## ▶️ Guia de Início Rápido (Quick Start)
 
-1.  **Configuração do Ambiente** (Veja o [Módulo 0](https://www.google.com/search?q=docs/docs_modulo0.md)):
+1.  **Configuração do Ambiente** (Veja o [Módulo 0](docs/docs_modulo0.md)):
     ```bash
     ./scripts/setup_containers.sh
     ```
