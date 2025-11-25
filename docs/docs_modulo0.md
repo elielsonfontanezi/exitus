@@ -65,8 +65,9 @@ __pycache__/
 *.pyo
 *.pyd
 *.env
-*.venv
-.env*
+.env
+.env.*
+!.env.example    # Permite apenas .env.example
 instance/
 db.sqlite3
 # logs
