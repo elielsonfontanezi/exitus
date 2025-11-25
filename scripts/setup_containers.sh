@@ -5,8 +5,15 @@ set -e
 
 # Remover containers existentes
 echo "Removendo containers antigos (se existirem)..."
-podman stop exitus-db exitus-backend exitus-frontend 2>/dev/null || true
-podman rm exitus-db exitus-backend exitus-frontend 2>/dev/null || true
+podman stop exitus-db  2>/dev/null || true
+podman stop exitus-backend 2>/dev/null || true
+podman stop exitus-frontend 2>/dev/null || true
+
+podman rm exitus-db 2>/dev/null || true
+podman rm exitus-backend 2>/dev/null || true
+podman rm exitus-frontend 2>/dev/null || true
+
+pkill -9 containers-rootlessport || true
 
 echo "=== Setup Exitus - Módulo 0 ==="
 
@@ -49,18 +56,37 @@ cd ..
 
 # Criar container PostgreSQL
 echo "Criando container PostgreSQL..."
-podman run -d --name exitus-db   --network exitus-net   -v exitus-pgdata:/var/lib/postgresql/data   -e POSTGRES_USER=exitus   -e POSTGRES_PASSWORD=exitus123   -e POSTGRES_DB=exitusdb   -e TZ=America/Sao_Paulo   docker.io/postgres:15
+podman run -d --name exitus-db \
+  --network exitus-net \
+  -v exitus-pgdata:/var/lib/postgresql/data \
+  -e POSTGRES_USER=exitus \
+  -e POSTGRES_PASSWORD=exitus123 \
+  -e POSTGRES_DB=exitusdb \
+  -e TZ=America/Sao_Paulo \
+  docker.io/postgres:15
 
 echo "Aguardando PostgreSQL inicializar..."
 sleep 10
 
 # Criar container Backend (usando .env)
 echo "Criando container Backend..."
-podman run -d --name exitus-backend   --network exitus-net   -p 5000:5000   -v ./backend:/app:Z   -v exitus-backend-logs:/app/logs:Z   --env-file ./backend/.env   exitus-backend:latest
+podman run -d --name exitus-backend \
+  --network exitus-net \
+  -p 5000:5000 \
+  -v ./backend:/app:Z \
+  -v exitus-backend-logs:/app/logs:Z \
+  --env-file ./backend/.env \
+  exitus-backend:latest
 
 # Criar container Frontend (usando .env)
 echo "Criando container Frontend..."
-podman run -d --name exitus-frontend   --network exitus-net   -p 8080:8080   -v ./frontend:/app:Z   -v exitus-frontend-logs:/app/logs:Z   --env-file ./frontend/.env   exitus-frontend:latest
+podman run -d --name exitus-frontend \
+  --network exitus-net \
+  -p 8080:8080 \
+  -v ./frontend:/app:Z \
+  -v exitus-frontend-logs:/app/logs:Z \
+  --env-file ./frontend/.env \
+  exitus-frontend:latest
 
 echo ""
 echo "=== Setup concluído! ==="

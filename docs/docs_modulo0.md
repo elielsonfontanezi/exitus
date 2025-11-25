@@ -583,8 +583,14 @@ set -e
 
 # Remover containers existentes
 echo "Removendo containers antigos (se existirem)..."
-podman stop exitus-db exitus-backend exitus-frontend 2>/dev/null || true
-podman rm exitus-db exitus-backend exitus-frontend 2>/dev/null || true
+podman stop exitus-db  2>/dev/null || true
+podman stop exitus-backend 2>/dev/null || true
+podman stop exitus-frontend 2>/dev/null || true
+
+podman rm exitus-db 2>/dev/null || true
+podman rm exitus-backend 2>/dev/null || true
+podman rm exitus-frontend 2>/dev/null || true
+pkill -9 containers-rootlessport || true
 
 echo "=== Setup Exitus - Módulo 0 ==="
 
@@ -768,7 +774,9 @@ podman logs exitus-backend --tail 50
 podman logs exitus-frontend --tail 50
 ```
 
-## 9. .gitignore (Boas Práticas)
+## 9. Boas Práticas
+
+### .gitignore
 
 Crie o arquivo `exitus/.gitignore` para evitar versionar artefatos sensíveis ou gerados:
 
@@ -814,6 +822,24 @@ exitus-db/
 # OS files
 .DS_Store
 Thumbs.db
+```
+
+### 9.2 Template dotenv.
+
+Segue exemplo de uso dos dotenv para preparação do ambiente.
+
+```bash
+# Desenvolvimento (padrão)
+./scripts/setup_env.sh development
+./scripts/setup_containers.sh
+
+# Staging
+./scripts/setup_env.sh staging
+./scripts/setup_containers.sh
+
+# Produção
+./scripts/setup_env.sh production
+./scripts/setup_containers.sh
 ```
 
 ## 10. Documentação do Módulo
