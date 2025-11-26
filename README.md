@@ -29,21 +29,21 @@ Nossa documentação está organizada para guiar você desde a configuração in
 
 ## Documentação dos Módulos
 
-- [Módulo 0: Preparação do Ambiente](docs/docs_modulo0.md)
-- [Módulo 1: Estrutura do Banco de Dados](docs/docs_modulo1.md)
-- [Módulo 2: Backend - Autenticação e Usuários](docs/docs_modulo2.md)
-- [Módulo 3: Backend - Gestão de Ativos](docs/docs_modulo3.md)
-- [Módulo 4: Backend - Transações e Portfólio](docs/docs_modulo4.md)
-- [Módulo 5: Backend - APIs de Integração](docs/docs_modulo5.md)
-- [Módulo 6: Frontend - Interface do Usuário](docs/docs_modulo6.md)
-- [Módulo 7: Testes e Validação](docs/docs_modulo7.md)
-- [Módulo 8: Deploy e Monitoramento](docs/docs_modulo8.md)
+- [Módulo 0: Preparação do Ambiente](docs/modulo0_ambiente.md)
+- [Módulo 1: Estrutura do Banco de Dados](docs/modulo1_database.md)
+- [Módulo 2: Backend - Autenticação e Usuários](docs/modulo2_backend_auth.md)
+- [Módulo 3: Backend - Gestão de Ativos](docs/modulo3_backend_financeiro.md)
+- [Módulo 4: Backend - Transações e Portfólio](docs/modulo4_backend_integracoes.md)
+- [Módulo 5: Backend - APIs de Integração](docs/modulo5_frontend_base.md)
+- [Módulo 6: Frontend - Interface do Usuário](docs/modulo6_frontend_dashboards.md)
+- [Módulo 7: Testes e Validação](docs/modulo7_relatorios.md)
+- [Módulo 8: Deploy e Monitoramento](docs/modulo8_deploy.md)
 
 -----
 
 ## ▶️ Guia de Início Rápido (Quick Start)
 
-1.  **Configuração do Ambiente** (Veja o [Módulo 0](docs/docs_modulo0.md)):
+1.  **Configuração do Ambiente** (Veja o [Módulo 0](docs/modulo0_ambiente.md)):
     ```bash
     ./scripts/setup_containers.sh
     ```
