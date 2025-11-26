@@ -7,8 +7,8 @@ __pycache__/
 .env
 .env.*
 !.env.example*
-!frontend/.env.example*
-!backend/.env.example*
+!frontend/.env.*example*
+!backend/.env.*example*
 instance/
 db.sqlite3
 # logs
