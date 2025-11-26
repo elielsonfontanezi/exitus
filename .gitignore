@@ -6,9 +6,9 @@ __pycache__/
 *.env
 .env
 .env.*
-!.env.example    # Permite apenas .env.example
-!frontend/.env.example
-!backend/.env.example
+!.env.example*
+!frontend/.env.example*
+!backend/.env.example*
 instance/
 db.sqlite3
 # logs
