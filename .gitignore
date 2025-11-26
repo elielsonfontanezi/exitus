@@ -3,10 +3,10 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+!.env.example    # Permite apenas .env.example
 *.env
 .env
 .env.*
-!.env.example    # Permite apenas .env.example
 instance/
 db.sqlite3
 # logs
