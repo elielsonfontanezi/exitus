@@ -4,6 +4,7 @@
 from flask import Flask
 from flask_cors import CORS
 from .config import Config
+from .database import init_db
 
 
 def create_app():
@@ -15,6 +16,9 @@ def create_app():
 
     # Habilita CORS
     CORS(app)
+    
+    # Inicializa banco de dados
+    init_db(app)
 
     # Health check route
     @app.route('/health')
