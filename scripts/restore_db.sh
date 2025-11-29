@@ -120,3 +120,14 @@ start_app_containers
 # 8. Lista o status de todos os containers
 echo "--- 📊 Status de Todos os Containers ---"
 podman ps -a
+
+echo
+echo
+
+cat << 'EOF'
+# ========================================================
+# GARANTA QUE AS SEEDS ESTEJAM POPULADAS NA BASE DE DADOS:
+# 
+# EXECUTE: exitus/scirpts/populate_seeds.sh
+# ========================================================
+EOF
