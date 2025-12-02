@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+"""Exitus - Auth Schemas - Validação Marshmallow"""
+
+from marshmallow import Schema, fields, validates, ValidationError
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from app.models import Usuario
+
+class LoginSchema(Schema):
+    """Schema para validação de login"""
+    username = fields.Str(required=True, validate=lambda x: len(x) >= 3)
+    password = fields.Str(required=True, validate=lambda x: len(x) >= 6)
+
+    @validates('username')
+    def validate_username(self, value):
+        if len(value) < 3:
+            raise ValidationError("Username deve ter pelo menos 3 caracteres")
+
+class TokenResponseSchema(Schema):
+    """Schema para resposta de tokens"""
+    access_token = fields.Str(dump_only=True)
+    refresh_token = fields.Str(dump_only=True)
+    token_type = fields.Str(dump_only=True)
+    expires_in = fields.Int(dump_only=True)
+
+class UserMeSchema(SQLAlchemyAutoSchema):
+    """Schema para dados do usuário logado (sem senha)"""
+    class Meta:
+        model = Usuario
+        load_instance = False
+        exclude = ('password_hash',)
+
+    role = fields.Method("get_role_str")
+
+    def get_role_str(self, obj):
+        return obj.role.value if obj.role else None

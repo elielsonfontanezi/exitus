@@ -5,6 +5,7 @@
 from app import create_app
 import os
 
+# Criar a aplicação Flask (já inicializa o banco internamente)
 app = create_app()
 
 if __name__ == '__main__':

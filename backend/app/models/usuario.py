@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Exitus - Model Usuario
-Entidade principal para autenticação e gestão de usuários
-"""
+"""Exitus - Model Usuario - Entidade principal para autenticação"""
 
+import enum
 from datetime import datetime
-from app.database import db
 from sqlalchemy import String, Boolean, DateTime, Enum
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-import enum
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from app.database import db
 
 class UserRole(enum.Enum):
     """Enum para roles/perfis de usuário"""
@@ -19,19 +15,22 @@ class UserRole(enum.Enum):
     USER = "user"
     READONLY = "readonly"
 
-
 class Usuario(db.Model):
     """Model para usuários do sistema Exitus"""
+    __tablename__ = 'usuarios'  # ⬅️ PLURAL (consistente com FK)
     
-    __tablename__ = 'usuario'
-    
+    # Identificação
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = db.Column(String(50), unique=True, nullable=False, index=True)
     email = db.Column(String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(String(255), nullable=False)
     nome_completo = db.Column(String(200), nullable=True)
+    
+    # Controle
     ativo = db.Column(Boolean, default=True, nullable=False)
     role = db.Column(Enum(UserRole), default=UserRole.USER, nullable=False)
+    
+    # Timestamps
     created_at = db.Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
     updated_at = db.Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     
@@ -52,19 +51,21 @@ class Usuario(db.Model):
         return self.ativo
     
     def to_dict(self, include_sensitive=False):
-        """Converte objeto para dicionário (para serialização JSON)"""
+        """Converte objeto para dicionário para serialização JSON"""
         data = {
-            'id': str(self.id),
-            'username': self.username,
-            'email': self.email,
-            'nome_completo': self.nome_completo,
-            'ativo': self.ativo,
-            'role': self.role.value if self.role else UserRole.USER.value,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            "id": str(self.id),
+            "username": self.username,
+            "email": self.email,
+            "nome_completo": self.nome_completo,
+            "ativo": self.ativo,
+            "role": self.role.value if self.role else UserRole.USER.value,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }
+        
         if include_sensitive:
-            data['password_hash'] = self.password_hash
+            data["password_hash"] = self.password_hash
+        
         return data
     
     def __repr__(self):
