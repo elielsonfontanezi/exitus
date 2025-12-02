@@ -67,14 +67,18 @@ def create_app(testing=False):
     from .blueprints.ativos.routes import bp as ativos_bp
     app.register_blueprint(ativos_bp)
     
+    # Blueprint de transações (Fase 2.2.4)
+    from .blueprints.transacoes.routes import bp as transacoes_bp
+    app.register_blueprint(transacoes_bp)
+    
     # Outros blueprints serão adicionados gradualmente nas próximas fases
-    # from .blueprints.transacoes.routes import bp as transacoes_bp
-    # app.register_blueprint(transacoes_bp)
+    # from .blueprints.posicoes.routes import bp as posicoes_bp
+    # app.register_blueprint(posicoes_bp)
     
     print("🚀 Exitus Backend Módulo 2 - Application Factory criada com sucesso!")
     print(f"📍 Environment: {app.config.get('FLASK_ENV')}")
     print(f"🔐 JWT Secret configurado: {'*' * 16}")
     print(f"🌐 CORS configurado para: http://localhost:8080")
-    print(f"✅ Blueprints registrados: auth, usuarios, corretoras, ativos")
+    print(f"✅ Blueprints registrados: auth, usuarios, corretoras, ativos, transacoes")
     
     return app
