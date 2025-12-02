@@ -59,6 +59,10 @@ def create_app(testing=False):
     from .blueprints.usuarios.routes import bp as usuarios_bp
     app.register_blueprint(usuarios_bp)
     
+    # Blueprint de corretoras (Fase 2.2.2)
+    from .blueprints.corretoras.routes import bp as corretoras_bp
+    app.register_blueprint(corretoras_bp)
+    
     # Outros blueprints serão adicionados gradualmente nas próximas fases
     # from .blueprints.ativos.routes import bp as ativos_bp
     # app.register_blueprint(ativos_bp)
@@ -67,6 +71,6 @@ def create_app(testing=False):
     print(f"📍 Environment: {app.config.get('FLASK_ENV')}")
     print(f"🔐 JWT Secret configurado: {'*' * 16}")
     print(f"🌐 CORS configurado para: http://localhost:8080")
-    print(f"✅ Blueprints registrados: auth, usuarios")
+    print(f"✅ Blueprints registrados: auth, usuarios, corretoras")
     
     return app
