@@ -6,6 +6,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services.auth_service import AuthService
 from app.schemas.auth_schema import LoginSchema, TokenResponseSchema, UserMeSchema
 from app.utils.responses import success, error, unauthorized
+from app.utils.decorators import admin_required  # ← NOVO IMPORT
+from app.models import Usuario  # ← NOVO IMPORT
+from app.database import db
 
 bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -38,6 +41,17 @@ def me():
     if not user:
         return unauthorized("Usuário não encontrado")
     return success(UserMeSchema().dump(user), "Dados do usuário")
+
+@bp.route('/me/admin', methods=['GET'])
+@admin_required  # ← NOVO: Apenas ADMIN pode acessar
+def me_admin():
+    """Endpoint de teste - apenas para ADMIN."""
+    identity = get_jwt_identity()
+    user = Usuario.query.get(identity)
+    return success({
+        "message": "Você é um administrador!",
+        "user": UserMeSchema().dump(user)
+    }, "Acesso ADMIN confirmado")
 
 @bp.route('/logout', methods=['POST'])
 @jwt_required(refresh=True)
