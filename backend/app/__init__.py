@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
 """Exitus - Módulo 2 Backend API REST - Application Factory"""
+
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from .config import Config
+from .database import init_db
 
 def create_app(testing=False):
     """
@@ -34,6 +37,9 @@ def create_app(testing=False):
         }
     })
     
+    # Inicializar banco de dados
+    init_db(app)
+    
     # Health check básico (Módulo 1 + Módulo 2)
     @app.route('/health')
     def health():
@@ -44,13 +50,19 @@ def create_app(testing=False):
             "module": "2 - API REST"
         }
     
-    # Registrar blueprints (serão adicionados gradualmente)
-    # from .blueprints.auth.routes import bp as auth_bp
-    # app.register_blueprint(auth_bp, url_prefix='/api')
+    # ⭐ Registrar blueprints
+    # Blueprint de autenticação (Fase 2.1)
+    from .blueprints.auth.routes import bp as auth_bp
+    app.register_blueprint(auth_bp)
+    
+    # Outros blueprints serão adicionados gradualmente nas próximas fases
+    # from .blueprints.usuarios.routes import bp as usuarios_bp
+    # app.register_blueprint(usuarios_bp)
     
     print("🚀 Exitus Backend Módulo 2 - Application Factory criada com sucesso!")
     print(f"📍 Environment: {app.config.get('FLASK_ENV')}")
     print(f"🔐 JWT Secret configurado: {'*' * 16}")
     print(f"🌐 CORS configurado para: http://localhost:8080")
+    print(f"✅ Blueprints registrados: auth")
     
     return app

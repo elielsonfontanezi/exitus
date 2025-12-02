@@ -93,4 +93,5 @@ echo "=== Setup concluído! ==="
 echo "Backend: http://localhost:5000"
 echo "Frontend: http://localhost:8080"
 echo ""
+sleep 20
 podman ps

@@ -3,14 +3,10 @@
 """Exitus Backend - Entry Point"""
 
 from app import create_app
-from app.database import init_db
 import os
 
-# Criar a aplicação Flask
+# Criar a aplicação Flask (já inicializa o banco internamente)
 app = create_app()
-
-# Inicializar o banco de dados com a aplicação
-init_db(app)
 
 if __name__ == '__main__':
     port = int(os.getenv('FLASK_PORT', 5000))
