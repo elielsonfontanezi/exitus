@@ -1,0 +1,1604 @@
+================================================================================
+EXITUS - ESTRUTURA DO BANCO DE DADOS
+================================================================================
+Database: exitusdb
+Gerado em: 2025-12-02 13:52:10
+================================================================================
+
+================================================================================
+TABELAS DO BANCO EXITUS
+================================================================================
+
+ Schema |       Tabela       | Owner  
+--------+--------------------+--------
+ public | alembic_version    | exitus
+ public | ativo              | exitus
+ public | ativos             | exitus
+ public | corretora          | exitus
+ public | corretoras         | exitus
+ public | evento_corporativo | exitus
+ public | feriado_mercado    | exitus
+ public | fonte_dados        | exitus
+ public | log_auditoria      | exitus
+ public | movimentacao_caixa | exitus
+ public | posicao            | exitus
+ public | provento           | exitus
+ public | regra_fiscal       | exitus
+ public | transacao          | exitus
+ public | transacoes         | exitus
+ public | usuario            | exitus
+ public | usuarios           | exitus
+(17 rows)
+
+
+================================================================================
+ESTRUTURA DETALHADA DAS TABELAS
+================================================================================
+
+DO
+
+################################################################################
+TABELA: alembic_version
+################################################################################
+
+                                               Table "public.alembic_version"
+   Column    |         Type          | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+-------------+-----------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ version_num | character varying(32) |           | not null |         | extended |             |              | 
+Indexes:
+    "alembic_version_pkc" PRIMARY KEY, btree (version_num)
+Access method: heap
+
+ Pos |   Coluna    |       Tipo        | Tamanho | Null? | Default 
+-----+-------------+-------------------+---------+-------+---------
+   1 | version_num | character varying | (32)    | NO    | 
+(1 row)
+
+
+Foreign Keys:
+ Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
+---------+--------+---------------------+---------------------
+(0 rows)
+
+
+Primary Keys:
+       Nome PK       |   Coluna    
+---------------------+-------------
+ alembic_version_pkc | version_num
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+   Nome do Índice    |                                          Definição                                          
+---------------------+---------------------------------------------------------------------------------------------
+ alembic_version_pkc | CREATE UNIQUE INDEX alembic_version_pkc ON public.alembic_version USING btree (version_num)
+(1 row)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: ativo
+################################################################################
+
+                                                                           Table "public.ativo"
+       Column        |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                   Description                   
+---------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------------------------------------------
+ id                  | uuid                     |           | not null |         | plain    |             |              | Identificador único do ativo
+ ticker              | character varying(20)    |           | not null |         | extended |             |              | Código/símbolo do ativo (ex: PETR4, AAPL, BTC)
+ nome                | character varying(200)   |           | not null |         | extended |             |              | Nome completo do ativo
+ tipo                | tipoativo                |           | not null |         | plain    |             |              | Tipo do ativo (ação, FII, REIT, bond, cripto)
+ classe              | classeativo              |           | not null |         | plain    |             |              | Classe do ativo (renda variável, fixa, cripto)
+ mercado             | character varying(10)    |           | not null |         | extended |             |              | Mercado/país de negociação (BR, US, EUR)
+ moeda               | character varying(3)     |           | not null |         | extended |             |              | Moeda de negociação (BRL, USD, EUR)
+ preco_atual         | numeric(18,6)            |           |          |         | main     |             |              | Preço/cotação atual do ativo
+ data_ultima_cotacao | timestamp with time zone |           |          |         | plain    |             |              | Data e hora da última cotação
+ dividend_yield      | numeric(8,4)             |           |          |         | main     |             |              | Dividend Yield em % (ex: 6.5000 = 6.5%)
+ p_l                 | numeric(10,2)            |           |          |         | main     |             |              | Índice Preço/Lucro
+ p_vp                | numeric(10,2)            |           |          |         | main     |             |              | Índice Preço/Valor Patrimonial
+ roe                 | numeric(8,4)             |           |          |         | main     |             |              | Return on Equity em %
+ ativo               | boolean                  |           | not null |         | plain    |             |              | Indica se ativo está disponível para negociação
+ deslistado          | boolean                  |           | not null |         | plain    |             |              | Indica se ativo foi deslistado da bolsa
+ data_deslistagem    | date                     |           |          |         | plain    |             |              | Data de deslistagem (se aplicável)
+ observacoes         | text                     |           |          |         | extended |             |              | Observações e notas sobre o ativo
+ created_at          | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
+ updated_at          | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+Indexes:
+    "ativo_pkey" PRIMARY KEY, btree (id)
+    "ix_ativo_ativo" btree (ativo)
+    "ix_ativo_classe" btree (classe)
+    "ix_ativo_data_ultima_cotacao" btree (data_ultima_cotacao)
+    "ix_ativo_deslistado" btree (deslistado)
+    "ix_ativo_mercado" btree (mercado)
+    "ix_ativo_moeda" btree (moeda)
+    "ix_ativo_nome" btree (nome)
+    "ix_ativo_ticker" btree (ticker)
+    "ix_ativo_tipo" btree (tipo)
+    "unique_ativo_ticker_mercado" UNIQUE CONSTRAINT, btree (ticker, mercado)
+Check constraints:
+    "ativo_nome_min_length" CHECK (length(nome::text) >= 2)
+    "ativo_preco_positivo" CHECK (preco_atual IS NULL OR preco_atual >= 0::numeric)
+    "ativo_ticker_min_length" CHECK (length(ticker::text) >= 1)
+Referenced by:
+    TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
+    TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_ativo_novo_id_fkey" FOREIGN KEY (ativo_novo_id) REFERENCES ativo(id) ON DELETE SET NULL
+    TABLE "posicao" CONSTRAINT "posicao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
+    TABLE "provento" CONSTRAINT "provento_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
+    TABLE "transacao" CONSTRAINT "transacao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
+Access method: heap
+
+ Pos |       Coluna        |           Tipo           | Tamanho | Null? | Default 
+-----+---------------------+--------------------------+---------+-------+---------
+   1 | id                  | uuid                     |         | NO    | 
+   2 | ticker              | character varying        | (20)    | NO    | 
+   3 | nome                | character varying        | (200)   | NO    | 
+   4 | tipo                | USER-DEFINED             |         | NO    | 
+   5 | classe              | USER-DEFINED             |         | NO    | 
+   6 | mercado             | character varying        | (10)    | NO    | 
+   7 | moeda               | character varying        | (3)     | NO    | 
+   8 | preco_atual         | numeric                  |         | YES   | 
+   9 | data_ultima_cotacao | timestamp with time zone |         | YES   | 
+  10 | dividend_yield      | numeric                  |         | YES   | 
+  11 | p_l                 | numeric                  |         | YES   | 
+  12 | p_vp                | numeric                  |         | YES   | 
+  13 | roe                 | numeric                  |         | YES   | 
+  14 | ativo               | boolean                  |         | NO    | 
+  15 | deslistado          | boolean                  |         | NO    | 
+  16 | data_deslistagem    | date                     |         | YES   | 
+  17 | observacoes         | text                     |         | YES   | 
+  18 | created_at          | timestamp with time zone |         | NO    | 
+  19 | updated_at          | timestamp with time zone |         | NO    | 
+(19 rows)
+
+
+Foreign Keys:
+ Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
+---------+--------+---------------------+---------------------
+(0 rows)
+
+
+Primary Keys:
+  Nome PK   | Coluna 
+------------+--------
+ ativo_pkey | id
+(1 row)
+
+
+Unique Constraints:
+       Nome Constraint       | Coluna  
+-----------------------------+---------
+ unique_ativo_ticker_mercado | ticker
+ unique_ativo_ticker_mercado | mercado
+(2 rows)
+
+
+Índices:
+        Nome do Índice        |                                           Definição                                           
+------------------------------+-----------------------------------------------------------------------------------------------
+ ativo_pkey                   | CREATE UNIQUE INDEX ativo_pkey ON public.ativo USING btree (id)
+ unique_ativo_ticker_mercado  | CREATE UNIQUE INDEX unique_ativo_ticker_mercado ON public.ativo USING btree (ticker, mercado)
+ ix_ativo_ativo               | CREATE INDEX ix_ativo_ativo ON public.ativo USING btree (ativo)
+ ix_ativo_classe              | CREATE INDEX ix_ativo_classe ON public.ativo USING btree (classe)
+ ix_ativo_data_ultima_cotacao | CREATE INDEX ix_ativo_data_ultima_cotacao ON public.ativo USING btree (data_ultima_cotacao)
+ ix_ativo_deslistado          | CREATE INDEX ix_ativo_deslistado ON public.ativo USING btree (deslistado)
+ ix_ativo_mercado             | CREATE INDEX ix_ativo_mercado ON public.ativo USING btree (mercado)
+ ix_ativo_moeda               | CREATE INDEX ix_ativo_moeda ON public.ativo USING btree (moeda)
+ ix_ativo_nome                | CREATE INDEX ix_ativo_nome ON public.ativo USING btree (nome)
+ ix_ativo_ticker              | CREATE INDEX ix_ativo_ticker ON public.ativo USING btree (ticker)
+ ix_ativo_tipo                | CREATE INDEX ix_ativo_tipo ON public.ativo USING btree (tipo)
+(11 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: ativos
+################################################################################
+
+                                                         Table "public.ativos"
+       Column        |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+---------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id                  | uuid                     |           | not null |         | plain    |             |              | 
+ ticker              | character varying(20)    |           | not null |         | extended |             |              | 
+ nome                | character varying(200)   |           | not null |         | extended |             |              | 
+ tipo                | tipoativo                |           | not null |         | plain    |             |              | 
+ classe              | classeativo              |           | not null |         | plain    |             |              | 
+ mercado             | character varying(10)    |           | not null |         | extended |             |              | 
+ moeda               | character varying(3)     |           | not null |         | extended |             |              | 
+ preco_atual         | numeric(18,6)            |           |          |         | main     |             |              | 
+ data_ultima_cotacao | timestamp with time zone |           |          |         | plain    |             |              | 
+ dividend_yield      | numeric(8,4)             |           |          |         | main     |             |              | 
+ p_l                 | numeric(10,2)            |           |          |         | main     |             |              | 
+ p_vp                | numeric(10,2)            |           |          |         | main     |             |              | 
+ roe                 | numeric(8,4)             |           |          |         | main     |             |              | 
+ ativo               | boolean                  |           | not null |         | plain    |             |              | 
+ deslistado          | boolean                  |           | not null |         | plain    |             |              | 
+ data_deslistagem    | date                     |           |          |         | plain    |             |              | 
+ observacoes         | text                     |           |          |         | extended |             |              | 
+ created_at          | timestamp with time zone |           | not null |         | plain    |             |              | 
+ updated_at          | timestamp with time zone |           | not null |         | plain    |             |              | 
+Indexes:
+    "ativos_pkey" PRIMARY KEY, btree (id)
+    "ix_ativos_ativo" btree (ativo)
+    "ix_ativos_classe" btree (classe)
+    "ix_ativos_data_ultima_cotacao" btree (data_ultima_cotacao)
+    "ix_ativos_deslistado" btree (deslistado)
+    "ix_ativos_mercado" btree (mercado)
+    "ix_ativos_moeda" btree (moeda)
+    "ix_ativos_nome" btree (nome)
+    "ix_ativos_ticker" btree (ticker)
+    "ix_ativos_tipo" btree (tipo)
+Referenced by:
+    TABLE "transacoes" CONSTRAINT "transacoes_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativos(id)
+Access method: heap
+
+ Pos |       Coluna        |           Tipo           | Tamanho | Null? | Default 
+-----+---------------------+--------------------------+---------+-------+---------
+   1 | id                  | uuid                     |         | NO    | 
+   2 | ticker              | character varying        | (20)    | NO    | 
+   3 | nome                | character varying        | (200)   | NO    | 
+   4 | tipo                | USER-DEFINED             |         | NO    | 
+   5 | classe              | USER-DEFINED             |         | NO    | 
+   6 | mercado             | character varying        | (10)    | NO    | 
+   7 | moeda               | character varying        | (3)     | NO    | 
+   8 | preco_atual         | numeric                  |         | YES   | 
+   9 | data_ultima_cotacao | timestamp with time zone |         | YES   | 
+  10 | dividend_yield      | numeric                  |         | YES   | 
+  11 | p_l                 | numeric                  |         | YES   | 
+  12 | p_vp                | numeric                  |         | YES   | 
+  13 | roe                 | numeric                  |         | YES   | 
+  14 | ativo               | boolean                  |         | NO    | 
+  15 | deslistado          | boolean                  |         | NO    | 
+  16 | data_deslistagem    | date                     |         | YES   | 
+  17 | observacoes         | text                     |         | YES   | 
+  18 | created_at          | timestamp with time zone |         | NO    | 
+  19 | updated_at          | timestamp with time zone |         | NO    | 
+(19 rows)
+
+
+Foreign Keys:
+ Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
+---------+--------+---------------------+---------------------
+(0 rows)
+
+
+Primary Keys:
+   Nome PK   | Coluna 
+-------------+--------
+ ativos_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+        Nome do Índice         |                                           Definição                                           
+-------------------------------+-----------------------------------------------------------------------------------------------
+ ativos_pkey                   | CREATE UNIQUE INDEX ativos_pkey ON public.ativos USING btree (id)
+ ix_ativos_moeda               | CREATE INDEX ix_ativos_moeda ON public.ativos USING btree (moeda)
+ ix_ativos_data_ultima_cotacao | CREATE INDEX ix_ativos_data_ultima_cotacao ON public.ativos USING btree (data_ultima_cotacao)
+ ix_ativos_deslistado          | CREATE INDEX ix_ativos_deslistado ON public.ativos USING btree (deslistado)
+ ix_ativos_tipo                | CREATE INDEX ix_ativos_tipo ON public.ativos USING btree (tipo)
+ ix_ativos_nome                | CREATE INDEX ix_ativos_nome ON public.ativos USING btree (nome)
+ ix_ativos_classe              | CREATE INDEX ix_ativos_classe ON public.ativos USING btree (classe)
+ ix_ativos_ativo               | CREATE INDEX ix_ativos_ativo ON public.ativos USING btree (ativo)
+ ix_ativos_ticker              | CREATE INDEX ix_ativos_ticker ON public.ativos USING btree (ticker)
+ ix_ativos_mercado             | CREATE INDEX ix_ativos_mercado ON public.ativos USING btree (mercado)
+(10 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: corretora
+################################################################################
+
+                                                                        Table "public.corretora"
+    Column    |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                     Description                     
+--------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-----------------------------------------------------
+ id           | uuid                     |           | not null |         | plain    |             |              | Identificador único da corretora
+ usuario_id   | uuid                     |           | not null |         | plain    |             |              | ID do usuário proprietário
+ nome         | character varying(100)   |           | not null |         | extended |             |              | Nome da corretora/exchange (ex: XP, Clear, Binance)
+ tipo         | tipocorretora            |           | not null |         | plain    |             |              | Tipo: corretora tradicional ou exchange cripto
+ pais         | character varying(2)     |           | not null |         | extended |             |              | Código ISO 3166-1 alpha-2 do país (BR, US, etc.)
+ moeda_padrao | character varying(3)     |           | not null |         | extended |             |              | Código ISO 4217 da moeda (BRL, USD, EUR)
+ saldo_atual  | numeric(18,2)            |           | not null |         | main     |             |              | Saldo disponível em caixa (na moeda padrão)
+ ativa        | boolean                  |           | not null |         | plain    |             |              | Indica se conta está ativa
+ observacoes  | text                     |           |          |         | extended |             |              | Observações e notas do usuário sobre a conta
+ created_at   | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
+ updated_at   | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+Indexes:
+    "corretora_pkey" PRIMARY KEY, btree (id)
+    "ix_corretora_ativa" btree (ativa)
+    "ix_corretora_moeda_padrao" btree (moeda_padrao)
+    "ix_corretora_nome" btree (nome)
+    "ix_corretora_pais" btree (pais)
+    "ix_corretora_tipo" btree (tipo)
+    "ix_corretora_usuario_id" btree (usuario_id)
+    "unique_corretora_usuario_nome_pais" UNIQUE CONSTRAINT, btree (usuario_id, nome, pais)
+Check constraints:
+    "corretora_moeda_iso_format" CHECK (moeda_padrao::text ~* '^[A-Z]{3}$'::text)
+    "corretora_nome_min_length" CHECK (length(nome::text) >= 2)
+    "corretora_pais_iso_format" CHECK (pais::text ~* '^[A-Z]{2}$'::text)
+    "corretora_saldo_positivo" CHECK (saldo_atual >= 0::numeric)
+Foreign-key constraints:
+    "corretora_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Referenced by:
+    TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_corretora_destino_id_fkey" FOREIGN KEY (corretora_destino_id) REFERENCES corretora(id) ON DELETE SET NULL
+    TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id) ON DELETE CASCADE
+    TABLE "posicao" CONSTRAINT "posicao_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id) ON DELETE CASCADE
+    TABLE "transacao" CONSTRAINT "transacao_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |    Coluna    |           Tipo           | Tamanho | Null? | Default 
+-----+--------------+--------------------------+---------+-------+---------
+   1 | id           | uuid                     |         | NO    | 
+   2 | usuario_id   | uuid                     |         | NO    | 
+   3 | nome         | character varying        | (100)   | NO    | 
+   4 | tipo         | USER-DEFINED             |         | NO    | 
+   5 | pais         | character varying        | (2)     | NO    | 
+   6 | moeda_padrao | character varying        | (3)     | NO    | 
+   7 | saldo_atual  | numeric                  |         | NO    | 
+   8 | ativa        | boolean                  |         | NO    | 
+   9 | observacoes  | text                     |         | YES   | 
+  10 | created_at   | timestamp with time zone |         | NO    | 
+  11 | updated_at   | timestamp with time zone |         | NO    | 
+(11 rows)
+
+
+Foreign Keys:
+          Nome FK          |   Coluna   | Tabela Referenciada | Coluna Referenciada 
+---------------------------+------------+---------------------+---------------------
+ corretora_usuario_id_fkey | usuario_id | usuario             | id
+(1 row)
+
+
+Primary Keys:
+    Nome PK     | Coluna 
+----------------+--------
+ corretora_pkey | id
+(1 row)
+
+
+Unique Constraints:
+          Nome Constraint           |   Coluna   
+------------------------------------+------------
+ unique_corretora_usuario_nome_pais | usuario_id
+ unique_corretora_usuario_nome_pais | nome
+ unique_corretora_usuario_nome_pais | pais
+(3 rows)
+
+
+Índices:
+           Nome do Índice           |                                                    Definição                                                    
+------------------------------------+-----------------------------------------------------------------------------------------------------------------
+ corretora_pkey                     | CREATE UNIQUE INDEX corretora_pkey ON public.corretora USING btree (id)
+ unique_corretora_usuario_nome_pais | CREATE UNIQUE INDEX unique_corretora_usuario_nome_pais ON public.corretora USING btree (usuario_id, nome, pais)
+ ix_corretora_ativa                 | CREATE INDEX ix_corretora_ativa ON public.corretora USING btree (ativa)
+ ix_corretora_moeda_padrao          | CREATE INDEX ix_corretora_moeda_padrao ON public.corretora USING btree (moeda_padrao)
+ ix_corretora_nome                  | CREATE INDEX ix_corretora_nome ON public.corretora USING btree (nome)
+ ix_corretora_pais                  | CREATE INDEX ix_corretora_pais ON public.corretora USING btree (pais)
+ ix_corretora_tipo                  | CREATE INDEX ix_corretora_tipo ON public.corretora USING btree (tipo)
+ ix_corretora_usuario_id            | CREATE INDEX ix_corretora_usuario_id ON public.corretora USING btree (usuario_id)
+(8 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: corretoras
+################################################################################
+
+                                                   Table "public.corretoras"
+    Column    |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+--------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id           | uuid                     |           | not null |         | plain    |             |              | 
+ usuario_id   | uuid                     |           | not null |         | plain    |             |              | 
+ nome         | character varying(100)   |           | not null |         | extended |             |              | 
+ tipo         | tipocorretora            |           | not null |         | plain    |             |              | 
+ pais         | character varying(2)     |           | not null |         | extended |             |              | 
+ moeda_padrao | character varying(3)     |           | not null |         | extended |             |              | 
+ saldo_atual  | numeric(18,2)            |           | not null |         | main     |             |              | 
+ ativa        | boolean                  |           | not null |         | plain    |             |              | 
+ observacoes  | text                     |           |          |         | extended |             |              | 
+ created_at   | timestamp with time zone |           | not null |         | plain    |             |              | 
+ updated_at   | timestamp with time zone |           | not null |         | plain    |             |              | 
+Indexes:
+    "corretoras_pkey" PRIMARY KEY, btree (id)
+    "ix_corretoras_ativa" btree (ativa)
+    "ix_corretoras_moeda_padrao" btree (moeda_padrao)
+    "ix_corretoras_nome" btree (nome)
+    "ix_corretoras_pais" btree (pais)
+    "ix_corretoras_tipo" btree (tipo)
+    "ix_corretoras_usuario_id" btree (usuario_id)
+Foreign-key constraints:
+    "corretoras_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+Referenced by:
+    TABLE "transacoes" CONSTRAINT "transacoes_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretoras(id)
+Access method: heap
+
+ Pos |    Coluna    |           Tipo           | Tamanho | Null? | Default 
+-----+--------------+--------------------------+---------+-------+---------
+   1 | id           | uuid                     |         | NO    | 
+   2 | usuario_id   | uuid                     |         | NO    | 
+   3 | nome         | character varying        | (100)   | NO    | 
+   4 | tipo         | USER-DEFINED             |         | NO    | 
+   5 | pais         | character varying        | (2)     | NO    | 
+   6 | moeda_padrao | character varying        | (3)     | NO    | 
+   7 | saldo_atual  | numeric                  |         | NO    | 
+   8 | ativa        | boolean                  |         | NO    | 
+   9 | observacoes  | text                     |         | YES   | 
+  10 | created_at   | timestamp with time zone |         | NO    | 
+  11 | updated_at   | timestamp with time zone |         | NO    | 
+(11 rows)
+
+
+Foreign Keys:
+          Nome FK           |   Coluna   | Tabela Referenciada | Coluna Referenciada 
+----------------------------+------------+---------------------+---------------------
+ corretoras_usuario_id_fkey | usuario_id | usuarios            | id
+(1 row)
+
+
+Primary Keys:
+     Nome PK     | Coluna 
+-----------------+--------
+ corretoras_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+       Nome do Índice       |                                        Definição                                        
+----------------------------+-----------------------------------------------------------------------------------------
+ corretoras_pkey            | CREATE UNIQUE INDEX corretoras_pkey ON public.corretoras USING btree (id)
+ ix_corretoras_usuario_id   | CREATE INDEX ix_corretoras_usuario_id ON public.corretoras USING btree (usuario_id)
+ ix_corretoras_moeda_padrao | CREATE INDEX ix_corretoras_moeda_padrao ON public.corretoras USING btree (moeda_padrao)
+ ix_corretoras_tipo         | CREATE INDEX ix_corretoras_tipo ON public.corretoras USING btree (tipo)
+ ix_corretoras_ativa        | CREATE INDEX ix_corretoras_ativa ON public.corretoras USING btree (ativa)
+ ix_corretoras_nome         | CREATE INDEX ix_corretoras_nome ON public.corretoras USING btree (nome)
+ ix_corretoras_pais         | CREATE INDEX ix_corretoras_pais ON public.corretoras USING btree (pais)
+(7 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: evento_corporativo
+################################################################################
+
+                                                                    Table "public.evento_corporativo"
+      Column      |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                   Description                    
+------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+--------------------------------------------------
+ id               | uuid                     |           | not null |         | plain    |             |              | Identificador único do evento
+ ativo_id         | uuid                     |           | not null |         | plain    |             |              | ID do ativo afetado pelo evento
+ ativo_novo_id    | uuid                     |           |          |         | plain    |             |              | ID do novo ativo (fusões, mudanças de ticker)
+ tipo_evento      | tipoeventocorporativo    |           | not null |         | plain    |             |              | Tipo do evento corporativo
+ data_evento      | date                     |           | not null |         | plain    |             |              | Data do evento
+ data_com         | date                     |           |          |         | plain    |             |              | Data COM (último dia para ter direito ao evento)
+ proporcao        | character varying(20)    |           |          |         | extended |             |              | Proporção do evento (ex: '2:1', '1:10', '1:1.5')
+ descricao        | text                     |           | not null |         | extended |             |              | Descrição detalhada do evento
+ impacto_posicoes | boolean                  |           | not null |         | plain    |             |              | Indica se as posições já foram ajustadas
+ observacoes      | text                     |           |          |         | extended |             |              | Observações adicionais sobre o evento
+ created_at       | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
+ updated_at       | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+Indexes:
+    "evento_corporativo_pkey" PRIMARY KEY, btree (id)
+    "ix_evento_corporativo_ativo_id" btree (ativo_id)
+    "ix_evento_corporativo_ativo_novo_id" btree (ativo_novo_id)
+    "ix_evento_corporativo_data_com" btree (data_com)
+    "ix_evento_corporativo_data_evento" btree (data_evento)
+    "ix_evento_corporativo_impacto_posicoes" btree (impacto_posicoes)
+    "ix_evento_corporativo_tipo_evento" btree (tipo_evento)
+Check constraints:
+    "evento_data_com_valida" CHECK (data_com IS NULL OR data_com <= data_evento)
+Foreign-key constraints:
+    "evento_corporativo_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
+    "evento_corporativo_ativo_novo_id_fkey" FOREIGN KEY (ativo_novo_id) REFERENCES ativo(id) ON DELETE SET NULL
+Access method: heap
+
+ Pos |      Coluna      |           Tipo           | Tamanho | Null? | Default 
+-----+------------------+--------------------------+---------+-------+---------
+   1 | id               | uuid                     |         | NO    | 
+   2 | ativo_id         | uuid                     |         | NO    | 
+   3 | ativo_novo_id    | uuid                     |         | YES   | 
+   4 | tipo_evento      | USER-DEFINED             |         | NO    | 
+   5 | data_evento      | date                     |         | NO    | 
+   6 | data_com         | date                     |         | YES   | 
+   7 | proporcao        | character varying        | (20)    | YES   | 
+   8 | descricao        | text                     |         | NO    | 
+   9 | impacto_posicoes | boolean                  |         | NO    | 
+  10 | observacoes      | text                     |         | YES   | 
+  11 | created_at       | timestamp with time zone |         | NO    | 
+  12 | updated_at       | timestamp with time zone |         | NO    | 
+(12 rows)
+
+
+Foreign Keys:
+                Nome FK                |    Coluna     | Tabela Referenciada | Coluna Referenciada 
+---------------------------------------+---------------+---------------------+---------------------
+ evento_corporativo_ativo_id_fkey      | ativo_id      | ativo               | id
+ evento_corporativo_ativo_novo_id_fkey | ativo_novo_id | ativo               | id
+(2 rows)
+
+
+Primary Keys:
+         Nome PK         | Coluna 
+-------------------------+--------
+ evento_corporativo_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+             Nome do Índice             |                                                    Definição                                                    
+----------------------------------------+-----------------------------------------------------------------------------------------------------------------
+ evento_corporativo_pkey                | CREATE UNIQUE INDEX evento_corporativo_pkey ON public.evento_corporativo USING btree (id)
+ ix_evento_corporativo_ativo_id         | CREATE INDEX ix_evento_corporativo_ativo_id ON public.evento_corporativo USING btree (ativo_id)
+ ix_evento_corporativo_ativo_novo_id    | CREATE INDEX ix_evento_corporativo_ativo_novo_id ON public.evento_corporativo USING btree (ativo_novo_id)
+ ix_evento_corporativo_data_com         | CREATE INDEX ix_evento_corporativo_data_com ON public.evento_corporativo USING btree (data_com)
+ ix_evento_corporativo_data_evento      | CREATE INDEX ix_evento_corporativo_data_evento ON public.evento_corporativo USING btree (data_evento)
+ ix_evento_corporativo_impacto_posicoes | CREATE INDEX ix_evento_corporativo_impacto_posicoes ON public.evento_corporativo USING btree (impacto_posicoes)
+ ix_evento_corporativo_tipo_evento      | CREATE INDEX ix_evento_corporativo_tipo_evento ON public.evento_corporativo USING btree (tipo_evento)
+(7 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: feriado_mercado
+################################################################################
+
+                                                                              Table "public.feriado_mercado"
+       Column       |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                           Description                            
+--------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+------------------------------------------------------------------
+ id                 | uuid                     |           | not null |         | plain    |             |              | Identificador único do feriado
+ pais               | character varying(2)     |           | not null |         | extended |             |              | Código ISO do país (BR, US, etc.)
+ mercado            | character varying(20)    |           |          |         | extended |             |              | Mercado/bolsa específica (B3, NYSE, NASDAQ, etc.) - NULL = todos
+ data_feriado       | date                     |           | not null |         | plain    |             |              | Data do feriado
+ tipo_feriado       | tipoferiado              |           | not null |         | plain    |             |              | Tipo do feriado
+ nome               | character varying(200)   |           | not null |         | extended |             |              | Nome do feriado
+ horario_fechamento | time without time zone   |           |          |         | plain    |             |              | Horário de fechamento antecipado (se aplicável)
+ recorrente         | boolean                  |           | not null |         | plain    |             |              | Indica se é feriado anual fixo (sempre no mesmo dia/mês)
+ observacoes        | text                     |           |          |         | extended |             |              | Observações sobre o feriado
+ created_at         | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
+ updated_at         | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+Indexes:
+    "feriado_mercado_pkey" PRIMARY KEY, btree (id)
+    "ix_feriado_mercado_data_feriado" btree (data_feriado)
+    "ix_feriado_mercado_mercado" btree (mercado)
+    "ix_feriado_mercado_pais" btree (pais)
+    "ix_feriado_mercado_recorrente" btree (recorrente)
+    "ix_feriado_mercado_tipo_feriado" btree (tipo_feriado)
+    "unique_feriado_pais_mercado_data" UNIQUE CONSTRAINT, btree (pais, mercado, data_feriado)
+Check constraints:
+    "feriado_nome_min_length" CHECK (length(nome::text) >= 3)
+    "feriado_pais_iso_format" CHECK (pais::text ~* '^[A-Z]{2}$'::text)
+Access method: heap
+
+ Pos |       Coluna       |           Tipo           | Tamanho | Null? | Default 
+-----+--------------------+--------------------------+---------+-------+---------
+   1 | id                 | uuid                     |         | NO    | 
+   2 | pais               | character varying        | (2)     | NO    | 
+   3 | mercado            | character varying        | (20)    | YES   | 
+   4 | data_feriado       | date                     |         | NO    | 
+   5 | tipo_feriado       | USER-DEFINED             |         | NO    | 
+   6 | nome               | character varying        | (200)   | NO    | 
+   7 | horario_fechamento | time without time zone   |         | YES   | 
+   8 | recorrente         | boolean                  |         | NO    | 
+   9 | observacoes        | text                     |         | YES   | 
+  10 | created_at         | timestamp with time zone |         | NO    | 
+  11 | updated_at         | timestamp with time zone |         | NO    | 
+(11 rows)
+
+
+Foreign Keys:
+ Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
+---------+--------+---------------------+---------------------
+(0 rows)
+
+
+Primary Keys:
+       Nome PK        | Coluna 
+----------------------+--------
+ feriado_mercado_pkey | id
+(1 row)
+
+
+Unique Constraints:
+         Nome Constraint          |    Coluna    
+----------------------------------+--------------
+ unique_feriado_pais_mercado_data | pais
+ unique_feriado_pais_mercado_data | mercado
+ unique_feriado_pais_mercado_data | data_feriado
+(3 rows)
+
+
+Índices:
+          Nome do Índice          |                                                        Definição                                                         
+----------------------------------+--------------------------------------------------------------------------------------------------------------------------
+ feriado_mercado_pkey             | CREATE UNIQUE INDEX feriado_mercado_pkey ON public.feriado_mercado USING btree (id)
+ unique_feriado_pais_mercado_data | CREATE UNIQUE INDEX unique_feriado_pais_mercado_data ON public.feriado_mercado USING btree (pais, mercado, data_feriado)
+ ix_feriado_mercado_data_feriado  | CREATE INDEX ix_feriado_mercado_data_feriado ON public.feriado_mercado USING btree (data_feriado)
+ ix_feriado_mercado_mercado       | CREATE INDEX ix_feriado_mercado_mercado ON public.feriado_mercado USING btree (mercado)
+ ix_feriado_mercado_pais          | CREATE INDEX ix_feriado_mercado_pais ON public.feriado_mercado USING btree (pais)
+ ix_feriado_mercado_recorrente    | CREATE INDEX ix_feriado_mercado_recorrente ON public.feriado_mercado USING btree (recorrente)
+ ix_feriado_mercado_tipo_feriado  | CREATE INDEX ix_feriado_mercado_tipo_feriado ON public.feriado_mercado USING btree (tipo_feriado)
+(7 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: fonte_dados
+################################################################################
+
+                                                                           Table "public.fonte_dados"
+       Column        |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                     Description                      
+---------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+------------------------------------------------------
+ id                  | uuid                     |           | not null |         | plain    |             |              | Identificador único da fonte
+ nome                | character varying(100)   |           | not null |         | extended |             |              | Nome da fonte de dados (ex: yfinance, Alpha Vantage)
+ tipo_fonte          | tipofontedados           |           | not null |         | plain    |             |              | Tipo da fonte de dados
+ url_base            | character varying(500)   |           |          |         | extended |             |              | URL base da API ou site
+ requer_autenticacao | boolean                  |           | not null |         | plain    |             |              | Indica se requer chave API ou autenticação
+ rate_limit          | character varying(50)    |           |          |         | extended |             |              | Limite de requisições (ex: '5/minute', '500/day')
+ ativa               | boolean                  |           | not null |         | plain    |             |              | Indica se fonte está ativa
+ prioridade          | integer                  |           | not null |         | plain    |             |              | Ordem de prioridade (1 = maior prioridade)
+ ultima_consulta     | timestamp with time zone |           |          |         | plain    |             |              | Timestamp da última consulta bem-sucedida
+ total_consultas     | integer                  |           | not null |         | plain    |             |              | Total de consultas realizadas
+ total_erros         | integer                  |           | not null |         | plain    |             |              | Total de erros encontrados
+ observacoes         | text                     |           |          |         | extended |             |              | Observações sobre a fonte de dados
+ created_at          | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
+ updated_at          | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+Indexes:
+    "fonte_dados_pkey" PRIMARY KEY, btree (id)
+    "ix_fonte_dados_ativa" btree (ativa)
+    "ix_fonte_dados_nome" UNIQUE, btree (nome)
+    "ix_fonte_dados_prioridade" btree (prioridade)
+    "ix_fonte_dados_tipo_fonte" btree (tipo_fonte)
+    "ix_fonte_dados_ultima_consulta" btree (ultima_consulta)
+Check constraints:
+    "fonte_consultas_positivas" CHECK (total_consultas >= 0)
+    "fonte_erros_positivos" CHECK (total_erros >= 0)
+    "fonte_nome_min_length" CHECK (length(nome::text) >= 2)
+    "fonte_prioridade_positiva" CHECK (prioridade > 0)
+Access method: heap
+
+ Pos |       Coluna        |           Tipo           | Tamanho | Null? | Default 
+-----+---------------------+--------------------------+---------+-------+---------
+   1 | id                  | uuid                     |         | NO    | 
+   2 | nome                | character varying        | (100)   | NO    | 
+   3 | tipo_fonte          | USER-DEFINED             |         | NO    | 
+   4 | url_base            | character varying        | (500)   | YES   | 
+   5 | requer_autenticacao | boolean                  |         | NO    | 
+   6 | rate_limit          | character varying        | (50)    | YES   | 
+   7 | ativa               | boolean                  |         | NO    | 
+   8 | prioridade          | integer                  |         | NO    | 
+   9 | ultima_consulta     | timestamp with time zone |         | YES   | 
+  10 | total_consultas     | integer                  |         | NO    | 
+  11 | total_erros         | integer                  |         | NO    | 
+  12 | observacoes         | text                     |         | YES   | 
+  13 | created_at          | timestamp with time zone |         | NO    | 
+  14 | updated_at          | timestamp with time zone |         | NO    | 
+(14 rows)
+
+
+Foreign Keys:
+ Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
+---------+--------+---------------------+---------------------
+(0 rows)
+
+
+Primary Keys:
+     Nome PK      | Coluna 
+------------------+--------
+ fonte_dados_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+         Nome do Índice         |                                            Definição                                            
+--------------------------------+-------------------------------------------------------------------------------------------------
+ fonte_dados_pkey               | CREATE UNIQUE INDEX fonte_dados_pkey ON public.fonte_dados USING btree (id)
+ ix_fonte_dados_ativa           | CREATE INDEX ix_fonte_dados_ativa ON public.fonte_dados USING btree (ativa)
+ ix_fonte_dados_nome            | CREATE UNIQUE INDEX ix_fonte_dados_nome ON public.fonte_dados USING btree (nome)
+ ix_fonte_dados_prioridade      | CREATE INDEX ix_fonte_dados_prioridade ON public.fonte_dados USING btree (prioridade)
+ ix_fonte_dados_tipo_fonte      | CREATE INDEX ix_fonte_dados_tipo_fonte ON public.fonte_dados USING btree (tipo_fonte)
+ ix_fonte_dados_ultima_consulta | CREATE INDEX ix_fonte_dados_ultima_consulta ON public.fonte_dados USING btree (ultima_consulta)
+(6 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: log_auditoria
+################################################################################
+
+                                                                                Table "public.log_auditoria"
+    Column    |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                               Description                                
+--------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+--------------------------------------------------------------------------
+ id           | uuid                     |           | not null |         | plain    |             |              | Identificador único do log
+ usuario_id   | uuid                     |           |          |         | plain    |             |              | ID do usuário (NULL para ações anônimas)
+ acao         | character varying(50)    |           | not null |         | extended |             |              | Tipo de ação (LOGIN, LOGOUT, CREATE, UPDATE, DELETE, VIEW, EXPORT, etc.)
+ entidade     | character varying(100)   |           |          |         | extended |             |              | Nome da entidade afetada (Usuario, Transacao, Posicao, etc.)
+ entidade_id  | uuid                     |           |          |         | plain    |             |              | ID do registro afetado
+ dados_antes  | json                     |           |          |         | extended |             |              | Estado anterior do registro (JSON)
+ dados_depois | json                     |           |          |         | extended |             |              | Estado posterior do registro (JSON)
+ ip_address   | character varying(45)    |           |          |         | extended |             |              | Endereço IP de origem
+ user_agent   | character varying(500)   |           |          |         | extended |             |              | User-Agent (navegador/cliente)
+ timestamp    | timestamp with time zone |           | not null |         | plain    |             |              | Data/hora da ação
+ sucesso      | boolean                  |           | not null |         | plain    |             |              | Indica se ação foi bem-sucedida
+ mensagem     | text                     |           |          |         | extended |             |              | Mensagem de erro ou detalhes adicionais
+Indexes:
+    "log_auditoria_pkey" PRIMARY KEY, btree (id)
+    "ix_log_auditoria_acao" btree (acao)
+    "ix_log_auditoria_entidade" btree (entidade)
+    "ix_log_auditoria_entidade_id" btree (entidade_id)
+    "ix_log_auditoria_ip_address" btree (ip_address)
+    "ix_log_auditoria_sucesso" btree (sucesso)
+    "ix_log_auditoria_timestamp" btree ("timestamp")
+    "ix_log_auditoria_usuario_id" btree (usuario_id)
+Check constraints:
+    "log_acao_min_length" CHECK (length(acao::text) >= 3)
+Foreign-key constraints:
+    "log_auditoria_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL
+Access method: heap
+
+ Pos |    Coluna    |           Tipo           | Tamanho | Null? | Default 
+-----+--------------+--------------------------+---------+-------+---------
+   1 | id           | uuid                     |         | NO    | 
+   2 | usuario_id   | uuid                     |         | YES   | 
+   3 | acao         | character varying        | (50)    | NO    | 
+   4 | entidade     | character varying        | (100)   | YES   | 
+   5 | entidade_id  | uuid                     |         | YES   | 
+   6 | dados_antes  | json                     |         | YES   | 
+   7 | dados_depois | json                     |         | YES   | 
+   8 | ip_address   | character varying        | (45)    | YES   | 
+   9 | user_agent   | character varying        | (500)   | YES   | 
+  10 | timestamp    | timestamp with time zone |         | NO    | 
+  11 | sucesso      | boolean                  |         | NO    | 
+  12 | mensagem     | text                     |         | YES   | 
+(12 rows)
+
+
+Foreign Keys:
+            Nome FK            |   Coluna   | Tabela Referenciada | Coluna Referenciada 
+-------------------------------+------------+---------------------+---------------------
+ log_auditoria_usuario_id_fkey | usuario_id | usuario             | id
+(1 row)
+
+
+Primary Keys:
+      Nome PK       | Coluna 
+--------------------+--------
+ log_auditoria_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+        Nome do Índice        |                                          Definição                                          
+------------------------------+---------------------------------------------------------------------------------------------
+ log_auditoria_pkey           | CREATE UNIQUE INDEX log_auditoria_pkey ON public.log_auditoria USING btree (id)
+ ix_log_auditoria_acao        | CREATE INDEX ix_log_auditoria_acao ON public.log_auditoria USING btree (acao)
+ ix_log_auditoria_entidade    | CREATE INDEX ix_log_auditoria_entidade ON public.log_auditoria USING btree (entidade)
+ ix_log_auditoria_entidade_id | CREATE INDEX ix_log_auditoria_entidade_id ON public.log_auditoria USING btree (entidade_id)
+ ix_log_auditoria_ip_address  | CREATE INDEX ix_log_auditoria_ip_address ON public.log_auditoria USING btree (ip_address)
+ ix_log_auditoria_sucesso     | CREATE INDEX ix_log_auditoria_sucesso ON public.log_auditoria USING btree (sucesso)
+ ix_log_auditoria_timestamp   | CREATE INDEX ix_log_auditoria_timestamp ON public.log_auditoria USING btree ("timestamp")
+ ix_log_auditoria_usuario_id  | CREATE INDEX ix_log_auditoria_usuario_id ON public.log_auditoria USING btree (usuario_id)
+(8 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: movimentacao_caixa
+################################################################################
+
+                                                                        Table "public.movimentacao_caixa"
+        Column        |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                     Description                      
+----------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+------------------------------------------------------
+ id                   | uuid                     |           | not null |         | plain    |             |              | Identificador único da movimentação
+ usuario_id           | uuid                     |           | not null |         | plain    |             |              | ID do usuário
+ corretora_id         | uuid                     |           | not null |         | plain    |             |              | ID da corretora (origem)
+ corretora_destino_id | uuid                     |           |          |         | plain    |             |              | ID da corretora destino (apenas para transferências)
+ provento_id          | uuid                     |           |          |         | plain    |             |              | ID do provento (apenas para crédito de provento)
+ tipo_movimentacao    | tipomovimentacao         |           | not null |         | plain    |             |              | Tipo da movimentação
+ valor                | numeric(18,2)            |           | not null |         | main     |             |              | Valor da movimentação
+ moeda                | character varying(3)     |           | not null |         | extended |             |              | Código ISO 4217 da moeda (BRL, USD, EUR)
+ data_movimentacao    | date                     |           | not null |         | plain    |             |              | Data da movimentação
+ descricao            | text                     |           |          |         | extended |             |              | Descrição da movimentação
+ comprovante          | character varying(200)   |           |          |         | extended |             |              | Referência ao comprovante (número, hash, arquivo)
+ created_at           | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
+ updated_at           | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+Indexes:
+    "movimentacao_caixa_pkey" PRIMARY KEY, btree (id)
+    "ix_movimentacao_caixa_corretora_destino_id" btree (corretora_destino_id)
+    "ix_movimentacao_caixa_corretora_id" btree (corretora_id)
+    "ix_movimentacao_caixa_data_movimentacao" btree (data_movimentacao)
+    "ix_movimentacao_caixa_moeda" btree (moeda)
+    "ix_movimentacao_caixa_provento_id" btree (provento_id)
+    "ix_movimentacao_caixa_tipo_movimentacao" btree (tipo_movimentacao)
+    "ix_movimentacao_caixa_usuario_id" btree (usuario_id)
+Check constraints:
+    "movimentacao_moeda_iso_format" CHECK (moeda::text ~* '^[A-Z]{3}$'::text)
+    "movimentacao_valor_positivo" CHECK (valor > 0::numeric)
+Foreign-key constraints:
+    "movimentacao_caixa_corretora_destino_id_fkey" FOREIGN KEY (corretora_destino_id) REFERENCES corretora(id) ON DELETE SET NULL
+    "movimentacao_caixa_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id) ON DELETE CASCADE
+    "movimentacao_caixa_provento_id_fkey" FOREIGN KEY (provento_id) REFERENCES provento(id) ON DELETE SET NULL
+    "movimentacao_caixa_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |        Coluna        |           Tipo           | Tamanho | Null? | Default 
+-----+----------------------+--------------------------+---------+-------+---------
+   1 | id                   | uuid                     |         | NO    | 
+   2 | usuario_id           | uuid                     |         | NO    | 
+   3 | corretora_id         | uuid                     |         | NO    | 
+   4 | corretora_destino_id | uuid                     |         | YES   | 
+   5 | provento_id          | uuid                     |         | YES   | 
+   6 | tipo_movimentacao    | USER-DEFINED             |         | NO    | 
+   7 | valor                | numeric                  |         | NO    | 
+   8 | moeda                | character varying        | (3)     | NO    | 
+   9 | data_movimentacao    | date                     |         | NO    | 
+  10 | descricao            | text                     |         | YES   | 
+  11 | comprovante          | character varying        | (200)   | YES   | 
+  12 | created_at           | timestamp with time zone |         | NO    | 
+  13 | updated_at           | timestamp with time zone |         | NO    | 
+(13 rows)
+
+
+Foreign Keys:
+                   Nome FK                    |        Coluna        | Tabela Referenciada | Coluna Referenciada 
+----------------------------------------------+----------------------+---------------------+---------------------
+ movimentacao_caixa_corretora_destino_id_fkey | corretora_destino_id | corretora           | id
+ movimentacao_caixa_corretora_id_fkey         | corretora_id         | corretora           | id
+ movimentacao_caixa_provento_id_fkey          | provento_id          | provento            | id
+ movimentacao_caixa_usuario_id_fkey           | usuario_id           | usuario             | id
+(4 rows)
+
+
+Primary Keys:
+         Nome PK         | Coluna 
+-------------------------+--------
+ movimentacao_caixa_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+               Nome do Índice               |                                                        Definição                                                        
+--------------------------------------------+-------------------------------------------------------------------------------------------------------------------------
+ movimentacao_caixa_pkey                    | CREATE UNIQUE INDEX movimentacao_caixa_pkey ON public.movimentacao_caixa USING btree (id)
+ ix_movimentacao_caixa_corretora_destino_id | CREATE INDEX ix_movimentacao_caixa_corretora_destino_id ON public.movimentacao_caixa USING btree (corretora_destino_id)
+ ix_movimentacao_caixa_corretora_id         | CREATE INDEX ix_movimentacao_caixa_corretora_id ON public.movimentacao_caixa USING btree (corretora_id)
+ ix_movimentacao_caixa_data_movimentacao    | CREATE INDEX ix_movimentacao_caixa_data_movimentacao ON public.movimentacao_caixa USING btree (data_movimentacao)
+ ix_movimentacao_caixa_moeda                | CREATE INDEX ix_movimentacao_caixa_moeda ON public.movimentacao_caixa USING btree (moeda)
+ ix_movimentacao_caixa_provento_id          | CREATE INDEX ix_movimentacao_caixa_provento_id ON public.movimentacao_caixa USING btree (provento_id)
+ ix_movimentacao_caixa_tipo_movimentacao    | CREATE INDEX ix_movimentacao_caixa_tipo_movimentacao ON public.movimentacao_caixa USING btree (tipo_movimentacao)
+ ix_movimentacao_caixa_usuario_id           | CREATE INDEX ix_movimentacao_caixa_usuario_id ON public.movimentacao_caixa USING btree (usuario_id)
+(8 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: posicao
+################################################################################
+
+                                                                               Table "public.posicao"
+            Column            |           Type           | Collation | Nullable | Default | Storage | Compression | Stats target |                    Description                    
+------------------------------+--------------------------+-----------+----------+---------+---------+-------------+--------------+---------------------------------------------------
+ id                           | uuid                     |           | not null |         | plain   |             |              | Identificador único da posição
+ usuario_id                   | uuid                     |           | not null |         | plain   |             |              | ID do usuário proprietário
+ corretora_id                 | uuid                     |           | not null |         | plain   |             |              | ID da corretora onde está a posição
+ ativo_id                     | uuid                     |           | not null |         | plain   |             |              | ID do ativo
+ quantidade                   | numeric(18,8)            |           | not null |         | main    |             |              | Quantidade de ativos (suporta fracionários)
+ preco_medio                  | numeric(18,6)            |           | not null |         | main    |             |              | Preço médio de aquisição
+ custo_total                  | numeric(18,2)            |           | not null |         | main    |             |              | Custo total investido (quantidade * preço médio)
+ taxas_acumuladas             | numeric(18,2)            |           | not null |         | main    |             |              | Taxas de corretagem e custódia acumuladas
+ impostos_acumulados          | numeric(18,2)            |           | not null |         | main    |             |              | Impostos pagos acumulados (IR, IOF, etc.)
+ valor_atual                  | numeric(18,2)            |           |          |         | main    |             |              | Valor de mercado atual da posição
+ lucro_prejuizo_realizado     | numeric(18,2)            |           | not null |         | main    |             |              | Lucro/prejuízo realizado em vendas
+ lucro_prejuizo_nao_realizado | numeric(18,2)            |           |          |         | main    |             |              | Lucro/prejuízo não realizado (marcação a mercado)
+ data_primeira_compra         | date                     |           |          |         | plain   |             |              | Data da primeira aquisição deste ativo
+ data_ultima_atualizacao      | timestamp with time zone |           |          |         | plain   |             |              | Data da última atualização de valores
+ created_at                   | timestamp with time zone |           | not null |         | plain   |             |              | Data de criação do registro
+ updated_at                   | timestamp with time zone |           | not null |         | plain   |             |              | Data da última atualização
+Indexes:
+    "posicao_pkey" PRIMARY KEY, btree (id)
+    "ix_posicao_ativo_id" btree (ativo_id)
+    "ix_posicao_corretora_id" btree (corretora_id)
+    "ix_posicao_data_primeira_compra" btree (data_primeira_compra)
+    "ix_posicao_data_ultima_atualizacao" btree (data_ultima_atualizacao)
+    "ix_posicao_usuario_id" btree (usuario_id)
+    "unique_posicao_usuario_corretora_ativo" UNIQUE CONSTRAINT, btree (usuario_id, corretora_id, ativo_id)
+Check constraints:
+    "posicao_custo_total_positivo" CHECK (custo_total >= 0::numeric)
+    "posicao_impostos_positivos" CHECK (impostos_acumulados >= 0::numeric)
+    "posicao_preco_medio_positivo" CHECK (preco_medio >= 0::numeric)
+    "posicao_quantidade_positiva" CHECK (quantidade >= 0::numeric)
+    "posicao_taxas_positivas" CHECK (taxas_acumuladas >= 0::numeric)
+Foreign-key constraints:
+    "posicao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
+    "posicao_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id) ON DELETE CASCADE
+    "posicao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |            Coluna            |           Tipo           | Tamanho | Null? | Default 
+-----+------------------------------+--------------------------+---------+-------+---------
+   1 | id                           | uuid                     |         | NO    | 
+   2 | usuario_id                   | uuid                     |         | NO    | 
+   3 | corretora_id                 | uuid                     |         | NO    | 
+   4 | ativo_id                     | uuid                     |         | NO    | 
+   5 | quantidade                   | numeric                  |         | NO    | 
+   6 | preco_medio                  | numeric                  |         | NO    | 
+   7 | custo_total                  | numeric                  |         | NO    | 
+   8 | taxas_acumuladas             | numeric                  |         | NO    | 
+   9 | impostos_acumulados          | numeric                  |         | NO    | 
+  10 | valor_atual                  | numeric                  |         | YES   | 
+  11 | lucro_prejuizo_realizado     | numeric                  |         | NO    | 
+  12 | lucro_prejuizo_nao_realizado | numeric                  |         | YES   | 
+  13 | data_primeira_compra         | date                     |         | YES   | 
+  14 | data_ultima_atualizacao      | timestamp with time zone |         | YES   | 
+  15 | created_at                   | timestamp with time zone |         | NO    | 
+  16 | updated_at                   | timestamp with time zone |         | NO    | 
+(16 rows)
+
+
+Foreign Keys:
+          Nome FK          |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+---------------------------+--------------+---------------------+---------------------
+ posicao_ativo_id_fkey     | ativo_id     | ativo               | id
+ posicao_corretora_id_fkey | corretora_id | corretora           | id
+ posicao_usuario_id_fkey   | usuario_id   | usuario             | id
+(3 rows)
+
+
+Primary Keys:
+   Nome PK    | Coluna 
+--------------+--------
+ posicao_pkey | id
+(1 row)
+
+
+Unique Constraints:
+            Nome Constraint             |    Coluna    
+----------------------------------------+--------------
+ unique_posicao_usuario_corretora_ativo | usuario_id
+ unique_posicao_usuario_corretora_ativo | corretora_id
+ unique_posicao_usuario_corretora_ativo | ativo_id
+(3 rows)
+
+
+Índices:
+             Nome do Índice             |                                                           Definição                                                           
+----------------------------------------+-------------------------------------------------------------------------------------------------------------------------------
+ posicao_pkey                           | CREATE UNIQUE INDEX posicao_pkey ON public.posicao USING btree (id)
+ unique_posicao_usuario_corretora_ativo | CREATE UNIQUE INDEX unique_posicao_usuario_corretora_ativo ON public.posicao USING btree (usuario_id, corretora_id, ativo_id)
+ ix_posicao_ativo_id                    | CREATE INDEX ix_posicao_ativo_id ON public.posicao USING btree (ativo_id)
+ ix_posicao_corretora_id                | CREATE INDEX ix_posicao_corretora_id ON public.posicao USING btree (corretora_id)
+ ix_posicao_data_primeira_compra        | CREATE INDEX ix_posicao_data_primeira_compra ON public.posicao USING btree (data_primeira_compra)
+ ix_posicao_data_ultima_atualizacao     | CREATE INDEX ix_posicao_data_ultima_atualizacao ON public.posicao USING btree (data_ultima_atualizacao)
+ ix_posicao_usuario_id                  | CREATE INDEX ix_posicao_usuario_id ON public.posicao USING btree (usuario_id)
+(7 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: provento
+################################################################################
+
+                                                                           Table "public.provento"
+      Column       |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                     Description                     
+-------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-----------------------------------------------------
+ id                | uuid                     |           | not null |         | plain    |             |              | Identificador único do provento
+ ativo_id          | uuid                     |           | not null |         | plain    |             |              | ID do ativo que pagou o provento
+ tipo_provento     | tipoprovento             |           | not null |         | plain    |             |              | Tipo do provento (dividendo, JCP, rendimento, etc.)
+ valor_por_acao    | numeric(18,6)            |           | not null |         | main     |             |              | Valor unitário por ativo
+ quantidade_ativos | numeric(18,8)            |           | not null |         | main     |             |              | Quantidade de ativos que geraram o provento
+ valor_bruto       | numeric(18,2)            |           | not null |         | main     |             |              | Valor bruto recebido
+ imposto_retido    | numeric(18,2)            |           | not null |         | main     |             |              | IR retido na fonte
+ valor_liquido     | numeric(18,2)            |           | not null |         | main     |             |              | Valor líquido creditado
+ data_com          | date                     |           | not null |         | plain    |             |              | Data COM (último dia para ter direito ao provento)
+ data_pagamento    | date                     |           | not null |         | plain    |             |              | Data efetiva do pagamento
+ observacoes       | text                     |           |          |         | extended |             |              | Observações sobre o provento
+ created_at        | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
+ updated_at        | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+Indexes:
+    "provento_pkey" PRIMARY KEY, btree (id)
+    "ix_provento_ativo_id" btree (ativo_id)
+    "ix_provento_data_com" btree (data_com)
+    "ix_provento_data_pagamento" btree (data_pagamento)
+    "ix_provento_tipo_provento" btree (tipo_provento)
+Check constraints:
+    "provento_data_pagamento_valida" CHECK (data_pagamento >= data_com)
+    "provento_imposto_positivo" CHECK (imposto_retido >= 0::numeric)
+    "provento_liquido_menor_bruto" CHECK (valor_liquido <= valor_bruto)
+    "provento_quantidade_positiva" CHECK (quantidade_ativos > 0::numeric)
+    "provento_valor_bruto_positivo" CHECK (valor_bruto > 0::numeric)
+    "provento_valor_liquido_positivo" CHECK (valor_liquido > 0::numeric)
+    "provento_valor_por_acao_positivo" CHECK (valor_por_acao > 0::numeric)
+Foreign-key constraints:
+    "provento_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
+Referenced by:
+    TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_provento_id_fkey" FOREIGN KEY (provento_id) REFERENCES provento(id) ON DELETE SET NULL
+Access method: heap
+
+ Pos |      Coluna       |           Tipo           | Tamanho | Null? | Default 
+-----+-------------------+--------------------------+---------+-------+---------
+   1 | id                | uuid                     |         | NO    | 
+   2 | ativo_id          | uuid                     |         | NO    | 
+   3 | tipo_provento     | USER-DEFINED             |         | NO    | 
+   4 | valor_por_acao    | numeric                  |         | NO    | 
+   5 | quantidade_ativos | numeric                  |         | NO    | 
+   6 | valor_bruto       | numeric                  |         | NO    | 
+   7 | imposto_retido    | numeric                  |         | NO    | 
+   8 | valor_liquido     | numeric                  |         | NO    | 
+   9 | data_com          | date                     |         | NO    | 
+  10 | data_pagamento    | date                     |         | NO    | 
+  11 | observacoes       | text                     |         | YES   | 
+  12 | created_at        | timestamp with time zone |         | NO    | 
+  13 | updated_at        | timestamp with time zone |         | NO    | 
+(13 rows)
+
+
+Foreign Keys:
+        Nome FK         |  Coluna  | Tabela Referenciada | Coluna Referenciada 
+------------------------+----------+---------------------+---------------------
+ provento_ativo_id_fkey | ativo_id | ativo               | id
+(1 row)
+
+
+Primary Keys:
+    Nome PK    | Coluna 
+---------------+--------
+ provento_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+       Nome do Índice       |                                        Definição                                        
+----------------------------+-----------------------------------------------------------------------------------------
+ provento_pkey              | CREATE UNIQUE INDEX provento_pkey ON public.provento USING btree (id)
+ ix_provento_ativo_id       | CREATE INDEX ix_provento_ativo_id ON public.provento USING btree (ativo_id)
+ ix_provento_data_com       | CREATE INDEX ix_provento_data_com ON public.provento USING btree (data_com)
+ ix_provento_data_pagamento | CREATE INDEX ix_provento_data_pagamento ON public.provento USING btree (data_pagamento)
+ ix_provento_tipo_provento  | CREATE INDEX ix_provento_tipo_provento ON public.provento USING btree (tipo_provento)
+(5 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: regra_fiscal
+################################################################################
+
+                                                                                  Table "public.regra_fiscal"
+     Column      |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                               Description                               
+-----------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------------------------------------------------------------------
+ id              | uuid                     |           | not null |         | plain    |             |              | Identificador único da regra
+ pais            | character varying(2)     |           | not null |         | extended |             |              | Código ISO do país (BR, US, etc.)
+ tipo_ativo      | character varying(20)    |           |          |         | extended |             |              | Tipo de ativo (ACAO, FII, REIT, BOND, etc.) - NULL = todos
+ tipo_operacao   | character varying(20)    |           |          |         | extended |             |              | Tipo de operação (COMPRA, VENDA, DAY_TRADE, SWING_TRADE) - NULL = todas
+ aliquota_ir     | numeric(6,4)             |           | not null |         | main     |             |              | Alíquota de IR em % (ex: 15.0000 = 15%)
+ valor_isencao   | numeric(18,2)            |           |          |         | main     |             |              | Valor de isenção mensal (ex: R$ 20.000,00 no Brasil)
+ incide_sobre    | incidenciaimposto        |           | not null |         | plain    |             |              | Sobre o que incide o imposto
+ descricao       | text                     |           | not null |         | extended |             |              | Descrição detalhada da regra fiscal
+ vigencia_inicio | date                     |           | not null |         | plain    |             |              | Data de início da vigência da regra
+ vigencia_fim    | date                     |           |          |         | plain    |             |              | Data de fim da vigência (NULL = vigente indefinidamente)
+ ativa           | boolean                  |           | not null |         | plain    |             |              | Indica se regra está ativa
+ created_at      | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
+ updated_at      | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+Indexes:
+    "regra_fiscal_pkey" PRIMARY KEY, btree (id)
+    "ix_regra_fiscal_ativa" btree (ativa)
+    "ix_regra_fiscal_incide_sobre" btree (incide_sobre)
+    "ix_regra_fiscal_pais" btree (pais)
+    "ix_regra_fiscal_tipo_ativo" btree (tipo_ativo)
+    "ix_regra_fiscal_tipo_operacao" btree (tipo_operacao)
+    "ix_regra_fiscal_vigencia_fim" btree (vigencia_fim)
+    "ix_regra_fiscal_vigencia_inicio" btree (vigencia_inicio)
+Check constraints:
+    "regra_aliquota_valida" CHECK (aliquota_ir >= 0::numeric AND aliquota_ir <= 100::numeric)
+    "regra_isencao_positiva" CHECK (valor_isencao IS NULL OR valor_isencao >= 0::numeric)
+    "regra_pais_iso_format" CHECK (pais::text ~* '^[A-Z]{2}$'::text)
+    "regra_vigencia_valida" CHECK (vigencia_fim IS NULL OR vigencia_fim >= vigencia_inicio)
+Access method: heap
+
+ Pos |     Coluna      |           Tipo           | Tamanho | Null? | Default 
+-----+-----------------+--------------------------+---------+-------+---------
+   1 | id              | uuid                     |         | NO    | 
+   2 | pais            | character varying        | (2)     | NO    | 
+   3 | tipo_ativo      | character varying        | (20)    | YES   | 
+   4 | tipo_operacao   | character varying        | (20)    | YES   | 
+   5 | aliquota_ir     | numeric                  |         | NO    | 
+   6 | valor_isencao   | numeric                  |         | YES   | 
+   7 | incide_sobre    | USER-DEFINED             |         | NO    | 
+   8 | descricao       | text                     |         | NO    | 
+   9 | vigencia_inicio | date                     |         | NO    | 
+  10 | vigencia_fim    | date                     |         | YES   | 
+  11 | ativa           | boolean                  |         | NO    | 
+  12 | created_at      | timestamp with time zone |         | NO    | 
+  13 | updated_at      | timestamp with time zone |         | NO    | 
+(13 rows)
+
+
+Foreign Keys:
+ Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
+---------+--------+---------------------+---------------------
+(0 rows)
+
+
+Primary Keys:
+      Nome PK      | Coluna 
+-------------------+--------
+ regra_fiscal_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+         Nome do Índice          |                                             Definição                                             
+---------------------------------+---------------------------------------------------------------------------------------------------
+ regra_fiscal_pkey               | CREATE UNIQUE INDEX regra_fiscal_pkey ON public.regra_fiscal USING btree (id)
+ ix_regra_fiscal_ativa           | CREATE INDEX ix_regra_fiscal_ativa ON public.regra_fiscal USING btree (ativa)
+ ix_regra_fiscal_incide_sobre    | CREATE INDEX ix_regra_fiscal_incide_sobre ON public.regra_fiscal USING btree (incide_sobre)
+ ix_regra_fiscal_pais            | CREATE INDEX ix_regra_fiscal_pais ON public.regra_fiscal USING btree (pais)
+ ix_regra_fiscal_tipo_ativo      | CREATE INDEX ix_regra_fiscal_tipo_ativo ON public.regra_fiscal USING btree (tipo_ativo)
+ ix_regra_fiscal_tipo_operacao   | CREATE INDEX ix_regra_fiscal_tipo_operacao ON public.regra_fiscal USING btree (tipo_operacao)
+ ix_regra_fiscal_vigencia_fim    | CREATE INDEX ix_regra_fiscal_vigencia_fim ON public.regra_fiscal USING btree (vigencia_fim)
+ ix_regra_fiscal_vigencia_inicio | CREATE INDEX ix_regra_fiscal_vigencia_inicio ON public.regra_fiscal USING btree (vigencia_inicio)
+(8 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: transacao
+################################################################################
+
+                                                                       Table "public.transacao"
+     Column      |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                   Description                   
+-----------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------------------------------------------
+ id              | uuid                     |           | not null |         | plain    |             |              | Identificador único da transação
+ usuario_id      | uuid                     |           | not null |         | plain    |             |              | ID do usuário
+ corretora_id    | uuid                     |           | not null |         | plain    |             |              | ID da corretora
+ ativo_id        | uuid                     |           | not null |         | plain    |             |              | ID do ativo transacionado
+ tipo_operacao   | tipooperacao             |           | not null |         | plain    |             |              | Tipo de operação: COMPRA ou VENDA
+ quantidade      | numeric(18,8)            |           | not null |         | main     |             |              | Quantidade transacionada (suporta fracionários)
+ preco_unitario  | numeric(18,6)            |           | not null |         | main     |             |              | Preço por unidade
+ valor_total     | numeric(18,2)            |           | not null |         | main     |             |              | Valor total da operação (quantidade * preço)
+ taxas           | numeric(18,2)            |           | not null |         | main     |             |              | Taxas de corretagem, custódia, emolumentos
+ impostos        | numeric(18,2)            |           | not null |         | main     |             |              | IR retido na fonte, IOF, etc.
+ data_operacao   | date                     |           | not null |         | plain    |             |              | Data da operação
+ data_liquidacao | date                     |           |          |         | plain    |             |              | Data de liquidação (D+2, D+3, etc.)
+ observacoes     | text                     |           |          |         | extended |             |              | Observações sobre a transação
+ created_at      | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
+ updated_at      | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+Indexes:
+    "transacao_pkey" PRIMARY KEY, btree (id)
+    "ix_transacao_ativo_id" btree (ativo_id)
+    "ix_transacao_corretora_id" btree (corretora_id)
+    "ix_transacao_data_liquidacao" btree (data_liquidacao)
+    "ix_transacao_data_operacao" btree (data_operacao)
+    "ix_transacao_tipo_operacao" btree (tipo_operacao)
+    "ix_transacao_usuario_id" btree (usuario_id)
+Check constraints:
+    "transacao_data_liquidacao_valida" CHECK (data_liquidacao IS NULL OR data_liquidacao >= data_operacao)
+    "transacao_impostos_positivos" CHECK (impostos >= 0::numeric)
+    "transacao_preco_positivo" CHECK (preco_unitario > 0::numeric)
+    "transacao_quantidade_positiva" CHECK (quantidade > 0::numeric)
+    "transacao_taxas_positivas" CHECK (taxas >= 0::numeric)
+    "transacao_valor_total_positivo" CHECK (valor_total > 0::numeric)
+Foreign-key constraints:
+    "transacao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
+    "transacao_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id) ON DELETE CASCADE
+    "transacao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |     Coluna      |           Tipo           | Tamanho | Null? | Default 
+-----+-----------------+--------------------------+---------+-------+---------
+   1 | id              | uuid                     |         | NO    | 
+   2 | usuario_id      | uuid                     |         | NO    | 
+   3 | corretora_id    | uuid                     |         | NO    | 
+   4 | ativo_id        | uuid                     |         | NO    | 
+   5 | tipo_operacao   | USER-DEFINED             |         | NO    | 
+   6 | quantidade      | numeric                  |         | NO    | 
+   7 | preco_unitario  | numeric                  |         | NO    | 
+   8 | valor_total     | numeric                  |         | NO    | 
+   9 | taxas           | numeric                  |         | NO    | 
+  10 | impostos        | numeric                  |         | NO    | 
+  11 | data_operacao   | date                     |         | NO    | 
+  12 | data_liquidacao | date                     |         | YES   | 
+  13 | observacoes     | text                     |         | YES   | 
+  14 | created_at      | timestamp with time zone |         | NO    | 
+  15 | updated_at      | timestamp with time zone |         | NO    | 
+(15 rows)
+
+
+Foreign Keys:
+           Nome FK           |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+-----------------------------+--------------+---------------------+---------------------
+ transacao_usuario_id_fkey   | usuario_id   | usuario             | id
+ transacao_ativo_id_fkey     | ativo_id     | ativo               | id
+ transacao_corretora_id_fkey | corretora_id | corretora           | id
+(3 rows)
+
+
+Primary Keys:
+    Nome PK     | Coluna 
+----------------+--------
+ transacao_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+        Nome do Índice        |                                          Definição                                          
+------------------------------+---------------------------------------------------------------------------------------------
+ transacao_pkey               | CREATE UNIQUE INDEX transacao_pkey ON public.transacao USING btree (id)
+ ix_transacao_ativo_id        | CREATE INDEX ix_transacao_ativo_id ON public.transacao USING btree (ativo_id)
+ ix_transacao_corretora_id    | CREATE INDEX ix_transacao_corretora_id ON public.transacao USING btree (corretora_id)
+ ix_transacao_data_liquidacao | CREATE INDEX ix_transacao_data_liquidacao ON public.transacao USING btree (data_liquidacao)
+ ix_transacao_data_operacao   | CREATE INDEX ix_transacao_data_operacao ON public.transacao USING btree (data_operacao)
+ ix_transacao_tipo_operacao   | CREATE INDEX ix_transacao_tipo_operacao ON public.transacao USING btree (tipo_operacao)
+ ix_transacao_usuario_id      | CREATE INDEX ix_transacao_usuario_id ON public.transacao USING btree (usuario_id)
+(7 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: transacoes
+################################################################################
+
+                                                     Table "public.transacoes"
+     Column      |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+-----------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id              | uuid                     |           | not null |         | plain    |             |              | 
+ usuario_id      | uuid                     |           | not null |         | plain    |             |              | 
+ tipo            | tipotransacao            |           | not null |         | plain    |             |              | 
+ ativo_id        | uuid                     |           | not null |         | plain    |             |              | 
+ corretora_id    | uuid                     |           | not null |         | plain    |             |              | 
+ data_transacao  | timestamp with time zone |           | not null |         | plain    |             |              | 
+ quantidade      | numeric(18,8)            |           | not null |         | main     |             |              | 
+ preco_unitario  | numeric(18,6)            |           | not null |         | main     |             |              | 
+ valor_total     | numeric(18,2)            |           | not null |         | main     |             |              | 
+ taxa_corretagem | numeric(18,2)            |           | not null |         | main     |             |              | 
+ taxa_liquidacao | numeric(18,2)            |           | not null |         | main     |             |              | 
+ emolumentos     | numeric(18,2)            |           | not null |         | main     |             |              | 
+ imposto         | numeric(18,2)            |           | not null |         | main     |             |              | 
+ outros_custos   | numeric(18,2)            |           | not null |         | main     |             |              | 
+ custos_totais   | numeric(18,2)            |           | not null |         | main     |             |              | 
+ valor_liquido   | numeric(18,2)            |           | not null |         | main     |             |              | 
+ observacoes     | text                     |           |          |         | extended |             |              | 
+ created_at      | timestamp with time zone |           | not null |         | plain    |             |              | 
+ updated_at      | timestamp with time zone |           | not null |         | plain    |             |              | 
+Indexes:
+    "transacoes_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "transacoes_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativos(id)
+    "transacoes_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretoras(id)
+    "transacoes_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+Access method: heap
+
+ Pos |     Coluna      |           Tipo           | Tamanho | Null? | Default 
+-----+-----------------+--------------------------+---------+-------+---------
+   1 | id              | uuid                     |         | NO    | 
+   2 | usuario_id      | uuid                     |         | NO    | 
+   3 | tipo            | USER-DEFINED             |         | NO    | 
+   4 | ativo_id        | uuid                     |         | NO    | 
+   5 | corretora_id    | uuid                     |         | NO    | 
+   6 | data_transacao  | timestamp with time zone |         | NO    | 
+   7 | quantidade      | numeric                  |         | NO    | 
+   8 | preco_unitario  | numeric                  |         | NO    | 
+   9 | valor_total     | numeric                  |         | NO    | 
+  10 | taxa_corretagem | numeric                  |         | NO    | 
+  11 | taxa_liquidacao | numeric                  |         | NO    | 
+  12 | emolumentos     | numeric                  |         | NO    | 
+  13 | imposto         | numeric                  |         | NO    | 
+  14 | outros_custos   | numeric                  |         | NO    | 
+  15 | custos_totais   | numeric                  |         | NO    | 
+  16 | valor_liquido   | numeric                  |         | NO    | 
+  17 | observacoes     | text                     |         | YES   | 
+  18 | created_at      | timestamp with time zone |         | NO    | 
+  19 | updated_at      | timestamp with time zone |         | NO    | 
+(19 rows)
+
+
+Foreign Keys:
+           Nome FK            |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+------------------------------+--------------+---------------------+---------------------
+ transacoes_usuario_id_fkey   | usuario_id   | usuarios            | id
+ transacoes_ativo_id_fkey     | ativo_id     | ativos              | id
+ transacoes_corretora_id_fkey | corretora_id | corretoras          | id
+(3 rows)
+
+
+Primary Keys:
+     Nome PK     | Coluna 
+-----------------+--------
+ transacoes_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+ Nome do Índice  |                                 Definição                                 
+-----------------+---------------------------------------------------------------------------
+ transacoes_pkey | CREATE UNIQUE INDEX transacoes_pkey ON public.transacoes USING btree (id)
+(1 row)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: usuario
+################################################################################
+
+                                                     Table "public.usuario"
+    Column     |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+---------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id            | uuid                     |           | not null |         | plain    |             |              | 
+ username      | character varying(50)    |           | not null |         | extended |             |              | 
+ email         | character varying(120)   |           | not null |         | extended |             |              | 
+ password_hash | character varying(255)   |           | not null |         | extended |             |              | 
+ nome_completo | character varying(200)   |           |          |         | extended |             |              | 
+ ativo         | boolean                  |           | not null |         | plain    |             |              | 
+ role          | userrole                 |           | not null |         | plain    |             |              | 
+ created_at    | timestamp with time zone |           | not null |         | plain    |             |              | 
+ updated_at    | timestamp with time zone |           | not null |         | plain    |             |              | 
+Indexes:
+    "usuario_pkey" PRIMARY KEY, btree (id)
+    "ix_usuario_email" UNIQUE, btree (email)
+    "ix_usuario_username" UNIQUE, btree (username)
+Referenced by:
+    TABLE "corretora" CONSTRAINT "corretora_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    TABLE "log_auditoria" CONSTRAINT "log_auditoria_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL
+    TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    TABLE "posicao" CONSTRAINT "posicao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    TABLE "transacao" CONSTRAINT "transacao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |    Coluna     |           Tipo           | Tamanho | Null? | Default 
+-----+---------------+--------------------------+---------+-------+---------
+   1 | id            | uuid                     |         | NO    | 
+   2 | username      | character varying        | (50)    | NO    | 
+   3 | email         | character varying        | (120)   | NO    | 
+   4 | password_hash | character varying        | (255)   | NO    | 
+   5 | nome_completo | character varying        | (200)   | YES   | 
+   6 | ativo         | boolean                  |         | NO    | 
+   7 | role          | USER-DEFINED             |         | NO    | 
+   8 | created_at    | timestamp with time zone |         | NO    | 
+   9 | updated_at    | timestamp with time zone |         | NO    | 
+(9 rows)
+
+
+Foreign Keys:
+ Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
+---------+--------+---------------------+---------------------
+(0 rows)
+
+
+Primary Keys:
+   Nome PK    | Coluna 
+--------------+--------
+ usuario_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+   Nome do Índice    |                                    Definição                                     
+---------------------+----------------------------------------------------------------------------------
+ usuario_pkey        | CREATE UNIQUE INDEX usuario_pkey ON public.usuario USING btree (id)
+ ix_usuario_email    | CREATE UNIQUE INDEX ix_usuario_email ON public.usuario USING btree (email)
+ ix_usuario_username | CREATE UNIQUE INDEX ix_usuario_username ON public.usuario USING btree (username)
+(3 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: usuarios
+################################################################################
+
+                                                     Table "public.usuarios"
+    Column     |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+---------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id            | uuid                     |           | not null |         | plain    |             |              | 
+ username      | character varying(50)    |           | not null |         | extended |             |              | 
+ email         | character varying(120)   |           | not null |         | extended |             |              | 
+ password_hash | character varying(255)   |           | not null |         | extended |             |              | 
+ nome_completo | character varying(200)   |           |          |         | extended |             |              | 
+ ativo         | boolean                  |           | not null |         | plain    |             |              | 
+ role          | userrole                 |           | not null |         | plain    |             |              | 
+ created_at    | timestamp with time zone |           | not null |         | plain    |             |              | 
+ updated_at    | timestamp with time zone |           | not null |         | plain    |             |              | 
+Indexes:
+    "usuarios_pkey" PRIMARY KEY, btree (id)
+    "ix_usuarios_email" UNIQUE, btree (email)
+    "ix_usuarios_username" UNIQUE, btree (username)
+Referenced by:
+    TABLE "corretoras" CONSTRAINT "corretoras_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+    TABLE "transacoes" CONSTRAINT "transacoes_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+Access method: heap
+
+ Pos |    Coluna     |           Tipo           | Tamanho | Null? | Default 
+-----+---------------+--------------------------+---------+-------+---------
+   1 | id            | uuid                     |         | NO    | 
+   2 | username      | character varying        | (50)    | NO    | 
+   3 | email         | character varying        | (120)   | NO    | 
+   4 | password_hash | character varying        | (255)   | NO    | 
+   5 | nome_completo | character varying        | (200)   | YES   | 
+   6 | ativo         | boolean                  |         | NO    | 
+   7 | role          | USER-DEFINED             |         | NO    | 
+   8 | created_at    | timestamp with time zone |         | NO    | 
+   9 | updated_at    | timestamp with time zone |         | NO    | 
+(9 rows)
+
+
+Foreign Keys:
+ Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
+---------+--------+---------------------+---------------------
+(0 rows)
+
+
+Primary Keys:
+    Nome PK    | Coluna 
+---------------+--------
+ usuarios_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+    Nome do Índice    |                                     Definição                                      
+----------------------+------------------------------------------------------------------------------------
+ usuarios_pkey        | CREATE UNIQUE INDEX usuarios_pkey ON public.usuarios USING btree (id)
+ ix_usuarios_email    | CREATE UNIQUE INDEX ix_usuarios_email ON public.usuarios USING btree (email)
+ ix_usuarios_username | CREATE UNIQUE INDEX ix_usuarios_username ON public.usuarios USING btree (username)
+(3 rows)
+
+
+________________________________________________________________________________
+
+
+================================================================================
+RESUMO GERAL
+================================================================================
+
+Total de Tabelas:
+ Total 
+-------
+    17
+(1 row)
+
+
+Total de Colunas por Tabela:
+       Tabela       | Num Colunas 
+--------------------+-------------
+ alembic_version    |           1
+ ativo              |          19
+ ativos             |          19
+ corretora          |          11
+ corretoras         |          11
+ evento_corporativo |          12
+ feriado_mercado    |          11
+ fonte_dados        |          14
+ log_auditoria      |          12
+ movimentacao_caixa |          13
+ posicao            |          16
+ provento           |          13
+ regra_fiscal       |          13
+ transacao          |          15
+ transacoes         |          19
+ usuario            |           9
+ usuarios           |           9
+(17 rows)
+
+
+Total de Foreign Keys por Tabela:
+       Tabela       | Num FKs 
+--------------------+---------
+ corretora          |       1
+ corretoras         |       1
+ evento_corporativo |       2
+ log_auditoria      |       1
+ movimentacao_caixa |       4
+ posicao            |       3
+ provento           |       1
+ transacao          |       3
+ transacoes         |       3
+(9 rows)
+
+
+================================================================================
+FIM DA DOCUMENTAÇÃO
+================================================================================
