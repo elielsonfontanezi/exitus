@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2025-12-03 17:45:47
+Gerado em: 2025-12-03 19:28:39
 ================================================================================
 
 ================================================================================
@@ -111,6 +111,8 @@ TABELA: ativo
  observacoes         | text                     |           |          |         | extended |             |              | Observações e notas sobre o ativo
  created_at          | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
  updated_at          | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+ preco_teto          | numeric(18,6)            |           |          |         | main     |             |              | 
+ beta                | numeric(8,4)             |           |          |         | main     |             |              | 
 Indexes:
     "ativo_pkey" PRIMARY KEY, btree (id)
     "ix_ativo_ativo" btree (ativo)
@@ -156,7 +158,9 @@ Access method: heap
   17 | observacoes         | text                     |         | YES   | 
   18 | created_at          | timestamp with time zone |         | NO    | 
   19 | updated_at          | timestamp with time zone |         | NO    | 
-(19 rows)
+  20 | preco_teto          | numeric                  |         | YES   | 
+  21 | beta                | numeric                  |         | YES   | 
+(21 rows)
 
 
 Foreign Keys:
@@ -1632,7 +1636,7 @@ Total de Colunas por Tabela:
        Tabela       | Num Colunas 
 --------------------+-------------
  alembic_version    |           1
- ativo              |          19
+ ativo              |          21
  ativos             |          19
  corretora          |          11
  corretoras         |          11
