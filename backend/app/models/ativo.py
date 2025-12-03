@@ -27,42 +27,46 @@ class ClasseAtivo(enum.Enum):
 
 class Ativo(db.Model):
     """Model para ativos financeiros"""
-    __tablename__ = 'ativo'  # ⬅️ PLURAL
-    
+    __tablename__ = 'ativo'
+
     # Identificação
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     ticker = Column(String(20), nullable=False, index=True)
     nome = Column(String(200), nullable=False, index=True)
     tipo = Column(Enum(TipoAtivo), nullable=False, index=True)
     classe = Column(Enum(ClasseAtivo), nullable=False, index=True)
-    
+
     # Mercado
     mercado = Column(String(10), nullable=False, default='BR', index=True)
     moeda = Column(String(3), nullable=False, default='BRL', index=True)
-    
+
     # Cotação
     preco_atual = Column(Numeric(18, 6), nullable=True)
     data_ultima_cotacao = Column(DateTime(timezone=True), nullable=True, index=True)
-    
+
+    # 🆕 M4 Buy Signals - NOVOS CAMPOS
+    preco_teto = Column(Numeric(18, 6), nullable=True)
+    beta = Column(Numeric(8, 4), nullable=True)
+
     # Indicadores
     dividend_yield = Column(Numeric(8, 4), nullable=True)
     p_l = Column(Numeric(10, 2), nullable=True)
     p_vp = Column(Numeric(10, 2), nullable=True)
     roe = Column(Numeric(8, 4), nullable=True)
-    
+
     # Status
     ativo = Column(Boolean, default=True, nullable=False, index=True)
     deslistado = Column(Boolean, default=False, nullable=False, index=True)
     data_deslistagem = Column(Date, nullable=True)
-    
+
     # Metadados
     observacoes = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    
+
     def __repr__(self):
         return f"<Ativo {self.ticker} - {self.nome} ({self.mercado})>"
-    
+
     def to_dict(self):
         return {
             "id": str(self.id),
@@ -73,6 +77,8 @@ class Ativo(db.Model):
             "mercado": self.mercado,
             "moeda": self.moeda,
             "preco_atual": str(self.preco_atual) if self.preco_atual else None,
+            "preco_teto": str(self.preco_teto) if self.preco_teto else None,
+            "beta": str(self.beta) if self.beta else None,
             "data_ultima_cotacao": self.data_ultima_cotacao.isoformat() if self.data_ultima_cotacao else None,
             "dividend_yield": str(self.dividend_yield) if self.dividend_yield else None,
             "p_l": str(self.p_l) if self.p_l else None,

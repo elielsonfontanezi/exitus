@@ -103,6 +103,13 @@ def create_app(testing=False):
     from .blueprints.calculosblueprint import calculosbp
     app.register_blueprint(calculosbp)
 
+    # 🆕 Buy Signals M4
+    from .blueprints.buy_signals_blueprint import buy_signals_bp
+    app.register_blueprint(buy_signals_bp, url_prefix='/api/buy-signals')
+
+    print("🚀 Exitus Backend M4 COMPLETO - Buy Signals ATIVO!")
+    print(f"✅ Blueprints: auth+usuarios+...+buy_signals (24 total)")
+
     print("🚀 Exitus Backend Módulo 2 - Application Factory criada com sucesso!")
     print(f"📍 Environment: {app.config.get('FLASK_ENV')}")
     print(f"🔐 JWT Secret configurado: {'*' * 16}")
