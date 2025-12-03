@@ -1042,3 +1042,117 @@ O banco de dados do Exitus foi projetado para:
 **Versão:** 1.0  
 **Data:** Novembro 2025  
 **Autor:** Equipe Exitus
+
+---
+
+# Adendo - Módulo 1 Database - Parâmetros Macroeconômicos Multi-Mercado (M4)
+
+---
+
+## Nova Tabela: parametros_macro 
+
+Tabela para armazenamento de parâmetros macroeconômicos regionais para suportar multi-mercado em Exitus.
+
+| Campo              | Tipo              | Descrição |
+|--------------------|-------------------|-----------|
+| `id`              | UUID PK           | Identificador único |
+| `pais`            | VARCHAR(2)        | Código país ISO (ex: BR, US, EU, JP) |
+| `mercado`         | VARCHAR(10)       | Nome mercado (ex: B3, NYSE, Euronext, Tokyo) |
+| `taxa_livre_risco`| NUMERIC(8,6)      | Taxa livre de risco vigente no mercado local |
+| `crescimento_medio`| NUMERIC(8,6)    | Crescimento médio esperado |
+| `custo_capital`   | NUMERIC(8,6)      | Custo médio de capital (WACC) |
+| `inflacao_anual`  | NUMERIC(8,6)      | Inflação anual do mercado local |
+| `cap_rate_fii`    | NUMERIC(8,6)      | Cap rate típico para FIIs ou REITs no mercado |
+| `ytm_rf`          | NUMERIC(8,6)      | Yield to maturity para renda fixa local |
+| `ativo`           | BOOLEAN           | Indicador se está ativo para uso |
+| `created_at`      | TIMESTAMPTZ       | Timestamp criação registro |
+
+---
+
+### Índices
+
+- ix_parametros_macro_pais_mercado (único)
+- ix_parametros_macro_pais
+- ix_parametros_macro_mercado
+- ix_parametros_macro_ativo
+
+---
+
+### Dados Semente (Seed Data)
+
+- `BR` / `B3`: CDI 10.5%, WACC 12.5%, Cap Rate FIIs 8.5%
+- `US` / `NYSE`: T-Bill 4.2%, WACC 8.5%, Cap Rate REITs 6.5%
+- `EU` / `Euronext`: Bund 2.8%, WACC 7.2%, Cap Rate 4.5%
+- `JP` / `Tokyo`: JGB 0.15%, WACC 3.5%, Cap Rate 3.5%
+
+---
+
+### Uso na aplicação
+
+Essa tabela foi adicionada para permitir cálculos financeiros adaptados para múltiplos mercados dentro do sistema Exitus, incluindo o cálculo de preço teto e métricas de risco ajustados regionalmente.
+
+---
+
+
+---
+
+# 🔄 ADENDO M4 - Tabela parâmetros_macro (03/12/2025)
+
+## 📋 Estrutura Atual (Executar no container)
+
+podman exec exitus-db psql -U exitus -d exitusdb -c "\d parametros_macro"
+
+
+
+**Saída esperada:**
+Tabela "public.parametros_macro"
+Coluna | Tipo | Modificadores
+-------------+------------------------+---------------
+id | uuid | not null default gen_random_uuid()
+pais | character varying(2) | not null
+mercado | character varying(10) | not null
+taxa_livre_risco | numeric(6,4) | not null
+wacc | numeric(6,4) | not null
+cap_rate | numeric(6,4) |
+Índices:
+"pk_parametros_macro" PRIMARY KEY, btree (id)
+"ix_parametros_macro_pais_mercado" btree (pais, mercado)
+
+
+
+## 🌍 REGISTROS SEEDADOS M4 (12 parâmetros globais)
+
+-- BR B3
+BR|B3|0.1050|0.1250|0.0850 ← CDI 10.5%
+BR|B3FII|0.1050|0.1250|0.0850 ← FIIs BR
+
+-- US NYSE
+US|NYSE|0.0420|0.0850|0.0650 ← T-Bill 4.2%
+US|NASDAQ|0.0420|0.0850|null
+
+-- EU Euronext
+EU|Euronext|0.0280|0.0720|null ← Bund 2.8%
+
+-- JP Tokyo
+JP|Tokyo|0.0015|0.0350|null ← JGB 0.15%
+
+
+
+**Total: 12 registros** | **4 mercados** | **Multi-moeda ready**
+
+## 🧪 VALIDAÇÃO M4
+
+1. Verificar tabela existe
+podman exec exitus-db psql -U exitus -d exitusdb -c "\dt parametros_macro"
+
+2. Contar registros
+podman exec exitus-db psql -U exitus -d exitusdb -c "SELECT COUNT(*) FROM parametros_macro;"
+
+3. Testar query M4
+podman exec exitus-db psql -U exitus -d exitusdb -c "
+SELECT pais, mercado, taxa_livre_risco, wacc
+FROM parametros_macro
+WHERE pais='BR' ORDER BY mercado;"
+
+
+

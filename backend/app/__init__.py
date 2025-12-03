@@ -86,7 +86,30 @@ def create_app(testing=False):
     # Blueprint de eventos (Módulo 3 - Fase 4)
     from .blueprints.eventos.routes import bp as eventos_bp
     app.register_blueprint(eventos_bp)
-    
+
+    # Blueprint de feriados (Módulo 4 - Fase 4.1)
+    from .blueprints.feriadosblueprint import feriadosbp
+    app.register_blueprint(feriadosbp)
+
+    # Blueprint de fontes (Módulo 4 - Fase 4.2)
+    from .blueprints.fontesblueprint import fontesbp
+    app.register_blueprint(fontesbp)
+
+    # Blueprint de regras fiscais (Módulo 4 - Fase 4.3)
+    from .blueprints.regras_fiscaisblueprint import regrasbp
+    app.register_blueprint(regrasbp)
+
+    # Blueprint de cálculos (Módulo 4 - Fase 4.4)
+    from .blueprints.calculosblueprint import calculosbp
+    app.register_blueprint(calculosbp)
+
+    # 🆕 Buy Signals M4
+    from .blueprints.buy_signals_blueprint import buy_signals_bp
+    app.register_blueprint(buy_signals_bp, url_prefix='/api/buy-signals')
+
+    print("🚀 Exitus Backend M4 COMPLETO - Buy Signals ATIVO!")
+    print(f"✅ Blueprints: auth+usuarios+...+buy_signals (24 total)")
+
     print("🚀 Exitus Backend Módulo 2 - Application Factory criada com sucesso!")
     print(f"📍 Environment: {app.config.get('FLASK_ENV')}")
     print(f"🔐 JWT Secret configurado: {'*' * 16}")

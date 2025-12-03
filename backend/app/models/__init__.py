@@ -5,15 +5,17 @@ from .usuario import Usuario, UserRole
 from .corretora import Corretora, TipoCorretora
 from .ativo import Ativo, TipoAtivo, ClasseAtivo
 from .transacao import Transacao, TipoTransacao
+from .posicao import Posicao
+from .provento import Provento
+from .movimentacao_caixa import MovimentacaoCaixa
+from .evento_corporativo import EventoCorporativo
+from .parametros_macro import ParametrosMacro
 
 __all__ = [
-    'Usuario',
-    'UserRole',
-    'Corretora',
-    'TipoCorretora',
-    'Ativo',
-    'TipoAtivo',
-    'ClasseAtivo',
-    'Transacao',
-    'TipoTransacao',
+    'Usuario', 'UserRole',
+    'Corretora', 'TipoCorretora', 
+    'Ativo', 'TipoAtivo', 'ClasseAtivo',
+    'Transacao', 'TipoTransacao',
+    'Posicao', 'Provento', 
+    'MovimentacaoCaixa', 'EventoCorporativo'
 ]
