@@ -98,7 +98,7 @@ Sistema Exitus - Entidades Financeiras Avançadas + Analytics de Portfólio
 - `POST /api/movimentacoes-caixa` - Criar movimentação
 - `PUT /api/movimentacoes-caixa/<id>` - Atualizar movimentação
 - `DELETE /api/movimentacoes-caixa/<id>` - Deletar movimentação
-- `GET /api/movimentacoes-caixa/saldo/<corretora_id>` - Saldo
+- `GET /api/movimentacoes-caixa/saldo/rretora_id>` - Saldo
 - `GET /api/movimentacoes-caixa/extrato` - Extrato
 
 ### Pendências
@@ -180,21 +180,21 @@ Sistema Exitus - Entidades Financeiras Avançadas + Analytics de Portfólio
 
 Editar `backend/app/__init__.py` e adicionar:
 
-```python
-# Importar blueprints do Módulo 3
+Importar blueprints do Módulo 3
 from app.blueprints.posicao_blueprint import posicao_bp
 from app.blueprints.provento_blueprint import provento_bp
 from app.blueprints.movimentacao_caixa_blueprint import movimentacao_caixa_bp
 from app.blueprints.evento_corporativo_blueprint import evento_corporativo_bp
 from app.blueprints.portfolio_blueprint import portfolio_bp
 
-# Registrar blueprints
+Registrar blueprints
 app.register_blueprint(posicao_bp)
 app.register_blueprint(provento_bp)
 app.register_blueprint(movimentacao_caixa_bp)
 app.register_blueprint(evento_corporativo_bp)
 app.register_blueprint(portfolio_bp)
-```
+
+text
 
 ### Passo 2: Verificar Imports nos Models
 
