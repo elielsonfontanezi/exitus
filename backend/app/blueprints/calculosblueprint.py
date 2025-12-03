@@ -85,7 +85,7 @@ def calcular_preco_teto(ticker):
         }
         pt_medio = sum([v["pt"] for v in metodos.values()]) / 4
 
-    elif tipo == 'fii':
+    elif 'fii' in tipo.lower():
         # FIIs: Cap Rate regional
         cap_rate = params['cap_rate_fii']
         pt_cap_rate = 1 / cap_rate
