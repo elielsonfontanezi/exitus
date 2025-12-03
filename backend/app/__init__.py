@@ -99,6 +99,10 @@ def create_app(testing=False):
     from .blueprints.regras_fiscaisblueprint import regrasbp
     app.register_blueprint(regrasbp)
 
+    # Blueprint de cálculos (Módulo 4 - Fase 4.4)
+    from .blueprints.calculosblueprint import calculosbp
+    app.register_blueprint(calculosbp)
+
     print("🚀 Exitus Backend Módulo 2 - Application Factory criada com sucesso!")
     print(f"📍 Environment: {app.config.get('FLASK_ENV')}")
     print(f"🔐 JWT Secret configurado: {'*' * 16}")
