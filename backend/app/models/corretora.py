@@ -16,11 +16,11 @@ class TipoCorretora(enum.Enum):
 
 class Corretora(db.Model):
     """Model para corretoras/exchanges"""
-    __tablename__ = 'corretoras'  # ⬅️ PLURAL
+    __tablename__ = 'corretora'  # ⬅️ PLURAL
     
     # Identificação
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuarios.id', ondelete='CASCADE'), nullable=False, index=True)
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuario.id', ondelete='CASCADE'), nullable=False, index=True)
     
     # Dados
     nome = Column(String(100), nullable=False, index=True)
