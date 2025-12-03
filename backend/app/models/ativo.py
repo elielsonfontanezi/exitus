@@ -27,7 +27,7 @@ class ClasseAtivo(enum.Enum):
 
 class Ativo(db.Model):
     """Model para ativos financeiros"""
-    __tablename__ = 'ativos'  # ⬅️ PLURAL
+    __tablename__ = 'ativo'  # ⬅️ PLURAL
     
     # Identificação
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

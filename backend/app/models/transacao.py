@@ -28,16 +28,16 @@ class Transacao(db.Model):
     - Recebimento de dividendos/JCP
     - Eventos corporativos (bonificação, desdobramento, grupamento)
     """
-    __tablename__ = 'transacoes'
+    __tablename__ = 'transacao'
     
     # Identificação
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuarios.id'), nullable=False)
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuario.id'), nullable=False)
     tipo = Column(Enum(TipoTransacao), nullable=False)
     
     # Relacionamentos
-    ativo_id = Column(UUID(as_uuid=True), ForeignKey('ativos.id'), nullable=False)
-    corretora_id = Column(UUID(as_uuid=True), ForeignKey('corretoras.id'), nullable=False)
+    ativo_id = Column(UUID(as_uuid=True), ForeignKey('ativo.id'), nullable=False)
+    corretora_id = Column(UUID(as_uuid=True), ForeignKey('corretora.id'), nullable=False)
     
     # Dados da transação
     data_transacao = Column(DateTime(timezone=True), nullable=False)
@@ -63,7 +63,7 @@ class Transacao(db.Model):
     
     # Relationships (lazy loading)
     usuario = relationship("Usuario", backref="transacoes", lazy=True)
-    ativo = relationship("Ativo", backref="transacoes", lazy=True)
+    ativo = relationship("Ativo", backref="transacoes", primaryjoin="Transacao.ativo_id == Ativo.id", lazy=True)
     corretora = relationship("Corretora", backref="transacoes", lazy=True)
     
     def __repr__(self):

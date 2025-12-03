@@ -72,8 +72,20 @@ def create_app(testing=False):
     app.register_blueprint(transacoes_bp)
     
     # Outros blueprints serão adicionados gradualmente nas próximas fases
-    # from .blueprints.posicoes.routes import bp as posicoes_bp
-    # app.register_blueprint(posicoes_bp)
+    from .blueprints.posicoes.routes import bp as posicoes_bp
+    app.register_blueprint(posicoes_bp)
+
+    # Blueprint de proventos (Módulo 3 - Fase 2)
+    from .blueprints.proventos.routes import bp as proventos_bp
+    app.register_blueprint(proventos_bp)
+
+    # Blueprint de movimentacoes (Módulo 3 - Fase 3)
+    from .blueprints.movimentacoes.routes import bp as movimentacoes_bp
+    app.register_blueprint(movimentacoes_bp)
+
+    # Blueprint de eventos (Módulo 3 - Fase 4)
+    from .blueprints.eventos.routes import bp as eventos_bp
+    app.register_blueprint(eventos_bp)
     
     print("🚀 Exitus Backend Módulo 2 - Application Factory criada com sucesso!")
     print(f"📍 Environment: {app.config.get('FLASK_ENV')}")

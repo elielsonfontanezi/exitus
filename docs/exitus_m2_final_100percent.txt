@@ -1,0 +1,33 @@
+[0;34m================================================[0m
+[0;34m  EXITUS - Documentação da Estrutura do Banco[0m
+[0;34m================================================[0m
+
+[0;32m✓ Container exitus-db está online[0m
+Gerando documentação em: [1;33mexitus_db_structure_20251202_214838.txt[0m
+
+Coletando lista de tabelas...
+Coletando estrutura detalhada das tabelas...
+Coletando detalhes de colunas, PKs e FKs...
+  - Processando tabela: alembic_version
+  - Processando tabela: ativo
+  - Processando tabela: corretora
+  - Processando tabela: evento_corporativo
+  - Processando tabela: feriado_mercado
+  - Processando tabela: fonte_dados
+  - Processando tabela: log_auditoria
+  - Processando tabela: movimentacao_caixa
+  - Processando tabela: posicao
+  - Processando tabela: provento
+  - Processando tabela: regra_fiscal
+  - Processando tabela: transacao
+  - Processando tabela: usuario
+
+[0;32m✓ Documentação gerada com sucesso![0m
+[0;34mArquivo: [1;33mexitus_db_structure_20251202_214838.txt[0m
+
+[0;34mPara visualizar:[0m
+  cat exitus_db_structure_20251202_214838.txt
+  less exitus_db_structure_20251202_214838.txt
+  code exitus_db_structure_20251202_214838.txt  [0;34m# (se estiver usando VSCode)[0m
+
+[0;32mPronto para compartilhar o status do banco! 🎯[0m

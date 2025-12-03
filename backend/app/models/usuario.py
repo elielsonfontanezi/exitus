@@ -17,7 +17,7 @@ class UserRole(enum.Enum):
 
 class Usuario(db.Model):
     """Model para usuários do sistema Exitus"""
-    __tablename__ = 'usuarios'  # ⬅️ PLURAL (consistente com FK)
+    __tablename__ = 'usuario'  # ⬅️ PLURAL (consistente com FK)
     
     # Identificação
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

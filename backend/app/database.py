@@ -22,5 +22,5 @@ def init_db(app):
         import app.models
 
         # Criar todas as tabelas
-        db.create_all()
+        # db.create_all() # DESABILITADO - tabelas já existem
         print("✅ Banco de dados inicializado e tabelas criadas!")
