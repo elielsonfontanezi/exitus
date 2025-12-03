@@ -38,7 +38,7 @@ class Corretora(db.Model):
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     
     # Relationships
-    usuario = relationship("Usuario", backref="corretoras", lazy=True)
+    usuario = relationship("Usuario", backref="corretoras", primaryjoin="Corretora.usuario_id == Usuario.id", lazy=True)
     
     def __repr__(self):
         return f"<Corretora {self.nome} ({self.pais})>"

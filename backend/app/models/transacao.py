@@ -36,7 +36,7 @@ class Transacao(db.Model):
     tipo = Column(Enum(TipoTransacao), nullable=False)
     
     # Relacionamentos
-    ativo_id = Column(UUID(as_uuid=True), ForeignKey('ativos.id'), nullable=False)
+    ativo_id = Column(UUID(as_uuid=True), ForeignKey('ativo.id'), nullable=False)
     corretora_id = Column(UUID(as_uuid=True), ForeignKey('corretora.id'), nullable=False)
     
     # Dados da transação
@@ -63,7 +63,7 @@ class Transacao(db.Model):
     
     # Relationships (lazy loading)
     usuario = relationship("Usuario", backref="transacoes", lazy=True)
-    ativo = relationship("Ativo", backref="transacoes", lazy=True)
+    ativo = relationship("Ativo", backref="transacoes", primaryjoin="Transacao.ativo_id == Ativo.id", lazy=True)
     corretora = relationship("Corretora", backref="transacoes", lazy=True)
     
     def __repr__(self):
