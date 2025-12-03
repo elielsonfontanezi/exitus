@@ -9,6 +9,7 @@ from .posicao import Posicao
 from .provento import Provento
 from .movimentacao_caixa import MovimentacaoCaixa
 from .evento_corporativo import EventoCorporativo
+from .parametros_macro import ParametrosMacro
 
 __all__ = [
     'Usuario', 'UserRole',
