@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Exitus Frontend - Application Factory"""
+"""
+Exitus Frontend - Application Factory
+Módulo 5: Frontend Base + Autenticação
+"""
 
-from flask import Flask, render_template_string
+from flask import Flask
 from .config import Config
 
 
@@ -12,22 +15,10 @@ def create_app():
     # Carrega configurações
     app.config.from_object(Config)
 
-    # Rota inicial simples (será substituída em módulos futuros)
-    @app.route('/')
-    def index():
-        html = """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Exitus - Sistema de Investimentos</title>
-        </head>
-        <body>
-            <h1>Exitus - Sistema de Controle e Análise de Investimentos</h1>
-            <p>Frontend funcionando corretamente!</p>
-        </body>
-        </html>
-        """
-        return render_template_string(html)
+    # Registrar blueprints
+    from .routes import auth, dashboard
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(dashboard.bp)
 
     # Health check
     @app.route('/health')
@@ -37,5 +28,13 @@ def create_app():
             'service': 'exitus-frontend',
             'env': app.config.get('FLASK_ENV', 'unknown')
         }, 200
+
+    # Redirect root to dashboard or login
+    @app.route('/')
+    def index():
+        from flask import session, redirect, url_for
+        if session.get('user_id'):
+            return redirect(url_for('dashboard.index'))
+        return redirect(url_for('auth.login'))
 
     return app

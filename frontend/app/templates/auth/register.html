@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Criar Conta - Exitus{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        
+        <!-- Logo & Title -->
+        <div class="text-center">
+            <div class="flex justify-center">
+                <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user-plus text-3xl text-white"></i>
+                </div>
+            </div>
+            <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
+                Criar Nova Conta
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Comece a gerenciar seus investimentos hoje
+            </p>
+        </div>
+
+        <!-- Register Form -->
+        <div class="card">
+            <form id="register-form" 
+                  hx-post="{{ config.BACKEND_API_URL }}/api/auth/register"
+                  hx-trigger="submit"
+                  hx-target="#register-response"
+                  hx-indicator="#register-loading">
+                
+                <div class="space-y-4">
+                    
+                    <!-- Nome -->
+                    <div>
+                        <label for="nome" class="label">
+                            <i class="fas fa-user mr-1"></i> Nome Completo
+                        </label>
+                        <input type="text" 
+                               id="nome" 
+                               name="nome" 
+                               class="input" 
+                               placeholder="João Silva"
+                               required
+                               minlength="3"
+                               autocomplete="name">
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="label">
+                            <i class="fas fa-envelope mr-1"></i> E-mail
+                        </label>
+                        <input type="email" 
+                               id="email" 
+                               name="email" 
+                               class="input" 
+                               placeholder="seu@email.com"
+                               required
+                               autocomplete="email">
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="label">
+                            <i class="fas fa-lock mr-1"></i> Senha
+                        </label>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="input" 
+                               placeholder="••••••••"
+                               required
+                               minlength="6"
+                               autocomplete="new-password">
+                        <p class="mt-1 text-xs text-gray-500">
+                            Mínimo 6 caracteres
+                        </p>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div>
+                        <label for="password_confirm" class="label">
+                            <i class="fas fa-lock mr-1"></i> Confirmar Senha
+                        </label>
+                        <input type="password" 
+                               id="password_confirm" 
+                               name="password_confirm" 
+                               class="input" 
+                               placeholder="••••••••"
+                               required
+                               minlength="6"
+                               autocomplete="new-password">
+                    </div>
+
+                    <!-- Terms & Conditions -->
+                    <div class="flex items-start">
+                        <input type="checkbox" 
+                               id="terms" 
+                               name="terms"
+                               class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                               required>
+                        <label for="terms" class="ml-2 text-sm text-gray-700">
+                            Eu aceito os 
+                            <a href="/terms" class="text-blue-600 hover:text-blue-700">Termos de Uso</a> 
+                            e 
+                            <a href="/privacy" class="text-blue-600 hover:text-blue-700">Política de Privacidade</a>
+                        </label>
+                    </div>
+
+                    <!-- Response Area -->
+                    <div id="register-response"></div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            class="w-full btn btn-primary flex items-center justify-center space-x-2">
+                        <span>Criar Conta</span>
+                        <div id="register-loading" class="htmx-indicator">
+                            <div class="spinner"></div>
+                        </div>
+                    </button>
+
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Já tem uma conta?</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Link -->
+            <div class="mt-4 text-center">
+                <a href="/auth/login" class="text-blue-600 hover:text-blue-700 font-medium">
+                    Fazer login
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Validate password match
+    document.getElementById('register-form').addEventListener('submit', function(event) {
+        const password = document.getElementById('password').value;
+        const passwordConfirm = document.getElementById('password_confirm').value;
+        
+        if (password !== passwordConfirm) {
+            event.preventDefault();
+            document.getElementById('register-response').innerHTML = `
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    As senhas não coincidem
+                </div>
+            `;
+            return false;
+        }
+    });
+
+    // Handle HTMX response
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.target.id === 'register-response') {
+            const xhr = event.detail.xhr;
+            const response = JSON.parse(xhr.responseText);
+            
+            if (xhr.status === 201 || xhr.status === 200) {
+                // Success message
+                document.getElementById('register-response').innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        Conta criada com sucesso! Redirecionando para login...
+                    </div>
+                `;
+                
+                // Redirect to login
+                setTimeout(() => {
+                    window.location.href = '/auth/login';
+                }, 2000);
+            } else {
+                // Error message
+                document.getElementById('register-response').innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        ${response.message || 'Erro ao criar conta. Tente novamente.'}
+                    </div>
+                `;
+            }
+        }
+    });
+</script>
+{% endblock %}

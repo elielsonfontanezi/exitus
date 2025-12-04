@@ -1,0 +1,59 @@
+<!-- Navbar Component -->
+<nav class="bg-white border-b border-gray-200 px-6 py-4">
+    <div class="flex items-center justify-between">
+        
+        <!-- Left: Logo + Menu Toggle -->
+        <div class="flex items-center space-x-4">
+            <!-- Mobile Menu Toggle -->
+            <button @click="sidebarOpen = !sidebarOpen" 
+                    class="lg:hidden text-gray-600 hover:text-gray-900">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            
+            <!-- Logo -->
+            <a href="/" class="flex items-center space-x-2">
+                <i class="fas fa-chart-line text-2xl text-blue-600"></i>
+                <span class="text-xl font-bold text-gray-800">Exitus</span>
+            </a>
+        </div>
+
+        <!-- Right: User Menu -->
+        <div class="flex items-center space-x-4" x-data="{ dropdownOpen: false }">
+            
+            <!-- Notifications -->
+            <button class="relative text-gray-600 hover:text-gray-900">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+
+            <!-- User Dropdown -->
+            <div class="relative">
+                <button @click="dropdownOpen = !dropdownOpen" 
+                        class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                    <span class="font-medium">{{ session.get('user_name', 'Usuário') }}</span>
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div x-show="dropdownOpen" 
+                     @click.away="dropdownOpen = false"
+                     x-transition
+                     class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                    <a href="/auth/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user-circle mr-2"></i> Meu Perfil
+                    </a>
+                    <a href="/dashboard/settings" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-cog mr-2"></i> Configurações
+                    </a>
+                    <hr class="my-2">
+                    <a href="/auth/logout" class="block px-4 py-2 text-red-600 hover:bg-red-50">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
