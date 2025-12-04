@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Exitus{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        
+        <!-- Logo & Title -->
+        <div class="text-center">
+            <div class="flex justify-center">
+                <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-chart-line text-3xl text-white"></i>
+                </div>
+            </div>
+            <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
+                Bem-vindo ao Exitus
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Faça login para acessar sua conta
+            </p>
+        </div>
+
+        <!-- Login Form -->
+        <div class="card">
+            <form id="login-form" 
+                  hx-post="{{ config.BACKEND_API_URL }}/api/auth/login"
+                  hx-trigger="submit"
+                  hx-target="#login-response"
+                  hx-indicator="#login-loading">
+                
+                <div class="space-y-4">
+                    
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="label">
+                            <i class="fas fa-envelope mr-1"></i> E-mail
+                        </label>
+                        <input type="email" 
+                               id="email" 
+                               name="email" 
+                               class="input" 
+                               placeholder="seu@email.com"
+                               required
+                               autocomplete="email">
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="label">
+                            <i class="fas fa-lock mr-1"></i> Senha
+                        </label>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="input" 
+                               placeholder="••••••••"
+                               required
+                               autocomplete="current-password">
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input type="checkbox" 
+                                   id="remember_me" 
+                                   name="remember_me"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="remember_me" class="ml-2 text-sm text-gray-700">
+                                Lembrar-me
+                            </label>
+                        </div>
+                        <a href="/auth/forgot-password" class="text-sm text-blue-600 hover:text-blue-700">
+                            Esqueceu a senha?
+                        </a>
+                    </div>
+
+                    <!-- Response Area -->
+                    <div id="login-response"></div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            class="w-full btn btn-primary flex items-center justify-center space-x-2">
+                        <span>Entrar</span>
+                        <div id="login-loading" class="htmx-indicator">
+                            <div class="spinner"></div>
+                        </div>
+                    </button>
+
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Não tem uma conta?</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register Link -->
+            <div class="mt-4 text-center">
+                <a href="/auth/register" class="text-blue-600 hover:text-blue-700 font-medium">
+                    Criar nova conta
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Handle HTMX response
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.target.id === 'login-response') {
+            const xhr = event.detail.xhr;
+            const response = JSON.parse(xhr.responseText);
+            
+            if (xhr.status === 200 && response.access_token) {
+                // Store token in sessionStorage
+                sessionStorage.setItem('access_token', response.access_token);
+                
+                // Success message
+                document.getElementById('login-response').innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        Login realizado com sucesso! Redirecionando...
+                    </div>
+                `;
+                
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1500);
+            } else {
+                // Error message
+                document.getElementById('login-response').innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        ${response.message || 'E-mail ou senha inválidos'}
+                    </div>
+                `;
+            }
+        }
+    });
+</script>
+{% endblock %}

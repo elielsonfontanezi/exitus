@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Perfil - Exitus{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    
+    <!-- Page Header -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">
+            <i class="fas fa-user-circle text-blue-600"></i> Meu Perfil
+        </h1>
+        <p class="mt-2 text-gray-600">Gerencie suas informações pessoais e configurações</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Profile Card -->
+        <div class="lg:col-span-1">
+            <div class="card text-center">
+                <div class="mb-4">
+                    <div class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center mx-auto">
+                        <i class="fas fa-user text-5xl text-white"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">{{ session.get('user_name', 'Usuário') }}</h3>
+                <p class="text-gray-600 mt-1">{{ session.get('user_email', 'email@exemplo.com') }}</p>
+                <div class="mt-4">
+                    <span class="badge badge-success">
+                        <i class="fas fa-check-circle"></i> Conta Ativa
+                    </span>
+                </div>
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <div class="text-sm text-gray-600">
+                        <div class="flex justify-between py-2">
+                            <span>Membro desde:</span>
+                            <span class="font-medium">Jan 2025</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span>Último acesso:</span>
+                            <span class="font-medium">Hoje</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Details -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Personal Information -->
+            <div class="card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">
+                        <i class="fas fa-info-circle text-blue-600"></i> Informações Pessoais
+                    </h3>
+                    <button class="btn btn-secondary btn-sm" onclick="enableEdit()">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                </div>
+                
+                <form id="profile-form" 
+                      hx-put="{{ config.BACKEND_API_URL }}/api/auth/profile"
+                      hx-trigger="submit"
+                      hx-target="#profile-response"
+                      hx-indicator="#profile-loading">
+                    
+                    <div class="space-y-4">
+                        
+                        <!-- Nome -->
+                        <div>
+                            <label for="nome" class="label">Nome Completo</label>
+                            <input type="text" 
+                                   id="nome" 
+                                   name="nome" 
+                                   class="input" 
+                                   value="{{ session.get('user_name', '') }}"
+                                   disabled>
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="label">E-mail</label>
+                            <input type="email" 
+                                   id="email" 
+                                   name="email" 
+                                   class="input" 
+                                   value="{{ session.get('user_email', '') }}"
+                                   disabled>
+                        </div>
+
+                        <!-- Response Area -->
+                        <div id="profile-response"></div>
+
+                        <!-- Save Button (hidden by default) -->
+                        <div id="save-button" class="hidden">
+                            <button type="submit" 
+                                    class="btn btn-primary flex items-center space-x-2">
+                                <span>Salvar Alterações</span>
+                                <div id="profile-loading" class="htmx-indicator">
+                                    <div class="spinner"></div>
+                                </div>
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+            <!-- Change Password -->
+            <div class="card">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-key text-blue-600"></i> Alterar Senha
+                </h3>
+                
+                <form id="password-form"
+                      hx-put="{{ config.BACKEND_API_URL }}/api/auth/change-password"
+                      hx-trigger="submit"
+                      hx-target="#password-response"
+                      hx-indicator="#password-loading">
+                    
+                    <div class="space-y-4">
+                        
+                        <!-- Current Password -->
+                        <div>
+                            <label for="current_password" class="label">Senha Atual</label>
+                            <input type="password" 
+                                   id="current_password" 
+                                   name="current_password" 
+                                   class="input" 
+                                   placeholder="••••••••"
+                                   required>
+                        </div>
+
+                        <!-- New Password -->
+                        <div>
+                            <label for="new_password" class="label">Nova Senha</label>
+                            <input type="password" 
+                                   id="new_password" 
+                                   name="new_password" 
+                                   class="input" 
+                                   placeholder="••••••••"
+                                   minlength="6"
+                                   required>
+                        </div>
+
+                        <!-- Confirm New Password -->
+                        <div>
+                            <label for="new_password_confirm" class="label">Confirmar Nova Senha</label>
+                            <input type="password" 
+                                   id="new_password_confirm" 
+                                   name="new_password_confirm" 
+                                   class="input" 
+                                   placeholder="••••••••"
+                                   minlength="6"
+                                   required>
+                        </div>
+
+                        <!-- Response Area -->
+                        <div id="password-response"></div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" 
+                                class="btn btn-primary flex items-center space-x-2">
+                            <span>Alterar Senha</span>
+                            <div id="password-loading" class="htmx-indicator">
+                                <div class="spinner"></div>
+                            </div>
+                        </button>
+
+                    </div>
+                </form>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card border-2 border-red-200">
+                <h3 class="text-lg font-bold text-red-600 mb-4">
+                    <i class="fas fa-exclamation-triangle"></i> Zona de Perigo
+                </h3>
+                <p class="text-gray-600 mb-4">
+                    Ações irreversíveis relacionadas à sua conta
+                </p>
+                <button class="btn btn-danger" onclick="confirmDeleteAccount()">
+                    <i class="fas fa-trash"></i> Excluir Conta
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Enable form editing
+    function enableEdit() {
+        document.getElementById('nome').disabled = false;
+        document.getElementById('email').disabled = false;
+        document.getElementById('save-button').classList.remove('hidden');
+    }
+
+    // Validate password change
+    document.getElementById('password-form').addEventListener('submit', function(event) {
+        const newPassword = document.getElementById('new_password').value;
+        const confirmPassword = document.getElementById('new_password_confirm').value;
+        
+        if (newPassword !== confirmPassword) {
+            event.preventDefault();
+            document.getElementById('password-response').innerHTML = `
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    As senhas não coincidem
+                </div>
+            `;
+            return false;
+        }
+    });
+
+    // Handle password change response
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.target.id === 'password-response') {
+            const xhr = event.detail.xhr;
+            
+            if (xhr.status === 200) {
+                document.getElementById('password-response').innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        Senha alterada com sucesso!
+                    </div>
+                `;
+                document.getElementById('password-form').reset();
+            } else {
+                const response = JSON.parse(xhr.responseText);
+                document.getElementById('password-response').innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        ${response.message || 'Erro ao alterar senha'}
+                    </div>
+                `;
+            }
+        }
+    });
+
+    // Confirm account deletion
+    function confirmDeleteAccount() {
+        if (confirm('Tem certeza que deseja excluir sua conta? Esta ação é irreversível!')) {
+            if (confirm('ATENÇÃO: Todos os seus dados serão permanentemente excluídos. Confirma?')) {
+                // Implement delete account logic
+                alert('Funcionalidade de exclusão será implementada no Módulo 7');
+            }
+        }
+    }
+</script>
+{% endblock %}

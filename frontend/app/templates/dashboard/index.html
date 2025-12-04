@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Exitus{% endblock %}
+
+{% block content %}
+<div>
+    
+    <!-- Page Header -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">
+            <i class="fas fa-home text-blue-600"></i> Dashboard
+        </h1>
+        <p class="mt-2 text-gray-600">Visão geral do seu portfólio e Buy Signals</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        
+        <!-- Total Portfolio -->
+        <div class="card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600">Portfólio Total</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">R$ 125.430,00</p>
+                    <p class="text-sm text-green-600 mt-1">
+                        <i class="fas fa-arrow-up"></i> +12.5% no mês
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-wallet text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Dividends -->
+        <div class="card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600">Proventos (mês)</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">R$ 1.245,00</p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        <i class="fas fa-calendar"></i> Dezembro 2025
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-coins text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buy Signals -->
+        <div class="card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600">Buy Signals Ativos</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">8</p>
+                    <p class="text-sm text-green-600 mt-1">
+                        <i class="fas fa-signal"></i> 3 oportunidades fortes
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-chart-line text-emerald-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assets -->
+        <div class="card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600">Ativos em Carteira</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">24</p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        <i class="fas fa-chart-pie"></i> 5 mercados
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-briefcase text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Buy Signals Section -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold text-gray-900">
+                <i class="fas fa-signal text-emerald-600"></i> Buy Signals - TOP 10
+            </h2>
+            <a href="/dashboard/buy-signals" class="btn btn-primary">
+                Ver Todos <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+
+        <!-- Buy Signals Table -->
+        <div class="card overflow-hidden">
+            <div id="buy-signals-table"
+                 hx-get="{{ config.BACKEND_API_URL }}/api/buy-signals/watchlist-top"
+                 hx-trigger="load"
+                 hx-indicator="#signals-loading">
+                
+                <!-- Loading State -->
+                <div id="signals-loading" class="flex items-center justify-center py-12">
+                    <div class="text-center">
+                        <div class="spinner mx-auto mb-4"></div>
+                        <p class="text-gray-600">Carregando Buy Signals...</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <a href="/dashboard/transactions/new" class="card hover:shadow-lg transition-shadow cursor-pointer">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-plus text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900">Nova Transação</h3>
+                    <p class="text-sm text-gray-600">Registrar compra ou venda</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="/dashboard/reports" class="card hover:shadow-lg transition-shadow cursor-pointer">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-file-alt text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900">Relatórios</h3>
+                    <p class="text-sm text-gray-600">Análises e exportações</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="/dashboard/analytics" class="card hover:shadow-lg transition-shadow cursor-pointer">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-chart-bar text-purple-600 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900">Análises</h3>
+                    <p class="text-sm text-gray-600">Performance e métricas</p>
+                </div>
+            </div>
+        </a>
+
+    </div>
+</div>
+
+<script>
+    // Handle Buy Signals response
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.target.id === 'buy-signals-table') {
+            const xhr = event.detail.xhr;
+            
+            if (xhr.status === 200) {
+                const signals = JSON.parse(xhr.responseText);
+                
+                let html = `
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rank</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ativo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mercado</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Buy Score</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Margem</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sinal</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                `;
+                
+                signals.forEach((signal, index) => {
+                    const signalClass = signal.buy_score >= 70 ? 'signal-compra' : 
+                                       signal.buy_score >= 40 ? 'signal-neutro' : 'signal-venda';
+                    const badgeClass = signal.buy_score >= 70 ? 'badge-success' : 
+                                      signal.buy_score >= 40 ? 'badge-warning' : 'badge-danger';
+                    
+                    html += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="font-bold text-gray-900">#${index + 1}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="font-bold text-gray-900">${signal.ticker}</div>
+                                <div class="text-sm text-gray-500">${signal.nome || ''}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="badge badge-neutral">${signal.mercado}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="${signalClass} text-lg">${signal.buy_score}/100</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-green-600 font-medium">${signal.margem_seguranca}%</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="badge ${badgeClass}">
+                                    ${signal.buy_score >= 70 ? '🟢 COMPRA' : 
+                                      signal.buy_score >= 40 ? '🟡 NEUTRO' : '🔴 VENDA'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <a href="/dashboard/assets/${signal.ticker}" 
+                                   class="text-blue-600 hover:text-blue-800">
+                                    Ver Detalhes <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                document.getElementById('buy-signals-table').innerHTML = html;
+            } else {
+                document.getElementById('buy-signals-table').innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-exclamation-triangle text-4xl text-yellow-500 mb-4"></i>
+                        <p class="text-gray-600">Erro ao carregar Buy Signals</p>
+                        <button onclick="location.reload()" class="btn btn-primary mt-4">
+                            Tentar Novamente
+                        </button>
+                    </div>
+                `;
+            }
+        }
+    });
+</script>
+{% endblock %}
