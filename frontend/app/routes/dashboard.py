@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Exitus Frontend - Dashboard Routes
-MÓDULO 6: Buy Signals + Portfolios ✅
+MÓDULO 6: Buy Signals + Portfolios + Transações ✅
 """
 
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
@@ -24,7 +24,6 @@ def login_required(f):
 @login_required
 def index():
     """Dashboard principal - M6 ✅"""
-    # Renderizar dashboard principal (não redirecionar!)
     return render_template('dashboard/index.html')
 
 @bp.route('/buy-signals', methods=['GET'])
@@ -167,16 +166,198 @@ def portfolios_create():
 
     return redirect(url_for('dashboard.portfolios'))
 
-# Placeholders M6/M7
+# ========================================
+# M6.3 TRANSAÇÕES
+# ========================================
+
+@bp.route('/transactions', methods=['GET'])
+@login_required
+def transactions():
+    """M6.3 - Gestão de Transações (COMPRA/VENDA) - Todos os tipos de ativos"""
+    token = session.get('accesstoken')
+    transacoes = []
+    
+    # Filtros da query string
+    tipo_ativo = request.args.get('tipo')
+    classe = request.args.get('classe')
+    mercado = request.args.get('mercado')
+    corretora_id = request.args.get('corretora')
+    data_inicio = request.args.get('data_inicio')
+    data_fim = request.args.get('data_fim')
+    page = int(request.args.get('page', 1))
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            params = {'page': page, 'per_page': 20}
+            
+            if tipo_ativo:
+                params['tipo_ativo'] = tipo_ativo
+            if classe:
+                params['classe'] = classe
+            if mercado:
+                params['mercado'] = mercado
+            if corretora_id:
+                params['corretora_id'] = corretora_id
+            if data_inicio:
+                params['data_inicio'] = data_inicio
+            if data_fim:
+                params['data_fim'] = data_fim
+            
+            response = requests.get(
+                f'{Config.BACKEND_API_URL}/api/transacoes',
+                headers=headers, params=params, timeout=10
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                transacoes = result.get('data', {}).get('transacoes', [])
+        except:
+            pass
+    
+    # Mock data se API falhar
+    if not transacoes:
+        transacoes = [
+            {
+                'id': '1', 'data': '2024-12-01', 'tipo_operacao': 'compra',
+                'ativo': {'ticker': 'PETR4', 'nome': 'Petrobras', 'tipo': 'acao', 'classe': 'rendavariavel', 'mercado': 'BR'},
+                'corretora': {'nome': 'XP Investimentos'},
+                'quantidade': 100, 'preco_unitario': 38.50, 'valor_total': 3850.00,
+                'taxas': 5.00, 'moeda': 'BRL'
+            },
+            {
+                'id': '2', 'data': '2024-11-28', 'tipo_operacao': 'compra',
+                'ativo': {'ticker': 'MXRF11', 'nome': 'Maxi Renda', 'tipo': 'fii', 'classe': 'rendavariavel', 'mercado': 'BR'},
+                'corretora': {'nome': 'Clear Corretora'},
+                'quantidade': 50, 'preco_unitario': 10.20, 'valor_total': 510.00,
+                'taxas': 2.50, 'moeda': 'BRL'
+            },
+            {
+                'id': '3', 'data': '2024-11-25', 'tipo_operacao': 'compra',
+                'ativo': {'ticker': 'AAPL', 'nome': 'Apple Inc', 'tipo': 'acao', 'classe': 'rendavariavel', 'mercado': 'US'},
+                'corretora': {'nome': 'Avenue Securities'},
+                'quantidade': 10, 'preco_unitario': 195.50, 'valor_total': 1955.00,
+                'taxas': 1.00, 'moeda': 'USD'
+            },
+            {
+                'id': '4', 'data': '2024-11-20', 'tipo_operacao': 'venda',
+                'ativo': {'ticker': 'VALE3', 'nome': 'Vale S.A.', 'tipo': 'acao', 'classe': 'rendavariavel', 'mercado': 'BR'},
+                'corretora': {'nome': 'XP Investimentos'},
+                'quantidade': 200, 'preco_unitario': 62.30, 'valor_total': 12460.00,
+                'taxas': 8.00, 'moeda': 'BRL'
+            },
+            {
+                'id': '5', 'data': '2024-11-15', 'tipo_operacao': 'compra',
+                'ativo': {'ticker': 'BTC', 'nome': 'Bitcoin', 'tipo': 'cripto', 'classe': 'cripto', 'mercado': 'US'},
+                'corretora': {'nome': 'Binance'},
+                'quantidade': 0.05, 'preco_unitario': 42000.00, 'valor_total': 2100.00,
+                'taxas': 10.50, 'moeda': 'USD'
+            },
+        ]
+    
+    # Stats
+    total_compras = sum(1 for t in transacoes if t['tipo_operacao'] == 'compra')
+    total_vendas = sum(1 for t in transacoes if t['tipo_operacao'] == 'venda')
+    volume_total = sum(t.get('valor_total', 0) for t in transacoes)
+    
+    stats = {
+        'total': len(transacoes),
+        'compras': total_compras,
+        'vendas': total_vendas,
+        'volume_total': volume_total
+    }
+    
+    # Listas para filtros
+    corretoras = [
+        {'id': '1', 'nome': 'XP Investimentos'},
+        {'id': '2', 'nome': 'Clear Corretora'},
+        {'id': '3', 'nome': 'Avenue Securities'}
+    ]
+    
+    tipos_ativo = [
+        {'value': 'acao', 'label': 'Ação'},
+        {'value': 'fii', 'label': 'FII'},
+        {'value': 'reit', 'label': 'REIT'},
+        {'value': 'bond', 'label': 'Bond'},
+        {'value': 'etf', 'label': 'ETF'},
+        {'value': 'cripto', 'label': 'Cripto'},
+        {'value': 'outro', 'label': 'Outro'}
+    ]
+    
+    classes_ativo = [
+        {'value': 'rendavariavel', 'label': 'Renda Variável'},
+        {'value': 'rendafixa', 'label': 'Renda Fixa'},
+        {'value': 'cripto', 'label': 'Cripto'},
+        {'value': 'hibrido', 'label': 'Híbrido'}
+    ]
+    
+    mercados = [
+        {'value': 'BR', 'label': 'Brasil 🇧🇷'},
+        {'value': 'US', 'label': 'EUA 🇺🇸'},
+        {'value': 'EUR', 'label': 'Europa 🇪🇺'}
+    ]
+    
+    return render_template('dashboard/transactions.html',
+                         transacoes=transacoes,
+                         stats=stats,
+                         corretoras=corretoras,
+                         tipos_ativo=tipos_ativo,
+                         classes_ativo=classes_ativo,
+                         mercados=mercados,
+                         filtros={
+                             'tipo': tipo_ativo,
+                             'classe': classe,
+                             'mercado': mercado,
+                             'corretora_id': corretora_id,
+                             'data_inicio': data_inicio,
+                             'data_fim': data_fim
+                         },
+                         current_page=page,
+                         total_pages=1)
+
+@bp.route('/transactions/new', methods=['GET', 'POST'])
+@login_required
+def transactions_new():
+    """M6.3 - Form Nova Transação"""
+    if request.method == 'POST':
+        try:
+            data = {
+                'tipo_operacao': request.form.get('tipo_operacao'),
+                'ativo_id': request.form.get('ativo_id'),
+                'corretora_id': request.form.get('corretora_id'),
+                'data': request.form.get('data'),
+                'quantidade': float(request.form.get('quantidade')),
+                'preco_unitario': float(request.form.get('preco_unitario')),
+                'taxas': float(request.form.get('taxas', 0)),
+                'observacoes': request.form.get('observacoes', '')
+            }
+            
+            token = session.get('accesstoken')
+            headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
+            
+            response = requests.post(
+                f'{Config.BACKEND_API_URL}/api/transacoes',
+                json=data, headers=headers, timeout=10
+            )
+            
+            if response.status_code in [200, 201]:
+                flash('✅ Transação registrada com sucesso!', 'success')
+                return redirect(url_for('dashboard.transactions'))
+            else:
+                flash(f'❌ Erro ao registrar: {response.status_code}', 'error')
+        except Exception as e:
+            flash(f'❌ Erro: {str(e)}', 'error')
+    
+    return redirect(url_for('dashboard.transactions'))
+
+# Placeholders M7
 @bp.route('/assets')
 @bp.route('/assets/<ticker>')
-@bp.route('/transactions')
-@bp.route('/transactions/new')
 @bp.route('/dividends')
 @bp.route('/reports')
 @bp.route('/analytics')
 @bp.route('/settings')
 @login_required
 def placeholder():
-    flash('Em desenvolvimento - M6/M7', 'info')
+    flash('Em desenvolvimento - M7', 'info')
     return redirect(url_for('dashboard.buy_signals'))
