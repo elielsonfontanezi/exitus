@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block title %}Carteiras - Exitus{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">
+        <i class="fas fa-wallet text-blue-600 mr-3"></i>
+        Carteiras
+      </h1>
+      <p class="text-gray-600 mt-1">Gerencie suas corretoras e contas de investimento</p>
+    </div>
+    <button onclick="openModal()" class="btn btn-primary">
+      <i class="fas fa-plus mr-2"></i>Nova Carteira
+    </button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="card p-6 text-center hover:shadow-xl transition-all">
+      <div class="text-3xl font-bold text-blue-600 mb-2">{{ stats.total }}</div>
+      <div class="text-sm text-gray-600 uppercase tracking-wider">Total Carteiras</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl transition-all">
+      <div class="text-3xl font-bold text-green-600 mb-2">{{ stats.ativas }}</div>
+      <div class="text-sm text-gray-600 uppercase tracking-wider">Ativas</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl transition-all">
+      <div class="text-3xl font-bold text-emerald-600 mb-2">
+        R$ {{ "%.2f"|format(stats.saldo_total) }}
+      </div>
+      <div class="text-sm text-gray-600 uppercase tracking-wider">Saldo Total</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl transition-all">
+      <div class="text-2xl font-bold text-purple-600 mb-2">
+        BR: R$ {{ "%.0f"|format(stats.saldo_br) }}<br>
+        US: $ {{ "%.0f"|format(stats.saldo_us) }}
+      </div>
+      <div class="text-sm text-gray-600 uppercase tracking-wider">Por Região</div>
+    </div>
+  </div>
+
+  <!-- Tabela Carteiras -->
+  <div class="card">
+    <div class="p-6 border-b flex justify-between items-center">
+      <h2 class="text-xl font-bold">Suas Carteiras ({{ corretoras|length }})</h2>
+      <div class="text-sm text-gray-500">Saldo Total: R$ {{ "%.2f"|format(stats.saldo_total) }}</div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full table-auto">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-4 text-left font-bold text-gray-900">Nome</th>
+            <th class="px-6 py-4 text-left font-bold text-gray-900">Tipo</th>
+            <th class="px-6 py-4 text-center font-bold text-gray-900">País</th>
+            <th class="px-6 py-4 text-right font-bold text-gray-900">Saldo</th>
+            <th class="px-6 py-4 text-center font-bold text-gray-900">Status</th>
+            <th class="px-6 py-4 text-center font-bold text-gray-900">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for corr in corretoras %}
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4">
+              <div class="font-bold text-lg text-gray-900">{{ corr.nome }}</div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="badge badge-blue px-3 py-1">{{ corr.tipo|title }}</span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <span class="text-xl font-semibold">
+                {{ '🇧🇷' if corr.pais == 'BR' else '🇺🇸' if corr.pais == 'US' else '🌍' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right font-bold text-emerald-600 text-lg">
+              {{ corr.moeda_padrao }} {{ "%.2f"|format(corr.saldo_atual or 0) }}
+            </td>
+            <td class="px-6 py-4 text-center">
+              <span class="badge {{ 'badge-success text-green-800' if corr.ativa else 'badge-danger text-red-800' }} px-3 py-1">
+                {{ 'ATIVA' if corr.ativa else 'INATIVA' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-center space-x-2">
+              <button class="btn btn-sm btn-primary" title="Editar">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" title="Excluir">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+              <i class="fas fa-wallet text-4xl text-gray-400 mb-4"></i>
+              <div>Nenhuma carteira cadastrada</div>
+              <div class="text-sm mt-1">Clique em "Nova Carteira" para começar</div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Gráfico Alocação -->
+  <div class="card">
+    <div class="p-6 border-b">
+      <h2 class="text-xl font-bold flex items-center">
+        <i class="fas fa-chart-pie text-blue-600 mr-2"></i>Alocação por Carteira
+      </h2>
+    </div>
+    <div class="p-6 bg-gray-50">
+      <div style="position: relative; height:400px; width:100%">
+        nvas id="allocationn-chart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nova Carteira -->
+<div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-2xl font-bold text-gray-900">Nova Carteira</h3>
+      <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <form method="POST" action="/dashboard/portfolios/create" class="space-y-6">
+      <div>
+        <label class="label block mb-2">Nome da Carteira <span class="text-red-500">*</span></label>
+        <input type="text" name="nome" class="input" placeholder="Ex: XP Investimentos" required>
+      </div>
+      <div>
+        <label class="label block mb-2">Tipo <span class="text-red-500">*</span></label>
+        <select name="tipo" class="input" required>
+          <option value="corretora">Corretora</option>
+          <option value="exchange">Exchange</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="label block mb-2">País <span class="text-red-500">*</span></label>
+          <select name="pais" class="input" required>
+            <option value="BR">Brasil 🇧🇷</option>
+            <option value="US">EUA 🇺🇸</option>
+            <option value="EU">Europa 🇪🇺</option>
+          </select>
+        </div>
+        <div>
+          <label class="label block mb-2">Moeda <span class="text-red-500">*</span></label>
+          <select name="moeda" class="input" required>
+            <option value="BRL">BRL (R$)</option>
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="label block mb-2">Saldo Inicial</label>
+        <input type="number" name="saldo" step="0.01" class="input" placeholder="0.00" value="0">
+      </div>
+      <div class="flex gap-3 pt-4 border-t">
+        <button type="button" onclick="closeModal()" class="btn btn-secondary flex-1">Cancelar</button>
+        <button type="submit" class="btn btn-primary flex-1">
+          <i class="fas fa-save mr-2"></i>Salvar Carteira
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function openModal() {
+  document.getElementById('modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+  document.body.style.overflow = 'auto';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const ctx = document.getElementById('allocation-chart');
+  if (ctx) {
+    const labels = {{ corretoras|map(attribute='nome')|list|tojson }};
+    const data = {{ corretoras|map(attribute='saldo_atual')|list|tojson }};
+    
+    new Chart(ctx.getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { padding: 20 }
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}
