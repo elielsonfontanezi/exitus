@@ -1,48 +1,144 @@
 {% extends "base.html" %}
 {% block title %}Buy Signals - Exitus{% endblock %}
+
 {% block content %}
 <div class="container mx-auto p-6 space-y-6">
-  <!-- Filtros -->
-  <div class="card">
-    <h2 class="text-xl font-bold p-6 border-b">🔍 Filtros Buy Signals</h2>
-    <form hx-get="/dashboard/buy-signals/table" hx-target="#signals-table" hx-swap="innerHTML" class="p-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <select name="mercado" class="input">
-          <option value="all">Todos</option>
-          <option value="BR">Brasil</option>
-          <option value="US">EUA</option>
-        </select>
-        <button class="btn btn-primary">Filtrar</button>
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">
+        <i class="fas fa-chart-line text-blue-600 mr-3"></i>Buy Signals
+      </h1>
+      <p class="text-gray-600 mt-1">Ativos com melhores oportunidades de compra</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-blue-600 mb-2">{{ signals|length }}</div>
+      <div class="text-sm text-gray-600 uppercase">Total Sinais</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-green-600 mb-2">
+        {{ signals|selectattr('buyscore', 'ge', 80)|list|length }}
       </div>
-    </form>
-  </div>
-
-  <!-- Tabela -->
-  <div class="card">
-    <div class="p-6 border-b flex justify-between">
-      <h2>📊 Buy Signals ({{ signals|length }})</h2>
-      <span>Página {{ current_page }}</span>
+      <div class="text-sm text-gray-600 uppercase">Sinais Fortes</div>
     </div>
-    <div id="signals-table">
-      {% include 'components/buy_signals_table.html' %}
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-orange-600 mb-2">
+        {{ (signals|map(attribute='margem')|sum / signals|length)|round(2) if signals else 0 }}%
+      </div>
+      <div class="text-sm text-gray-600 uppercase">Margem Média</div>
     </div>
   </div>
 
-  <!-- Gráficos -->
+  <!-- Tabela Sinais -->
   <div class="card">
-    <h2 class="text-xl font-bold p-6 border-b">📈 Performance</h2>
-    <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-      anvas id="markets-chart" height="200"></canvas>
+    <div class="p-6 border-b">
+      <h2 class="text-xl font-bold">Melhores Oportunidades</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-4 text-left font-bold">Ativo</th>
+            <th class="px-6 py-4 text-left font-bold">Mercado</th>
+            <th class="px-6 py-4 text-center font-bold">Buy Score</th>
+            <th class="px-6 py-4 text-right font-bold">Margem</th>
+            <th class="px-6 py-4 text-center font-bold">Ação</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for signal in signals %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <div class="font-bold text-lg">{{ signal.ticker }}</div>
+              <div class="text-sm text-gray-600">{{ signal.nome }}</div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="text-2xl">
+                {% if signal.mercado == 'BR' %}🇧🇷
+                {% elif signal.mercado == 'US' %}🇺🇸
+                {% else %}🇪🇺{% endif %}
+              </span>
+              <span class="text-sm text-gray-600 ml-2">{{ signal.mercado }}</span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              {% if signal.buyscore >= 80 %}
+              <span class="badge bg-green-500 text-white px-4 py-2 text-lg font-bold">{{ signal.buyscore }}</span>
+              {% elif signal.buyscore >= 60 %}
+              <span class="badge bg-yellow-500 text-white px-4 py-2 text-lg font-bold">{{ signal.buyscore }}</span>
+              {% else %}
+              <span class="badge bg-red-500 text-white px-4 py-2 text-lg font-bold">{{ signal.buyscore }}</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 text-right">
+              <span class="text-lg font-bold text-green-600">+{{ "%.2f"|format(signal.margem) }}%</span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <a href="/dashboard/assets/{{ signal.ticker }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-shopping-cart mr-1"></i>Comprar
+              </a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+              <i class="fas fa-chart-line text-4xl mb-4"></i>
+              <div>Nenhum sinal disponível</div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Gráfico Distribuição Mercados -->
+  <div class="card">
+    <div class="p-6 border-b">
+      <h2 class="text-xl font-bold"><i class="fas fa-globe text-blue-600 mr-2"></i>Distribuição por Mercado</h2>
+    </div>
+    <div class="p-6 bg-gray-50">
+      <div style="max-width:500px;margin:0 auto;height:300px;">
+        <canvas id="chartMercados"></canvas>
+      </div>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-  new Chart(document.getElementById('markets-chart'), {
-    type: 'doughnut',
-    data: {{ summary.mercados | tojson }},
-    options: { responsive: true }
-  });
+document.addEventListener('DOMContentLoaded', function(){
+  const ctx = document.getElementById('chartMercados');
+  if(ctx){
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Brasil 🇧🇷', 'EUA 🇺🇸', 'Europa 🇪🇺'],
+        datasets: [{
+          label: 'Sinais por Mercado',
+          data: [2, 1, 0],
+          backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: {size: 14},
+              padding: 15
+            }
+          }
+        }
+      }
+    });
+  }
+});
 </script>
 {% endblock %}
