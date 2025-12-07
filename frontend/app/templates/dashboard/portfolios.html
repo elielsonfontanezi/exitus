@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Portfolios - Exitus{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 space-y-6">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">
+        <i class="fas fa-briefcase text-blue-600 mr-3"></i>Carteiras
+      </h1>
+      <p class="text-gray-600 mt-1">Gerencie suas contas de investimento</p>
+    </div>
+    <button onclick="openModal()" class="btn btn-primary">
+      <i class="fas fa-plus mr-2"></i>Nova Carteira
+    </button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-blue-600 mb-2">{{ stats.total }}</div>
+      <div class="text-sm text-gray-600 uppercase">Total Carteiras</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-green-600 mb-2">{{ stats.ativas }}</div>
+      <div class="text-sm text-gray-600 uppercase">Ativas</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-emerald-600 mb-2">R$ {{ "%.2f"|format(stats.saldo_br) }}</div>
+      <div class="text-sm text-gray-600 uppercase">Saldo Brasil</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-blue-600 mb-2">$ {{ "%.2f"|format(stats.saldo_us) }}</div>
+      <div class="text-sm text-gray-600 uppercase">Saldo EUA</div>
+    </div>
+  </div>
+
+  <!-- Tabela Carteiras -->
+  <div class="card">
+    <div class="p-6 border-b">
+      <h2 class="text-xl font-bold">Minhas Carteiras ({{ corretoras|length }})</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-4 text-left font-bold">Corretora</th>
+            <th class="px-6 py-4 text-left font-bold">Tipo</th>
+            <th class="px-6 py-4 text-left font-bold">País</th>
+            <th class="px-6 py-4 text-right font-bold">Saldo</th>
+            <th class="px-6 py-4 text-center font-bold">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for corr in corretoras %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <div class="font-bold text-lg">{{ corr.nome }}</div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="badge badge-blue">{{ corr.tipo|upper }}</span>
+            </td>
+            <td class="px-6 py-4">
+              <span class="text-2xl">{{ '🇧🇷' if corr.pais == 'BR' else '🇺🇸' }}</span>
+              <span class="ml-2">{{ corr.pais }}</span>
+            </td>
+            <td class="px-6 py-4 text-right font-bold text-green-600">
+              {{ corr.moeda_padrao }} {{ "%.2f"|format(corr.saldo_atual) }}
+            </td>
+            <td class="px-6 py-4 text-center">
+              <span class="badge {{ 'bg-green-500 text-white' if corr.ativa else 'bg-gray-400 text-white' }} px-3 py-1">
+                {{ 'ATIVA' if corr.ativa else 'INATIVA' }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nova Carteira (6 CAMPOS) -->
+<div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl p-8 max-w-md w-full">
+    <h3 class="text-2xl font-bold mb-6">Nova Carteira</h3>
+    <form method="POST" action="/dashboard/portfolios/create" class="space-y-4">
+      <div>
+        <label class="label">Nome <span class="text-red-500">*</span></label>
+        <input type="text" name="nome" class="input" placeholder="Ex: XP Investimentos" required>
+      </div>
+      <div>
+        <label class="label">Tipo <span class="text-red-500">*</span></label>
+        <select name="tipo" class="input" required>
+          <option value="corretora">Corretora</option>
+          <option value="exchange">Exchange</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="label">País <span class="text-red-500">*</span></label>
+          <select name="pais" class="input" required>
+            <option value="BR">Brasil 🇧🇷</option>
+            <option value="US">EUA 🇺🇸</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Moeda <span class="text-red-500">*</span></label>
+          <select name="moeda" class="input" required>
+            <option value="BRL">BRL</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="label">Saldo Inicial</label>
+        <input type="number" name="saldo" step="0.01" class="input" placeholder="0.00" value="0">
+      </div>
+      <div>
+        <label class="label">Observações</label>
+        <textarea name="observacoes" class="input" rows="2" placeholder="Notas opcionais..."></textarea>
+      </div>
+      <div class="flex gap-3 pt-4 border-t">
+        <button type="button" onclick="closeModal()" class="btn btn-secondary flex-1">Cancelar</button>
+        <button type="submit" class="btn btn-primary flex-1">
+          <i class="fas fa-save mr-2"></i>Criar Carteira
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openModal(){document.getElementById('modal').classList.remove('hidden');}
+function closeModal(){document.getElementById('modal').classList.add('hidden');}
+</script>
+{% endblock %}

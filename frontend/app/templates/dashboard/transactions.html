@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% block title %}Transações - Exitus{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">
+        <i class="fas fa-exchange-alt text-blue-600 mr-3"></i>Transações
+      </h1>
+      <p class="text-gray-600 mt-1">Histórico completo de compras e vendas</p>
+    </div>
+    <button onclick="openModal()" class="btn btn-primary">
+      <i class="fas fa-plus mr-2"></i>Nova Transação
+    </button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-blue-600 mb-2">{{ stats.total }}</div>
+      <div class="text-sm text-gray-600 uppercase">Total Transações</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-green-600 mb-2">{{ stats.compras }}</div>
+      <div class="text-sm text-gray-600 uppercase">Compras</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-red-600 mb-2">{{ stats.vendas }}</div>
+      <div class="text-sm text-gray-600 uppercase">Vendas</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-emerald-600 mb-2">R$ {{ "%.2f"|format(stats.volume_total) }}</div>
+      <div class="text-sm text-gray-600 uppercase">Volume Total</div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card p-6">
+    <form method="GET" action="/dashboard/transactions" class="grid grid-cols-1 md:grid-cols-6 gap-4">
+      <div>
+        <label class="label text-sm">Tipo Ativo</label>
+        <select name="tipo" class="input text-sm">
+          <option value="">Todos</option>
+          {% for tipo in tipos_ativo %}
+          <option value="{{ tipo.value }}" {{ 'selected' if filtros.tipo == tipo.value else '' }}>{{ tipo.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="label text-sm">Classe</label>
+        <select name="classe" class="input text-sm">
+          <option value="">Todas</option>
+          {% for classe in classes_ativo %}
+          <option value="{{ classe.value }}" {{ 'selected' if filtros.classe == classe.value else '' }}>{{ classe.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="label text-sm">Mercado</label>
+        <select name="mercado" class="input text-sm">
+          <option value="">Todos</option>
+          {% for merc in mercados %}
+          <option value="{{ merc.value }}" {{ 'selected' if filtros.mercado == merc.value else '' }}>{{ merc.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="label text-sm">Corretora</label>
+        <select name="corretora" class="input text-sm">
+          <option value="">Todas</option>
+          {% for corr in corretoras %}
+          <option value="{{ corr.id }}" {{ 'selected' if filtros.corretora_id == corr.id else '' }}>{{ corr.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="label text-sm">Data Início</label>
+        <input type="date" name="data_inicio" class="input text-sm" value="{{ filtros.data_inicio or '' }}">
+      </div>
+      <div class="flex items-end">
+        <button type="submit" class="btn btn-primary w-full">
+          <i class="fas fa-filter mr-2"></i>Filtrar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabela Transações -->
+  <div class="card">
+    <div class="p-6 border-b">
+      <h2 class="text-xl font-bold">Histórico ({{ transacoes|length }} registros)</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-4 text-left font-bold">Data</th>
+            <th class="px-6 py-4 text-left font-bold">Operação</th>
+            <th class="px-6 py-4 text-left font-bold">Ativo</th>
+            <th class="px-6 py-4 text-left font-bold">Tipo</th>
+            <th class="px-6 py-4 text-left font-bold">Corretora</th>
+            <th class="px-6 py-4 text-right font-bold">Qtd</th>
+            <th class="px-6 py-4 text-right font-bold">Preço Unit.</th>
+            <th class="px-6 py-4 text-right font-bold">Total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for trans in transacoes %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm">{{ trans.data }}</td>
+            <td class="px-6 py-4">
+              <span class="badge {{ 'badge-success' if trans.tipo_operacao == 'compra' else 'badge-danger' }} px-3 py-1">
+                {{ 'COMPRA' if trans.tipo_operacao == 'compra' else 'VENDA' }}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <div class="font-bold">{{ trans.ativo.ticker }}</div>
+              <div class="text-sm text-gray-600">{{ trans.ativo.nome }}</div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="badge bg-blue-500 text-white text-xs px-2 py-1">{{ trans.ativo.tipo|upper }}</span>
+              <span class="text-xl ml-1">{{ '🇧🇷' if trans.ativo.mercado == 'BR' else '🇺🇸' }}</span>
+            </td>
+            <td class="px-6 py-4 text-sm">{{ trans.corretora.nome }}</td>
+            <td class="px-6 py-4 text-right font-semibold">{{ trans.quantidade }}</td>
+            <td class="px-6 py-4 text-right">{{ trans.moeda }} {{ "%.2f"|format(trans.preco_unitario) }}</td>
+            <td class="px-6 py-4 text-right font-bold text-emerald-600">
+              {{ trans.moeda }} {{ "%.2f"|format(trans.valor_total) }}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+              <i class="fas fa-exchange-alt text-4xl mb-4"></i>
+              <div>Nenhuma transação encontrada</div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Gráfico Volume -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="card">
+      <div class="p-6 border-b">
+        <h2 class="text-xl font-bold"><i class="fas fa-chart-bar text-blue-600 mr-2"></i>Volume por Tipo</h2>
+      </div>
+      <div class="p-6 bg-gray-50">
+        <div style="max-width:400px;margin:0 auto;height:300px;">
+          <canvas id="chart-tipo"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="p-6 border-b">
+        <h2 class="text-xl font-bold"><i class="fas fa-chart-line text-green-600 mr-2"></i>Compras vs Vendas</h2>
+      </div>
+      <div class="p-6 bg-gray-50">
+        <div style="max-width:400px;margin:0 auto;height:300px;">
+          <canvas id="chart-operacao"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nova Transação -->
+<div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <h3 class="text-2xl font-bold mb-6">Nova Transação</h3>
+    <form method="POST" action="/dashboard/transactions/new" class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="label">Operação <span class="text-red-500">*</span></label>
+          <select name="tipo_operacao" class="input" required>
+            <option value="compra">Compra</option>
+            <option value="venda">Venda</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Data <span class="text-red-500">*</span></label>
+          <input type="date" name="data" class="input" required>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="label">Tipo Ativo <span class="text-red-500">*</span></label>
+          <select name="tipo_ativo" class="input" required>
+            {% for tipo in tipos_ativo %}
+            <option value="{{ tipo.value }}">{{ tipo.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="label">Mercado <span class="text-red-500">*</span></label>
+          <select name="mercado" class="input" required>
+            {% for merc in mercados %}
+            <option value="{{ merc.value }}">{{ merc.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="label">Ticker <span class="text-red-500">*</span></label>
+          <input type="text" name="ticker" class="input" placeholder="PETR4" required>
+        </div>
+      </div>
+      <div>
+        <label class="label">Corretora <span class="text-red-500">*</span></label>
+        <select name="corretora_id" class="input" required>
+          {% for corr in corretoras %}
+          <option value="{{ corr.id }}">{{ corr.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="label">Quantidade <span class="text-red-500">*</span></label>
+          <input type="number" name="quantidade" step="0.00001" class="input" required>
+        </div>
+        <div>
+          <label class="label">Preço Unit. <span class="text-red-500">*</span></label>
+          <input type="number" name="preco_unitario" step="0.01" class="input" required>
+        </div>
+        <div>
+          <label class="label">Taxas</label>
+          <input type="number" name="taxas" step="0.01" class="input" value="0">
+        </div>
+      </div>
+      <div>
+        <label class="label">Observações</label>
+        <textarea name="observacoes" class="input" rows="2"></textarea>
+      </div>
+      <div class="flex gap-3 pt-4 border-t">
+        <button type="button" onclick="closeModal()" class="btn btn-secondary flex-1">Cancelar</button>
+        <button type="submit" class="btn btn-primary flex-1">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+function openModal(){document.getElementById('modal').classList.remove('hidden');}
+function closeModal(){document.getElementById('modal').classList.add('hidden');}
+
+document.addEventListener('DOMContentLoaded', function(){
+  // Gráfico Volume por Tipo (Ações=2, FII=1, Cripto=1, Outros=1)
+  const ctx1 = document.getElementById('chart-tipo');
+  if(ctx1){
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: ['Ações', 'FII', 'Cripto'],
+        datasets: [{
+          label: 'Volume (R$)',
+          data: [26085, 510, 10500],
+          backgroundColor: ['#3b82f6', '#10b981', '#ec4899']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {display: false},
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return 'R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return 'R$ ' + (value/1000).toFixed(1) + 'k';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Gráfico Compras vs Vendas (4 compras, 1 venda)
+  const ctx2 = document.getElementById('chart-operacao');
+  if(ctx2){
+    new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: ['Compras', 'Vendas'],
+        datasets: [{
+          data: [24635, 12460],
+          backgroundColor: ['#10b981', '#ef4444'],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {position: 'bottom'},
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                return label + ': R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

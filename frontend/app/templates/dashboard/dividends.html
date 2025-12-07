@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Proventos - Exitus{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">
+        <i class="fas fa-hand-holding-usd text-green-600 mr-3"></i>Proventos
+      </h1>
+      <p class="text-gray-600 mt-1">Dividendos, JCP e Rendimentos recebidos</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-blue-600 mb-2">{{ stats.total }}</div>
+      <div class="text-sm text-gray-600 uppercase">Total Proventos</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-green-600 mb-2">R$ {{ "%.2f"|format(stats.recebido) }}</div>
+      <div class="text-sm text-gray-600 uppercase">Recebido</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-orange-600 mb-2">R$ {{ "%.2f"|format(stats.previsto) }}</div>
+      <div class="text-sm text-gray-600 uppercase">A Receber</div>
+    </div>
+    <div class="card p-6 text-center hover:shadow-xl">
+      <div class="text-3xl font-bold text-emerald-600 mb-2">R$ {{ "%.2f"|format(stats.total_geral) }}</div>
+      <div class="text-sm text-gray-600 uppercase">Total Geral</div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card p-6">
+    <form method="GET" action="/dashboard/dividends" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div>
+        <label class="label text-sm">Ativo</label>
+        <select name="ativo" class="input text-sm">
+          <option value="">Todos</option>
+          {% for ativo in ativos %}
+          <option value="{{ ativo.id }}" {{ 'selected' if filtros.ativo == ativo.id else '' }}>{{ ativo.ticker }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="label text-sm">Tipo</label>
+        <select name="tipo" class="input text-sm">
+          <option value="">Todos</option>
+          {% for tipo in tipos_provento %}
+          <option value="{{ tipo.value }}" {{ 'selected' if filtros.tipo == tipo.value else '' }}>{{ tipo.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="label text-sm">Status</label>
+        <select name="status" class="input text-sm">
+          <option value="">Todos</option>
+          <option value="pago" {{ 'selected' if filtros.status == 'pago' else '' }}>Pago</option>
+          <option value="previsto" {{ 'selected' if filtros.status == 'previsto' else '' }}>Previsto</option>
+        </select>
+      </div>
+      <div>
+        <label class="label text-sm">Data Início</label>
+        <input type="date" name="data_inicio" class="input text-sm" value="{{ filtros.data_inicio or '' }}">
+      </div>
+      <div class="flex items-end">
+        <button type="submit" class="btn btn-primary w-full">
+          <i class="fas fa-filter mr-2"></i>Filtrar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabela Proventos -->
+  <div class="card">
+    <div class="p-6 border-b">
+      <h2 class="text-xl font-bold">Histórico ({{ proventos|length }} registros)</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-4 text-left font-bold">Data COM</th>
+            <th class="px-6 py-4 text-left font-bold">Pagamento</th>
+            <th class="px-6 py-4 text-left font-bold">Ativo</th>
+            <th class="px-6 py-4 text-left font-bold">Tipo</th>
+            <th class="px-6 py-4 text-right font-bold">Valor Unit.</th>
+            <th class="px-6 py-4 text-right font-bold">Qtd</th>
+            <th class="px-6 py-4 text-right font-bold">Total</th>
+            <th class="px-6 py-4 text-center font-bold">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for prov in proventos %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm">{{ prov.data_com }}</td>
+            <td class="px-6 py-4 text-sm">{{ prov.data_pagamento }}</td>
+            <td class="px-6 py-4">
+              <div class="font-bold">{{ prov.ativo.ticker }}</div>
+              <div class="text-sm text-gray-600">{{ prov.ativo.nome }}</div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="badge badge-blue text-xs">{{ prov.tipo|upper }}</span>
+            </td>
+            <td class="px-6 py-4 text-right text-sm">{{ prov.moeda }} {{ "%.2f"|format(prov.valor_unitario) }}</td>
+            <td class="px-6 py-4 text-right font-semibold">{{ prov.quantidade }}</td>
+            <td class="px-6 py-4 text-right font-bold text-green-600">
+              {{ prov.moeda }} {{ "%.2f"|format(prov.valor_total) }}
+            </td>
+            <td class="px-6 py-4 text-center">
+              <span class="badge {{ 'bg-green-500 text-white' if prov.status == 'pago' else 'bg-yellow-500 text-white' }} px-3 py-1">
+                {{ 'PAGO' if prov.status == 'pago' else 'PREVISTO' }}
+              </span>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+              <i class="fas fa-hand-holding-usd text-4xl mb-4"></i>
+              <div>Nenhum provento encontrado</div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Gráfico Evolução -->
+  <div class="card">
+    <div class="p-6 border-b">
+      <h2 class="text-xl font-bold"><i class="fas fa-chart-line text-green-600 mr-2"></i>Evolução Mensal</h2>
+    </div>
+    <div class="p-6 bg-gray-50 flex justify-center">
+      <div style="max-width:700px;width:100%;height:350px;">
+        <canvas id="chart-evolucao"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const ctx = document.getElementById('chart-evolucao');
+  if(ctx){
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Set/24', 'Out/24', 'Nov/24', 'Dez/24'],
+        datasets: [{
+          label: 'Proventos Recebidos (R$)',
+          data: [2.40, 170.00, 145.00, 47.50],
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          fill: true,
+          tension: 0.3,
+          borderWidth: 3,
+          pointRadius: 5,
+          pointBackgroundColor: '#10b981'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {font: {size: 14}}
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return 'R$ ' + value.toFixed(2);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}
