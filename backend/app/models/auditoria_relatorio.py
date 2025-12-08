@@ -1,0 +1,189 @@
+# -*- coding: utf-8 -*-
+"""
+Exitus - Model AuditoriaRelatorio
+Auditoria de geração e download de relatórios
+"""
+
+from datetime import datetime
+from app.database import db
+from sqlalchemy import Column, String, DateTime, Enum, Text, ForeignKey, Date
+from sqlalchemy.dialects.postgresql import UUID, JSON
+from sqlalchemy.orm import relationship
+import uuid
+from .enums_m7 import TipoRelatorio, FormatoExport
+
+
+class AuditoriaRelatorio(db.Model):
+    """
+    Model para auditoria de relatórios gerados
+    
+    Attributes:
+        id (UUID): Identificador único
+        usuario_id (UUID): ID do usuário que gerou
+        tipo_relatorio (TipoRelatorio): Tipo do relatório
+        data_inicio (date): Data início do período
+        data_fim (date): Data fim do período
+        filtros (JSON): Filtros aplicados (país, mercado, setor, classe)
+        resultado_json (JSON): Dados completos do relatório
+        timestamp_criacao (datetime): Quando foi gerado
+        timestamp_download (datetime): Quando foi baixado (null se nunca)
+        formato_export (FormatoExport): Formato de exportação
+        chave_api_auditoria (str): Chave para rastreamento
+        created_at (datetime): Data de criação do registro
+        updated_at (datetime): Data da última atualização
+    
+    Relationships:
+        usuario: Usuário que gerou o relatório
+    """
+    
+    __tablename__ = "auditoria_relatorios"
+    
+    # Chave primária
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        comment="Identificador único da auditoria"
+    )
+    
+    # Foreign keys
+    usuario_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey('usuario.id', ondelete='CASCADE'),
+        nullable=False,
+        index=True,
+        comment="ID do usuário proprietário"
+    )
+    
+    # Dados do relatório
+    tipo_relatorio = Column(
+        Enum(TipoRelatorio),
+        nullable=False,
+        index=True,
+        comment="Tipo do relatório gerado"
+    )
+    
+    data_inicio = Column(
+        Date,
+        nullable=True,
+        index=True,
+        comment="Data início do período analisado"
+    )
+    
+    data_fim = Column(
+        Date,
+        nullable=True,
+        index=True,
+        comment="Data fim do período analisado"
+    )
+    
+    filtros = Column(
+        JSON,
+        nullable=True,
+        comment="Filtros aplicados (país, mercado, setor, classe_ativo)"
+    )
+    
+    resultado_json = Column(
+        JSON,
+        nullable=True,
+        comment="Dados completos do relatório em JSON"
+    )
+    
+    # Auditoria
+    timestamp_criacao = Column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+        nullable=False,
+        index=True,
+        comment="Timestamp de criação do relatório"
+    )
+    
+    timestamp_download = Column(
+        DateTime(timezone=True),
+        nullable=True,
+        index=True,
+        comment="Timestamp do primeiro download (null se nunca baixado)"
+    )
+    
+    formato_export = Column(
+        Enum(FormatoExport),
+        nullable=False,
+        default=FormatoExport.VISUALIZACAO,
+        index=True,
+        comment="Formato de exportação"
+    )
+    
+    chave_api_auditoria = Column(
+        String(64),
+        nullable=True,
+        index=True,
+        comment="Chave para rastreamento de API"
+    )
+    
+    # Timestamps padrão
+    created_at = Column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+        nullable=False,
+        comment="Data de criação do registro"
+    )
+    
+    updated_at = Column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+        comment="Data da última atualização"
+    )
+    
+    # Relacionamentos
+    usuario = relationship("Usuario", backref="relatorios_auditoria", lazy="joined")
+    
+    # Constraints de tabela
+    __table_args__ = (
+        db.CheckConstraint(
+            "data_inicio IS NULL OR data_fim IS NULL OR data_inicio <= data_fim",
+            name="auditoria_relatorio_datas_validas"
+        ),
+        {"comment": "Tabela de auditoria de relatórios gerados"}
+    )
+    
+    def marcar_download(self):
+        """Marca o relatório como baixado pela primeira vez"""
+        if self.timestamp_download is None:
+            self.timestamp_download = datetime.utcnow()
+    
+    def foi_baixado(self):
+        """Verifica se o relatório já foi baixado"""
+        return self.timestamp_download is not None
+    
+    def tempo_geracao(self):
+        """Retorna tempo desde a geração em segundos"""
+        if self.timestamp_criacao:
+            return (datetime.utcnow() - self.timestamp_criacao).total_seconds()
+        return None
+    
+    def to_dict(self):
+        """Converte objeto para dicionário para serialização JSON"""
+        return {
+            "id": str(self.id),
+            "usuario_id": str(self.usuario_id),
+            "tipo_relatorio": self.tipo_relatorio.value if self.tipo_relatorio else None,
+            "data_inicio": self.data_inicio.isoformat() if self.data_inicio else None,
+            "data_fim": self.data_fim.isoformat() if self.data_fim else None,
+            "filtros": self.filtros,
+            "resultado_json": self.resultado_json,
+            "timestamp_criacao": self.timestamp_criacao.isoformat() if self.timestamp_criacao else None,
+            "timestamp_download": self.timestamp_download.isoformat() if self.timestamp_download else None,
+            "foi_baixado": self.foi_baixado(),
+            "formato_export": self.formato_export.value if self.formato_export else None,
+            "chave_api_auditoria": self.chave_api_auditoria,
+            "tempo_geracao_segundos": self.tempo_geracao(),
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
+    
+    def __repr__(self):
+        """Representação string do objeto"""
+        tipo = self.tipo_relatorio.value if self.tipo_relatorio else "N/A"
+        return f"<AuditoriaRelatorio {tipo} - {self.timestamp_criacao}>"
