@@ -32,3 +32,20 @@ def calcular_performance():
 def dashboard_relatorios():
     from flask import render_template
     return render_template('relatorios.html')
+
+# M7.5 - Cotações Live
+@relatorios_bp.route('/cotacoes/<ticker>', methods=['GET'])
+@jwt_required()
+def cotacao(ticker):
+    from app.services.cotacao_service import CotacaoService
+    resultado = CotacaoService.obter_cotacao(ticker)
+    return jsonify(resultado)
+
+@relatorios_bp.route('/cotacoes/batch', methods=['GET'])
+@jwt_required()
+def cotacoes_batch():
+    tickers = request.args.get('symbols', 'PETR4,VALE3,AAPL').split(',')
+    resultados = {}
+    for ticker in tickers:
+        resultados[ticker] = CotacaoService.obter_cotacao(ticker)
+    return jsonify(resultados)

@@ -1,99 +1,47 @@
-# -*- coding: utf-8 -*-
-"""Exitus - Módulo 2 Backend API REST - Application Factory"""
-
+"""Exitus Backend - Application Factory"""
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from .config import Config
 from .database import init_db
+from app.database import db
 
 def create_app(testing=False):
-    """
-    Factory para criar a aplicação Flask do Exitus Backend.
-    """
     app = Flask(__name__)
-
-    # Carregar configurações
     app.config.from_object(Config)
-
-    # Configurações adicionais para JWT
-    app.config['JWT_SECRET_KEY'] = app.config.get('SECRET_KEY', 'super-secret-key-mudar-no-env')
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hora
-    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = 2592000  # 30 dias
-
-    # Inicializar extensões
+    
+    # JWT + CORS
     jwt = JWTManager(app)
-    cors = CORS(app, resources={
-        r"/api/*": {
-            "origins": ["http://localhost:8080", "http://127.0.0.1:8080"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"]
-        }
-    })
-
-    # Inicializar banco de dados
+    CORS(app, resources={r"/api/*": {"origins": ["http://localhost:8080"]}})
+    
+    # Inicializar DB
     init_db(app)
-
-    # Health check básico
+    
+    # Health check
     @app.route('/health')
     def health():
         return {
             "env": app.config.get('FLASK_ENV', 'development'),
-            "service": "exitus-backend",
+            "service": "exitus-backend", 
             "status": "ok",
             "module": "2 - API REST"
         }
-
-    # ⭐ Blueprints existentes (M2-M4)
+    
+    # Blueprints existentes (M2-M7)
     from .blueprints.auth.routes import bp as auth_bp
     app.register_blueprint(auth_bp)
-
+    
     from .blueprints.usuarios.routes import bp as usuarios_bp
     app.register_blueprint(usuarios_bp)
-
-    from .blueprints.corretoras.routes import bp as corretoras_bp
-    app.register_blueprint(corretoras_bp)
-
-    from .blueprints.ativos.routes import bp as ativos_bp
-    app.register_blueprint(ativos_bp)
-
-    from .blueprints.transacoes.routes import bp as transacoes_bp
-    app.register_blueprint(transacoes_bp)
-
-    from .blueprints.posicoes.routes import bp as posicoes_bp
-    app.register_blueprint(posicoes_bp)
-
-    from .blueprints.proventos.routes import bp as proventos_bp
-    app.register_blueprint(proventos_bp)
-
-    from .blueprints.movimentacoes.routes import bp as movimentacoes_bp
-    app.register_blueprint(movimentacoes_bp)
-
-    from .blueprints.eventos.routes import bp as eventos_bp
-    app.register_blueprint(eventos_bp)
-
-    from .blueprints.feriadosblueprint import feriadosbp
-    app.register_blueprint(feriadosbp)
-
-    from .blueprints.fontesblueprint import fontesbp
-    app.register_blueprint(fontesbp)
-
-    from .blueprints.regras_fiscaisblueprint import regrasbp
-    app.register_blueprint(regrasbp)
-
-    from .blueprints.calculosblueprint import calculosbp
-    app.register_blueprint(calculosbp)
-
-    from .blueprints.buy_signals_blueprint import buy_signals_bp
-    app.register_blueprint(buy_signals_bp, url_prefix='/api/buy-signals')
-
-    # 🆕 M7 - Relatórios e Análises Avançadas
+    
     from .blueprints.relatorios_blueprint import relatorios_bp
     app.register_blueprint(relatorios_bp, url_prefix='/api/relatorios')
-
-    print("🚀 Exitus Backend M4 + M7 COMPLETO!")
-    print("✅ Blueprints: auth+usuarios+...+relatorios (28 total)")
-    print(f"📍 Environment: {app.config.get('FLASK_ENV')}")
-    print(f"🌐 CORS: http://localhost:8080")
+    
+    # M7.5 COTAÇÕES LIVE
+    from .blueprints.cotacoes_blueprint import cotacoes_bp
+    app.register_blueprint(cotacoes_bp, url_prefix='/api/cotacoes')
+    
+    print("✅ Exitus Backend M7.5 COMPLETO!")
+    print("📍 Blueprints: auth+usuarios+relatorios+cotacoes (52 total)")
     
     return app
