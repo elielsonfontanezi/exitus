@@ -1,0 +1,126 @@
+"""M7.5 - Cotações Multi-Provider com Fallback Cascata"""
+import requests
+from datetime import datetime
+import logging
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+logger = logging.getLogger(__name__)
+
+class CotacoesService:
+    """Fallback: brapi.dev → yfinance → alphavantage → cache DB"""
+    
+    # Tokens carregados do .env
+    BRAPI_TOKEN = os.getenv('BRAPI_TOKEN', '')
+    ALPHA_KEY = os.getenv('ALPHAVANTAGE_TOKEN', 'demo')
+    FINNHUB_KEY = os.getenv('FINNHUB_TOKEN', '')
+    TIMEOUT = 5
+    
+    @staticmethod
+    def _build_brapi_url(ticker):
+        """Constrói URL brapi.dev com ou sem token"""
+        base_url = f"https://brapi.dev/api/quote/{ticker}"
+        if CotacoesService.BRAPI_TOKEN:
+            return f"{base_url}?token={CotacoesService.BRAPI_TOKEN}"
+        return base_url
+    
+    @staticmethod
+    def obter_cotacao(ticker, mercado='BR'):
+        """Tenta APIs em ordem até uma funcionar"""
+        
+        # 1️⃣ BRAPI.DEV (B3 apenas) - FREE TIER ou PREMIUM
+        if mercado == 'BR':
+            try:
+                logger.info(f"📡 Tentando brapi.dev para {ticker}")
+                url = CotacoesService._build_brapi_url(ticker)
+                resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+                
+                if resp.status_code == 200:
+                    data = resp.json()['results'][0]
+                    return {
+                        'ticker': ticker,
+                        'preco_atual': float(data['regularMarketPrice']),
+                        'variacao_percentual': float(data['regularMarketChangePercent']),
+                        'volume': int(data['regularMarketVolume']),
+                        'dy_12m': round(float(data.get('dividendYield', 0)) * 100, 2),
+                        'pl': round(float(data.get('trailingPE', 0)), 2),
+                        'provider': 'brapi.dev',
+                        'success': True
+                    }
+            except Exception as e:
+                logger.warning(f"⚠️ brapi.dev falhou: {e}")
+        
+        # 2️⃣ YFINANCE (global) - Com tratamento 429
+        try:
+            logger.info(f"📡 Tentando yfinance para {ticker}")
+            import yfinance as yf
+            yahoo_ticker = f'{ticker}.SA' if mercado == 'BR' else ticker
+            stock = yf.Ticker(yahoo_ticker)
+            
+            # Usar fast_info (mais rápido, sem rate limit agressivo)
+            if hasattr(stock, 'fast_info'):
+                info = stock.fast_info
+                return {
+                    'ticker': ticker,
+                    'preco_atual': float(info.last_price),
+                    'variacao_percentual': 0,
+                    'volume': 0,
+                    'dy_12m': 0,
+                    'pl': 0,
+                    'provider': 'yfinance_fast',
+                    'success': True
+                }
+            
+        except Exception as e:
+            logger.warning(f"⚠️ yfinance falhou: {e}")
+        
+        # 3️⃣ ALPHA VANTAGE (global) - 500 req/dia grátis
+        if mercado in ['US', 'NASDAQ', 'NYSE']:
+            try:
+                logger.info(f"📡 Tentando alphavantage para {ticker}")
+                url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={CotacoesService.ALPHA_KEY}"
+                resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+                
+                if resp.status_code == 200:
+                    data = resp.json().get('Global Quote', {})
+                    if data:
+                        return {
+                            'ticker': ticker,
+                            'preco_atual': float(data.get('05. price', 0)),
+                            'variacao_percentual': float(data.get('10. change percent', '0').replace('%', '')),
+                            'volume': int(data.get('06. volume', 0)),
+                            'dy_12m': 0,
+                            'pl': 0,
+                            'provider': 'alphavantage',
+                            'success': True
+                        }
+            except Exception as e:
+                logger.warning(f"⚠️ alphavantage falhou: {e}")
+        
+        # 4️⃣ FINNHUB (global) - Se token configurado
+        if CotacoesService.FINNHUB_KEY and mercado in ['US', 'NASDAQ', 'NYSE']:
+            try:
+                logger.info(f"📡 Tentando Finnhub para {ticker}")
+                url = f"https://finnhub.io/api/v1/quote?symbol={ticker}&token={CotacoesService.FINNHUB_KEY}"
+                resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+                
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data.get('c'):  # current price
+                        return {
+                            'ticker': ticker,
+                            'preco_atual': float(data['c']),
+                            'variacao_percentual': float(data.get('dp', 0)),
+                            'volume': 0,
+                            'dy_12m': 0,
+                            'pl': 0,
+                            'provider': 'finnhub',
+                            'success': True
+                        }
+            except Exception as e:
+                logger.warning(f"⚠️ Finnhub falhou: {e}")
+        
+        # ❌ TODAS FALHARAM
+        logger.error(f"❌ Todas APIs falharam para {ticker}")
+        return {'success': False, 'error': 'Todas APIs indisponíveis'}
