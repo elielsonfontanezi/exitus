@@ -1,7 +1,7 @@
 """M7.1: Relatórios e Análises Avançadas
 
 Revision ID: 20251208_1004_m7
-Revises: [COLOCAR_ULTIMA_REVISION_AQUI]
+Revises: b2542b2f7857
 Create Date: 2025-12-08 10:04:00.000000
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '20251208_1004_m7'
-down_revision = None  # SUBSTITUIR pela última revision existente
+down_revision = "b2542b2f7857"
 branch_labels = None
 depends_on = None
 
