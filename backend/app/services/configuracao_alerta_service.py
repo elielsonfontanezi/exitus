@@ -1,46 +1,33 @@
-# -*- coding: utf-8 -*-
-"""
-Exitus - ConfiguracaoAlertaService
-Service para gerenciamento de alertas
-"""
-from decimal import Decimal
-from typing import List, Dict, Optional
-from sqlalchemy.orm import Session
-from app.database import db
-from app.models import Usuario, ConfiguracaoAlerta
-from app.models.enums_m7 import TipoAlerta, OperadorCondicao, FrequenciaNotificacao
+"""M7.1 - ConfiguracaoAlerta Service"""
+from app.models.configuracao_alerta import ConfiguracaoAlerta
+from sqlalchemy import desc
 
 class ConfiguracaoAlertaService:
-    """Service para alertas inteligentes"""
-    
     @staticmethod
-    def criar_alerta(
-        usuario_id: str,
-        nome: str,
-        tipo_alerta: TipoAlerta,
-        condicao_valor: Decimal,
-        condicao_operador: OperadorCondicao = OperadorCondicao.MAIOR,
-        ativo_id: Optional[str] = None,
-        canais_entrega: List[str] = None
-    ) -> ConfiguracaoAlerta:
-        """Cria novo alerta"""
-        alerta = ConfiguracaoAlerta(
-            usuario_id=usuario_id,
-            nome=nome,
-            tipo_alerta=tipo_alerta,
-            condicao_valor=condicao_valor,
-            condicao_operador=condicao_operador,
-            ativo_id=ativo_id,
-            canais_entrega=canais_entrega or ['email', 'webapp']
-        )
+    def list_by_usuario(usuario_id, ativo_id=None):
+        query = ConfiguracaoAlerta.query.filter_by(usuario_id=usuario_id)
+        if ativo_id:
+            query = query.filter_by(ativo_id=ativo_id)
+        return [a.to_dict() for a in query.order_by(desc(ConfiguracaoAlerta.timestamp_criacao)).all()]
+
+    @staticmethod
+    def create(usuario_id, data):
+        alerta = ConfiguracaoAlerta(usuario_id=usuario_id, **data)
         db.session.add(alerta)
         db.session.commit()
-        return alerta
-    
+        db.session.refresh(alerta)
+        return alerta.to_dict()
+
     @staticmethod
-    def listar_alertas_usuario(usuario_id: str) -> List[ConfiguracaoAlerta]:
-        """Lista todos os alertas de um usuário"""
-        return (db.session.query(ConfiguracaoAlerta)
-               .filter_by(usuario_id=usuario_id)
-               .order_by(ConfiguracaoAlerta.nome)
-               .all())
+    def update(usuario_id, alerta_id, data):
+        alerta = ConfiguracaoAlerta.query.filter_by(usuario_id=usuario_id, id=alerta_id).first_or_404()
+        for key, value in data.items():
+            setattr(alerta, key, value)
+        db.session.commit()
+        return alerta.to_dict()
+
+    @staticmethod
+    def delete(usuario_id, alerta_id):
+        alerta = ConfiguracaoAlerta.query.filter_by(usuario_id=usuario_id, id=alerta_id).first_or_404()
+        db.session.delete(alerta)
+        db.session.commit()

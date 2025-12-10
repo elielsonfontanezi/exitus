@@ -1,29 +1,25 @@
-# -*- coding: utf-8 -*-
-from decimal import Decimal
-from datetime import date
-from flask import jsonify
-from app.database import db
-from app.models import RelatorioPerformance
+"""M7.1 - RelatorioPerformance Service COMPLETO"""
+from app import db
+from app.models.relatorio_performance import RelatorioPerformance
+from sqlalchemy import desc
 
 class RelatorioPerformanceService:
     @staticmethod
-    def calcular_performance(usuario_id: str, periodo_inicio: str, periodo_fim: str):
-        relatorio = RelatorioPerformance(
-            usuario_id=usuario_id,
-            periodo_inicio=date.fromisoformat(periodo_inicio),
-            periodo_fim=date.fromisoformat(periodo_fim),
-            retorno_bruto_percentual=Decimal('18.50'),
-            retorno_liquido_percentual=Decimal('15.20'),
-            indice_sharpe=Decimal('1.45'),
-            max_drawdown_percentual=Decimal('-8.75')
-        )
+    def list_by_usuario(usuario_id, portfolio_id=None, periodo='12m'):
+        query = RelatorioPerformance.query.filter_by(usuario_id=usuario_id)
+        if portfolio_id:
+            query = query.filter_by(portfolio_id=portfolio_id)
+        return [r.to_dict() for r in query.order_by(desc(RelatorioPerformance.created_at)).all()]
+
+    @staticmethod
+    def generate(usuario_id, data):
+        relatorio = RelatorioPerformance(usuario_id=usuario_id, **data)
         db.session.add(relatorio)
         db.session.commit()
-        return {
-            'id': str(relatorio.id),
-            'usuario_id': str(relatorio.usuario_id),
-            'periodo_inicio': periodo_inicio,
-            'periodo_fim': periodo_fim,
-            'retorno_bruto_percentual': '18.50',
-            'status': 'criado_com_sucesso'
-        }
+        db.session.refresh(relatorio)
+        return relatorio.to_dict()
+
+    @staticmethod
+    def get_by_id(usuario_id, relatorio_id):
+        relatorio = RelatorioPerformance.query.filter_by(usuario_id=usuario_id, id=relatorio_id).first()
+        return relatorio.to_dict() if relatorio else {}

@@ -15,3 +15,5 @@ podman run -d --name exitus-backend --network exitus-net -p 5000:5000 \
 sleep 15
 podman logs --tail 30 exitus-backend
 curl http://localhost:5000/health
+
+sleep 10
