@@ -1,51 +1,25 @@
-from decimal import Decimal
-from datetime import date, datetime
-from typing import Dict, Any
-
-from app.database import db
-from app.models import RelatorioPerformance
-
+"""M7.1 - RelatorioPerformance Service COMPLETO"""
+from app import db
+from app.models.relatorio_performance import RelatorioPerformance
+from sqlalchemy import desc
 
 class RelatorioPerformanceService:
     @staticmethod
-    def calcular_performance(usuario_id: str,
-                             periodo_inicio: str,
-                             periodo_fim: str) -> Dict[str, Any]:
-        data_inicio = date.fromisoformat(periodo_inicio)
-        data_fim = date.fromisoformat(periodo_fim)
+    def list_by_usuario(usuario_id, portfolio_id=None, periodo='12m'):
+        query = RelatorioPerformance.query.filter_by(usuario_id=usuario_id)
+        if portfolio_id:
+            query = query.filter_by(portfolio_id=portfolio_id)
+        return [r.to_dict() for r in query.order_by(desc(RelatorioPerformance.created_at)).all()]
 
-        # TODO: substituir por cálculo real (usando Transacao, Posicao, etc.)
-        relatorio = RelatorioPerformance(
-            usuario_id=usuario_id,
-            periodo_inicio=data_inicio,
-            periodo_fim=data_fim,
-            retorno_bruto_percentual=Decimal("18.50"),
-            retorno_liquido_percentual=Decimal("15.20"),
-            volatilidade_percentual=Decimal("12.30"),
-            indice_sharpe=Decimal("1.45"),
-            indice_sortino=Decimal("1.80"),
-            max_drawdown_percentual=Decimal("-8.75"),
-            taxa_interna_retorno_irr=Decimal("0.16"),
-            beta_mercado=Decimal("1.05"),
-            alfa_jensen=Decimal("0.02"),
-            valor_patrimonial_inicio=Decimal("100000.00"),
-            valor_patrimonial_fim=Decimal("118500.00"),
-            alocacao_por_classe={},
-            alocacao_por_setor={},
-            alocacao_por_pais={},
-            rentabilidade_por_ativo={},
-            timestamp_calculo=datetime.utcnow(),
-        )
-
+    @staticmethod
+    def generate(usuario_id, data):
+        relatorio = RelatorioPerformance(usuario_id=usuario_id, **data)
         db.session.add(relatorio)
         db.session.commit()
+        db.session.refresh(relatorio)
+        return relatorio.to_dict()
 
-        return {
-            "id": str(relatorio.id),
-            "usuario_id": str(relatorio.usuario_id),
-            "periodo_inicio": periodo_inicio,
-            "periodo_fim": periodo_fim,
-            "retorno_bruto_percentual": float(relatorio.retorno_bruto_percentual),
-            "retorno_liquido_percentual": float(relatorio.retorno_liquido_percentual),
-            "status": "criado_com_sucesso",
-        }
+    @staticmethod
+    def get_by_id(usuario_id, relatorio_id):
+        relatorio = RelatorioPerformance.query.filter_by(usuario_id=usuario_id, id=relatorio_id).first()
+        return relatorio.to_dict() if relatorio else {}

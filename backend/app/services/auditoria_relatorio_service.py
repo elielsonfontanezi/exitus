@@ -1,62 +1,29 @@
-from datetime import datetime
-from typing import List, Optional, Dict, Any
-
-from app.database import db
-from app.models import AuditoriaRelatorio, TipoRelatorio, FormatoExport
-
+"""M7.1 - AuditoriaRelatorio Service Completo"""
+from app.models.auditoria_relatorio import AuditoriaRelatorio
+from sqlalchemy import desc
+from flask import current_app
 
 class AuditoriaRelatorioService:
     @staticmethod
-    def listar_por_usuario(usuario_id: str,
-                           tipo_relatorio: Optional[TipoRelatorio] = None,
-                           limite: int = 50) -> List[AuditoriaRelatorio]:
-        query = AuditoriaRelatorio.query.filter_by(usuario_id=usuario_id)
-
-        if tipo_relatorio:
-            query = query.filter_by(tipo_relatorio=tipo_relatorio)
-
-        return query.order_by(AuditoriaRelatorio.timestamp_criacao.desc()) \
-                    .limit(limite).all()
+    def list_by_usuario(usuario_id, page=1, per_page=10):
+        """Lista relatórios paginados por usuário"""
+        query = AuditoriaRelatorio.query.filter_by(usuario_id=usuario_id)\
+            .order_by(desc(AuditoriaRelatorio.timestamp_criacao))
+        relatorios = query.paginate(page=page, per_page=per_page, error_out=False)
+        return [r.to_dict() for r in relatorios.items]
 
     @staticmethod
-    def registrar_geracao(usuario_id: str,
-                          tipo_relatorio: TipoRelatorio,
-                          data_inicio: Optional[datetime.date],
-                          data_fim: Optional[datetime.date],
-                          filtros: Optional[Dict[str, Any]],
-                          resultado_json: Dict[str, Any],
-                          formato_export: FormatoExport = FormatoExport.VISUALIZACAO,
-                          chave_api_auditoria: Optional[str] = None
-                          ) -> AuditoriaRelatorio:
+    def create(usuario_id, data):
+        """Cria novo relatório de auditoria"""
         relatorio = AuditoriaRelatorio(
             usuario_id=usuario_id,
-            tipo_relatorio=tipo_relatorio,
-            data_inicio=data_inicio,
-            data_fim=data_fim,
-            filtros=filtros or {},
-            resultado_json=resultado_json,
-            formato_export=formato_export,
-            chave_api_auditoria=chave_api_auditoria,
+            tipo_relatorio=data.get('tipo_relatorio', 'geral'),
+            data_inicio=data.get('data_inicio'),
+            data_fim=data.get('data_fim'),
+            filtros=data.get('filtros', {}),
+            formato_export='visualizacao'
         )
-        db.session.add(relatorio)
-        db.session.commit()
-        return relatorio
-
-    @staticmethod
-    def marcar_download(relatorio_id: str) -> None:
-        relatorio = AuditoriaRelatorio.query.get(relatorio_id)
-        if not relatorio:
-            raise ValueError("Relatório não encontrado")
-
-        if not relatorio.timestamp_download:
-            relatorio.timestamp_download = datetime.utcnow()
-            db.session.commit()
-
-    @staticmethod
-    def buscar_por_id(relatorio_id: str,
-                      usuario_id: Optional[str] = None
-                      ) -> Optional[AuditoriaRelatorio]:
-        query = AuditoriaRelatorio.query.filter_by(id=relatorio_id)
-        if usuario_id:
-            query = query.filter_by(usuario_id=usuario_id)
-        return query.first()
+        current_app.db.session.add(relatorio)
+        current_app.db.session.commit()
+        current_app.db.session.refresh(relatorio)
+        return relatorio.to_dict()
