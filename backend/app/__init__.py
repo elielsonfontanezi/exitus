@@ -69,9 +69,13 @@ def create_app(testing=False):
     
     from .blueprints.performance_blueprint import performance_bp
     app.register_blueprint(performance_bp)
+
+    try:
+        from app.blueprints.m7_portfolio import bp_m7
+        app.register_blueprint(bp_m7)
+        print('✅ M7.4 /api/m7/portfolio OK')
+    except:
+        print('⚠️ M7.4 opcional')
     
-    print("✅ Exitus Backend M7.3 PRONTO!")
-    print("📍 Blueprints M1-M7.3: 60+ endpoints operacionais")
-    print("🚀 Services M7.2: Relatorio/Alerta/Projecao/Analise (29 métodos)")
     
     return app
