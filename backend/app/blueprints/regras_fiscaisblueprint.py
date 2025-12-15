@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-regrasbp = Blueprint('regras_fiscais', __name__, url_prefix='/api/regras_fiscais')
+regrasbp = Blueprint('regras_fiscais', __name__, url_prefix='/api/regras-fiscais')
 
 # Dados mock baseados em regrafiscal (DB M3)
 regras_fiscais = [

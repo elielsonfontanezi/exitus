@@ -13,7 +13,7 @@ def success(data=None, message="Sucesso", status=200):
 def error(message="Erro interno do servidor", status=500):
     """Resposta de erro genérico."""
     return jsonify({
-        "success": False, 
+        "success": False,
         "message": message
     }), status
 
@@ -37,3 +37,12 @@ def not_found(message="Recurso não encontrado"):
         "success": False,
         "message": message
     }), 404
+
+# ============================================
+# ALIASES para retrocompatibilidade
+# ============================================
+success_response = success
+error_response = error
+unauthorized_response = unauthorized
+forbidden_response = forbidden
+not_found_response = not_found

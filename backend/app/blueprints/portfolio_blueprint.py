@@ -33,6 +33,24 @@ def dashboard():
         return error_response(str(e), 500)
 
 
+@portfolio_bp.route('/alocacao', methods=['GET'])
+@jwt_required()
+def alocacao():
+    """Retorna alocação do portfólio por classe de ativo"""
+    try:
+        usuario_id = get_jwt_identity()
+        alocacao_data = PortfolioService.get_alocacao(usuario_id)
+
+        return success_response(
+            data=alocacao_data,
+            message="Alocação por classe calculada"
+        )
+
+    except Exception as e:
+        logger.error(f"Erro ao calcular alocação: {e}")
+        return error_response(str(e), 500)
+
+
 @portfolio_bp.route('/distribuicao/classes', methods=['GET'])
 @jwt_required()
 def distribuicao_classes():
