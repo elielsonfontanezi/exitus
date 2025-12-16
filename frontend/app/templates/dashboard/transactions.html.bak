@@ -111,8 +111,8 @@
           <tr class="hover:bg-gray-50">
             <td class="px-6 py-4 text-sm">{{ trans.data }}</td>
             <td class="px-6 py-4">
-              <span class="px-3 py-1 rounded-full text-xs font-semibold {{ 'bg-green-100 text-green-800' if trans.tipo_operacao == 'compra' else 'bg-red-100 text-red-800' }}">
-                {{ 'COMPRA' if trans.tipo_operacao == 'compra' else 'VENDA' }}
+              <span class="badge {{ 'badge-success' if trans.tipo_operacao == 'compra' else 'badge-danger' }} px-3 py-1">
+                {{ 'COMPRA' if trans.tipo_operacao == 'compra' else 'VENDA' }}
               </span>
             </td>
             <td class="px-6 py-4">
@@ -120,7 +120,7 @@
               <div class="text-sm text-gray-600">{{ trans.ativo.nome }}</div>
             </td>
             <td class="px-6 py-4">
-              <span class="bg-blue-500 text-white text-xs px-2.5 py-0.5 rounded-full font-medium">{{ trans.ativo.tipo|upper }}</span>
+              <span class="badge bg-blue-500 text-white text-xs px-2 py-1">{{ trans.ativo.tipo|upper }}</span>
               <span class="text-xl ml-1">{{ '🇧🇷' if trans.ativo.mercado == 'BR' else '🇺🇸' }}</span>
             </td>
             <td class="px-6 py-4 text-sm">{{ trans.corretora.nome }}</td>
