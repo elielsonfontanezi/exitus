@@ -30,28 +30,18 @@ def login():
         if response.status_code == 200:
             api_data = response.json()
             user_data = api_data.get('data', {})
-
-            # Decodificar JWT para extrair user_id
-            import jwt
-            access_token = user_data.get('access_token')
             
-            if access_token:
-                try:
-                    # Decodificar sem verificar assinatura (só precisamos do payload)
-                    payload = jwt.decode(access_token, options={"verify_signature": False})
-                    
-                    session['user_id'] = payload.get('sub')  # user_id está no 'sub'
-                    session['username'] = username  # Usar o username do form
-                    session['role'] = payload.get('role', 'user')
-                    session['access_token'] = access_token
-                    session.permanent = True
-                    
-                    flash('Login OK!', 'success')
-                    return redirect(url_for('dashboard.index'))
-                except Exception as e:
-                    flash(f'Erro ao processar token: {str(e)}', 'error')
-            else:
-                flash('Token não recebido do backend', 'error')
+            # FLEXÍVEL - tenta múltiplas chaves do backend
+            session['user_id'] = (user_data.get('user_id') or 
+                                user_data.get('id') or 
+                                user_data.get('userid'))
+            session['username'] = user_data.get('username', username)
+            session['useremail'] = user_data.get('useremail', username)
+            session['accesstoken'] = user_data.get('accesstoken')
+            
+            session.permanent = True
+            flash('Login OK!', 'success')
+            return redirect(url_for('dashboard.index'))
         else:
             flash('Login falhou', 'error')
     

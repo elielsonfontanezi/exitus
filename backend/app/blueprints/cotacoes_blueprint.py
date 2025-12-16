@@ -81,18 +81,29 @@ def cotacoes_batch():
     """Batch com TTL 15min por ativo"""
     tickers = request.args.get('symbols', 'PETR4,VALE3').split(',')
     resultados = {}
-    
+
     for ticker in tickers[:10]:
         ticker = ticker.strip().upper()
         try:
-            # Reusar lógica individual
-            resp = obter_cotacao(ticker)
-            resultados[ticker] = resp[0].get_json()
+            # ✅ CORRETO: Chamar service diretamente
+            ativo = Ativo.query.filter_by(ticker=ticker).first()
+            if not ativo:
+                resultados[ticker] = {
+                    'error': f'Ativo {ticker} não encontrado',
+                    'success': False
+                }
+                continue
+            
+            # Usar lógica do service
+            cotacao = CotacoesService.obter_cotacao(ticker, ativo.mercado)
+            resultados[ticker] = cotacao
+            
         except Exception as e:
             logger.error(f"❌ Batch {ticker}: {e}")
             resultados[ticker] = {'error': str(e), 'success': False}
-    
+
     return jsonify(resultados)
+
 
 @cotacoes_bp.route('/health', methods=['GET'])
 def cotacoes_health():

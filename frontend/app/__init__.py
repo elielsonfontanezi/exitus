@@ -37,4 +37,10 @@ def create_app():
             return redirect(url_for('dashboard.index'))
         return redirect(url_for('auth.login'))
 
+    # Adicionar funções ao contexto Jinja2
+    @app.context_processor
+    def inject_now():
+        from datetime import datetime
+        return {'now': datetime.now}
+    
     return app
