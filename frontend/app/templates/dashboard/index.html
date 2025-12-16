@@ -43,6 +43,37 @@
     </div>
   </div>
 
+  <!-- NOVO: Gráficos de Portfólio -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    
+    <!-- Gráfico 1: Evolução do Portfólio -->
+    <div class="card">
+      <div class="p-6 border-b">
+        <h2 class="text-xl font-bold text-gray-900 flex items-center">
+          <i class="fas fa-chart-line text-blue-600 mr-3"></i>
+          Evolução do Portfólio
+        </h2>
+      </div>
+      <div class="p-6 bg-gray-50">
+        <canvas id="chart-evolution" style="max-height: 300px;"></canvas>
+      </div>
+    </div>
+    
+    <!-- Gráfico 2: Alocação por Tipo de Ativo -->
+    <div class="card">
+      <div class="p-6 border-b">
+        <h2 class="text-xl font-bold text-gray-900 flex items-center">
+          <i class="fas fa-chart-pie text-green-600 mr-3"></i>
+          Alocação por Tipo
+        </h2>
+      </div>
+      <div class="p-6 bg-gray-50">
+        <canvas id="chart-allocation" style="max-height: 300px;"></canvas>
+      </div>
+    </div>
+    
+  </div>
+
   <!-- Buy Signals TOP 5 Preview -->
   <div class="card">
     <div class="p-6 border-b flex items-center justify-between">
@@ -81,4 +112,119 @@
     </div>
   </div>
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // ========================================
+  // GRÁFICO 1: Evolução do Portfólio (Linha)
+  // ========================================
+  const ctxEvolution = document.getElementById('chart-evolution');
+  if (ctxEvolution) {
+    new Chart(ctxEvolution, {
+      type: 'line',
+      data: {
+        labels: ['Jul/24', 'Ago/24', 'Set/24', 'Out/24', 'Nov/24', 'Dez/24'],
+        datasets: [{
+          label: 'Valor do Portfólio',
+          data: [95000, 102000, 108000, 115000, 120000, 125430],
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: '#3b82f6',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return 'R$ ' + context.parsed.y.toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                });
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            ticks: {
+              callback: function(value) {
+                return 'R$ ' + (value / 1000).toFixed(0) + 'k';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // ========================================
+  // GRÁFICO 2: Alocação por Tipo (Rosca)
+  // ========================================
+  const ctxAllocation = document.getElementById('chart-allocation');
+  if (ctxAllocation) {
+    new Chart(ctxAllocation, {
+      type: 'doughnut',
+      data: {
+        labels: ['Ações', 'FIIs', 'Renda Fixa', 'Cripto'],
+        datasets: [{
+          data: [78500, 25430, 15200, 6300],
+          backgroundColor: [
+            '#3b82f6',  // Azul - Ações
+            '#10b981',  // Verde - FIIs
+            '#f59e0b',  // Amarelo - Renda Fixa
+            '#ec4899'   // Rosa - Cripto
+          ],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              font: {
+                size: 12
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return label + ': R$ ' + value.toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2
+                }) + ' (' + percentage + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
+});
+</script>
 {% endblock %}
