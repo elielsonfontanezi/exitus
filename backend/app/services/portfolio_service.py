@@ -1,272 +1,239 @@
-# -*- coding: utf-8 -*-
-"""
-Portfolio Service - Análise Consolidada de Portfolio
-"""
-from decimal import Decimal
-import numpy as np
-from sqlalchemy import func
-from app.models import Posicao, Ativo, MovimentacaoCaixa
-from app.database import db
+"""M7.5 - Cotações Multi-Provider com Fallback Otimizado"""
+import requests
+from datetime import datetime
+import logging
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+logger = logging.getLogger(__name__)
 
-class PortfolioService:
-    """Service para cálculos e análises de portfolio consolidado"""
-    
+class CotacoesService:
+    """Fallback cascata com 8 providers"""
+
+    # Tokens do .env
+    BRAPI_TOKEN = os.getenv('BRAPI_API_KEY', '')
+    ALPHA_KEY = os.getenv('ALPHA_VANTAGE_API_KEY', 'demo')
+    FINNHUB_KEY = os.getenv('FINNHUB_API_KEY', '')
+    TWELVE_KEY = os.getenv('TWELVE_DATA_API_KEY', '')
+    MARKETSTACK_KEY = os.getenv('MARKETSTACK_API_KEY', '')
+    HGFINANCE_KEY = os.getenv('HGFINANCE_API_KEY', '')
+    TIMEOUT = 5
+
     @staticmethod
-    def get_dashboard(usuario_id):
-        """
-        Dashboard completo do portfolio - conforme API Reference
-        
-        Returns:
-            dict: {
-                patrimonio_ativos, custo_aquisicao, saldo_caixa,
-                patrimonio_total, lucro_bruto, rentabilidade_perc
-            }
-        """
-        # Buscar posições ativas
-        posicoes = Posicao.query.filter_by(usuario_id=usuario_id).filter(
-            Posicao.quantidade > 0
-        ).all()
-        
-        # Calcular métricas de ativos
-        patrimonio_ativos = sum(float(p.valor_atual or 0) for p in posicoes)
-        custo_aquisicao = sum(float(p.custo_total or 0) for p in posicoes)
-        
-        # Calcular saldo em caixa (somar todos os DEPOSITOs - SAQUEs)
-        saldo_caixa = db.session.query(
-            func.coalesce(func.sum(MovimentacaoCaixa.valor), 0)
-        ).filter(
-            MovimentacaoCaixa.usuario_id == usuario_id
-        ).scalar() or 0.0
-        
-        saldo_caixa = float(saldo_caixa)
-        
-        # Calcular métricas consolidadas
-        patrimonio_total = patrimonio_ativos + saldo_caixa
-        lucro_bruto = patrimonio_ativos - custo_aquisicao
-        rentabilidade_perc = (
-            (lucro_bruto / custo_aquisicao * 100) if custo_aquisicao > 0 else 0.0
-        )
-        
-        return {
-            'patrimonio_ativos': round(patrimonio_ativos, 2),
-            'custo_aquisicao': round(custo_aquisicao, 2),
-            'saldo_caixa': round(saldo_caixa, 2),
-            'patrimonio_total': round(patrimonio_total, 2),
-            'lucro_bruto': round(lucro_bruto, 2),
-            'rentabilidade_perc': round(rentabilidade_perc, 2)
-        }
-    
+    def _build_brapi_url(ticker):
+        """Constrói URL brapi.dev com token"""
+        base_url = f"https://brapi.dev/api/quote/{ticker}"
+        if CotacoesService.BRAPI_TOKEN:
+            return f"{base_url}?token={CotacoesService.BRAPI_TOKEN}"
+        return base_url
+
     @staticmethod
-    def get_alocacao(usuario_id):
-        """
-        Distribuição do portfolio por classe de ativo
+    def obter_cotacao(ticker, mercado='BR'):
+        """Fallback otimizado por mercado"""
         
-        Returns:
-            dict: { classe: { valor, percentual }, ... }
-        """
-        posicoes = db.session.query(Posicao, Ativo).join(
-            Ativo, Posicao.ativo_id == Ativo.id
-        ).filter(
-            Posicao.usuario_id == usuario_id,
-            Posicao.quantidade > 0
-        ).all()
-        
-        if not posicoes:
-            return {}
-        
-        # Agrupar por classe
-        alocacao = {}
-        total_valor = 0.0
-        
-        for posicao, ativo in posicoes:
-            # ✅ CONVERSÃO CRÍTICA: Enum -> String
-            classe_raw = getattr(ativo, 'classe', None)
+        # ============================================
+        # ATIVOS BRASIL (B3)
+        # ============================================
+        if mercado == 'BR':
             
-            if classe_raw is None:
-                classe = 'DESCONHECIDA'
-            elif hasattr(classe_raw, 'value'):
-                # É um Enum, extrair o valor
-                classe = str(classe_raw.value)
-            else:
-                # Já é string
-                classe = str(classe_raw)
+            # 1️⃣ BRAPI.DEV (PRINCIPAL BR - mais rápido)
+            try:
+                logger.info(f"📡 [1/4 BR] brapi.dev para {ticker}")
+                url = CotacoesService._build_brapi_url(ticker)
+                resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+
+                if resp.status_code == 200:
+                    data = resp.json()['results'][0]
+                    logger.info(f"✅ brapi.dev OK: {ticker}")
+                    return {
+                        'ticker': ticker,
+                        'preco_atual': float(data['regularMarketPrice']),
+                        'variacao_percentual': float(data['regularMarketChangePercent']),
+                        'volume': int(data['regularMarketVolume']),
+                        'dy_12m': round(float(data.get('dividendYield', 0)) * 100, 2),
+                        'pl': round(float(data.get('trailingPE', 0)), 2),
+                        'provider': 'brapi.dev',
+                        'success': True
+                    }
+            except Exception as e:
+                logger.warning(f"⚠️ brapi.dev falhou: {e}")
+
+            # 2️⃣ HG FINANCE (BR específico)
+            if CotacoesService.HGFINANCE_KEY:
+                try:
+                    logger.info(f"📡 [2/4 BR] hgfinance para {ticker}")
+                    url = f"https://api.hgbrasil.com/finance/stock_price?key={CotacoesService.HGFINANCE_KEY}&symbol={ticker}"
+                    resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+                    
+                    if resp.status_code == 200:
+                        data = resp.json()['results'][ticker]
+                        logger.info(f"✅ hgfinance OK: {ticker}")
+                        return {
+                            'ticker': ticker,
+                            'preco_atual': float(data['price']),
+                            'variacao_percentual': float(data['change_percent']),
+                            'volume': 0,
+                            'dy_12m': 0,
+                            'pl': 0,
+                            'provider': 'hgfinance',
+                            'success': True
+                        }
+                except Exception as e:
+                    logger.warning(f"⚠️ hgfinance falhou: {e}")
+
+            # 3️⃣ YFINANCE (BR com .SA)
+            try:
+                logger.info(f"📡 [3/4 BR] yfinance para {ticker}")
+                import yfinance as yf
+                from requests.exceptions import Timeout
+                
+                stock = yf.Ticker(f'{ticker}.SA')
+                hist = stock.history(period='1d', timeout=CotacoesService.TIMEOUT)
+                
+                if not hist.empty:
+                    logger.info(f"✅ yfinance OK: {ticker}")
+                    return {
+                        'ticker': ticker,
+                        'preco_atual': float(hist['Close'].iloc[-1]),
+                        'variacao_percentual': 0,
+                        'volume': int(hist['Volume'].iloc[-1]),
+                        'dy_12m': 0,
+                        'pl': 0,
+                        'provider': 'yfinance',
+                        'success': True
+                    }
+            except Timeout:
+                logger.warning(f"⚠️ yfinance timeout 5s")
+            except Exception as e:
+                logger.warning(f"⚠️ yfinance falhou: {e}")
+
+            # 4️⃣ TWELVE DATA (Global backup)
+            if CotacoesService.TWELVE_KEY:
+                try:
+                    logger.info(f"📡 [4/4 BR] twelvedata para {ticker}")
+                    url = f"https://api.twelvedata.com/price?symbol={ticker}.SA&apikey={CotacoesService.TWELVE_KEY}"
+                    resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+                    
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        if 'price' in data:
+                            logger.info(f"✅ twelvedata OK: {ticker}")
+                            return {
+                                'ticker': ticker,
+                                'preco_atual': float(data['price']),
+                                'variacao_percentual': 0,
+                                'volume': 0,
+                                'dy_12m': 0,
+                                'pl': 0,
+                                'provider': 'twelvedata',
+                                'success': True
+                            }
+                except Exception as e:
+                    logger.warning(f"⚠️ twelvedata falhou: {e}")
+
+        # ============================================
+        # ATIVOS US/GLOBAL
+        # ============================================
+        else:
             
-            valor_posicao = float(posicao.valor_atual or 0)
-            total_valor += valor_posicao
-            
-            if classe not in alocacao:
-                alocacao[classe] = {'valor': 0.0, 'percentual': 0.0}
-            
-            alocacao[classe]['valor'] += valor_posicao
-        
-        # Calcular percentuais
-        if total_valor > 0:
-            for classe in alocacao:
-                alocacao[classe]['percentual'] = round(
-                    (alocacao[classe]['valor'] / total_valor) * 100, 2
-                )
-                alocacao[classe]['valor'] = round(alocacao[classe]['valor'], 2)
-        
-        return alocacao
-    
-    @staticmethod
-    def get_portfolio_metrics(usuario_id):
-        """
-        Métricas avançadas do portfolio (para calculosblueprint)
-        
-        Returns:
-            dict: Estrutura COMPLETA esperada pelo calculosblueprint
-        """
-        dashboard = PortfolioService.get_dashboard(usuario_id)
-        alocacao = PortfolioService.get_alocacao(usuario_id)
-        
-        # Contar ativos
-        num_ativos = Posicao.query.filter_by(usuario_id=usuario_id).filter(
-            Posicao.quantidade > 0
-        ).count()
-        
-        # Calcular dividend yield médio (simplificado)
-        posicoes_com_ativo = db.session.query(Posicao, Ativo).join(
-            Ativo, Posicao.ativo_id == Ativo.id
-        ).filter(
-            Posicao.usuario_id == usuario_id,
-            Posicao.quantidade > 0
-        ).all()
-        
-        dividend_yields = [
-            float(ativo.dividend_yield or 0) 
-            for _, ativo in posicoes_com_ativo 
-            if ativo.dividend_yield
-        ]
-        dividend_yield_medio = (
-            sum(dividend_yields) / len(dividend_yields) 
-            if dividend_yields else 0.0
-        )
-        
-        # Retornar estrutura COMPLETA esperada pelo calculosblueprint
-        return {
-            'portfolio_info': {
-                'patrimonio_total': dashboard['patrimonio_total'],
-                'custo_total': dashboard['custo_aquisicao'],
-                'num_ativos': num_ativos,
-                'saldo_caixa': dashboard['saldo_caixa']
-            },
-            'rentabilidade_ytd': dashboard['rentabilidade_perc'] / 100,
-            'alocacao': alocacao,  # Campo esperado: 'alocacao' não 'alocacao_por_classe'
-            'dividend_yield_medio': round(dividend_yield_medio, 2),
-            'volatilidade_anualizada': 0.0,  # TODO: calcular com histórico
-            'sharpe_ratio': 0.0,
-            'max_drawdown': 0.0,
-            'beta_ibov': 0.0,  # TODO: calcular correlação com IBOV
-            'correlacao_ativos': {}  # TODO: matriz de correlação
-        }
+            # 1️⃣ FINNHUB (PRINCIPAL US - 60 req/min)
+            if CotacoesService.FINNHUB_KEY:
+                try:
+                    logger.info(f"📡 [1/4 US] finnhub para {ticker}")
+                    url = f"https://finnhub.io/api/v1/quote?symbol={ticker}&token={CotacoesService.FINNHUB_KEY}"
+                    resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
 
-    @staticmethod
-    def get_distribuicao_classes(usuario_id):
-        """
-        Wrapper para get_alocacao (mantém compatibilidade com blueprint)
-        
-        Returns:
-            dict: { total, classes: {...} }
-        """
-        alocacao = PortfolioService.get_alocacao(usuario_id)
-        dashboard = PortfolioService.get_dashboard(usuario_id)
-        
-        return {
-            'total': dashboard['patrimonio_total'],
-            'classes': alocacao
-        }
-    
-    @staticmethod
-    def get_distribuicao_setores(usuario_id):
-        """
-        Distribuição por setor (simplificado - retorna vazio por enquanto)
-        
-        Returns:
-            dict: Distribuição por setor
-        """
-        # TODO: Implementar quando houver campo 'setor' em Ativo
-        return {}
-    
-    @staticmethod
-    def get_evolucao_patrimonio(usuario_id, meses=12):
-        """
-        Evolução do patrimônio (simplificado - retorna snapshot atual)
-        
-        Returns:
-            list: Histórico de patrimônio
-        """
-        # TODO: Implementar com histórico real de transações
-        dashboard = PortfolioService.get_dashboard(usuario_id)
-        return [{
-            'mes': '2025-12',
-            'patrimonio': dashboard['patrimonio_total']
-        }]
-    
-    @staticmethod
-    def get_metricas_risco(usuario_id):
-        """
-        Métricas de risco do portfolio
-        
-        Returns:
-            dict: Métricas de risco
-        """
-        return {
-            'volatilidade': 0.0,
-            'sharpe_ratio': 0.0,
-            'max_drawdown': 0.0,
-            'var_95': 0.0  # Value at Risk 95%
-        }
-    
-    @staticmethod
-    def get_performance_ativos(usuario_id):
-        """
-        Performance individual de cada ativo
-        
-        Returns:
-            list: Lista de ativos com performance
-        """
-        posicoes = db.session.query(Posicao, Ativo).join(
-            Ativo, Posicao.ativo_id == Ativo.id
-        ).filter(
-            Posicao.usuario_id == usuario_id,
-            Posicao.quantidade > 0
-        ).all()
-        
-        performance = []
-        for posicao, ativo in posicoes:
-            ticker = getattr(ativo, 'ticker', 'N/A')
-            custo = float(posicao.custo_total or 0)
-            valor_atual = float(posicao.valor_atual or 0)
-            lucro = valor_atual - custo
-            rentabilidade = (lucro / custo * 100) if custo > 0 else 0.0
-            
-            performance.append({
-                'ticker': ticker,
-                'quantidade': float(posicao.quantidade),
-                'custo_total': round(custo, 2),
-                'valor_atual': round(valor_atual, 2),
-                'lucro': round(lucro, 2),
-                'rentabilidade_perc': round(rentabilidade, 2)
-            })
-        
-        return performance
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        if data.get('c'):  # current price
+                            logger.info(f"✅ finnhub OK: {ticker} = ${data['c']}")
+                            return {
+                                'ticker': ticker,
+                                'preco_atual': float(data['c']),
+                                'variacao_percentual': float(data.get('dp', 0)),
+                                'volume': 0,
+                                'dy_12m': 0,
+                                'pl': 0,
+                                'provider': 'finnhub',
+                                'success': True
+                            }
+                except Exception as e:
+                    logger.warning(f"⚠️ finnhub falhou: {e}")
 
-# ============================================
-# FUNÇÕES STANDALONE para retrocompatibilidade
-# ============================================
+            # 2️⃣ ALPHA VANTAGE (Confiável US)
+            try:
+                logger.info(f"📡 [2/4 US] alphavantage para {ticker}")
+                url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={CotacoesService.ALPHA_KEY}"
+                resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
 
-def get_portfolio_metrics(usuario_id):
-    """Wrapper para retrocompatibilidade"""
-    return PortfolioService.get_portfolio_metrics(usuario_id)
+                if resp.status_code == 200:
+                    data = resp.json().get('Global Quote', {})
+                    if data and '05. price' in data:
+                        logger.info(f"✅ alphavantage OK: {ticker}")
+                        return {
+                            'ticker': ticker,
+                            'preco_atual': float(data['05. price']),
+                            'variacao_percentual': float(data.get('10. change percent', '0').replace('%', '')),
+                            'volume': int(data.get('06. volume', 0)),
+                            'dy_12m': 0,
+                            'pl': 0,
+                            'provider': 'alphavantage',
+                            'success': True
+                        }
+            except Exception as e:
+                logger.warning(f"⚠️ alphavantage falhou: {e}")
 
+            # 3️⃣ TWELVE DATA (Global)
+            if CotacoesService.TWELVE_KEY:
+                try:
+                    logger.info(f"📡 [3/4 US] twelvedata para {ticker}")
+                    url = f"https://api.twelvedata.com/price?symbol={ticker}&apikey={CotacoesService.TWELVE_KEY}"
+                    resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+                    
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        if 'price' in data:
+                            logger.info(f"✅ twelvedata OK: {ticker}")
+                            return {
+                                'ticker': ticker,
+                                'preco_atual': float(data['price']),
+                                'variacao_percentual': 0,
+                                'volume': 0,
+                                'dy_12m': 0,
+                                'pl': 0,
+                                'provider': 'twelvedata',
+                                'success': True
+                            }
+                except Exception as e:
+                    logger.warning(f"⚠️ twelvedata falhou: {e}")
 
-def get_dashboard(usuario_id):
-    """Wrapper para get_dashboard"""
-    return PortfolioService.get_dashboard(usuario_id)
+            # 4️⃣ YFINANCE (Último recurso)
+            try:
+                logger.info(f"📡 [4/4 US] yfinance para {ticker}")
+                import yfinance as yf
+                from requests.exceptions import Timeout
+                
+                stock = yf.Ticker(ticker)
+                hist = stock.history(period='1d', timeout=CotacoesService.TIMEOUT)
+                
+                if not hist.empty:
+                    logger.info(f"✅ yfinance OK: {ticker}")
+                    return {
+                        'ticker': ticker,
+                        'preco_atual': float(hist['Close'].iloc[-1]),
+                        'variacao_percentual': 0,
+                        'volume': int(hist['Volume'].iloc[-1]),
+                        'dy_12m': 0,
+                        'pl': 0,
+                        'provider': 'yfinance',
+                        'success': True
+                    }
+            except Timeout:
+                logger.warning(f"⚠️ yfinance timeout 5s")
+            except Exception as e:
+                logger.warning(f"⚠️ yfinance falhou: {e}")
 
-
-def get_alocacao(usuario_id):
-    """Wrapper para get_alocacao"""
-    return PortfolioService.get_alocacao(usuario_id)
+        # ❌ TODAS FALHARAM
+        logger.error(f"❌ Todos os 4 providers falharam para {ticker}")
+        return {'success': False, 'error': 'Todas APIs indisponíveis', 'ticker': ticker}

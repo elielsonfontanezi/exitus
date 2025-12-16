@@ -32,7 +32,7 @@
                    class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors">
                     <i class="fas fa-signal w-5"></i>
                     <span>Buy Signals</span>
-                    <span class="ml-auto badge badge-success">NOVO</span>
+                    <span class="ml-auto bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">NOVO</span>
                 </a>
 
                 <!-- Separator -->
@@ -94,7 +94,7 @@
         <div class="p-4 border-t border-gray-700">
             <div class="text-xs text-gray-400 text-center">
                 Última atualização<br>
-                <span class="text-white font-medium">{{ "now"|date("%d/%m/%Y %H:%M") }}</span>
+                <span class="text-white font-medium">{{ now().strftime("%d/%m/%Y %H:%M") }}</span>
             </div>
         </div>
     </div>

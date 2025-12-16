@@ -103,7 +103,7 @@
               <div class="text-sm text-gray-600">{{ prov.ativo.nome }}</div>
             </td>
             <td class="px-6 py-4">
-              <span class="badge badge-blue text-xs">{{ prov.tipo|upper }}</span>
+              <span class="bg-blue-500 text-white text-xs px-2.5 py-0.5 rounded-full font-medium">{{ prov.tipo|upper }}</span>
             </td>
             <td class="px-6 py-4 text-right text-sm">{{ prov.moeda }} {{ "%.2f"|format(prov.valor_unitario) }}</td>
             <td class="px-6 py-4 text-right font-semibold">{{ prov.quantidade }}</td>
@@ -150,10 +150,11 @@ document.addEventListener('DOMContentLoaded', function(){
     new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Set/24', 'Out/24', 'Nov/24', 'Dez/24'],
+        labels: [{% for item in dividends_timeline %}'{{ item.mes }}',{% endfor %}],
         datasets: [{
           label: 'Proventos Recebidos (R$)',
-          data: [2.40, 170.00, 145.00, 47.50],
+          data: [{% for item in dividends_timeline %}{{ item.valor }},{% endfor %}],
+
           borderColor: '#10b981',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
           fill: true,

@@ -8,6 +8,8 @@ from flask import Blueprint, render_template, session, redirect, url_for, flash,
 import requests
 from functools import wraps
 from app.config import Config
+from collections import defaultdict
+from datetime import datetime
 
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -19,6 +21,34 @@ def login_required(f):
             return f(*args, **kwargs)
         return redirect(url_for('auth.login'))
     return decorated_function
+
+# ========================================
+# HELPER: Transformar dados da API
+# ========================================
+
+def transform_buy_signal(item):
+    """Transforma estrutura da API para formato do template"""
+    ticker = item.get('ticker', '')
+    preco_atual = item.get('preco_atual', 0)
+    preco_teto = item.get('preco_teto', 0)
+
+    # Calcular margem de segurança %
+    margem = 0
+    if preco_teto > 0 and preco_atual > 0:
+        margem = round(((preco_teto - preco_atual) / preco_atual) * 100, 2)
+
+    # Detectar mercado (BR se tem números no ticker, US se não tem)
+    mercado = 'BR' if any(c.isdigit() for c in ticker) else 'US'
+
+    return {
+        'ticker': ticker,
+        'nome': ticker,  # Temporário: usar ticker como nome
+        'mercado': mercado,
+        'buyscore': item.get('buy_score', 0),
+        'margem': margem,
+        'preco_atual': preco_atual,
+        'preco_teto': preco_teto
+    }
 
 # ========================================
 # DASHBOARD INDEX
@@ -49,8 +79,11 @@ def buy_signals():
                 headers=headers, timeout=5
             )
             if response.status_code == 200:
-                data = response.json().get('data', [])
-        except:
+                raw_data = response.json().get('data', [])
+                # Transformar estrutura para template
+                data = [transform_buy_signal(item) for item in raw_data]
+        except Exception as e:
+            print(f"❌ Erro ao buscar buy signals: {e}")
             pass
 
     if not data:
@@ -64,7 +97,7 @@ def buy_signals():
         'mercados': {
             'labels': ['BR', 'US', 'EU'],
             'data': [len([s for s in data if s.get('mercado') == 'BR']),
-                     len([s for s in data if s.get('mercado') == 'US']), 1]
+                     len([s for s in data if s.get('mercado') == 'US']), 0]
         }
     }
 
@@ -86,8 +119,11 @@ def buy_signals_table():
                 headers=headers, timeout=5
             )
             if response.status_code == 200:
-                data = response.json().get('data', [])
-        except:
+                raw_data = response.json().get('data', [])
+                # Transformar estrutura para template
+                data = [transform_buy_signal(item) for item in raw_data]
+        except Exception as e:
+            print(f"❌ Erro ao buscar buy signals table: {e}")
             pass
 
     if not data:
@@ -267,16 +303,34 @@ def transactions():
             },
         ]
 
-    # Stats
+    # Stats - Totais gerais
     total_compras = sum(1 for t in transacoes if t['tipo_operacao'] == 'compra')
     total_vendas = sum(1 for t in transacoes if t['tipo_operacao'] == 'venda')
     volume_total = sum(t.get('valor_total', 0) for t in transacoes)
+
+    # Stats - Volume por tipo de ativo
+    volume_acoes = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') in ['acao', 'stock'])
+    volume_fii = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') in ['fii', 'reit'])
+    volume_cripto = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') == 'cripto')
+    volume_outros = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') not in ['acao', 'stock', 'fii', 'reit', 'cripto'])
+
+    # Stats - Volume por operação
+    volume_compras = sum(t.get('valor_total', 0) for t in transacoes if t['tipo_operacao'] == 'compra')
+    volume_vendas = sum(t.get('valor_total', 0) for t in transacoes if t['tipo_operacao'] == 'venda')
 
     stats = {
         'total': len(transacoes),
         'compras': total_compras,
         'vendas': total_vendas,
-        'volume_total': volume_total
+        'volume_total': volume_total,
+        # Novos: volume por tipo
+        'volume_acoes': volume_acoes,
+        'volume_fii': volume_fii,
+        'volume_cripto': volume_cripto,
+        'volume_outros': volume_outros,
+        # Novos: volume por operação
+        'volume_compras': volume_compras,
+        'volume_vendas': volume_vendas
     }
 
     # Listas para filtros
@@ -372,7 +426,7 @@ def dividends():
     """M6.4 - Gestão de Proventos (Dividendos, JCP, Rendimentos)"""
     token = session.get('accesstoken')
     proventos = []
-    
+
     # Filtros
     ativo_id = request.args.get('ativo')
     corretora_id = request.args.get('corretora')
@@ -381,12 +435,12 @@ def dividends():
     data_inicio = request.args.get('data_inicio')
     data_fim = request.args.get('data_fim')
     page = int(request.args.get('page', 1))
-    
+
     if token:
         try:
             headers = {'Authorization': f'Bearer {token}'}
             params = {'page': page, 'per_page': 20}
-            
+
             if ativo_id:
                 params['ativo_id'] = ativo_id
             if corretora_id:
@@ -399,18 +453,18 @@ def dividends():
                 params['data_inicio'] = data_inicio
             if data_fim:
                 params['data_fim'] = data_fim
-            
+
             response = requests.get(
                 f'{Config.BACKEND_API_URL}/api/proventos',
                 headers=headers, params=params, timeout=10
             )
-            
+
             if response.status_code == 200:
                 result = response.json()
                 proventos = result.get('data', {}).get('proventos', [])
         except:
             pass
-    
+
     # Mock data
     if not proventos:
         proventos = [
@@ -445,41 +499,60 @@ def dividends():
                 'moeda': 'BRL', 'status': 'previsto'
             }
         ]
-    
+
     # Stats
     total_recebido = sum(p.get('valor_total', 0) for p in proventos if p.get('status') == 'pago')
     total_previsto = sum(p.get('valor_total', 0) for p in proventos if p.get('status') == 'previsto')
     total_geral = sum(p.get('valor_total', 0) for p in proventos)
-    
+
     stats = {
         'total': len(proventos),
         'recebido': total_recebido,
         'previsto': total_previsto,
         'total_geral': total_geral
     }
+
+    # NOVO: Timeline mensal (agrupar proventos PAGOS por mês)
+    timeline_dict = defaultdict(float)
+    for p in proventos:
+        if p.get('status') == 'pago':
+            try:
+                # Converter data_pagamento para formato Mmm/AA
+                data_pag = p.get('data_pagamento', '')
+                if data_pag:
+                    dt = datetime.strptime(data_pag, '%Y-%m-%d')
+                    mes_label = dt.strftime('%b/%y')  # Set/24, Out/24, etc
+                    timeline_dict[mes_label] += p.get('valor_total', 0)
+            except:
+                pass
     
+    # Ordenar cronologicamente e formatar
+    timeline_sorted = sorted(timeline_dict.items(), key=lambda x: datetime.strptime(x[0], '%b/%y'))
+    dividends_timeline = [{'mes': mes, 'valor': round(valor, 2)} for mes, valor in timeline_sorted]
+
     # Listas para filtros
     ativos = [
         {'id': '1', 'ticker': 'PETR4', 'nome': 'Petrobras'},
         {'id': '2', 'ticker': 'VALE3', 'nome': 'Vale'},
         {'id': '3', 'ticker': 'MXRF11', 'nome': 'Maxi Renda'}
     ]
-    
+
     corretoras = [
         {'id': '1', 'nome': 'XP Investimentos'},
         {'id': '2', 'nome': 'Clear Corretora'},
         {'id': '3', 'nome': 'Avenue Securities'}
     ]
-    
+
     tipos_provento_list = [
         {'value': 'dividendo', 'label': 'Dividendo'},
         {'value': 'jcp', 'label': 'JCP'},
         {'value': 'rendimento', 'label': 'Rendimento'}
     ]
-    
+
     return render_template('dashboard/dividends.html',
                          proventos=proventos,
                          stats=stats,
+                         dividends_timeline=dividends_timeline,  # NOVO
                          ativos=ativos,
                          corretoras=corretoras,
                          tipos_provento=tipos_provento_list,

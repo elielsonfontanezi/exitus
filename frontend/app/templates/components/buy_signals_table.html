@@ -19,7 +19,7 @@
         <td class="px-4 py-3 text-right font-bold text-green-600">{{ signal.buyscore or 0 }}/100</td>
         <td class="px-4 py-3 text-right text-green-600">{{ "%.1f"|format(signal.margem or 0) }}%</td>
         <td class="px-4 py-3 text-center">
-          <span class="badge badge-success px-3 py-1">
+          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">
             {{ 'COMPRA' if (signal.buyscore or 0) >= 70 else 'NEUTRO' }}
           </span>
         </td>
