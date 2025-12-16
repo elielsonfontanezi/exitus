@@ -8,6 +8,8 @@ from flask import Blueprint, render_template, session, redirect, url_for, flash,
 import requests
 from functools import wraps
 from app.config import Config
+from collections import defaultdict
+from datetime import datetime
 
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -29,15 +31,15 @@ def transform_buy_signal(item):
     ticker = item.get('ticker', '')
     preco_atual = item.get('preco_atual', 0)
     preco_teto = item.get('preco_teto', 0)
-    
+
     # Calcular margem de segurança %
     margem = 0
     if preco_teto > 0 and preco_atual > 0:
         margem = round(((preco_teto - preco_atual) / preco_atual) * 100, 2)
-    
+
     # Detectar mercado (BR se tem números no ticker, US se não tem)
     mercado = 'BR' if any(c.isdigit() for c in ticker) else 'US'
-    
+
     return {
         'ticker': ticker,
         'nome': ticker,  # Temporário: usar ticker como nome
@@ -301,16 +303,34 @@ def transactions():
             },
         ]
 
-    # Stats
+    # Stats - Totais gerais
     total_compras = sum(1 for t in transacoes if t['tipo_operacao'] == 'compra')
     total_vendas = sum(1 for t in transacoes if t['tipo_operacao'] == 'venda')
     volume_total = sum(t.get('valor_total', 0) for t in transacoes)
+
+    # Stats - Volume por tipo de ativo
+    volume_acoes = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') in ['acao', 'stock'])
+    volume_fii = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') in ['fii', 'reit'])
+    volume_cripto = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') == 'cripto')
+    volume_outros = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') not in ['acao', 'stock', 'fii', 'reit', 'cripto'])
+
+    # Stats - Volume por operação
+    volume_compras = sum(t.get('valor_total', 0) for t in transacoes if t['tipo_operacao'] == 'compra')
+    volume_vendas = sum(t.get('valor_total', 0) for t in transacoes if t['tipo_operacao'] == 'venda')
 
     stats = {
         'total': len(transacoes),
         'compras': total_compras,
         'vendas': total_vendas,
-        'volume_total': volume_total
+        'volume_total': volume_total,
+        # Novos: volume por tipo
+        'volume_acoes': volume_acoes,
+        'volume_fii': volume_fii,
+        'volume_cripto': volume_cripto,
+        'volume_outros': volume_outros,
+        # Novos: volume por operação
+        'volume_compras': volume_compras,
+        'volume_vendas': volume_vendas
     }
 
     # Listas para filtros
@@ -492,6 +512,24 @@ def dividends():
         'total_geral': total_geral
     }
 
+    # NOVO: Timeline mensal (agrupar proventos PAGOS por mês)
+    timeline_dict = defaultdict(float)
+    for p in proventos:
+        if p.get('status') == 'pago':
+            try:
+                # Converter data_pagamento para formato Mmm/AA
+                data_pag = p.get('data_pagamento', '')
+                if data_pag:
+                    dt = datetime.strptime(data_pag, '%Y-%m-%d')
+                    mes_label = dt.strftime('%b/%y')  # Set/24, Out/24, etc
+                    timeline_dict[mes_label] += p.get('valor_total', 0)
+            except:
+                pass
+    
+    # Ordenar cronologicamente e formatar
+    timeline_sorted = sorted(timeline_dict.items(), key=lambda x: datetime.strptime(x[0], '%b/%y'))
+    dividends_timeline = [{'mes': mes, 'valor': round(valor, 2)} for mes, valor in timeline_sorted]
+
     # Listas para filtros
     ativos = [
         {'id': '1', 'ticker': 'PETR4', 'nome': 'Petrobras'},
@@ -514,6 +552,7 @@ def dividends():
     return render_template('dashboard/dividends.html',
                          proventos=proventos,
                          stats=stats,
+                         dividends_timeline=dividends_timeline,  # NOVO
                          ativos=ativos,
                          corretoras=corretoras,
                          tipos_provento=tipos_provento_list,

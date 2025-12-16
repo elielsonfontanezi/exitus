@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function(){
         labels: ['Ações', 'FII', 'Cripto'],
         datasets: [{
           label: 'Volume (R$)',
-          data: [26085, 510, 10500],
+          data: [{{ stats.volume_acoes }}, {{ stats.volume_fii }}, {{ stats.volume_cripto }}],
           backgroundColor: ['#3b82f6', '#10b981', '#ec4899']
         }]
       },
@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function(){
       data: {
         labels: ['Compras', 'Vendas'],
         datasets: [{
-          data: [24635, 12460],
+          data: [{{ stats.volume_compras }}, {{ stats.volume_vendas }}],
           backgroundColor: ['#10b981', '#ef4444'],
           borderWidth: 2,
           borderColor: '#fff'
