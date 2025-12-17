@@ -810,6 +810,120 @@ def alerts_create():
     
     return redirect(url_for('dashboard.alerts'))
 
+@bp.route('/alerts/table', methods=['GET'])
+@login_required
+def alerts_table():
+    """
+    M7.3 - Partial render da tabela de alertas (HTMX)
+    Retorna apenas o HTML da tabela para atualização dinâmica
+    """
+    token = session.get('access_token')
+    alertas = []
+    
+    # Filtros da query string
+    tipo_alerta = request.args.get('tipo')
+    status_filtro = request.args.get('status')
+    ativo_ticker = request.args.get('ativo')
+    
+    # Mock data (igual ao alerts())
+    alertas = [
+        {
+            'id': 'alert-001',
+            'nome': 'PETR4 acima de R$ 32,00',
+            'tipoalerta': 'ALTA_PRECO',
+            'ticker': 'PETR4',
+            'condicaooperador': '>=',
+            'condicaovalor': 32.00,
+            'condicaovalor2': None,
+            'ativo': True,
+            'frequencianotificacao': 'IMEDIATA',
+            'canaisentrega': ['WEBAPP', 'EMAIL'],
+            'totalacionamentos': 3,
+            'timestampultimoacionamento': '2024-12-15 14:35:22',
+            'createdat': '2024-12-01 10:00:00'
+        },
+        {
+            'id': 'alert-002',
+            'nome': 'VALE3 queda > 5%',
+            'tipoalerta': 'QUEDA_PRECO',
+            'ticker': 'VALE3',
+            'condicaooperador': '<=',
+            'condicaovalor': 65.50,
+            'condicaovalor2': None,
+            'ativo': True,
+            'frequencianotificacao': 'DIARIA',
+            'canaisentrega': ['WEBAPP'],
+            'totalacionamentos': 1,
+            'timestampultimoacionamento': '2024-12-10 09:15:00',
+            'createdat': '2024-11-20 08:30:00'
+        },
+        {
+            'id': 'alert-003',
+            'nome': 'Dividendo PETR4 previsto',
+            'tipoalerta': 'DIVIDENDO_PREVISTO',
+            'ticker': 'PETR4',
+            'condicaooperador': '>=',
+            'condicaovalor': 1.00,
+            'condicaovalor2': None,
+            'ativo': True,
+            'frequencianotificacao': 'SEMANAL',
+            'canaisentrega': ['WEBAPP', 'EMAIL', 'SMS'],
+            'totalacionamentos': 0,
+            'timestampultimoacionamento': None,
+            'createdat': '2024-12-05 16:45:00'
+        },
+        {
+            'id': 'alert-004',
+            'nome': 'Portfolio rentabilidade 20%',
+            'tipoalerta': 'META_RENTABILIDADE',
+            'ticker': None,
+            'condicaooperador': '>=',
+            'condicaovalor': 20.00,
+            'condicaovalor2': None,
+            'ativo': False,
+            'frequencianotificacao': 'MENSAL',
+            'canaisentrega': ['WEBAPP'],
+            'totalacionamentos': 0,
+            'timestampultimoacionamento': None,
+            'createdat': '2024-11-01 12:00:00'
+        },
+        {
+            'id': 'alert-005',
+            'nome': 'AAPL entre 180-200',
+            'tipoalerta': 'ALTA_PRECO',
+            'ticker': 'AAPL',
+            'condicaooperador': 'ENTRE',
+            'condicaovalor': 180.00,
+            'condicaovalor2': 200.00,
+            'ativo': True,
+            'frequencianotificacao': 'IMEDIATA',
+            'canaisentrega': ['WEBAPP', 'EMAIL'],
+            'totalacionamentos': 5,
+            'timestampultimoacionamento': '2024-12-16 11:22:00',
+            'createdat': '2024-11-15 14:20:00'
+        }
+    ]
+    
+    # Aplicar filtros
+    alertas_filtrados = alertas
+    
+    if tipo_alerta:
+        alertas_filtrados = [a for a in alertas_filtrados if a.get('tipoalerta') == tipo_alerta]
+    
+    if status_filtro:
+        ativo_bool = (status_filtro == 'ativo')
+        alertas_filtrados = [a for a in alertas_filtrados if a.get('ativo') == ativo_bool]
+    
+    if ativo_ticker:
+        alertas_filtrados = [a for a in alertas_filtrados if a.get('ticker') == ativo_ticker]
+    
+    # Log para debug
+    print(f"[M7.3 HTMX] Filtros: tipo={tipo_alerta}, status={status_filtro}, ativo={ativo_ticker}")
+    print(f"[M7.3 HTMX] Resultados: {len(alertas_filtrados)}/{len(alertas)} alertas")
+    
+    # Retorna apenas o partial (sem layout completo)
+    return render_template('components/alerts_table.html', alertas=alertas_filtrados)
+
 
 # ========================================
 # PLACEHOLDERS M7

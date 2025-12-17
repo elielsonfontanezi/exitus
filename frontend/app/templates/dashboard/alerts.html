@@ -1,4 +1,3 @@
-<!-- frontend/app/templates/dashboard/alerts.html -->
 {% extends "base.html" %}
 
 {% block title %}Alertas - Exitus{% endblock %}
@@ -46,9 +45,15 @@
         </div>
     </div>
 
-    <!-- Filtros -->
+    <!-- Filtros com HTMX -->
     <div class="card p-6">
-        <form method="GET" action="{{ url_for('dashboard.alerts') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form 
+            hx-get="{{ url_for('dashboard.alerts_table') }}"
+            hx-target="#alerts-table-container"
+            hx-trigger="change, submit"
+            hx-indicator=".htmx-indicator"
+            class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            
             <div>
                 <label class="label text-sm">Tipo de Alerta</label>
                 <select name="tipo" class="input text-sm">
@@ -57,8 +62,11 @@
                     <option value="QUEDA_PRECO" {% if filtros.tipo == 'QUEDA_PRECO' %}selected{% endif %}>Queda de Preço</option>
                     <option value="DIVIDENDO_PREVISTO" {% if filtros.tipo == 'DIVIDENDO_PREVISTO' %}selected{% endif %}>Dividendo Previsto</option>
                     <option value="META_RENTABILIDADE" {% if filtros.tipo == 'META_RENTABILIDADE' %}selected{% endif %}>Meta de Rentabilidade</option>
+                    <option value="VOLATILIDADE_ALTA" {% if filtros.tipo == 'VOLATILIDADE_ALTA' %}selected{% endif %}>Volatilidade Alta</option>
+                    <option value="DESVIO_ALOCACAO" {% if filtros.tipo == 'DESVIO_ALOCACAO' %}selected{% endif %}>Desvio de Alocação</option>
                 </select>
             </div>
+            
             <div>
                 <label class="label text-sm">Status</label>
                 <select name="status" class="input text-sm">
@@ -67,6 +75,7 @@
                     <option value="inativo" {% if filtros.status == 'inativo' %}selected{% endif %}>Inativos</option>
                 </select>
             </div>
+            
             <div>
                 <label class="label text-sm">Ativo</label>
                 <select name="ativo" class="input text-sm">
@@ -78,92 +87,30 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="flex items-end">
+            
+            <div class="flex items-end space-x-2">
                 <button type="submit" class="btn btn-primary w-full">
                     <i class="fas fa-filter mr-2"></i>Filtrar
                 </button>
+                <a href="{{ url_for('dashboard.alerts') }}" class="btn bg-gray-200 hover:bg-gray-300 text-gray-700">
+                    <i class="fas fa-times"></i>
+                </a>
             </div>
         </form>
     </div>
 
-    <!-- Tabela de Alertas -->
+    <!-- Tabela de Alertas com HTMX Target -->
     <div class="card">
-        <div class="p-6 border-b">
+        <div class="p-6 border-b flex items-center justify-between">
             <h2 class="text-xl font-bold">Meus Alertas</h2>
+            <span class="text-sm text-gray-500">
+                <i class="fas fa-sync-alt mr-1"></i>Atualização automática
+            </span>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-4 text-left font-bold">Nome</th>
-                        <th class="px-6 py-4 text-left font-bold">Tipo</th>
-                        <th class="px-6 py-4 text-left font-bold">Ativo</th>
-                        <th class="px-6 py-4 text-center font-bold">Condição</th>
-                        <th class="px-6 py-4 text-center font-bold">Status</th>
-                        <th class="px-6 py-4 text-center font-bold">Acionamentos</th>
-                        <th class="px-6 py-4 text-center font-bold">Ações</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    {% for alerta in alertas %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-lg">{{ alerta.nome }}</div>
-                            <div class="text-sm text-gray-600">{{ alerta.frequencianotificacao }}</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            {% if alerta.tipoalerta == 'ALTA_PRECO' %}
-                                <span class="badge bg-green-500 text-white px-3 py-1">Alta de Preço</span>
-                            {% elif alerta.tipoalerta == 'QUEDA_PRECO' %}
-                                <span class="badge bg-red-500 text-white px-3 py-1">Queda de Preço</span>
-                            {% elif alerta.tipoalerta == 'DIVIDENDO_PREVISTO' %}
-                                <span class="badge bg-blue-500 text-white px-3 py-1">Dividendo</span>
-                            {% else %}
-                                <span class="badge bg-purple-500 text-white px-3 py-1">{{ alerta.tipoalerta }}</span>
-                            {% endif %}
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="font-bold text-lg">{{ alerta.ticker or '-' }}</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-mono">
-                                {{ alerta.condicaooperador }} R$ {{ "%.2f"|format(alerta.condicaovalor) }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            {% if alerta.ativo %}
-                                <span class="badge bg-green-500 text-white px-4 py-2">ATIVO</span>
-                            {% else %}
-                                <span class="badge bg-gray-500 text-white px-4 py-2">INATIVO</span>
-                            {% endif %}
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-lg font-bold">{{ alerta.totalacionamentos or 0 }}</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <div class="flex justify-center space-x-2">
-                                <button class="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1" title="Toggle">
-                                    <i class="fas fa-power-off"></i>
-                                </button>
-                                <button class="btn btn-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1" title="Deletar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-                            <i class="fas fa-bell text-4xl mb-4"></i>
-                            <div>Nenhum alerta configurado</div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        
+        <!-- Container HTMX Target (posição relativa para loading indicator) -->
+        <div id="alerts-table-container" class="relative">
+            {% include 'components/alerts_table.html' %}
         </div>
     </div>
 </div>
@@ -423,10 +370,5 @@
             </form>
         </div>
     </div>
-</div>
-
-
-<div x-data="{ openModal: false }" x-cloak>
-    <!-- Será implementado no Passo 3 -->
 </div>
 {% endblock %}

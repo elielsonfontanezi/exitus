@@ -1,0 +1,118 @@
+<!-- components/alerts_table.html - Partial para HTMX -->
+<div class="overflow-x-auto">
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-4 text-left font-bold">Nome</th>
+                <th class="px-6 py-4 text-left font-bold">Tipo</th>
+                <th class="px-6 py-4 text-left font-bold">Ativo</th>
+                <th class="px-6 py-4 text-center font-bold">Condição</th>
+                <th class="px-6 py-4 text-center font-bold">Status</th>
+                <th class="px-6 py-4 text-center font-bold">Acionamentos</th>
+                <th class="px-6 py-4 text-center font-bold">Ações</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for alerta in alertas %}
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4">
+                    <div class="font-bold text-lg">{{ alerta.nome }}</div>
+                    <div class="text-sm text-gray-600">{{ alerta.frequencianotificacao }}</div>
+                </td>
+                <td class="px-6 py-4">
+                    {% if alerta.tipoalerta == 'ALTA_PRECO' %}
+                        <span class="badge bg-green-500 text-white px-3 py-1">📈 Alta de Preço</span>
+                    {% elif alerta.tipoalerta == 'QUEDA_PRECO' %}
+                        <span class="badge bg-red-500 text-white px-3 py-1">📉 Queda de Preço</span>
+                    {% elif alerta.tipoalerta == 'DIVIDENDO_PREVISTO' %}
+                        <span class="badge bg-blue-500 text-white px-3 py-1">💰 Dividendo</span>
+                    {% elif alerta.tipoalerta == 'META_RENTABILIDADE' %}
+                        <span class="badge bg-purple-500 text-white px-3 py-1">🎯 Meta</span>
+                    {% elif alerta.tipoalerta == 'VOLATILIDADE_ALTA' %}
+                        <span class="badge bg-orange-500 text-white px-3 py-1">⚠️ Volatilidade</span>
+                    {% else %}
+                        <span class="badge bg-gray-500 text-white px-3 py-1">{{ alerta.tipoalerta }}</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4">
+                    {% if alerta.ticker %}
+                        <span class="font-bold text-lg text-blue-600">{{ alerta.ticker }}</span>
+                    {% else %}
+                        <span class="text-gray-500 italic">Portfolio Geral</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-center">
+                    <span class="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
+                        {{ alerta.condicaooperador }} R$ {{ "%.2f"|format(alerta.condicaovalor) }}
+                        {% if alerta.condicaovalor2 %}
+                            e {{ "%.2f"|format(alerta.condicaovalor2) }}
+                        {% endif %}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                    {% if alerta.ativo %}
+                        <span class="badge bg-green-500 text-white px-4 py-2 font-semibold">
+                            <i class="fas fa-check-circle mr-1"></i>ATIVO
+                        </span>
+                    {% else %}
+                        <span class="badge bg-gray-500 text-white px-4 py-2 font-semibold">
+                            <i class="fas fa-pause-circle mr-1"></i>INATIVO
+                        </span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-center">
+                    <div class="flex items-center justify-center space-x-2">
+                        <span class="text-2xl font-bold text-blue-600">{{ alerta.totalacionamentos or 0 }}</span>
+                        {% if alerta.totalacionamentos > 0 %}
+                            <i class="fas fa-bell text-yellow-500 animate-pulse"></i>
+                        {% endif %}
+                    </div>
+                    {% if alerta.timestampultimoacionamento %}
+                        <div class="text-xs text-gray-500 mt-1">
+                            Último: {{ alerta.timestampultimoacionamento[:10] }}
+                        </div>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-center">
+                    <div class="flex justify-center space-x-2">
+                        <button 
+                            class="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 transition-all transform hover:scale-110" 
+                            title="Editar Alerta"
+                            onclick="alert('Editar: {{ alerta.id }} - Passo 7')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button 
+                            class="btn btn-sm bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 transition-all transform hover:scale-110" 
+                            title="Ativar/Desativar"
+                            onclick="alert('Toggle: {{ alerta.id }} - Passo 7')">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                        <button 
+                            class="btn btn-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 transition-all transform hover:scale-110" 
+                            title="Deletar Alerta"
+                            onclick="alert('Deletar: {{ alerta.id }} - Passo 7')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                    <i class="fas fa-bell-slash text-4xl mb-4 text-gray-300"></i>
+                    <div class="text-lg font-semibold">Nenhum alerta encontrado</div>
+                    <div class="text-sm mt-2">Ajuste os filtros ou crie um novo alerta</div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Loading Indicator para HTMX -->
+<div class="htmx-indicator absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
+    <div class="flex flex-col items-center space-y-3">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-yellow-500"></div>
+        <span class="text-gray-600 font-medium">Filtrando alertas...</span>
+    </div>
+</div>

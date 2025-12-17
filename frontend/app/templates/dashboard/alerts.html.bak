@@ -168,7 +168,264 @@
     </div>
 </div>
 
-<!-- Modal Novo Alerta (Passo 3) -->
+<!-- Modal Novo Alerta - M7.3 -->
+<div x-data="{ openModal: false, operador: '>=' }" x-cloak>
+    <!-- Overlay -->
+    <div 
+        x-show="openModal" 
+        @click="openModal = false"
+        class="fixed inset-0 bg-black bg-opacity-50 z-40"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0">
+    </div>
+
+    <!-- Modal Content -->
+    <div 
+        x-show="openModal"
+        @click.away="openModal = false"
+        class="fixed inset-0 flex items-center justify-center z-50 px-4"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform scale-90"
+        x-transition:enter-end="opacity-100 transform scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform scale-100"
+        x-transition:leave-end="opacity-0 transform scale-90">
+        
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-yellow-50 to-orange-50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-bell text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Novo Alerta</h2>
+                        <p class="text-sm text-gray-600">Configure notificações personalizadas</p>
+                    </div>
+                </div>
+                <button 
+                    @click="openModal = false"
+                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body - Formulário -->
+            <form method="POST" action="{{ url_for('dashboard.alerts_create') }}" class="p-6 space-y-6">
+                
+                <!-- Row 1: Nome do Alerta -->
+                <div>
+                    <label class="label text-sm font-semibold text-gray-700">
+                        <i class="fas fa-tag text-yellow-500 mr-2"></i>Nome do Alerta *
+                    </label>
+                    <input 
+                        type="text" 
+                        name="nome" 
+                        class="input mt-1" 
+                        placeholder="Ex: PETR4 acima de R$ 32,00"
+                        required
+                        minlength="5"
+                        maxlength="100">
+                    <p class="text-xs text-gray-500 mt-1">Nome descritivo para identificar o alerta</p>
+                </div>
+
+                <!-- Row 2: Tipo de Alerta -->
+                <div>
+                    <label class="label text-sm font-semibold text-gray-700">
+                        <i class="fas fa-list text-blue-500 mr-2"></i>Tipo de Alerta *
+                    </label>
+                    <select name="tipoalerta" class="input mt-1" required>
+                        <option value="">Selecione o tipo...</option>
+                        <option value="ALTA_PRECO">📈 Alta de Preço</option>
+                        <option value="QUEDA_PRECO">📉 Queda de Preço</option>
+                        <option value="DIVIDENDO_PREVISTO">💰 Dividendo Previsto</option>
+                        <option value="META_RENTABILIDADE">🎯 Meta de Rentabilidade</option>
+                        <option value="VOLATILIDADE_ALTA">⚠️ Volatilidade Alta</option>
+                        <option value="DESVIO_ALOCACAO">📊 Desvio de Alocação</option>
+                    </select>
+                </div>
+
+                <!-- Row 3: Ativo Alvo -->
+                <div>
+                    <label class="label text-sm font-semibold text-gray-700">
+                        <i class="fas fa-chart-line text-green-500 mr-2"></i>Ativo Alvo
+                    </label>
+                    <select name="ticker" class="input mt-1">
+                        <option value="">Nenhum (alerta de portfolio)</option>
+                        <option value="PETR4">🇧🇷 PETR4 - Petrobras</option>
+                        <option value="VALE3">🇧🇷 VALE3 - Vale</option>
+                        <option value="BBAS3">🇧🇷 BBAS3 - Banco do Brasil</option>
+                        <option value="ITUB4">🇧🇷 ITUB4 - Itaú</option>
+                        <option value="MXRF11">🇧🇷 MXRF11 - Maxi Renda (FII)</option>
+                        <option value="HGLG11">🇧🇷 HGLG11 - CSHG Logística (FII)</option>
+                        <option value="AAPL">🇺🇸 AAPL - Apple</option>
+                        <option value="MSFT">🇺🇸 MSFT - Microsoft</option>
+                        <option value="GOOGL">🇺🇸 GOOGL - Google</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Deixe vazio para alertas de portfolio geral</p>
+                </div>
+
+                <!-- Row 4: Condição (Grid 3 colunas) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Operador -->
+                    <div>
+                        <label class="label text-sm font-semibold text-gray-700">
+                            <i class="fas fa-calculator text-purple-500 mr-2"></i>Operador *
+                        </label>
+                        <select 
+                            name="condicaooperador" 
+                            x-model="operador"
+                            class="input mt-1" 
+                            required>
+                            <option value=">=">&gt;= (Maior ou Igual)</option>
+                            <option value="<=">&lt;= (Menor ou Igual)</option>
+                            <option value="==">== (Igual a)</option>
+                            <option value=">">&gt; (Maior que)</option>
+                            <option value="<">&lt; (Menor que)</option>
+                            <option value="ENTRE">⇔ Entre (Range)</option>
+                        </select>
+                    </div>
+
+                    <!-- Valor 1 -->
+                    <div>
+                        <label class="label text-sm font-semibold text-gray-700">
+                            Valor 1 * <span class="text-xs font-normal">(R$ ou %)</span>
+                        </label>
+                        <input 
+                            type="number" 
+                            name="condicaovalor" 
+                            class="input mt-1" 
+                            placeholder="32.00"
+                            step="0.01"
+                            min="0"
+                            required>
+                    </div>
+
+                    <!-- Valor 2 (apenas para ENTRE) -->
+                    <div x-show="operador === 'ENTRE'">
+                        <label class="label text-sm font-semibold text-gray-700">
+                            Valor 2 <span class="text-xs font-normal">(R$ ou %)</span>
+                        </label>
+                        <input 
+                            type="number" 
+                            name="condicaovalor2" 
+                            class="input mt-1" 
+                            placeholder="35.00"
+                            step="0.01"
+                            min="0"
+                            :required="operador === 'ENTRE'">
+                    </div>
+                </div>
+
+                <!-- Row 5: Frequência de Notificação -->
+                <div>
+                    <label class="label text-sm font-semibold text-gray-700">
+                        <i class="fas fa-clock text-orange-500 mr-2"></i>Frequência de Notificação *
+                    </label>
+                    <select name="frequencianotificacao" class="input mt-1" required>
+                        <option value="IMEDIATA">⚡ Imediata (em tempo real)</option>
+                        <option value="DIARIA">📅 Diária (resumo 1x/dia)</option>
+                        <option value="SEMANAL">📆 Semanal (resumo semanal)</option>
+                        <option value="MENSAL">🗓️ Mensal (resumo mensal)</option>
+                    </select>
+                </div>
+
+                <!-- Row 6: Canais de Entrega (Checkboxes) -->
+                <div>
+                    <label class="label text-sm font-semibold text-gray-700 mb-3 block">
+                        <i class="fas fa-paper-plane text-indigo-500 mr-2"></i>Canais de Entrega * (selecione ao menos 1)
+                    </label>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                            <input 
+                                type="checkbox" 
+                                name="canais" 
+                                value="WEBAPP"
+                                class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                                checked>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-desktop text-blue-500"></i>
+                                <span class="text-sm font-medium">Web App (notificações no sistema)</span>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                            <input 
+                                type="checkbox" 
+                                name="canais" 
+                                value="EMAIL"
+                                class="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-envelope text-green-500"></i>
+                                <span class="text-sm font-medium">E-mail (envio automático)</span>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                            <input 
+                                type="checkbox" 
+                                name="canais" 
+                                value="SMS"
+                                class="w-5 h-5 text-yellow-600 rounded focus:ring-2 focus:ring-yellow-500">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-sms text-yellow-500"></i>
+                                <span class="text-sm font-medium">SMS (via Twilio - premium)</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                            <input 
+                                type="checkbox" 
+                                name="canais" 
+                                value="TELEGRAM"
+                                class="w-5 h-5 text-blue-400 rounded focus:ring-2 focus:ring-blue-300">
+                            <div class="flex items-center space-x-2">
+                                <i class="fab fa-telegram text-blue-400"></i>
+                                <span class="text-sm font-medium">Telegram (futuro - M8)</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Row 7: Status Inicial (Toggle) -->
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <label class="label text-sm font-semibold text-gray-700">
+                            <i class="fas fa-power-off text-green-500 mr-2"></i>Ativar Alerta Imediatamente
+                        </label>
+                        <p class="text-xs text-gray-500 mt-1">Começar a monitorar após criar</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="ativo" value="true" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                    </label>
+                </div>
+
+                <!-- Modal Footer - Botões -->
+                <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200">
+                    <button 
+                        type="button"
+                        @click="openModal = false"
+                        class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-colors">
+                        <i class="fas fa-times mr-2"></i>Cancelar
+                    </button>
+                    <button 
+                        type="submit"
+                        class="px-6 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white rounded-lg font-semibold shadow-lg transition-all transform hover:scale-105">
+                        <i class="fas fa-bell mr-2"></i>Criar Alerta
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <div x-data="{ openModal: false }" x-cloak>
     <!-- Será implementado no Passo 3 -->
 </div>
