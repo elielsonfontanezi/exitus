@@ -27,7 +27,7 @@
                     {% elif alerta.tipoalerta == 'DIVIDENDO_PREVISTO' %}
                         <span class="badge bg-blue-500 text-white px-3 py-1">💰 Dividendo</span>
                     {% elif alerta.tipoalerta == 'META_RENTABILIDADE' %}
-                        <span class="badge bg-purple-500 text-white px-3 py-1">🎯 Meta</span>
+                        <span class="badge bg-purple-500 text-white px-1">🎯 Meta</span>
                     {% elif alerta.tipoalerta == 'VOLATILIDADE_ALTA' %}
                         <span class="badge bg-orange-500 text-white px-3 py-1">⚠️ Volatilidade</span>
                     {% else %}
@@ -75,24 +75,35 @@
                 </td>
                 <td class="px-6 py-4 text-center">
                     <div class="flex justify-center space-x-2">
+                        <!-- Botão Editar -->
                         <button 
                             class="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 transition-all transform hover:scale-110" 
                             title="Editar Alerta"
-                            onclick="alert('Editar: {{ alerta.id }} - Passo 7')">
+                            onclick="alert('⚙️ Modal de edição será implementado no Passo 7.3\nAlerta ID: {{ alerta.id }}')">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button 
-                            class="btn btn-sm bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 transition-all transform hover:scale-110" 
-                            title="Ativar/Desativar"
-                            onclick="alert('Toggle: {{ alerta.id }} - Passo 7')">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button 
-                            class="btn btn-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 transition-all transform hover:scale-110" 
-                            title="Deletar Alerta"
-                            onclick="alert('Deletar: {{ alerta.id }} - Passo 7')">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        
+                        <!-- Botão Toggle -->
+                        <form method="POST" action="{{ url_for('dashboard.alerts_toggle', alert_id=alerta.id) }}" class="inline">
+                            <button 
+                                type="submit"
+                                class="btn btn-sm {% if alerta.ativo %}bg-yellow-500 hover:bg-yellow-600{% else %}bg-green-500 hover:bg-green-600{% endif %} text-white px-3 py-1 transition-all transform hover:scale-110" 
+                                title="{% if alerta.ativo %}Desativar{% else %}Ativar{% endif %} Alerta"
+                                onclick="return confirm('{% if alerta.ativo %}Desativar{% else %}Ativar{% endif %} este alerta?')">
+                                <i class="fas fa-power-off"></i>
+                            </button>
+                        </form>
+                        
+                        <!-- Botão Deletar -->
+                        <form method="POST" action="{{ url_for('dashboard.alerts_delete', alert_id=alerta.id) }}" class="inline">
+                            <button 
+                                type="submit"
+                                class="btn btn-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 transition-all transform hover:scale-110" 
+                                title="Deletar Alerta"
+                                onclick="return confirm('⚠️ Tem certeza que deseja deletar este alerta?\n\nNome: {{ alerta.nome }}\n\nEsta ação não pode ser desfeita!')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
                     </div>
                 </td>
             </tr>
@@ -107,12 +118,4 @@
             {% endfor %}
         </tbody>
     </table>
-</div>
-
-<!-- Loading Indicator para HTMX -->
-<div class="htmx-indicator absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
-    <div class="flex flex-col items-center space-y-3">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-yellow-500"></div>
-        <span class="text-gray-600 font-medium">Filtrando alertas...</span>
-    </div>
 </div>

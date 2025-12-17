@@ -924,6 +924,67 @@ def alerts_table():
     # Retorna apenas o partial (sem layout completo)
     return render_template('components/alerts_table.html', alertas=alertas_filtrados)
 
+@bp.route('/alerts/toggle/<alert_id>', methods=['POST'])
+@login_required
+def alerts_toggle(alert_id):
+    """
+    M7.3 - Ativar/Desativar alerta (Toggle)
+    """
+    try:
+        # TODO: Integração com Backend (quando API existir)
+        # Mock: Simular sucesso
+        flash(f'✅ Status do alerta alterado com sucesso! (Mock - M7.3)', 'success')
+        print(f"[M7.3] Toggle alerta: {alert_id}")
+        
+    except Exception as e:
+        flash(f'Erro ao alterar status: {str(e)}', 'error')
+        print(f"[ERROR] {e}")
+    
+    return redirect(url_for('dashboard.alerts'))
+
+
+@bp.route('/alerts/delete/<alert_id>', methods=['POST'])
+@login_required
+def alerts_delete(alert_id):
+    """
+    M7.3 - Deletar alerta
+    """
+    try:
+        # TODO: Integração com Backend (quando API existir)
+        # Mock: Simular sucesso
+        flash(f'✅ Alerta deletado com sucesso! (Mock - M7.3)', 'success')
+        print(f"[M7.3] Delete alerta: {alert_id}")
+        
+    except Exception as e:
+        flash(f'Erro ao deletar alerta: {str(e)}', 'error')
+        print(f"[ERROR] {e}")
+    
+    return redirect(url_for('dashboard.alerts'))
+
+
+@bp.route('/alerts/edit/<alert_id>', methods=['GET', 'POST'])
+@login_required
+def alerts_edit(alert_id):
+    """
+    M7.3 - Editar alerta existente
+    """
+    if request.method == 'POST':
+        try:
+            nome = request.form.get('nome')
+            # (resto da lógica de edição - futuro)
+            flash(f'✅ Alerta "{nome}" atualizado com sucesso! (Mock - M7.3)', 'success')
+            print(f"[M7.3] Edit alerta: {alert_id} → {nome}")
+            
+        except Exception as e:
+            flash(f'Erro ao atualizar alerta: {str(e)}', 'error')
+            print(f"[ERROR] {e}")
+        
+        return redirect(url_for('dashboard.alerts'))
+    
+    # GET: Por enquanto redireciona (modal será implementado depois)
+    flash('Edição via modal em desenvolvimento (M7.3)', 'info')
+    return redirect(url_for('dashboard.alerts'))
+
 
 # ========================================
 # PLACEHOLDERS M7
