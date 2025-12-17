@@ -567,6 +567,166 @@ def dividends():
                          current_page=page,
                          total_pages=1)
 
+# ===========================
+# M7.3 - ALERTAS
+# ===========================
+
+@bp.route('/alerts', methods=['GET'])
+@login_required
+def alerts():
+    """
+    M7.3 - Gestão de Alertas e Notificações
+    Monitora ativos e portfólios com alertas personalizados
+    """
+    token = session.get('access_token')
+    alertas = []
+    
+    # Filtros da query string
+    tipo_alerta = request.args.get('tipo')
+    status_filtro = request.args.get('status')  # 'ativo' ou 'inativo'
+    ativo_ticker = request.args.get('ativo')
+    page = int(request.args.get('page', 1))
+    
+    # TODO: Integração com Backend (Fase M7.3 completa)
+    # if token:
+    #     try:
+    #         headers = {'Authorization': f'Bearer {token}'}
+    #         params = {'page': page, 'per_page': 20}
+    #         if tipo_alerta:
+    #             params['tipo'] = tipo_alerta
+    #         if status_filtro:
+    #             params['ativo'] = (status_filtro == 'ativo')
+    #         if ativo_ticker:
+    #             params['ticker'] = ativo_ticker
+    #         
+    #         response = requests.get(
+    #             f'{Config.BACKEND_API_URL}/api/alertas',
+    #             headers=headers,
+    #             params=params,
+    #             timeout=10
+    #         )
+    #         if response.status_code == 200:
+    #             result = response.json()
+    #             alertas = result.get('data', {}).get('alertas', [])
+    #     except:
+    #         pass
+    
+    # Mock data para desenvolvimento (M7.3 - Fase 1)
+    if not alertas:
+        alertas = [
+            {
+                'id': 'alert-001',
+                'nome': 'PETR4 acima de R$ 32,00',
+                'tipoalerta': 'ALTA_PRECO',
+                'ticker': 'PETR4',
+                'condicaooperador': '>=',
+                'condicaovalor': 32.00,
+                'condicaovalor2': None,
+                'ativo': True,
+                'frequencianotificacao': 'IMEDIATA',
+                'canaisentrega': ['WEBAPP', 'EMAIL'],
+                'totalacionamentos': 3,
+                'timestampultimoacionamento': '2024-12-15 14:35:22',
+                'createdat': '2024-12-01 10:00:00'
+            },
+            {
+                'id': 'alert-002',
+                'nome': 'VALE3 queda > 5%',
+                'tipoalerta': 'QUEDA_PRECO',
+                'ticker': 'VALE3',
+                'condicaooperador': '<=',
+                'condicaovalor': 65.50,
+                'condicaovalor2': None,
+                'ativo': True,
+                'frequencianotificacao': 'DIARIA',
+                'canaisentrega': ['WEBAPP'],
+                'totalacionamentos': 1,
+                'timestampultimoacionamento': '2024-12-10 09:15:00',
+                'createdat': '2024-11-20 08:30:00'
+            },
+            {
+                'id': 'alert-003',
+                'nome': 'Dividendo PETR4 previsto',
+                'tipoalerta': 'DIVIDENDO_PREVISTO',
+                'ticker': 'PETR4',
+                'condicaooperador': '>=',
+                'condicaovalor': 1.00,
+                'condicaovalor2': None,
+                'ativo': True,
+                'frequencianotificacao': 'SEMANAL',
+                'canaisentrega': ['WEBAPP', 'EMAIL', 'SMS'],
+                'totalacionamentos': 0,
+                'timestampultimoacionamento': None,
+                'createdat': '2024-12-05 16:45:00'
+            },
+            {
+                'id': 'alert-004',
+                'nome': 'Portfolio rentabilidade 20%',
+                'tipoalerta': 'META_RENTABILIDADE',
+                'ticker': None,  # Alerta de portfolio, não de ativo específico
+                'condicaooperador': '>=',
+                'condicaovalor': 20.00,
+                'condicaovalor2': None,
+                'ativo': False,  # Inativo
+                'frequencianotificacao': 'MENSAL',
+                'canaisentrega': ['WEBAPP'],
+                'totalacionamentos': 0,
+                'timestampultimoacionamento': None,
+                'createdat': '2024-11-01 12:00:00'
+            },
+            {
+                'id': 'alert-005',
+                'nome': 'AAPL entre 180-200',
+                'tipoalerta': 'ALTA_PRECO',
+                'ticker': 'AAPL',
+                'condicaooperador': 'ENTRE',
+                'condicaovalor': 180.00,
+                'condicaovalor2': 200.00,
+                'ativo': True,
+                'frequencianotificacao': 'IMEDIATA',
+                'canaisentrega': ['WEBAPP', 'EMAIL'],
+                'totalacionamentos': 5,
+                'timestampultimoacionamento': '2024-12-16 11:22:00',
+                'createdat': '2024-11-15 14:20:00'
+            }
+        ]
+    
+    # Aplicar filtros aos dados mock
+    alertas_filtrados = alertas
+    
+    if tipo_alerta:
+        alertas_filtrados = [a for a in alertas_filtrados if a.get('tipoalerta') == tipo_alerta]
+    
+    if status_filtro:
+        ativo_bool = (status_filtro == 'ativo')
+        alertas_filtrados = [a for a in alertas_filtrados if a.get('ativo') == ativo_bool]
+    
+    if ativo_ticker:
+        alertas_filtrados = [a for a in alertas_filtrados if a.get('ticker') == ativo_ticker]
+    
+    # Listas para filtros
+    ativos_unicos = [
+        {'ticker': 'PETR4'},
+        {'ticker': 'VALE3'},
+        {'ticker': 'AAPL'},
+        {'ticker': 'MXRF11'},
+        {'ticker': 'BBAS3'},
+    ]
+    
+    return render_template(
+        'dashboard/alerts.html',
+        alertas=alertas_filtrados,
+        ativos=ativos_unicos,
+        filtros={
+            'tipo': tipo_alerta,
+            'status': status_filtro,
+            'ativo': ativo_ticker
+        },
+        current_page=page,
+        total_pages=1
+    )
+
+
 # ========================================
 # PLACEHOLDERS M7
 # ========================================
@@ -580,3 +740,5 @@ def dividends():
 def placeholder():
     flash('Em desenvolvimento - M7', 'info')
     return redirect(url_for('dashboard.buy_signals'))
+
+

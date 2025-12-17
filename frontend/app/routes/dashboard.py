@@ -726,6 +726,90 @@ def alerts():
         total_pages=1
     )
 
+@bp.route('/alerts/create', methods=['POST'])
+@login_required
+def alerts_create():
+    """
+    M7.3 - Criar novo alerta (POST)
+    """
+    try:
+        # Capturar dados do formulário
+        nome = request.form.get('nome')
+        tipoalerta = request.form.get('tipoalerta')
+        ticker = request.form.get('ticker') or None  # Pode ser vazio (portfolio)
+        condicaooperador = request.form.get('condicaooperador')
+        condicaovalor = float(request.form.get('condicaovalor'))
+        condicaovalor2 = request.form.get('condicaovalor2')
+        condicaovalor2 = float(condicaovalor2) if condicaovalor2 else None
+        frequencianotificacao = request.form.get('frequencianotificacao')
+        
+        # Capturar checkboxes (múltiplos valores)
+        canais = request.form.getlist('canais')  # ['WEBAPP', 'EMAIL', etc]
+        
+        ativo = bool(request.form.get('ativo'))  # Toggle
+        
+        # Validação básica
+        if not nome or len(nome) < 5:
+            flash('Nome do alerta deve ter ao menos 5 caracteres', 'error')
+            return redirect(url_for('dashboard.alerts'))
+        
+        if not canais:
+            flash('Selecione ao menos um canal de entrega', 'error')
+            return redirect(url_for('dashboard.alerts'))
+        
+        # TODO: Integração com Backend (quando API existir)
+        # token = session.get('access_token')
+        # if token:
+        #     headers = {
+        #         'Authorization': f'Bearer {token}',
+        #         'Content-Type': 'application/json'
+        #     }
+        #     data = {
+        #         'nome': nome,
+        #         'tipoalerta': tipoalerta,
+        #         'ticker': ticker,
+        #         'condicaooperador': condicaooperador,
+        #         'condicaovalor': condicaovalor,
+        #         'condicaovalor2': condicaovalor2,
+        #         'frequencianotificacao': frequencianotificacao,
+        #         'canaisentrega': canais,
+        #         'ativo': ativo
+        #     }
+        #     response = requests.post(
+        #         f'{Config.BACKEND_API_URL}/api/alertas/criar',
+        #         json=data,
+        #         headers=headers,
+        #         timeout=10
+        #     )
+        #     if response.status_code in [200, 201]:
+        #         flash(f'✅ Alerta "{nome}" criado com sucesso!', 'success')
+        #     else:
+        #         flash(f'Erro ao criar alerta: {response.status_code}', 'error')
+        # else:
+        #     flash('Token de autenticação não encontrado', 'error')
+        
+        # Mock: Simular sucesso (Fase de desenvolvimento)
+        flash(f'✅ Alerta "{nome}" criado com sucesso! (Mock - M7.3)', 'success')
+        
+        # Log para debug
+        print(f"[M7.3] Alerta criado:")
+        print(f"  Nome: {nome}")
+        print(f"  Tipo: {tipoalerta}")
+        print(f"  Ticker: {ticker or 'Portfolio Geral'}")
+        print(f"  Condição: {condicaooperador} {condicaovalor}" + 
+              (f" e {condicaovalor2}" if condicaovalor2 else ""))
+        print(f"  Frequência: {frequencianotificacao}")
+        print(f"  Canais: {', '.join(canais)}")
+        print(f"  Ativo: {'Sim' if ativo else 'Não'}")
+        
+    except ValueError as e:
+        flash(f'Erro nos valores numéricos: {str(e)}', 'error')
+    except Exception as e:
+        flash(f'Erro ao criar alerta: {str(e)}', 'error')
+        print(f"[ERROR] {e}")
+    
+    return redirect(url_for('dashboard.alerts'))
+
 
 # ========================================
 # PLACEHOLDERS M7
