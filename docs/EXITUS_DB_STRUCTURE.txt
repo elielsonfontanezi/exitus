@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2025-12-13 14:58:58
+Gerado em: 2025-12-18 13:00:06
 ================================================================================
 
 ================================================================================
@@ -22,6 +22,7 @@ TABELAS DO BANCO EXITUS
  public | log_auditoria          | exitus
  public | movimentacao_caixa     | exitus
  public | parametros_macro       | exitus
+ public | portfolio              | exitus
  public | posicao                | exitus
  public | projecoes_renda        | exitus
  public | provento               | exitus
@@ -29,7 +30,7 @@ TABELAS DO BANCO EXITUS
  public | relatorios_performance | exitus
  public | transacao              | exitus
  public | usuario                | exitus
-(18 rows)
+(19 rows)
 
 
 ================================================================================
@@ -320,6 +321,7 @@ Check constraints:
     "alerta_valor2_apenas_entre" CHECK (condicao_operador = 'ENTRE'::operadorcondicao OR condicao_valor2 IS NULL)
 Foreign-key constraints:
     "configuracoes_alertas_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE CASCADE
+    "configuracoes_alertas_portfolio_id_fkey" FOREIGN KEY (portfolio_id) REFERENCES portfolio(id) ON DELETE CASCADE
     "configuracoes_alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 Access method: heap
 
@@ -345,11 +347,12 @@ Access method: heap
 
 
 Foreign Keys:
-                Nome FK                |   Coluna   | Tabela Referenciada | Coluna Referenciada 
----------------------------------------+------------+---------------------+---------------------
- configuracoes_alertas_usuario_id_fkey | usuario_id | usuario             | id
- configuracoes_alertas_ativo_id_fkey   | ativo_id   | ativo               | id
-(2 rows)
+                 Nome FK                 |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+-----------------------------------------+--------------+---------------------+---------------------
+ configuracoes_alertas_usuario_id_fkey   | usuario_id   | usuario             | id
+ configuracoes_alertas_ativo_id_fkey     | ativo_id     | ativo               | id
+ configuracoes_alertas_portfolio_id_fkey | portfolio_id | portfolio           | id
+(3 rows)
 
 
 Primary Keys:
@@ -999,6 +1002,86 @@ ________________________________________________________________________________
 
 
 ################################################################################
+TABELA: portfolio
+################################################################################
+
+                                                                     Table "public.portfolio"
+           Column           |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |           Description            
+----------------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+----------------------------------
+ id                         | uuid                     |           | not null |         | plain    |             |              | Identificador único do portfolio
+ usuario_id                 | uuid                     |           | not null |         | plain    |             |              | ID do usuário proprietário
+ nome                       | character varying(100)   |           | not null |         | extended |             |              | Nome do portfolio
+ descricao                  | text                     |           |          |         | extended |             |              | Descrição detalhada do portfolio
+ objetivo                   | character varying(50)    |           |          |         | extended |             |              | Objetivo do portfolio
+ ativo                      | boolean                  |           | not null | true    | plain    |             |              | Indica se o portfolio está ativo
+ valor_inicial              | numeric(18,2)            |           |          |         | main     |             |              | Valor inicial investido (R$)
+ percentual_alocacao_target | numeric(5,2)             |           |          |         | main     |             |              | % de alocação desejada (0-100)
+ created_at                 | timestamp with time zone |           | not null | now()   | plain    |             |              | Data de criação do registro
+ updated_at                 | timestamp with time zone |           | not null | now()   | plain    |             |              | Data da última atualização
+Indexes:
+    "portfolio_pkey" PRIMARY KEY, btree (id)
+    "ix_portfolio_ativo" btree (ativo)
+    "ix_portfolio_nome" btree (nome)
+    "ix_portfolio_usuario_id" btree (usuario_id)
+Check constraints:
+    "portfolio_nome_min_length" CHECK (length(nome::text) >= 3)
+    "portfolio_percentual_valido" CHECK (percentual_alocacao_target IS NULL OR percentual_alocacao_target >= 0::numeric AND percentual_alocacao_target <= 100::numeric)
+    "portfolio_valor_inicial_positivo" CHECK (valor_inicial IS NULL OR valor_inicial >= 0::numeric)
+Foreign-key constraints:
+    "portfolio_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Referenced by:
+    TABLE "configuracoes_alertas" CONSTRAINT "configuracoes_alertas_portfolio_id_fkey" FOREIGN KEY (portfolio_id) REFERENCES portfolio(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |           Coluna           |           Tipo           | Tamanho | Null? | Default 
+-----+----------------------------+--------------------------+---------+-------+---------
+   1 | id                         | uuid                     |         | NO    | 
+   2 | usuario_id                 | uuid                     |         | NO    | 
+   3 | nome                       | character varying        | (100)   | NO    | 
+   4 | descricao                  | text                     |         | YES   | 
+   5 | objetivo                   | character varying        | (50)    | YES   | 
+   6 | ativo                      | boolean                  |         | NO    | true
+   7 | valor_inicial              | numeric                  |         | YES   | 
+   8 | percentual_alocacao_target | numeric                  |         | YES   | 
+   9 | created_at                 | timestamp with time zone |         | NO    | now()
+  10 | updated_at                 | timestamp with time zone |         | NO    | now()
+(10 rows)
+
+
+Foreign Keys:
+          Nome FK          |   Coluna   | Tabela Referenciada | Coluna Referenciada 
+---------------------------+------------+---------------------+---------------------
+ portfolio_usuario_id_fkey | usuario_id | usuario             | id
+(1 row)
+
+
+Primary Keys:
+    Nome PK     | Coluna 
+----------------+--------
+ portfolio_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+     Nome do Índice      |                                     Definição                                     
+-------------------------+-----------------------------------------------------------------------------------
+ portfolio_pkey          | CREATE UNIQUE INDEX portfolio_pkey ON public.portfolio USING btree (id)
+ ix_portfolio_usuario_id | CREATE INDEX ix_portfolio_usuario_id ON public.portfolio USING btree (usuario_id)
+ ix_portfolio_ativo      | CREATE INDEX ix_portfolio_ativo ON public.portfolio USING btree (ativo)
+ ix_portfolio_nome       | CREATE INDEX ix_portfolio_nome ON public.portfolio USING btree (nome)
+(4 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
 TABELA: posicao
 ################################################################################
 
@@ -1552,6 +1635,7 @@ Referenced by:
     TABLE "corretora" CONSTRAINT "corretora_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "log_auditoria" CONSTRAINT "log_auditoria_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL
     TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    TABLE "portfolio" CONSTRAINT "portfolio_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "posicao" CONSTRAINT "posicao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "projecoes_renda" CONSTRAINT "projecoes_renda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "relatorios_performance" CONSTRAINT "relatorios_performance_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
@@ -1610,7 +1694,7 @@ RESUMO GERAL
 Total de Tabelas:
  Total 
 -------
-    18
+    19
 (1 row)
 
 
@@ -1628,6 +1712,7 @@ Total de Colunas por Tabela:
  log_auditoria          |          12
  movimentacao_caixa     |          13
  parametros_macro       |          12
+ portfolio              |          10
  posicao                |          16
  projecoes_renda        |          11
  provento               |          13
@@ -1635,24 +1720,25 @@ Total de Colunas por Tabela:
  relatorios_performance |          11
  transacao              |          19
  usuario                |           9
-(18 rows)
+(19 rows)
 
 
 Total de Foreign Keys por Tabela:
          Tabela         | Num FKs 
 ------------------------+---------
  auditoria_relatorios   |       1
- configuracoes_alertas  |       2
+ configuracoes_alertas  |       3
  corretora              |       1
  evento_corporativo     |       2
  log_auditoria          |       1
  movimentacao_caixa     |       4
+ portfolio              |       1
  posicao                |       3
  projecoes_renda        |       1
  provento               |       1
  relatorios_performance |       1
  transacao              |       3
-(11 rows)
+(12 rows)
 
 
 ================================================================================
