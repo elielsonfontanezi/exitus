@@ -12,7 +12,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 TOKEN=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "admin123"}' \
-  | jq -r '.data.accessToken')
+  | jq -r '.data.access_token')  # ✅ Snake case
 
 echo "Token: $TOKEN"
 ```

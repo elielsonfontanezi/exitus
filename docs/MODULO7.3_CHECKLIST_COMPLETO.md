@@ -1,6 +1,12 @@
 # MÓDULO 7.3 - ALERTAS E NOTIFICAÇÕES ✅
 **Sistema Exitus - Gestão de Investimentos**
 
+
+## 🔄 ATUALIZAÇÃO 18/12/2025
+**CORREÇÃO**: Backend NÃO estava 0%. Foi implementado em 08/12/2025.
+- ✅ 7 rotas funcionais | ✅ Tabela no banco | ❌ Falta: dados + integração
+
+
 ---
 
 ## 📋 INFORMAÇÕES DO MÓDULO
