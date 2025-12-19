@@ -27,29 +27,29 @@ class DecimalJSONProvider(DefaultJSONProvider):
 def create_app(testing=False):
     """
     Factory para criar a aplicação Flask do Exitus Backend.
-    
+
     Args:
         testing (bool): Modo de teste (configurações específicas)
-        
+
     Returns:
         Flask: Aplicação Flask configurada com todos os módulos
     """
     app = Flask(__name__)
-    
+
     # Carregar configurações
     app.config.from_object(Config)
-    
+
     # Configurações JWT
     app.config['JWT_SECRET_KEY'] = app.config.get('SECRET_KEY', 'super-secret-key-mudar-no-env')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hora
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = 2592000  # 30 dias
-    
+
     # Custom JSON Provider (Decimal/UUID)
     app.json = DecimalJSONProvider(app)
-    
+
     # Inicializar extensões
     jwt = JWTManager(app)
-    
+
     # CORS configurado para frontend
     CORS(app, resources={
         r"/api/*": {
@@ -58,10 +58,10 @@ def create_app(testing=False):
             "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"]
         }
     })
-    
+
     # Inicializar banco de dados
     init_db(app)
-    
+
     # ============================================
     # HEALTH CHECK
     # ============================================
@@ -73,52 +73,53 @@ def create_app(testing=False):
             "status": "ok",
             "module": "M4 - Buy Signals + Fiscais + Portfolio ✅"
         }
-    
+
     # ============================================
     # M2 - API REST BÁSICA (Core)
     # ============================================
     from .blueprints.auth.routes import bp as auth_bp
     app.register_blueprint(auth_bp)
-    
+
     from .blueprints.usuarios.routes import bp as usuarios_bp
     app.register_blueprint(usuarios_bp)
-    
+
     from .blueprints.corretoras.routes import bp as corretoras_bp
     app.register_blueprint(corretoras_bp)
-    
+
     from .blueprints.ativos.routes import bp as ativos_bp
     app.register_blueprint(ativos_bp)
-    
+
     from .blueprints.transacoes.routes import bp as transacoes_bp
     app.register_blueprint(transacoes_bp)
-    
+
     # ============================================
     # M3 - GESTÃO DE PORTFOLIO
     # ============================================
     from .blueprints.posicao_blueprint import posicao_bp
     app.register_blueprint(posicao_bp)
-    
+
     from .blueprints.provento_blueprint import provento_bp
     app.register_blueprint(provento_bp)
-    
+
     from .blueprints.movimentacao_blueprint import movimentacao_bp
     app.register_blueprint(movimentacao_bp)
-    
+
     from .blueprints.evento_corporativo_blueprint import evento_bp
     app.register_blueprint(evento_bp)
-    
-    # 🆕 Portfolio consolidado
+
+    # 🆕 Portfolio consolidado (M7)
+    # CORREÇÃO: Apontando para o novo caminho 'portfolio.blueprint'
     try:
-        from .blueprints.portfolio_blueprint import portfolio_bp
+        from .blueprints.portfolio.blueprint import portfolio_bp
         app.register_blueprint(portfolio_bp)
-        print("✅ Portfolio blueprint registrado: /api/portfolio/*")
+        print("✅ Portfolio blueprint registrado: /api/portfolios")
     except ImportError as e:
         print(f"⚠️  Portfolio blueprint não encontrado: {e}")
-    
+
     # ============================================
     # M4 - BUY SIGNALS + FERIADOS/FONTES/REGRAS/CÁLCULOS
     # ============================================
-    
+
     # M4.1 - Feriados
     try:
         from .blueprints.feriadosblueprint import feriadosbp
@@ -126,7 +127,7 @@ def create_app(testing=False):
         print("✅ Feriados blueprint registrado: /api/feriados")
     except ImportError as e:
         print(f"⚠️  Feriados blueprint não encontrado: {e}")
-    
+
     # M4.2 - Fontes de Dados
     try:
         from .blueprints.fontesblueprint import fontesbp
@@ -134,7 +135,7 @@ def create_app(testing=False):
         print("✅ Fontes blueprint registrado: /api/fontes")
     except ImportError as e:
         print(f"⚠️  Fontes blueprint não encontrado: {e}")
-    
+
     # M4.3 - Regras Fiscais
     try:
         from .blueprints.regras_fiscaisblueprint import regrasbp
@@ -142,7 +143,7 @@ def create_app(testing=False):
         print("✅ Regras fiscais blueprint registrado: /api/regras-fiscais")
     except ImportError as e:
         print(f"⚠️  Regras fiscais blueprint não encontrado: {e}")
-    
+
     # M4.4 - Cálculos Financeiros
     try:
         from .blueprints.calculosblueprint import calculosbp
@@ -150,7 +151,7 @@ def create_app(testing=False):
         print("✅ Cálculos blueprint registrado: /api/calculos")
     except ImportError as e:
         print(f"⚠️  Cálculos blueprint não encontrado: {e}")
-    
+
     # M4.5 - Buy Signals (Análise Fundamentalista)
     try:
         from .blueprints.buy_signals_blueprint import buy_signals_bp
@@ -158,7 +159,7 @@ def create_app(testing=False):
         print("✅ Buy Signals blueprint registrado: /api/buy-signals/*")
     except ImportError as e:
         print(f"⚠️  Buy Signals blueprint não encontrado: {e}")
-    
+
     # ============================================
     # M7.5 - COTAÇÕES EM TEMPO REAL
     # ============================================
@@ -168,7 +169,7 @@ def create_app(testing=False):
         print("✅ Cotações blueprint registrado: /api/cotacoes/*")
     except ImportError as e:
         print(f"⚠️  Cotações blueprint não encontrado: {e}")
-    
+
     # ============================================
     # M7 - RELATÓRIOS E ANÁLISES (Opcional/Legacy)
     # ============================================
@@ -177,25 +178,25 @@ def create_app(testing=False):
         app.register_blueprint(relatorios_bp)
     except ImportError:
         pass
-    
+
     try:
         from .blueprints.alertas_blueprint import alertas_bp
         app.register_blueprint(alertas_bp)
     except ImportError:
         pass
-    
+
     try:
         from .blueprints.projecoes_blueprint import projecoes_bp
         app.register_blueprint(projecoes_bp)
     except ImportError:
         pass
-    
+
     try:
         from .blueprints.performance_blueprint import performance_bp
         app.register_blueprint(performance_bp)
     except ImportError:
         pass
-    
+
     # ============================================
     # LOGS DE INICIALIZAÇÃO
     # ============================================
@@ -220,5 +221,5 @@ def create_app(testing=False):
     print("")
     print("📊 Total de Blueprints Ativos: Verifique os logs ✅ acima")
     print("=" * 60)
-    
+
     return app
