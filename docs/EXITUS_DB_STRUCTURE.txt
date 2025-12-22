@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2025-12-19 14:24:30
+Gerado em: 2025-12-22 13:29:52
 ================================================================================
 
 ================================================================================
@@ -90,28 +90,28 @@ ________________________________________________________________________________
 TABELA: ativo
 ################################################################################
 
-                                                                           Table "public.ativo"
-       Column        |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                   Description                   
----------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------------------------------------------
- id                  | uuid                     |           | not null |         | plain    |             |              | Identificador único do ativo
- ticker              | character varying(20)    |           | not null |         | extended |             |              | Código/símbolo do ativo (ex: PETR4, AAPL, BTC)
- nome                | character varying(200)   |           | not null |         | extended |             |              | Nome completo do ativo
- tipo                | tipoativo                |           | not null |         | plain    |             |              | Tipo do ativo (ação, FII, REIT, bond, cripto)
- classe              | classeativo              |           | not null |         | plain    |             |              | Classe do ativo (renda variável, fixa, cripto)
- mercado             | character varying(10)    |           | not null |         | extended |             |              | Mercado/país de negociação (BR, US, EUR)
- moeda               | character varying(3)     |           | not null |         | extended |             |              | Moeda de negociação (BRL, USD, EUR)
- preco_atual         | numeric(18,6)            |           |          |         | main     |             |              | Preço/cotação atual do ativo
- data_ultima_cotacao | timestamp with time zone |           |          |         | plain    |             |              | Data e hora da última cotação
- dividend_yield      | numeric(8,4)             |           |          |         | main     |             |              | Dividend Yield em % (ex: 6.5000 = 6.5%)
- p_l                 | numeric(10,2)            |           |          |         | main     |             |              | Índice Preço/Lucro
- p_vp                | numeric(10,2)            |           |          |         | main     |             |              | Índice Preço/Valor Patrimonial
- roe                 | numeric(8,4)             |           |          |         | main     |             |              | Return on Equity em %
- ativo               | boolean                  |           | not null |         | plain    |             |              | Indica se ativo está disponível para negociação
- deslistado          | boolean                  |           | not null |         | plain    |             |              | Indica se ativo foi deslistado da bolsa
- data_deslistagem    | date                     |           |          |         | plain    |             |              | Data de deslistagem (se aplicável)
- observacoes         | text                     |           |          |         | extended |             |              | Observações e notas sobre o ativo
- created_at          | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
- updated_at          | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+                                                         Table "public.ativo"
+       Column        |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+---------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id                  | uuid                     |           | not null |         | plain    |             |              | 
+ ticker              | character varying(20)    |           | not null |         | extended |             |              | 
+ nome                | character varying(200)   |           | not null |         | extended |             |              | 
+ tipo                | tipoativo                |           | not null |         | plain    |             |              | 
+ classe              | classeativo              |           | not null |         | plain    |             |              | 
+ mercado             | character varying(10)    |           | not null |         | extended |             |              | 
+ moeda               | character varying(3)     |           | not null |         | extended |             |              | 
+ preco_atual         | numeric(18,6)            |           |          |         | main     |             |              | 
+ data_ultima_cotacao | timestamp with time zone |           |          |         | plain    |             |              | 
+ dividend_yield      | numeric(8,4)             |           |          |         | main     |             |              | 
+ p_l                 | numeric(10,2)            |           |          |         | main     |             |              | 
+ p_vp                | numeric(10,2)            |           |          |         | main     |             |              | 
+ roe                 | numeric(8,4)             |           |          |         | main     |             |              | 
+ ativo               | boolean                  |           | not null |         | plain    |             |              | 
+ deslistado          | boolean                  |           | not null |         | plain    |             |              | 
+ data_deslistagem    | date                     |           |          |         | plain    |             |              | 
+ observacoes         | text                     |           |          |         | extended |             |              | 
+ created_at          | timestamp with time zone |           | not null |         | plain    |             |              | 
+ updated_at          | timestamp with time zone |           | not null |         | plain    |             |              | 
  preco_teto          | numeric(18,6)            |           |          |         | main     |             |              | 
  beta                | numeric(8,4)             |           |          |         | main     |             |              | 
 Indexes:
@@ -125,7 +125,6 @@ Indexes:
     "ix_ativo_nome" btree (nome)
     "ix_ativo_ticker" btree (ticker)
     "ix_ativo_tipo" btree (tipo)
-    "unique_ativo_ticker_mercado" UNIQUE CONSTRAINT, btree (ticker, mercado)
 Check constraints:
     "ativo_nome_min_length" CHECK (length(nome::text) >= 2)
     "ativo_preco_positivo" CHECK (preco_atual IS NULL OR preco_atual >= 0::numeric)
@@ -179,18 +178,15 @@ Primary Keys:
 
 
 Unique Constraints:
-       Nome Constraint       | Coluna  
------------------------------+---------
- unique_ativo_ticker_mercado | ticker
- unique_ativo_ticker_mercado | mercado
-(2 rows)
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
 
 
 Índices:
-        Nome do Índice        |                                           Definição                                           
-------------------------------+-----------------------------------------------------------------------------------------------
+        Nome do Índice        |                                          Definição                                          
+------------------------------+---------------------------------------------------------------------------------------------
  ativo_pkey                   | CREATE UNIQUE INDEX ativo_pkey ON public.ativo USING btree (id)
- unique_ativo_ticker_mercado  | CREATE UNIQUE INDEX unique_ativo_ticker_mercado ON public.ativo USING btree (ticker, mercado)
  ix_ativo_ativo               | CREATE INDEX ix_ativo_ativo ON public.ativo USING btree (ativo)
  ix_ativo_classe              | CREATE INDEX ix_ativo_classe ON public.ativo USING btree (classe)
  ix_ativo_data_ultima_cotacao | CREATE INDEX ix_ativo_data_ultima_cotacao ON public.ativo USING btree (data_ultima_cotacao)
@@ -200,7 +196,7 @@ Unique Constraints:
  ix_ativo_nome                | CREATE INDEX ix_ativo_nome ON public.ativo USING btree (nome)
  ix_ativo_ticker              | CREATE INDEX ix_ativo_ticker ON public.ativo USING btree (ticker)
  ix_ativo_tipo                | CREATE INDEX ix_ativo_tipo ON public.ativo USING btree (tipo)
-(11 rows)
+(10 rows)
 
 
 ________________________________________________________________________________
@@ -210,25 +206,30 @@ ________________________________________________________________________________
 TABELA: auditoria_relatorios
 ################################################################################
 
-                                                             Table "public.auditoria_relatorios"
-       Column        |           Type           | Collation | Nullable |            Default            | Storage  | Compression | Stats target | Description 
----------------------+--------------------------+-----------+----------+-------------------------------+----------+-------------+--------------+-------------
- id                  | uuid                     |           | not null |                               | plain    |             |              | 
- usuario_id          | uuid                     |           | not null |                               | plain    |             |              | 
- tipo_relatorio      | tiporelatorio            |           | not null |                               | plain    |             |              | 
- data_inicio         | date                     |           |          |                               | plain    |             |              | 
- data_fim            | date                     |           |          |                               | plain    |             |              | 
- filtros             | json                     |           |          |                               | extended |             |              | 
- resultado_json      | json                     |           |          |                               | extended |             |              | 
- timestamp_criacao   | timestamp with time zone |           | not null | now()                         | plain    |             |              | 
- timestamp_download  | timestamp with time zone |           |          |                               | plain    |             |              | 
- formato_export      | formatoexport            |           | not null | 'visualizacao'::formatoexport | plain    |             |              | 
- chave_api_auditoria | character varying(64)    |           |          |                               | extended |             |              | 
- created_at          | timestamp with time zone |           | not null | now()                         | plain    |             |              | 
- updated_at          | timestamp with time zone |           | not null | now()                         | plain    |             |              | 
+                                                                                  Table "public.auditoria_relatorios"
+       Column        |           Type           | Collation | Nullable |            Default            | Storage  | Compression | Stats target |                      Description                       
+---------------------+--------------------------+-----------+----------+-------------------------------+----------+-------------+--------------+--------------------------------------------------------
+ id                  | uuid                     |           | not null |                               | plain    |             |              | Identificador único da auditoria
+ usuario_id          | uuid                     |           | not null |                               | plain    |             |              | ID do usuário proprietário
+ tipo_relatorio      | character varying(50)    |           | not null |                               | extended |             |              | Tipo do relatório gerado
+ data_inicio         | date                     |           |          |                               | plain    |             |              | Data início do período analisado
+ data_fim            | date                     |           |          |                               | plain    |             |              | Data fim do período analisado
+ filtros             | json                     |           |          |                               | extended |             |              | Filtros aplicados (país, mercado, setor, classe_ativo)
+ resultado_json      | json                     |           |          |                               | extended |             |              | Dados completos do relatório em JSON
+ timestamp_criacao   | timestamp with time zone |           | not null | now()                         | plain    |             |              | Timestamp de criação do relatório
+ timestamp_download  | timestamp with time zone |           |          |                               | plain    |             |              | Timestamp do primeiro download (null se nunca baixado)
+ formato_export      | character varying(50)    |           | not null | 'visualizacao'::formatoexport | extended |             |              | Formato de exportação
+ chave_api_auditoria | character varying(64)    |           |          |                               | extended |             |              | Chave para rastreamento de API
+ created_at          | timestamp with time zone |           | not null | now()                         | plain    |             |              | Data de criação do registro
+ updated_at          | timestamp with time zone |           | not null | now()                         | plain    |             |              | Data da última atualização
 Indexes:
     "auditoria_relatorios_pkey" PRIMARY KEY, btree (id)
+    "ix_auditoria_relatorios_chave_api_auditoria" btree (chave_api_auditoria)
+    "ix_auditoria_relatorios_data_fim" btree (data_fim)
+    "ix_auditoria_relatorios_data_inicio" btree (data_inicio)
+    "ix_auditoria_relatorios_formato_export" btree (formato_export)
     "ix_auditoria_relatorios_timestamp_criacao" btree (timestamp_criacao)
+    "ix_auditoria_relatorios_timestamp_download" btree (timestamp_download)
     "ix_auditoria_relatorios_tipo_relatorio" btree (tipo_relatorio)
     "ix_auditoria_relatorios_usuario_id" btree (usuario_id)
 Check constraints:
@@ -241,14 +242,14 @@ Access method: heap
 -----+---------------------+--------------------------+---------+-------+-------------------------------
    1 | id                  | uuid                     |         | NO    | 
    2 | usuario_id          | uuid                     |         | NO    | 
-   3 | tipo_relatorio      | USER-DEFINED             |         | NO    | 
+   3 | tipo_relatorio      | character varying        | (50)    | NO    | 
    4 | data_inicio         | date                     |         | YES   | 
    5 | data_fim            | date                     |         | YES   | 
    6 | filtros             | json                     |         | YES   | 
    7 | resultado_json      | json                     |         | YES   | 
    8 | timestamp_criacao   | timestamp with time zone |         | NO    | now()
    9 | timestamp_download  | timestamp with time zone |         | YES   | 
-  10 | formato_export      | USER-DEFINED             |         | NO    | 'visualizacao'::formatoexport
+  10 | formato_export      | character varying        | (50)    | NO    | 'visualizacao'::formatoexport
   11 | chave_api_auditoria | character varying        | (64)    | YES   | 
   12 | created_at          | timestamp with time zone |         | NO    | now()
   13 | updated_at          | timestamp with time zone |         | NO    | now()
@@ -276,13 +277,18 @@ Unique Constraints:
 
 
 Índices:
-              Nome do Índice               |                                                       Definição                                                       
--------------------------------------------+-----------------------------------------------------------------------------------------------------------------------
- auditoria_relatorios_pkey                 | CREATE UNIQUE INDEX auditoria_relatorios_pkey ON public.auditoria_relatorios USING btree (id)
- ix_auditoria_relatorios_usuario_id        | CREATE INDEX ix_auditoria_relatorios_usuario_id ON public.auditoria_relatorios USING btree (usuario_id)
- ix_auditoria_relatorios_tipo_relatorio    | CREATE INDEX ix_auditoria_relatorios_tipo_relatorio ON public.auditoria_relatorios USING btree (tipo_relatorio)
- ix_auditoria_relatorios_timestamp_criacao | CREATE INDEX ix_auditoria_relatorios_timestamp_criacao ON public.auditoria_relatorios USING btree (timestamp_criacao)
-(4 rows)
+               Nome do Índice                |                                                         Definição                                                         
+---------------------------------------------+---------------------------------------------------------------------------------------------------------------------------
+ ix_auditoria_relatorios_tipo_relatorio      | CREATE INDEX ix_auditoria_relatorios_tipo_relatorio ON public.auditoria_relatorios USING btree (tipo_relatorio)
+ ix_auditoria_relatorios_chave_api_auditoria | CREATE INDEX ix_auditoria_relatorios_chave_api_auditoria ON public.auditoria_relatorios USING btree (chave_api_auditoria)
+ ix_auditoria_relatorios_data_fim            | CREATE INDEX ix_auditoria_relatorios_data_fim ON public.auditoria_relatorios USING btree (data_fim)
+ ix_auditoria_relatorios_data_inicio         | CREATE INDEX ix_auditoria_relatorios_data_inicio ON public.auditoria_relatorios USING btree (data_inicio)
+ ix_auditoria_relatorios_formato_export      | CREATE INDEX ix_auditoria_relatorios_formato_export ON public.auditoria_relatorios USING btree (formato_export)
+ ix_auditoria_relatorios_timestamp_download  | CREATE INDEX ix_auditoria_relatorios_timestamp_download ON public.auditoria_relatorios USING btree (timestamp_download)
+ auditoria_relatorios_pkey                   | CREATE UNIQUE INDEX auditoria_relatorios_pkey ON public.auditoria_relatorios USING btree (id)
+ ix_auditoria_relatorios_usuario_id          | CREATE INDEX ix_auditoria_relatorios_usuario_id ON public.auditoria_relatorios USING btree (usuario_id)
+ ix_auditoria_relatorios_timestamp_criacao   | CREATE INDEX ix_auditoria_relatorios_timestamp_criacao ON public.auditoria_relatorios USING btree (timestamp_criacao)
+(9 rows)
 
 
 ________________________________________________________________________________
@@ -292,28 +298,32 @@ ________________________________________________________________________________
 TABELA: configuracoes_alertas
 ################################################################################
 
-                                                                     Table "public.configuracoes_alertas"
-            Column            |           Type           | Collation | Nullable |                Default                | Storage  | Compression | Stats target | Description 
-------------------------------+--------------------------+-----------+----------+---------------------------------------+----------+-------------+--------------+-------------
- id                           | uuid                     |           | not null |                                       | plain    |             |              | 
- usuario_id                   | uuid                     |           | not null |                                       | plain    |             |              | 
- ativo_id                     | uuid                     |           |          |                                       | plain    |             |              | 
- portfolio_id                 | uuid                     |           |          |                                       | plain    |             |              | 
- nome                         | character varying(200)   |           | not null |                                       | extended |             |              | 
- tipo_alerta                  | tipoalerta               |           | not null |                                       | plain    |             |              | 
- condicao_valor               | numeric(18,6)            |           | not null |                                       | main     |             |              | 
- condicao_operador            | operadorcondicao         |           | not null | '>'::operadorcondicao                 | plain    |             |              | 
- condicao_valor2              | numeric(18,6)            |           |          |                                       | main     |             |              | 
- ativo                        | boolean                  |           | not null | true                                  | plain    |             |              | 
- frequencia_notificacao       | frequencianotificacao    |           | not null | 'imediata'::frequencianotificacao     | plain    |             |              | 
- canais_entrega               | character varying[]      |           | not null | '{email,webapp}'::character varying[] | extended |             |              | 
- timestamp_criacao            | timestamp with time zone |           | not null | now()                                 | plain    |             |              | 
- timestamp_ultimo_acionamento | timestamp with time zone |           |          |                                       | plain    |             |              | 
- created_at                   | timestamp with time zone |           | not null | now()                                 | plain    |             |              | 
- updated_at                   | timestamp with time zone |           | not null | now()                                 | plain    |             |              | 
+                                                                                         Table "public.configuracoes_alertas"
+            Column            |           Type           | Collation | Nullable |                Default                | Storage  | Compression | Stats target |                     Description                      
+------------------------------+--------------------------+-----------+----------+---------------------------------------+----------+-------------+--------------+------------------------------------------------------
+ id                           | uuid                     |           | not null |                                       | plain    |             |              | Identificador único do alerta
+ usuario_id                   | uuid                     |           | not null |                                       | plain    |             |              | ID do usuário proprietário
+ ativo_id                     | uuid                     |           |          |                                       | plain    |             |              | ID do ativo (opcional)
+ portfolio_id                 | uuid                     |           |          |                                       | plain    |             |              | ID do portfolio (opcional)
+ nome                         | character varying(200)   |           | not null |                                       | extended |             |              | Nome descritivo do alerta (ex: 'Alerta PETR4 > 30%')
+ tipo_alerta                  | tipoalerta               |           | not null |                                       | plain    |             |              | Tipo do alerta
+ condicao_valor               | numeric(18,6)            |           | not null |                                       | main     |             |              | Valor threshold da condição
+ condicao_operador            | operadorcondicao         |           | not null | '>'::operadorcondicao                 | plain    |             |              | Operador de comparação (>, <, ==, >=, <=, ENTRE)
+ condicao_valor2              | numeric(18,6)            |           |          |                                       | main     |             |              | Segundo valor (usado quando operador é ENTRE)
+ ativo                        | boolean                  |           | not null | true                                  | plain    |             |              | Indica se o alerta está ativo
+ frequencia_notificacao       | frequencianotificacao    |           | not null | 'imediata'::frequencianotificacao     | plain    |             |              | Frequência de notificação
+ canais_entrega               | character varying[]      |           | not null | '{email,webapp}'::character varying[] | extended |             |              | Canais de entrega (email, webapp, sms, telegram)
+ timestamp_criacao            | timestamp with time zone |           | not null | now()                                 | plain    |             |              | Data de criação do alerta
+ timestamp_ultimo_acionamento | timestamp with time zone |           |          |                                       | plain    |             |              | Data do último acionamento (null se nunca acionado)
+ created_at                   | timestamp with time zone |           | not null | now()                                 | plain    |             |              | Data de criação do registro
+ updated_at                   | timestamp with time zone |           | not null | now()                                 | plain    |             |              | Data da última atualização
 Indexes:
     "configuracoes_alertas_pkey" PRIMARY KEY, btree (id)
+    "ix_configuracoes_alertas_ativo" btree (ativo)
     "ix_configuracoes_alertas_ativo_id" btree (ativo_id)
+    "ix_configuracoes_alertas_portfolio_id" btree (portfolio_id)
+    "ix_configuracoes_alertas_timestamp_criacao" btree (timestamp_criacao)
+    "ix_configuracoes_alertas_timestamp_ultimo_acionamento" btree (timestamp_ultimo_acionamento)
     "ix_configuracoes_alertas_tipo_alerta" btree (tipo_alerta)
     "ix_configuracoes_alertas_usuario_id" btree (usuario_id)
 Check constraints:
@@ -369,13 +379,17 @@ Unique Constraints:
 
 
 Índices:
-            Nome do Índice            |                                                  Definição                                                  
---------------------------------------+-------------------------------------------------------------------------------------------------------------
- configuracoes_alertas_pkey           | CREATE UNIQUE INDEX configuracoes_alertas_pkey ON public.configuracoes_alertas USING btree (id)
- ix_configuracoes_alertas_usuario_id  | CREATE INDEX ix_configuracoes_alertas_usuario_id ON public.configuracoes_alertas USING btree (usuario_id)
- ix_configuracoes_alertas_ativo_id    | CREATE INDEX ix_configuracoes_alertas_ativo_id ON public.configuracoes_alertas USING btree (ativo_id)
- ix_configuracoes_alertas_tipo_alerta | CREATE INDEX ix_configuracoes_alertas_tipo_alerta ON public.configuracoes_alertas USING btree (tipo_alerta)
-(4 rows)
+                    Nome do Índice                     |                                                                   Definição                                                                   
+-------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------
+ ix_configuracoes_alertas_ativo                        | CREATE INDEX ix_configuracoes_alertas_ativo ON public.configuracoes_alertas USING btree (ativo)
+ ix_configuracoes_alertas_portfolio_id                 | CREATE INDEX ix_configuracoes_alertas_portfolio_id ON public.configuracoes_alertas USING btree (portfolio_id)
+ ix_configuracoes_alertas_timestamp_criacao            | CREATE INDEX ix_configuracoes_alertas_timestamp_criacao ON public.configuracoes_alertas USING btree (timestamp_criacao)
+ ix_configuracoes_alertas_timestamp_ultimo_acionamento | CREATE INDEX ix_configuracoes_alertas_timestamp_ultimo_acionamento ON public.configuracoes_alertas USING btree (timestamp_ultimo_acionamento)
+ configuracoes_alertas_pkey                            | CREATE UNIQUE INDEX configuracoes_alertas_pkey ON public.configuracoes_alertas USING btree (id)
+ ix_configuracoes_alertas_usuario_id                   | CREATE INDEX ix_configuracoes_alertas_usuario_id ON public.configuracoes_alertas USING btree (usuario_id)
+ ix_configuracoes_alertas_ativo_id                     | CREATE INDEX ix_configuracoes_alertas_ativo_id ON public.configuracoes_alertas USING btree (ativo_id)
+ ix_configuracoes_alertas_tipo_alerta                  | CREATE INDEX ix_configuracoes_alertas_tipo_alerta ON public.configuracoes_alertas USING btree (tipo_alerta)
+(8 rows)
 
 
 ________________________________________________________________________________
@@ -385,20 +399,20 @@ ________________________________________________________________________________
 TABELA: corretora
 ################################################################################
 
-                                                                        Table "public.corretora"
-    Column    |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                     Description                     
---------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-----------------------------------------------------
- id           | uuid                     |           | not null |         | plain    |             |              | Identificador único da corretora
- usuario_id   | uuid                     |           | not null |         | plain    |             |              | ID do usuário proprietário
- nome         | character varying(100)   |           | not null |         | extended |             |              | Nome da corretora/exchange (ex: XP, Clear, Binance)
- tipo         | tipocorretora            |           | not null |         | plain    |             |              | Tipo: corretora tradicional ou exchange cripto
- pais         | character varying(2)     |           | not null |         | extended |             |              | Código ISO 3166-1 alpha-2 do país (BR, US, etc.)
- moeda_padrao | character varying(3)     |           | not null |         | extended |             |              | Código ISO 4217 da moeda (BRL, USD, EUR)
- saldo_atual  | numeric(18,2)            |           | not null |         | main     |             |              | Saldo disponível em caixa (na moeda padrão)
- ativa        | boolean                  |           | not null |         | plain    |             |              | Indica se conta está ativa
- observacoes  | text                     |           |          |         | extended |             |              | Observações e notas do usuário sobre a conta
- created_at   | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
- updated_at   | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+                                                    Table "public.corretora"
+    Column    |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+--------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id           | uuid                     |           | not null |         | plain    |             |              | 
+ usuario_id   | uuid                     |           | not null |         | plain    |             |              | 
+ nome         | character varying(100)   |           | not null |         | extended |             |              | 
+ tipo         | tipocorretora            |           | not null |         | plain    |             |              | 
+ pais         | character varying(2)     |           | not null |         | extended |             |              | 
+ moeda_padrao | character varying(3)     |           | not null |         | extended |             |              | 
+ saldo_atual  | numeric(18,2)            |           | not null |         | main     |             |              | 
+ ativa        | boolean                  |           | not null |         | plain    |             |              | 
+ observacoes  | text                     |           |          |         | extended |             |              | 
+ created_at   | timestamp with time zone |           | not null |         | plain    |             |              | 
+ updated_at   | timestamp with time zone |           | not null |         | plain    |             |              | 
 Indexes:
     "corretora_pkey" PRIMARY KEY, btree (id)
     "ix_corretora_ativa" btree (ativa)
@@ -407,7 +421,6 @@ Indexes:
     "ix_corretora_pais" btree (pais)
     "ix_corretora_tipo" btree (tipo)
     "ix_corretora_usuario_id" btree (usuario_id)
-    "unique_corretora_usuario_nome_pais" UNIQUE CONSTRAINT, btree (usuario_id, nome, pais)
 Check constraints:
     "corretora_moeda_iso_format" CHECK (moeda_padrao::text ~* '^[A-Z]{3}$'::text)
     "corretora_nome_min_length" CHECK (length(nome::text) >= 2)
@@ -453,26 +466,22 @@ Primary Keys:
 
 
 Unique Constraints:
-          Nome Constraint           |   Coluna   
-------------------------------------+------------
- unique_corretora_usuario_nome_pais | usuario_id
- unique_corretora_usuario_nome_pais | nome
- unique_corretora_usuario_nome_pais | pais
-(3 rows)
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
 
 
 Índices:
-           Nome do Índice           |                                                    Definição                                                    
-------------------------------------+-----------------------------------------------------------------------------------------------------------------
- corretora_pkey                     | CREATE UNIQUE INDEX corretora_pkey ON public.corretora USING btree (id)
- unique_corretora_usuario_nome_pais | CREATE UNIQUE INDEX unique_corretora_usuario_nome_pais ON public.corretora USING btree (usuario_id, nome, pais)
- ix_corretora_ativa                 | CREATE INDEX ix_corretora_ativa ON public.corretora USING btree (ativa)
- ix_corretora_moeda_padrao          | CREATE INDEX ix_corretora_moeda_padrao ON public.corretora USING btree (moeda_padrao)
- ix_corretora_nome                  | CREATE INDEX ix_corretora_nome ON public.corretora USING btree (nome)
- ix_corretora_pais                  | CREATE INDEX ix_corretora_pais ON public.corretora USING btree (pais)
- ix_corretora_tipo                  | CREATE INDEX ix_corretora_tipo ON public.corretora USING btree (tipo)
- ix_corretora_usuario_id            | CREATE INDEX ix_corretora_usuario_id ON public.corretora USING btree (usuario_id)
-(8 rows)
+      Nome do Índice       |                                       Definição                                       
+---------------------------+---------------------------------------------------------------------------------------
+ corretora_pkey            | CREATE UNIQUE INDEX corretora_pkey ON public.corretora USING btree (id)
+ ix_corretora_ativa        | CREATE INDEX ix_corretora_ativa ON public.corretora USING btree (ativa)
+ ix_corretora_moeda_padrao | CREATE INDEX ix_corretora_moeda_padrao ON public.corretora USING btree (moeda_padrao)
+ ix_corretora_nome         | CREATE INDEX ix_corretora_nome ON public.corretora USING btree (nome)
+ ix_corretora_pais         | CREATE INDEX ix_corretora_pais ON public.corretora USING btree (pais)
+ ix_corretora_tipo         | CREATE INDEX ix_corretora_tipo ON public.corretora USING btree (tipo)
+ ix_corretora_usuario_id   | CREATE INDEX ix_corretora_usuario_id ON public.corretora USING btree (usuario_id)
+(7 rows)
 
 
 ________________________________________________________________________________
@@ -940,9 +949,9 @@ TABELA: parametros_macro
  inflacao_anual    | numeric(8,6)             |           | not null |                   | main     |             |              | 
  cap_rate_fii      | numeric(8,6)             |           |          |                   | main     |             |              | 
  ytm_rf            | numeric(8,6)             |           |          |                   | main     |             |              | 
- ativo             | boolean                  |           | not null | true              | plain    |             |              | 
- created_at        | timestamp with time zone |           | not null | now()             | plain    |             |              | 
- updated_at        | timestamp with time zone |           | not null | now()             | plain    |             |              | 
+ ativo             | boolean                  |           |          | true              | plain    |             |              | 
+ created_at        | timestamp with time zone |           |          | now()             | plain    |             |              | 
+ updated_at        | timestamp with time zone |           |          | now()             | plain    |             |              | 
 Indexes:
     "parametros_macro_pkey" PRIMARY KEY, btree (id)
     "ix_parametros_macro_ativo" btree (ativo)
@@ -962,9 +971,9 @@ Access method: heap
    7 | inflacao_anual    | numeric                  |         | NO    | 
    8 | cap_rate_fii      | numeric                  |         | YES   | 
    9 | ytm_rf            | numeric                  |         | YES   | 
-  10 | ativo             | boolean                  |         | NO    | true
-  11 | created_at        | timestamp with time zone |         | NO    | now()
-  12 | updated_at        | timestamp with time zone |         | NO    | now()
+  10 | ativo             | boolean                  |         | YES   | true
+  11 | created_at        | timestamp with time zone |         | YES   | now()
+  12 | updated_at        | timestamp with time zone |         | YES   | now()
 (12 rows)
 
 
@@ -1005,23 +1014,22 @@ ________________________________________________________________________________
 TABELA: portfolio
 ################################################################################
 
-                                                                     Table "public.portfolio"
-           Column           |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |           Description            
-----------------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+----------------------------------
+                                                                                      Table "public.portfolio"
+           Column           |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                            Description                             
+----------------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+--------------------------------------------------------------------
  id                         | uuid                     |           | not null |         | plain    |             |              | Identificador único do portfolio
  usuario_id                 | uuid                     |           | not null |         | plain    |             |              | ID do usuário proprietário
- nome                       | character varying(100)   |           | not null |         | extended |             |              | Nome do portfolio
- descricao                  | text                     |           |          |         | extended |             |              | Descrição detalhada do portfolio
- objetivo                   | character varying(50)    |           |          |         | extended |             |              | Objetivo do portfolio
+ nome                       | character varying(100)   |           | not null |         | extended |             |              | Nome do portfolio (ex: Portfolio Principal, Trade, Longo Prazo)
+ descricao                  | text                     |           |          |         | extended |             |              | Descrição detalhada do portfolio e sua estratégia
+ objetivo                   | character varying(50)    |           |          |         | extended |             |              | Objetivo do portfolio (Renda Passiva, Crescimento, Proteção, etc.)
  ativo                      | boolean                  |           | not null | true    | plain    |             |              | Indica se o portfolio está ativo
- valor_inicial              | numeric(18,2)            |           |          |         | main     |             |              | Valor inicial investido (R$)
- percentual_alocacao_target | numeric(5,2)             |           |          |         | main     |             |              | % de alocação desejada (0-100)
+ valor_inicial              | numeric(18,2)            |           |          |         | main     |             |              | Valor inicial investido no portfolio (R$)
+ percentual_alocacao_target | numeric(5,2)             |           |          |         | main     |             |              | Percentual de alocação desejada do patrimônio total (0-100)
  created_at                 | timestamp with time zone |           | not null | now()   | plain    |             |              | Data de criação do registro
  updated_at                 | timestamp with time zone |           | not null | now()   | plain    |             |              | Data da última atualização
 Indexes:
     "portfolio_pkey" PRIMARY KEY, btree (id)
     "ix_portfolio_ativo" btree (ativo)
-    "ix_portfolio_nome" btree (nome)
     "ix_portfolio_usuario_id" btree (usuario_id)
 Check constraints:
     "portfolio_nome_min_length" CHECK (length(nome::text) >= 3)
@@ -1074,8 +1082,7 @@ Unique Constraints:
  portfolio_pkey          | CREATE UNIQUE INDEX portfolio_pkey ON public.portfolio USING btree (id)
  ix_portfolio_usuario_id | CREATE INDEX ix_portfolio_usuario_id ON public.portfolio USING btree (usuario_id)
  ix_portfolio_ativo      | CREATE INDEX ix_portfolio_ativo ON public.portfolio USING btree (ativo)
- ix_portfolio_nome       | CREATE INDEX ix_portfolio_nome ON public.portfolio USING btree (nome)
-(4 rows)
+(3 rows)
 
 
 ________________________________________________________________________________
@@ -1206,10 +1213,11 @@ TABELA: projecoes_renda
  updated_at                  | timestamp with time zone |           | not null | now()             | plain    |             |              | 
 Indexes:
     "projecoes_renda_pkey" PRIMARY KEY, btree (id)
+    "ix_projecoes_renda_mes_ano" btree (mes_ano)
     "ix_projecoes_renda_usuario_id" btree (usuario_id)
     "projecoes_renda_usuario_id_portfolio_id_mes_ano_key" UNIQUE CONSTRAINT, btree (usuario_id, portfolio_id, mes_ano)
 Foreign-key constraints:
-    "projecoes_renda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    "projecoes_renda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 Access method: heap
 
  Pos |           Coluna            |           Tipo           | Tamanho | Null? |      Default      
@@ -1254,10 +1262,11 @@ Unique Constraints:
 Índices:
                    Nome do Índice                    |                                                                     Definição                                                                     
 -----------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------
+ ix_projecoes_renda_mes_ano                          | CREATE INDEX ix_projecoes_renda_mes_ano ON public.projecoes_renda USING btree (mes_ano)
  projecoes_renda_pkey                                | CREATE UNIQUE INDEX projecoes_renda_pkey ON public.projecoes_renda USING btree (id)
  projecoes_renda_usuario_id_portfolio_id_mes_ano_key | CREATE UNIQUE INDEX projecoes_renda_usuario_id_portfolio_id_mes_ano_key ON public.projecoes_renda USING btree (usuario_id, portfolio_id, mes_ano)
  ix_projecoes_renda_usuario_id                       | CREATE INDEX ix_projecoes_renda_usuario_id ON public.projecoes_renda USING btree (usuario_id)
-(3 rows)
+(4 rows)
 
 
 ________________________________________________________________________________
@@ -1459,8 +1468,8 @@ TABELA: relatorios_performance
  periodo_fim                | date                     |           | not null |                   | plain   |             |              | 
  retorno_bruto_percentual   | numeric(10,4)            |           |          |                   | main    |             |              | 
  retorno_liquido_percentual | numeric(10,4)            |           |          |                   | main    |             |              | 
- indice_sharpe              | numeric(10,4)            |           |          |                   | main    |             |              | 
- max_drawdown_percentual    | numeric(10,4)            |           |          |                   | main    |             |              | 
+ indice_sharpe              | numeric(8,4)             |           |          |                   | main    |             |              | 
+ max_drawdown_percentual    | numeric(8,4)             |           |          |                   | main    |             |              | 
  created_at                 | timestamp with time zone |           | not null | now()             | plain   |             |              | 
  updated_at                 | timestamp with time zone |           | not null | now()             | plain   |             |              | 
 Indexes:
@@ -1469,7 +1478,7 @@ Indexes:
 Check constraints:
     "relatorios_performance_check" CHECK (periodo_inicio <= periodo_fim)
 Foreign-key constraints:
-    "relatorios_performance_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    "relatorios_performance_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 Access method: heap
 
  Pos |           Coluna           |           Tipo           | Tamanho | Null? |      Default      
@@ -1637,8 +1646,8 @@ Referenced by:
     TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "portfolio" CONSTRAINT "portfolio_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "posicao" CONSTRAINT "posicao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
-    TABLE "projecoes_renda" CONSTRAINT "projecoes_renda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
-    TABLE "relatorios_performance" CONSTRAINT "relatorios_performance_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    TABLE "projecoes_renda" CONSTRAINT "projecoes_renda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+    TABLE "relatorios_performance" CONSTRAINT "relatorios_performance_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
     TABLE "transacao" CONSTRAINT "transacao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 Access method: heap
 

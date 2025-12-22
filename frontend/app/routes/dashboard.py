@@ -13,6 +13,7 @@ from datetime import datetime
 
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
+
 def login_required(f):
     """Decorator FINAL - aceita username OU accesstoken"""
     @wraps(f)
@@ -21,6 +22,7 @@ def login_required(f):
             return f(*args, **kwargs)
         return redirect(url_for('auth.login'))
     return decorated_function
+
 
 # ========================================
 # HELPER: Transformar dados da API
@@ -32,23 +34,22 @@ def transform_buy_signal(item):
     preco_atual = item.get('preco_atual', 0)
     preco_teto = item.get('preco_teto', 0)
 
-    # Calcular margem de segurança %
     margem = 0
     if preco_teto > 0 and preco_atual > 0:
         margem = round(((preco_teto - preco_atual) / preco_atual) * 100, 2)
 
-    # Detectar mercado (BR se tem números no ticker, US se não tem)
     mercado = 'BR' if any(c.isdigit() for c in ticker) else 'US'
 
     return {
         'ticker': ticker,
-        'nome': ticker,  # Temporário: usar ticker como nome
+        'nome': ticker,
         'mercado': mercado,
         'buyscore': item.get('buy_score', 0),
         'margem': margem,
         'preco_atual': preco_atual,
         'preco_teto': preco_teto
     }
+
 
 # ========================================
 # DASHBOARD INDEX
@@ -59,6 +60,7 @@ def transform_buy_signal(item):
 def index():
     """Dashboard principal - M6 ✅"""
     return render_template('dashboard/index.html')
+
 
 # ========================================
 # M6.1 BUY SIGNALS
@@ -80,11 +82,9 @@ def buy_signals():
             )
             if response.status_code == 200:
                 raw_data = response.json().get('data', [])
-                # Transformar estrutura para template
                 data = [transform_buy_signal(item) for item in raw_data]
         except Exception as e:
             print(f"❌ Erro ao buscar buy signals: {e}")
-            pass
 
     if not data:
         data = [
@@ -96,13 +96,17 @@ def buy_signals():
     summary = {
         'mercados': {
             'labels': ['BR', 'US', 'EU'],
-            'data': [len([s for s in data if s.get('mercado') == 'BR']),
-                     len([s for s in data if s.get('mercado') == 'US']), 0]
+            'data': [
+                len([s for s in data if s.get('mercado') == 'BR']),
+                len([s for s in data if s.get('mercado') == 'US']),
+                0
+            ]
         }
     }
 
     return render_template('dashboard/buy_signals.html',
-                         signals=data, total_pages=1, current_page=1, summary=summary)
+                           signals=data, total_pages=1, current_page=1, summary=summary)
+
 
 @bp.route('/buy-signals/table', methods=['GET'])
 @login_required
@@ -120,11 +124,9 @@ def buy_signals_table():
             )
             if response.status_code == 200:
                 raw_data = response.json().get('data', [])
-                # Transformar estrutura para template
                 data = [transform_buy_signal(item) for item in raw_data]
         except Exception as e:
             print(f"❌ Erro ao buscar buy signals table: {e}")
-            pass
 
     if not data:
         data = [
@@ -133,7 +135,8 @@ def buy_signals_table():
         ]
 
     return render_template('components/buy_signals_table.html',
-                         signals=data, total_pages=1, current_page=1, request=request)
+                           signals=data, total_pages=1, current_page=1, request=request)
+
 
 # ========================================
 # M6.2 PORTFOLIOS
@@ -158,7 +161,7 @@ def portfolios():
                 result = response.json()
                 corretoras = result.get('data', {}).get('corretoras', [])
                 saldo_total = sum([c.get('saldo_atual', 0) for c in corretoras])
-        except:
+        except Exception:
             pass
 
     if not corretoras:
@@ -181,7 +184,8 @@ def portfolios():
     }
 
     return render_template('dashboard/portfolios.html',
-                         corretoras=corretoras, stats=stats)
+                           corretoras=corretoras, stats=stats)
+
 
 @bp.route('/portfolios/create', methods=['POST'])
 @login_required
@@ -214,6 +218,7 @@ def portfolios_create():
 
     return redirect(url_for('dashboard.portfolios'))
 
+
 # ========================================
 # M6.3 TRANSAÇÕES
 # ========================================
@@ -225,7 +230,6 @@ def transactions():
     token = session.get('accesstoken')
     transacoes = []
 
-    # Filtros da query string
     tipo_ativo = request.args.get('tipo')
     classe = request.args.get('classe')
     mercado = request.args.get('mercado')
@@ -260,10 +264,9 @@ def transactions():
             if response.status_code == 200:
                 result = response.json()
                 transacoes = result.get('data', {}).get('transacoes', [])
-        except:
+        except Exception:
             pass
 
-    # Mock data se API falhar
     if not transacoes:
         transacoes = [
             {
@@ -303,18 +306,15 @@ def transactions():
             },
         ]
 
-    # Stats - Totais gerais
     total_compras = sum(1 for t in transacoes if t['tipo_operacao'] == 'compra')
     total_vendas = sum(1 for t in transacoes if t['tipo_operacao'] == 'venda')
     volume_total = sum(t.get('valor_total', 0) for t in transacoes)
 
-    # Stats - Volume por tipo de ativo
     volume_acoes = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') in ['acao', 'stock'])
     volume_fii = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') in ['fii', 'reit'])
     volume_cripto = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') == 'cripto')
     volume_outros = sum(t.get('valor_total', 0) for t in transacoes if t.get('ativo', {}).get('tipo') not in ['acao', 'stock', 'fii', 'reit', 'cripto'])
 
-    # Stats - Volume por operação
     volume_compras = sum(t.get('valor_total', 0) for t in transacoes if t['tipo_operacao'] == 'compra')
     volume_vendas = sum(t.get('valor_total', 0) for t in transacoes if t['tipo_operacao'] == 'venda')
 
@@ -323,17 +323,14 @@ def transactions():
         'compras': total_compras,
         'vendas': total_vendas,
         'volume_total': volume_total,
-        # Novos: volume por tipo
         'volume_acoes': volume_acoes,
         'volume_fii': volume_fii,
         'volume_cripto': volume_cripto,
         'volume_outros': volume_outros,
-        # Novos: volume por operação
         'volume_compras': volume_compras,
         'volume_vendas': volume_vendas
     }
 
-    # Listas para filtros
     corretoras = [
         {'id': '1', 'nome': 'XP Investimentos'},
         {'id': '2', 'nome': 'Clear Corretora'},
@@ -363,23 +360,26 @@ def transactions():
         {'value': 'EUR', 'label': 'Europa 🇪🇺'}
     ]
 
-    return render_template('dashboard/transactions.html',
-                         transacoes=transacoes,
-                         stats=stats,
-                         corretoras=corretoras,
-                         tipos_ativo=tipos_ativo,
-                         classes_ativo=classes_ativo,
-                         mercados=mercados,
-                         filtros={
-                             'tipo': tipo_ativo,
-                             'classe': classe,
-                             'mercado': mercado,
-                             'corretora_id': corretora_id,
-                             'data_inicio': data_inicio,
-                             'data_fim': data_fim
-                         },
-                         current_page=page,
-                         total_pages=1)
+    return render_template(
+        'dashboard/transactions.html',
+        transacoes=transacoes,
+        stats=stats,
+        corretoras=corretoras,
+        tipos_ativo=tipos_ativo,
+        classes_ativo=classes_ativo,
+        mercados=mercados,
+        filtros={
+            'tipo': tipo_ativo,
+            'classe': classe,
+            'mercado': mercado,
+            'corretora_id': corretora_id,
+            'data_inicio': data_inicio,
+            'data_fim': data_fim
+        },
+        current_page=page,
+        total_pages=1
+    )
+
 
 @bp.route('/transactions/new', methods=['GET', 'POST'])
 @login_required
@@ -416,6 +416,7 @@ def transactions_new():
 
     return redirect(url_for('dashboard.transactions'))
 
+
 # ========================================
 # M6.4 PROVENTOS (DIVIDENDOS/JCP)
 # ========================================
@@ -427,7 +428,6 @@ def dividends():
     token = session.get('accesstoken')
     proventos = []
 
-    # Filtros
     ativo_id = request.args.get('ativo')
     corretora_id = request.args.get('corretora')
     tipo_provento = request.args.get('tipo')
@@ -462,10 +462,9 @@ def dividends():
             if response.status_code == 200:
                 result = response.json()
                 proventos = result.get('data', {}).get('proventos', [])
-        except:
+        except Exception:
             pass
 
-    # Mock data
     if not proventos:
         proventos = [
             {
@@ -500,7 +499,6 @@ def dividends():
             }
         ]
 
-    # Stats
     total_recebido = sum(p.get('valor_total', 0) for p in proventos if p.get('status') == 'pago')
     total_previsto = sum(p.get('valor_total', 0) for p in proventos if p.get('status') == 'previsto')
     total_geral = sum(p.get('valor_total', 0) for p in proventos)
@@ -512,25 +510,21 @@ def dividends():
         'total_geral': total_geral
     }
 
-    # NOVO: Timeline mensal (agrupar proventos PAGOS por mês)
     timeline_dict = defaultdict(float)
     for p in proventos:
         if p.get('status') == 'pago':
             try:
-                # Converter data_pagamento para formato Mmm/AA
                 data_pag = p.get('data_pagamento', '')
                 if data_pag:
                     dt = datetime.strptime(data_pag, '%Y-%m-%d')
-                    mes_label = dt.strftime('%b/%y')  # Set/24, Out/24, etc
+                    mes_label = dt.strftime('%b/%y')
                     timeline_dict[mes_label] += p.get('valor_total', 0)
-            except:
+            except Exception:
                 pass
-    
-    # Ordenar cronologicamente e formatar
+
     timeline_sorted = sorted(timeline_dict.items(), key=lambda x: datetime.strptime(x[0], '%b/%y'))
     dividends_timeline = [{'mes': mes, 'valor': round(valor, 2)} for mes, valor in timeline_sorted]
 
-    # Listas para filtros
     ativos = [
         {'id': '1', 'ticker': 'PETR4', 'nome': 'Petrobras'},
         {'id': '2', 'ticker': 'VALE3', 'nome': 'Vale'},
@@ -549,397 +543,158 @@ def dividends():
         {'value': 'rendimento', 'label': 'Rendimento'}
     ]
 
-    return render_template('dashboard/dividends.html',
-                         proventos=proventos,
-                         stats=stats,
-                         dividends_timeline=dividends_timeline,  # NOVO
-                         ativos=ativos,
-                         corretoras=corretoras,
-                         tipos_provento=tipos_provento_list,
-                         filtros={
-                             'ativo': ativo_id,
-                             'corretora': corretora_id,
-                             'tipo': tipo_provento,
-                             'status': status,
-                             'data_inicio': data_inicio,
-                             'data_fim': data_fim
-                         },
-                         current_page=page,
-                         total_pages=1)
-
-# ===========================
-# M7.3 - ALERTAS
-# ===========================
-
-@bp.route('/alerts', methods=['GET'])
-@login_required
-def alerts():
-    """
-    M7.3 - Gestão de Alertas e Notificações
-    Monitora ativos e portfólios com alertas personalizados
-    """
-    token = session.get('access_token')
-    alertas = []
-    
-    # Filtros da query string
-    tipo_alerta = request.args.get('tipo')
-    status_filtro = request.args.get('status')  # 'ativo' ou 'inativo'
-    ativo_ticker = request.args.get('ativo')
-    page = int(request.args.get('page', 1))
-    
-    # TODO: Integração com Backend (Fase M7.3 completa)
-    # if token:
-    #     try:
-    #         headers = {'Authorization': f'Bearer {token}'}
-    #         params = {'page': page, 'per_page': 20}
-    #         if tipo_alerta:
-    #             params['tipo'] = tipo_alerta
-    #         if status_filtro:
-    #             params['ativo'] = (status_filtro == 'ativo')
-    #         if ativo_ticker:
-    #             params['ticker'] = ativo_ticker
-    #         
-    #         response = requests.get(
-    #             f'{Config.BACKEND_API_URL}/api/alertas',
-    #             headers=headers,
-    #             params=params,
-    #             timeout=10
-    #         )
-    #         if response.status_code == 200:
-    #             result = response.json()
-    #             alertas = result.get('data', {}).get('alertas', [])
-    #     except:
-    #         pass
-    
-    # Mock data para desenvolvimento (M7.3 - Fase 1)
-    if not alertas:
-        alertas = [
-            {
-                'id': 'alert-001',
-                'nome': 'PETR4 acima de R$ 32,00',
-                'tipoalerta': 'ALTA_PRECO',
-                'ticker': 'PETR4',
-                'condicaooperador': '>=',
-                'condicaovalor': 32.00,
-                'condicaovalor2': None,
-                'ativo': True,
-                'frequencianotificacao': 'IMEDIATA',
-                'canaisentrega': ['WEBAPP', 'EMAIL'],
-                'totalacionamentos': 3,
-                'timestampultimoacionamento': '2024-12-15 14:35:22',
-                'createdat': '2024-12-01 10:00:00'
-            },
-            {
-                'id': 'alert-002',
-                'nome': 'VALE3 queda > 5%',
-                'tipoalerta': 'QUEDA_PRECO',
-                'ticker': 'VALE3',
-                'condicaooperador': '<=',
-                'condicaovalor': 65.50,
-                'condicaovalor2': None,
-                'ativo': True,
-                'frequencianotificacao': 'DIARIA',
-                'canaisentrega': ['WEBAPP'],
-                'totalacionamentos': 1,
-                'timestampultimoacionamento': '2024-12-10 09:15:00',
-                'createdat': '2024-11-20 08:30:00'
-            },
-            {
-                'id': 'alert-003',
-                'nome': 'Dividendo PETR4 previsto',
-                'tipoalerta': 'DIVIDENDO_PREVISTO',
-                'ticker': 'PETR4',
-                'condicaooperador': '>=',
-                'condicaovalor': 1.00,
-                'condicaovalor2': None,
-                'ativo': True,
-                'frequencianotificacao': 'SEMANAL',
-                'canaisentrega': ['WEBAPP', 'EMAIL', 'SMS'],
-                'totalacionamentos': 0,
-                'timestampultimoacionamento': None,
-                'createdat': '2024-12-05 16:45:00'
-            },
-            {
-                'id': 'alert-004',
-                'nome': 'Portfolio rentabilidade 20%',
-                'tipoalerta': 'META_RENTABILIDADE',
-                'ticker': None,  # Alerta de portfolio, não de ativo específico
-                'condicaooperador': '>=',
-                'condicaovalor': 20.00,
-                'condicaovalor2': None,
-                'ativo': False,  # Inativo
-                'frequencianotificacao': 'MENSAL',
-                'canaisentrega': ['WEBAPP'],
-                'totalacionamentos': 0,
-                'timestampultimoacionamento': None,
-                'createdat': '2024-11-01 12:00:00'
-            },
-            {
-                'id': 'alert-005',
-                'nome': 'AAPL entre 180-200',
-                'tipoalerta': 'ALTA_PRECO',
-                'ticker': 'AAPL',
-                'condicaooperador': 'ENTRE',
-                'condicaovalor': 180.00,
-                'condicaovalor2': 200.00,
-                'ativo': True,
-                'frequencianotificacao': 'IMEDIATA',
-                'canaisentrega': ['WEBAPP', 'EMAIL'],
-                'totalacionamentos': 5,
-                'timestampultimoacionamento': '2024-12-16 11:22:00',
-                'createdat': '2024-11-15 14:20:00'
-            }
-        ]
-    
-    # Aplicar filtros aos dados mock
-    alertas_filtrados = alertas
-    
-    if tipo_alerta:
-        alertas_filtrados = [a for a in alertas_filtrados if a.get('tipoalerta') == tipo_alerta]
-    
-    if status_filtro:
-        ativo_bool = (status_filtro == 'ativo')
-        alertas_filtrados = [a for a in alertas_filtrados if a.get('ativo') == ativo_bool]
-    
-    if ativo_ticker:
-        alertas_filtrados = [a for a in alertas_filtrados if a.get('ticker') == ativo_ticker]
-    
-    # Listas para filtros
-    ativos_unicos = [
-        {'ticker': 'PETR4'},
-        {'ticker': 'VALE3'},
-        {'ticker': 'AAPL'},
-        {'ticker': 'MXRF11'},
-        {'ticker': 'BBAS3'},
-    ]
-    
     return render_template(
-        'dashboard/alerts.html',
-        alertas=alertas_filtrados,
-        ativos=ativos_unicos,
+        'dashboard/dividends.html',
+        proventos=proventos,
+        stats=stats,
+        dividends_timeline=dividends_timeline,
+        ativos=ativos,
+        corretoras=corretoras,
+        tipos_provento=tipos_provento_list,
         filtros={
-            'tipo': tipo_alerta,
-            'status': status_filtro,
-            'ativo': ativo_ticker
+            'ativo': ativo_id,
+            'corretora': corretora_id,
+            'tipo': tipo_provento,
+            'status': status,
+            'data_inicio': data_inicio,
+            'data_fim': data_fim
         },
         current_page=page,
         total_pages=1
     )
 
-@bp.route('/alerts/create', methods=['POST'])
+
+# ========================================
+# M7.3 ALERTAS - INTEGRAÇÃO COM BACKEND
+# ========================================
+
+@bp.route('/alerts', methods=['GET'])
 @login_required
-def alerts_create():
+def alerts():
     """
-    M7.3 - Criar novo alerta (POST)
+    M7.3 - Lista de alertas consumindo API backend /api/alertas/
     """
-    try:
-        # Capturar dados do formulário
-        nome = request.form.get('nome')
-        tipoalerta = request.form.get('tipoalerta')
-        ticker = request.form.get('ticker') or None  # Pode ser vazio (portfolio)
-        condicaooperador = request.form.get('condicaooperador')
-        condicaovalor = float(request.form.get('condicaovalor'))
-        condicaovalor2 = request.form.get('condicaovalor2')
-        condicaovalor2 = float(condicaovalor2) if condicaovalor2 else None
-        frequencianotificacao = request.form.get('frequencianotificacao')
-        
-        # Capturar checkboxes (múltiplos valores)
-        canais = request.form.getlist('canais')  # ['WEBAPP', 'EMAIL', etc]
-        
-        ativo = bool(request.form.get('ativo'))  # Toggle
-        
-        # Validação básica
-        if not nome or len(nome) < 5:
-            flash('Nome do alerta deve ter ao menos 5 caracteres', 'error')
-            return redirect(url_for('dashboard.alerts'))
-        
-        if not canais:
-            flash('Selecione ao menos um canal de entrega', 'error')
-            return redirect(url_for('dashboard.alerts'))
-        
-        # TODO: Integração com Backend (quando API existir)
-        # token = session.get('access_token')
-        # if token:
-        #     headers = {
-        #         'Authorization': f'Bearer {token}',
-        #         'Content-Type': 'application/json'
-        #     }
-        #     data = {
-        #         'nome': nome,
-        #         'tipoalerta': tipoalerta,
-        #         'ticker': ticker,
-        #         'condicaooperador': condicaooperador,
-        #         'condicaovalor': condicaovalor,
-        #         'condicaovalor2': condicaovalor2,
-        #         'frequencianotificacao': frequencianotificacao,
-        #         'canaisentrega': canais,
-        #         'ativo': ativo
-        #     }
-        #     response = requests.post(
-        #         f'{Config.BACKEND_API_URL}/api/alertas/criar',
-        #         json=data,
-        #         headers=headers,
-        #         timeout=10
-        #     )
-        #     if response.status_code in [200, 201]:
-        #         flash(f'✅ Alerta "{nome}" criado com sucesso!', 'success')
-        #     else:
-        #         flash(f'Erro ao criar alerta: {response.status_code}', 'error')
-        # else:
-        #     flash('Token de autenticação não encontrado', 'error')
-        
-        # Mock: Simular sucesso (Fase de desenvolvimento)
-        flash(f'✅ Alerta "{nome}" criado com sucesso! (Mock - M7.3)', 'success')
-        
-        # Log para debug
-        print(f"[M7.3] Alerta criado:")
-        print(f"  Nome: {nome}")
-        print(f"  Tipo: {tipoalerta}")
-        print(f"  Ticker: {ticker or 'Portfolio Geral'}")
-        print(f"  Condição: {condicaooperador} {condicaovalor}" + 
-              (f" e {condicaovalor2}" if condicaovalor2 else ""))
-        print(f"  Frequência: {frequencianotificacao}")
-        print(f"  Canais: {', '.join(canais)}")
-        print(f"  Ativo: {'Sim' if ativo else 'Não'}")
-        
-    except ValueError as e:
-        flash(f'Erro nos valores numéricos: {str(e)}', 'error')
-    except Exception as e:
-        flash(f'Erro ao criar alerta: {str(e)}', 'error')
-        print(f"[ERROR] {e}")
-    
-    return redirect(url_for('dashboard.alerts'))
+    token = session.get('accesstoken')
+    alertas = []
+
+    filtros = {
+        'tipo': request.args.get('tipo', ''),
+        'status': request.args.get('status', ''),
+        'ativo': request.args.get('ativo', '')
+    }
+
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            resp = requests.get(
+                f'{Config.BACKEND_API_URL}/api/alertas/',
+                headers=headers,
+                timeout=5
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                alertas = data if isinstance(data, list) else data.get('data', [])
+        except Exception as e:
+            print(f"[M7.3] Erro ao buscar alertas API: {e}")
+
+    alertas = alertas or []
+    ativos = []
+
+    return render_template(
+        'dashboard/alerts.html',
+        alertas=alertas,
+        filtros=filtros,
+        ativos=ativos
+    )
+
 
 @bp.route('/alerts/table', methods=['GET'])
 @login_required
 def alerts_table():
     """
-    M7.3 - Partial render da tabela de alertas (HTMX)
-    Retorna apenas o HTML da tabela para atualização dinâmica
+    M7.3 - HTMX partial da tabela de alertas, consumindo /api/alertas/
     """
-    token = session.get('access_token')
+    token = session.get('accesstoken')
     alertas = []
-    
-    # Filtros da query string
+
     tipo_alerta = request.args.get('tipo')
     status_filtro = request.args.get('status')
     ativo_ticker = request.args.get('ativo')
-    
-    # Mock data (igual ao alerts())
-    alertas = [
-        {
-            'id': 'alert-001',
-            'nome': 'PETR4 acima de R$ 32,00',
-            'tipoalerta': 'ALTA_PRECO',
-            'ticker': 'PETR4',
-            'condicaooperador': '>=',
-            'condicaovalor': 32.00,
-            'condicaovalor2': None,
-            'ativo': True,
-            'frequencianotificacao': 'IMEDIATA',
-            'canaisentrega': ['WEBAPP', 'EMAIL'],
-            'totalacionamentos': 3,
-            'timestampultimoacionamento': '2024-12-15 14:35:22',
-            'createdat': '2024-12-01 10:00:00'
-        },
-        {
-            'id': 'alert-002',
-            'nome': 'VALE3 queda > 5%',
-            'tipoalerta': 'QUEDA_PRECO',
-            'ticker': 'VALE3',
-            'condicaooperador': '<=',
-            'condicaovalor': 65.50,
-            'condicaovalor2': None,
-            'ativo': True,
-            'frequencianotificacao': 'DIARIA',
-            'canaisentrega': ['WEBAPP'],
-            'totalacionamentos': 1,
-            'timestampultimoacionamento': '2024-12-10 09:15:00',
-            'createdat': '2024-11-20 08:30:00'
-        },
-        {
-            'id': 'alert-003',
-            'nome': 'Dividendo PETR4 previsto',
-            'tipoalerta': 'DIVIDENDO_PREVISTO',
-            'ticker': 'PETR4',
-            'condicaooperador': '>=',
-            'condicaovalor': 1.00,
-            'condicaovalor2': None,
-            'ativo': True,
-            'frequencianotificacao': 'SEMANAL',
-            'canaisentrega': ['WEBAPP', 'EMAIL', 'SMS'],
-            'totalacionamentos': 0,
-            'timestampultimoacionamento': None,
-            'createdat': '2024-12-05 16:45:00'
-        },
-        {
-            'id': 'alert-004',
-            'nome': 'Portfolio rentabilidade 20%',
-            'tipoalerta': 'META_RENTABILIDADE',
-            'ticker': None,
-            'condicaooperador': '>=',
-            'condicaovalor': 20.00,
-            'condicaovalor2': None,
-            'ativo': False,
-            'frequencianotificacao': 'MENSAL',
-            'canaisentrega': ['WEBAPP'],
-            'totalacionamentos': 0,
-            'timestampultimoacionamento': None,
-            'createdat': '2024-11-01 12:00:00'
-        },
-        {
-            'id': 'alert-005',
-            'nome': 'AAPL entre 180-200',
-            'tipoalerta': 'ALTA_PRECO',
-            'ticker': 'AAPL',
-            'condicaooperador': 'ENTRE',
-            'condicaovalor': 180.00,
-            'condicaovalor2': 200.00,
-            'ativo': True,
-            'frequencianotificacao': 'IMEDIATA',
-            'canaisentrega': ['WEBAPP', 'EMAIL'],
-            'totalacionamentos': 5,
-            'timestampultimoacionamento': '2024-12-16 11:22:00',
-            'createdat': '2024-11-15 14:20:00'
-        }
-    ]
-    
-    # Aplicar filtros
-    alertas_filtrados = alertas
-    
+
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            resp = requests.get(
+                f'{Config.BACKEND_API_URL}/api/alertas/',
+                headers=headers,
+                timeout=5
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                alertas = data if isinstance(data, list) else data.get('data', [])
+        except Exception as e:
+            print(f"[M7.3 HTMX] Erro ao buscar alertas API: {e}")
+
+    alertas_filtrados = alertas or []
+
     if tipo_alerta:
-        alertas_filtrados = [a for a in alertas_filtrados if a.get('tipoalerta') == tipo_alerta]
-    
+        alertas_filtrados = [a for a in alertas_filtrados if a.get('tipo') == tipo_alerta]
+
     if status_filtro:
         ativo_bool = (status_filtro == 'ativo')
         alertas_filtrados = [a for a in alertas_filtrados if a.get('ativo') == ativo_bool]
-    
+
     if ativo_ticker:
         alertas_filtrados = [a for a in alertas_filtrados if a.get('ticker') == ativo_ticker]
-    
-    # Log para debug
+
     print(f"[M7.3 HTMX] Filtros: tipo={tipo_alerta}, status={status_filtro}, ativo={ativo_ticker}")
     print(f"[M7.3 HTMX] Resultados: {len(alertas_filtrados)}/{len(alertas)} alertas")
-    
-    # Retorna apenas o partial (sem layout completo)
+
     return render_template('components/alerts_table.html', alertas=alertas_filtrados)
+
 
 @bp.route('/alerts/toggle/<alert_id>', methods=['POST'])
 @login_required
 def alerts_toggle(alert_id):
     """
-    M7.3 - Ativar/Desativar alerta (Toggle)
+    M7.3 - Ativar/Desativar alerta (Toggle) via API backend
     """
     try:
-        # TODO: Integração com Backend (quando API existir)
-        # Mock: Simular sucesso
-        flash(f'✅ Status do alerta alterado com sucesso! (Mock - M7.3)', 'success')
-        print(f"[M7.3] Toggle alerta: {alert_id}")
-        
+        token = session.get('accesstoken')
+        headers = {'Authorization': f'Bearer {token}'}
+
+        resp_get = requests.get(
+            f'{Config.BACKEND_API_URL}/api/alertas/',
+            headers=headers,
+            timeout=5
+        )
+        alvo = None
+        if resp_get.status_code == 200:
+            data = resp_get.json()
+            alertas = data if isinstance(data, list) else data.get('data', [])
+            alvo = next((a for a in alertas if str(a.get('id')) == str(alert_id)), None)
+
+        if not alvo:
+            flash('Alerta não encontrado para toggle.', 'error')
+            return redirect(url_for('dashboard.alerts'))
+
+        novo_status = not alvo.get('ativo', True)
+
+        resp_put = requests.put(
+            f'{Config.BACKEND_API_URL}/api/alertas/{alert_id}',
+            json={'ativo': novo_status},
+            headers={**headers, 'Content-Type': 'application/json'},
+            timeout=5
+        )
+        if resp_put.status_code in (200, 204):
+            flash('✅ Status do alerta alterado com sucesso!', 'success')
+        else:
+            flash(f'❌ Erro ao alterar status ({resp_put.status_code})', 'error')
+
     except Exception as e:
         flash(f'Erro ao alterar status: {str(e)}', 'error')
         print(f"[ERROR] {e}")
-    
+
     return redirect(url_for('dashboard.alerts'))
 
 
@@ -947,18 +702,25 @@ def alerts_toggle(alert_id):
 @login_required
 def alerts_delete(alert_id):
     """
-    M7.3 - Deletar alerta
+    M7.3 - Deletar alerta via API backend
     """
     try:
-        # TODO: Integração com Backend (quando API existir)
-        # Mock: Simular sucesso
-        flash(f'✅ Alerta deletado com sucesso! (Mock - M7.3)', 'success')
-        print(f"[M7.3] Delete alerta: {alert_id}")
-        
+        token = session.get('accesstoken')
+        headers = {'Authorization': f'Bearer {token}'}
+        resp = requests.delete(
+            f'{Config.BACKEND_API_URL}/api/alertas/{alert_id}',
+            headers=headers,
+            timeout=5
+        )
+        if resp.status_code in (200, 204):
+            flash('✅ Alerta deletado com sucesso!', 'success')
+        else:
+            flash(f'❌ Erro ao deletar alerta ({resp.status_code})', 'error')
+
     except Exception as e:
         flash(f'Erro ao deletar alerta: {str(e)}', 'error')
         print(f"[ERROR] {e}")
-    
+
     return redirect(url_for('dashboard.alerts'))
 
 
@@ -966,22 +728,18 @@ def alerts_delete(alert_id):
 @login_required
 def alerts_edit(alert_id):
     """
-    M7.3 - Editar alerta existente
+    M7.3 - Editar alerta existente (ainda mock; futura integração com API PUT)
     """
     if request.method == 'POST':
         try:
             nome = request.form.get('nome')
-            # (resto da lógica de edição - futuro)
             flash(f'✅ Alerta "{nome}" atualizado com sucesso! (Mock - M7.3)', 'success')
             print(f"[M7.3] Edit alerta: {alert_id} → {nome}")
-            
         except Exception as e:
             flash(f'Erro ao atualizar alerta: {str(e)}', 'error')
             print(f"[ERROR] {e}")
-        
         return redirect(url_for('dashboard.alerts'))
-    
-    # GET: Por enquanto redireciona (modal será implementado depois)
+
     flash('Edição via modal em desenvolvimento (M7.3)', 'info')
     return redirect(url_for('dashboard.alerts'))
 
@@ -999,5 +757,3 @@ def alerts_edit(alert_id):
 def placeholder():
     flash('Em desenvolvimento - M7', 'info')
     return redirect(url_for('dashboard.buy_signals'))
-
-
