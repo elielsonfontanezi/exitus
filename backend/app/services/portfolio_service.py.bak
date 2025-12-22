@@ -1,239 +1,157 @@
-"""M7.5 - Cotações Multi-Provider com Fallback Otimizado"""
-import requests
-from datetime import datetime
+# backend/app/services/portfolio_service.py
+# -*- coding: utf-8 -*-
+"""
+Exitus - Portfolio Service
+Módulo de serviço para encapsular a lógica de negócio de Portfolios.
+"""
 import logging
-import os
-from dotenv import load_dotenv
+from uuid import UUID
+from sqlalchemy.exc import IntegrityError
+from app.database import db
+from app.models import Portfolio, Usuario
 
-load_dotenv()
 logger = logging.getLogger(__name__)
 
-class CotacoesService:
-    """Fallback cascata com 8 providers"""
-
-    # Tokens do .env
-    BRAPI_TOKEN = os.getenv('BRAPI_API_KEY', '')
-    ALPHA_KEY = os.getenv('ALPHA_VANTAGE_API_KEY', 'demo')
-    FINNHUB_KEY = os.getenv('FINNHUB_API_KEY', '')
-    TWELVE_KEY = os.getenv('TWELVE_DATA_API_KEY', '')
-    MARKETSTACK_KEY = os.getenv('MARKETSTACK_API_KEY', '')
-    HGFINANCE_KEY = os.getenv('HGFINANCE_API_KEY', '')
-    TIMEOUT = 5
+class PortfolioService:
+    """Serviço para operações relacionadas a portfolios."""
 
     @staticmethod
-    def _build_brapi_url(ticker):
-        """Constrói URL brapi.dev com token"""
-        base_url = f"https://brapi.dev/api/quote/{ticker}"
-        if CotacoesService.BRAPI_TOKEN:
-            return f"{base_url}?token={CotacoesService.BRAPI_TOKEN}"
-        return base_url
+    def get_all_for_user(usuario_id: UUID, page: int = 1, per_page: int = 20):
+        """
+        Lista todos os portfolios de um usuário com paginação.
+        Apenas portfolios ativos são retornados por padrão.
+        """
+        try:
+            paginated_portfolios = Portfolio.query.filter_by(
+                usuario_id=usuario_id,
+                ativo=True
+            ).order_by(Portfolio.nome.asc()).paginate(
+                page=page, per_page=per_page, error_out=False
+            )
+            return paginated_portfolios
+        except Exception as e:
+            logger.error(f"Erro ao listar portfolios para usuario_id {usuario_id}: {e}")
+            raise
 
     @staticmethod
-    def obter_cotacao(ticker, mercado='BR'):
-        """Fallback otimizado por mercado"""
-        
-        # ============================================
-        # ATIVOS BRASIL (B3)
-        # ============================================
-        if mercado == 'BR':
-            
-            # 1️⃣ BRAPI.DEV (PRINCIPAL BR - mais rápido)
-            try:
-                logger.info(f"📡 [1/4 BR] brapi.dev para {ticker}")
-                url = CotacoesService._build_brapi_url(ticker)
-                resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+    def get_by_id(portfolio_id: UUID, usuario_id: UUID) -> Portfolio | None:
+        """
+        Busca um portfolio específico pelo seu ID, garantindo que ele pertença
+        ao usuário solicitante.
+        """
+        try:
+            return Portfolio.query.filter_by(id=portfolio_id, usuario_id=usuario_id).first()
+        except Exception as e:
+            logger.error(f"Erro ao buscar portfolio {portfolio_id} para usuario_id {usuario_id}: {e}")
+            raise
 
-                if resp.status_code == 200:
-                    data = resp.json()['results'][0]
-                    logger.info(f"✅ brapi.dev OK: {ticker}")
-                    return {
-                        'ticker': ticker,
-                        'preco_atual': float(data['regularMarketPrice']),
-                        'variacao_percentual': float(data['regularMarketChangePercent']),
-                        'volume': int(data['regularMarketVolume']),
-                        'dy_12m': round(float(data.get('dividendYield', 0)) * 100, 2),
-                        'pl': round(float(data.get('trailingPE', 0)), 2),
-                        'provider': 'brapi.dev',
-                        'success': True
-                    }
-            except Exception as e:
-                logger.warning(f"⚠️ brapi.dev falhou: {e}")
+    @staticmethod
+    def create(data: dict, usuario_id: UUID) -> Portfolio:
+        """
+        Cria um novo portfolio para o usuário.
+        Valida se já existe um portfolio com o mesmo nome para o mesmo usuário.
+        """
+        nome = data.get('nome')
+        if Portfolio.query.filter_by(usuario_id=usuario_id, nome=nome).first():
+            raise ValueError(f"Portfolio com nome '{nome}' já existe.")
 
-            # 2️⃣ HG FINANCE (BR específico)
-            if CotacoesService.HGFINANCE_KEY:
-                try:
-                    logger.info(f"📡 [2/4 BR] hgfinance para {ticker}")
-                    url = f"https://api.hgbrasil.com/finance/stock_price?key={CotacoesService.HGFINANCE_KEY}&symbol={ticker}"
-                    resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
-                    
-                    if resp.status_code == 200:
-                        data = resp.json()['results'][ticker]
-                        logger.info(f"✅ hgfinance OK: {ticker}")
-                        return {
-                            'ticker': ticker,
-                            'preco_atual': float(data['price']),
-                            'variacao_percentual': float(data['change_percent']),
-                            'volume': 0,
-                            'dy_12m': 0,
-                            'pl': 0,
-                            'provider': 'hgfinance',
-                            'success': True
-                        }
-                except Exception as e:
-                    logger.warning(f"⚠️ hgfinance falhou: {e}")
+        novo_portfolio = Portfolio(
+            usuario_id=usuario_id,
+            nome=nome,
+            descricao=data.get('descricao'),
+            objetivo=data.get('objetivo')
+        )
+        try:
+            db.session.add(novo_portfolio)
+            db.session.commit()
+            logger.info(f"Portfolio '{nome}' criado para usuario_id {usuario_id}.")
+            return novo_portfolio
+        except IntegrityError as e:
+            db.session.rollback()
+            logger.error(f"Erro de integridade ao criar portfolio: {e}")
+            raise ValueError("Erro ao salvar o portfolio. Verifique os dados.")
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Erro inesperado ao criar portfolio: {e}")
+            raise
 
-            # 3️⃣ YFINANCE (BR com .SA)
-            try:
-                logger.info(f"📡 [3/4 BR] yfinance para {ticker}")
-                import yfinance as yf
-                from requests.exceptions import Timeout
-                
-                stock = yf.Ticker(f'{ticker}.SA')
-                hist = stock.history(period='1d', timeout=CotacoesService.TIMEOUT)
-                
-                if not hist.empty:
-                    logger.info(f"✅ yfinance OK: {ticker}")
-                    return {
-                        'ticker': ticker,
-                        'preco_atual': float(hist['Close'].iloc[-1]),
-                        'variacao_percentual': 0,
-                        'volume': int(hist['Volume'].iloc[-1]),
-                        'dy_12m': 0,
-                        'pl': 0,
-                        'provider': 'yfinance',
-                        'success': True
-                    }
-            except Timeout:
-                logger.warning(f"⚠️ yfinance timeout 5s")
-            except Exception as e:
-                logger.warning(f"⚠️ yfinance falhou: {e}")
+    @staticmethod
+    def update(portfolio_id: UUID, data: dict, usuario_id: UUID) -> Portfolio | None:
+        """
+        Atualiza um portfolio existente.
+        Permite a atualização de nome, descrição e objetivo.
+        """
+        portfolio = PortfolioService.get_by_id(portfolio_id, usuario_id)
+        if not portfolio:
+            return None # Not found or doesn't belong to user
 
-            # 4️⃣ TWELVE DATA (Global backup)
-            if CotacoesService.TWELVE_KEY:
-                try:
-                    logger.info(f"📡 [4/4 BR] twelvedata para {ticker}")
-                    url = f"https://api.twelvedata.com/price?symbol={ticker}.SA&apikey={CotacoesService.TWELVE_KEY}"
-                    resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
-                    
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        if 'price' in data:
-                            logger.info(f"✅ twelvedata OK: {ticker}")
-                            return {
-                                'ticker': ticker,
-                                'preco_atual': float(data['price']),
-                                'variacao_percentual': 0,
-                                'volume': 0,
-                                'dy_12m': 0,
-                                'pl': 0,
-                                'provider': 'twelvedata',
-                                'success': True
-                            }
-                except Exception as e:
-                    logger.warning(f"⚠️ twelvedata falhou: {e}")
+        if 'nome' in data and data['nome'] != portfolio.nome:
+            if Portfolio.query.filter(
+                Portfolio.usuario_id == usuario_id,
+                Portfolio.nome == data['nome'],
+                Portfolio.id != portfolio_id
+            ).first():
+                raise ValueError(f"Portfolio com nome '{data['nome']}' já existe.")
+            portfolio.nome = data['nome']
 
-        # ============================================
-        # ATIVOS US/GLOBAL
-        # ============================================
-        else:
-            
-            # 1️⃣ FINNHUB (PRINCIPAL US - 60 req/min)
-            if CotacoesService.FINNHUB_KEY:
-                try:
-                    logger.info(f"📡 [1/4 US] finnhub para {ticker}")
-                    url = f"https://finnhub.io/api/v1/quote?symbol={ticker}&token={CotacoesService.FINNHUB_KEY}"
-                    resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+        if 'descricao' in data:
+            portfolio.descricao = data['descricao']
+        if 'objetivo' in data:
+            portfolio.objetivo = data['objetivo']
 
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        if data.get('c'):  # current price
-                            logger.info(f"✅ finnhub OK: {ticker} = ${data['c']}")
-                            return {
-                                'ticker': ticker,
-                                'preco_atual': float(data['c']),
-                                'variacao_percentual': float(data.get('dp', 0)),
-                                'volume': 0,
-                                'dy_12m': 0,
-                                'pl': 0,
-                                'provider': 'finnhub',
-                                'success': True
-                            }
-                except Exception as e:
-                    logger.warning(f"⚠️ finnhub falhou: {e}")
+        try:
+            db.session.commit()
+            logger.info(f"Portfolio {portfolio_id} atualizado para usuario_id {usuario_id}.")
+            return portfolio
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Erro ao atualizar portfolio {portfolio_id}: {e}")
+            raise
 
-            # 2️⃣ ALPHA VANTAGE (Confiável US)
-            try:
-                logger.info(f"📡 [2/4 US] alphavantage para {ticker}")
-                url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={CotacoesService.ALPHA_KEY}"
-                resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+    @staticmethod
+    def delete(portfolio_id: UUID, usuario_id: UUID) -> bool:
+        """
+        Realiza um 'soft delete' de um portfolio, marcando-o como inativo.
+        Retorna True se bem-sucedido, False caso contrário.
+        """
+        portfolio = PortfolioService.get_by_id(portfolio_id, usuario_id)
+        if not portfolio or not portfolio.ativo:
+            return False
 
-                if resp.status_code == 200:
-                    data = resp.json().get('Global Quote', {})
-                    if data and '05. price' in data:
-                        logger.info(f"✅ alphavantage OK: {ticker}")
-                        return {
-                            'ticker': ticker,
-                            'preco_atual': float(data['05. price']),
-                            'variacao_percentual': float(data.get('10. change percent', '0').replace('%', '')),
-                            'volume': int(data.get('06. volume', 0)),
-                            'dy_12m': 0,
-                            'pl': 0,
-                            'provider': 'alphavantage',
-                            'success': True
-                        }
-            except Exception as e:
-                logger.warning(f"⚠️ alphavantage falhou: {e}")
+        try:
+            portfolio.ativo = False
+            db.session.commit()
+            logger.info(f"Portfolio {portfolio_id} desativado (soft delete) para usuario_id {usuario_id}.")
+            return True
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Erro ao deletar portfolio {portfolio_id}: {e}")
+            raise
 
-            # 3️⃣ TWELVE DATA (Global)
-            if CotacoesService.TWELVE_KEY:
-                try:
-                    logger.info(f"📡 [3/4 US] twelvedata para {ticker}")
-                    url = f"https://api.twelvedata.com/price?symbol={ticker}&apikey={CotacoesService.TWELVE_KEY}"
-                    resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
-                    
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        if 'price' in data:
-                            logger.info(f"✅ twelvedata OK: {ticker}")
-                            return {
-                                'ticker': ticker,
-                                'preco_atual': float(data['price']),
-                                'variacao_percentual': 0,
-                                'volume': 0,
-                                'dy_12m': 0,
-                                'pl': 0,
-                                'provider': 'twelvedata',
-                                'success': True
-                            }
-                except Exception as e:
-                    logger.warning(f"⚠️ twelvedata falhou: {e}")
+    # --- MÉTODOS DE ANALYTICS (STUBS) ---
 
-            # 4️⃣ YFINANCE (Último recurso)
-            try:
-                logger.info(f"📡 [4/4 US] yfinance para {ticker}")
-                import yfinance as yf
-                from requests.exceptions import Timeout
-                
-                stock = yf.Ticker(ticker)
-                hist = stock.history(period='1d', timeout=CotacoesService.TIMEOUT)
-                
-                if not hist.empty:
-                    logger.info(f"✅ yfinance OK: {ticker}")
-                    return {
-                        'ticker': ticker,
-                        'preco_atual': float(hist['Close'].iloc[-1]),
-                        'variacao_percentual': 0,
-                        'volume': int(hist['Volume'].iloc[-1]),
-                        'dy_12m': 0,
-                        'pl': 0,
-                        'provider': 'yfinance',
-                        'success': True
-                    }
-            except Timeout:
-                logger.warning(f"⚠️ yfinance timeout 5s")
-            except Exception as e:
-                logger.warning(f"⚠️ yfinance falhou: {e}")
+    @staticmethod
+    def get_dashboard(usuario_id: UUID) -> dict:
+        logger.warning(f"Analytics (get_dashboard) para usuario {usuario_id} não implementado.")
+        return {"status": "Não implementado"}
 
-        # ❌ TODAS FALHARAM
-        logger.error(f"❌ Todos os 4 providers falharam para {ticker}")
-        return {'success': False, 'error': 'Todas APIs indisponíveis', 'ticker': ticker}
+    @staticmethod
+    def get_alocacao(usuario_id: UUID) -> dict:
+        logger.warning(f"Analytics (get_alocacao) para usuario {usuario_id} não implementado.")
+        return {"status": "Não implementado"}
+    
+    @staticmethod
+    def get_portfolio_metrics(usuario_id: UUID) -> dict:
+        """
+        Método de compatibilidade para o módulo de Cálculos (M4).
+        Retorna métricas vazias por enquanto.
+        """
+        logger.warning(f"Analytics (get_portfolio_metrics) para usuario {usuario_id} chamado (STUB).")
+        return {
+            "total_equity": 0.0,
+            "total_invested": 0.0,
+            "profit_loss": 0.0,
+            "profit_loss_pct": 0.0,
+            "volatility": 0.0,
+            "sharpe_ratio": 0.0
+        }

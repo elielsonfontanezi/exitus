@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
-"""Exitus Backend - Database Configuration"""
+"""Exitus - Database Configuration - SQLAlchemy + PostgreSQL"""
 
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 
-# Instâncias globais
+# Instância global do SQLAlchemy
 db = SQLAlchemy()
-migrate = Migrate()
-
 
 def init_db(app):
-    """Inicializa o banco de dados com a aplicação Flask"""
+    """
+    Inicializa o banco de dados com a aplicação Flask.
+
+    Args:
+        app: Instância Flask
+    """
     db.init_app(app)
-    migrate.init_app(app, db)
-    
+
+    # Importar models DEPOIS de db.init_app para evitar circular imports
     with app.app_context():
-        # Importa todos os models (apenas quando existirem)
-        # COMENTADO até criarmos os models na Fase 2
-        # from app.models import (
-        #     usuario, corretora, ativo, posicao, transacao,
-        #     provento, movimentacao_caixa, evento_corporativo,
-        #     fonte_dados, regra_fiscal, feriado_mercado, log_auditoria
-        # )
-        pass
-    
-    return db
+        # Import APENAS do pacote - o __init__.py já importa todos os models
+        # na ordem correta para resolver foreign keys
+        import app.models
+
+        # Criar todas as tabelas
+        # db.create_all() # DESABILITADO - tabelas já existem
+        print("✅ Banco de dados inicializado e tabelas criadas!")

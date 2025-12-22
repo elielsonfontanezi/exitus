@@ -116,22 +116,16 @@ def delete_portfolio(portfolio_id: UUID):
 
 @portfolio_bp.route('/dashboard', methods=['GET'])
 @jwt_required()
-def get_dashboard_data():
-    current_user_id = UUID(get_jwt_identity())
-    try:
-        # Chama a nova lógica implementada
-        dash_data = PortfolioService.get_dashboard(current_user_id)
-        return jsonify(dash_data), 200
-    except Exception as e:
-        return jsonify({"message": f"Erro ao gerar dashboard: {str(e)}"}), 500
+def dashboard():
+    """(STUB) Retorna dashboard completo do portfólio."""
+    usuario_id = UUID(get_jwt_identity())
+    dados = PortfolioService.get_dashboard(usuario_id)
+    return jsonify(dados), 200
 
 @portfolio_bp.route('/alocacao', methods=['GET'])
 @jwt_required()
-def get_alocacao_data():
-    current_user_id = UUID(get_jwt_identity())
-    try:
-        alloc_data = PortfolioService.get_alocacao(current_user_id)
-        return jsonify(alloc_data), 200
-    except Exception as e:
-        return jsonify({"message": f"Erro ao gerar alocação: {str(e)}"}), 500
-
+def alocacao():
+    """(STUB) Retorna alocação do portfólio por classe de ativo."""
+    usuario_id = UUID(get_jwt_identity())
+    dados = PortfolioService.get_alocacao(usuario_id)
+    return jsonify(dados), 200
