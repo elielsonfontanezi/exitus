@@ -744,6 +744,55 @@ def alerts_edit(alert_id):
     return redirect(url_for('dashboard.alerts'))
 
 
+@bp.route('/alerts/create', methods=['POST'])
+@login_required
+def alerts_create():
+    """M7.3 - Criar novo alerta (POST)"""
+    try:
+        # Capturar dados do formulário
+        nome = request.form.get('nome')
+        tipoalerta = request.form.get('tipoalerta')
+        ticker = request.form.get('ticker') or None  # Pode ser vazio
+        condicaooperador = request.form.get('condicaooperador')
+        condicaovalor = float(request.form.get('condicaovalor'))
+        condicaovalor2 = request.form.get('condicaovalor2')
+        condicaovalor2 = float(condicaovalor2) if condicaovalor2 else None
+        frequencianotificacao = request.form.get('frequencianotificacao')
+        
+        # Capturar checkboxes múltiplos (canais)
+        canais = request.form.getlist('canais')
+        ativo = bool(request.form.get('ativo'))  # Toggle
+        
+        # Validação básica
+        if not nome or len(nome) < 5:
+            flash('Nome do alerta deve ter ao menos 5 caracteres', 'error')
+            return redirect(url_for('dashboard.alerts'))
+        if not canais:
+            flash('Selecione ao menos um canal de entrega', 'error')
+            return redirect(url_for('dashboard.alerts'))
+        
+        # TODO: Integração com API backend (POST /api/alertas)
+        flash(f'Alerta "{nome}" criado com sucesso! (Mock - M7.3)', 'success')
+        
+        print(f"M7.3 Alerta criado:")
+        print(f"  Nome: {nome}")
+        print(f"  Tipo: {tipoalerta}")
+        print(f"  Ticker: {ticker or 'Portfolio Geral'}")
+        print(f"  Condição: {condicaooperador} {condicaovalor} {'e ' + str(condicaovalor2) if condicaovalor2 else ''}")
+        print(f"  Frequência: {frequencianotificacao}")
+        print(f"  Canais: {', '.join(canais)}")
+        print(f"  Ativo: {'Sim' if ativo else 'Não'}")
+        
+    except ValueError as e:
+        flash(f'Erro nos valores numéricos: {str(e)}', 'error')
+    except Exception as e:
+        flash(f'Erro ao criar alerta: {str(e)}', 'error')
+        print(f"ERROR: {e}")
+    
+    return redirect(url_for('dashboard.alerts'))
+
+
+
 # ========================================
 # PLACEHOLDERS M7
 # ========================================
