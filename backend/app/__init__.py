@@ -2,7 +2,7 @@
 """
 Exitus Backend M4 - Application Factory
 Sistema de Gestão e Análise de Investimentos
-Módulos: M2 (API REST) + M3 (Portfolio) + M4 (Buy Signals + Fiscais) + M7.5 (Cotações)
+Módulos: M2 (API REST) + M3 (Portfolio) + M4 (Buy Signals + Fiscais) + M7.4 (Alertas) + M7.5 (Cotações)
 """
 from flask import Flask
 from flask.json.provider import DefaultJSONProvider
@@ -71,7 +71,7 @@ def create_app(testing=False):
             "env": app.config.get('FLASK_ENV', 'development'),
             "service": "exitus-backend",
             "status": "ok",
-            "module": "M4 - Buy Signals + Fiscais + Portfolio ✅"
+            "module": "M4 - Buy Signals + Fiscais + Portfolio + Alertas ✅"
         }
 
     # ============================================
@@ -108,7 +108,6 @@ def create_app(testing=False):
     app.register_blueprint(evento_bp)
 
     # 🆕 Portfolio consolidado (M7)
-    # CORREÇÃO: Apontando para o novo caminho 'portfolio.blueprint'
     try:
         from .blueprints.portfolio.blueprint import portfolio_bp
         app.register_blueprint(portfolio_bp)
@@ -161,6 +160,16 @@ def create_app(testing=False):
         print(f"⚠️  Buy Signals blueprint não encontrado: {e}")
 
     # ============================================
+    # M7.4 - ALERTAS (NOVO!)
+    # ============================================
+    try:
+        from .blueprints.alertas import bp as alertas_bp
+        app.register_blueprint(alertas_bp)
+        print("✅ Alertas blueprint registrado: /api/alertas")
+    except ImportError as e:
+        print(f"⚠️  Alertas blueprint não encontrado: {e}")
+
+    # ============================================
     # M7.5 - COTAÇÕES EM TEMPO REAL
     # ============================================
     try:
@@ -171,17 +180,11 @@ def create_app(testing=False):
         print(f"⚠️  Cotações blueprint não encontrado: {e}")
 
     # ============================================
-    # M7 - RELATÓRIOS E ANÁLISES (Opcional/Legacy)
+    # M7 - RELATÓRIOS E ANÁLISES (Legacy - Opcional)
     # ============================================
     try:
         from .blueprints.relatorios_blueprint import relatorios_bp
         app.register_blueprint(relatorios_bp)
-    except ImportError:
-        pass
-
-    try:
-        from .blueprints.alertas_blueprint import alertas_bp
-        app.register_blueprint(alertas_bp)
     except ImportError:
         pass
 
@@ -215,6 +218,9 @@ def create_app(testing=False):
     print("")
     print("✅ M4 - Buy Signals + Fiscais (5 blueprints):")
     print("   - feriados, fontes, regras-fiscais, calculos, buy-signals")
+    print("")
+    print("✅ M7.4 - Alertas (1 blueprint):")
+    print("   - alertas")
     print("")
     print("✅ M7.5 - Cotações (1 blueprint):")
     print("   - cotacoes")
