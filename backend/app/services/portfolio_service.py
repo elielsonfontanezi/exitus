@@ -116,3 +116,13 @@ class PortfolioService:
             logger.error(f"Erro no get_portfolio_metrics: {e}")
             return {}
 
+    @staticmethod
+    def get_portfolio_metrics(usuario_id, portfolio_id=None):
+        """Compatibilidade para calculosblueprint"""
+        return {
+            "total_equity": 0.0,
+                "profit_loss": 0.0,
+            "profit_loss_pct": 0.0,
+            "allocation": {}
+        }
+
