@@ -23,7 +23,50 @@ def login_required(f):
 @bp.route('/', methods=['GET'])
 @login_required
 def index():
-    return render_template('dashboard/index.html')
+    """Dashboard Principal (Home) - Integrado M7"""
+    token = session.get('access_token')
+    
+    # Estrutura padrão (zerada) para evitar erros no template
+    dados = {
+        "patrimonio_total": 0.0,
+        "rentabilidade_geral": 0.0,
+        "total_portfolios": 0,
+        "total_ativos": 0,
+        "alocacao": {},
+        "evolucao": [],
+        "ultimas_transacoes": []
+    }
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            
+            # 1. Buscar resumo do dashboard (API Unificada M7)
+            # Se não tivermos endpoint unificado, chamamos individuais
+            
+            # Chamada A: Resumo Portfolio
+            resp_dash = requests.get(f'{Config.BACKEND_API_URL}/api/portfolios/dashboard', headers=headers, timeout=5)
+            if resp_dash.status_code == 200:
+                data = resp_dash.json().get('data', {})
+                resumo = data.get('resumo', {})
+                dados.update({
+                    "patrimonio_total": resumo.get('patrimonio_total', 0.0),
+                    "rentabilidade_geral": resumo.get('rentabilidade_geral', 0.0),
+                    "total_portfolios": resumo.get('total_portfolios', 0),
+                    "total_ativos": resumo.get('total_posicoes', 0) # ou ativos monitorados
+                })
+
+            # Chamada B: Últimas Transações (Opcional por enquanto)
+            # resp_tx = requests.get(f'{Config.BACKEND_API_URL}/api/transacoes', headers=headers, params={'per_page': 5})
+            # if resp_tx.status_code == 200:
+            #     dados['ultimas_transacoes'] = resp_tx.json().get('data', [])
+
+        except Exception as e:
+            print(f"Erro no dashboard home: {e}")
+            # Flash opcional, pode ser irritante na home
+            
+    return render_template('dashboard/index.html', dados=dados)
+
 
 # --- Rotas Restauradas do Módulo 6 ---
 @bp.route('/buy-signals')
@@ -143,10 +186,83 @@ def _render_portfolios_mock(backend_status="mock"):
     )
 
 # --- DEMAIS ROTAS (assets, transactions, etc.) permanecem iguais ---
+# ... imports ...
+
 @bp.route('/assets')
 @login_required
 def assets():
-    return render_template('dashboard/assets.html')
+    """M7 - Dashboard Ativos integrado com Backend API"""
+    token = session.get('access_token')
+    
+    # Estrutura padrão para template
+    ativos = []
+    stats = {
+        "total": 0,
+        "acoes": 0,
+        "fiis": 0,
+        "bdrs": 0,
+        "etfs": 0
+    }
+    
+    # Filtros da URL
+    tipo_filtro = request.args.get('tipo', 'todos')
+    setor_filtro = request.args.get('setor', '')
+    
+    if token:
+        try:
+            # 1. Configurar headers e params
+            headers = {'Authorization': f'Bearer {token}'}
+            params = {'page': request.args.get('page', 1), 'per_page': 50}
+            
+            # Se tiver filtro de tipo específico no backend, adicionar aqui
+            # params['tipo'] = tipo_filtro if tipo_filtro != 'todos' else None
+
+            # 2. Chamada ao Backend API
+            response = requests.get(
+                f'{Config.BACKEND_API_URL}/api/ativos/',
+                headers=headers,
+                params=params,
+                timeout=5
+            )
+            
+            if response.status_code == 200:
+                payload = response.json()
+                # A API retorna paginado: {"data": [...], "total": X, ...}
+                ativos_raw = payload.get('data', [])
+                
+                # 3. Processar dados para o template
+                for item in ativos_raw:
+                    # Garantir campos seguros
+                    ativos.append({
+                        "id": item.get('id'),
+                        "ticker": item.get('ticker'),
+                        "nome": item.get('nome') or item.get('ticker'),
+                        "tipo": item.get('tipo', 'OUTROS'),
+                        "setor": item.get('setor', 'N/A'),
+                        "cotacao": item.get('cotacao_atual', 0.0)
+                    })
+                
+                # Calcular stats locais (ou pegar do backend se houver endpoint de stats)
+                stats["total"] = payload.get('total', len(ativos))
+                stats["acoes"] = len([a for a in ativos if a['tipo'] == 'ACAO'])
+                stats["fiis"] = len([a for a in ativos if a['tipo'] == 'FII'])
+                stats["bdrs"] = len([a for a in ativos if a['tipo'] == 'BDR'])
+                stats["etfs"] = len([a for a in ativos if a['tipo'] == 'ETF'])
+
+        except Exception as e:
+            print(f"Erro ao buscar ativos: {e}")
+            flash('Não foi possível carregar a lista de ativos.', 'error')
+
+    return render_template(
+        'dashboard/assets.html',
+        ativos=ativos,
+        stats=stats,
+        filtros={
+            "tipo": tipo_filtro,
+            "setor": setor_filtro
+        }
+    )
+
 
 @bp.route('/transactions')
 @login_required
