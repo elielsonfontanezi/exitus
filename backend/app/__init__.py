@@ -108,12 +108,18 @@ def create_app(testing=False):
     app.register_blueprint(evento_bp)
 
     # 🆕 Portfolio consolidado (M7)
+    # 🆕 Portfolio consolidado (M7)
     try:
-        from .blueprints.portfolio.blueprint import portfolio_bp
+        # CORREÇÃO: Ponto no início (.) e importando 'bp' como 'portfolio_bp'
+        from .blueprints.portfolio import bp as portfolio_bp
         app.register_blueprint(portfolio_bp)
+
         print("✅ Portfolio blueprint registrado: /api/portfolios")
     except ImportError as e:
         print(f"⚠️  Portfolio blueprint não encontrado: {e}")
+    except Exception as e:
+        print(f"⚠️  Erro genérico ao registrar Portfolio: {e}")
+
 
     # ============================================
     # M4 - BUY SIGNALS + FERIADOS/FONTES/REGRAS/CÁLCULOS
