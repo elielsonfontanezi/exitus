@@ -166,23 +166,26 @@ class AlertaService:
     @staticmethod
     def criar_alerta(usuario_id: UUID, dados: Dict) -> Dict:
         if not dados.get('nome'): raise ValueError("Nome obrigatório")
-        if not dados.get('tipo_alerta'): raise ValueError("Tipo obrigatório")
-        if 'condicao_valor' not in dados: raise ValueError("Valor obrigatório")
-
-        operador = dados.get('condicao_operador', 'MAIOR')
+        
+        # Tratamento de Enum (Garante minúsculo se string)
         tipo_alerta = dados['tipo_alerta']
-        if hasattr(tipo_alerta, 'value'): tipo_alerta = tipo_alerta.value
+        if isinstance(tipo_alerta, str):
+            tipo_alerta = tipo_alerta.lower()
+        
+        freq = dados.get('frequencia_notificacao', 'imediata')
+        if isinstance(freq, str):
+            freq = freq.lower()
 
         alerta = ConfiguracaoAlerta(
             usuario_id=usuario_id,
             nome=dados['nome'],
-            tipo_alerta=tipo_alerta,
+            tipo_alerta=tipo_alerta, # Agora passa 'alta_preco'
             condicao_valor=Decimal(str(dados['condicao_valor'])),
-            condicao_operador=operador,
+            condicao_operador=dados.get('condicao_operador', '>'),
             condicao_valor2=Decimal(str(dados['condicao_valor2'])) if dados.get('condicao_valor2') else None,
             ativo_id=dados.get('ativo_id'),
             portfolio_id=dados.get('portfolio_id'),
-            frequencia_notificacao=dados.get('frequencia_notificacao', 'IMEDIATA'),
+            frequencia_notificacao=freq,
             canais_entrega=dados.get('canais_entrega', ['email', 'webapp']),
             ativo=True
         )
@@ -190,6 +193,7 @@ class AlertaService:
         db.session.commit()
         db.session.refresh(alerta)
         return alerta.to_dict()
+
         
     @staticmethod
     def atualizar_alerta(usuario_id: UUID, alerta_id: UUID, dados: Dict) -> Dict:
