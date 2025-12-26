@@ -1,0 +1,57 @@
+"""M7.4 - Model Alerta SQLAlchemy"""
+from sqlalchemy import Column, String, Boolean, Numeric, Integer, DateTime, ForeignKey, JSON
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.sql import func
+from ..database import db
+import uuid
+from datetime import datetime
+
+class Alerta(db.Model):
+    __tablename__ = 'alertas'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuarios.id'), nullable=False, index=True)
+    
+    # Configuração do Alerta
+    nome = Column(String(100), nullable=False, index=True)
+    tipo_alerta = Column(String(50), nullable=False, index=True)  # ALTA_PRECO, QUEDA_PRECO, etc
+    ticker = Column(String(20), nullable=True)  # NULL = portfolio geral
+    
+    # Condição
+    condicao_operador = Column(String(10), nullable=False)  # >, <, >=, <=, ==, ENTRE
+    condicao_valor = Column(Numeric(18, 4), nullable=False)
+    condicao_valor2 = Column(Numeric(18, 4), nullable=True)  # Para ENTRE
+    
+    # Configurações
+    ativo = Column(Boolean, default=True, nullable=False)
+    frequencia_notificacao = Column(String(20), nullable=False)  # IMEDIATA, DIARIA, etc
+    canais_entrega = Column(JSON, nullable=False, default=list)  # ["WEBAPP", "EMAIL"]
+    
+    # Métricas
+    total_acionamentos = Column(Integer, default=0)
+    timestamp_ultimo_acionamento = Column(DateTime, nullable=True)
+    
+    # Audit
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    def __repr__(self):
+        return f'<Alerta {self.nome} - {self.ticker}>'
+
+    def to_dict(self):
+        return {
+            'id': str(self.id),
+            'nome': self.nome,
+            'tipo_alerta': self.tipo_alerta,
+            'ticker': self.ticker,
+            'condicao_operador': self.condicao_operador,
+            'condicao_valor': float(self.condicao_valor),
+            'condicao_valor2': float(self.condicao_valor2) if self.condicao_valor2 else None,
+            'ativo': self.ativo,
+            'frequencia_notificacao': self.frequencia_notificacao,
+            'canais_entrega': self.canais_entrega,
+            'total_acionamentos': self.total_acionamentos,
+            'timestamp_ultimo_acionamento': self.timestamp_ultimo_acionamento.isoformat() if self.timestamp_ultimo_acionamento else None,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }

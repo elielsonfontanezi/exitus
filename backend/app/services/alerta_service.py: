@@ -1,7 +1,7 @@
 # backend/app/services/alerta_service.py
 # -*- coding: utf-8 -*-
 """
-Exitus - AlertaService (M7.2) - VERSÃO FINAL ESTÁVEL
+Exitus - AlertaService (M7.2) - VERSÃO LIMPA E FINAL
 """
 from decimal import Decimal
 from typing import Dict, List, Optional
@@ -20,13 +20,8 @@ class AlertaService:
             query = query.filter(ConfiguracaoAlerta.ativo_id == ativo_id)
 
         if apenas_ativos:
-            # Tenta filtrar pela coluna booleana 'ativo'
-            # Se o model tiver conflito (relacionamento com mesmo nome), isso pode falhar.
-            # O try/except garante que a listagem funcione mesmo assim.
-            try:
-                query = query.filter(ConfiguracaoAlerta.ativo.is_(True))
-            except:
-                pass # Se der erro no filtro, retorna todos (menos grave que crashar)
+            # Assume que o model foi corrigido e 'ativo' é a coluna booleana
+            query = query.filter(ConfiguracaoAlerta.ativo.is_(True))
 
         alertas = query.order_by(ConfiguracaoAlerta.timestamp_criacao.desc()).all()
         return [a.to_dict() for a in alertas]
@@ -36,30 +31,12 @@ class AlertaService:
         """
         Verifica todos os alertas ativos do usuário e retorna os disparados.
         """
-        # 1. Busca os alertas de forma segura contra conflitos de nome no Model
-        try:
-            # Tenta via ORM padrão
-            alertas = ConfiguracaoAlerta.query.filter(
-                and_(
-                    ConfiguracaoAlerta.usuario_id == usuario_id,
-                    ConfiguracaoAlerta.ativo.is_(True)
-                )
-            ).all()
-        except Exception:
-            # Fallback: Se der erro de Ambiguidade ou Coluna, busca todos e filtra no Python
-            # Isso contorna o problema do 'text' e do 'AmbiguousColumn' definitivamente
-            todos = ConfiguracaoAlerta.query.filter_by(usuario_id=usuario_id).all()
-            # Filtra manualmente checando se o atributo 'ativo' é True (bool)
-            alertas = []
-            for a in todos:
-                # Se 'ativo' for o relacionamento (objeto), ele não é True/False simples
-                # Verificamos se existe um campo alternativo ou assumimos True
-                val = getattr(a, 'ativo', True)
-                if isinstance(val, bool) and val:
-                    alertas.append(a)
-                elif not isinstance(val, bool):
-                    # Se não é bool (é o relacionamento), consideramos o alerta ativo por segurança
-                    alertas.append(a)
+        alertas = ConfiguracaoAlerta.query.filter(
+            and_(
+                ConfiguracaoAlerta.usuario_id == usuario_id,
+                ConfiguracaoAlerta.ativo.is_(True)
+            )
+        ).all()
 
         disparados = []
         
@@ -79,15 +56,17 @@ class AlertaService:
                     
                     # 1. Alertas de Preço
                     if tipo in ['QUEDA_PRECO', 'ALTA_PRECO'] and alerta.ativo_id:
-                         # Tenta acessar relacionamento (ativo_rel ou ativo)
-                         # Prioriza 'ativo_rel' (fix do model), depois 'ativo' (model antigo)
-                         ativo_obj = getattr(alerta, 'ativo_rel', getattr(alerta, 'ativo', None))
-                         
-                         # Se ativo_obj for booleano ou None (falha no relacionamento), busca manual no DB
-                         if isinstance(ativo_obj, bool) or ativo_obj is None:
-                             ativo_obj = Ativo.query.get(alerta.ativo_id)
+                         # Tenta acessar relacionamento renomeado (ativo_rel) ou busca manual
+                         # Verifica se o atributo existe, senão busca no banco
+                         if hasattr(alerta, 'ativo_rel'):
+                            ativo_obj = alerta.ativo_rel
+                         elif hasattr(alerta, 'ativo') and not isinstance(alerta.ativo, bool): 
+                            # Caso o rename falhou e ainda é relacionamento
+                            ativo_obj = alerta.ativo
+                         else:
+                            ativo_obj = Ativo.query.get(alerta.ativo_id)
 
-                         if hasattr(ativo_obj, 'preco_atual') and ativo_obj.preco_atual:
+                         if ativo_obj and ativo_obj.preco_atual:
                              valor_atual = ativo_obj.preco_atual
                              trigger = AlertaService.validar_condicao(alerta, valor_atual)
                              
@@ -166,26 +145,23 @@ class AlertaService:
     @staticmethod
     def criar_alerta(usuario_id: UUID, dados: Dict) -> Dict:
         if not dados.get('nome'): raise ValueError("Nome obrigatório")
-        
-        # Tratamento de Enum (Garante minúsculo se string)
+        if not dados.get('tipo_alerta'): raise ValueError("Tipo obrigatório")
+        if 'condicao_valor' not in dados: raise ValueError("Valor obrigatório")
+
+        operador = dados.get('condicao_operador', 'MAIOR')
         tipo_alerta = dados['tipo_alerta']
-        if isinstance(tipo_alerta, str):
-            tipo_alerta = tipo_alerta.lower()
-        
-        freq = dados.get('frequencia_notificacao', 'imediata')
-        if isinstance(freq, str):
-            freq = freq.lower()
+        if hasattr(tipo_alerta, 'value'): tipo_alerta = tipo_alerta.value
 
         alerta = ConfiguracaoAlerta(
             usuario_id=usuario_id,
             nome=dados['nome'],
-            tipo_alerta=tipo_alerta, # Agora passa 'alta_preco'
+            tipo_alerta=tipo_alerta,
             condicao_valor=Decimal(str(dados['condicao_valor'])),
-            condicao_operador=dados.get('condicao_operador', '>'),
+            condicao_operador=operador,
             condicao_valor2=Decimal(str(dados['condicao_valor2'])) if dados.get('condicao_valor2') else None,
             ativo_id=dados.get('ativo_id'),
             portfolio_id=dados.get('portfolio_id'),
-            frequencia_notificacao=freq,
+            frequencia_notificacao=dados.get('frequencia_notificacao', 'IMEDIATA'),
             canais_entrega=dados.get('canais_entrega', ['email', 'webapp']),
             ativo=True
         )
@@ -193,7 +169,6 @@ class AlertaService:
         db.session.commit()
         db.session.refresh(alerta)
         return alerta.to_dict()
-
         
     @staticmethod
     def atualizar_alerta(usuario_id: UUID, alerta_id: UUID, dados: Dict) -> Dict:
@@ -210,9 +185,7 @@ class AlertaService:
             if campo in ['nome', 'tipo_alerta', 'frequencia_notificacao']:
                 setattr(alerta, campo, valor)
             elif campo == 'ativo':
-                try:
-                    setattr(alerta, campo, bool(valor))
-                except: pass
+                setattr(alerta, campo, bool(valor))
             elif campo in ['condicao_valor', 'condicao_valor2']:
                 setattr(alerta, campo, Decimal(str(valor)) if valor else None)
 
@@ -236,8 +209,10 @@ class AlertaService:
     
     @staticmethod
     def testar_alerta(usuario_id: UUID, alerta_id: UUID) -> Dict:
+        # Método stub para manter compatibilidade com blueprint
         return {"status": "ok", "message": "Testado"}
         
     @staticmethod
     def obter_historico_acionamentos(usuario_id: UUID, limite: int = 20) -> List[Dict]:
+        # Método stub
         return []

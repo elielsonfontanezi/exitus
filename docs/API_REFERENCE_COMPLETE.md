@@ -10,13 +10,8 @@
 
 ## 📋 ROTAS DISPONÍVEIS
 
-@alertas_bp.route("/criar", methods=["POST"])
-@alertas_bp.route("/historico", methods=["GET"])
-@alertas_bp.route("/lista", methods=["GET"])
-@alertas_bp.route("/<string:alerta_id>", methods=["DELETE"])
-@alertas_bp.route("/<string:alerta_id>", methods=["GET"])
-@alertas_bp.route("/<string:alerta_id>", methods=["PUT"])
-@alertas_bp.route("/<string:alerta_id>/test", methods=["POST"])
+[alertas] 'GET' /
+[alertas] 'POST' /verificar
 [buy_signals] 'GET' /buy-score/<string:ticker>
 [buy_signals] 'GET' /margem-seguranca/<string:ticker>
 [buy_signals] 'GET' /watchlist-top

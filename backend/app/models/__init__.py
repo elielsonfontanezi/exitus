@@ -16,7 +16,7 @@ from .provento import Provento, TipoProvento
 from .movimentacao_caixa import MovimentacaoCaixa, TipoMovimentacao
 from .evento_corporativo import EventoCorporativo
 
-# Módulo 4 - Dados de Suporte  
+# Módulo 4 - Dados de Suporte
 from .feriado_mercado import FeriadoMercado
 from .fonte_dados import FonteDados
 from .regra_fiscal import RegraFiscal
@@ -36,6 +36,7 @@ from .auditoria_relatorio import AuditoriaRelatorio
 from .configuracao_alerta import ConfiguracaoAlerta
 from .projecao_renda import ProjecaoRenda
 from .relatorio_performance import RelatorioPerformance
+from .portfolio import Portfolio
 
 __all__ = [
     # Core
@@ -48,7 +49,7 @@ __all__ = [
     "ClasseAtivo",
     "Transacao",
     "TipoTransacao",
-    
+
     # Entidades Financeiras
     "Posicao",
     "Provento",
@@ -56,14 +57,14 @@ __all__ = [
     "MovimentacaoCaixa",
     "TipoMovimentacao",
     "EventoCorporativo",
-    
+
     # Dados de Suporte
     "FeriadoMercado",
     "FonteDados",
     "RegraFiscal",
     "LogAuditoria",
     "ParametrosMacro",
-    
+
     # Módulo 7 - Enums
     "TipoRelatorio",
     "FormatoExport",
@@ -71,10 +72,11 @@ __all__ = [
     "OperadorCondicao",
     "FrequenciaNotificacao",
     "CanalEntrega",
-    
+
     # Módulo 7 - Models
     "AuditoriaRelatorio",
     "ConfiguracaoAlerta",
     "ProjecaoRenda",
     "RelatorioPerformance",
+    "Portfolio",
 ]

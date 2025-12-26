@@ -78,3 +78,7 @@ echo "  podman logs -f exitus-frontend        # Ver logs em tempo real"
 echo "  podman exec -it exitus-frontend bash  # Acessar container"
 echo "  podman restart exitus-frontend        # Restart rápido"
 echo ""
+
+sleep 10
+
+podman logs --tail 30 exitus-frontend

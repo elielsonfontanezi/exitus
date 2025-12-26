@@ -16,7 +16,7 @@ from .enums_m7 import TipoAlerta, OperadorCondicao, FrequenciaNotificacao, Canal
 class ConfiguracaoAlerta(db.Model):
     """
     Model para configuração de alertas personalizados
-
+    
     Attributes:
         id (UUID): Identificador único
         usuario_id (UUID): ID do usuário proprietário
@@ -34,15 +34,15 @@ class ConfiguracaoAlerta(db.Model):
         timestamp_ultimo_acionamento (datetime): Última vez que foi acionado
         created_at (datetime): Data de criação do registro
         updated_at (datetime): Data da última atualização
-
+    
     Relationships:
         usuario: Usuário proprietário
         ativo: Ativo relacionado (opcional)
         portfolio: Portfolio relacionado (opcional)
     """
-
+    
     __tablename__ = "configuracoes_alertas"
-
+    
     # Chave primária
     id = Column(
         UUID(as_uuid=True),
@@ -50,7 +50,7 @@ class ConfiguracaoAlerta(db.Model):
         default=uuid.uuid4,
         comment="Identificador único do alerta"
     )
-
+    
     # Foreign keys
     usuario_id = Column(
         UUID(as_uuid=True),
@@ -59,7 +59,7 @@ class ConfiguracaoAlerta(db.Model):
         index=True,
         comment="ID do usuário proprietário"
     )
-
+    
     ativo_id = Column(
         UUID(as_uuid=True),
         ForeignKey('ativo.id', ondelete='CASCADE'),
@@ -67,7 +67,7 @@ class ConfiguracaoAlerta(db.Model):
         index=True,
         comment="ID do ativo (opcional)"
     )
-
+    
     portfolio_id = Column(
         UUID(as_uuid=True),
         ForeignKey('portfolio.id', ondelete='CASCADE'),
@@ -75,43 +75,41 @@ class ConfiguracaoAlerta(db.Model):
         index=True,
         comment="ID do portfolio (opcional)"
     )
-
+    
     # Dados do alerta
     nome = Column(
         String(200),
         nullable=False,
         comment="Nome descritivo do alerta (ex: 'Alerta PETR4 > 30%')"
     )
-
+    
     tipo_alerta = Column(
-#        Enum(TipoAlerta),
-        Enum(TipoAlerta, values_callable=lambda x: [e.value for e in x]),
+        Enum(TipoAlerta),
         nullable=False,
         index=True,
         comment="Tipo do alerta"
     )
-
+    
     # Condições
     condicao_valor = Column(
         Numeric(18, 6),
         nullable=False,
         comment="Valor threshold da condição"
     )
-
+    
     condicao_operador = Column(
-#        Enum(OperadorCondicao),
-        Enum(OperadorCondicao, values_callable=lambda x: [e.value for e in x]),
+        Enum(OperadorCondicao),
         nullable=False,
         default=OperadorCondicao.MAIOR,
         comment="Operador de comparação (>, <, ==, >=, <=, ENTRE)"
     )
-
+    
     condicao_valor2 = Column(
         Numeric(18, 6),
         nullable=True,
         comment="Segundo valor (usado quando operador é ENTRE)"
     )
-
+    
     # Status e configurações
     ativo = Column(
         Boolean,
@@ -120,22 +118,21 @@ class ConfiguracaoAlerta(db.Model):
         index=True,
         comment="Indica se o alerta está ativo"
     )
-
+    
     frequencia_notificacao = Column(
-#        Enum(FrequenciaNotificacao),
-        Enum(FrequenciaNotificacao, values_callable=lambda x: [e.value for e in x]),
+        Enum(FrequenciaNotificacao),
         nullable=False,
         default=FrequenciaNotificacao.IMEDIATA,
         comment="Frequência de notificação"
     )
-
+    
     canais_entrega = Column(
         ARRAY(String),
         nullable=False,
         default=['email', 'webapp'],
         comment="Canais de entrega (email, webapp, sms, telegram)"
     )
-
+    
     # Timestamps
     timestamp_criacao = Column(
         DateTime(timezone=True),
@@ -144,21 +141,21 @@ class ConfiguracaoAlerta(db.Model):
         index=True,
         comment="Data de criação do alerta"
     )
-
+    
     timestamp_ultimo_acionamento = Column(
         DateTime(timezone=True),
         nullable=True,
         index=True,
         comment="Data do último acionamento (null se nunca acionado)"
     )
-
+    
     created_at = Column(
         DateTime(timezone=True),
         default=datetime.utcnow,
         nullable=False,
         comment="Data de criação do registro"
     )
-
+    
     updated_at = Column(
         DateTime(timezone=True),
         default=datetime.utcnow,
@@ -166,13 +163,12 @@ class ConfiguracaoAlerta(db.Model):
         nullable=False,
         comment="Data da última atualização"
     )
-
+    
     # Relacionamentos
     usuario = relationship("Usuario", backref="alertas", lazy="joined")
-#    ativo = relationship("Ativo", backref="alertas", lazy="joined")
-    ativo_rel = relationship("Ativo", backref="alertas", lazy="joined")
-    portfolio = relationship("Portfolio", back_populates="alertas", lazy="joined")  # ✅ DESCOMENTADO
-
+    ativo = relationship("Ativo", backref="alertas", lazy="joined")
+    # portfolio = relationship("Portfolio", backref="alertas", lazy="joined")  # Descomentar quando Portfolio existir
+    
     # Constraints de tabela
     __table_args__ = (
         db.CheckConstraint(
@@ -185,36 +181,36 @@ class ConfiguracaoAlerta(db.Model):
         ),
         {"comment": "Tabela de configurações de alertas"}
     )
-
+    
     def foi_acionado(self):
         """Verifica se o alerta já foi acionado alguma vez"""
         return self.timestamp_ultimo_acionamento is not None
-
+    
     def marcar_acionamento(self):
         """Marca o alerta como acionado agora"""
         self.timestamp_ultimo_acionamento = datetime.utcnow()
-
+    
     def tempo_desde_ultimo_acionamento(self):
         """Retorna tempo desde último acionamento em segundos"""
         if self.timestamp_ultimo_acionamento:
             return (datetime.utcnow() - self.timestamp_ultimo_acionamento).total_seconds()
         return None
-
+    
     def verificar_condicao(self, valor_atual):
         """
         Verifica se a condição do alerta foi satisfeita
-
+        
         Args:
             valor_atual (Decimal): Valor atual para comparação
-
+            
         Returns:
             bool: True se condição satisfeita, False caso contrário
         """
         if not self.ativo:
             return False
-
+        
         operador = self.condicao_operador
-
+        
         if operador == OperadorCondicao.MAIOR:
             return valor_atual > self.condicao_valor
         elif operador == OperadorCondicao.MENOR:
@@ -229,9 +225,9 @@ class ConfiguracaoAlerta(db.Model):
             if self.condicao_valor2 is None:
                 return False
             return self.condicao_valor <= valor_atual <= self.condicao_valor2
-
+        
         return False
-
+    
     def to_dict(self):
         """Converte objeto para dicionário para serialização JSON"""
         return {
@@ -254,7 +250,7 @@ class ConfiguracaoAlerta(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }
-
+    
     def __repr__(self):
         """Representação string do objeto"""
         status = "ATIVO" if self.ativo else "INATIVO"

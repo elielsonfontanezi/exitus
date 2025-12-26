@@ -1,0 +1,104 @@
+<!-- components/alerts_table.html - versão alinhada com API /api/alertas/ -->
+<div class="overflow-x-auto">
+    <table class="w-full">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-4 text-left font-bold">Nome</th>
+                <th class="px-6 py-4 text-left font-bold">Tipo</th>
+                <th class="px-6 py-4 text-left font-bold">Ativo/Portfolio</th>
+                <th class="px-6 py-4 text-center font-bold">Condição</th>
+                <th class="px-6 py-4 text-center font-bold">Status</th>
+                <th class="px-6 py-4 text-center font-bold">Ações</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for alerta in alertas %}
+            <tr class="hover:bg-gray-50 transition-colors">
+                <!-- Nome + frequência -->
+                <td class="px-6 py-4">
+                    <div class="font-bold text-lg">{{ alerta.nome }}</div>
+                    <div class="text-sm text-gray-600">
+                        {{ alerta.frequencia_notificacao or 'imediata' }}
+                    </div>
+                </td>
+
+                <!-- Tipo -->
+                <td class="px-6 py-4">
+                    {% set tipo = (alerta.tipo_alerta or '')|upper %}
+                    {% if tipo == 'ALTA_PRECO' %}
+                        <span class="badge bg-green-500 text-white px-3 py-1">📈 Alta Preço</span>
+                    {% elif tipo == 'META_RENTABILIDADE' %}
+                        <span class="badge bg-yellow-500 text-white px-3 py-1">🎯 Rentabilidade</span>
+                    {% else %}
+                        <span class="badge bg-gray-500 text-white px-3 py-1">{{ tipo }}</span>
+                    {% endif %}
+                </td>
+
+                <!-- Ativo / Portfolio -->
+                <td class="px-6 py-4">
+                    {% if alerta.ticker %}
+                        <span class="font-bold text-lg text-blue-600">{{ alerta.ticker }}</span>
+                    {% elif alerta.portfolio_id %}
+                        <span class="text-gray-700">Portfolio</span>
+                    {% else %}
+                        <span class="text-gray-500 italic">Geral</span>
+                    {% endif %}
+                </td>
+
+                <!-- Condição -->
+                <td class="px-6 py-4 text-center">
+                    <span class="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
+                        {{ alerta.condicao_operador }} {{ "%.2f"|format(alerta.condicao_valor) }}
+                        {% if alerta.condicao_valor2 %}
+                            e {{ "%.2f"|format(alerta.condicao_valor2) }}
+                        {% endif %}
+                    </span>
+                </td>
+
+                <!-- Status -->
+                <td class="px-6 py-4 text-center">
+                    {% if alerta.ativo %}
+                        <span class="badge bg-green-500 text-white px-4 py-2 font-semibold">
+                            ATIVO
+                        </span>
+                    {% else %}
+                        <span class="badge bg-gray-500 text-white px-4 py-2 font-semibold">
+                            INATIVO
+                        </span>
+                    {% endif %}
+                </td>
+
+                <!-- Ações -->
+                <td class="px-6 py-4 text-center">
+                    <div class="flex justify-center space-x-2">
+                        <form method="POST" action="{{ url_for('dashboard.alerts_toggle', alert_id=alerta.id) }}" class="inline">
+                            <button
+                                type="submit"
+                                class="btn btn-sm {% if alerta.ativo %}bg-yellow-500 hover:bg-yellow-600{% else %}bg-green-500 hover:bg-green-600{% endif %} text-white px-3 py-1">
+                                Toggle
+                            </button>
+                        </form>
+
+                        <form method="POST" action="{{ url_for('dashboard.alerts_delete', alert_id=alerta.id) }}" class="inline">
+                            <button
+                                type="submit"
+                                class="btn btn-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1"
+                                onclick="return confirm('Tem certeza que deseja deletar este alerta?');">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                    <i class="fas fa-bell-slash text-4xl mb-4 text-gray-300"></i>
+                    <div class="text-lg font-semibold">Nenhum alerta encontrado</div>
+                    <div class="text-sm mt-2">Ajuste os filtros ou crie um novo alerta</div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

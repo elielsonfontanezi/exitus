@@ -84,8 +84,7 @@ class ConfiguracaoAlerta(db.Model):
     )
 
     tipo_alerta = Column(
-#        Enum(TipoAlerta),
-        Enum(TipoAlerta, values_callable=lambda x: [e.value for e in x]),
+        Enum(TipoAlerta),
         nullable=False,
         index=True,
         comment="Tipo do alerta"
@@ -99,8 +98,7 @@ class ConfiguracaoAlerta(db.Model):
     )
 
     condicao_operador = Column(
-#        Enum(OperadorCondicao),
-        Enum(OperadorCondicao, values_callable=lambda x: [e.value for e in x]),
+        Enum(OperadorCondicao),
         nullable=False,
         default=OperadorCondicao.MAIOR,
         comment="Operador de comparação (>, <, ==, >=, <=, ENTRE)"
@@ -122,8 +120,7 @@ class ConfiguracaoAlerta(db.Model):
     )
 
     frequencia_notificacao = Column(
-#        Enum(FrequenciaNotificacao),
-        Enum(FrequenciaNotificacao, values_callable=lambda x: [e.value for e in x]),
+        Enum(FrequenciaNotificacao),
         nullable=False,
         default=FrequenciaNotificacao.IMEDIATA,
         comment="Frequência de notificação"

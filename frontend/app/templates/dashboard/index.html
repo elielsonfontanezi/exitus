@@ -11,7 +11,7 @@
         <i class="fas fa-chart-line text-blue-600 mr-3"></i>
         Dashboard Exitus
       </h1>
-      <p class="text-gray-600 mt-2">Buy Signals, portfólio e análises em tempo real</p>
+      <p class="text-gray-600 mt-2">Visão geral consolidada dos seus investimentos</p>
     </div>
     <div class="flex flex-wrap gap-3">
       <a href="/dashboard/buy-signals" class="btn btn-primary px-6 py-2">
@@ -23,208 +23,82 @@
     </div>
   </div>
 
-  <!-- Quick Stats Cards -->
+  <!-- Quick Stats Cards (INTEGRADOS) -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div class="card p-6 text-center hover:shadow-xl transition-shadow">
-      <div class="text-3xl font-bold text-blue-600 mb-2">{{ signals|length|default(10) }}</div>
-      <div class="text-sm text-gray-600 uppercase tracking-wider">Buy Signals Ativos</div>
+    
+    <!-- Card 1: Patrimônio Total -->
+    <div class="card p-6 text-center hover:shadow-xl transition-shadow bg-white border-t-4 border-blue-500">
+      <div class="text-3xl font-bold text-gray-800 mb-2">
+        R$ {{ "%.2f"|format(dados.patrimonio_total) }}
+      </div>
+      <div class="text-xs text-gray-500 uppercase font-bold tracking-wider">Patrimônio Total</div>
     </div>
-    <div class="card p-6 text-center hover:shadow-xl transition-shadow">
-      <div class="text-3xl font-bold text-green-600 mb-2">R$ 125.430</div>
-      <div class="text-sm text-gray-600 uppercase tracking-wider">Portfólio Total</div>
+
+    <!-- Card 2: Rentabilidade Geral -->
+    <div class="card p-6 text-center hover:shadow-xl transition-shadow bg-white border-t-4 
+        {% if dados.rentabilidade_geral >= 0 %}border-green-500{% else %}border-red-500{% endif %}">
+      <div class="text-3xl font-bold mb-2 
+          {% if dados.rentabilidade_geral >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+        {{ "%+.2f"|format(dados.rentabilidade_geral) }}%
+      </div>
+      <div class="text-xs text-gray-500 uppercase font-bold tracking-wider">Rentabilidade Geral</div>
     </div>
-    <div class="card p-6 text-center hover:shadow-xl transition-shadow">
-      <div class="text-3xl font-bold text-emerald-600 mb-2">+24.5%</div>
-      <div class="text-sm text-gray-600 uppercase tracking-wider">Rentabilidade YTD</div>
+
+    <!-- Card 3: Portfólios Ativos -->
+    <div class="card p-6 text-center hover:shadow-xl transition-shadow bg-white border-t-4 border-purple-500">
+      <div class="text-3xl font-bold text-purple-600 mb-2">
+        {{ dados.total_portfolios }}
+      </div>
+      <div class="text-xs text-gray-500 uppercase font-bold tracking-wider">Carteiras Ativas</div>
     </div>
-    <div class="card p-6 text-center hover:shadow-xl transition-shadow">
-      <div class="text-3xl font-bold text-yellow-600 mb-2">8</div>
-      <div class="text-sm text-gray-600 uppercase tracking-wider">Alertas COMPRA</div>
+
+    <!-- Card 4: Ativos na Carteira -->
+    <div class="card p-6 text-center hover:shadow-xl transition-shadow bg-white border-t-4 border-yellow-500">
+      <div class="text-3xl font-bold text-yellow-600 mb-2">
+        {{ dados.total_ativos }}
+      </div>
+      <div class="text-xs text-gray-500 uppercase font-bold tracking-wider">Posições em Aberto</div>
     </div>
   </div>
 
-  <!-- NOVO: Gráficos de Portfólio -->
+  <!-- Gráficos de Portfólio (Stub Visual - Futuro: Integrar com Chart.js via dados JSON) -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    
-    <!-- Gráfico 1: Evolução do Portfólio -->
-    <div class="card">
-      <div class="p-6 border-b">
-        <h2 class="text-xl font-bold text-gray-900 flex items-center">
-          <i class="fas fa-chart-line text-blue-600 mr-3"></i>
-          Evolução do Portfólio
-        </h2>
-      </div>
-      <div class="p-6 bg-gray-50">
-        <canvas id="chart-evolution" style="max-height: 300px;"></canvas>
+    <div class="card bg-white p-6">
+      <h2 class="text-lg font-bold text-gray-700 mb-4">Evolução Patrimonial (Simulado)</h2>
+      <div class="h-64 bg-gray-50 rounded flex items-center justify-center text-gray-400">
+        <i class="fas fa-chart-area text-4xl opacity-20"></i>
+        <span class="ml-2 text-sm">Gráfico aguardando histórico de dados</span>
       </div>
     </div>
-    
-    <!-- Gráfico 2: Alocação por Tipo de Ativo -->
-    <div class="card">
-      <div class="p-6 border-b">
-        <h2 class="text-xl font-bold text-gray-900 flex items-center">
-          <i class="fas fa-chart-pie text-green-600 mr-3"></i>
-          Alocação por Tipo
-        </h2>
+    <div class="card bg-white p-6">
+      <h2 class="text-lg font-bold text-gray-700 mb-4">Alocação por Ativo (Simulado)</h2>
+      <div class="h-64 bg-gray-50 rounded flex items-center justify-center text-gray-400">
+        <i class="fas fa-chart-pie text-4xl opacity-20"></i>
+        <span class="ml-2 text-sm">Gráfico aguardando posições consolidadas</span>
       </div>
-      <div class="p-6 bg-gray-50">
-        <canvas id="chart-allocation" style="max-height: 300px;"></canvas>
-      </div>
-    </div>
-    
-  </div>
-
-  <!-- Buy Signals TOP 5 Preview -->
-  <div class="card">
-    <div class="p-6 border-b flex items-center justify-between">
-      <div class="flex items-center">
-        <i class="fas fa-bolt text-yellow-500 text-2xl mr-3"></i>
-        <h2 class="text-xl font-bold text-gray-900">Buy Signals TOP 5</h2>
-      </div>
-      <a href="/dashboard/buy-signals" class="btn btn-primary btn-sm flex items-center">
-        Ver Todos <i class="fas fa-arrow-right ml-2"></i>
-      </a>
-    </div>
-    <div id="top-signals-preview" class="p-6">
-      {% include 'components/buy_signals_table.html' %}
     </div>
   </div>
 
   <!-- Quick Actions -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="card p-6">
-      <h3 class="font-bold text-lg mb-4 flex items-center">
+    <div class="card p-6 hover:bg-gray-50 transition">
+      <h3 class="font-bold text-lg mb-4 flex items-center text-gray-800">
         <i class="fas fa-plus-circle text-green-500 mr-2"></i>Nova Transação
       </h3>
-      <a href="/dashboard/transactions/new" class="btn btn-success w-full">+ Compra/Venda</a>
+      <a href="/dashboard/transactions" class="btn btn-success w-full text-white">+ Compra/Venda</a>
     </div>
-    <div class="card p-6">
-      <h3 class="font-bold text-lg mb-4 flex items-center">
+    <div class="card p-6 hover:bg-gray-50 transition">
+      <h3 class="font-bold text-lg mb-4 flex items-center text-gray-800">
         <i class="fas fa-wallet text-blue-500 mr-2"></i>Carteiras
       </h3>
-      <a href="/dashboard/portfolios" class="btn btn-primary w-full">Gerenciar</a>
+      <a href="/dashboard/portfolios" class="btn btn-primary w-full text-white">Gerenciar Carteiras</a>
     </div>
-    <div class="card p-6">
-      <h3 class="font-bold text-lg mb-4 flex items-center">
-        <i class="fas fa-chart-bar text-purple-500 mr-2"></i>Relatórios
+    <div class="card p-6 hover:bg-gray-50 transition">
+      <h3 class="font-bold text-lg mb-4 flex items-center text-gray-800">
+        <i class="fas fa-bell text-yellow-500 mr-2"></i>Alertas
       </h3>
-      <a href="/dashboard/reports" class="btn btn-secondary w-full">Gerar PDF</a>
+      <a href="/dashboard/alerts" class="btn btn-warning w-full text-white">Configurar Alertas</a>
     </div>
   </div>
 </div>
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  
-  // ========================================
-  // GRÁFICO 1: Evolução do Portfólio (Linha)
-  // ========================================
-  const ctxEvolution = document.getElementById('chart-evolution');
-  if (ctxEvolution) {
-    new Chart(ctxEvolution, {
-      type: 'line',
-      data: {
-        labels: ['Jul/24', 'Ago/24', 'Set/24', 'Out/24', 'Nov/24', 'Dez/24'],
-        datasets: [{
-          label: 'Valor do Portfólio',
-          data: [95000, 102000, 108000, 115000, 120000, 125430],
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          fill: true,
-          tension: 0.4,
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          pointBackgroundColor: '#3b82f6',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return 'R$ ' + context.parsed.y.toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                });
-              }
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: false,
-            ticks: {
-              callback: function(value) {
-                return 'R$ ' + (value / 1000).toFixed(0) + 'k';
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  // ========================================
-  // GRÁFICO 2: Alocação por Tipo (Rosca)
-  // ========================================
-  const ctxAllocation = document.getElementById('chart-allocation');
-  if (ctxAllocation) {
-    new Chart(ctxAllocation, {
-      type: 'doughnut',
-      data: {
-        labels: ['Ações', 'FIIs', 'Renda Fixa', 'Cripto'],
-        datasets: [{
-          data: [78500, 25430, 15200, 6300],
-          backgroundColor: [
-            '#3b82f6',  // Azul - Ações
-            '#10b981',  // Verde - FIIs
-            '#f59e0b',  // Amarelo - Renda Fixa
-            '#ec4899'   // Rosa - Cripto
-          ],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              padding: 15,
-              font: {
-                size: 12
-              }
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const label = context.label || '';
-                const value = context.parsed || 0;
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((value / total) * 100).toFixed(1);
-                return label + ': R$ ' + value.toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2
-                }) + ' (' + percentage + '%)';
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-  
-});
-</script>
 {% endblock %}

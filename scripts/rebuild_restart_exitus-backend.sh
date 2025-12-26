@@ -17,3 +17,5 @@ podman logs --tail 30 exitus-backend
 curl http://localhost:5000/health
 
 sleep 10
+
+podman logs --tail 30 exitus-backend
