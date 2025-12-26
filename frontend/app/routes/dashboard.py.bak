@@ -23,7 +23,50 @@ def login_required(f):
 @bp.route('/', methods=['GET'])
 @login_required
 def index():
-    return render_template('dashboard/index.html')
+    """Dashboard Principal (Home) - Integrado M7"""
+    token = session.get('access_token')
+    
+    # Estrutura padrão (zerada) para evitar erros no template
+    dados = {
+        "patrimonio_total": 0.0,
+        "rentabilidade_geral": 0.0,
+        "total_portfolios": 0,
+        "total_ativos": 0,
+        "alocacao": {},
+        "evolucao": [],
+        "ultimas_transacoes": []
+    }
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            
+            # 1. Buscar resumo do dashboard (API Unificada M7)
+            # Se não tivermos endpoint unificado, chamamos individuais
+            
+            # Chamada A: Resumo Portfolio
+            resp_dash = requests.get(f'{Config.BACKEND_API_URL}/api/portfolios/dashboard', headers=headers, timeout=5)
+            if resp_dash.status_code == 200:
+                data = resp_dash.json().get('data', {})
+                resumo = data.get('resumo', {})
+                dados.update({
+                    "patrimonio_total": resumo.get('patrimonio_total', 0.0),
+                    "rentabilidade_geral": resumo.get('rentabilidade_geral', 0.0),
+                    "total_portfolios": resumo.get('total_portfolios', 0),
+                    "total_ativos": resumo.get('total_posicoes', 0) # ou ativos monitorados
+                })
+
+            # Chamada B: Últimas Transações (Opcional por enquanto)
+            # resp_tx = requests.get(f'{Config.BACKEND_API_URL}/api/transacoes', headers=headers, params={'per_page': 5})
+            # if resp_tx.status_code == 200:
+            #     dados['ultimas_transacoes'] = resp_tx.json().get('data', [])
+
+        except Exception as e:
+            print(f"Erro no dashboard home: {e}")
+            # Flash opcional, pode ser irritante na home
+            
+    return render_template('dashboard/index.html', dados=dados)
+
 
 # --- Rotas Restauradas do Módulo 6 ---
 @bp.route('/buy-signals')
