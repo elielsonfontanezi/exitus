@@ -217,7 +217,7 @@ def assets():
 
             if response.status_code == 200:
                 payload = response.json()
-                ativos_raw = payload.get('data', {}).get('ativos', [])
+                ativos_raw = payload.get('data', [])
 
                 for item in ativos_raw:
                     ativos.append({
