@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-900">Detalhes do Relatório</h2>
+        <a href="{{ url_for('dashboard.reports') }}" class="btn btn-outline">
+            <i class="fas fa-arrow-left mr-2"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card p-6">
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+                <p class="text-sm text-gray-500">Tipo</p>
+                <p class="font-bold text-lg">{{ relatorio.tipo_relatorio|upper }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Data Criação</p>
+                <p class="font-bold">{{ relatorio.timestamp_criacao }}</p>
+            </div>
+        </div>
+
+        <h3 class="text-lg font-semibold mb-3 border-b pb-2">Resultado (JSON)</h3>
+        <div class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto font-mono text-sm">
+            <pre>{{ relatorio.resultado_json | tojson(indent=2) }}</pre>
+        </div>
+    </div>
+</div>
+{% endblock %}

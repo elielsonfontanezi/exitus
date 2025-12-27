@@ -491,10 +491,159 @@ def dividends():
     )
 
 
-@bp.route('/reports')
+@bp.route('/reports', methods=['GET'])
 @login_required
 def reports():
-    return render_template('dashboard/reports.html')
+    """Relatórios e Auditoria - M7.4 Integrado"""
+    token = session.get('access_token')
+    
+    # Paginação
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    
+    relatorios = []
+    pagination = {'page': 1, 'pages': 1, 'total': 0}
+
+    if token:
+        try:
+            headers = {'Authorization': f"Bearer {token}"}
+            # Padronização sem barra final
+            url = f"{Config.BACKEND_API_URL}/api/relatorios/lista"
+            
+            params = {'page': page, 'perpage': per_page}
+            
+            response = requests.get(url, headers=headers, params=params, timeout=10)
+            
+            if response.status_code == 200:
+                payload = response.json()
+                # A API retorna { "relatorios": [...], "total": N, "pages": N, ... } na raiz ou dentro de data?
+                # Pelo seu curl: { "relatorios": [...], "current_page": 1, ... } (na raiz)
+                
+                # Adaptação para garantir leitura correta
+                data_source = payload if 'relatorios' in payload else payload.get('data', {})
+                
+                raw_relatorios = data_source.get('relatorios', [])
+                pagination = {
+                    'page': data_source.get('current_page', page),
+                    'pages': data_source.get('pages', 1),
+                    'total': data_source.get('total', len(raw_relatorios))
+                }
+
+                for item in raw_relatorios:
+                    # Formata dados para exibição
+                    tipo = item.get('tipo_relatorio', 'N/A').upper()
+                    periodo = item.get('resultado_json', {}).get('periodo') or 'N/A'
+                    
+                    # Tenta formatar data de criação
+                    criado_em = item.get('timestamp_criacao')
+                    try:
+                        # Ex: 2025-12-12T11:15:11.041026+00:00 -> 12/12/2025 11:15
+                        dt = datetime.fromisoformat(criado_em.replace('Z', '+00:00'))
+                        criado_fmt = dt.strftime('%d/%m/%Y %H:%M')
+                    except:
+                        criado_fmt = criado_em
+
+                    relatorios.append({
+                        'id': item.get('id'),
+                        'tipo': tipo,
+                        'periodo': periodo,
+                        'criado_em': criado_fmt,
+                        'formato': item.get('formato_export', 'visualizacao'),
+                        'status': 'Disponível'
+                    })
+
+        except Exception as e:
+            print(f"[ERROR] Reports Route: {e}")
+            flash('Erro ao carregar lista de relatórios.', 'error')
+
+    return render_template('dashboard/reports.html',
+                         relatorios=relatorios,
+                         pagination=pagination)
+
+@bp.route('/reports/generate', methods=['POST'])
+@login_required
+def reports_generate():
+    """Gera novo relatório via API"""
+    token = session.get('access_token')
+    tipo = request.form.get('tipo')
+    
+    payload = {
+        'tipo': tipo,
+        'filtros': {}
+    }
+    
+    # Se for PERFORMANCE, adiciona datas (pode pegar do form ou fixar últimos 30 dias por enquanto)
+    if tipo == 'PERFORMANCE':
+        # Simplificação: pega mês atual se não vier no form
+        hoje = datetime.now()
+        inicio_mes = hoje.replace(day=1).strftime('%Y-%m-%d')
+        fim_mes = hoje.strftime('%Y-%m-%d')
+        
+        payload['datainicio'] = request.form.get('datainicio') or inicio_mes
+        payload['datafim'] = request.form.get('datafim') or fim_mes
+
+    if token:
+        try:
+            headers = {
+                'Authorization': f"Bearer {token}",
+                'Content-Type': 'application/json'
+            }
+            url = f"{Config.BACKEND_API_URL}/api/relatorios/gerar"
+            
+            response = requests.post(url, json=payload, headers=headers, timeout=30)
+            
+            if response.status_code in [200, 201]:
+                flash('Relatório gerado com sucesso!', 'success')
+            else:
+                flash(f'Erro ao gerar relatório: {response.text}', 'error')
+                
+        except Exception as e:
+            flash(f'Erro de conexão: {str(e)}', 'error')
+            
+    return redirect(url_for('dashboard.reports'))
+
+@bp.route('/reports/delete/<id>', methods=['POST'])
+@login_required
+def reports_delete(id):
+    """Deleta relatório"""
+    token = session.get('access_token')
+    if token:
+        try:
+            headers = {'Authorization': f"Bearer {token}"}
+            url = f"{Config.BACKEND_API_URL}/api/relatorios/{id}"
+            requests.delete(url, headers=headers)
+            flash('Relatório removido.', 'success')
+        except:
+            flash('Erro ao deletar.', 'error')
+            
+    return redirect(url_for('dashboard.reports'))
+
+@bp.route('/reports/<id>', methods=['GET'])
+@login_required
+def reports_view(id):
+    """Visualizar detalhes de um relatório específico"""
+    token = session.get('access_token')
+    relatorio = None
+    
+    if token:
+        try:
+            headers = {'Authorization': f"Bearer {token}"}
+            url = f"{Config.BACKEND_API_URL}/api/relatorios/{id}"
+            
+            response = requests.get(url, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                relatorio = response.json()
+            else:
+                flash('Relatório não encontrado.', 'error')
+                return redirect(url_for('dashboard.reports'))
+                
+        except Exception as e:
+            flash(f'Erro ao carregar relatório: {str(e)}', 'error')
+            return redirect(url_for('dashboard.reports'))
+    
+    # Renderiza um template simples de visualização (JSON pretty print)
+    return render_template('dashboard/report_detail.html', relatorio=relatorio)
 
 
 @bp.route('/analytics')

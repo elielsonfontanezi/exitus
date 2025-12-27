@@ -9,7 +9,7 @@
             <p class="text-gray-500">Histórico de relatórios gerados pelo sistema</p>
         </div>
         
-        <!-- Botão Novo Relatório (Dropdown simples) -->
+        <!-- Botão Novo Relatório (Dropdown simples ou Modal) -->
         <div x-data="{ open: false }" class="relative">
             <button @click="open = !open" class="btn btn-primary flex items-center space-x-2">
                 <i class="fas fa-plus"></i>
@@ -17,7 +17,7 @@
             </button>
             
             <!-- Dropdown Menu -->
-            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5" style="display: none;">
+            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
                 <form action="{{ url_for('dashboard.reports_generate') }}" method="POST">
                     <input type="hidden" name="tipo" value="PORTFOLIO">
                     <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -63,15 +63,11 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ rel.criado_em }}
                         </td>
-                        <!-- Célula CORRIGIDA com link clicável -->
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <a href="{{ url_for('dashboard.reports_view', id=rel.id) }}" class="text-blue-600 hover:text-blue-900 flex items-center group" title="Ver Detalhes">
-                                <i class="fas fa-file-code group-hover:text-blue-700 mr-2"></i> 
-                                <span class="group-hover:underline">{{ rel.formato }}</span>
-                            </a>
+                            <i class="fas fa-file-code text-gray-400 mr-1"></i> {{ rel.formato }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <form action="{{ url_for('dashboard.reports_delete', id=rel.id) }}" method="POST" class="inline" onsubmit="return confirm('Tem certeza que deseja excluir este relatório?');">
+                            <form action="{{ url_for('dashboard.reports_delete', id=rel.id) }}" method="POST" class="inline" onsubmit="return confirm('Tem certeza?');">
                                 <button type="submit" class="text-red-600 hover:text-red-900 ml-4" title="Excluir">
                                     <i class="fas fa-trash"></i>
                                 </button>
