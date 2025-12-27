@@ -1,3 +1,4 @@
+# frontend/app/routes/dashboard.py
 # -*- coding: utf-8 -*-
 """
 Exitus Frontend - Dashboard Routes
@@ -25,7 +26,7 @@ def login_required(f):
 def index():
     """Dashboard Principal (Home) - Integrado M7"""
     token = session.get('access_token')
-    
+
     # Estrutura padrão (zerada) para evitar erros no template
     dados = {
         "patrimonio_total": 0.0,
@@ -36,14 +37,11 @@ def index():
         "evolucao": [],
         "ultimas_transacoes": []
     }
-    
+
     if token:
         try:
             headers = {'Authorization': f'Bearer {token}'}
-            
-            # 1. Buscar resumo do dashboard (API Unificada M7)
-            # Se não tivermos endpoint unificado, chamamos individuais
-            
+
             # Chamada A: Resumo Portfolio
             resp_dash = requests.get(f'{Config.BACKEND_API_URL}/api/portfolios/dashboard', headers=headers, timeout=5)
             if resp_dash.status_code == 200:
@@ -53,18 +51,12 @@ def index():
                     "patrimonio_total": resumo.get('patrimonio_total', 0.0),
                     "rentabilidade_geral": resumo.get('rentabilidade_geral', 0.0),
                     "total_portfolios": resumo.get('total_portfolios', 0),
-                    "total_ativos": resumo.get('total_posicoes', 0) # ou ativos monitorados
+                    "total_ativos": resumo.get('total_posicoes', 0)
                 })
-
-            # Chamada B: Últimas Transações (Opcional por enquanto)
-            # resp_tx = requests.get(f'{Config.BACKEND_API_URL}/api/transacoes', headers=headers, params={'per_page': 5})
-            # if resp_tx.status_code == 200:
-            #     dados['ultimas_transacoes'] = resp_tx.json().get('data', [])
 
         except Exception as e:
             print(f"Erro no dashboard home: {e}")
-            # Flash opcional, pode ser irritante na home
-            
+
     return render_template('dashboard/index.html', dados=dados)
 
 
@@ -72,38 +64,48 @@ def index():
 @bp.route('/buy-signals')
 @login_required
 def buy_signals():
-    return render_template('dashboard/buy_signals.html')
+    """Buy Signals - M6.1"""
+    token = session.get('access_token')
+    signals = []
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(
+                f'{Config.BACKEND_API_URL}/api/buy-signals/watchlist-top',
+                headers=headers,
+                timeout=5
+            )
+            if response.status_code == 200:
+                raw_signals = response.json().get('data', [])
+                # ✅ CORREÇÃO 1: Mapear buy_score → buyscore para compatibilidade com template
+                for item in raw_signals:
+                    signals.append({
+                        'ticker': item.get('ticker'),
+                        'nome': item.get('nome'),
+                        'mercado': item.get('mercado'),
+                        'buyscore': item.get('buy_score', 0),  # ← Mapeamento
+                        'margem': item.get('margem_seguranca', 0)
+                    })
+        except Exception as e:
+            print(f"Erro buy-signals: {e}")
+    
+    return render_template('dashboard/buy_signals.html', signals=signals)
+
 
 @bp.route('/portfolios')
 @login_required
 def portfolios():
     """M7 - Dashboard Portfolios integrado com Backend API"""
-    try:
-        # Backend URL
-        backend_url = Config.BACKEND_API_URL  # ✅ Usa config.py
-        
-        # Credenciais da sessão
-        username = session.get('username', 'admin')
-        password = session.get('backend_password', 'admin123')
-        
-        login_data = {"username": username, "password": password}
-
-        # Tentar login no backend
-        login_response = requests.post(
-            f"{backend_url}/api/auth/login",
-            json=login_data,
-            headers={'Content-Type': 'application/json'},
-            timeout=5
-        )
-
-        if login_response.status_code == 200:
-            token = login_response.json()['data']['access_token']
-
-            # Buscar portfolios reais
+    token = session.get('access_token')
+    
+    if token:
+        try:
             headers = {'Authorization': f'Bearer {token}'}
             portfolios_response = requests.get(
-                f"{backend_url}/api/portfolios",
+                f"{Config.BACKEND_API_URL}/api/portfolios",
                 headers=headers,
+                params={'page': 1, 'per_page': 50},
                 timeout=10
             )
 
@@ -111,7 +113,6 @@ def portfolios():
                 portfolios_data = portfolios_response.json()
                 portfolios = portfolios_data.get('data', [])
 
-                # Calcular stats reais
                 stats = {
                     "total": portfolios_data.get('total', 0),
                     "ativas": len([p for p in portfolios if p.get('ativo', True)]),
@@ -120,7 +121,6 @@ def portfolios():
                     "saldo_us": 0.0
                 }
 
-                # Mapear com created_at garantido ✅
                 corretoras = []
                 for portfolio in portfolios:
                     corretoras.append({
@@ -129,7 +129,7 @@ def portfolios():
                         "descricao": portfolio['descricao'] or '',
                         "objetivo": portfolio['objetivo'] or 'Geral',
                         "ativo": portfolio['ativo'],
-                        "created_at": portfolio.get('created_at', '2025-12-25T00:00:00')  # ✅ GARANTIDO
+                        "created_at": portfolio.get('created_at', '2025-12-25T00:00:00')
                     })
 
                 return render_template(
@@ -139,13 +139,11 @@ def portfolios():
                     filtros={"tipo": "todos", "status": "ativos", "periodo": "12m"},
                     backend_status="ok"
                 )
+        except Exception as e:
+            print(f"Erro portfolios API: {e}")
 
-        # Backend offline → Mock ROBUSTO ✅
-        return _render_portfolios_mock(backend_status="backend_offline")
-
-    except Exception as e:
-        print(f"Erro portfolios API: {e}")
-        return _render_portfolios_mock(backend_status="error")
+    # Backend offline → Mock ROBUSTO
+    return _render_portfolios_mock(backend_status="backend_offline")
 
 
 def _render_portfolios_mock(backend_status="mock"):
@@ -165,7 +163,7 @@ def _render_portfolios_mock(backend_status="mock"):
             "descricao": "Carteira principal de investimentos",
             "objetivo": "Crescimento",
             "ativo": True,
-            "created_at": "2025-12-18T15:47:24"  # ✅ SEMPRE PRESENTE
+            "created_at": "2025-12-18T15:47:24"
         },
         {
             "id": "b6629879-1a9e-460f-944f-3f31b7f34d01",
@@ -173,7 +171,7 @@ def _render_portfolios_mock(backend_status="mock"):
             "descricao": "Foco em dividendos",
             "objetivo": "Longo Prazo",
             "ativo": True,
-            "created_at": "2025-12-19T18:21:19"  # ✅ SEMPRE PRESENTE
+            "created_at": "2025-12-19T18:21:19"
         }
     ]
 
@@ -185,17 +183,13 @@ def _render_portfolios_mock(backend_status="mock"):
         backend_status=backend_status
     )
 
-# --- DEMAIS ROTAS (assets, transactions, etc.) permanecem iguais ---
-# ... imports ...
 
 @bp.route('/assets')
 @login_required
 def assets():
     """M7 - Dashboard Ativos integrado com Backend API"""
     token = session.get('access_token')
-    
-    # Estrutura padrão para template
-    ativos = []
+
     stats = {
         "total": 0,
         "acoes": 0,
@@ -203,36 +197,29 @@ def assets():
         "bdrs": 0,
         "etfs": 0
     }
-    
-    # Filtros da URL
+
+    ativos = []
     tipo_filtro = request.args.get('tipo', 'todos')
     setor_filtro = request.args.get('setor', '')
-    
+
     if token:
         try:
-            # 1. Configurar headers e params
             headers = {'Authorization': f'Bearer {token}'}
             params = {'page': request.args.get('page', 1), 'per_page': 50}
-            
-            # Se tiver filtro de tipo específico no backend, adicionar aqui
-            # params['tipo'] = tipo_filtro if tipo_filtro != 'todos' else None
 
-            # 2. Chamada ao Backend API
+            # ✅ CORREÇÃO 2: Endpoint sem barra final
             response = requests.get(
-                f'{Config.BACKEND_API_URL}/api/ativos/',
+                f'{Config.BACKEND_API_URL}/api/ativos',  # ← SEM /
                 headers=headers,
                 params=params,
                 timeout=5
             )
-            
+
             if response.status_code == 200:
                 payload = response.json()
-                # A API retorna paginado: {"data": [...], "total": X, ...}
-                ativos_raw = payload.get('data', [])
-                
-                # 3. Processar dados para o template
+                ativos_raw = payload.get('data', {}).get('ativos', [])
+
                 for item in ativos_raw:
-                    # Garantir campos seguros
                     ativos.append({
                         "id": item.get('id'),
                         "ticker": item.get('ticker'),
@@ -241,8 +228,7 @@ def assets():
                         "setor": item.get('setor', 'N/A'),
                         "cotacao": item.get('cotacao_atual', 0.0)
                     })
-                
-                # Calcular stats locais (ou pegar do backend se houver endpoint de stats)
+
                 stats["total"] = payload.get('total', len(ativos))
                 stats["acoes"] = len([a for a in ativos if a['tipo'] == 'ACAO'])
                 stats["fiis"] = len([a for a in ativos if a['tipo'] == 'FII'])
@@ -267,6 +253,9 @@ def assets():
 @bp.route('/transactions')
 @login_required
 def transactions():
+    """Transações Integrado"""
+    token = session.get('access_token')
+    
     stats = {
         "total": 0,
         "compras": 0,
@@ -290,6 +279,61 @@ def transactions():
     }
 
     transacoes = []
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(
+                f'{Config.BACKEND_API_URL}/api/transacoes',
+                headers=headers,
+                timeout=5
+            )
+            
+            if response.status_code == 200:
+                payload = response.json()
+                raw_data = payload.get('data', [])
+                
+                for item in raw_data:
+                    # Parsing seguro para campos nested
+                    ativo_obj = item.get('ativo', {})
+                    if isinstance(ativo_obj, dict):
+                        ticker = ativo_obj.get('ticker', 'N/A')
+                    else:
+                        ticker = 'N/A'
+                    
+                    corretora_obj = item.get('corretora', {})
+                    if isinstance(corretora_obj, dict):
+                        corretora_nome = corretora_obj.get('nome', 'N/A')
+                    else:
+                        corretora_nome = 'N/A'
+                    
+                    tipo = item.get('tipo_operacao', 'COMPRA')
+                    qtd = float(item.get('quantidade') or 0)
+                    preco = float(item.get('preco_unitario') or 0)
+                    total = float(item.get('valor_total') or (qtd * preco))
+                    
+                    transacoes.append({
+                        'data': item.get('data_operacao'),
+                        'ativo': ticker,
+                        'tipo': tipo,
+                        'quantidade': qtd,
+                        'preco': preco,
+                        'total': total,
+                        'corretora': corretora_nome
+                    })
+                    
+                    stats['total'] += 1
+                    stats['volume_total'] += total
+                    if tipo == 'COMPRA':
+                        stats['compras'] += 1
+                        stats['volume_compras'] += total
+                    elif tipo == 'VENDA':
+                        stats['vendas'] += 1
+                        stats['volume_vendas'] += total
+                        
+        except Exception as e:
+            print(f"Erro transactions: {e}")
+
     corretoras = []
     tiposativo = []
     classesativo = []
@@ -310,11 +354,14 @@ def transactions():
 @bp.route('/dividends')
 @login_required
 def dividends():
+    """Proventos Integrado"""
+    token = session.get('access_token')
+    
     stats = {
         "total": 0,
         "recebido": 0.0,
         "previsto": 0.0,
-        "total_geral": 0.0,  # ← garante compatibilidade com o template
+        "total_geral": 0.0,
     }
 
     filtros = {
@@ -328,6 +375,49 @@ def dividends():
     }
 
     proventos = []
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(
+                f'{Config.BACKEND_API_URL}/api/proventos',
+                headers=headers,
+                timeout=5
+            )
+            
+            if response.status_code == 200:
+                payload = response.json()
+                raw_data = payload.get('data', [])
+                
+                for item in raw_data:
+                    # Parsing seguro para campo nested ativo
+                    ativo_obj = item.get('ativo', {})
+                    if isinstance(ativo_obj, dict):
+                        ticker = ativo_obj.get('ticker', 'N/A')
+                    else:
+                        ticker = 'N/A'
+                    
+                    valor = float(item.get('valor_liquido') or item.get('valor_bruto') or 0)
+                    status = item.get('status', 'PREVISTO')
+                    
+                    proventos.append({
+                        'data_pagamento': item.get('data_pagamento'),
+                        'ativo': ticker,
+                        'tipo': item.get('tipo_provento'),
+                        'valor': valor,
+                        'status': status
+                    })
+                    
+                    stats['total'] += 1
+                    stats['total_geral'] += valor
+                    if status == 'PAGO':
+                        stats['recebido'] += valor
+                    else:
+                        stats['previsto'] += valor
+                        
+        except Exception as e:
+            print(f"Erro dividends: {e}")
+
     ativos = []
     corretoras = []
     tiposprovento = []
@@ -350,6 +440,7 @@ def dividends():
 def reports():
     return render_template('dashboard/reports.html')
 
+
 @bp.route('/analytics')
 @login_required
 def analytics():
@@ -362,8 +453,7 @@ def alerts():
     token = session.get('access_token')
     alertas = []
     stats = {'total': 0, 'ativos': 0, 'alta_preco': 0, 'acionados': 0}
-    
-    # Filtros
+
     tipo = request.args.get('tipo')
     status = request.args.get('status')
     ativo = request.args.get('ativo')
@@ -374,28 +464,25 @@ def alerts():
             params = {}
             if tipo and tipo != 'Todos': params['tipo_alerta'] = tipo
             if status and status != 'Todos': params['ativo'] = 'true' if status == 'ativo' else 'false'
-            
-            # GET no Backend
+
             response = requests.get(
                 f'{Config.BACKEND_API_URL}/api/alertas/',
                 headers=headers, params=params, timeout=5
             )
-            
+
             if response.status_code == 200:
                 payload = response.json()
                 alertas = payload.get('data', [])
-                
-                # Calcular stats dinâmicos
+
                 stats['total'] = len(alertas)
                 stats['ativos'] = len([a for a in alertas if a.get('ativo')])
                 stats['alta_preco'] = len([a for a in alertas if str(a.get('tipo_alerta') or '').upper() == 'ALTA_PRECO'])
                 stats['acionados'] = len([a for a in alertas if a.get('foi_acionado')])
-                
+
         except Exception as e:
             print(f"Erro ao buscar alertas: {e}")
             flash('Erro ao carregar alertas.', 'error')
 
-    # Lista única de ativos para o filtro
     ativos_unicos = sorted(list(set(a.get('ticker') for a in alertas if a.get('ticker'))))
 
     return render_template(
@@ -406,16 +493,16 @@ def alerts():
         ativos=ativos_unicos
     )
 
+
 @bp.route('/alerts/create', methods=['POST'])
 @login_required
 def alerts_create():
     try:
         token = session.get('access_token')
-        
-        # Converte valores do form
+
         val_str = request.form.get('condicaovalor', '0').replace(',', '.')
         val2_str = request.form.get('condicaovalor2', '').replace(',', '.')
-        
+
         payload = {
             "nome": request.form.get('nome'),
             "tipo_alerta": request.form.get('tipoalerta'),
@@ -441,8 +528,9 @@ def alerts_create():
 
     except Exception as e:
         flash(f'Erro de sistema: {str(e)}', 'error')
-    
+
     return redirect(url_for('dashboard.alerts'))
+
 
 @bp.route('/alerts/toggle/<alert_id>', methods=['POST'])
 @login_required
@@ -451,6 +539,7 @@ def alerts_toggle(alert_id):
     headers = {'Authorization': f'Bearer {token}'}
     requests.patch(f'{Config.BACKEND_API_URL}/api/alertas/{alert_id}/toggle', headers=headers)
     return redirect(url_for('dashboard.alerts'))
+
 
 @bp.route('/alerts/delete/<alert_id>', methods=['POST'])
 @login_required

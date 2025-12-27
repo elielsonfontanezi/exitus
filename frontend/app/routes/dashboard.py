@@ -250,105 +250,161 @@ def assets():
     )
 
 
-@bp.route('/transactions')
+@bp.route('/transactions', methods=['GET'])
 @login_required
 def transactions():
-    """Transações Integrado"""
+    """Transações Integrado (Correção M7.2)"""
     token = session.get('access_token')
     
+    # Estrutura inicial de stats
     stats = {
-        "total": 0,
-        "compras": 0,
-        "vendas": 0,
-        "volume_total": 0.0,
-        "volume_compras": 0.0,
-        "volume_vendas": 0.0,
-        "volume_acoes": 0.0,
-        "volume_fii": 0.0,
-        "volume_cripto": 0.0,
-        "volume_outros": 0.0,
+        'total': 0,
+        'compras': 0,
+        'vendas': 0,
+        'volume_total': 0.0,
+        'volume_compras': 0.0,
+        'volume_vendas': 0.0,
+        'volume_acoes': 0.0,
+        'volume_fii': 0.0,
+        'volume_cripto': 0.0,
+        'volume_outros': 0.0
     }
-
+    
+    # Estrutura inicial de filtros
     filtros = {
-        "tipo": "",
-        "classe": "",
-        "mercado": "",
-        "corretora_id": "",
-        "data_inicio": "",
-        "data_fim": "",
+        'tipo': '',
+        'classe': '',
+        'mercado': '',
+        'corretora_id': '',
+        'data_inicio': '',
+        'data_fim': ''
     }
-
+    
     transacoes = []
     
+    # Listas auxiliares para os filtros da tela
+    corretoras = []
+    tipos_ativo = [
+        {'value': 'ACAO', 'label': 'Ações'}, 
+        {'value': 'FII', 'label': 'FIIs'}, 
+        {'value': 'ETF', 'label': 'ETFs'}, 
+        {'value': 'BDR', 'label': 'BDRs'}, 
+        {'value': 'CRIPTO', 'label': 'Cripto'}
+    ]
+    classes_ativo = [
+        {'value': 'Renda Variável', 'label': 'Renda Variável'}, 
+        {'value': 'Renda Fixa', 'label': 'Renda Fixa'}
+    ]
+    mercados = [
+        {'value': 'BR', 'label': 'Brasil'}, 
+        {'value': 'US', 'label': 'EUA'}
+    ]
+
     if token:
         try:
-            headers = {'Authorization': f'Bearer {token}'}
-            response = requests.get(
-                f'{Config.BACKEND_API_URL}/api/transacoes',
-                headers=headers,
-                timeout=5
-            )
+            headers = {'Authorization': f"Bearer {token}"}
+            # Removemos a barra final para evitar redirecionamentos (308)
+            response = requests.get(f"{Config.BACKEND_API_URL}/api/transacoes", headers=headers, timeout=5)
             
             if response.status_code == 200:
                 payload = response.json()
-                raw_data = payload.get('data', [])
+                
+                # --- PARSING ROBUSTO (M7.2) ---
+                # 1. Tenta pegar 'data'
+                payload_data = payload.get('data', {})
+                
+                # 2. Extrai a lista real de transações, lidando com paginação
+                if isinstance(payload_data, dict):
+                    # Padrão novo: { data: { transacoes: [], total: 17, ... } }
+                    raw_data = payload_data.get('transacoes', [])
+                elif isinstance(payload_data, list):
+                    # Padrão antigo: { data: [] }
+                    raw_data = payload_data
+                else:
+                    raw_data = []
                 
                 for item in raw_data:
-                    # Parsing seguro para campos nested
-                    ativo_obj = item.get('ativo', {})
-                    if isinstance(ativo_obj, dict):
-                        ticker = ativo_obj.get('ticker', 'N/A')
-                    else:
-                        ticker = 'N/A'
+                    # Parsing seguro de objetos aninhados
+                    ativo_obj = item.get('ativo') or {}
+                    corretora_obj = item.get('corretora') or {}
                     
-                    corretora_obj = item.get('corretora', {})
-                    if isinstance(corretora_obj, dict):
-                        corretora_nome = corretora_obj.get('nome', 'N/A')
-                    else:
-                        corretora_nome = 'N/A'
+                    # Normalização de dados
+                    ticker = ativo_obj.get('ticker', 'N/A')
+                    tipo_ativo_str = ativo_obj.get('tipo', 'OUTROS').upper()
+                    mercado = (ativo_obj.get('mercado') or 'BR').upper()
+                    moeda = 'R$' if mercado == 'BR' else '$'
                     
-                    tipo = item.get('tipo_operacao', 'COMPRA')
+                    # Normalização de tipo de operação (template espera lowercase 'compra'/'venda')
+                    tipo_raw = (item.get('tipo') or 'COMPRA').lower()
+                    
+                    # Valores numéricos seguros
                     qtd = float(item.get('quantidade') or 0)
-                    preco = float(item.get('preco_unitario') or 0)
-                    total = float(item.get('valor_total') or (qtd * preco))
+                    preco_unit = float(item.get('preco_unitario') or 0)
+                    # Prioriza valor_total da API, senão calcula
+                    valor_total = float(item.get('valor_total') or (qtd * preco_unit))
                     
-                    transacoes.append({
-                        'data': item.get('data_operacao'),
-                        'ativo': ticker,
-                        'tipo': tipo,
-                        'quantidade': qtd,
-                        'preco': preco,
-                        'total': total,
-                        'corretora': corretora_nome
-                    })
-                    
-                    stats['total'] += 1
-                    stats['volume_total'] += total
-                    if tipo == 'COMPRA':
-                        stats['compras'] += 1
-                        stats['volume_compras'] += total
-                    elif tipo == 'VENDA':
-                        stats['vendas'] += 1
-                        stats['volume_vendas'] += total
+                    # Monta objeto compatível com o template (incluindo aliases)
+                    transacao_dict = {
+                        # Datas
+                        'data': item.get('data_transacao'),
+                        'data_transacao': item.get('data_transacao'),
                         
+                        # Operação
+                        'tipo_operacao': tipo_raw,  # snake_case
+                        'tipooperacao': tipo_raw,   # compatibilidade
+                        
+                        # Objetos aninhados (para acesso via ponto: trans.ativo.ticker)
+                        'ativo': ativo_obj,
+                        'corretora': corretora_obj,
+                        
+                        # Valores
+                        'quantidade': qtd,
+                        'preco_unitario': preco_unit, # snake_case
+                        'precounitario': preco_unit,  # compatibilidade
+                        'valor_total': valor_total,   # snake_case
+                        'valortotal': valor_total,    # compatibilidade
+                        
+                        # Extras UI
+                        'moeda': moeda
+                    }
+                    
+                    transacoes.append(transacao_dict)
+                    
+                    # --- Atualiza Stats ---
+                    stats['total'] += 1
+                    stats['volume_total'] += valor_total
+                    
+                    if tipo_raw == 'compra':
+                        stats['compras'] += 1
+                        stats['volume_compras'] += valor_total
+                    elif tipo_raw == 'venda':
+                        stats['vendas'] += 1
+                        stats['volume_vendas'] += valor_total
+                        
+                    # Stats por tipo de ativo
+                    if 'ACAO' in tipo_ativo_str:
+                        stats['volume_acoes'] += valor_total
+                    elif 'FII' in tipo_ativo_str:
+                        stats['volume_fii'] += valor_total
+                    elif 'CRIPTO' in tipo_ativo_str:
+                        stats['volume_cripto'] += valor_total
+                    else:
+                        stats['volume_outros'] += valor_total
+
         except Exception as e:
             print(f"Erro transactions: {e}")
+            flash('Erro ao carregar transações.', 'error')
 
-    corretoras = []
-    tiposativo = []
-    classesativo = []
-    mercados = []
+    # Renderiza template passando todas as variáveis
+    return render_template('dashboard/transactions.html',
+                         stats=stats,
+                         transacoes=transacoes,
+                         filtros=filtros,
+                         corretoras=corretoras,
+                         tipos_ativo=tipos_ativo,
+                         classes_ativo=classes_ativo,
+                         mercados=mercados)
 
-    return render_template(
-        'dashboard/transactions.html',
-        stats=stats,
-        transacoes=transacoes,
-        filtros=filtros,
-        corretoras=corretoras,
-        tiposativo=tiposativo,
-        classesativo=classesativo,
-        mercados=mercados,
-    )
 
 
 @bp.route('/dividends')
