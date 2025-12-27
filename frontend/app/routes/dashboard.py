@@ -405,14 +405,15 @@ def transactions():
                          classes_ativo=classes_ativo,
                          mercados=mercados)
 
-
-
 @bp.route('/dividends')
 @login_required
 def dividends():
-    """Proventos Integrado"""
+    """Proventos Integrado - Alinhado com o template M6"""
+    from collections import defaultdict
+    from datetime import datetime
+
     token = session.get('access_token')
-    
+
     stats = {
         "total": 0,
         "recebido": 0.0,
@@ -431,56 +432,97 @@ def dividends():
     }
 
     proventos = []
-    
-    if token:
-        try:
-            headers = {'Authorization': f'Bearer {token}'}
-            response = requests.get(
-                f'{Config.BACKEND_API_URL}/api/proventos',
-                headers=headers,
-                timeout=5
-            )
-            
-            if response.status_code == 200:
-                payload = response.json()
-                raw_data = payload.get('data', [])
-                
-                for item in raw_data:
-                    # Parsing seguro para campo nested ativo
-                    ativo_obj = item.get('ativo', {})
-                    if isinstance(ativo_obj, dict):
-                        ticker = ativo_obj.get('ticker', 'N/A')
-                    else:
-                        ticker = 'N/A'
-                    
-                    valor = float(item.get('valor_liquido') or item.get('valor_bruto') or 0)
-                    status = item.get('status', 'PREVISTO')
-                    
-                    proventos.append({
-                        'data_pagamento': item.get('data_pagamento'),
-                        'ativo': ticker,
-                        'tipo': item.get('tipo_provento'),
-                        'valor': valor,
-                        'status': status
-                    })
-                    
-                    stats['total'] += 1
-                    stats['total_geral'] += valor
-                    if status == 'PAGO':
-                        stats['recebido'] += valor
-                    else:
-                        stats['previsto'] += valor
-                        
-        except Exception as e:
-            print(f"Erro dividends: {e}")
-
+    dividendstimeline = []
     ativos = []
     corretoras = []
     tiposprovento = []
-    dividendstimeline = []
+
+    if token:
+        try:
+            headers = {"Authorization": f"Bearer {token}"}
+            resp = requests.get(
+                f"{Config.BACKEND_API_URL}/api/proventos?per_page=100",
+                headers=headers,
+                timeout=5,
+            )
+
+            if resp.status_code == 200:
+                payload = resp.json()
+                data_container = payload.get("data", {})
+                raw_data = (
+                    data_container
+                    if isinstance(data_container, list)
+                    else data_container.get("proventos", [])
+                )
+
+                timeline = defaultdict(float)
+
+                for item in raw_data:
+                    data_pag = item.get("data_pagamento")
+                    data_com = item.get("data_com")
+
+                    # Tipo vem como "TipoProvento.DIVIDENDO" etc.
+                    raw_tipo = item.get("tipo_provento", "TipoProvento.DIVIDENDO")
+                    tipo = raw_tipo.split(".")[-1]  # DIVIDENDO / RENDIMENTO / JCP etc.
+
+                    valor = float(item.get("valor_liquido") or item.get("valor_bruto") or 0.0)
+                    valor_unitario = float(item.get("valor_por_acao") or 0.0)
+
+                    # Template espera 'ativo' como objeto com ticker/nome
+                    ticker_label = f"ID {str(item.get('ativo_id'))[:4]}"
+                    ativo_obj = {
+                        "ticker": ticker_label,
+                        "nome": ticker_label,
+                    }
+
+                    # Status: inferido pela data de pagamento
+                    status = "PREVISTO"
+                    if data_pag:
+                        try:
+                            dt_pag = datetime.strptime(data_pag, "%Y-%m-%d")
+                            if dt_pag <= datetime.now():
+                                status = "PAGO"
+                        except Exception:
+                            pass
+
+                    quantidade = item.get("quantidade", 0)
+
+                    proventos.append(
+                        {
+                            "datacom": data_com,
+                            "datapagamento": data_pag,
+                            "ativo": ativo_obj,
+                            "tipo": tipo,
+                            "moeda": "R$",
+                            "valor_unitario": valor_unitario,
+                            "quantidade": quantidade,
+                            "valor_total": valor,
+                            "status": status,
+                        }
+                    )
+
+                    stats["total"] += 1
+                    stats["total_geral"] += valor
+                    if status == "PAGO":
+                        stats["recebido"] += valor
+                    else:
+                        stats["previsto"] += valor
+
+                    # Timeline por mês (usa data_pagamento ou data_com)
+                    d_ref = data_pag or data_com
+                    if d_ref:
+                        chave = d_ref[:7]  # YYYY-MM
+                        timeline[chave] += valor
+
+                dividendstimeline = [
+                    {"mes": k, "valor": v} for k, v in sorted(timeline.items())
+                ]
+
+        except Exception as e:
+            print(f"Erro dividends: {e}")
 
     return render_template(
-        'dashboard/dividends.html',
+        "dashboard/dividends.html",
         stats=stats,
         proventos=proventos,
         filtros=filtros,
@@ -489,6 +531,8 @@ def dividends():
         tiposprovento=tiposprovento,
         dividendstimeline=dividendstimeline,
     )
+
+
 
 
 @bp.route('/reports', methods=['GET'])
