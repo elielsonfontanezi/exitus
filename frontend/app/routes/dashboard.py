@@ -502,52 +502,122 @@ def reports():
 def analytics():
     return render_template('dashboard/analytics.html')
 
-
 @bp.route('/alerts', methods=['GET'])
 @login_required
 def alerts():
+    """Alertas Integrado (Correção M7.3 - Campos Template)"""
     token = session.get('access_token')
+    
+    # Stats iniciais
+    stats = {
+        'total': 0,
+        'ativos': 0,
+        'alta_preco': 0,
+        'acionados': 0
+    }
+    
     alertas = []
-    stats = {'total': 0, 'ativos': 0, 'alta_preco': 0, 'acionados': 0}
-
-    tipo = request.args.get('tipo')
-    status = request.args.get('status')
-    ativo = request.args.get('ativo')
+    ativos_unicos = [] 
+    
+    # Filtros
+    tipo_filtro = request.args.get('tipo')
+    status_filtro = request.args.get('status')
+    ativo_filtro = request.args.get('ativo')
 
     if token:
         try:
-            headers = {'Authorization': f'Bearer {token}'}
+            headers = {'Authorization': f"Bearer {token}"}
             params = {}
-            if tipo and tipo != 'Todos': params['tipo_alerta'] = tipo
-            if status and status != 'Todos': params['ativo'] = 'true' if status == 'ativo' else 'false'
+            
+            if tipo_filtro and tipo_filtro != 'Todos':
+                params['tipo_alerta'] = tipo_filtro
+            if status_filtro and status_filtro != 'Todos':
+                params['ativo'] = 'true' if status_filtro == 'Ativo' else 'false'
+            if ativo_filtro:
+                params['ticker'] = ativo_filtro
 
-            response = requests.get(
-                f'{Config.BACKEND_API_URL}/api/alertas/',
-                headers=headers, params=params, timeout=5
-            )
-
+            # URL Padronizada (sem barra)
+            url = f"{Config.BACKEND_API_URL}/api/alertas"
+            
+            # Debug
+            print(f"[DEBUG] Requesting Alerts: {url}")
+            
+            response = requests.get(url, headers=headers, params=params, timeout=10)
+            
             if response.status_code == 200:
                 payload = response.json()
-                alertas = payload.get('data', [])
+                # Extração robusta da lista
+                payload_data = payload.get('data', [])
+                if isinstance(payload_data, dict):
+                    raw_alertas = payload_data.get('alertas', [])
+                elif isinstance(payload_data, list):
+                    raw_alertas = payload_data
+                else:
+                    raw_alertas = []
 
-                stats['total'] = len(alertas)
-                stats['ativos'] = len([a for a in alertas if a.get('ativo')])
-                stats['alta_preco'] = len([a for a in alertas if str(a.get('tipo_alerta') or '').upper() == 'ALTA_PRECO'])
-                stats['acionados'] = len([a for a in alertas if a.get('foi_acionado')])
+                print(f"[DEBUG] Alerts Found: {len(raw_alertas)}")
+
+                for item in raw_alertas:
+                    ticker = item.get('ticker') or 'GERAL'
+                    ativo_flag = item.get('ativo', True)
+                    foi_acionado = item.get('foi_acionado', False)
+                    tipo_alerta = item.get('tipo_alerta', 'OUTROS')
+                    
+                    # Valores brutos para o template
+                    cond_op = item.get('condicao_operador', '')
+                    cond_val = float(item.get('condicao_valor') or 0.0)
+                    
+                    alerta_dict = {
+                        'id': item.get('id'),
+                        'nome': item.get('nome'),
+                        
+                        # Tipos
+                        'tipo': tipo_alerta,
+                        'tipo_alerta': tipo_alerta,
+                        
+                        # Ativo
+                        'ticker': ticker,
+                        'ativo_ticker': ticker,
+                        
+                        # Condição (RAW + Formatada)
+                        'condicao': f"{cond_op} {cond_val}",
+                        'condicao_operador': cond_op,    # <--- O que faltava
+                        'condicao_valor': cond_val,      # <--- O que faltava
+                        
+                        # Status
+                        'ativo': ativo_flag,
+                        'status': 'ATIVO' if ativo_flag else 'INATIVO',
+                        
+                        # Disparos
+                        'foi_acionado': foi_acionado,
+                        'disparos': item.get('contagem_disparos', 0) if foi_acionado else 0,
+                        'ultimo_disparo': item.get('data_ultimo_disparo'),
+                        'created_at': item.get('created_at')
+                    }
+                    
+                    alertas.append(alerta_dict)
+                    
+                    if ticker and ticker != 'GERAL' and ticker not in ativos_unicos:
+                        ativos_unicos.append(ticker)
+
+                    # Stats
+                    stats['total'] += 1
+                    if ativo_flag: stats['ativos'] += 1
+                    if 'ALTA' in str(tipo_alerta).upper(): stats['alta_preco'] += 1
+                    if foi_acionado: stats['acionados'] += 1
 
         except Exception as e:
-            print(f"Erro ao buscar alertas: {e}")
+            print(f"[ERROR] Alerts Route: {e}")
             flash('Erro ao carregar alertas.', 'error')
+            
+    ativos_unicos.sort()
 
-    ativos_unicos = sorted(list(set(a.get('ticker') for a in alertas if a.get('ticker'))))
+    return render_template('dashboard/alerts.html',
+                         alertas=alertas,
+                         stats=stats,
+                         filtros={'tipo': tipo_filtro, 'status': status_filtro, 'ativo': ativo_filtro},
+                         ativos=ativos_unicos)
 
-    return render_template(
-        'dashboard/alerts.html',
-        alertas=alertas,
-        stats=stats,
-        filtros={'tipo': tipo, 'status': status, 'ativo': ativo},
-        ativos=ativos_unicos
-    )
 
 
 @bp.route('/alerts/create', methods=['POST'])

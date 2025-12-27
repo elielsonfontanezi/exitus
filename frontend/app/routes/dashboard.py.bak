@@ -250,105 +250,161 @@ def assets():
     )
 
 
-@bp.route('/transactions')
+@bp.route('/transactions', methods=['GET'])
 @login_required
 def transactions():
-    """Transações Integrado"""
+    """Transações Integrado (Correção M7.2)"""
     token = session.get('access_token')
     
+    # Estrutura inicial de stats
     stats = {
-        "total": 0,
-        "compras": 0,
-        "vendas": 0,
-        "volume_total": 0.0,
-        "volume_compras": 0.0,
-        "volume_vendas": 0.0,
-        "volume_acoes": 0.0,
-        "volume_fii": 0.0,
-        "volume_cripto": 0.0,
-        "volume_outros": 0.0,
+        'total': 0,
+        'compras': 0,
+        'vendas': 0,
+        'volume_total': 0.0,
+        'volume_compras': 0.0,
+        'volume_vendas': 0.0,
+        'volume_acoes': 0.0,
+        'volume_fii': 0.0,
+        'volume_cripto': 0.0,
+        'volume_outros': 0.0
     }
-
+    
+    # Estrutura inicial de filtros
     filtros = {
-        "tipo": "",
-        "classe": "",
-        "mercado": "",
-        "corretora_id": "",
-        "data_inicio": "",
-        "data_fim": "",
+        'tipo': '',
+        'classe': '',
+        'mercado': '',
+        'corretora_id': '',
+        'data_inicio': '',
+        'data_fim': ''
     }
-
+    
     transacoes = []
     
+    # Listas auxiliares para os filtros da tela
+    corretoras = []
+    tipos_ativo = [
+        {'value': 'ACAO', 'label': 'Ações'}, 
+        {'value': 'FII', 'label': 'FIIs'}, 
+        {'value': 'ETF', 'label': 'ETFs'}, 
+        {'value': 'BDR', 'label': 'BDRs'}, 
+        {'value': 'CRIPTO', 'label': 'Cripto'}
+    ]
+    classes_ativo = [
+        {'value': 'Renda Variável', 'label': 'Renda Variável'}, 
+        {'value': 'Renda Fixa', 'label': 'Renda Fixa'}
+    ]
+    mercados = [
+        {'value': 'BR', 'label': 'Brasil'}, 
+        {'value': 'US', 'label': 'EUA'}
+    ]
+
     if token:
         try:
-            headers = {'Authorization': f'Bearer {token}'}
-            response = requests.get(
-                f'{Config.BACKEND_API_URL}/api/transacoes',
-                headers=headers,
-                timeout=5
-            )
+            headers = {'Authorization': f"Bearer {token}"}
+            # Removemos a barra final para evitar redirecionamentos (308)
+            response = requests.get(f"{Config.BACKEND_API_URL}/api/transacoes", headers=headers, timeout=5)
             
             if response.status_code == 200:
                 payload = response.json()
-                raw_data = payload.get('data', [])
+                
+                # --- PARSING ROBUSTO (M7.2) ---
+                # 1. Tenta pegar 'data'
+                payload_data = payload.get('data', {})
+                
+                # 2. Extrai a lista real de transações, lidando com paginação
+                if isinstance(payload_data, dict):
+                    # Padrão novo: { data: { transacoes: [], total: 17, ... } }
+                    raw_data = payload_data.get('transacoes', [])
+                elif isinstance(payload_data, list):
+                    # Padrão antigo: { data: [] }
+                    raw_data = payload_data
+                else:
+                    raw_data = []
                 
                 for item in raw_data:
-                    # Parsing seguro para campos nested
-                    ativo_obj = item.get('ativo', {})
-                    if isinstance(ativo_obj, dict):
-                        ticker = ativo_obj.get('ticker', 'N/A')
-                    else:
-                        ticker = 'N/A'
+                    # Parsing seguro de objetos aninhados
+                    ativo_obj = item.get('ativo') or {}
+                    corretora_obj = item.get('corretora') or {}
                     
-                    corretora_obj = item.get('corretora', {})
-                    if isinstance(corretora_obj, dict):
-                        corretora_nome = corretora_obj.get('nome', 'N/A')
-                    else:
-                        corretora_nome = 'N/A'
+                    # Normalização de dados
+                    ticker = ativo_obj.get('ticker', 'N/A')
+                    tipo_ativo_str = ativo_obj.get('tipo', 'OUTROS').upper()
+                    mercado = (ativo_obj.get('mercado') or 'BR').upper()
+                    moeda = 'R$' if mercado == 'BR' else '$'
                     
-                    tipo = item.get('tipo_operacao', 'COMPRA')
+                    # Normalização de tipo de operação (template espera lowercase 'compra'/'venda')
+                    tipo_raw = (item.get('tipo') or 'COMPRA').lower()
+                    
+                    # Valores numéricos seguros
                     qtd = float(item.get('quantidade') or 0)
-                    preco = float(item.get('preco_unitario') or 0)
-                    total = float(item.get('valor_total') or (qtd * preco))
+                    preco_unit = float(item.get('preco_unitario') or 0)
+                    # Prioriza valor_total da API, senão calcula
+                    valor_total = float(item.get('valor_total') or (qtd * preco_unit))
                     
-                    transacoes.append({
-                        'data': item.get('data_operacao'),
-                        'ativo': ticker,
-                        'tipo': tipo,
-                        'quantidade': qtd,
-                        'preco': preco,
-                        'total': total,
-                        'corretora': corretora_nome
-                    })
-                    
-                    stats['total'] += 1
-                    stats['volume_total'] += total
-                    if tipo == 'COMPRA':
-                        stats['compras'] += 1
-                        stats['volume_compras'] += total
-                    elif tipo == 'VENDA':
-                        stats['vendas'] += 1
-                        stats['volume_vendas'] += total
+                    # Monta objeto compatível com o template (incluindo aliases)
+                    transacao_dict = {
+                        # Datas
+                        'data': item.get('data_transacao'),
+                        'data_transacao': item.get('data_transacao'),
                         
+                        # Operação
+                        'tipo_operacao': tipo_raw,  # snake_case
+                        'tipooperacao': tipo_raw,   # compatibilidade
+                        
+                        # Objetos aninhados (para acesso via ponto: trans.ativo.ticker)
+                        'ativo': ativo_obj,
+                        'corretora': corretora_obj,
+                        
+                        # Valores
+                        'quantidade': qtd,
+                        'preco_unitario': preco_unit, # snake_case
+                        'precounitario': preco_unit,  # compatibilidade
+                        'valor_total': valor_total,   # snake_case
+                        'valortotal': valor_total,    # compatibilidade
+                        
+                        # Extras UI
+                        'moeda': moeda
+                    }
+                    
+                    transacoes.append(transacao_dict)
+                    
+                    # --- Atualiza Stats ---
+                    stats['total'] += 1
+                    stats['volume_total'] += valor_total
+                    
+                    if tipo_raw == 'compra':
+                        stats['compras'] += 1
+                        stats['volume_compras'] += valor_total
+                    elif tipo_raw == 'venda':
+                        stats['vendas'] += 1
+                        stats['volume_vendas'] += valor_total
+                        
+                    # Stats por tipo de ativo
+                    if 'ACAO' in tipo_ativo_str:
+                        stats['volume_acoes'] += valor_total
+                    elif 'FII' in tipo_ativo_str:
+                        stats['volume_fii'] += valor_total
+                    elif 'CRIPTO' in tipo_ativo_str:
+                        stats['volume_cripto'] += valor_total
+                    else:
+                        stats['volume_outros'] += valor_total
+
         except Exception as e:
             print(f"Erro transactions: {e}")
+            flash('Erro ao carregar transações.', 'error')
 
-    corretoras = []
-    tiposativo = []
-    classesativo = []
-    mercados = []
+    # Renderiza template passando todas as variáveis
+    return render_template('dashboard/transactions.html',
+                         stats=stats,
+                         transacoes=transacoes,
+                         filtros=filtros,
+                         corretoras=corretoras,
+                         tipos_ativo=tipos_ativo,
+                         classes_ativo=classes_ativo,
+                         mercados=mercados)
 
-    return render_template(
-        'dashboard/transactions.html',
-        stats=stats,
-        transacoes=transacoes,
-        filtros=filtros,
-        corretoras=corretoras,
-        tiposativo=tiposativo,
-        classesativo=classesativo,
-        mercados=mercados,
-    )
 
 
 @bp.route('/dividends')
@@ -446,52 +502,136 @@ def reports():
 def analytics():
     return render_template('dashboard/analytics.html')
 
-
 @bp.route('/alerts', methods=['GET'])
 @login_required
 def alerts():
+    """Alertas Integrado (Padronização e Correção M7.3)"""
     token = session.get('access_token')
+    
+    # Stats iniciais zerados
+    stats = {
+        'total': 0,
+        'ativos': 0,
+        'alta_preco': 0,
+        'acionados': 0
+    }
+    
     alertas = []
-    stats = {'total': 0, 'ativos': 0, 'alta_preco': 0, 'acionados': 0}
-
-    tipo = request.args.get('tipo')
-    status = request.args.get('status')
-    ativo = request.args.get('ativo')
+    ativos_unicos = [] 
+    
+    # Filtros da URL
+    tipo_filtro = request.args.get('tipo')
+    status_filtro = request.args.get('status')
+    ativo_filtro = request.args.get('ativo')
 
     if token:
         try:
-            headers = {'Authorization': f'Bearer {token}'}
+            headers = {'Authorization': f"Bearer {token}"}
             params = {}
-            if tipo and tipo != 'Todos': params['tipo_alerta'] = tipo
-            if status and status != 'Todos': params['ativo'] = 'true' if status == 'ativo' else 'false'
+            
+            # Mapeamento de filtros Frontend -> Backend
+            if tipo_filtro and tipo_filtro != 'Todos':
+                params['tipo_alerta'] = tipo_filtro
+            
+            if status_filtro and status_filtro != 'Todos':
+                params['ativo'] = 'true' if status_filtro == 'Ativo' else 'false'
+                
+            if ativo_filtro:
+                params['ticker'] = ativo_filtro
 
-            response = requests.get(
-                f'{Config.BACKEND_API_URL}/api/alertas/',
-                headers=headers, params=params, timeout=5
-            )
-
+            # --- PADRONIZAÇÃO: URL SEM BARRA ---
+            url = f"{Config.BACKEND_API_URL}/api/alertas"
+            
+            # Debug: Log da requisição
+            print(f"[DEBUG] Requesting Alerts: {url} | Params: {params}")
+            
+            response = requests.get(url, headers=headers, params=params, timeout=10)
+            
+            # Debug: Log da resposta
+            print(f"[DEBUG] Alerts Status: {response.status_code}")
+            
             if response.status_code == 200:
                 payload = response.json()
-                alertas = payload.get('data', [])
+                print(f"[DEBUG] Alerts Payload Keys: {payload.keys()}") # Ver o que tem na raiz
+                
+                # --- PARSING ROBUSTO ---
+                # 1. Tenta extrair lista de 'data' ou 'data.alertas' ou raiz
+                payload_data = payload.get('data', [])
+                
+                raw_alertas = []
+                if isinstance(payload_data, dict):
+                    # Padrão novo: { data: { alertas: [...], total: N } }
+                    raw_alertas = payload_data.get('alertas', [])
+                elif isinstance(payload_data, list):
+                    # Padrão antigo: { data: [...] }
+                    raw_alertas = payload_data
+                
+                print(f"[DEBUG] Alerts Found: {len(raw_alertas)}")
 
-                stats['total'] = len(alertas)
-                stats['ativos'] = len([a for a in alertas if a.get('ativo')])
-                stats['alta_preco'] = len([a for a in alertas if str(a.get('tipo_alerta') or '').upper() == 'ALTA_PRECO'])
-                stats['acionados'] = len([a for a in alertas if a.get('foi_acionado')])
+                for item in raw_alertas:
+                    # Normalização de dados
+                    ticker = item.get('ticker') or 'GERAL'
+                    ativo_flag = item.get('ativo', True)
+                    foi_acionado = item.get('foi_acionado', False)
+                    tipo_alerta = item.get('tipo_alerta', 'OUTROS')
+                    
+                    # Formata condição
+                    cond_op = item.get('condicao_operador', '')
+                    cond_val = item.get('condicao_valor', 0)
+                    condicao_str = f"{cond_op} {cond_val}"
+                    
+                    # Objeto final para o template
+                    alerta_dict = {
+                        'id': item.get('id'),
+                        'nome': item.get('nome'),
+                        
+                        # Tipos compatíveis
+                        'tipo': tipo_alerta,
+                        'tipo_alerta': tipo_alerta,
+                        
+                        # Dados do ativo
+                        'ticker': ticker,
+                        'ativo_ticker': ticker, # Alias
+                        
+                        # Condição e Status
+                        'condicao': condicao_str,
+                        'ativo': ativo_flag, # Boolean (para lógica)
+                        'status': 'ATIVO' if ativo_flag else 'INATIVO', # String (para display)
+                        
+                        # Disparos
+                        'foi_acionado': foi_acionado,
+                        'disparos': item.get('contagem_disparos', 0) if foi_acionado else 0,
+                        'ultimo_disparo': item.get('data_ultimo_disparo'),
+                        'created_at': item.get('created_at')
+                    }
+                    
+                    alertas.append(alerta_dict)
+                    
+                    # Coleta tickers únicos
+                    if ticker and ticker != 'GERAL' and ticker not in ativos_unicos:
+                        ativos_unicos.append(ticker)
+
+                    # Atualiza Stats
+                    stats['total'] += 1
+                    if ativo_flag:
+                        stats['ativos'] += 1
+                    if 'ALTA' in str(tipo_alerta).upper():
+                        stats['alta_preco'] += 1
+                    if foi_acionado:
+                        stats['acionados'] += 1
 
         except Exception as e:
-            print(f"Erro ao buscar alertas: {e}")
+            print(f"[ERROR] Alerts Route: {e}")
             flash('Erro ao carregar alertas.', 'error')
+            
+    ativos_unicos.sort()
 
-    ativos_unicos = sorted(list(set(a.get('ticker') for a in alertas if a.get('ticker'))))
+    return render_template('dashboard/alerts.html',
+                         alertas=alertas,
+                         stats=stats,
+                         filtros={'tipo': tipo_filtro, 'status': status_filtro, 'ativo': ativo_filtro},
+                         ativos=ativos_unicos)
 
-    return render_template(
-        'dashboard/alerts.html',
-        alertas=alertas,
-        stats=stats,
-        filtros={'tipo': tipo, 'status': status, 'ativo': ativo},
-        ativos=ativos_unicos
-    )
 
 
 @bp.route('/alerts/create', methods=['POST'])
