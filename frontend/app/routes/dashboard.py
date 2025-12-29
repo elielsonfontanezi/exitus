@@ -836,7 +836,7 @@ def alerts_create():
 
         headers = {'Authorization': f'Bearer {token}'}
         response = requests.post(
-            f'{Config.BACKEND_API_URL}/api/alertas/',
+            f'{Config.BACKEND_API_URL}/api/alertas',
             json=payload, headers=headers, timeout=10
         )
 

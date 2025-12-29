@@ -1,21 +1,38 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Analytics - Exitus{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6 space-y-4">
-    <div class="flex items-center justify-between mb-4">
-        <h1 class="text-2xl font-bold text-gray-900">
-            <i class="fas fa-chart-line text-green-500 mr-2"></i>Analytics
-        </h1>
-        <span class="text-sm text-gray-500">Planejado para Módulo 7</span>
+<div class="container mx-auto p-6 space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                <i class="fas fa-chart-pie text-purple-600 mr-3"></i>Analytics Avançado
+            </h1>
+            <p class="text-gray-600 mt-1">Análise profunda de performance e risco do portfólio.</p>
+        </div>
     </div>
 
-    <div class="card p-6">
-        <p class="text-gray-600">
-            Este painel exibirá gráficos e métricas avançadas de performance, risco e alocação
-            quando o Módulo 7 estiver completo. Por enquanto, funciona como rascunho para navegação.
+    <!-- Conteúdo Placeholder -->
+    <div class="bg-white rounded-lg shadow-sm p-12 text-center border border-gray-200">
+        <div class="w-24 h-24 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-hard-hat text-4xl text-purple-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Em Desenvolvimento (Módulo 8)</h3>
+        <p class="text-gray-500 max-w-md mx-auto mb-8">
+            Esta funcionalidade trará cálculos de Sharpe, Volatilidade, Correlação de Ativos e projeções de Monte Carlo.
+            <br>Aguarde as próximas atualizações do Sistema Exitus.
         </p>
+        
+        <div class="flex justify-center space-x-4">
+            <a href="{{ url_for('dashboard.index') }}" class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                <i class="fas fa-home mr-2"></i>Voltar ao Início
+            </a>
+            <a href="{{ url_for('dashboard.reports') }}" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                <i class="fas fa-file-alt mr-2"></i>Ver Relatórios
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}
