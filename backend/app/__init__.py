@@ -111,7 +111,7 @@ def create_app(testing=False):
     # 🆕 Portfolio consolidado (M7)
     try:
         # CORREÇÃO: Ponto no início (.) e importando 'bp' como 'portfolio_bp'
-        from .blueprints.portfolio import bp as portfolio_bp
+        from .blueprints.portfolio_blueprint import portfolio_bp
         app.register_blueprint(portfolio_bp)
 
         print("✅ Portfolio blueprint registrado: /api/portfolios")
