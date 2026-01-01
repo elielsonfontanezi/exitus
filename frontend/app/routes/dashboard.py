@@ -230,10 +230,10 @@ def assets():
                     })
 
                 stats["total"] = payload.get('total', len(ativos))
-                stats["acoes"] = len([a for a in ativos if a['tipo'] == 'ACAO'])
-                stats["fiis"] = len([a for a in ativos if a['tipo'] == 'FII'])
-                stats["bdrs"] = len([a for a in ativos if a['tipo'] == 'BDR'])
-                stats["etfs"] = len([a for a in ativos if a['tipo'] == 'ETF'])
+                stats['acoes'] = len([a for a in ativos if a.get('tipo', '').upper() == 'ACAO'])
+                stats['fiis'] = len([a for a in ativos if a.get('tipo', '').upper() == 'FII'])
+                stats['bdrs'] = len([a for a in ativos if a.get('tipo', '').upper() == 'BDR'])
+                stats['etfs'] = len([a for a in ativos if a.get('tipo', '').upper() == 'ETF'])
 
         except Exception as e:
             print(f"Erro ao buscar ativos: {e}")
