@@ -245,25 +245,26 @@ class Provento(db.Model):
         return delta.days
     
     def to_dict(self):
-        """
-        Converte objeto para dicionário (para serialização JSON)
+        """Converte objeto para dicionário para serialização JSON"""
         
-        Returns:
-            dict: Dicionário com dados do provento
-        """
+        # ✅ CORREÇÃO: Serializar enum corretamente
+        tipo_str = self.tipo_provento.value if isinstance(self.tipo_provento, TipoProvento) else str(self.tipo_provento)
+        
+        # Remove prefixo "TipoProvento." se existir
+        if tipo_str.startswith('TipoProvento.'):
+            tipo_str = tipo_str.replace('TipoProvento.', '').lower()
+        
         return {
             'id': str(self.id),
             'ativo_id': str(self.ativo_id),
-            'tipo_provento': self.tipo_provento.value if self.tipo_provento else None,
+            'tipo_provento': tipo_str,  # ✅ CORRIGIDO
             'valor_por_acao': float(self.valor_por_acao) if self.valor_por_acao else 0,
             'quantidade_ativos': float(self.quantidade_ativos) if self.quantidade_ativos else 0,
             'valor_bruto': float(self.valor_bruto) if self.valor_bruto else 0,
             'imposto_retido': float(self.imposto_retido) if self.imposto_retido else 0,
             'valor_liquido': float(self.valor_liquido) if self.valor_liquido else 0,
-            'percentual_imposto': float(self.percentual_imposto()),
             'data_com': self.data_com.isoformat() if self.data_com else None,
             'data_pagamento': self.data_pagamento.isoformat() if self.data_pagamento else None,
-            'dias_ate_pagamento': self.dias_ate_pagamento(),
             'observacoes': self.observacoes,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
