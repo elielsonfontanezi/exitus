@@ -151,7 +151,7 @@ def create_app(testing=False):
 
     # M4.4 - Cálculos Financeiros
     try:
-        from .blueprints.calculosblueprint import calculosbp
+        from .blueprints.calculos_blueprint import calculosbp
         app.register_blueprint(calculosbp)
         print("✅ Cálculos blueprint registrado: /api/calculos")
     except ImportError as e:
