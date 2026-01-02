@@ -11,17 +11,39 @@ logger = logging.getLogger(__name__)
 
 class PortfolioService:
     @staticmethod
+    def get_by_id(portfolio_id: UUID, usuario_id: UUID) -> Optional[Portfolio]:
+        """Busca um portfolio específico garantindo que pertença ao usuário."""
+        return Portfolio.query.filter_by(id=portfolio_id, usuario_id=usuario_id).first()
+
+    @staticmethod
     def get_all_for_user(usuario_id: UUID, page: int = 1, per_page: int = 20):
         """Retorna todos os portfolios do usuário com paginação."""
         return Portfolio.query.filter_by(usuario_id=usuario_id, ativo=True)\
             .order_by(Portfolio.nome)\
             .paginate(page=page, per_page=per_page, error_out=False)
 
+    # ADICIONAR APÓS o método get_all_for_user() (linha ~23)
     @staticmethod
-    def get_by_id(portfolio_id: UUID, usuario_id: UUID) -> Optional[Portfolio]:
-        """Busca um portfolio específico garantindo que pertença ao usuário."""
-        return Portfolio.query.filter_by(id=portfolio_id, usuario_id=usuario_id).first()
-
+    def get_all(usuario_id: UUID, page: int = 1, per_page: int = 20, ativo: bool = None):
+        """
+        Retorna portfolios do usuário com paginação e filtro de status.
+        Alias melhorado de get_all_for_user().
+        
+        Args:
+            usuario_id: UUID do usuário
+            page: Página atual (default: 1)
+            per_page: Itens por página (default: 20)
+            ativo: Filtrar por status (True/False/None para todos)
+        """
+        query = Portfolio.query.filter_by(usuario_id=usuario_id)
+        
+        # Filtrar por status se especificado
+        if ativo is not None:
+            query = query.filter_by(ativo=ativo)
+        
+        return query.order_by(Portfolio.nome)\
+            .paginate(page=page, per_page=per_page, error_out=False)
+        
     @staticmethod
     def create(data: Dict, usuario_id: UUID) -> Portfolio:
         """Cria um novo portfolio."""

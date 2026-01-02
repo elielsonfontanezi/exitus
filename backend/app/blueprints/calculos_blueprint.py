@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.database import db
 from app.models import Ativo
-#from app.services.portfolio_service import get_portfolio_metrics
 from app.services.portfolio_service import PortfolioService
 from app.services.parametros_macro_service import get_parametros_macro
 
@@ -13,7 +12,6 @@ calculos_bp = Blueprint('calculos', __name__, url_prefix='/api/calculos')
 def calcular_portfolio():
     """Endpoint principal - métricas reais + AVANÇADAS do portfólio"""
     usuario_id = get_jwt_identity()
-    #metrics = get_portfolio_metrics(usuario_id)
     metrics = PortfolioService.get_portfolio_metrics(usuario_id)
 
     if "erro" in metrics:
