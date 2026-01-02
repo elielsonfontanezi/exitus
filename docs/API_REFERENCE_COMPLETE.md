@@ -10,14 +10,16 @@
 
 ## 📋 ROTAS DISPONÍVEIS
 
-[alertas] 'GET' /
-[alertas] 'POST' /verificar
+[alertas] 'DELETE' /<alerta_id>
+[alertas] 'GET' 
+[alertas] 'PATCH' /<alerta_id>/toggle
+[alertas] 'POST' 
 [buy_signals] 'GET' /buy-score/<string:ticker>
 [buy_signals] 'GET' /margem-seguranca/<string:ticker>
 [buy_signals] 'GET' /watchlist-top
 [buy_signals] 'GET' /zscore/<string:ticker>
-[calculosblueprint] 'GET' /portfolio
-[calculosblueprint] 'GET' /preco_teto/<string:ticker>
+[calculos] 'GET' /portfolio
+[calculos] 'GET' /preco_teto/<string:ticker>
 [cotacoes] 'GET' /batch
 [cotacoes] 'GET' /health
 [cotacoes] 'GET' /<ticker>
@@ -31,7 +33,6 @@
 [fontesblueprint] 'GET' /
 [fontesblueprint] 'GET' /<string:id>
 [fontesblueprint] 'POST' /
-[m7_portfolio] 'GET' /portfolio
 [movimentacao_caixa] 'DELETE' /<uuid:movimentacao_id>
 [movimentacao_caixa] 'GET' 
 [movimentacao_caixa] 'GET' /extrato
