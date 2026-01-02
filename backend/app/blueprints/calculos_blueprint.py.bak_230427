@@ -2,17 +2,19 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.database import db
 from app.models import Ativo
-from app.services.portfolio_service import get_portfolio_metrics
+#from app.services.portfolio_service import get_portfolio_metrics
+from app.services.portfolio_service import PortfolioService
 from app.services.parametros_macro_service import get_parametros_macro
 
-calculosbp = Blueprint('calculos', __name__, url_prefix='/api/calculos')
+calculos_bp = Blueprint('calculos', __name__, url_prefix='/api/calculos')
 
-@calculosbp.route('/portfolio', methods=['GET'])
+@calculos_bp.route('/portfolio', methods=['GET'])
 @jwt_required()
 def calcular_portfolio():
     """Endpoint principal - métricas reais + AVANÇADAS do portfólio"""
     usuario_id = get_jwt_identity()
-    metrics = get_portfolio_metrics(usuario_id)
+    #metrics = get_portfolio_metrics(usuario_id)
+    metrics = PortfolioService.get_portfolio_metrics(usuario_id)
 
     if "erro" in metrics:
         return jsonify(metrics), 404
@@ -20,7 +22,7 @@ def calcular_portfolio():
     resultado = {
         "portfolio_info": metrics["portfolio_info"],
         "rentabilidade": {
-            "YTD": metrics["rentabilidade_ytd"],
+            "YTD": metrics.get("rentabilidade_ytd", 0.0),
             "1A": 0.12,
             "3A": 0.36
         },
@@ -37,7 +39,7 @@ def calcular_portfolio():
     return jsonify(resultado), 200
 
 
-@calculosbp.route('/preco_teto/<string:ticker>', methods=['GET'])
+@calculos_bp.route('/preco_teto/<string:ticker>', methods=['GET'])
 @jwt_required()
 def calcular_preco_teto(ticker):
     """Preço Teto MULTI-MERCADO - Parâmetros REGIONAIS dinâmicos"""
