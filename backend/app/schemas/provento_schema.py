@@ -3,7 +3,7 @@
 Exitus - Provento Schema - Serialização Marshmallow
 """
 
-from marshmallow import Schema, fields, post_dump, ValidationError
+from marshmallow import Schema, fields, post_dump, post_load, ValidationError
 from app.models.provento import TipoProvento
 
 
@@ -34,6 +34,9 @@ class ProventoSchema(Schema):
     # Timestamps
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
+    
+    # ✅ ADICIONAR: Campos nested do ativo
+    ativo = fields.Method('get_ativo_info')
     
     def get_tipo_provento(self, obj):
         """

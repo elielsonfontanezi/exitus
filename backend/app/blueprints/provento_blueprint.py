@@ -7,6 +7,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 
+from app.models import TipoProvento
 from app.services.provento_service import ProventoService
 
 from app.schemas.provento_schema import (
@@ -39,7 +40,15 @@ def listar_proventos():
     if ativo_id:
         filters['ativo_id'] = ativo_id
     if tipo:
-        filters['tipo_provento'] = tipo
+        try:
+            # Converte string para Enum Python
+            tipo_enum = TipoProvento[tipo.upper()]
+            filters['tipo_provento'] = tipo_enum
+        except KeyError:
+            return error_response(
+                f"Tipo inválido: {tipo}. Use: {', '.join([t.name.lower() for t in TipoProvento])}",
+                400
+            )
     if ano:  # ✅ ADICIONAR
         filters['ano'] = ano
     
