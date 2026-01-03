@@ -8,6 +8,7 @@ from uuid import UUID
 from decimal import Decimal
 from datetime import datetime, date
 from sqlalchemy.orm import joinedload
+from sqlalchemy import extract
 
 from app.database import db
 from app.models import Provento, Ativo, Posicao
@@ -27,7 +28,7 @@ class ProventoService:
             usuario_id: UUID do usuário
             page: Página atual
             per_page: Itens por página
-            filters: Dict com ativo_id, tipo_provento
+            filters: Dict com ativo_id, tipo_provento, ano
         
         Returns:
             Pagination: Objeto de paginação SQLAlchemy
@@ -53,6 +54,12 @@ class ProventoService:
                 
                 if filters.get('tipo_provento'):
                     query = query.filter_by(tipo_provento=filters['tipo_provento'])
+                
+                # ✅ NOVO: Filtro por ANO
+                if filters.get('ano'):
+                    query = query.filter(
+                        extract('year', Provento.data_pagamento) == filters['ano']
+                    )
             
             # 4. Eager loading e ordenação
             query = query.options(joinedload(Provento.ativo)).order_by(Provento.data_com.desc())
@@ -63,7 +70,6 @@ class ProventoService:
         except Exception as e:
             logger.error(f"Erro proventos usuario {usuario_id}: {e}")
             raise
-    
     
     @staticmethod
     def get_by_id(provento_id):

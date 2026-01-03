@@ -8,13 +8,15 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 
 from app.services.provento_service import ProventoService
+
 from app.schemas.provento_schema import (
     ProventoSchema,
     ProventoCreateSchema,
     ProventoUpdateSchema,
     ProventoResponseSchema
 )
-from app.utils.responses import success_response, error_response, not_found
+
+from app.utils.responses import success_response, error_response, not_found 
 
 provento_bp = Blueprint('proventos', __name__, url_prefix='/api/proventos')
 
@@ -32,19 +34,20 @@ def listar_proventos():
     tipo = request.args.get('tipo', type=str)
     ano = request.args.get('ano', type=int)
     
-    # ✅ CORREÇÃO: Montar dict de filtros
+    # Montar dict de filtros
     filters = {}
     if ativo_id:
         filters['ativo_id'] = ativo_id
     if tipo:
         filters['tipo_provento'] = tipo
-    # Nota: 'ano' não está implementado no service, ignorar por enquanto
+    if ano:  # ✅ ADICIONAR
+        filters['ano'] = ano
     
     pagination = ProventoService.get_all(
         usuario_id=usuario_id,
         page=page,
         per_page=per_page,
-        filters=filters  # ✅ Passar como dict
+        filters=filters
     )
     
     return success_response(
