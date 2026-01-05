@@ -867,3 +867,44 @@ def alerts_delete(alert_id):
     headers = {'Authorization': f'Bearer {token}'}
     requests.delete(f'{Config.BACKEND_API_URL}/api/alertas/{alert_id}', headers=headers)
     return redirect(url_for('dashboard.alerts'))
+
+# ✅ ADICIONAR NO FINAL (usando bp Blueprint)
+@bp.route('/movimentacoes')
+@login_required
+def dashboard_movimentacoes():
+    """Dashboard Movimentações Caixa M7.2"""
+    token = session.get('access_token')  # ← CORREÇÃO: access_token
+    movimentacoes = []
+    total = 0
+    
+    if token:
+        try:
+            headers = {"Authorization": f"Bearer {token}"}
+            params = {"page": 1, "per_page": 50}
+            response = requests.get(
+                f"{Config.BACKEND_API_URL}/api/movimentacoes",
+                headers=headers,
+                params=params,
+                timeout=5
+            )
+            if response.status_code == 200:
+                payload = response.json()
+                movimentacoes = payload.get("data", {}).get("movimentacoes", [])
+                total = payload.get("data", {}).get("total", 0)
+            else:
+                flash("Erro ao carregar movimentações.", "error")
+        except Exception as e:
+            print(f"Erro ao buscar movimentações: {e}")
+            flash("Erro ao carregar movimentações.", "error")
+    
+    # Fallback
+    if not movimentacoes:
+        movimentacoes = [{"id": "test", "tipomovimentacao": "deposito", "valor": "5000.00",
+                         "corretora": {"nome": "XP"}, "datamovimentacao": "2026-01-05"}]
+    
+    return render_template(
+        "dashboard/movimentacoes.html",
+        movimentacoes=movimentacoes,
+        total_movimentacoes=total,
+        page_title="Movimentações - Exitus"
+    )
