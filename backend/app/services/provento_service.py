@@ -297,11 +297,3 @@ class ProventoService:
                 } for tipo, dados in total_por_tipo.items()
             }
         }
-
-    @staticmethod
-    def get_by_id(provento_id):
-        """Busca provento por ID"""
-        # ✅ ADICIONAR: joinedload para carregar ativo
-        return Provento.query.options(
-            joinedload(Provento.ativo)
-        ).get(provento_id)
