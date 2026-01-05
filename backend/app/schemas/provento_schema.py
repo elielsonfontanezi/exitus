@@ -3,9 +3,8 @@
 Exitus - Provento Schema - Serialização Marshmallow
 """
 
-from marshmallow import Schema, fields, post_dump, post_load, ValidationError
+from marshmallow import Schema, fields, post_dump, post_load, validates, ValidationError
 from app.models.provento import TipoProvento
-
 
 class ProventoSchema(Schema):
     """Schema para serialização de Proventos"""
@@ -79,19 +78,30 @@ class ProventoSchema(Schema):
 
 
 class ProventoCreateSchema(Schema):
-    """Schema para criação de Provento (validação de input)"""
-    
+    """Schema para criação de Provento"""
     ativo_id = fields.UUID(required=True)
     tipo_provento = fields.String(required=True)
     valor_por_acao = fields.Decimal(required=True)
     quantidade_ativos = fields.Decimal(required=True)
     valor_bruto = fields.Decimal(required=True)
-    imposto_retido = fields.Decimal(missing=0.00)
+    imposto_retido = fields.Decimal(missing="0.00")
     valor_liquido = fields.Decimal(required=True)
     data_com = fields.Date(required=True)
     data_pagamento = fields.Date(required=True)
     observacoes = fields.String(allow_none=True)
-
+    
+    @validates('tipo_provento')
+    def validate_tipo_provento(self, value):
+        """Valida e converte tipo_provento para UPPERCASE"""
+        valid_tipos = ['dividendo', 'rendimento', 'jcp', 'bonificacao']
+        
+        if value.lower() not in valid_tipos:
+            raise ValidationError(
+                f"Tipo inválido: {value}. Use: {', '.join(valid_tipos)}"
+            )
+        
+        # ✅ CONVERTER PARA UPPERCASE (PostgreSQL enum)
+        return value.upper()
 
 class ProventoUpdateSchema(Schema):
     """Schema para atualização de Provento (todos campos opcionais)"""

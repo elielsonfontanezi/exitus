@@ -48,8 +48,7 @@ class Provento(db.Model):
     """
     
     __tablename__ = 'provento'
-    
-    # Chave primária
+        # Chave primária
     id = db.Column(
         UUID(as_uuid=True),
         primary_key=True,

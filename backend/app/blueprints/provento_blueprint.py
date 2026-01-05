@@ -6,18 +6,17 @@ Exitus - Provento Blueprint - Endpoints CRUD
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
-
-from app.models import TipoProvento
+from app.models import TipoProvento, Provento  # ✅ ADICIONAR Provento
+from sqlalchemy.orm import joinedload  # ✅ ADICIONAR joinedload
 from app.services.provento_service import ProventoService
-
 from app.schemas.provento_schema import (
-    ProventoSchema,
-    ProventoCreateSchema,
-    ProventoUpdateSchema,
+    ProventoSchema, 
+    ProventoCreateSchema, 
+    ProventoUpdateSchema, 
     ProventoResponseSchema
 )
+from app.utils.responses import success_response, error_response, not_found
 
-from app.utils.responses import success_response, error_response, not_found 
 
 provento_bp = Blueprint('proventos', __name__, url_prefix='/api/proventos')
 
@@ -70,11 +69,28 @@ def listar_proventos():
     )
 
 
+# @provento_bp.route('/<uuid:id>', methods=['GET'])
+# @jwt_required()
+# def get_provento(id):
+#     """Buscar provento por ID"""
+#     provento = ProventoService.get_by_id(id)
+    
+#     if not provento:
+#         return not_found("Provento não encontrado")
+    
+#     return success_response(
+#         ProventoResponseSchema().dump(provento),
+#         "Dados do provento"
+#     )
+
 @provento_bp.route('/<uuid:id>', methods=['GET'])
 @jwt_required()
 def get_provento(id):
     """Buscar provento por ID"""
-    provento = ProventoService.get_by_id(id)
+    # ✅ FORÇAR EAGER LOAD no blueprint
+    provento = Provento.query.options(
+        joinedload(Provento.ativo)
+    ).get(id)
     
     if not provento:
         return not_found("Provento não encontrado")

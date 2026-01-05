@@ -86,21 +86,44 @@ class ProventoService:
             if not ativo:
                 raise ValueError("Ativo não encontrado")
             
-            # Calcular valores derivados
-            if 'valor_por_acao' in data and 'quantidade_ativos' in data:
-                data['valor_bruto'] = Decimal(str(data['valor_por_acao'])) * Decimal(str(data['quantidade_ativos']))
+            # ✅ GARANTIR que tipo_provento está em UPPERCASE
+            if 'tipo_provento' in data:
+                data['tipo_provento'] = data['tipo_provento'].upper()
             
-            if 'valor_bruto' in data and 'imposto_retido' in data:
-                data['valor_liquido'] = Decimal(str(data['valor_bruto'])) - Decimal(str(data['imposto_retido']))
+            # Converter string para Enum
+            from app.models import TipoProvento
+            tipo_enum = TipoProvento[data['tipo_provento']]
             
-            provento = Provento(**data)
+            provento = Provento(
+                ativo_id=data['ativo_id'],
+                tipo_provento=tipo_enum,  # ✅ Usar enum, não string
+                valor_por_acao=data['valor_por_acao'],
+                quantidade_ativos=data['quantidade_ativos'],
+                valor_bruto=data['valor_bruto'],
+                imposto_retido=data.get('imposto_retido', 0),
+                valor_liquido=data['valor_liquido'],
+                data_com=data['data_com'],
+                data_pagamento=data['data_pagamento'],
+                observacoes=data.get('observacoes')
+            )
+            
             db.session.add(provento)
             db.session.commit()
+            db.session.refresh(provento)
+            
+            # ✅ EAGER LOAD ativo para retornar completo
+            provento = Provento.query.options(
+                joinedload(Provento.ativo)
+            ).get(provento.id)
+            
             return provento
+            
+        except KeyError as e:
+            raise ValueError(f"Tipo de provento inválido: {data.get('tipo_provento')}")
         except Exception as e:
             db.session.rollback()
             raise
-    
+   
     
     @staticmethod
     def update(provento_id, data):
@@ -274,3 +297,11 @@ class ProventoService:
                 } for tipo, dados in total_por_tipo.items()
             }
         }
+
+    @staticmethod
+    def get_by_id(provento_id):
+        """Busca provento por ID"""
+        # ✅ ADICIONAR: joinedload para carregar ativo
+        return Provento.query.options(
+            joinedload(Provento.ativo)
+        ).get(provento_id)
