@@ -83,21 +83,20 @@ def listar_proventos():
 #         "Dados do provento"
 #     )
 
-@provento_bp.route('/<uuid:id>', methods=['GET'])
+@provento_bp.route("/<uuid:id>", methods=["GET"])
 @jwt_required()
 def get_provento(id):
     """Buscar provento por ID"""
-    # ✅ FORÇAR EAGER LOAD no blueprint
     provento = Provento.query.options(
         joinedload(Provento.ativo)
     ).get(id)
-    
+
     if not provento:
         return not_found("Provento não encontrado")
-    
+
     return success_response(
         ProventoResponseSchema().dump(provento),
-        "Dados do provento"
+        "Dados do provento",
     )
 
 

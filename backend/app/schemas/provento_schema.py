@@ -120,11 +120,9 @@ class ProventoUpdateSchema(Schema):
 class ProventoResponseSchema(Schema):
     """
     Schema para resposta de API (inclui campos calculados).
-    
-    Herda de ProventoSchema e adiciona campos extras.
     """
-    
-    # Campos base do ProventoSchema
+
+    # Campos base
     id = fields.UUID(dump_only=True)
     ativo_id = fields.UUID()
     tipo_provento = fields.Method("get_tipo_provento")
@@ -138,25 +136,42 @@ class ProventoResponseSchema(Schema):
     observacoes = fields.String(allow_none=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
-    
-    # Campos calculados/extras
+
+    # Campos extras/calculados
     percentual_imposto = fields.Method("get_percentual_imposto")
     dias_ate_pagamento = fields.Method("get_dias_ate_pagamento")
-    
+
+    # ✅ Adicionar o nested do ativo
+    ativo = fields.Method("get_ativo_info")
+
     def get_tipo_provento(self, obj):
-        """Serializa enum corretamente"""
-        if hasattr(obj.tipo_provento, 'value'):
+        """Serializa enum TipoProvento corretamente em lowercase."""
+        if hasattr(obj.tipo_provento, "value"):
             return obj.tipo_provento.value
-        return str(obj.tipo_provento).replace('TipoProvento.', '').lower()
-    
+        # fallback se vier string
+        s = str(obj.tipo_provento)
+        return s.replace("TipoProvento.", "").lower()
+
+    def get_ativo_info(self, obj):
+        """Retorna dados básicos do ativo relacionado."""
+        if not hasattr(obj, "ativo") or obj.ativo is None:
+            return None
+
+        tipo = obj.ativo.tipo.value if hasattr(obj.ativo.tipo, "value") else str(obj.ativo.tipo)
+        return {
+            "id": str(obj.ativo.id),
+            "ticker": obj.ativo.ticker,
+            "nome": obj.ativo.nome,
+            "tipo": tipo,
+            "mercado": obj.ativo.mercado,
+        }
+
     def get_percentual_imposto(self, obj):
-        """Calcula percentual de imposto retido"""
-        if hasattr(obj, 'percentual_imposto') and callable(obj.percentual_imposto):
+        if hasattr(obj, "percentual_imposto") and callable(obj.percentual_imposto):
             return float(obj.percentual_imposto())
         return 0.0
-    
+
     def get_dias_ate_pagamento(self, obj):
-        """Calcula dias até pagamento"""
-        if hasattr(obj, 'dias_ate_pagamento') and callable(obj.dias_ate_pagamento):
+        if hasattr(obj, "dias_ate_pagamento") and callable(obj.dias_ate_pagamento):
             return obj.dias_ate_pagamento()
         return None
