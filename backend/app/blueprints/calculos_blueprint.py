@@ -2,42 +2,43 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.database import db
 from app.models import Ativo
-from app.services.portfolio_service import get_portfolio_metrics
+from app.services.portfolio_service import PortfolioService
 from app.services.parametros_macro_service import get_parametros_macro
 
-calculosbp = Blueprint('calculos', __name__, url_prefix='/api/calculos')
+calculos_bp = Blueprint('calculos', __name__, url_prefix='/api/calculos')
 
-@calculosbp.route('/portfolio', methods=['GET'])
+@calculos_bp.route('/portfolio', methods=['GET'])
 @jwt_required()
 def calcular_portfolio():
     """Endpoint principal - métricas reais + AVANÇADAS do portfólio"""
     usuario_id = get_jwt_identity()
-    metrics = get_portfolio_metrics(usuario_id)
+    metrics = PortfolioService.get_portfolio_metrics(usuario_id)
 
     if "erro" in metrics:
         return jsonify(metrics), 404
 
     resultado = {
-        "portfolio_info": metrics["portfolio_info"],
+        "portfolio_info": metrics.get("portfolio_info", {}),  # ✅ Safe get
         "rentabilidade": {
-            "YTD": metrics["rentabilidade_ytd"],
+            "YTD": metrics.get("rentabilidade_ytd", 0.0),
             "1A": 0.12,
             "3A": 0.36
         },
-        "alocacao": metrics["alocacao"],
-        "dividend_yield_medio": metrics["dividend_yield_medio"],
+        "alocacao": metrics.get("alocacao", {}),  # ✅ Safe get
+        "dividend_yield_medio": metrics.get("dividend_yield_medio", 0.0),  # ✅ Safe get
         "risco": {
-            "volatilidade_anualizada": round(metrics["volatilidade_anualizada"], 4),
-            "sharpe_ratio": round(metrics["sharpe_ratio"], 2),
-            "max_drawdown": f"{metrics['max_drawdown']*100:.1f}%",
-            "beta_ibov": round(metrics["beta_ibov"], 2)
+            "volatilidade_anualizada": round(metrics.get("volatilidade_anualizada", 0.0), 4),  # ✅ Safe get
+            "sharpe_ratio": round(metrics.get("sharpe_ratio", 0.0), 2),  # ✅ Safe get
+            "max_drawdown": f"{metrics.get('max_drawdown', 0.0)*100:.1f}%",  # ✅ Safe get
+            "beta_ibov": round(metrics.get("beta_ibov", 0.0), 2)  # ✅ Safe get
         },
-        "correlacao_ativos": metrics["correlacao_ativos"]
+        "correlacao_ativos": metrics.get("correlacao_ativos", [])  # ✅ Safe get
     }
+
     return jsonify(resultado), 200
 
 
-@calculosbp.route('/preco_teto/<string:ticker>', methods=['GET'])
+@calculos_bp.route('/preco_teto/<string:ticker>', methods=['GET'])
 @jwt_required()
 def calcular_preco_teto(ticker):
     """Preço Teto MULTI-MERCADO - Parâmetros REGIONAIS dinâmicos"""

@@ -11,17 +11,39 @@ logger = logging.getLogger(__name__)
 
 class PortfolioService:
     @staticmethod
+    def get_by_id(portfolio_id: UUID, usuario_id: UUID) -> Optional[Portfolio]:
+        """Busca um portfolio específico garantindo que pertença ao usuário."""
+        return Portfolio.query.filter_by(id=portfolio_id, usuario_id=usuario_id).first()
+
+    @staticmethod
     def get_all_for_user(usuario_id: UUID, page: int = 1, per_page: int = 20):
         """Retorna todos os portfolios do usuário com paginação."""
         return Portfolio.query.filter_by(usuario_id=usuario_id, ativo=True)\
             .order_by(Portfolio.nome)\
             .paginate(page=page, per_page=per_page, error_out=False)
 
+    # ADICIONAR APÓS o método get_all_for_user() (linha ~23)
     @staticmethod
-    def get_by_id(portfolio_id: UUID, usuario_id: UUID) -> Optional[Portfolio]:
-        """Busca um portfolio específico garantindo que pertença ao usuário."""
-        return Portfolio.query.filter_by(id=portfolio_id, usuario_id=usuario_id).first()
-
+    def get_all(usuario_id: UUID, page: int = 1, per_page: int = 20, ativo: bool = None):
+        """
+        Retorna portfolios do usuário com paginação e filtro de status.
+        Alias melhorado de get_all_for_user().
+        
+        Args:
+            usuario_id: UUID do usuário
+            page: Página atual (default: 1)
+            per_page: Itens por página (default: 20)
+            ativo: Filtrar por status (True/False/None para todos)
+        """
+        query = Portfolio.query.filter_by(usuario_id=usuario_id)
+        
+        # Filtrar por status se especificado
+        if ativo is not None:
+            query = query.filter_by(ativo=ativo)
+        
+        return query.order_by(Portfolio.nome)\
+            .paginate(page=page, per_page=per_page, error_out=False)
+        
     @staticmethod
     def create(data: Dict, usuario_id: UUID) -> Portfolio:
         """Cria um novo portfolio."""
@@ -125,4 +147,74 @@ class PortfolioService:
             "profit_loss_pct": 0.0,
             "allocation": {}
         }
+
+
+# Adicionar no final da classe PortfolioService
+
+    @staticmethod
+    def get_alocacao(usuario_id):
+        """
+        Calcula alocação do portfólio por classe de ativo.
+        
+        Returns:
+            {
+                "renda_variavel": {"valor": 0.0, "percentual": 0.0},
+                "renda_fixa": {"valor": 0.0, "percentual": 0.0},
+                "cripto": {"valor": 0.0, "percentual": 0.0}
+            }
+        """
+        from app.models import Posicao, Ativo
+        from app.database import db
+        
+        # Buscar todas as posições do usuário
+        posicoes = Posicao.query.filter_by(usuario_id=usuario_id).all()
+        
+        if not posicoes:
+            return {
+                "renda_variavel": {"valor": 0.0, "percentual": 0.0},
+                "renda_fixa": {"valor": 0.0, "percentual": 0.0},
+                "cripto": {"valor": 0.0, "percentual": 0.0}
+            }
+        
+        # Agrupar por classe
+        alocacao = {}
+        total_patrimonio = 0.0
+        
+        for posicao in posicoes:
+            ativo = posicao.ativo
+            if not ativo:
+                continue
+            
+            # Valor da posição = quantidade * preço atual (ou custo médio se preco_atual nulo)
+            preco = float(ativo.preco_atual) if ativo.preco_atual else float(posicao.preco_medio)
+            valor_posicao = float(posicao.quantidade) * preco
+            total_patrimonio += valor_posicao
+            
+            # Obter classe do ativo (enum -> string lowercase)
+            if hasattr(ativo, 'classe'):
+                classe = str(ativo.classe.value) if hasattr(ativo.classe, 'value') else str(ativo.classe)
+                classe = classe.lower().replace('classeativo.', '')  # Normalizar
+            else:
+                classe = "renda_variavel"  # Default
+            
+            if classe not in alocacao:
+                alocacao[classe] = 0.0
+            
+            alocacao[classe] += valor_posicao
+        
+        # Calcular percentuais
+        resultado = {}
+        for classe, valor in alocacao.items():
+            percentual = (valor / total_patrimonio * 100) if total_patrimonio > 0 else 0
+            resultado[classe] = {
+                "valor": round(valor, 2),
+                "percentual": round(percentual, 2)
+            }
+        
+        # Garantir que classes obrigatórias existam (mesmo zeradas)
+        for classe in ["renda_variavel", "renda_fixa", "cripto"]:
+            if classe not in resultado:
+                resultado[classe] = {"valor": 0.0, "percentual": 0.0}
+        
+        return resultado
 

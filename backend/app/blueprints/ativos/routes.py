@@ -13,7 +13,7 @@ from app.utils.decorators import admin_required
 
 bp = Blueprint('ativos', __name__, url_prefix='/api/ativos')
 
-@bp.route('', methods=['GET'])
+@bp.route('/', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def list_ativos():
     """Lista ativos com filtros"""
@@ -59,7 +59,7 @@ def get_by_ticker(ticker):
     
     return success(AtivoResponseSchema().dump(ativo), "Dados do ativo")
 
-@bp.route('', methods=['POST'])
+@bp.route('/', methods=['POST'], strict_slashes=False)
 @admin_required
 def create_ativo():
     """Criar novo ativo (admin only)"""

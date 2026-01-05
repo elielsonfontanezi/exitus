@@ -6,9 +6,11 @@ from app.services.alerta_service import AlertaService
 from app.models.configuracao_alerta import ConfiguracaoAlerta
 from app.database import db
 
+# Prefixo definido. Rotas abaixo serão relativas a /api/alertas
 bp = Blueprint('alertas', __name__, url_prefix='/api/alertas')
 
-@bp.route('/', methods=['GET'])
+# CORREÇÃO: strict_slashes=False permite acesso com ou sem barra final (/api/alertas ou /api/alertas/)
+@bp.route('', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def listar_alertas():
     try:
@@ -22,7 +24,7 @@ def listar_alertas():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@bp.route('/', methods=['POST'])
+@bp.route('', methods=['POST'], strict_slashes=False)
 @jwt_required()
 def criar_alerta():
     try:

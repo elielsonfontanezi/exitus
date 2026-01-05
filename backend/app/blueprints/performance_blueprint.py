@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 """
 M7.3 - Performance/Analise Blueprint (4 endpoints)
 - GET /api/performance/performance
@@ -16,7 +16,6 @@ from app.services.analise_service import AnaliseService
 from app.services.relatorio_service import RelatorioService
 
 performance_bp = Blueprint("performance", __name__, url_prefix="/api/performance")
-
 
 @performance_bp.route("/performance", methods=["GET"])
 @jwt_required()

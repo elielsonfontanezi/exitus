@@ -35,6 +35,13 @@
                     <span class="ml-auto bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">NOVO</span>
                 </a>
 
+                <!-- Alertas -->
+                <a href="{{ url_for('dashboard.alerts') }}" 
+                   class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors {{ 'bg-primary text-white' if request.endpoint == 'dashboard.alerts' else 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
+                   <i class="fas fa-bell w-5"></i>
+                   <span class="font-medium">Alertas</span>
+                </a>
+
                 <!-- Separator -->
                 <div class="py-2">
                     <div class="border-t border-gray-700"></div>
@@ -59,6 +66,12 @@
                    class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors">
                     <i class="fas fa-exchange-alt w-5"></i>
                     <span>Transações</span>
+                </a>
+
+                <!-- Movimentações Caixa M7.2 -->
+                <a href="{{ url_for('dashboard.dashboard_movimentacoes') }}" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+                  <i class="fas fa-wallet w-5"></i>
+                  <span>Movimentações</span>
                 </a>
 
                 <!-- Proventos -->

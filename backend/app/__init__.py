@@ -111,7 +111,7 @@ def create_app(testing=False):
     # 🆕 Portfolio consolidado (M7)
     try:
         # CORREÇÃO: Ponto no início (.) e importando 'bp' como 'portfolio_bp'
-        from .blueprints.portfolio import bp as portfolio_bp
+        from .blueprints.portfolio_blueprint import portfolio_bp
         app.register_blueprint(portfolio_bp)
 
         print("✅ Portfolio blueprint registrado: /api/portfolios")
@@ -151,8 +151,8 @@ def create_app(testing=False):
 
     # M4.4 - Cálculos Financeiros
     try:
-        from .blueprints.calculosblueprint import calculosbp
-        app.register_blueprint(calculosbp)
+        from .blueprints.calculos_blueprint import calculos_bp
+        app.register_blueprint(calculos_bp)
         print("✅ Cálculos blueprint registrado: /api/calculos")
     except ImportError as e:
         print(f"⚠️  Cálculos blueprint não encontrado: {e}")

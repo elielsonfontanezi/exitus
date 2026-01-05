@@ -12,7 +12,7 @@ from .corretora_service import CorretoraService
 from .transacao_service import TransacaoService
 from .posicao_service import PosicaoService
 from .provento_service import ProventoService
-from .cotacao_service import CotacaoService
+from .cotacoes_service import CotacoesService
 
 # M7.2: Novos Services - Relatórios e Análises Avançadas
 from .relatorio_service import RelatorioService
@@ -29,8 +29,7 @@ SERVICES = [
     'TransacaoService',
     'PosicaoService',
     'ProventoService',
-    'CotacaoService',
-    # M7 Services
+    'CotacoesService',
     'RelatorioService',
     'AlertaService',
     'ProjecaoService',
