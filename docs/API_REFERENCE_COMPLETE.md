@@ -47,6 +47,8 @@
 @performance_bp.route("/correlacao", methods=["GET"])
 @performance_bp.route("/desvio-alocacao", methods=["GET"])
 @performance_bp.route("/performance", methods=["GET"])
+[portfolio] 'DELETE' /<uuid:portfolio_id>
+[portfolio] 'GET' /
 [portfolio] 'GET' /alocacao
 [portfolio] 'GET' /dashboard
 [portfolio] 'GET' /distribuicao/classes
@@ -54,14 +56,21 @@
 [portfolio] 'GET' /evolucao
 [portfolio] 'GET' /metricas-risco
 [portfolio] 'GET' /performance
+[portfolio] 'GET' /<uuid:portfolio_id>
+[portfolio] 'POST' /
+[portfolio] 'PUT' /<uuid:portfolio_id>
 [posicao] 'GET' 
 [posicao] 'GET' /
 @projecoes_bp.route("/cenarios", methods=["GET"])
 @projecoes_bp.route("/recalcular", methods=["POST"])
 @projecoes_bp.route("/renda", methods=["GET"])
 @projecoes_bp.route("/renda/<string:portfolio_id>", methods=["GET"])
-[provento] 'GET' 
+@provento_bp.route("/<uuid:id>", methods=["GET"])
+[provento] 'DELETE' /<uuid:id>
 [provento] 'GET' /
+# [provento] 'GET' /<uuid:id>
+[provento] 'POST' /
+[provento] 'PUT' /<uuid:id>
 [regras_fiscaisblueprint] 'DELETE' /<string:id>
 [regras_fiscaisblueprint] 'GET' /
 [regras_fiscaisblueprint] 'GET' /<string:id>
