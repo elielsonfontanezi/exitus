@@ -1,15 +1,9 @@
 """M7.5 - Cotações Multi-Provider com Fallback Otimizado"""
 import requests
+from datetime import datetime
 import logging
 import os
 from dotenv import load_dotenv
-from datetime import date, datetime
-from decimal import Decimal
-from typing import List
-import pandas as pd 
-import yfinance as yf
-from datetime import timedelta
-
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -243,73 +237,3 @@ class CotacoesService:
         # ❌ TODAS FALHARAM
         logger.error(f"❌ Todos os {4} providers falharam para {ticker}")
         return {'success': False, 'error': 'Todas APIs indisponíveis', 'ticker': ticker}
-
-    # @staticmethod
-    # def buscar_historico(ticker: str, data_inicio: date, data_fim: date) -> List[dict]:
-    @staticmethod
-    def buscar_historico(ticker: str, data_inicio: date, data_fim: date, mercado: str = 'BR') -> List[dict]:        
-        """
-        Busca histórico de preços de um ticker entre duas datas.
-        
-        Args:
-            ticker: Símbolo do ativo (ex: 'PETR4')
-            data_inicio: Data inicial do histórico
-            data_fim: Data final do histórico
-            
-        Returns:
-            Lista de dicts com formato:
-            [
-                {
-                    'data': date(2026, 1, 6),
-                    'abertura': Decimal('31.50'),
-                    'fechamento': Decimal('31.26'),
-                    'minimo': Decimal('31.10'),
-                    'maximo': Decimal('31.80'),
-                    'volume': 125000000
-                },
-                ...
-            ]
-        """
-        try:
-            logger.info(f"Buscando histórico: {ticker} ({data_inicio} a {data_fim})")
-            
-            import yfinance as yf
-            from datetime import timedelta
-            
-            # yfinance usa ticker com sufixo para Brasil
-            #yahoo_ticker = f"{ticker}.SA" if ticker and not any(x in ticker for x in ['.SA', '^']) else ticker
-            yahoo_ticker = ticker
-            if mercado == 'BR' and '.' not in ticker and '^' not in ticker:
-                yahoo_ticker = f"{ticker}.SA"
-                        
-            # Adicionar 1 dia à data_fim porque yfinance é exclusive no end
-            data_fim_ajustada = data_fim + timedelta(days=1)
-            
-            stock = yf.Ticker(yahoo_ticker)
-            hist = stock.history(
-                start=data_inicio.strftime('%Y-%m-%d'),
-                end=data_fim_ajustada.strftime('%Y-%m-%d')
-            )
-            
-            if hist.empty:
-                logger.warning(f"yfinance não retornou dados para {ticker}")
-                return []
-            
-            # Converter DataFrame para lista de dicts
-            resultado = []
-            for data_index, row in hist.iterrows():
-                resultado.append({
-                    'data': data_index.date(),
-                    'abertura': Decimal(str(row['Open'])) if not pd.isna(row['Open']) else None,
-                    'fechamento': Decimal(str(row['Close'])),
-                    'minimo': Decimal(str(row['Low'])) if not pd.isna(row['Low']) else None,
-                    'maximo': Decimal(str(row['High'])) if not pd.isna(row['High']) else None,
-                    'volume': int(row['Volume']) if not pd.isna(row['Volume']) else None
-                })
-            
-            logger.info(f"✅ {len(resultado)} registros obtidos para {ticker}")
-            return resultado
-            
-        except Exception as e:
-            logger.error(f"Erro ao buscar histórico de {ticker}: {str(e)}", exc_info=True)
-            return []

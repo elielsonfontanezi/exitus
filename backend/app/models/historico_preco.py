@@ -4,7 +4,7 @@ Criado em: 2026-01-06
 Issue: #1 - Gap P0 da Revisão M1-4
 """
 
-from app import db
+from app.database import db
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Index
 import uuid
