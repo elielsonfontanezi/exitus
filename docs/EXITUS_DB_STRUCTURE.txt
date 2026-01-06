@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2025-12-22 13:29:52
+Gerado em: 2026-01-06 15:06:34
 ================================================================================
 
 ================================================================================
@@ -12,6 +12,7 @@ TABELAS DO BANCO EXITUS
  Schema |         Tabela         | Owner  
 --------+------------------------+--------
  public | alembic_version        | exitus
+ public | alertas                | exitus
  public | ativo                  | exitus
  public | auditoria_relatorios   | exitus
  public | configuracoes_alertas  | exitus
@@ -19,6 +20,7 @@ TABELAS DO BANCO EXITUS
  public | evento_corporativo     | exitus
  public | feriado_mercado        | exitus
  public | fonte_dados            | exitus
+ public | historico_preco        | exitus
  public | log_auditoria          | exitus
  public | movimentacao_caixa     | exitus
  public | parametros_macro       | exitus
@@ -30,7 +32,7 @@ TABELAS DO BANCO EXITUS
  public | relatorios_performance | exitus
  public | transacao              | exitus
  public | usuario                | exitus
-(19 rows)
+(21 rows)
 
 
 ================================================================================
@@ -87,6 +89,90 @@ ________________________________________________________________________________
 
 
 ################################################################################
+TABELA: alertas
+################################################################################
+
+                                                                   Table "public.alertas"
+            Column            |            Type             | Collation | Nullable |      Default      | Storage  | Compression | Stats target | Description 
+------------------------------+-----------------------------+-----------+----------+-------------------+----------+-------------+--------------+-------------
+ id                           | uuid                        |           | not null | gen_random_uuid() | plain    |             |              | 
+ usuario_id                   | uuid                        |           | not null |                   | plain    |             |              | 
+ nome                         | character varying(100)      |           | not null |                   | extended |             |              | 
+ tipo_alerta                  | character varying(50)       |           | not null |                   | extended |             |              | 
+ ticker                       | character varying(20)       |           |          |                   | extended |             |              | 
+ condicao_operador            | character varying(10)       |           | not null |                   | extended |             |              | 
+ condicao_valor               | numeric(18,4)               |           | not null |                   | main     |             |              | 
+ condicao_valor2              | numeric(18,4)               |           |          |                   | main     |             |              | 
+ ativo                        | boolean                     |           | not null | true              | plain    |             |              | 
+ frequencia_notificacao       | character varying(20)       |           | not null |                   | extended |             |              | 
+ canais_entrega               | jsonb                       |           | not null | '[]'::jsonb       | extended |             |              | 
+ total_acionamentos           | integer                     |           |          | 0                 | plain    |             |              | 
+ timestamp_ultimo_acionamento | timestamp without time zone |           |          |                   | plain    |             |              | 
+ created_at                   | timestamp without time zone |           |          | now()             | plain    |             |              | 
+ updated_at                   | timestamp without time zone |           |          | now()             | plain    |             |              | 
+Indexes:
+    "alertas_pkey" PRIMARY KEY, btree (id)
+    "idx_alertas_nome" btree (nome)
+    "idx_alertas_tipo" btree (tipo_alerta)
+    "idx_alertas_usuario_id" btree (usuario_id)
+Foreign-key constraints:
+    "alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |            Coluna            |            Tipo             | Tamanho | Null? |      Default      
+-----+------------------------------+-----------------------------+---------+-------+-------------------
+   1 | id                           | uuid                        |         | NO    | gen_random_uuid()
+   2 | usuario_id                   | uuid                        |         | NO    | 
+   3 | nome                         | character varying           | (100)   | NO    | 
+   4 | tipo_alerta                  | character varying           | (50)    | NO    | 
+   5 | ticker                       | character varying           | (20)    | YES   | 
+   6 | condicao_operador            | character varying           | (10)    | NO    | 
+   7 | condicao_valor               | numeric                     |         | NO    | 
+   8 | condicao_valor2              | numeric                     |         | YES   | 
+   9 | ativo                        | boolean                     |         | NO    | true
+  10 | frequencia_notificacao       | character varying           | (20)    | NO    | 
+  11 | canais_entrega               | jsonb                       |         | NO    | '[]'::jsonb
+  12 | total_acionamentos           | integer                     |         | YES   | 0
+  13 | timestamp_ultimo_acionamento | timestamp without time zone |         | YES   | 
+  14 | created_at                   | timestamp without time zone |         | YES   | now()
+  15 | updated_at                   | timestamp without time zone |         | YES   | now()
+(15 rows)
+
+
+Foreign Keys:
+         Nome FK         |   Coluna   | Tabela Referenciada | Coluna Referenciada 
+-------------------------+------------+---------------------+---------------------
+ alertas_usuario_id_fkey | usuario_id | usuario             | id
+(1 row)
+
+
+Primary Keys:
+   Nome PK    | Coluna 
+--------------+--------
+ alertas_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+     Nome do Índice     |                                   Definição                                    
+------------------------+--------------------------------------------------------------------------------
+ alertas_pkey           | CREATE UNIQUE INDEX alertas_pkey ON public.alertas USING btree (id)
+ idx_alertas_usuario_id | CREATE INDEX idx_alertas_usuario_id ON public.alertas USING btree (usuario_id)
+ idx_alertas_nome       | CREATE INDEX idx_alertas_nome ON public.alertas USING btree (nome)
+ idx_alertas_tipo       | CREATE INDEX idx_alertas_tipo ON public.alertas USING btree (tipo_alerta)
+(4 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
 TABELA: ativo
 ################################################################################
 
@@ -133,6 +219,7 @@ Referenced by:
     TABLE "configuracoes_alertas" CONSTRAINT "configuracoes_alertas_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE CASCADE
     TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_ativo_novo_id_fkey" FOREIGN KEY (ativo_novo_id) REFERENCES ativo(id) ON DELETE SET NULL
+    TABLE "historico_preco" CONSTRAINT "historico_preco_ativoid_fkey" FOREIGN KEY (ativoid) REFERENCES ativo(id) ON DELETE CASCADE
     TABLE "posicao" CONSTRAINT "posicao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     TABLE "provento" CONSTRAINT "provento_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     TABLE "transacao" CONSTRAINT "transacao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
@@ -743,6 +830,83 @@ Unique Constraints:
  ix_fonte_dados_tipo_fonte      | CREATE INDEX ix_fonte_dados_tipo_fonte ON public.fonte_dados USING btree (tipo_fonte)
  ix_fonte_dados_ultima_consulta | CREATE INDEX ix_fonte_dados_ultima_consulta ON public.fonte_dados USING btree (ultima_consulta)
 (6 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: historico_preco
+################################################################################
+
+                                                         Table "public.historico_preco"
+      Column      |            Type             | Collation | Nullable |      Default      | Storage | Compression | Stats target | Description 
+------------------+-----------------------------+-----------+----------+-------------------+---------+-------------+--------------+-------------
+ id               | uuid                        |           | not null | gen_random_uuid() | plain   |             |              | 
+ ativoid          | uuid                        |           | not null |                   | plain   |             |              | 
+ data             | date                        |           | not null |                   | plain   |             |              | 
+ preco_abertura   | numeric(18,6)               |           |          |                   | main    |             |              | 
+ preco_fechamento | numeric(18,6)               |           | not null |                   | main    |             |              | 
+ preco_minimo     | numeric(18,6)               |           |          |                   | main    |             |              | 
+ preco_maximo     | numeric(18,6)               |           |          |                   | main    |             |              | 
+ volume           | bigint                      |           |          |                   | plain   |             |              | 
+ createdat        | timestamp without time zone |           | not null | now()             | plain   |             |              | 
+ updatedat        | timestamp without time zone |           |          |                   | plain   |             |              | 
+Indexes:
+    "historico_preco_pkey" PRIMARY KEY, btree (id)
+    "ix_historico_ativoid_data" btree (ativoid, data)
+    "uq_historico_ativo_data" UNIQUE CONSTRAINT, btree (ativoid, data)
+Check constraints:
+    "ck_historico_fechamento_positivo" CHECK (preco_fechamento > 0::numeric)
+    "ck_historico_minmax" CHECK (preco_minimo IS NULL OR preco_maximo IS NULL OR preco_minimo <= preco_maximo)
+Foreign-key constraints:
+    "historico_preco_ativoid_fkey" FOREIGN KEY (ativoid) REFERENCES ativo(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |      Coluna      |            Tipo             | Tamanho | Null? |      Default      
+-----+------------------+-----------------------------+---------+-------+-------------------
+   1 | id               | uuid                        |         | NO    | gen_random_uuid()
+   2 | ativoid          | uuid                        |         | NO    | 
+   3 | data             | date                        |         | NO    | 
+   4 | preco_abertura   | numeric                     |         | YES   | 
+   5 | preco_fechamento | numeric                     |         | NO    | 
+   6 | preco_minimo     | numeric                     |         | YES   | 
+   7 | preco_maximo     | numeric                     |         | YES   | 
+   8 | volume           | bigint                      |         | YES   | 
+   9 | createdat        | timestamp without time zone |         | NO    | now()
+  10 | updatedat        | timestamp without time zone |         | YES   | 
+(10 rows)
+
+
+Foreign Keys:
+           Nome FK            | Coluna  | Tabela Referenciada | Coluna Referenciada 
+------------------------------+---------+---------------------+---------------------
+ historico_preco_ativoid_fkey | ativoid | ativo               | id
+(1 row)
+
+
+Primary Keys:
+       Nome PK        | Coluna 
+----------------------+--------
+ historico_preco_pkey | id
+(1 row)
+
+
+Unique Constraints:
+     Nome Constraint     | Coluna  
+-------------------------+---------
+ uq_historico_ativo_data | ativoid
+ uq_historico_ativo_data | data
+(2 rows)
+
+
+Índices:
+      Nome do Índice       |                                             Definição                                             
+---------------------------+---------------------------------------------------------------------------------------------------
+ historico_preco_pkey      | CREATE UNIQUE INDEX historico_preco_pkey ON public.historico_preco USING btree (id)
+ uq_historico_ativo_data   | CREATE UNIQUE INDEX uq_historico_ativo_data ON public.historico_preco USING btree (ativoid, data)
+ ix_historico_ativoid_data | CREATE INDEX ix_historico_ativoid_data ON public.historico_preco USING btree (ativoid, data)
+(3 rows)
 
 
 ________________________________________________________________________________
@@ -1639,6 +1803,7 @@ Indexes:
     "ix_usuario_email" UNIQUE, btree (email)
     "ix_usuario_username" UNIQUE, btree (username)
 Referenced by:
+    TABLE "alertas" CONSTRAINT "alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "auditoria_relatorios" CONSTRAINT "auditoria_relatorios_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "configuracoes_alertas" CONSTRAINT "configuracoes_alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "corretora" CONSTRAINT "corretora_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
@@ -1703,7 +1868,7 @@ RESUMO GERAL
 Total de Tabelas:
  Total 
 -------
-    19
+    21
 (1 row)
 
 
@@ -1711,6 +1876,7 @@ Total de Colunas por Tabela:
          Tabela         | Num Colunas 
 ------------------------+-------------
  alembic_version        |           1
+ alertas                |          15
  ativo                  |          21
  auditoria_relatorios   |          13
  configuracoes_alertas  |          16
@@ -1718,6 +1884,7 @@ Total de Colunas por Tabela:
  evento_corporativo     |          12
  feriado_mercado        |          11
  fonte_dados            |          14
+ historico_preco        |          10
  log_auditoria          |          12
  movimentacao_caixa     |          13
  parametros_macro       |          12
@@ -1729,16 +1896,18 @@ Total de Colunas por Tabela:
  relatorios_performance |          11
  transacao              |          19
  usuario                |           9
-(19 rows)
+(21 rows)
 
 
 Total de Foreign Keys por Tabela:
          Tabela         | Num FKs 
 ------------------------+---------
+ alertas                |       1
  auditoria_relatorios   |       1
  configuracoes_alertas  |       3
  corretora              |       1
  evento_corporativo     |       2
+ historico_preco        |       1
  log_auditoria          |       1
  movimentacao_caixa     |       4
  portfolio              |       1
@@ -1747,7 +1916,7 @@ Total de Foreign Keys por Tabela:
  provento               |       1
  relatorios_performance |       1
  transacao              |       3
-(12 rows)
+(14 rows)
 
 
 ================================================================================
