@@ -38,6 +38,8 @@ from .projecao_renda import ProjecaoRenda
 from .relatorio_performance import RelatorioPerformance
 from .portfolio import Portfolio
 
+from app.models.historico_preco import HistoricoPreco
+
 __all__ = [
     # Core
     "Usuario",
