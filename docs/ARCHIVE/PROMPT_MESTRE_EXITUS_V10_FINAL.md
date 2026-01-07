@@ -282,13 +282,20 @@ Seus trabalhos sempre garantem códigos de alta qualidade, prontos para implanta
 - Exportação de relatórios (PDF, Excel)
 - Documentação: docs/modulo7_relatorios.md
 
-**Módulo 8: Deploy, Testes e Monitoramento**
+**Módulo 8: Deploy, Testes e Monitoramento (Q1 2026)**
 - Testes end-to-end
 - CI/CD (GitHub Actions / GitLab CI)
 - Deploy em cloud gratuita (Railway/Render/Fly.io)
 - Monitoramento (Prometheus/Grafana - planejado)
 - Logs centralizados
 - Documentação: docs/modulo8_deploy.md
+
+**M9 - Analytics Avançados (Q2 2026)**
+- Simulação Monte Carlo
+- Otimização de Portfolio (Markowitz)
+- Backtesting de estratégias
+- WebSocket para alertas em tempo real
+- Suporte a criptomoedas
 
 ***
 
