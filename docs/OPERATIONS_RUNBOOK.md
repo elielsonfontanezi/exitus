@@ -910,17 +910,14 @@ ls -lh scripts/
 
 ### generate_api_docs.sh
 
-**Função**: Gera `docs/API_REFERENCE_COMPLETE.md` automaticamente a partir das rotas Flask.
+**Função**: Script legado que gerava `docs/API_REFERENCE_COMPLETE.md` (descontinuado em v0.7.6).
 
-```bash
-./scripts/generate_api_docs.sh
+**Status**: 
+- ⚠️ Descontinuado - substituído por documentação manual
+- Nova referência: `docs/API_REFERENCE.md` (67 endpoints organizados por domínio)
+- Arquivo antigo preservado em: `docs/ARCHIVE/API_REFERENCE_COMPLETE.md`
 
-# Output:
-# Gerando documentação de APIs...
-# 67 rotas encontradas
-# Salvando em docs/API_REFERENCE_COMPLETE.md
-# Concluído!
-```
+**Refatoração planejada**: M8 - Atualizar script para gerar novo formato
 
 ---
 
