@@ -9,6 +9,7 @@
 ---
 
 ## 📋 ROTAS DISPONÍVEIS
+
 ```bash
 [alertas] 'DELETE' /<alerta_id>
 [alertas] 'GET' 
@@ -82,4 +83,4 @@
 @relatorios_bp.route("/<string:relatorio_id>", methods=["GET"])
 [relatorios] 'GET' /relatorios
 [relatorios] 'POST' /relatorios
-```
+``` 

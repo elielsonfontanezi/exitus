@@ -1,3 +1,35 @@
+> ⚠️ **DOCUMENTO HISTÓRICO**  
+> Esta matriz foi criada em 06/01/2026 para identificar gaps de compliance.  
+> **GAP P0 (historico_preco) foi RESOLVIDO** em 06/01/2026 (commit `ab59342`).  
+> Documento mantido para referência histórica em `docs/ARCHIVE/`.
+
+---
+
+## GAP 1: Tabela historico_preco ✅ **RESOLVIDO** (v0.7.6)
+
+**Status anterior:** ❌ BLOQUEADOR - Tabela inexistente  
+**Status atual:** ✅ IMPLEMENTADO  
+
+### Resolução
+- **Data:** 06/01/2026
+- **Commit:** `ab59342` (Merge: Sistema de Histórico de Preços)
+- **Issues:** #1, #2, #3, #4
+
+### Implementação
+- ✅ Migration Alembic com tabela `historico_preco`
+- ✅ `HistoricoService` com lazy loading (189 linhas)
+- ✅ `calcular_zscore()` refatorado usando dados reais
+- ✅ Script `popular_historico_inicial.py` com filtros
+- ✅ Multi-mercado (BR `.SA`, US sem sufixo)
+- ✅ Validação mínimo 30 dias
+
+### Impacto
+- **Z-Score:** Dados reais (antes: mock array fixo)
+- **Volatilidade:** Cálculo habilitado
+- **Sharpe/Beta:** Desbloqueia implementação futura
+- **Compliance:** 50% → 100% (4/4 campos)
+
+
 # 🔍 MATRIZ DE COMPLIANCE: Entidade-Relacionamento x APIs
 
 **Data**: 06/01/2026  

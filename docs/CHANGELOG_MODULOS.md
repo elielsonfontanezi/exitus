@@ -1,3 +1,33 @@
+## v0.7.6 - Sistema de Histórico de Preços (06/01/2026)
+
+**Commit:** `ab59342` | **Branch:** `feature/lazy-loading-historico` → `main`
+
+### 🎯 Issues Implementados
+- **Issue #1:** Model `historico_preco` + Migration Alembic ✅
+- **Issue #2:** `HistoricoService` com Lazy Loading (189 linhas) ✅
+- **Issue #3:** Refatorar `calcular_zscore()` com dados reais ✅
+- **Issue #4:** Script `popular_historico_inicial.py` ✅
+
+### 📦 Arquivos Modificados (8 arquivos, +783 linhas)
+- `backend/app/models/historico_preco.py` - Model atualizado
+- `backend/app/services/historico_service.py` - **NOVO** (189 linhas)
+- `backend/app/services/buy_signals_service.py` - Z-Score refatorado
+- `backend/app/services/cotacoes_service.py` - Lazy loading implementado
+- `backend/app/scripts/popular_historico_inicial.py` - **NOVO** script
+- `backend/app/scripts/README.md` - **NOVO** documentação
+
+### 🚀 Funcionalidades
+- **Lazy Loading:** Busca banco primeiro, API apenas se necessário
+- **Multi-Mercado:** Brasil (`.SA`), US (sem sufixo), auto-detecção
+- **Z-Score Real:** Substituiu array mockado por dados históricos
+- **Validações:** Mínimo 30 dias, tratamento std=0
+- **Script Manual:** Filtros `--ticker`, `--dias`, `--incluir-deslistados`
+
+### 📊 Impacto
+- **Compliance ER x APIs:** 50% → 100% (Z-Score)
+- **GAP P0 Resolvido:** Tabela `historico_preco` implementada
+- **Performance:** Cache lazy evita chamadas desnecessárias
+
 
 # 📜 Changelog por Módulos - Exitus
 
