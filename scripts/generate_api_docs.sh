@@ -4,7 +4,7 @@
 
 set -e
 
-OUTPUT="docs/API_REFERENCE_COMPLETE.md"
+OUTPUT="docs/ARCHIVE/API_REFERENCE_COMPLETE.md"
 TEMP_FILE="/tmp/api_routes.tmp"
 
 echo "🔍 Extraindo rotas dos blueprints..."
