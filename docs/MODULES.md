@@ -34,8 +34,8 @@ O Sistema Exitus foi desenvolvido em **8 módulos incrementais** (M0-M7), cada u
 | **M7.4** | Relatórios | ✅ PROD | Jan 2026 | 5 |
 | **M7.5** | Cotações Live | ✅ PROD | 09 Dez 2025 | 3 |
 | **M7.6** | Histórico de Preços | ✅ PROD | 06 Jan 2026 | - |
-| **M8** | Deploy & Monitoramento | 📅 PLAN | Q1 2026 | - |
-| **M9** | Analytics Avançados | 📅 PLAN | Q2 2026 | - |
+| **M8** | Analytics Avançados | 📅 PLAN | Q2 2026 | - |
+| **M9** | Deploy & Monitoramento | 📅 PLAN | Q1 2026 | - |
 
 **Total de Endpoints**: **67 rotas** RESTful validadas
 
@@ -1020,7 +1020,21 @@ podman exec -it exitus-backend   python3 app/scripts/popular_historico_inicial.p
 
 ## Roadmap Futuro
 
-### M8 - Deploy e Monitoramento (Q1 2026)
+### M8 - Analytics Avançados (Q2 2026)
+
+**Objetivos**:
+- Simulação Monte Carlo
+- Otimização de Portfolio (Markowitz)
+- Backtesting de estratégias
+- Alertas em tempo real (WebSocket)
+- Export PDF/Excel completo
+- Celery para tarefas assíncronas
+
+**Escopo**:
+- 20-30 horas de implementação
+- Bibliotecas: PyPortfolioOpt, QuantLib
+
+### M9 - Deploy e Monitoramento (Q1 2026)
 
 **Objetivos**:
 - CI/CD com GitHub Actions
@@ -1034,20 +1048,6 @@ podman exec -it exitus-backend   python3 app/scripts/popular_historico_inicial.p
 - 10-15 horas de implementação
 - Testes end-to-end
 - Documentação de deploy
-
-### M9 - Analytics Avançados (Q2 2026)
-
-**Objetivos**:
-- Simulação Monte Carlo
-- Otimização de Portfolio (Markowitz)
-- Backtesting de estratégias
-- Alertas em tempo real (WebSocket)
-- Export PDF/Excel completo
-- Celery para tarefas assíncronas
-
-**Escopo**:
-- 20-30 horas de implementação
-- Bibliotecas: PyPortfolioOpt, QuantLib
 
 ---
 

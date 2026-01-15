@@ -337,22 +337,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Roadmap Futuro
 
-### [v0.8.0] - M8: Deploy & Monitoramento (Q1 2026)
-
-**Planejado**:
-- CI/CD com GitHub Actions
-- Deploy em Railway/Render/Fly.io
-- Monitoramento com Prometheus + Grafana
-- Logs centralizados (ELK stack ou similar)
-- Health checks avançados
-- Backups automáticos (diários)
-- Testes end-to-end (Selenium/Playwright)
-
-**Duração Estimada**: 10-15 horas
-
----
-
-### [v0.9.0] - M9: Analytics Avançados (Q2 2026)
+### [v0.8.0] - M8: Analytics Avançados (Q2 2026)
 
 **Planejado**:
 - Simulação Monte Carlo
@@ -370,6 +355,21 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Celery + Redis
 
 **Duração Estimada**: 20-30 horas
+
+---
+
+### [v0.9.0] - M9: Deploy & Monitoramento (Q1 2026)
+
+**Planejado**:
+- CI/CD com GitHub Actions
+- Deploy em Railway/Render/Fly.io
+- Monitoramento com Prometheus + Grafana
+- Logs centralizados (ELK stack ou similar)
+- Health checks avançados
+- Backups automáticos (diários)
+- Testes end-to-end (Selenium/Playwright)
+
+**Duração Estimada**: 10-15 horas
 
 ---
 
