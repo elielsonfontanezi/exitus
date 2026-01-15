@@ -138,8 +138,8 @@ podman logs -f exitus-backend
 | **M7.3** | ✅ PROD | Alertas (6 tipos, CRUD completo) | 4 |
 | **M7.4** | ✅ PROD | Relatórios (Performance, Export PDF stub) | 5 |
 | **M7.5** | ✅ PROD | Cotações Live (Multi-provider, Cache 15min) | 3 |
-| **M8** | 📅 PLAN | Deploy & Monitoramento (CI/CD, Prometheus) | - |
-| **M9** | 📅 PLAN | Analytics Avançados (Monte Carlo, Otimização) | - |
+| **M8** | 📅 PLAN | Analytics Avançados (Monte Carlo, Otimização) | - |
+| **M9** | 📅 PLAN | Deploy & Monitoramento (CI/CD, Prometheus) | - |
 
 **Total de Endpoints**: **67 rotas** validadas e documentadas
 
