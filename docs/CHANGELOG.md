@@ -7,6 +7,33 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [v0.7.7] - 2026-01-15
+
+### Infrastructure
+- **Upgrade PostgreSQL 15.15 → 16.11** ✅
+  - Backup completo realizado antes do upgrade
+  - Dados migrados sem perda (21 tabelas, 44 ativos, 17 transações)
+  - Zero downtime para usuário final
+  - Performance verificada: todas as APIs funcionais
+
+### Fixed
+- Padronização `POSTGRES_USER=exitus` em toda documentação
+- Correção de referências a `exitususer` → `exitus`
+- Atualização ARCHITECTURE.md e OPERATIONS_RUNBOOK.md
+
+### Documentation
+- Atualização de versão PostgreSQL em docs
+- Clarificação: 21 tabelas (20 dados + 1 alembic_version)
+- Identificação de rota correta: `/api/portfolios/dashboard`
+
+### Validated
+- Backend API REST: 17 blueprints ativos (M2-M7)
+- Frontend HTMX: Interface funcional com dados reais
+- Conectividade: Frontend ↔ Backend ↔ PostgreSQL 16
+- Zero erros em logs após upgrade
+- Ref: EXITUS-VAL-INFRA-HEALTH
+
+
 ## [v0.7.6] - 2026-01-06
 
 ### Sistema de Histórico de Preços

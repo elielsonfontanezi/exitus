@@ -414,7 +414,7 @@ Cria novo ativo.
 
 ## 5. Portfólios
 
-### GET /api/portfolio/dashboard
+### GET /api/portfolios/dashboard
 
 Dashboard consolidado do portfolio do usuário.
 
@@ -437,7 +437,7 @@ Dashboard consolidado do portfolio do usuário.
 **Exemplo cURL**:
 ```bash
 curl -H "Authorization: Bearer $TOKEN" \
-  http://localhost:5000/api/portfolio/dashboard | jq .
+  http://localhost:5000/api/portfolios/dashboard | jq .
 ```
 
 ---
@@ -1694,7 +1694,7 @@ export TOKEN=$(curl -s -X POST http://localhost:5000/api/auth/login \
 
 # 2. Consultar Dashboard
 curl -s -H "Authorization: Bearer $TOKEN" \
-  http://localhost:5000/api/portfolio/dashboard | jq .
+  http://localhost:5000/api/portfolios/dashboard | jq .
 
 # 3. Consultar Performance Individual
 curl -s -H "Authorization: Bearer $TOKEN" \
