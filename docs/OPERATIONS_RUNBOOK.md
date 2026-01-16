@@ -113,7 +113,7 @@ nano .env
 
 ```bash
 # Database Configuration
-POSTGRES_USER=exitus_user
+POSTGRES_USER=exitus
 POSTGRES_PASSWORD=sua_senha_segura_aqui
 POSTGRES_DB=exitus_db
 POSTGRES_HOST=exitus-db
@@ -185,7 +185,7 @@ mkdir -p volumes/data
 podman run -d \
   --name exitus-db \
   --network exitus-net \
-  -e POSTGRES_USER=exitus_user \
+  -e POSTGRES_USER=exitus \
   -e POSTGRES_PASSWORD=sua_senha \
   -e POSTGRES_DB=exitus_db \
   -e TZ=America/Sao_Paulo \
@@ -429,7 +429,7 @@ flask db downgrade base
 
 ```bash
 # Dump via pg_dump
-podman exec exitus-db pg_dump -U exitus_user exitus_db > backup_$(date +%Y%m%d_%H%M%S).sql
+podman exec exitus-db pg_dump -U exitus exitus_db > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Exemplo de output:
 # backup_20260107_101500.sql (12.5 MB)
@@ -441,13 +441,13 @@ head -20 backup_20260107_101500.sql
 #### Backup Apenas Dados (sem schema)
 
 ```bash
-podman exec exitus-db pg_dump -U exitus_user --data-only exitus_db > data_only_backup.sql
+podman exec exitus-db pg_dump -U exitus --data-only exitus_db > data_only_backup.sql
 ```
 
 #### Backup de Tabela Específica
 
 ```bash
-podman exec exitus-db pg_dump -U exitus_user -t transacao exitus_db > transacao_backup.sql
+podman exec exitus-db pg_dump -U exitus -t transacao exitus_db > transacao_backup.sql
 ```
 
 ---
@@ -459,7 +459,7 @@ podman exec exitus-db pg_dump -U exitus_user -t transacao exitus_db > transacao_
 podman stop exitus-backend
 
 # Restore
-podman exec -i exitus-db psql -U exitus_user exitus_db < backup_20260107_101500.sql
+podman exec -i exitus-db psql -U exitus exitus_db < backup_20260107_101500.sql
 
 # Reiniciar backend
 podman start exitus-backend
@@ -656,7 +656,7 @@ curl -f http://localhost:5000/health || echo "BACKEND DOWN"
 curl -f http://localhost:8080/health || echo "FRONTEND DOWN"
 
 # Database (via psql)
-podman exec exitus-db psql -U exitus_user -d exitus_db -c "SELECT 1;"
+podman exec exitus-db psql -U exitus -d exitus_db -c "SELECT 1;"
 ```
 
 ---
@@ -692,7 +692,7 @@ podman logs exitus-backend | grep "cotacoes" | tail -50
 
 ```bash
 # Ver conexões ativas
-podman exec exitus-db psql -U exitus_user -d exitus_db -c \
+podman exec exitus-db psql -U exitus -d exitus_db -c \
   "SELECT count(*) FROM pg_stat_activity WHERE datname='exitus_db';"
 
 # Output:
@@ -774,7 +774,7 @@ podman network create exitus-net
 
 **Sintoma nos logs**:
 ```
-FATAL: password authentication failed for user "exitus_user"
+FATAL: password authentication failed for user "exitus"
 ```
 
 **Diagnóstico**:
@@ -783,7 +783,7 @@ FATAL: password authentication failed for user "exitus_user"
 podman ps | grep exitus-db
 
 # 2. Testar conexão manual
-podman exec -it exitus-db psql -U exitus_user -d exitus_db
+podman exec -it exitus-db psql -U exitus -d exitus_db
 
 # 3. Verificar variáveis de ambiente
 podman exec exitus-backend env | grep POSTGRES
@@ -872,11 +872,11 @@ podman stats exitus-backend
 # exitus-backend 45.2%   512MB / 2GB         1.2MB/3.4MB
 
 # 2. Verificar queries lentas no PostgreSQL
-podman exec exitus-db psql -U exitus_user -d exitus_db -c \
+podman exec exitus-db psql -U exitus -d exitus_db -c \
   "SELECT query, mean_exec_time FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 10;"
 
 # 3. Ver conexões DB
-podman exec exitus-db psql -U exitus_user -d exitus_db -c \
+podman exec exitus-db psql -U exitus -d exitus_db -c \
   "SELECT count(*) FROM pg_stat_activity;"
 ```
 
@@ -959,7 +959,7 @@ DATE=$(date +%Y%m%d)
 mkdir -p $BACKUP_DIR
 
 # Backup database
-podman exec exitus-db pg_dump -U exitus_user exitus_db | \
+podman exec exitus-db pg_dump -U exitus exitus_db | \
   gzip > $BACKUP_DIR/db_backup_$DATE.sql.gz
 
 # Backup volumes
@@ -1013,7 +1013,7 @@ sleep 10
 5. **Restaurar dump SQL**:
 ```bash
 gunzip < /backup/exitus/db_backup_20260106.sql.gz | \
-  podman exec -i exitus-db psql -U exitus_user exitus_db
+  podman exec -i exitus-db psql -U exitus exitus_db
 ```
 
 6. **Iniciar backend e frontend**:

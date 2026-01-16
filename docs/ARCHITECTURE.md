@@ -556,7 +556,7 @@ HEALTHCHECK --interval=30s --timeout=10s --retries=3   CMD curl -f http://localh
 **Variáveis de Ambiente (.env)**:
 ```bash
 # Database
-POSTGRES_USER=exitus_user
+POSTGRES_USER=exitus
 POSTGRES_PASSWORD=<gerado_aleatoriamente>
 
 # JWT

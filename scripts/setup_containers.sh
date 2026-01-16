@@ -63,7 +63,7 @@ podman run -d --name exitus-db \
   -e POSTGRES_PASSWORD=exitus123 \
   -e POSTGRES_DB=exitusdb \
   -e TZ=America/Sao_Paulo \
-  docker.io/postgres:15
+  docker.io/postgres:16
 
 echo "Aguardando PostgreSQL inicializar..."
 sleep 10
