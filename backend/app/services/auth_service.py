@@ -8,62 +8,42 @@ from app.database import db
 from app.models import Usuario
 
 class AuthService:
-    """Serviço responsável por autenticação e geração de tokens JWT"""
-    
     @staticmethod
-    def login(username: str, password: str):
+    def login(username, password):
         """
-        Valida credenciais e gera tokens JWT.
+        Autentica usuário e retorna tokens.
         
         Returns:
-            dict: Tokens de acesso e refresh
+            dict: {
+                'access_token': str,
+                'refresh_token': str,
+                'token_type': 'Bearer',
+                'expires_in': 3600
+            }
+        
         Raises:
-            ValueError: Credenciais inválidas
+            ValueError: Se credenciais inválidas ou usuário inativo
         """
         user = Usuario.query.filter_by(username=username).first()
+        
         if not user or not check_password_hash(user.password_hash, password):
             raise ValueError("Credenciais inválidas")
         
         if not user.ativo:
-            raise ValueError("Usuário inativo")
+            raise ValueError("Credenciais inválidas")  # Mensagem genérica por segurança
         
-        # ✅ CORREÇÃO: .value converte Enum UserRole para string
-        additional_claims = {"role": user.role.value}
-        
+        # Gerar tokens
         access_token = create_access_token(
-            identity=str(user.id), 
-            additional_claims=additional_claims, 
-            expires_delta=timedelta(hours=1)
+            identity=str(user.id),
+            additional_claims={'role': user.role.value}
         )
-        refresh_token = create_refresh_token(
-            identity=str(user.id), 
-            expires_delta=timedelta(days=30)
-        )
-        
-        # Atualizar último login
-        user.ultimo_login = db.func.now()
-        db.session.commit()
+        refresh_token = create_refresh_token(identity=str(user.id))
         
         return {
-            "access_token": access_token,
-            "refresh_token": refresh_token,
-            "token_type": "Bearer",
-            "expires_in": 3600
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'token_type': 'Bearer',
+            'expires_in': 3600
+            # 'user' será adicionado na route (GAP-002)
         }
-    
-    @staticmethod
-    def refresh(identity: str):
-        """Gera novo access_token a partir do refresh_token."""
-        user = Usuario.query.get(identity)
-        additional_claims = {"role": user.role.value} if user else {}
-        
-        access_token = create_access_token(
-            identity=identity, 
-            additional_claims=additional_claims,
-            expires_delta=timedelta(hours=1)
-        )
-        return {
-            "access_token": access_token,
-            "token_type": "Bearer",
-            "expires_in": 3600
-        }
+
