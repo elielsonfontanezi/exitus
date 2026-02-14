@@ -29,6 +29,10 @@
 
 ## Informações Gerais
 
+### Endpoints
+
+Endpoints usam snake_case (ex: api_portfolio_dashboard).
+
 ### Base URL
 
 ```
@@ -91,6 +95,8 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 ### Paginação
 
+**Naming Convention**: Endpoints seguem snake_case (ex: `api/portfolio/dashboard`, `api/buy-signals/buy-scorePETR4`).
+
 Parâmetros de query:
 - `?page=1` - Número da página (default: 1)
 - `?per_page=10` - Items por página (default: 10, max: 100)
@@ -99,6 +105,8 @@ Parâmetros de query:
 ```bash
 GET /api/transacoes?page=2&per_page=20
 ```
+
+**Nota: snake_case em todos endpoints (ver CODING_STANDARDS.md).**
 
 ### Códigos de Status HTTP
 

@@ -60,6 +60,13 @@
         │  Port: 5432                        │
         └────────────────────────────────────┘
 ```
+---
+
+## Coding Standard
+- **Naming Convention**: snakecase para variáveis, funções, tabelas, colunas e arquivos (ex: `created_at`, `buy_score`, `historico_preco`).
+- **Classes**: PascalCase (ex: `PortfolioService`).
+- **Constantes**: UPPER_SNAKE_CASE (ex: `JWT_SECRET_KEY`).
+- **Guia Completo**: [CODING_STANDARDS.md](docs/CODING_STANDARDS.md) 
 
 ---
 

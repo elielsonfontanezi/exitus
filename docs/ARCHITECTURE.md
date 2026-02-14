@@ -5,10 +5,11 @@
 1. [Visão Arquitetural](#visão-arquitetural)
 2. [Topologia de Containers](#topologia-de-containers)
 3. [Stack Tecnológica Detalhada](#stack-tecnológica-detalhada)
-4. [Modelo de Dados](#modelo-de-dados)
-5. [Integrações Externas](#integrações-externas)
-6. [Segurança](#segurança)
-7. [Performance e Escalabilidade](#performance-e-escalabilidade)
+4. [Coding Conventions](#coding-conventions)
+5. [Modelo de Dados](#modelo-de-dados)
+6. [Integrações Externas](#integrações-externas)
+7. [Segurança](#segurança)
+8. [Performance e Escalabilidade](#performance-e-escalabilidade)
 
 ---
 
@@ -242,6 +243,15 @@ User: non-root (exitus:1000)
 - Sem daemon root (segurança)
 - Compatibilidade com Docker Compose
 - Geração de Kubernetes manifests (futuro)
+
+---
+
+## Coding Conventions
+Todo código segue snake_case (PEP 8 Python + PostgreSQL):
+- Tabelas/colunas: `movimentacao_caixa`, `data_ultima_cotacao`
+- Variáveis/funções: `get_portfolio_metrics()`
+- Endpoints: `api/buy-signals/buy-score`
+
 
 ---
 

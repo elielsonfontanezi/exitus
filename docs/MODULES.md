@@ -285,6 +285,8 @@ curl -X POST http://localhost:5000/api/auth/login   -H "Content-Type: applicatio
 3. `corretoras_bp` - Gestão de corretoras
 4. `ativos_bp` - Gestão de ativos
 
+**Nota: Todos os blueprints e endpoints usam snake_case (ex: `buysignalsbp`, `api/buy-signals/buy-score`).**
+
 **Portfolio**:
 5. `posicoes_bp` - Posições (holdings)
 6. `transacoes_bp` - Transações
@@ -302,6 +304,11 @@ curl -X POST http://localhost:5000/api/auth/login   -H "Content-Type: applicatio
 14. `alertas_bp` - Alertas
 15. `relatorios_bp` - Relatórios
 16. `cotacoes_bp` - Cotações live
+
+**Naming: snake_case obrigatório (PEP 8 + PostgreSQL)**  
+- Blueprints: `buysignalsbp`, `portfoliobp`  
+- Endpoints: `api/buy-signals/buy-score`, `api/portfolio/dashboard`  
+Ver [CODING_STANDARDS.md](docs/CODING_STANDARDS.md)
 
 #### 3. CRUD Base
 

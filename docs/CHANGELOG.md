@@ -3,7 +3,15 @@
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
-e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+e este 
+
+
+## v0.7.8 - 2026-02-14 - Documentation
+- Official **snake_case** naming standard documented:
+  - README.md: "Coding Standard" section
+  - ARCHITECTURE.md: Coding Conventions
+  - **docs/CODING_STANDARDS.md**: Tabela completa com exemplos
+- Ref: CODING_STANDARDS.md
 
 ---
 
