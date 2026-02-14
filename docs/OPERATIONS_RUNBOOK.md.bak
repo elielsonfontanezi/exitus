@@ -115,7 +115,7 @@ nano .env
 # Database Configuration
 POSTGRES_USER=exitus
 POSTGRES_PASSWORD=sua_senha_segura_aqui
-POSTGRES_DB=exitusdb
+POSTGRES_DB=exitus_db
 POSTGRES_HOST=exitus-db
 POSTGRES_PORT=5432
 
@@ -187,7 +187,7 @@ podman run -d \
   --network exitus-net \
   -e POSTGRES_USER=exitus \
   -e POSTGRES_PASSWORD=sua_senha \
-  -e POSTGRES_DB=exitusdb \
+  -e POSTGRES_DB=exitus_db \
   -e TZ=America/Sao_Paulo \
   -v ./volumes/postgres:/var/lib/postgresql/data:Z \
   -p 5432:5432 \
@@ -429,7 +429,7 @@ flask db downgrade base
 
 ```bash
 # Dump via pg_dump
-podman exec exitus-db pg_dump -U exitus exitusdb > backup_$(date +%Y%m%d_%H%M%S).sql
+podman exec exitus-db pg_dump -U exitus exitus_db > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Exemplo de output:
 # backup_20260107_101500.sql (12.5 MB)
@@ -441,13 +441,13 @@ head -20 backup_20260107_101500.sql
 #### Backup Apenas Dados (sem schema)
 
 ```bash
-podman exec exitus-db pg_dump -U exitus --data-only exitusdb > data_only_backup.sql
+podman exec exitus-db pg_dump -U exitus --data-only exitus_db > data_only_backup.sql
 ```
 
 #### Backup de Tabela Específica
 
 ```bash
-podman exec exitus-db pg_dump -U exitus -t transacao exitusdb > transacao_backup.sql
+podman exec exitus-db pg_dump -U exitus -t transacao exitus_db > transacao_backup.sql
 ```
 
 ---
@@ -459,7 +459,7 @@ podman exec exitus-db pg_dump -U exitus -t transacao exitusdb > transacao_backup
 podman stop exitus-backend
 
 # Restore
-podman exec -i exitus-db psql -U exitus exitusdb < backup_20260107_101500.sql
+podman exec -i exitus-db psql -U exitus exitus_db < backup_20260107_101500.sql
 
 # Reiniciar backend
 podman start exitus-backend
@@ -656,7 +656,7 @@ curl -f http://localhost:5000/health || echo "BACKEND DOWN"
 curl -f http://localhost:8080/health || echo "FRONTEND DOWN"
 
 # Database (via psql)
-podman exec exitus-db psql -U exitus -d exitusdb -c "SELECT 1;"
+podman exec exitus-db psql -U exitus -d exitus_db -c "SELECT 1;"
 ```
 
 ---
@@ -692,8 +692,8 @@ podman logs exitus-backend | grep "cotacoes" | tail -50
 
 ```bash
 # Ver conexões ativas
-podman exec exitus-db psql -U exitus -d exitusdb -c \
-  "SELECT count(*) FROM pg_stat_activity WHERE datname='exitusdb';"
+podman exec exitus-db psql -U exitus -d exitus_db -c \
+  "SELECT count(*) FROM pg_stat_activity WHERE datname='exitus_db';"
 
 # Output:
 #  count
@@ -783,7 +783,7 @@ FATAL: password authentication failed for user "exitus"
 podman ps | grep exitus-db
 
 # 2. Testar conexão manual
-podman exec -it exitus-db psql -U exitus -d exitusdb
+podman exec -it exitus-db psql -U exitus -d exitus_db
 
 # 3. Verificar variáveis de ambiente
 podman exec exitus-backend env | grep POSTGRES
@@ -872,11 +872,11 @@ podman stats exitus-backend
 # exitus-backend 45.2%   512MB / 2GB         1.2MB/3.4MB
 
 # 2. Verificar queries lentas no PostgreSQL
-podman exec exitus-db psql -U exitus -d exitusdb -c \
+podman exec exitus-db psql -U exitus -d exitus_db -c \
   "SELECT query, mean_exec_time FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 10;"
 
 # 3. Ver conexões DB
-podman exec exitus-db psql -U exitus -d exitusdb -c \
+podman exec exitus-db psql -U exitus -d exitus_db -c \
   "SELECT count(*) FROM pg_stat_activity;"
 ```
 
@@ -959,7 +959,7 @@ DATE=$(date +%Y%m%d)
 mkdir -p $BACKUP_DIR
 
 # Backup database
-podman exec exitus-db pg_dump -U exitus exitusdb | \
+podman exec exitus-db pg_dump -U exitus exitus_db | \
   gzip > $BACKUP_DIR/db_backup_$DATE.sql.gz
 
 # Backup volumes
@@ -1013,7 +1013,7 @@ sleep 10
 5. **Restaurar dump SQL**:
 ```bash
 gunzip < /backup/exitus/db_backup_20260106.sql.gz | \
-  podman exec -i exitus-db psql -U exitus exitusdb
+  podman exec -i exitus-db psql -U exitus exitus_db
 ```
 
 6. **Iniciar backend e frontend**:
@@ -1054,111 +1054,3 @@ curl -X POST http://localhost:5000/api/auth/login \
 **Documento gerado**: 07 de Janeiro de 2026  
 **Versão**: v0.7.6  
 **Baseado em**: Validações M4/M5/M6/M7.5, experiência operacional real
-
-## 🛠️ Validação Seeds M2 (Módulo 2 Core)
-
-**Versão:** `v0.7.6` | **Data:** `14/02/2026`
-
----
-
-### 🚀 1. Executar Seeds M2
-
-Use o comando abaixo para garantir que o path do Python seja reconhecido corretamente.
-
-* **Pré-requisito:** Container `exitus-backend` em execução.
-* **Tempo esperado:** < 2 segundos.
-
-```bash
-podman exec -it exitus-backend bash -c "cd /app && PYTHONPATH=. python3 app/seeds/seed_modulo2.py"
-
-```
-
-**Output esperado:**
-
-> ✅ Usuários criados!
-> ✅ Corretoras criadas!
-> ✅ Ativos criados!
-> ✅ SEED MÓDULO 2 CONCLUÍDO!
-
----
-
-### 📊 2. Auditoria de Dados (Contagens)
-
-Verifique se as volumetrias batem com os requisitos da `v0.7.6`.
-
-```bash
-podman exec -it exitus-db psql exitusdb -U exitus -c "
-SELECT 'usuario' as tabela, COUNT(*) as quantidade FROM usuario
-UNION ALL SELECT 'corretora', COUNT(*) FROM corretora
-UNION ALL SELECT 'ativo', COUNT(*) FROM ativo
-UNION ALL SELECT 'transacao', COUNT(*) FROM transacao
-UNION ALL SELECT 'portfolio', COUNT(*) FROM portfolio
-UNION ALL SELECT 'posicao', COUNT(*) FROM posicao
-UNION ALL SELECT 'provento', COUNT(*) FROM provento;"
-
-```
-
-| Tabela | Qtd Esperada |
-| --- | --- |
-| **usuario** | 5 |
-| **corretora** | 14 |
-| **ativo** | 44+ |
-| **transacao** | 17+ |
-| **portfolio** | 4+ |
-| **posicao** | 17+ |
-| **provento** | 29+ |
-
----
-
-### 🔐 3. Validação de Acesso Admin
-
-Verifique se o usuário mestre foi criado com as flags corretas.
-
-```bash
-podman exec -it exitus-db psql exitusdb -U exitus -c "
-SELECT id, username, email, role, ativo, created_at
-FROM usuario
-WHERE email='admin@exitus.com';"
-
-```
-
----
-
-### 🔑 4. Credenciais de Teste (Ambiente DEV)
-
-| Username | Email | Senha | Role |
-| --- | --- | --- | --- |
-| `admin` | admin@exitus.com | senha123 | **ADMIN** |
-| `joao.silva` | joao.silva@example.com | senha123 | USER |
-| `maria.santos` | maria.santos@example.com | senha123 | USER |
-| `viewer` | viewer@exitus.com | senha123 | READONLY |
-| `teste.user` | teste@exitus.com | senha123 | USER |
-
-> ⚠️ **IMPORTANTE:** Estas credenciais são exclusivas para desenvolvimento. **Nunca** utilize estas senhas em produção.
-
----
-
-### 🔧 5. Troubleshooting (Resolução de Problemas)
-
-#### **Erro:** `ModuleNotFoundError: No module named 'app'`
-
-* **Causa:** Execução fora do diretório raiz ou sem PYTHONPATH.
-* **Solução:** Utilize `PYTHONPATH=.` dentro do container.
-
-#### **Erro:** `ImportError: cannot import name 'IncidenciaImposto'`
-
-* **Causa:** Script `run_all_seeds.py` está legado/depreciado.
-* **Solução:** Execute especificamente o `seed_modulo2.py`.
-
----
-
-### ⏱️ 6. Performance
-
-Para medir a latência do banco de dados:
-
-```bash
-time podman exec exitus-db psql exitusdb -U exitus -c "SELECT COUNT(*) FROM usuario; SELECT COUNT(*) FROM ativo;"
-
-```
-
-* **Critério de Sucesso:** `real < 0.5s`
