@@ -10,6 +10,7 @@
 - [Troubleshooting](#troubleshooting)
 - [Scripts Úteis](#scripts-úteis)
 - [Backup e Recovery](#backup-e-recovery)
+- [Validação de Usuários](#validação-de-Usuários)
 
 ---
 
@@ -1163,7 +1164,7 @@ time podman exec exitus-db psql exitusdb -U exitus -c "SELECT COUNT(*) FROM usua
 
 * **Critério de Sucesso:** `real < 0.5s`
 
-# 🧪 Validação de Usuários 
+# Validação de Usuários 
 > Validação M2-USUARIOS (5 Endpoints)
 
 ### 🔑 Comandos de Teste
