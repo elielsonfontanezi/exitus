@@ -713,7 +713,7 @@ chmod +x test_performance.sh
 ```
 
 **Output esperado**:
-```
+```bash
 Benchmark: http://localhost:5000/api/portfolio/dashboard
 Requests: 100
 Concorrência: 10
@@ -1408,28 +1408,6 @@ curl -s -X DELETE -H "Authorization: Bearer $TOKEN_USER" \
 | `/api/usuarios` | POST | < 200ms | 201 / 400 |
 | `/api/usuarios/{id}` | PUT | < 150ms | 200 / 400 / 403 |
 | `/api/usuarios/{id}` | DELETE | < 100ms | 200 / 403 / 404 |
-
----
-
-### Validações Críticas (GAPs Resolvidos)
-
-* ✅ **GAP-001:** Filtro `ativo` funcional (ativo=true retorna apenas ativos)
-* ✅ **GAP-002:** Performance < 100ms (média 64ms)
-* ✅ **GAP-003:** Erro 400 estruturado com `ValidationError`
-* ✅ **GAP-004:** Senha mínimo 8 caracteres (não 6)
-* ✅ **GAP-005:** USER recebe erro 400 ao tentar alterar role/ativo
-
-### Segurança Validada
-
-* ✅ JWT obrigatório (401 sem token)
-* ✅ ADMIN only em rotas restritas (403 para USER)
-* ✅ Isolamento de dados (USER vê apenas próprios)
-* ✅ Campos sensíveis protegidos (role/ativo)
-* ✅ Email/username únicos
-
-### Status Final
-
-**M2-USUARIOS: ✅ 100% VALIDADO**
 
 ---
 
