@@ -10,7 +10,8 @@
 - [Troubleshooting](#troubleshooting)
 - [Scripts Úteis](#scripts-úteis)
 - [Backup e Recovery](#backup-e-recovery)
-- [Validação de Usuários](#validação-de-Usuários)
+- [Validação Seeds](#validação-seeds)
+- [Validação Usuários](#validação-usuários)
 
 ---
 
@@ -809,7 +810,7 @@ rm -rf volumes/postgres/*
 ```json
 {
   "error": "Token has expired",
-  "statuscode": 401
+  "status_code": 401
 }
 ```
 
@@ -937,7 +938,6 @@ ls -lh scripts/
 # ✅ docs/USER_GUIDE.md encontrado
 # ✅ docs/OPERATIONS_RUNBOOK.md encontrado
 # ✅ docs/CHANGELOG.md encontrado
-# 
 # Total: 7/7 documentos OK
 ```
 
@@ -1036,33 +1036,14 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 ---
 
-## Referências
-
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Detalhes da arquitetura
-- [MODULES.md](MODULES.md) - Módulos implementados
-- [API_REFERENCE.md](API_REFERENCE.md) - Documentação de APIs
-- [USER_GUIDE.md](USER_GUIDE.md) - Guia do usuário
-
----
-
-## Suporte
-
-**GitHub Issues**: https://github.com/elielsonfontanezi/exitus/issues  
-**Documentação**: https://github.com/elielsonfontanezi/exitus/tree/main/docs
-
----
-
-**Documento gerado**: 07 de Janeiro de 2026  
-**Versão**: v0.7.6  
-**Baseado em**: Validações M4/M5/M6/M7.5, experiência operacional real
-
-## 🛠️ Validação Seeds M2 (Módulo 2 Core)
+## Validação Seeds
+>  Módulo 2 Core
 
 **Versão:** `v0.7.6` | **Data:** `14/02/2026`
 
 ---
 
-### 🚀 1. Executar Seeds M2
+### 1. Executar Seeds M2
 
 Use o comando abaixo para garantir que o path do Python seja reconhecido corretamente.
 
@@ -1071,19 +1052,18 @@ Use o comando abaixo para garantir que o path do Python seja reconhecido correta
 
 ```bash
 podman exec -it exitus-backend bash -c "cd /app && PYTHONPATH=. python3 app/seeds/seed_modulo2.py"
-
 ```
 
 **Output esperado:**
 
-> ✅ Usuários criados!
-> ✅ Corretoras criadas!
-> ✅ Ativos criados!
+> ✅ Usuários criados!  
+> ✅ Corretoras criadas!  
+> ✅ Ativos criados!  
 > ✅ SEED MÓDULO 2 CONCLUÍDO!
 
 ---
 
-### 📊 2. Auditoria de Dados (Contagens)
+### 2. Auditoria de Dados (Contagens)
 
 Verifique se as volumetrias batem com os requisitos da `v0.7.6`.
 
@@ -1096,7 +1076,6 @@ UNION ALL SELECT 'transacao', COUNT(*) FROM transacao
 UNION ALL SELECT 'portfolio', COUNT(*) FROM portfolio
 UNION ALL SELECT 'posicao', COUNT(*) FROM posicao
 UNION ALL SELECT 'provento', COUNT(*) FROM provento;"
-
 ```
 
 | Tabela | Qtd Esperada |
@@ -1111,7 +1090,7 @@ UNION ALL SELECT 'provento', COUNT(*) FROM provento;"
 
 ---
 
-### 🔐 3. Validação de Acesso Admin
+### 3. Validação de Acesso Admin
 
 Verifique se o usuário mestre foi criado com as flags corretas.
 
@@ -1120,26 +1099,25 @@ podman exec -it exitus-db psql exitusdb -U exitus -c "
 SELECT id, username, email, role, ativo, created_at
 FROM usuario
 WHERE email='admin@exitus.com';"
-
 ```
 
 ---
 
-### 🔑 4. Credenciais de Teste (Ambiente DEV)
+### 4. Credenciais de Teste (Ambiente DEV)
 
 | Username | Email | Senha | Role |
 | --- | --- | --- | --- |
-| `admin` | admin@exitus.com | senha123 | **ADMIN** |
-| `joao.silva` | joao.silva@example.com | senha123 | USER |
-| `maria.santos` | maria.santos@example.com | senha123 | USER |
-| `viewer` | viewer@exitus.com | senha123 | READONLY |
-| `teste.user` | teste@exitus.com | senha123 | USER |
+| `admin` | admin@exitus.com | admin123 | **ADMIN** |
+| `joao.silva` | joao.silva@example.com | user123 | USER |
+| `maria.santos` | maria.santos@example.com | user123 | USER |
+| `viewer` | viewer@exitus.com | user123 | READONLY |
+| `teste.user` | teste@exitus.com | user123 | USER |
 
 > ⚠️ **IMPORTANTE:** Estas credenciais são exclusivas para desenvolvimento. **Nunca** utilize estas senhas em produção.
 
 ---
 
-### 🔧 5. Troubleshooting (Resolução de Problemas)
+### 5. Troubleshooting (Resolução de Problemas)
 
 #### **Erro:** `ModuleNotFoundError: No module named 'app'`
 
@@ -1153,21 +1131,26 @@ WHERE email='admin@exitus.com';"
 
 ---
 
-### ⏱️ 6. Performance
+###  6. Performance
 
 Para medir a latência do banco de dados:
 
 ```bash
 time podman exec exitus-db psql exitusdb -U exitus -c "SELECT COUNT(*) FROM usuario; SELECT COUNT(*) FROM ativo;"
-
 ```
 
 * **Critério de Sucesso:** `real < 0.5s`
 
-# Validação de Usuários 
-> Validação M2-USUARIOS (5 Endpoints)
+---
 
-### 🔑 Comandos de Teste
+## Validação Usuários 
+> M2 Core: 5 Endpoints
+
+**Versão:** `v0.7.6` | **Data:** `15/02/2026`
+
+---
+
+### Comandos de Teste
 
 #### 1. Login e Obtenção de Tokens
 
@@ -1185,7 +1168,6 @@ export TOKEN_USER=$(curl -s -X POST http://localhost:5000/api/auth/login \
 # Verificar tokens
 echo "Token ADMIN: ${TOKEN_ADMIN:0:50}..."
 echo "Token USER: ${TOKEN_USER:0:50}..."
-
 ```
 
 #### 2. GET /api/usuarios (Listagem - ADMIN only)
@@ -1205,7 +1187,6 @@ curl -s "http://localhost:5000/api/usuarios" | jq .
 # USER comum (deve retornar 403)
 curl -s -H "Authorization: Bearer $TOKEN_USER" \
   "http://localhost:5000/api/usuarios" | jq .
-
 ```
 
 #### 3. GET /api/usuarios/{id} (Detalhes)
@@ -1229,7 +1210,6 @@ ADMIN_ID=$(curl -s -H "Authorization: Bearer $TOKEN_ADMIN" \
 
 curl -s -H "Authorization: Bearer $TOKEN_USER" \
   "http://localhost:5000/api/usuarios/$ADMIN_ID" | jq .
-
 ```
 
 #### 4. POST /api/usuarios (Criar)
@@ -1255,7 +1235,6 @@ curl -s -X POST http://localhost:5000/api/usuarios \
 curl -s -X POST http://localhost:5000/api/usuarios \
   -H "Content-Type: application/json" \
   -d '{"username":"outro","email":"teste@example.com","password":"senha1234"}' | jq .
-
 ```
 
 #### 5. PUT /api/usuarios/{id} (Atualizar)
@@ -1278,7 +1257,6 @@ curl -s -X PUT -H "Authorization: Bearer $TOKEN_ADMIN" \
   -H "Content-Type: application/json" \
   -d '{"role": "READONLY", "ativo": false}' \
   "http://localhost:5000/api/usuarios/$MARIA_ID" | jq '{success, role: .data.role, ativo: .data.ativo}'
-
 ```
 
 #### 6. DELETE /api/usuarios/{id} (Deletar - ADMIN only)
@@ -1299,12 +1277,11 @@ curl -s -H "Authorization: Bearer $TOKEN_ADMIN" \
 # USER tenta deletar (deve retornar 403)
 curl -s -X DELETE -H "Authorization: Bearer $TOKEN_USER" \
   "http://localhost:5000/api/usuarios/$ADMIN_ID" | jq .
-
 ```
 
 ---
 
-### 📊 Resultados Esperados
+### Resultados Esperados
 
 | Endpoint | Método | Performance | Status |
 | --- | --- | --- | --- |
@@ -1316,7 +1293,7 @@ curl -s -X DELETE -H "Authorization: Bearer $TOKEN_USER" \
 
 ---
 
-### ✅ Validações Críticas (GAPs Resolvidos)
+### Validações Críticas (GAPs Resolvidos)
 
 * ✅ **GAP-001:** Filtro `ativo` funcional (ativo=true retorna apenas ativos)
 * ✅ **GAP-002:** Performance < 100ms (média 64ms)
@@ -1324,7 +1301,7 @@ curl -s -X DELETE -H "Authorization: Bearer $TOKEN_USER" \
 * ✅ **GAP-004:** Senha mínimo 8 caracteres (não 6)
 * ✅ **GAP-005:** USER recebe erro 400 ao tentar alterar role/ativo
 
-### 🔐 Segurança Validada
+### Segurança Validada
 
 * ✅ JWT obrigatório (401 sem token)
 * ✅ ADMIN only em rotas restritas (403 para USER)
@@ -1332,8 +1309,22 @@ curl -s -X DELETE -H "Authorization: Bearer $TOKEN_USER" \
 * ✅ Campos sensíveis protegidos (role/ativo)
 * ✅ Email/username únicos
 
-### 🎯 Status Final
+### Status Final
 
-**M2-USUARIOS: ✅ 100% VALIDADO E APROVADO PARA PRODUÇÃO**
+**M2-USUARIOS: ✅ 100% VALIDADO**
 
 ---
+
+## Referências
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Detalhes da arquitetura
+- [MODULES.md](MODULES.md) - Módulos implementados
+- [API_REFERENCE.md](API_REFERENCE.md) - Documentação de APIs
+- [USER_GUIDE.md](USER_GUIDE.md) - Guia do usuário
+
+---
+
+## Suporte
+
+**GitHub Issues**: https://github.com/elielsonfontanezi/exitus/issues  
+**Documentação**: https://github.com/elielsonfontanezi/exitus/tree/main/docs
