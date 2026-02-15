@@ -3,6 +3,7 @@
 
 from flask import Blueprint, request, jsonify, g
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from marshmallow import ValidationError
 from app.services.usuario_service import UsuarioService
 from app.schemas.usuario_schema import (
     UsuarioCreateSchema, UsuarioUpdateSchema, 

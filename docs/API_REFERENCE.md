@@ -192,7 +192,7 @@ Registra novo usuário.
 **Validações**:
 - `username`: mínimo 3 caracteres, único
 - `email`: formato válido, único
-- `password`: mínimo 6 caracteres
+- `password`: mínimo 8 caracteres
 - `password_confirm`: deve ser igual a `password`
 
 ---
