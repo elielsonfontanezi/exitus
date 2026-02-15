@@ -132,10 +132,34 @@ FLASK_FRONTEND_PORT=8080
 BACKEND_API_URL=http://exitus-backend:5000
 
 # APIs de Cotações (Opcional - M7.5)
-BRAPI_TOKEN=seu_token_premium_aqui
-ALPHAVANTAGE_TOKEN=seu_token_aqui
-FINNHUB_TOKEN=seu_token_aqui
-POLYGON_TOKEN=seu_token_aqui  # Opcional
+# Alpha Vantage API
+# Obtenha em: https://www.alphavantage.co/support/#api-key
+ALPHA_VANTAGE_API_KEY=seu_token_aqui
+
+
+# Finnhub API
+# Obtenha em: https://finnhub.io/register
+FINNHUB_API_KEY=seu_token_aqui
+
+# Financial Modeling Prep (opcional)
+# Obtenha em: https://site.financialmodelingprep.com/developer/docs
+FMP_API_KEY=seu_token_aqui
+
+# Polygon.io (opcional)
+# Obtenha em: https://polygon.io/
+POLYGON_API_KEY=seu_token_aqui
+
+# brapi.dev
+BRAPI_API_KEY=seu_token_aqui
+
+# https://twelvedata.com
+TWELVE_DATA_API_KEY=seu_token_aqui
+
+# https://marketstack.com
+MARKETSTACK_API_KEY=seu_token_aqui
+
+# https://console.hgbrasil.com
+HGFINANCE_API_KEY=seu_token_aqui
 
 # Timezone
 TZ=America/Sao_Paulo
@@ -251,6 +275,9 @@ podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 # Restart completo
 ./scripts/restart_exitus.sh
 
+# Modo Seguro / Health Check
+./scripts/startexitus-local.sh
+
 # Rebuild + Restart backend
 ./scripts/rebuild_restart_exitus-backend.sh
 
@@ -259,6 +286,97 @@ podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ```
 
 ---
+
+## Script de Inicialização
+
+>Os scripts de automação estão localizados no diretório `scripts/` e servem para padronizar o ciclo de vida dos serviços (Banco de Dados, Backend e Frontend).
+
+### 1. `start_exitus.sh` (Modo Padrão)
+
+**Objetivo:** Inicia os containers na ordem de dependência (DB -> API -> UI) de forma simples.
+
+* **Quando usar:** No dia a dia, quando o ambiente já está configurado e você apenas precisa subir os serviços.
+* **Comportamento:** Executa o `podman start`, aguarda um `sleep` fixo e exibe a tabela de status ao final.
+
+### 2. `startexitus-local.sh` (Modo Seguro / Health Check)
+
+**Objetivo:** Garante que cada serviço esteja **realmente pronto** antes de prosseguir.
+
+* **Quando usar:** Primeira execução do dia, após atualizações de código ou quando o ambiente apresentar instabilidade.
+* **Diferenciais:**
+* Verifica a saúde real (ex: testa conexão SQL no DB e endpoint `/health` no Backend).
+* Reinicia containers travados automaticamente.
+* Possui *timeout* de 40 segundos para evitar loops infinitos.
+
+
+
+---
+
+## Script de Interrupção
+
+### 3. `stop_exitus.sh`
+
+**Objetivo:** Encerra todos os processos de forma graciosa.
+
+* **Ordem de Execução:** Para o Frontend primeiro, seguido pelo Backend e, por fim, o PostgreSQL.
+* **Por que esta ordem?** Garante que as aplicações encerrem suas conexões antes que o banco de dados seja desligado, evitando corrupção de dados ou logs de erro desnecessários.
+
+---
+
+## Script de Reinicialização
+
+### 4. `restart_exitus.sh`
+
+**Objetivo:** Realiza o ciclo completo de desligamento e religamento.
+
+* **Funcionamento:** Orquestra a execução do `stop_exitus.sh` seguido do `start_exitus.sh`.
+* **Vantagem:** Reutiliza a lógica dos scripts base, garantindo consistência e limpeza de portas de rede (sockets) entre as sessões.
+
+---
+
+## Guia de Uso Rápido
+
+### Permissões
+
+Antes da primeira execução, garanta que todos os scripts sejam executáveis:
+
+```bash
+chmod +x scripts/*.sh
+
+```
+
+### Comandos Comuns
+
+| Ação | Comando |
+| --- | --- |
+| **Subir ambiente rápido** | `./scripts/start_exitus.sh` |
+| **Subir com validação (Safe)** | `./scripts/startexitus-local.sh` |
+| **Parar tudo** | `./scripts/stop_exitus.sh` |
+| **Reiniciar tudo** | `./scripts/restart_exitus.sh` |
+
+---
+
+## Verificação de Saúde
+
+Após rodar qualquer script de início, você pode verificar manualmente o status com:
+
+```bash
+podman ps --filter name=exitus
+
+```
+
+**URLs de Acesso:**
+
+* **Frontend:** [http://localhost:8080](https://www.google.com/search?q=http://localhost:8080)
+* **Backend:** [http://localhost:5000](https://www.google.com/search?q=http://localhost:5000)
+
+---
+
+> **Nota:** Se algum serviço falhar persistentemente no `startexitus-local.sh`, verifique os logs específicos usando `podman logs [nome-do-container]`.
+
+---
+
+
 
 ## Operações do Dia a Dia
 
