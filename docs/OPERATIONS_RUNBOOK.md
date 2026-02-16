@@ -10,6 +10,7 @@
 - [Troubleshooting](#troubleshooting)
 - [Scripts Úteis](#scripts-úteis)
 - [Backup e Recovery](#backup-e-recovery)
+- [Acessar Container Shell](#acessar-container-shell)
 - [Validação Seeds](#validação-seeds)
 - [Validação Usuários](#validação-usuários)
 
@@ -287,18 +288,18 @@ podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 ---
 
-## Script de Inicialização
+### Script de Inicialização
 
->Os scripts de automação estão localizados no diretório `scripts/` e servem para padronizar o ciclo de vida dos serviços (Banco de Dados, Backend e Frontend).
+>Lembpre-se de que os scripts de automação estão localizados no diretório `scripts/` e servem para padronizar o ciclo de vida dos serviços (Banco de Dados, Backend e Frontend).
 
-### 1. `start_exitus.sh` (Modo Padrão)
+#### `start_exitus.sh`** (Modo Padrão)
 
 **Objetivo:** Inicia os containers na ordem de dependência (DB -> API -> UI) de forma simples.
 
 * **Quando usar:** No dia a dia, quando o ambiente já está configurado e você apenas precisa subir os serviços.
 * **Comportamento:** Executa o `podman start`, aguarda um `sleep` fixo e exibe a tabela de status ao final.
 
-### 2. `startexitus-local.sh` (Modo Seguro / Health Check)
+#### `startexitus-local.sh` (Modo Seguro / Health Check)
 
 **Objetivo:** Garante que cada serviço esteja **realmente pronto** antes de prosseguir.
 
@@ -309,12 +310,11 @@ podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 * Possui *timeout* de 40 segundos para evitar loops infinitos.
 
 
-
 ---
 
-## Script de Interrupção
+### Script de Interrupção
 
-### 3. `stop_exitus.sh`
+#### `stop_exitus.sh`
 
 **Objetivo:** Encerra todos os processos de forma graciosa.
 
@@ -323,9 +323,9 @@ podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 ---
 
-## Script de Reinicialização
+### Script de Reinicialização
 
-### 4. `restart_exitus.sh`
+#### `restart_exitus.sh`
 
 **Objetivo:** Realiza o ciclo completo de desligamento e religamento.
 
@@ -618,6 +618,125 @@ podman exec -it exitus-backend \
 # [OK] VALE3: 252 registros inseridos
 # ...
 # [INFO] Resumo: 17 ativos processados, 15 sucesso, 2 falhas
+```
+---
+
+## Acessar Container Shell
+
+### Executar Scripts Python no Backend
+
+Para executar scripts administrativos que interagem com models Flask/SQLAlchemy:
+
+#### Método Correto (com contexto Flask)
+
+```bash
+# Template padrão para scripts administrativos
+podman exec -it exitus-backend bash -c "cd /app && python3 << 'EOF'
+from app import create_app
+from app.database import db
+from app.models import Usuario, Corretora, Ativo, Transacao  # Imports necessários
+
+app = create_app()
+
+with app.app_context():
+    # SEU CÓDIGO AQUI
+    # Exemplo: Listar todos os usuários
+    usuarios = Usuario.query.all()
+    for u in usuarios:
+        print(f'{u.username} - {u.email}')
+    
+    # Exemplo: Atualizar senha
+    admin = Usuario.query.filter_by(username='admin').first()
+    admin.set_password('novasenha123')
+    db.session.commit()
+    print('✅ Senha atualizada!')
+EOF
+"
+```
+
+#### Por que precisa de `app_context()`?
+
+- **SQLAlchemy** precisa do contexto Flask para acessar `db.session`
+- **Models** dependem de configurações carregadas em `create_app()`
+- **Queries** falham sem o contexto ativo (erro: `RuntimeError: Working outside of application context`)
+
+#### Métodos INCORRETOS (NÃO usar)
+
+```bash
+# ❌ ERRO 1: Sem contexto Flask
+podman exec exitus-backend python3 << 'EOF'
+from app.models import Usuario  # ModuleNotFoundError
+EOF
+
+# ❌ ERRO 2: Script externo sem app_context
+podman exec exitus-backend python3 /tmp/script.py  # RuntimeError
+
+# ❌ ERRO 3: Tentar usar python3 -m sem contexto
+podman exec exitus-backend python3 -m app.script  # Falha nas queries
+```
+
+#### Exemplos Práticos
+
+**1. Resetar senhas de usuários:**
+
+```bash
+podman exec -it exitus-backend bash -c "cd /app && python3 << 'EOF'
+from app import create_app
+from app.database import db
+from app.models import Usuario
+
+app = create_app()
+
+with app.app_context():
+    usuarios = Usuario.query.filter(Usuario.username.in_(['admin', 'joao.silva'])).all()
+    for u in usuarios:
+        u.set_password('senha123')
+        print(f'✅ {u.username} atualizado')
+    db.session.commit()
+EOF
+"
+```
+
+**2. Listar corretoras com saldo > 1000:**
+
+```bash
+podman exec -it exitus-backend bash -c "cd /app && python3 << 'EOF'
+from app import create_app
+from app.models import Corretora
+
+app = create_app()
+
+with app.app_context():
+    corretoras = Corretora.query.filter(Corretora.saldo_atual > 1000).all()
+    for c in corretoras:
+        print(f'{c.nome} ({c.pais}): {c.moeda_padrao} {c.saldo_atual}')
+EOF
+"
+```
+
+**3. Verificar integridade de dados:**
+
+```bash
+podman exec -it exitus-backend bash -c "cd /app && python3 << 'EOF'
+from app import create_app
+from app.models import Usuario, Corretora, Ativo
+
+app = create_app()
+
+with app.app_context():
+    print(f'Usuários: {Usuario.query.count()}')
+    print(f'Corretoras: {Corretora.query.count()}')
+    print(f'Ativos: {Ativo.query.count()}')
+EOF
+"
+```
+
+---
+
+**Nota importante:** Se o script for muito complexo, considere criar um arquivo `.py` dentro de `backend/app/scripts/` e executá-lo com:
+
+```bash
+podman exec -it exitus-backend bash -c "cd /app && python3 -c 'from app import create_app; from app.scripts.seu_script import main; app=create_app(); app.app_context().push(); main()'"
 ```
 
 ---

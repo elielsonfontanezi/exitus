@@ -40,12 +40,21 @@ def list_corretoras():
 def get_corretora(id):
     """Buscar corretora por ID"""
     usuario_id = get_jwt_identity()
-    corretora = CorretoraService.get_by_id(id, usuario_id)
     
-    if not corretora:
-        return not_found("Corretora não encontrada")
+    try:
+        corretora = CorretoraService.get_by_id(id, usuario_id)
+        return success(CorretoraResponseSchema().dump(corretora), "Dados da corretora")
     
-    return success(CorretoraResponseSchema().dump(corretora), "Dados da corretora")
+    except PermissionError as e:
+        # 403 - Corretora existe mas pertence a outro usuário
+        return forbidden(str(e))
+    
+    except ValueError as e:
+        # 404 - Corretora não existe
+        return not_found(str(e))
+    
+    except Exception as e:
+        return error(f"Erro ao buscar corretora: {str(e)}", 500)
 
 @bp.route('', methods=['POST'])
 @jwt_required()
@@ -73,11 +82,12 @@ def create_corretora():
 def update_corretora(id):
     """Atualizar corretora"""
     usuario_id = get_jwt_identity()
-    
     try:
         data = CorretoraUpdateSchema().load(request.json)
         corretora = CorretoraService.update(id, data, usuario_id)
         return success(CorretoraResponseSchema().dump(corretora), "Corretora atualizada")
+    except PermissionError as e:
+        return forbidden(str(e))  # 403
     except ValidationError as e:
         return error(str(e), 400)
     except ValueError as e:
@@ -85,19 +95,22 @@ def update_corretora(id):
     except Exception as e:
         return error(f"Erro ao atualizar: {str(e)}", 500)
 
+
 @bp.route('/<uuid:id>', methods=['DELETE'])
 @jwt_required()
 def delete_corretora(id):
     """Deletar corretora"""
     usuario_id = get_jwt_identity()
-    
     try:
         CorretoraService.delete(id, usuario_id)
         return success(None, "Corretora deletada com sucesso")
+    except PermissionError as e:
+        return forbidden(str(e))  # 403
     except ValueError as e:
-        return not_found(str(e))
+        return not_found(str(e))  # 404
     except Exception as e:
         return error(f"Erro ao deletar: {str(e)}", 500)
+
 
 @bp.route('/saldo-total', methods=['GET'])
 @jwt_required()

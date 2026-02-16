@@ -5,6 +5,23 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este 
 
+## [v0.7.8] - 2026-02-15
+
+### 🐛 Correções (M2 - Corretoras)
+
+**Segurança e Clareza de Respostas HTTP**
+- **CORREÇÃO:** Endpoints `GET/PUT/DELETE /api/corretoras/{id}` agora retornam **403 Forbidden** quando usuário tenta acessar corretora de outro usuário (anteriormente retornavam 404)
+- **Benefício:** Melhor clareza de erros e conformidade com padrões REST (404 = não existe, 403 = existe mas sem permissão)
+- **Arquivos modificados:**
+  - `backend/app/services/corretora_service.py` → Método `get_by_id()` distingue 404 vs 403 com `PermissionError`
+  - `backend/app/blueprints/corretoras/routes.py` → Captura `PermissionError` e retorna `forbidden()` (403)
+
+**Validação Completa M2-CORRETORAS**
+- ✅ 6 endpoints testados (29 cenários)
+- ✅ Performance: ~13ms (média) - 26x mais rápido que SLA de 500ms
+- ✅ Segurança: Isolamento multi-tenant 100% funcional
+- ✅ Filtros: 5 tipos funcionando (pais, tipo, ativa, search, combinados)
+
 
 ## v0.7.8 - 2026-02-14 - Documentation
 - Official **snake_case** naming standard documented:

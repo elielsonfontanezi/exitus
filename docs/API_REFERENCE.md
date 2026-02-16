@@ -321,20 +321,30 @@ Cria nova corretora.
 ---
 
 ### GET /api/corretoras/{id}
-
-Detalha corretora.
+**Responses:**
+- `200` - Corretora encontrada
+- `401` - Token JWT inválido ou ausente
+- `403` - ⚠️ **NOVO:** Corretora existe mas pertence a outro usuário
+- `404` - Corretora não existe
 
 ---
 
 ### PUT /api/corretoras/{id}
-
-Atualiza corretora.
+**Responses:**
+- `200` - Atualizada com sucesso
+- `400` - Dados inválidos
+- `401` - Token JWT inválido ou ausente
+- `403` - ⚠️ **NOVO:** Corretora existe mas pertence a outro usuário
+- `404` - Corretora não existe
 
 ---
 
 ### DELETE /api/corretoras/{id}
-
-Deleta corretora.
+**Responses:**
+- `200` - Deletada com sucesso
+- `401` - Token JWT inválido ou ausente
+- `403` - ⚠️ **NOVO:** Corretora existe mas pertence a outro usuário
+- `404` - Corretora não existe
 
 ---
 

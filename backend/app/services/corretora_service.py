@@ -46,8 +46,31 @@ class CorretoraService:
     
     @staticmethod
     def get_by_id(corretora_id, usuario_id):
-        """Busca corretora por ID (valida propriedade)"""
-        return Corretora.query.filter_by(id=corretora_id, usuario_id=usuario_id).first()
+        """
+        Busca corretora por ID com verificação de ownership.
+        
+        Args:
+            corretora_id: UUID da corretora
+            usuario_id: UUID do usuário autenticado
+            
+        Returns:
+            Corretora object se encontrada E pertence ao usuário
+            
+        Raises:
+            ValueError: Com mensagem específica para 404 ou 403
+        """
+        # Primeiro verifica se a corretora existe
+        corretora = Corretora.query.get(corretora_id)
+        
+        if not corretora:
+            raise ValueError("Corretora não encontrada")  # 404
+        
+        # Se existe, verifica se pertence ao usuário
+        if corretora.usuario_id != usuario_id:
+            raise PermissionError("Acesso negado a esta corretora")  # 403
+        
+        return corretora
+
     
     @staticmethod
     def create(data, usuario_id):
@@ -86,44 +109,44 @@ class CorretoraService:
     @staticmethod
     def update(corretora_id, data, usuario_id):
         """
-        Atualiza corretora.
-        
+        Atualiza corretora com verificação de ownership.
+
         Args:
             corretora_id: ID da corretora
             data: Dict com campos a atualizar
             usuario_id: ID do usuário proprietário
+            
+        Raises:
+            ValueError: Corretora não existe (404)
+            PermissionError: Corretora existe mas pertence a outro (403)
         """
-        corretora = Corretora.query.filter_by(id=corretora_id, usuario_id=usuario_id).first()
-        if not corretora:
-            raise ValueError("Corretora não encontrada")
+        # Usa get_by_id que já faz a verificação 403/404
+        corretora = CorretoraService.get_by_id(corretora_id, usuario_id)
         
-        # Atualizar campos permitidos
+        # Verifica duplicidade se nome mudou
         if 'nome' in data:
-            # Verifica duplicidade
             existing = Corretora.query.filter_by(
                 usuario_id=usuario_id,
                 nome=data['nome'],
                 pais=corretora.pais
             ).first()
+            
             if existing and existing.id != corretora.id:
                 raise ValueError(f"Já existe uma corretora '{data['nome']}' em {corretora.pais}")
+            
             corretora.nome = data['nome']
         
+        # Atualizar campos permitidos
         if 'tipo' in data:
             corretora.tipo = TipoCorretora[data['tipo'].upper()]
-        
         if 'pais' in data:
             corretora.pais = data['pais'].upper()
-        
         if 'moeda_padrao' in data:
             corretora.moeda_padrao = data['moeda_padrao'].upper()
-        
         if 'saldo_atual' in data:
             corretora.saldo_atual = Decimal(str(data['saldo_atual']))
-        
         if 'ativa' in data:
             corretora.ativa = data['ativa']
-        
         if 'observacoes' in data:
             corretora.observacoes = data['observacoes']
         
@@ -132,10 +155,15 @@ class CorretoraService:
     
     @staticmethod
     def delete(corretora_id, usuario_id):
-        """Deleta corretora (valida propriedade)"""
-        corretora = Corretora.query.filter_by(id=corretora_id, usuario_id=usuario_id).first()
-        if not corretora:
-            raise ValueError("Corretora não encontrada")
+        """
+        Deleta corretora com verificação de ownership.
+        
+        Raises:
+            ValueError: Corretora não existe (404)
+            PermissionError: Corretora existe mas pertence a outro (403)
+        """
+        # Usa get_by_id que já faz a verificação 403/404
+        corretora = CorretoraService.get_by_id(corretora_id, usuario_id)
         
         # TODO: Verificar se há posições/transações vinculadas
         # Por enquanto, permite deletar
@@ -143,6 +171,7 @@ class CorretoraService:
         db.session.delete(corretora)
         db.session.commit()
         return True
+
     
     @staticmethod
     def get_saldo_total(usuario_id, moeda='BRL'):
