@@ -2,9 +2,16 @@
 # Restart rápido do frontend (sem rebuild)
 
 echo "Reiniciando exitus-frontend..."
-podman restart exitus-frontend
+echo .
 
-sleep 3
+echo "Parando exitus-frontend..."
+podman stop exitus-frontend
+sleep 5
+
+echo "Iniciando exitus-frontend..."
+podman start exitus-frontend
+echo "Aguarde..."
+sleep 10
 
 echo ""
 echo "Status:"

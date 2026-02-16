@@ -279,6 +279,12 @@ podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 # Modo Seguro / Health Check
 ./scripts/startexitus-local.sh
 
+# Restart frontend
+./scripts/restart_frontend.sh
+
+# Restart backend
+./scripts/restart_backend.sh
+
 # Rebuild + Restart backend
 ./scripts/rebuild_restart_exitus-backend.sh
 

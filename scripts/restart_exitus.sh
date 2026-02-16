@@ -13,12 +13,17 @@ echo ""
 bash "$SCRIPT_DIR/stop_exitus.sh"
 
 echo ""
-echo "Aguardando 2 segundos para limpeza de sockets..."
-sleep 2
+echo "Aguardando 5 segundos para limpeza de sockets..."
+sleep 5
 echo ""
 
 # 2. Iniciar os serviços
 bash "$SCRIPT_DIR/start_exitus.sh"
+
+echo ""
+echo "Aguardando 10 segundos para termino das inicializações..."
+sleep 10
+echo ""
 
 echo ""
 echo "========================================"
