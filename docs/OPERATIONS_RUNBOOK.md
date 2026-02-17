@@ -13,6 +13,7 @@
 - [Acessar Container Shell](#acessar-container-shell)
 - [Validação Seeds](#validação-seeds)
 - [Validação Usuários](#validação-usuários)
+- [Validar ENUMs no Banco](#validar-enums-no-banco)
 
 ---
 
@@ -1533,6 +1534,32 @@ curl -s -X DELETE -H "Authorization: Bearer $TOKEN_USER" \
 | `/api/usuarios` | POST | < 200ms | 201 / 400 |
 | `/api/usuarios/{id}` | PUT | < 150ms | 200 / 400 / 403 |
 | `/api/usuarios/{id}` | DELETE | < 100ms | 200 / 403 / 404 |
+
+---
+
+### Validar ENUMs no Banco
+
+```bash
+# Verificar tipos de ativos cadastrados
+podman exec exitus-db psql -U exitus -d exitusdb -c "
+SELECT enumlabel 
+FROM pg_enum 
+WHERE enumtypid = 'tipoativo'::regtype 
+ORDER BY enumsortorder;
+"
+
+# Deve retornar 14 valores:
+# acao, fii, cdb, lcilca, tesourodireto, debenture,
+# stock, reit, bond, etf, stockintl, etfintl, cripto, outro
+
+# Contar ativos por tipo
+podman exec exitus-db psql -U exitus -d exitusdb -c "
+SELECT tipo, COUNT(*) as total 
+FROM ativo 
+GROUP BY tipo 
+ORDER BY total DESC;
+"
+```
 
 ---
 

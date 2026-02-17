@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-01-06 15:06:34
+Gerado em: 2026-02-17 19:33:49
 ================================================================================
 
 ================================================================================
@@ -163,9 +163,9 @@ Unique Constraints:
      Nome do Índice     |                                   Definição                                    
 ------------------------+--------------------------------------------------------------------------------
  alertas_pkey           | CREATE UNIQUE INDEX alertas_pkey ON public.alertas USING btree (id)
- idx_alertas_usuario_id | CREATE INDEX idx_alertas_usuario_id ON public.alertas USING btree (usuario_id)
  idx_alertas_nome       | CREATE INDEX idx_alertas_nome ON public.alertas USING btree (nome)
  idx_alertas_tipo       | CREATE INDEX idx_alertas_tipo ON public.alertas USING btree (tipo_alerta)
+ idx_alertas_usuario_id | CREATE INDEX idx_alertas_usuario_id ON public.alertas USING btree (usuario_id)
 (4 rows)
 
 
@@ -176,9 +176,9 @@ ________________________________________________________________________________
 TABELA: ativo
 ################################################################################
 
-                                                         Table "public.ativo"
-       Column        |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
----------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+                                                                                    Table "public.ativo"
+       Column        |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                           Description                            
+---------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+------------------------------------------------------------------
  id                  | uuid                     |           | not null |         | plain    |             |              | 
  ticker              | character varying(20)    |           | not null |         | extended |             |              | 
  nome                | character varying(200)   |           | not null |         | extended |             |              | 
@@ -200,6 +200,7 @@ TABELA: ativo
  updated_at          | timestamp with time zone |           | not null |         | plain    |             |              | 
  preco_teto          | numeric(18,6)            |           |          |         | main     |             |              | 
  beta                | numeric(8,4)             |           |          |         | main     |             |              | 
+ cap_rate            | numeric(8,4)             |           |          |         | main     |             |              | Cap Rate - Taxa de capitalização para FIIs/REITs (ex: 0.06 = 6%)
 Indexes:
     "ativo_pkey" PRIMARY KEY, btree (id)
     "ix_ativo_ativo" btree (ativo)
@@ -248,7 +249,8 @@ Access method: heap
   19 | updated_at          | timestamp with time zone |         | NO    | 
   20 | preco_teto          | numeric                  |         | YES   | 
   21 | beta                | numeric                  |         | YES   | 
-(21 rows)
+  22 | cap_rate            | numeric                  |         | YES   | 
+(22 rows)
 
 
 Foreign Keys:
@@ -366,15 +368,15 @@ Unique Constraints:
 Índices:
                Nome do Índice                |                                                         Definição                                                         
 ---------------------------------------------+---------------------------------------------------------------------------------------------------------------------------
- ix_auditoria_relatorios_tipo_relatorio      | CREATE INDEX ix_auditoria_relatorios_tipo_relatorio ON public.auditoria_relatorios USING btree (tipo_relatorio)
+ auditoria_relatorios_pkey                   | CREATE UNIQUE INDEX auditoria_relatorios_pkey ON public.auditoria_relatorios USING btree (id)
  ix_auditoria_relatorios_chave_api_auditoria | CREATE INDEX ix_auditoria_relatorios_chave_api_auditoria ON public.auditoria_relatorios USING btree (chave_api_auditoria)
  ix_auditoria_relatorios_data_fim            | CREATE INDEX ix_auditoria_relatorios_data_fim ON public.auditoria_relatorios USING btree (data_fim)
  ix_auditoria_relatorios_data_inicio         | CREATE INDEX ix_auditoria_relatorios_data_inicio ON public.auditoria_relatorios USING btree (data_inicio)
  ix_auditoria_relatorios_formato_export      | CREATE INDEX ix_auditoria_relatorios_formato_export ON public.auditoria_relatorios USING btree (formato_export)
- ix_auditoria_relatorios_timestamp_download  | CREATE INDEX ix_auditoria_relatorios_timestamp_download ON public.auditoria_relatorios USING btree (timestamp_download)
- auditoria_relatorios_pkey                   | CREATE UNIQUE INDEX auditoria_relatorios_pkey ON public.auditoria_relatorios USING btree (id)
- ix_auditoria_relatorios_usuario_id          | CREATE INDEX ix_auditoria_relatorios_usuario_id ON public.auditoria_relatorios USING btree (usuario_id)
  ix_auditoria_relatorios_timestamp_criacao   | CREATE INDEX ix_auditoria_relatorios_timestamp_criacao ON public.auditoria_relatorios USING btree (timestamp_criacao)
+ ix_auditoria_relatorios_timestamp_download  | CREATE INDEX ix_auditoria_relatorios_timestamp_download ON public.auditoria_relatorios USING btree (timestamp_download)
+ ix_auditoria_relatorios_tipo_relatorio      | CREATE INDEX ix_auditoria_relatorios_tipo_relatorio ON public.auditoria_relatorios USING btree (tipo_relatorio)
+ ix_auditoria_relatorios_usuario_id          | CREATE INDEX ix_auditoria_relatorios_usuario_id ON public.auditoria_relatorios USING btree (usuario_id)
 (9 rows)
 
 
@@ -446,9 +448,9 @@ Access method: heap
 Foreign Keys:
                  Nome FK                 |    Coluna    | Tabela Referenciada | Coluna Referenciada 
 -----------------------------------------+--------------+---------------------+---------------------
- configuracoes_alertas_usuario_id_fkey   | usuario_id   | usuario             | id
  configuracoes_alertas_ativo_id_fkey     | ativo_id     | ativo               | id
  configuracoes_alertas_portfolio_id_fkey | portfolio_id | portfolio           | id
+ configuracoes_alertas_usuario_id_fkey   | usuario_id   | usuario             | id
 (3 rows)
 
 
@@ -468,14 +470,14 @@ Unique Constraints:
 Índices:
                     Nome do Índice                     |                                                                   Definição                                                                   
 -------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------
+ configuracoes_alertas_pkey                            | CREATE UNIQUE INDEX configuracoes_alertas_pkey ON public.configuracoes_alertas USING btree (id)
  ix_configuracoes_alertas_ativo                        | CREATE INDEX ix_configuracoes_alertas_ativo ON public.configuracoes_alertas USING btree (ativo)
+ ix_configuracoes_alertas_ativo_id                     | CREATE INDEX ix_configuracoes_alertas_ativo_id ON public.configuracoes_alertas USING btree (ativo_id)
  ix_configuracoes_alertas_portfolio_id                 | CREATE INDEX ix_configuracoes_alertas_portfolio_id ON public.configuracoes_alertas USING btree (portfolio_id)
  ix_configuracoes_alertas_timestamp_criacao            | CREATE INDEX ix_configuracoes_alertas_timestamp_criacao ON public.configuracoes_alertas USING btree (timestamp_criacao)
  ix_configuracoes_alertas_timestamp_ultimo_acionamento | CREATE INDEX ix_configuracoes_alertas_timestamp_ultimo_acionamento ON public.configuracoes_alertas USING btree (timestamp_ultimo_acionamento)
- configuracoes_alertas_pkey                            | CREATE UNIQUE INDEX configuracoes_alertas_pkey ON public.configuracoes_alertas USING btree (id)
- ix_configuracoes_alertas_usuario_id                   | CREATE INDEX ix_configuracoes_alertas_usuario_id ON public.configuracoes_alertas USING btree (usuario_id)
- ix_configuracoes_alertas_ativo_id                     | CREATE INDEX ix_configuracoes_alertas_ativo_id ON public.configuracoes_alertas USING btree (ativo_id)
  ix_configuracoes_alertas_tipo_alerta                  | CREATE INDEX ix_configuracoes_alertas_tipo_alerta ON public.configuracoes_alertas USING btree (tipo_alerta)
+ ix_configuracoes_alertas_usuario_id                   | CREATE INDEX ix_configuracoes_alertas_usuario_id ON public.configuracoes_alertas USING btree (usuario_id)
 (8 rows)
 
 
@@ -1164,10 +1166,10 @@ Unique Constraints:
           Nome do Índice          |                                                  Definição                                                  
 ----------------------------------+-------------------------------------------------------------------------------------------------------------
  parametros_macro_pkey            | CREATE UNIQUE INDEX parametros_macro_pkey ON public.parametros_macro USING btree (id)
- ix_parametros_macro_pais_mercado | CREATE UNIQUE INDEX ix_parametros_macro_pais_mercado ON public.parametros_macro USING btree (pais, mercado)
- ix_parametros_macro_pais         | CREATE INDEX ix_parametros_macro_pais ON public.parametros_macro USING btree (pais)
- ix_parametros_macro_mercado      | CREATE INDEX ix_parametros_macro_mercado ON public.parametros_macro USING btree (mercado)
  ix_parametros_macro_ativo        | CREATE INDEX ix_parametros_macro_ativo ON public.parametros_macro USING btree (ativo)
+ ix_parametros_macro_mercado      | CREATE INDEX ix_parametros_macro_mercado ON public.parametros_macro USING btree (mercado)
+ ix_parametros_macro_pais         | CREATE INDEX ix_parametros_macro_pais ON public.parametros_macro USING btree (pais)
+ ix_parametros_macro_pais_mercado | CREATE UNIQUE INDEX ix_parametros_macro_pais_mercado ON public.parametros_macro USING btree (pais, mercado)
 (5 rows)
 
 
@@ -1244,8 +1246,8 @@ Unique Constraints:
      Nome do Índice      |                                     Definição                                     
 -------------------------+-----------------------------------------------------------------------------------
  portfolio_pkey          | CREATE UNIQUE INDEX portfolio_pkey ON public.portfolio USING btree (id)
- ix_portfolio_usuario_id | CREATE INDEX ix_portfolio_usuario_id ON public.portfolio USING btree (usuario_id)
  ix_portfolio_ativo      | CREATE INDEX ix_portfolio_ativo ON public.portfolio USING btree (ativo)
+ ix_portfolio_usuario_id | CREATE INDEX ix_portfolio_usuario_id ON public.portfolio USING btree (usuario_id)
 (3 rows)
 
 
@@ -1426,9 +1428,9 @@ Unique Constraints:
 Índices:
                    Nome do Índice                    |                                                                     Definição                                                                     
 -----------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------
- ix_projecoes_renda_mes_ano                          | CREATE INDEX ix_projecoes_renda_mes_ano ON public.projecoes_renda USING btree (mes_ano)
  projecoes_renda_pkey                                | CREATE UNIQUE INDEX projecoes_renda_pkey ON public.projecoes_renda USING btree (id)
  projecoes_renda_usuario_id_portfolio_id_mes_ano_key | CREATE UNIQUE INDEX projecoes_renda_usuario_id_portfolio_id_mes_ano_key ON public.projecoes_renda USING btree (usuario_id, portfolio_id, mes_ano)
+ ix_projecoes_renda_mes_ano                          | CREATE INDEX ix_projecoes_renda_mes_ano ON public.projecoes_renda USING btree (mes_ano)
  ix_projecoes_renda_usuario_id                       | CREATE INDEX ix_projecoes_renda_usuario_id ON public.projecoes_renda USING btree (usuario_id)
 (4 rows)
 
@@ -1753,9 +1755,9 @@ Access method: heap
 Foreign Keys:
            Nome FK           |    Coluna    | Tabela Referenciada | Coluna Referenciada 
 -----------------------------+--------------+---------------------+---------------------
- transacao_usuario_id_fkey   | usuario_id   | usuario             | id
  transacao_ativo_id_fkey     | ativo_id     | ativo               | id
  transacao_corretora_id_fkey | corretora_id | corretora           | id
+ transacao_usuario_id_fkey   | usuario_id   | usuario             | id
 (3 rows)
 
 
@@ -1877,7 +1879,7 @@ Total de Colunas por Tabela:
 ------------------------+-------------
  alembic_version        |           1
  alertas                |          15
- ativo                  |          21
+ ativo                  |          22
  auditoria_relatorios   |          13
  configuracoes_alertas  |          16
  corretora              |          11

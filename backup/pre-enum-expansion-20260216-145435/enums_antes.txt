@@ -1,0 +1,11 @@
+ unnest 
+--------
+ ACAO
+ FII
+ REIT
+ BOND
+ ETF
+ CRIPTO
+ OUTRO
+(7 rows)
+

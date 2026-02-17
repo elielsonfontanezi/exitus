@@ -11,28 +11,39 @@ from app.database import db
 
 
 class TipoAtivo(enum.Enum):
-    """Enum para tipos de ativo - 14 tipos (Multi-Mercado)"""
-    # Mercado BR
-    ACAO = "acao"                    # Ações Brasil (B3)
-    FII = "fii"                      # Fundos Imobiliários BR
-    CDB = "cdb"                      # Certificado de Depósito Bancário BR
-    LCI_LCA = "lci_lca"             # Letra de Crédito Imobiliário/Agrícola BR
-    TESOURO_DIRETO = "tesouro_direto"  # Tesouro Direto BR
-    DEBENTURE = "debenture"          # Debêntures BR
+    """Tipos de ativos suportados - Cobertura Global 95%+"""
     
-    # Mercado US
-    STOCK = "stock"                  # Ações US (NYSE, NASDAQ)
-    REIT = "reit"                    # Real Estate Investment Trust US
-    BOND = "bond"                    # Bonds US (corporativo, governamental)
-    ETF = "etf"                      # Exchange Traded Funds US
+    # Ações e derivados
+    ACAO = "acao"                          # Ações ordinárias/preferenciais
+    BDR = "bdr"                            # Brazilian Depositary Receipt
+    ADR = "adr"                            # American Depositary Receipt
     
-    # Mercado INTL (EU/ASIA)
-    STOCK_INTL = "stock_intl"       # Ações Internacionais (EU, ASIA)
-    ETF_INTL = "etf_intl"           # ETFs Internacionais
+    # Fundos Imobiliários
+    FII = "fii"                            # Fundo Imobiliário (Brasil)
+    REIT = "reit"                          # Real Estate Investment Trust (EUA/Global)
+    
+    # ETFs
+    ETF_ACAO = "etf_acao"                  # ETF de renda variável
+    ETF_RENDA_FIXA = "etf_renda_fixa"      # ETF de renda fixa
+    ETF_INTERNACIONAL = "etf_internacional"  # ETF global diversificado
+    ETF_COMMODITY = "etf_commodity"        # ETF de commodities (GLD, USO, etc.)
+    
+    # Renda Fixa
+    RENDA_FIXA = "renda_fixa"              # CDB, LCI, LCA, Tesouro Direto, Bonds
+    
+    # Commodities
+    OURO = "ouro"                          # Ouro físico ou certificados
+    COMMODITY = "commodity"                # Prata, petróleo, agrícolas, etc.
+    
+    # Criptomoedas
+    CRIPTO = "cripto"                      # Bitcoin, Ethereum, etc.
+    
+    # Câmbio
+    FOREX = "forex"                        # Pares de moedas (USD/BRL, EUR/USD)
     
     # Outros
-    CRIPTO = "cripto"                # Criptomoedas
-    OUTRO = "outro"                  # Outros ativos
+    OUTRO = "outro"                        # Ativos não classificados
+
 
 class ClasseAtivo(enum.Enum):
     """Classes de ativos para alocação de portfólio"""
@@ -107,6 +118,7 @@ class Ativo(db.Model):
     tipo = Column(Enum(TipoAtivo), nullable=False, index=True)
     classe = Column(Enum(ClasseAtivo), nullable=False, index=True)
     mercado = Column(String(10), nullable=False, index=True)  # BR, US, EU, ASIA, GLOBAL
+    bolsa_origem = Column(String(20), nullable=True, index=True)  # NYSE, B3, LSE, etc. (novo)
     moeda = Column(String(3), nullable=False)
     
     # Indicadores Fundamentalistas
@@ -149,6 +161,7 @@ class Ativo(db.Model):
             'tipo': self.tipo.value if self.tipo else None,
             'classe': self.classe.value if self.classe else None,
             'mercado': self.mercado,
+            'bolsa_origem': self.bolsa_origem,
             'moeda': self.moeda,
             'preco_atual': float(self.preco_atual) if self.preco_atual else None,
             'dividend_yield': float(self.dividend_yield) if self.dividend_yield else None,

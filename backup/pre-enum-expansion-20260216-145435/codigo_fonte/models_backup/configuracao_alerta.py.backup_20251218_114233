@@ -1,0 +1,257 @@
+# -*- coding: utf-8 -*-
+"""
+Exitus - Model ConfiguracaoAlerta
+Configurações de alertas inteligentes
+"""
+
+from datetime import datetime
+from app.database import db
+from sqlalchemy import Column, String, DateTime, Enum, Numeric, Boolean, ForeignKey, ARRAY
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+import uuid
+from .enums_m7 import TipoAlerta, OperadorCondicao, FrequenciaNotificacao, CanalEntrega
+
+
+class ConfiguracaoAlerta(db.Model):
+    """
+    Model para configuração de alertas personalizados
+    
+    Attributes:
+        id (UUID): Identificador único
+        usuario_id (UUID): ID do usuário proprietário
+        nome (str): Nome descritivo do alerta
+        tipo_alerta (TipoAlerta): Tipo do alerta
+        ativo_id (UUID): ID do ativo relacionado (opcional)
+        portfolio_id (UUID): ID do portfolio relacionado (opcional)
+        condicao_valor (Decimal): Threshold da condição
+        condicao_operador (OperadorCondicao): Operador de comparação
+        condicao_valor2 (Decimal): Segundo valor (para ENTRE)
+        ativo (bool): Se o alerta está ativo
+        frequencia_notificacao (FrequenciaNotificacao): Frequência de envio
+        canais_entrega (list): Lista de canais de entrega
+        timestamp_criacao (datetime): Data de criação
+        timestamp_ultimo_acionamento (datetime): Última vez que foi acionado
+        created_at (datetime): Data de criação do registro
+        updated_at (datetime): Data da última atualização
+    
+    Relationships:
+        usuario: Usuário proprietário
+        ativo: Ativo relacionado (opcional)
+        portfolio: Portfolio relacionado (opcional)
+    """
+    
+    __tablename__ = "configuracoes_alertas"
+    
+    # Chave primária
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        comment="Identificador único do alerta"
+    )
+    
+    # Foreign keys
+    usuario_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey('usuario.id', ondelete='CASCADE'),
+        nullable=False,
+        index=True,
+        comment="ID do usuário proprietário"
+    )
+    
+    ativo_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey('ativo.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID do ativo (opcional)"
+    )
+    
+    portfolio_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey('portfolio.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID do portfolio (opcional)"
+    )
+    
+    # Dados do alerta
+    nome = Column(
+        String(200),
+        nullable=False,
+        comment="Nome descritivo do alerta (ex: 'Alerta PETR4 > 30%')"
+    )
+    
+    tipo_alerta = Column(
+        Enum(TipoAlerta),
+        nullable=False,
+        index=True,
+        comment="Tipo do alerta"
+    )
+    
+    # Condições
+    condicao_valor = Column(
+        Numeric(18, 6),
+        nullable=False,
+        comment="Valor threshold da condição"
+    )
+    
+    condicao_operador = Column(
+        Enum(OperadorCondicao),
+        nullable=False,
+        default=OperadorCondicao.MAIOR,
+        comment="Operador de comparação (>, <, ==, >=, <=, ENTRE)"
+    )
+    
+    condicao_valor2 = Column(
+        Numeric(18, 6),
+        nullable=True,
+        comment="Segundo valor (usado quando operador é ENTRE)"
+    )
+    
+    # Status e configurações
+    ativo = Column(
+        Boolean,
+        nullable=False,
+        default=True,
+        index=True,
+        comment="Indica se o alerta está ativo"
+    )
+    
+    frequencia_notificacao = Column(
+        Enum(FrequenciaNotificacao),
+        nullable=False,
+        default=FrequenciaNotificacao.IMEDIATA,
+        comment="Frequência de notificação"
+    )
+    
+    canais_entrega = Column(
+        ARRAY(String),
+        nullable=False,
+        default=['email', 'webapp'],
+        comment="Canais de entrega (email, webapp, sms, telegram)"
+    )
+    
+    # Timestamps
+    timestamp_criacao = Column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+        nullable=False,
+        index=True,
+        comment="Data de criação do alerta"
+    )
+    
+    timestamp_ultimo_acionamento = Column(
+        DateTime(timezone=True),
+        nullable=True,
+        index=True,
+        comment="Data do último acionamento (null se nunca acionado)"
+    )
+    
+    created_at = Column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+        nullable=False,
+        comment="Data de criação do registro"
+    )
+    
+    updated_at = Column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+        comment="Data da última atualização"
+    )
+    
+    # Relacionamentos
+    usuario = relationship("Usuario", backref="alertas", lazy="joined")
+    ativo = relationship("Ativo", backref="alertas", lazy="joined")
+    # portfolio = relationship("Portfolio", backref="alertas", lazy="joined")  # Descomentar quando Portfolio existir
+    
+    # Constraints de tabela
+    __table_args__ = (
+        db.CheckConstraint(
+            "condicao_operador != 'ENTRE' OR condicao_valor2 IS NOT NULL",
+            name="alerta_entre_requer_valor2"
+        ),
+        db.CheckConstraint(
+            "condicao_operador = 'ENTRE' OR condicao_valor2 IS NULL",
+            name="alerta_valor2_apenas_entre"
+        ),
+        {"comment": "Tabela de configurações de alertas"}
+    )
+    
+    def foi_acionado(self):
+        """Verifica se o alerta já foi acionado alguma vez"""
+        return self.timestamp_ultimo_acionamento is not None
+    
+    def marcar_acionamento(self):
+        """Marca o alerta como acionado agora"""
+        self.timestamp_ultimo_acionamento = datetime.utcnow()
+    
+    def tempo_desde_ultimo_acionamento(self):
+        """Retorna tempo desde último acionamento em segundos"""
+        if self.timestamp_ultimo_acionamento:
+            return (datetime.utcnow() - self.timestamp_ultimo_acionamento).total_seconds()
+        return None
+    
+    def verificar_condicao(self, valor_atual):
+        """
+        Verifica se a condição do alerta foi satisfeita
+        
+        Args:
+            valor_atual (Decimal): Valor atual para comparação
+            
+        Returns:
+            bool: True se condição satisfeita, False caso contrário
+        """
+        if not self.ativo:
+            return False
+        
+        operador = self.condicao_operador
+        
+        if operador == OperadorCondicao.MAIOR:
+            return valor_atual > self.condicao_valor
+        elif operador == OperadorCondicao.MENOR:
+            return valor_atual < self.condicao_valor
+        elif operador == OperadorCondicao.IGUAL:
+            return valor_atual == self.condicao_valor
+        elif operador == OperadorCondicao.MAIOR_IGUAL:
+            return valor_atual >= self.condicao_valor
+        elif operador == OperadorCondicao.MENOR_IGUAL:
+            return valor_atual <= self.condicao_valor
+        elif operador == OperadorCondicao.ENTRE:
+            if self.condicao_valor2 is None:
+                return False
+            return self.condicao_valor <= valor_atual <= self.condicao_valor2
+        
+        return False
+    
+    def to_dict(self):
+        """Converte objeto para dicionário para serialização JSON"""
+        return {
+            "id": str(self.id),
+            "usuario_id": str(self.usuario_id),
+            "ativo_id": str(self.ativo_id) if self.ativo_id else None,
+            "portfolio_id": str(self.portfolio_id) if self.portfolio_id else None,
+            "nome": self.nome,
+            "tipo_alerta": self.tipo_alerta.value if self.tipo_alerta else None,
+            "condicao_valor": float(self.condicao_valor) if self.condicao_valor else None,
+            "condicao_operador": self.condicao_operador.value if self.condicao_operador else None,
+            "condicao_valor2": float(self.condicao_valor2) if self.condicao_valor2 else None,
+            "ativo": self.ativo,
+            "frequencia_notificacao": self.frequencia_notificacao.value if self.frequencia_notificacao else None,
+            "canais_entrega": self.canais_entrega,
+            "timestamp_criacao": self.timestamp_criacao.isoformat() if self.timestamp_criacao else None,
+            "timestamp_ultimo_acionamento": self.timestamp_ultimo_acionamento.isoformat() if self.timestamp_ultimo_acionamento else None,
+            "foi_acionado": self.foi_acionado(),
+            "tempo_desde_ultimo_acionamento_segundos": self.tempo_desde_ultimo_acionamento(),
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
+    
+    def __repr__(self):
+        """Representação string do objeto"""
+        status = "ATIVO" if self.ativo else "INATIVO"
+        return f"<ConfiguracaoAlerta '{self.nome}' - {status}>"

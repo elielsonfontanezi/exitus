@@ -1,30 +1,59 @@
 # Exitus - Sistema de Gestão de Investimentos
 
-[![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-3.0-green.svg)](https://flask.palletsprojects.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-## 🎯 Visão Geral
+## Visão Geral
 
 **Exitus** é uma plataforma multi-usuário de gestão e análise de investimentos, suportando múltiplos mercados (Brasil, EUA, Europa, Ásia), múltiplas classes de ativos (ações, FIIs, REITs, renda fixa) e múltiplas corretoras com controle unificado de caixa.
 
 ### Principais Funcionalidades
 
-- **Consolidação Multi-Mercado**: Gestão unificada de ativos brasileiros e internacionais
-- **Análise Fundamentalista**: Buy Score (0-100), Preço Teto (4 métodos), Z-Score com histórico real
-- **Cotações em Tempo Real**: Multi-provider com cache inteligente (15min TTL)
-- **Dashboards Interativos**: Performance, alocação, evolução patrimonial e métricas de risco
-- **Sistema de Alertas**: Notificações configuráveis por preço, percentual e indicadores
-- **Relatórios Avançados**: Geração automática de relatórios de performance com Sharpe Ratio
-- **Cálculos Fiscais**: Regras configuráveis por país e tipo de ativo
+* **Consolidação Multi-Mercado**: Gestão unificada de ativos brasileiros e internacionais
+* **Análise Fundamentalista**: Buy Score (0-100), Preço Teto (4 métodos), Z-Score com histórico real
+* **Cotações em Tempo Real**: Multi-provider com cache inteligente (15min TTL)
+* **Dashboards Interativos**: Performance, alocação, evolução patrimonial e métricas de risco
+* **Sistema de Alertas**: Notificações configuráveis por preço, percentual e indicadores
+* **Relatórios Avançados**: Geração automática de relatórios de performance com Sharpe Ratio
+* **Cálculos Fiscais**: Regras configuráveis por país e tipo de ativo
+
+### Tipos de Ativos Suportados (14 tipos)
+
+O Exitus suporta **14 tipos de ativos** em 4 mercados diferentes:
+
+#### **🇧🇷 Brasil (6 tipos)**
+
+* **Ações** (ACAO): B3 - PETR4, VALE3, ITUB4
+* **FIIs** (FII): Fundos Imobiliários - HGLG11, KNRI11
+* **CDB** (CDB): Certificados de Depósito Bancário
+* **LCI/LCA** (LCI_LCA): Letras de Crédito
+* **Tesouro Direto** (TESOURO_DIRETO): Selic, IPCA+, Prefixado
+* **Debêntures** (DEBENTURE): Títulos corporativos
+
+#### **🇺🇸 Estados Unidos (4 tipos)**
+
+* **Stocks** (STOCK): NYSE/NASDAQ - AAPL, MSFT, GOOGL
+* **REITs** (REIT): Real Estate Investment Trusts - O, VNQ
+* **Bonds** (BOND): Títulos corporativos e governamentais
+* **ETFs** (ETF): Fundos negociados em bolsa - SPY, QQQ
+
+#### **🌍 Internacional (2 tipos)**
+
+* **Stocks Internacionais** (STOCK_INTL): Europa/Ásia - SAP.DE, 7203.T
+* **ETFs Internacionais** (ETF_INTL): VWCE.DE
+
+#### **🔷 Outros (2 tipos)**
+
+* **Criptomoedas** (CRIPTO): BTC, ETH, SOL
+* **Outros** (OUTRO): Commodities, derivatives
+
+**Total de ativos cadastrados**: 62 (39 BR + 16 US + 3 EU + 4 outros)
+
+**Documentação completa**: [ENUMS.md]()
 
 ---
 
 ## 🛠️ Stack Tecnológica
 
 | Camada | Tecnologia | Versão |
-|--------|-----------|--------|
+| --- | --- | --- |
 | **Backend** | Python + Flask | 3.11 / 3.0 |
 | **ORM** | SQLAlchemy + Alembic | 2.0 / 1.13 |
 | **Frontend** | HTMX + Alpine.js + TailwindCSS | 2.0 / 3.14 / 3.4 |
@@ -59,14 +88,42 @@
         │  PostgreSQL 16                     │
         │  Port: 5432                        │
         └────────────────────────────────────┘
+
 ```
+
+---
+
+## 🗄️ Database Schema
+
+### Tabelas Principais (21 tabelas)
+
+| Tabela | Descrição | Campos Críticos |
+| --- | --- | --- |
+| `ativo` | Instrumentos financeiros (62 ativos) | ticker, tipo (**14 ENUMs**), classe, mercado, cap_rate |
+| `usuario` | Usuários do sistema | username, email, role (3 ENUMs) |
+| `corretora` | Corretoras/Exchanges | nome, tipo (2 ENUMs), pais, saldo_atual |
+| `posicao` | Holdings atuais | quantidade, preco_medio, lucro_prejuizo |
+| `transacao` | Operações executadas | tipo (10 ENUMs), quantidade, preco_unitario |
+| `provento` | Dividendos/JCP/Rendimentos | tipo (7 ENUMs), valor_por_acao, data_com |
+| `movimentacao_caixa` | Depósitos/Saques | tipo (9 ENUMs), valor, moeda |
+| `evento_corporativo` | Splits/Bonificações | tipo (12 ENUMs), proporcao, data_evento |
+| `historico_preco` | Histórico OHLCV | data, preco_fechamento, volume |
+| `parametros_macro` | Taxa Selic, CDI, WACC | por país/mercado, cap_rate_fii |
+| `regra_fiscal` | Impostos por país | aliquota_ir, valor_isencao, incidencia (4 ENUMs) |
+
+* **Total de ENUMs**: 11 tipos, 62 valores únicos
+* **Índices**: 86+ otimizados para queries de cálculo
+* **Foreign Keys**: 15 com integridade referencial
+* **Migrations**: Gerenciadas com Alembic (versão atual: `202602162130`)
+
 ---
 
 ## Coding Standard
-- **Naming Convention**: snakecase para variáveis, funções, tabelas, colunas e arquivos (ex: `created_at`, `buy_score`, `historico_preco`).
-- **Classes**: PascalCase (ex: `PortfolioService`).
-- **Constantes**: UPPER_SNAKE_CASE (ex: `JWT_SECRET_KEY`).
-- **Guia Completo**: [CODING_STANDARDS.md](docs/CODING_STANDARDS.md) 
+
+* **Naming Convention**: snakecase para variáveis, funções, tabelas, colunas e arquivos (ex: `created_at`, `buy_score`, `historico_preco`).
+* **Classes**: PascalCase (ex: `PortfolioService`).
+* **Constantes**: UPPER_SNAKE_CASE (ex: `JWT_SECRET_KEY`).
+* **Guia Completo**: [CODING_STANDARDS.md]()
 
 ---
 
@@ -74,11 +131,11 @@
 
 ### Pré-requisitos
 
-- **Ubuntu 22.04 LTS** (ou similar)
-- **Podman 4.x** instalado
-- **Git**
-- **8GB RAM** mínimo
-- **10GB** de espaço em disco
+* **Ubuntu 22.04 LTS** (ou similar)
+* **Podman 4.x** instalado
+* **Git**
+* **8GB RAM** mínimo
+* **10GB** de espaço em disco
 
 ### 1. Instalação
 
@@ -92,6 +149,7 @@ cp .env.example .env
 
 # Edite o .env com suas credenciais (opcional para desenvolvimento)
 nano .env
+
 ```
 
 ### 2. Configurar Tokens de APIs (Opcional)
@@ -103,6 +161,7 @@ Para cotações em tempo real, configure no `.env`:
 BRAPI_TOKEN=seu_token_premium_aqui          # Premium: 60 req/min (FREE tier: 10 req/min)
 ALPHAVANTAGE_TOKEN=seu_token_aqui           # Free: 500 req/dia
 FINNHUB_TOKEN=seu_token_aqui                # Free: 60 req/min
+
 ```
 
 **Nota**: O sistema funciona **SEM tokens** usando cache local e yfinance como fallback.
@@ -116,27 +175,29 @@ FINNHUB_TOKEN=seu_token_aqui                # Free: 60 req/min
 # Aguarde ~30 segundos para inicialização completa
 # Logs em tempo real (opcional):
 podman logs -f exitus-backend
+
 ```
 
 ### 4. Acessar
 
-- **Frontend**: http://localhost:8080
-- **Backend API**: http://localhost:5000/api
-- **Health Check Backend**: http://localhost:5000/health
-- **Health Check Frontend**: http://localhost:8080/health
+* **Frontend**: http://localhost:8080
+* **Backend API**: http://localhost:5000/api
+* **Health Check Backend**: http://localhost:5000/health
+* **Health Check Frontend**: http://localhost:8080/health
 
 **Credenciais padrão**:
-- **Usuário**: `admin`
-- **Senha**: `admin123`
+
+* **Usuário**: `admin`
+* **Senha**: `admin123`
 
 ---
 
 ## 📦 Módulos Implementados (M0-M7)
 
 | Módulo | Status | Descrição | Endpoints |
-|--------|--------|-----------|-----------|
+| --- | --- | --- | --- |
 | **M0** | ✅ PROD | Infraestrutura (Podman, PostgreSQL, Rede) | - |
-| **M1** | ✅ PROD | Database Schema (20 tabelas, 86+ índices) | - |
+| **M1** | ✅ PROD | Database Schema (21 tabelas, 86+ índices) | - |
 | **M2** | ✅ PROD | Backend API Core (Auth JWT, CRUD, 16 blueprints) | 67 |
 | **M3** | ✅ PROD | Portfolio Analytics (Dashboard, Performance, Alocação) | 11 |
 | **M4** | ✅ PROD | Buy Signals & Cálculos Fiscais (Z-Score, Preço Teto) | 12 |
@@ -155,13 +216,13 @@ podman logs -f exitus-backend
 ## 📚 Documentação Completa
 
 | Documento | Descrição |
-|-----------|-----------|
-| [**ARCHITECTURE.md**](docs/ARCHITECTURE.md) | Visão arquitetural, containers, modelo de dados, integrações |
-| [**MODULES.md**](docs/MODULES.md) | Detalhamento de cada módulo M0-M7 (objetivos, features, status) |
-| [**API_REFERENCE.md**](docs/API_REFERENCE.md) | Referência completa de todas as 67 APIs com exemplos cURL |
-| [**USER_GUIDE.md**](docs/USER_GUIDE.md) | Guia do usuário: dashboards, operações, análises |
-| [**OPERATIONS_RUNBOOK.md**](docs/OPERATIONS_RUNBOOK.md) | Deploy, testes, troubleshooting, scripts úteis |
-| [**CHANGELOG.md**](docs/CHANGELOG.md) | Histórico de versões e roadmap futuro |
+| --- | --- |
+| **[ARCHITECTURE.md]()** | Visão arquitetural, containers, modelo de dados, integrações |
+| **[MODULES.md]()** | Detalhamento de cada módulo M0-M7 (objetivos, features, status) |
+| **[API_REFERENCE.md]()** | Referência completa de todas as 67 APIs com exemplos cURL |
+| **[USER_GUIDE.md]()** | Guia do usuário: dashboards, operações, análises |
+| **[OPERATIONS_RUNBOOK.md]()** | Deploy, testes, troubleshooting, scripts úteis |
+| **[CHANGELOG.md]()** | Histórico de versões e roadmap futuro |
 
 ---
 
@@ -183,6 +244,7 @@ podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 podman logs exitus-backend
 podman logs exitus-frontend
 podman logs exitus-db
+
 ```
 
 ### Executar Migrations
@@ -196,6 +258,7 @@ flask db upgrade
 
 # Criar nova migration
 flask db migrate -m "Descrição da mudança"
+
 ```
 
 ### Popular Histórico de Preços
@@ -206,6 +269,7 @@ podman exec -it exitus-backend python3 app/scripts/popular_historico_inicial.py 
 
 # Popular todos os ativos em posições
 podman exec -it exitus-backend python3 app/scripts/popular_historico_inicial.py --dias 252
+
 ```
 
 ### Testes
@@ -216,6 +280,7 @@ podman exec -it exitus-backend pytest tests/
 
 # Teste de endpoints (requer token JWT)
 ./scripts/test_performance.sh
+
 ```
 
 ---
@@ -226,6 +291,7 @@ podman exec -it exitus-backend pytest tests/
 
 ```bash
 curl -X POST http://localhost:5000/api/auth/login   -H "Content-Type: application/json"   -d '{"username":"admin","password":"admin123"}' | jq -r '.data.access_token'
+
 ```
 
 ### 2. Consultar Dashboard do Portfolio
@@ -234,9 +300,11 @@ curl -X POST http://localhost:5000/api/auth/login   -H "Content-Type: applicatio
 TOKEN="seu_token_aqui"
 
 curl -H "Authorization: Bearer $TOKEN"   http://localhost:5000/api/portfolio/dashboard | jq .
+
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -249,44 +317,7 @@ curl -H "Authorization: Bearer $TOKEN"   http://localhost:5000/api/portfolio/das
     "rentabilidadeperc": -100.0
   }
 }
-```
 
-### 3. Buy Score de um Ativo
-
-```bash
-curl -H "Authorization: Bearer $TOKEN"   http://localhost:5000/api/buy-signals/buy-score/PETR4 | jq .
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "ticker": "PETR4",
-    "buyscore": 80,
-    "recomendacao": "COMPRA",
-    "precoteto": 34.39
-  }
-}
-```
-
-### 4. Cotação em Tempo Real
-
-```bash
-curl -H "Authorization: Bearer $TOKEN"   http://localhost:5000/api/cotacoes/PETR4 | jq .
-```
-
-**Response:**
-```json
-{
-  "ticker": "PETR4",
-  "precoatual": 31.46,
-  "variacaopercentual": -0.632,
-  "volume": 3764900,
-  "provider": "brapi.dev",
-  "cachettlminutes": 15,
-  "success": true
-}
 ```
 
 ---
@@ -299,46 +330,22 @@ curl -H "Authorization: Bearer $TOKEN"   http://localhost:5000/api/cotacoes/PETR
 4. Push para a branch (`git push origin feature/MinhaFeature`)
 5. Abra um Pull Request
 
-### Padrões de Commit
-
-- `feat:` Nova funcionalidade
-- `fix:` Correção de bug
-- `docs:` Documentação
-- `refactor:` Refatoração de código
-- `test:` Testes
-- `chore:` Tarefas de build/config
-
 ---
 
 ## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE]() para mais detalhes.
 
 ---
 
 ## 📞 Contato e Suporte
 
-- **Repositório**: https://github.com/elielsonfontanezi/exitus
-- **Issues**: https://github.com/elielsonfontanezi/exitus/issues
-- **Documentação**: [docs/](docs/)
+* **Repositório**: [https://github.com/elielsonfontanezi/exitus]()
+* **Issues**: [https://github.com/elielsonfontanezi/exitus/issues]()
 
 ---
 
-## 🎓 Créditos
+**Versão atual**: v0.7.7 (Database Optimization & Schema Update)
 
-Desenvolvido como parte do projeto de gestão avançada de investimentos multi-mercado.
+**Última atualização**: 16 de Fevereiro de 2026
 
-**Tecnologias e Serviços utilizados**:
-- [Flask](https://flask.palletsprojects.com/) - Framework web
-- [SQLAlchemy](https://www.sqlalchemy.org/) - ORM
-- [HTMX](https://htmx.org/) - Frontend interativo
-- [Alpine.js](https://alpinejs.dev/) - Reatividade
-- [TailwindCSS](https://tailwindcss.com/) - Estilização
-- [brapi.dev](https://brapi.dev/) - Cotações B3
-- [yfinance](https://github.com/ranaroussi/yfinance) - Cotações globais
-- [Chart.js](https://www.chartjs.org/) - Gráficos
-
----
-
-**Versão atual**: v0.7.6 (Sistema de Histórico de Preços)  
-**Última atualização**: 06 de Janeiro de 2026

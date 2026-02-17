@@ -30,7 +30,7 @@ O Sistema Exitus foi arquitetado seguindo os princípios:
 ### Princípios Fundamentais
 
 - **Multi-Mercado**: Suporte nativo a Brasil, EUA, Europa, Ásia
-- **Multi-Classe**: Ações, FIIs, REITs, Renda Fixa nacional e internacional
+- **Multi-Classe**: Ações, FIIs, REITs, Renda Fixa nacional e internacional, cripto e outros
 - **Multi-Corretora**: Abstração de caixa unificado, controle por corretora
 - **Dados Near Real-Time**: Cotações com delay até 15 minutos (não HFT)
 - **Transparência Operacional**: Logs auditáveis, rastreabilidade completa
@@ -97,7 +97,7 @@ Configurações:
 - Persistência via volume mapeado
 - Backup automático configurável
 - Migrations gerenciadas por Alembic
-- 20 tabelas + 86+ índices otimizados
+- 21 tabelas + 86+ índices otimizados
 
 ### Container 2: Flask Backend API
 
@@ -229,7 +229,7 @@ User: non-root (exitus:1000)
 **Otimizações**:
 - Índices compostos em queries frequentes
 - Foreign Keys com `ON DELETE CASCADE`
-- Enums para tipos fixos (ClasseAtivo, TipoTransacao)
+- Enums para tipos fixos (`ClasseAtivo`, `TipoTransacao`, `TipoAtivo`, etc.)[file:5][file:18]
 - Triggers para auditoria (planejado)
 
 ### Containerização
@@ -247,17 +247,18 @@ User: non-root (exitus:1000)
 ---
 
 ## Coding Conventions
-Todo código segue snake_case (PEP 8 Python + PostgreSQL):
+
+Todo código segue snake_case (PEP 8 Python + PostgreSQL):[file:24]
+
 - Tabelas/colunas: `movimentacao_caixa`, `data_ultima_cotacao`
 - Variáveis/funções: `get_portfolio_metrics()`
 - Endpoints: `api/buy-signals/buy-score`
-
 
 ---
 
 ## Modelo de Dados
 
-### Entidades Principais (20 Tabelas)
+### Entidades Principais (21 Tabelas)
 
 #### Core Tables
 
@@ -265,128 +266,231 @@ Todo código segue snake_case (PEP 8 Python + PostgreSQL):
    - `id` (UUID, PK)
    - `username`, `email` (unique)
    - `password_hash` (bcrypt)
+   - `role` (Enum `UserRole`: `ADMIN`, `USER`, `READONLY`)
    - `ativo` (boolean)
    - `created_at`, `updated_at`
 
 2. **corretora** - Corretoras/brokers
    - `id` (UUID, PK)
    - `usuario_id` (FK → usuario)
-   - `nome`, `cnpj`
-   - `pais`, `moeda_padrao`
-   - `saldo_caixa` (Decimal)
+   - `nome`
+   - `tipo` (Enum `TipoCorretora`: `CORRETORA`, `EXCHANGE`)
+   - `pais` (ISO 3166-1 alpha-2, ex: BR, US)
+   - `moeda_padrao` (ISO 4217, ex: BRL, USD, EUR)
+   - `saldo_atual` (Decimal)
+   - `ativa` (boolean)
+   - `observacoes`
 
-3. **ativo** - Ativos financeiros
+3. **ativo** - Ativos financeiros (cobertura global)[file:18][file:5]
    - `id` (UUID, PK)
-   - `ticker` (unique, indexed)
-   - `tipo` (Enum: ACAO, FII, REIT, RENDA_FIXA)
-   - `mercado` (BR, US, EU, ASIA)
-   - `preco_atual`, `dividend_yield`, `pl`
-   - `data_ultima_cotacao`
+   - `ticker` (VARCHAR(20), NOT NULL, INDEX)
+   - `nome` (VARCHAR(200), NOT NULL, INDEX)
+   - `tipo` (Enum `TipoAtivo`, 14 valores):
+     - **Brasil (BR)**: `ACAO`, `FII`, `CDB`, `LCI_LCA`, `TESOURO_DIRETO`, `DEBENTURE`
+     - **Estados Unidos (US)**: `STOCK`, `REIT`, `BOND`, `ETF`
+     - **Internacional (EU/ASIA)**: `STOCK_INTL`, `ETF_INTL`
+     - **Outros**: `CRIPTO`, `OUTRO`
+   - `classe` (Enum `ClasseAtivo`:
+     - `RENDA_VARIAVEL`, `RENDA_FIXA`, `CRIPTO`, `COMMODITY`, `HIBRIDO`)
+   - `mercado` (VARCHAR(10), NOT NULL, INDEX: `BR`, `US`, `EU`, `ASIA`, `GLOBAL`)
+   - `moeda` (VARCHAR(3), NOT NULL, INDEX: `BRL`, `USD`, `EUR`, etc.)
+   - `preco_atual` (NUMERIC, cotação atual)
+   - `preco_teto` (NUMERIC, preço teto calculado)
+   - `dividend_yield` (NUMERIC, 8,4)
+   - `pl` (NUMERIC, 10,2)
+   - `pvp` (NUMERIC, 10,2)
+   - `roe` (NUMERIC, 8,4)
+   - `beta` (NUMERIC, 8,4)
+   - `cap_rate` (NUMERIC, 8,4, NULL) — **Cap Rate** para FIIs/REITs, usado em cálculos de valuation (migr. `202602162130`)
+   - `data_ultima_cotacao` (TIMESTAMP WITH TIME ZONE)
+   - `ativo` (boolean, default TRUE)
+   - `deslistado` (boolean, default FALSE)
+   - `data_deslistagem` (DATE, NULL)
+   - `observacoes` (TEXT, NULL)
+   - `created_at`, `updated_at`
+   - **Constraints**:
+     - `UNIQUE (ticker, mercado)` — ticker único por mercado
+     - Check mínimo de tamanho de `ticker` e `nome`
 
 #### Portfolio Tables
 
 4. **posicao** - Holdings dos usuários
    - `id` (UUID, PK)
    - `usuario_id`, `ativo_id`, `corretora_id` (FKs)
-   - `quantidade` (Decimal)
-   - `preco_medio` (Decimal, calculado)
-   - `custo_total` (Decimal)
+   - `quantidade` (NUMERIC(18,8))
+   - `preco_medio` (NUMERIC(18,6))
+   - `custo_total` (NUMERIC(18,2))
+   - `taxas_acumuladas` (NUMERIC(18,2))
+   - `impostos_acumulados` (NUMERIC(18,2))
+   - `valor_atual` (NUMERIC(18,2), join com `ativo.preco_atual`)
+   - `lucro_prejuizo_realizado` (NUMERIC(18,2))
+   - `lucro_prejuizo_nao_realizado` (NUMERIC(18,2))
+   - `data_primeira_compra` (DATE)
+   - `data_ultima_atualizacao` (TIMESTAMP)
+   - `created_at`, `updated_at`
 
-5. **transacao** - Compras/Vendas
+5. **transacao** - Compras/Vendas/Operações
    - `id` (UUID, PK)
    - `usuario_id`, `ativo_id`, `corretora_id` (FKs)
-   - `tipo` (COMPRA, VENDA)
+   - `tipo` (Enum `TipoTransacao`: `COMPRA`, `VENDA`, `DIVIDENDO`, `JCP`, `ALUGUEL`, etc.)
    - `quantidade`, `preco_unitario`
-   - `taxas`, `impostos`
-   - `data_transacao`
+   - `valor_total`, `custos_totais`
+   - `taxa_corretagem`, `emolumentos`, `taxa_liquidacao`, `imposto`
+   - `data_transacao` (TIMESTAMP)
 
-6. **provento** - Dividendos/JCP
+6. **provento** - Dividendos/JCP/Rendimentos
    - `id` (UUID, PK)
    - `ativo_id`, `usuario_id` (FKs)
-   - `tipo` (DIVIDENDO, JCP, RENDIMENTO)
-   - `valor_bruto`, `valor_liquido`
-   - `data_pagamento`
+   - `tipo_provento` (Enum `TipoProvento`: `DIVIDENDO`, `JCP`, `RENDIMENTO`, `CUPOM`, etc.)
+   - `valor_por_acao`, `quantidade_ativos`
+   - `valor_bruto`, `imposto_retido`, `valor_liquido`
+   - `data_com`, `data_pagamento`
+   - `created_at`, `updated_at`
 
 #### Financial Operations
 
 7. **movimentacao_caixa** - Depósitos/Saques
    - `id` (UUID, PK)
    - `corretora_id`, `usuario_id` (FKs)
-   - `tipo` (DEPOSITO, SAQUE, TRANSFERENCIA)
+   - `provento_id` (FK opcional)
+   - `tipo_movimentacao` (Enum `TipoMovimentacao`: `DEPOSITO`, `SAQUE`, `TRANSFERENCIA`, `CREDITO_PROVENTO`, etc.)
    - `valor`, `moeda`
    - `data_movimentacao`
+   - `descricao`, `comprovante`
+   - `created_at`, `updated_at`
 
 8. **evento_corporativo** - Splits, Bonificações
    - `id` (UUID, PK)
-   - `ativo_id` (FK)
-   - `tipo` (SPLIT, BONIFICACAO, FUSAO, SPINOFF)
-   - `fator_ajuste`
-   - `data_evento`
+   - `ativo_id` (FK), `ativo_novo_id` (FK opcional)
+   - `tipo_evento` (Enum `TipoEventoCorporativo`: `SPLIT`, `GRUPAMENTO`, `BONIFICACAO`, `FUSAO`, `SPINOFF`, etc.)
+   - `data_evento`, `data_com`
+   - `proporcao` (ex: 2:1, 10:1)
+   - `descricao`
+   - `impacto_posicoes` (boolean)
+   - `observacoes`
+   - `created_at`, `updated_at`
 
 #### Reference Data
 
-9. **feriado** - Calendário de mercado
+9. **feriado_mercado** - Calendário de mercado
    - `id` (UUID, PK)
-   - `data`, `mercado` (BR, US, EU)
-   - `descricao`
+   - `pais` (ISO 3166-1 alpha-2)
+   - `mercado` (ex: `B3`, `NYSE`, `NASDAQ`, `EURONEXT`)
+   - `data_feriado`
+   - `tipo_feriado` (Enum `TipoFeriado`)
+   - `nome`
+   - `horario_fechamento` (opcional)
+   - `recorrente` (boolean)
+   - `observacoes`
+   - `created_at`, `updated_at`
 
 10. **fonte_dados** - APIs externas
     - `id` (UUID, PK)
-    - `nome` (yfinance, brapi.dev, etc)
-    - `prioridade`, `ativo`
-    - `rate_limit_dia`, `rate_limit_minuto`
+    - `nome` (yfinance, brapi.dev, etc.)
+    - `tipo_fonte` (Enum `TipoFonteDados`: `API`, `SCRAPER`, `MANUAL`, etc.)
+    - `url_base`
+    - `requer_autenticacao` (boolean)
+    - `rate_limit`
+    - `ativa` (boolean)
+    - `prioridade` (int)
+    - `ultima_consulta`, `total_consultas`, `total_erros`
+    - `observacoes`
+    - `created_at`, `updated_at`
 
 11. **regra_fiscal** - Impostos por país
     - `id` (UUID, PK)
-    - `pais`, `tipo_ativo`
-    - `aliquota_ir`, `incide_sobre`
+    - `pais` (ex: BR, US)
+    - `tipo_ativo` (string, ex: `ACAO`, `FII`, `REIT`, etc.)
+    - `tipo_operacao` (string, ex: `COMPRA`, `VENDA`, `DAYTRADE`)
+    - `aliquota_ir` (NUMERIC(6,4))
+    - `valor_isencao` (NUMERIC, opcional)
+    - `incide_sobre` (Enum `IncidenciaImposto`: `LUCRO`, `RECEITA`, `PROVENTO`, `OPERACAO`)
+    - `descricao`
+    - `vigencia_inicio`, `vigencia_fim`
+    - `ativa` (boolean)
+    - `created_at`, `updated_at`
 
 #### Analytics Tables (M7)
 
 12. **portfolio** - Carteiras customizadas
     - `id` (UUID, PK)
     - `usuario_id` (FK)
-    - `nome`, `descricao`
-    - `created_at`
-
-13. **alerta** - Sistema de alertas
-    - `id` (UUID, PK)
-    - `usuario_id`, `ativo_id` (FKs)
-    - `tipo` (ALTA_PRECO, BAIXA_PRECO, DY_MINIMO)
-    - `condicao_operador`, `condicao_valor`
+    - `nome`, `descricao`, `objetivo`
     - `ativo` (boolean)
+    - `valor_inicial`, `percentual_alocacao_target`
+    - `created_at`, `updated_at`
 
-14. **relatorio** - Relatórios salvos
+13. **alerta** / **configuracoes_alertas** - Sistema de alertas
+    - `id` (UUID, PK)
+    - `usuario_id`, `ativo_id`, `portfolio_id` (FKs)
+    - `nome`
+    - `tipo_alerta` (Enum `TipoAlerta`)
+    - `condicao_operador` (Enum `OperadorCondicao`)
+    - `condicao_valor`, `condicao_valor2`
+    - `ativo` (boolean)
+    - `frequencia_notificacao` (Enum `FrequenciaNotificacao`)
+    - `canais_entrega` (ARRAY ou JSON)
+    - `timestamp_criacao`, `timestamp_ultimo_acionamento`
+    - `created_at`, `updated_at`
+
+14. **relatorios_performance** / **auditoria_relatorio** - Relatórios salvos
     - `id` (UUID, PK)
     - `usuario_id` (FK)
-    - `tipo` (PERFORMANCE, FISCAL, ALOCACAO)
+    - `tipo_relatorio` (Enum `TipoRelatorio`)
     - `data_inicio`, `data_fim`
-    - `sharpe_ratio`, `max_drawdown`
+    - `filtros` (JSON)
+    - `resultado_json` (JSON)
+    - `indice_sharpe`, `max_drawdown_percentual`
+    - `formato_export` (Enum `FormatoExport`)
+    - `timestamp_criacao`, `timestamp_download`
+    - `created_at`, `updated_at`
 
-15. **projecao** - Projeções de renda
+15. **projecoes_renda** - Projeções de renda
     - `id` (UUID, PK)
     - `portfolio_id` (FK)
-    - `periodo`, `renda_estimada`
-    - `created_at`
+    - `periodo`
+    - `renda_estimada`
+    - `created_at`, `updated_at`
 
-16. **historico_preco** - Histórico de preços (M7.6)
+16. **historico_preco** - Histórico de preços (M7.6)[file:5]
     - `id` (UUID, PK)
-    - `ativo_id` (FK)
-    - `data`, `preco_fechamento`
+    - `ativo_id` (FK → ativo)
+    - `data`
+    - `preco_abertura`, `preco_fechamento`, `preco_minimo`, `preco_maximo`
     - `volume`
+    - `created_at`, `updated_at`
+    - `UNIQUE (ativo_id, data)`
 
 #### Audit & System
 
 17. **log_auditoria** - Rastreabilidade
     - `id` (UUID, PK)
     - `usuario_id` (FK)
-    - `acao`, `tabela_afetada`
+    - `acao`, `entidade`, `entidade_id`
+    - `dados_antes`, `dados_depois` (JSON)
+    - `ip_address`, `user_agent`
     - `timestamp`
+    - `sucesso` (boolean)
+    - `mensagem`
 
-18. **parametro** - Configurações globais
+18. **parametros_macro** - Parâmetros macroeconômicos por país/mercado
     - `id` (UUID, PK)
-    - `chave`, `valor`
-    - `tipo` (STRING, INT, FLOAT, BOOL)
+    - `pais` (ex: BR, US, EU, JP)
+    - `mercado` (ex: B3, NYSE, EURONEXT)
+    - `taxa_livre_risco`
+    - `crescimento_medio`
+    - `custo_capital`
+    - `inflacao_anual`
+    - `cap_rate_fii` (cap rate médio por mercado)
+    - `ytm_rf` (yield to maturity renda fixa)
+    - `ativo` (boolean)
+    - `created_at`, `updated_at`
+
+19. **relatorios_performance** (já citado acima) — tabelas de métricas de performance agregadas.
+
+20. **projecaorenda** / **relatoriosperformance** — tabelas auxiliares de analytics (detalhadas em `MODULES.md`).[file:10]
+
+21. **outros metadados** (ex.: tabelas auxiliares futuras para monitoramento/parametrização).
 
 ### Relacionamentos Chave
 
@@ -408,19 +512,41 @@ corretora (1) ─────> (N) transacao
 corretora (1) ─────> (N) movimentacao_caixa
 ```
 
+### Expansão Multi-Mercado (v0.7.8)
+
+A partir da versão **0.7.8**, o ENUM `TipoAtivo` foi expandido de 7 para **14 valores**, com suporte nativo a renda fixa BR e ativos internacionais.[file:18][file:28]
+
+- **Brasil (6 tipos)**:
+  - `ACAO`, `FII`, `CDB`, `LCI_LCA`, `TESOURO_DIRETO`, `DEBENTURE`
+- **Estados Unidos (4 tipos)**:
+  - `STOCK`, `REIT`, `BOND`, `ETF`
+- **Internacional (2 tipos)**:
+  - `STOCK_INTL`, `ETF_INTL`
+- **Outros (2 tipos)**:
+  - `CRIPTO`, `OUTRO`
+
+O campo **`cap_rate`** foi adicionado à tabela `ativo` para FIIs/REITs e outros ativos de renda imobiliária, permitindo cálculos mais precisos de Preço Teto e métricas de fluxo de caixa descontado.[file:18]
+
+> Referência detalhada em: `ENUMS.md`.
+
 ### Índices e Performance
 
-**Índices Críticos** (86+ total):
+**Índices Críticos** (86+ total):[file:5]
+
 - `ativo.ticker` (UNIQUE, BTREE)
+- `ativo.mercado`, `ativo.classe`, `ativo.tipo`
 - `transacao(usuario_id, data_transacao DESC)`
 - `posicao(usuario_id, ativo_id)` (UNIQUE)
 - `provento(ativo_id, data_pagamento DESC)`
 - `historico_preco(ativo_id, data DESC)`
+- `configuracoes_alertas(usuario_id, tipo_alerta)`
+- `feriado_mercado(pais, mercado, data_feriado)`
 
 **Otimizações Aplicadas**:
 - Índices compostos em joins frequentes
 - `ON DELETE CASCADE` em FKs (cleanup automático)
-- Enums nativos do PostgreSQL (performance + validação)
+- Enums nativos do PostgreSQL para todos os tipos fixos (`TipoAtivo`, `ClasseAtivo`, `TipoTransacao`, etc.)
+- Constraints de integridade (checks de faixa, unicidade, datas válidas)
 
 ---
 
@@ -481,7 +607,7 @@ GET https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=Y
 #### 5. PostgreSQL Cache (Fallback Final)
 
 **Características**:
-- **TTL**: 15 minutos (conforme Prompt Mestre)
+- **TTL**: 15 minutos (campo `data_ultima_cotacao`)
 - **Update**: On-demand (sem polling/cron)
 - **Latência**: 0.03-0.3s (query local)
 - **Hit Rate**: 85-95% (uso normal)
@@ -544,7 +670,8 @@ ARG APP_USER=exitus
 ARG APP_UID=1000
 ARG APP_GID=1000
 
-RUN groupadd -g ${APP_GID} ${APP_USER} &&     useradd -u ${APP_UID} -g ${APP_GID} -m ${APP_USER}
+RUN groupadd -g ${APP_GID} ${APP_USER} && \
+    useradd -u ${APP_UID} -g ${APP_GID} -m ${APP_USER}
 
 USER ${APP_USER}
 ```
@@ -558,7 +685,8 @@ podman exec -it exitus-backend whoami
 #### Healthcheck Robusto
 
 ```dockerfile
-HEALTHCHECK --interval=30s --timeout=10s --retries=3   CMD curl -f http://localhost:5000/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD curl -f http://localhost:5000/health || exit 1
 ```
 
 ### Secrets Management
@@ -605,7 +733,7 @@ ALPHAVANTAGE_TOKEN=<seu_token>
 **SQLAlchemy**:
 - Lazy loading de relacionamentos
 - Eager loading (`joinedload`) em queries complexas
-- Query result expiration (15min para cotações)
+- Expiração de resultados conforme TTL de negócios (15 min para cotações)
 
 #### 2. Application-Level Cache
 
@@ -714,9 +842,9 @@ Cloud Provider
 - [MODULES.md](MODULES.md) - Detalhes de cada módulo M0-M7
 - [API_REFERENCE.md](API_REFERENCE.md) - Endpoints completos
 - [OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md) - Deploy e troubleshooting
+- [ENUMS.md](ENUMS.md) - Documentação completa de ENUMs
 
 ---
 
-**Documento gerado**: 06 de Janeiro de 2026  
-**Versão**: v0.7.6  
-**Baseado em**: PROMPT_MESTRE_EXITUS_V10_FINAL + Estado real do sistema
+**Documento atualizado**: 17 de Fevereiro de 2026  
+**Versão arquitetural**: v0.7.8 (Expansão de ENUMs e cap_rate)

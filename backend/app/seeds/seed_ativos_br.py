@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
+# backend/app/seeds/seed_ativos_br.py
 """
 Exitus - Seed de Ativos Brasileiros
-Popular tabela ativo com ações e FIIs da B3
+Popular tabela ativo com ações e FIIs da B3 (NORMALIZADO)
 """
-
 from app import create_app
 from app.database import db
 from app.models import Ativo, TipoAtivo, ClasseAtivo
@@ -12,9 +11,7 @@ from decimal import Decimal
 
 def seed_ativos_br():
     """Cria ativos brasileiros (B3)"""
-    
     app = create_app()
-    
     with app.app_context():
         print("=" * 50)
         print("SEED: Criando Ativos Brasileiros (B3)")
@@ -23,20 +20,19 @@ def seed_ativos_br():
         # Verificar se já existem ativos
         count = Ativo.query.filter_by(mercado='BR').count()
         if count > 0:
-            print(f"⚠ Já existem {count} ativos brasileiros cadastrados.")
+            print(f"⚠️  Já existem {count} ativos brasileiros cadastrados.")
             resposta = input("Deseja recriar os ativos BR? (s/N): ").lower()
             if resposta != 's':
-                print("✗ Seed cancelado pelo usuário.")
+                print("Seed cancelado pelo usuário.")
                 return
             
             # Limpar ativos BR existentes
             Ativo.query.filter_by(mercado='BR').delete()
             db.session.commit()
-            print("✓ Ativos brasileiros anteriores removidos.")
+            print("✅ Ativos brasileiros anteriores removidos.")
         
         # Ações mais negociadas da B3
         acoes = [
-            # Ticker, Nome, Setor, Preço Inicial
             ('PETR4', 'Petrobras PN', 'Petróleo e Gás', Decimal('38.50')),
             ('VALE3', 'Vale ON', 'Mineração', Decimal('62.80')),
             ('ITUB4', 'Itaú Unibanco PN', 'Bancos', Decimal('28.45')),
@@ -56,7 +52,6 @@ def seed_ativos_br():
         
         # FIIs mais negociados
         fiis = [
-            # Ticker, Nome, Segmento, Preço Inicial
             ('HGLG11', 'CSHG Logística FII', 'Logística', Decimal('152.30')),
             ('VISC11', 'Vinci Shopping Centers FII', 'Shopping', Decimal('105.80')),
             ('KNRI11', 'Kinea Renda Imobiliária FII', 'Híbrido', Decimal('98.45')),
@@ -71,8 +66,7 @@ def seed_ativos_br():
         
         created_ativos = []
         
-        # Criar ações
-        print("\n📈 Criando Ações...")
+        print("Criando Ações...")
         for ticker, nome, setor, preco in acoes:
             ativo = Ativo(
                 ticker=ticker,
@@ -80,17 +74,17 @@ def seed_ativos_br():
                 tipo=TipoAtivo.ACAO,
                 classe=ClasseAtivo.RENDA_VARIAVEL,
                 mercado='BR',
+                bolsa_origem='B3',  # NOVO CAMPO
                 moeda='BRL',
                 preco_atual=preco,
-                observacoes=f'Setor: {setor}',
+                observacoes=f"Setor: {setor}",
                 ativo=True
             )
             db.session.add(ativo)
             created_ativos.append(ativo)
-            print(f"  ✓ {ticker:8} - {nome:35} - R$ {preco}")
+            print(f"  ✅ {ticker:8} - {nome:35} - R$ {preco}")
         
-        # Criar FIIs
-        print("\n🏢 Criando FIIs...")
+        print("\nCriando FIIs...")
         for ticker, nome, segmento, preco in fiis:
             ativo = Ativo(
                 ticker=ticker,
@@ -98,27 +92,26 @@ def seed_ativos_br():
                 tipo=TipoAtivo.FII,
                 classe=ClasseAtivo.RENDA_VARIAVEL,
                 mercado='BR',
+                bolsa_origem='B3',  # NOVO CAMPO
                 moeda='BRL',
                 preco_atual=preco,
-                observacoes=f'Segmento: {segmento}',
+                observacoes=f"Segmento: {segmento}",
                 ativo=True
             )
             db.session.add(ativo)
             created_ativos.append(ativo)
-            print(f"  ✓ {ticker:8} - {nome:40} - R$ {preco}")
+            print(f"  ✅ {ticker:8} - {nome:40} - R$ {preco}")
         
-        # Commit no banco
         try:
             db.session.commit()
-            print("\n" + "=" * 50)
-            print(f"✓ {len(created_ativos)} ativos criados com sucesso!")
-            print(f"  - {len(acoes)} ações")
-            print(f"  - {len(fiis)} FIIs")
-            print("=" * 50 + "\n")
-            
+            print("=" * 50)
+            print(f"✅ {len(created_ativos)} ativos criados com sucesso!")
+            print(f"   - {len(acoes)} ações")
+            print(f"   - {len(fiis)} FIIs")
+            print("=" * 50)
         except Exception as e:
             db.session.rollback()
-            print(f"\n✗ Erro ao criar ativos: {e}")
+            print(f"❌ Erro ao criar ativos: {e}")
             raise
 
 
