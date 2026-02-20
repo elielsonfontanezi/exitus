@@ -1,4 +1,4 @@
-# API Reference - Sistema Exitus v0.7.9
+# API Reference - Sistema Exitus v0.7.10
 
 ## 📋 Índice
 
@@ -60,7 +60,7 @@ Authorization: Bearer <seu_token_jwt>
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"admin","password":"senha123"}'
 ```
 
 **Expiry**: 1 hora (3600 segundos).[file:31]
@@ -137,7 +137,7 @@ Autentica usuário e retorna token JWT.[file:31]
 ```json
 {
   "username": "admin",
-  "password": "admin123"
+  "password": "senha123"
 }
 ```
 
@@ -203,24 +203,29 @@ Lista ativos (paginado, filtros opcionais).[file:31]
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "id": "uuid-1",
-      "ticker": "PETR4",
-      "nome": "Petrobras PN",
-      "tipo": "ACAO",
-      "mercado": "BR",
-      "moeda": "BRL",
-      "preco_atual": 31.46,
-      "dividend_yield": 9.5,
-      "pl": 4.8,
-      "pvp": 1.2,
-      "roe": 18.5,
-      "cap_rate": null,
-      "data_ultima_cotacao": "2026-01-06T18:00:00Z"
-    }
-  ],
-  "total": 62
+  "data": {
+    "ativos": [
+      {
+        "id": "uuid-1",
+        "ticker": "PETR4",
+        "nome": "Petrobras PN",
+        "tipo": "acao",
+        "mercado": "BR",
+        "moeda": "BRL",
+        "preco_atual": 31.46,
+        "dividend_yield": 9.5,
+        "pl": 4.8,
+        "pvp": 1.2,
+        "roe": 18.5,
+        "cap_rate": null,
+        "data_ultima_cotacao": "2026-01-06T18:00:00Z"
+      }
+    ],
+    "total": 70,
+    "pages": 7,
+    "current_page": 1,
+    "per_page": 10
+  }
 }
 ```
 
@@ -365,4 +370,4 @@ continuam com o mesmo contrato já descrito na versão v0.7.6, apenas consumindo
 ---
 
 **Documento atualizado**: 20 de Fevereiro de 2026  
-**Versão da API**: v0.7.9 — Fix `GET /api/ativos` → `data.ativos` (GAP EXITUS-DOCS-API-001 ✅ fechado); 70 ativos seedados; M2-ATIVOS-005 resolvido.
+**Versão da API**: v0.7.10 — GAP EXITUS-DOCS-API-001 ✅ fechado: `GET /api/ativos` responde `.data.ativos[]`; total=70; senha padrão dev padronizada (`senha123`).
