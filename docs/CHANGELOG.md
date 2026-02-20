@@ -1,3 +1,4 @@
+
 # Changelog - Sistema Exitus
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
@@ -6,7 +7,7 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ---
 
-## [0.7.9] - 2026-02-19
+## [0.7.9] - 2026-02-20
 
 ### ✨ Added
 - **Seed Renda Fixa BR**: `app/seeds/seed_ativos_renda_fixa_br.py` (**8 novos ativos**)
@@ -21,6 +22,12 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
   - `IncidenciaImposto` adicionado ao `app/models/__init__.py` (import + `__all__`)
   - `seed_regras_fiscais_br.py` agora executa sem `ImportError`
   - 6 regras fiscais BR confirmadas no banco
+- **M2-ATIVOS-005 — Seeds US/EU/BR normalizados (20/02/2026):**
+  - `seed_ativos_us.py`: checagem de existência corrigida para `filter_by(ticker, mercado='US')`
+    em 4 blocos (stocks, reits, bonds, etfs) — previne duplicatas com constraint `UNIQUE (ticker, mercado)`
+  - `seed_ativos_eu.py`: idem com `mercado='EU'` em 2 blocos (stocks_intl, etfs_intl)
+  - `seed_ativos_br.py`: removido campo `bolsa_origem='B3'` deprecated desde v0.7.8 migration `20260216_2130`
+  - Seeds US e EU agora são totalmente idempotentes (`Criados: 0 | Pulados: N` em reexecução)
 
 ### 📚 Documentation
 - **GAP EXITUS-AUTH-001 — Opção A aplicada:**
@@ -30,6 +37,8 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
   - Login corrigido (`email` → `username`) em todos os exemplos
   - Seção Renda Fixa BR adicionada com 8 ativos detalhados
   - Total ativos atualizado: 62 → **70**
+  - Lista real de ativos US corrigida: 6 Stocks, 3 REITs, 5 ETFs, 2 Bonds (total 16)
+  - Tickers EU corrigidos: `SAP.DE`/`ASML.AS` → `SAP`/`ASML` (sem sufixo)
   - Nota sobre estrutura de resposta `.data.ativos[]` (fix GAP EXITUS-DOCS-API-001)
 - **ENUMS.md** v0.7.9:
   - Seção de divergência adicionada: query param (UPPERCASE) vs resposta JSON (lowercase snake_case) vs banco (lowercase sem `_`)
@@ -45,7 +54,7 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### 🧪 Tested
 ```bash
 # Filtros Renda Fixa BR — validados 19/02/2026
-curl "http://localhost:5000/api/ativos?mercado=BR&tipo=CDB"           # total: 3 ✅
+curl "http://localhost:5000/api/ativos?mercado=BR&tipo=CDB"            # total: 3 ✅
 curl "http://localhost:5000/api/ativos?mercado=BR&tipo=TESOURO_DIRETO" # total: 3 ✅
 curl "http://localhost:5000/api/ativos?mercado=BR&tipo=DEBENTURE"      # total: 2 ✅
 
@@ -54,6 +63,14 @@ podman exec exitus-backend python3 -c "
 from app.models import RegraFiscal, IncidenciaImposto
 print([i.value for i in IncidenciaImposto])
 "  # ['lucro', 'receita', 'provento', 'operacao'] ✅
+
+# M2-ATIVOS-005 — Seeds idempotentes — validados 20/02/2026
+podman exec -it exitus-backend python -m app.seeds.seed_ativos_us  # Criados: 0 | Pulados: 16 ✅
+podman exec -it exitus-backend python -m app.seeds.seed_ativos_eu  # Criados: 0 | Pulados: 3  ✅
+podman exec exitus-db psql -U exitus -d exitusdb -c "
+  SELECT ticker, mercado, COUNT(*) FROM ativo
+  GROUP BY ticker, mercado HAVING COUNT(*) > 1;
+"  # (0 rows) ✅
 ```
 **Status:** ✅ **PRODUCTION READY**
 
@@ -170,10 +187,23 @@ print([i.value for i in IncidenciaImposto])
 
 ---
 
-**Última atualização:** 19 de Fevereiro de 2026
-**Versão atual:** **v0.7.9** (Seed Renda Fixa BR + Fix seeds + Docs)
+**Última atualização:** 20 de Fevereiro de 2026
+**Versão atual:** **v0.7.9** (Seed Renda Fixa BR + Fix seeds US/EU/BR — M2-ATIVOS-005)
 **Próxima:** v0.7.10 / v0.8.0
 
 **Contribuidores:**
 - Elielson Fontanezi
 - Perplexity AI (Documentação v0.7.8, v0.7.9)
+
+***
+
+## Resumo das alterações
+
+| Local | Mudança |
+|---|---|
+| Dois blocos `[0.7.9]` | Fundidos em um único bloco coeso  [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/138901332/be11111e-dbbc-4e6b-b9fb-200d68313ce3/CHANGELOG.md) |
+| `Fixed` | Adicionada entrada completa do **M2-ATIVOS-005** com os 3 seeds |
+| `Documentation` | Adicionados os fixes de tickers EU e lista US no SEEDS.md |
+| `Tested` | Adicionados os 3 comandos de validação do M2-ATIVOS-005 com resultados |
+| Data final | `19 de Fevereiro` → `20 de Fevereiro de 2026` |
+| Versão rodapé | Menção ao M2-ATIVOS-005 adicionada |

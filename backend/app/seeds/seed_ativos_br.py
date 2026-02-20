@@ -3,6 +3,8 @@
 Exitus - Seed de Ativos Brasileiros
 Popular tabela ativo com ações e FIIs da B3 (NORMALIZADO)
 """
+# Corrigido M2-ATIVOS-005: removido bolsa_origem='B3' (campo removido em v0.7.8)
+
 from app import create_app
 from app.database import db
 from app.models import Ativo, TipoAtivo, ClasseAtivo
@@ -12,11 +14,12 @@ from decimal import Decimal
 def seed_ativos_br():
     """Cria ativos brasileiros (B3)"""
     app = create_app()
+
     with app.app_context():
         print("=" * 50)
         print("SEED: Criando Ativos Brasileiros (B3)")
         print("=" * 50)
-        
+
         # Verificar se já existem ativos
         count = Ativo.query.filter_by(mercado='BR').count()
         if count > 0:
@@ -25,48 +28,48 @@ def seed_ativos_br():
             if resposta != 's':
                 print("Seed cancelado pelo usuário.")
                 return
-            
-            # Limpar ativos BR existentes
-            Ativo.query.filter_by(mercado='BR').delete()
-            db.session.commit()
-            print("✅ Ativos brasileiros anteriores removidos.")
-        
+
+        # Limpar ativos BR existentes
+        Ativo.query.filter_by(mercado='BR').delete()
+        db.session.commit()
+        print("✅ Ativos brasileiros anteriores removidos.")
+
         # Ações mais negociadas da B3
         acoes = [
-            ('PETR4', 'Petrobras PN', 'Petróleo e Gás', Decimal('38.50')),
-            ('VALE3', 'Vale ON', 'Mineração', Decimal('62.80')),
-            ('ITUB4', 'Itaú Unibanco PN', 'Bancos', Decimal('28.45')),
-            ('BBDC4', 'Bradesco PN', 'Bancos', Decimal('13.20')),
-            ('BBAS3', 'Banco do Brasil ON', 'Bancos', Decimal('25.60')),
-            ('MGLU3', 'Magazine Luiza ON', 'Varejo', Decimal('8.75')),
-            ('WEGE3', 'WEG ON', 'Máquinas e Equipamentos', Decimal('42.30')),
-            ('RENT3', 'Localiza ON', 'Locação de Veículos', Decimal('56.90')),
-            ('RAIL3', 'Rumo ON', 'Transporte', Decimal('18.45')),
-            ('SUZB3', 'Suzano ON', 'Papel e Celulose', Decimal('52.80')),
-            ('KLBN11', 'Klabin Units', 'Papel e Celulose', Decimal('22.15')),
-            ('ELET3', 'Eletrobras ON', 'Energia Elétrica', Decimal('42.10')),
-            ('CMIG4', 'Cemig PN', 'Energia Elétrica', Decimal('10.85')),
-            ('CPLE6', 'Copel PNB', 'Energia Elétrica', Decimal('8.95')),
-            ('ABEV3', 'Ambev ON', 'Bebidas', Decimal('11.20')),
+            ('PETR4',  'Petrobras PN',          'Petróleo e Gás',          Decimal('38.50')),
+            ('VALE3',  'Vale ON',                'Mineração',               Decimal('62.80')),
+            ('ITUB4',  'Itaú Unibanco PN',       'Bancos',                  Decimal('28.45')),
+            ('BBDC4',  'Bradesco PN',            'Bancos',                  Decimal('13.20')),
+            ('BBAS3',  'Banco do Brasil ON',     'Bancos',                  Decimal('25.60')),
+            ('MGLU3',  'Magazine Luiza ON',      'Varejo',                  Decimal('8.75')),
+            ('WEGE3',  'WEG ON',                 'Máquinas e Equipamentos', Decimal('42.30')),
+            ('RENT3',  'Localiza ON',            'Locação de Veículos',     Decimal('56.90')),
+            ('RAIL3',  'Rumo ON',                'Transporte',              Decimal('18.45')),
+            ('SUZB3',  'Suzano ON',              'Papel e Celulose',        Decimal('52.80')),
+            ('KLBN11', 'Klabin Units',           'Papel e Celulose',        Decimal('22.15')),
+            ('ELET3',  'Eletrobras ON',          'Energia Elétrica',        Decimal('42.10')),
+            ('CMIG4',  'Cemig PN',               'Energia Elétrica',        Decimal('10.85')),
+            ('CPLE6',  'Copel PNB',              'Energia Elétrica',        Decimal('8.95')),
+            ('ABEV3',  'Ambev ON',               'Bebidas',                 Decimal('11.20')),
         ]
-        
+
         # FIIs mais negociados
         fiis = [
-            ('HGLG11', 'CSHG Logística FII', 'Logística', Decimal('152.30')),
-            ('VISC11', 'Vinci Shopping Centers FII', 'Shopping', Decimal('105.80')),
-            ('KNRI11', 'Kinea Renda Imobiliária FII', 'Híbrido', Decimal('98.45')),
-            ('BTLG11', 'BTG Pactual Logística FII', 'Logística', Decimal('102.70')),
-            ('XPML11', 'XP Malls FII', 'Shopping', Decimal('95.60')),
-            ('MXRF11', 'Maxi Renda FII', 'Híbrido', Decimal('10.25')),
-            ('TRXF11', 'TRX Real Estate FII', 'Lajes Corporativas', Decimal('95.30')),
-            ('KNCR11', 'Kinea Rendimentos Imobiliários FII', 'Papel', Decimal('110.50')),
-            ('LVBI11', 'VBI Logístico FII', 'Logística', Decimal('98.20')),
-            ('GGRC11', 'GGR Covepi Renda FII', 'Lajes Corporativas', Decimal('105.40')),
+            ('HGLG11', 'CSHG Logística FII',              'Logística',          Decimal('152.30')),
+            ('VISC11', 'Vinci Shopping Centers FII',       'Shopping',           Decimal('105.80')),
+            ('KNRI11', 'Kinea Renda Imobiliária FII',      'Híbrido',            Decimal('98.45')),
+            ('BTLG11', 'BTG Pactual Logística FII',        'Logística',          Decimal('102.70')),
+            ('XPML11', 'XP Malls FII',                    'Shopping',           Decimal('95.60')),
+            ('MXRF11', 'Maxi Renda FII',                   'Híbrido',            Decimal('10.25')),
+            ('TRXF11', 'TRX Real Estate FII',              'Lajes Corporativas', Decimal('95.30')),
+            ('KNCR11', 'Kinea Rendimentos Imobiliários FII', 'Papel',            Decimal('110.50')),
+            ('LVBI11', 'VBI Logístico FII',                'Logística',          Decimal('98.20')),
+            ('GGRC11', 'GGR Covepi Renda FII',             'Lajes Corporativas', Decimal('105.40')),
         ]
-        
+
         created_ativos = []
-        
-        print("Criando Ações...")
+
+        print("\nCriando Ações...")
         for ticker, nome, setor, preco in acoes:
             ativo = Ativo(
                 ticker=ticker,
@@ -74,8 +77,7 @@ def seed_ativos_br():
                 tipo=TipoAtivo.ACAO,
                 classe=ClasseAtivo.RENDA_VARIAVEL,
                 mercado='BR',
-                bolsa_origem='B3',  # NOVO CAMPO
-                moeda='BRL',
+                moeda='BRL',          # FIX: removido bolsa_origem='B3' (campo removido em v0.7.8)
                 preco_atual=preco,
                 observacoes=f"Setor: {setor}",
                 ativo=True
@@ -83,7 +85,7 @@ def seed_ativos_br():
             db.session.add(ativo)
             created_ativos.append(ativo)
             print(f"  ✅ {ticker:8} - {nome:35} - R$ {preco}")
-        
+
         print("\nCriando FIIs...")
         for ticker, nome, segmento, preco in fiis:
             ativo = Ativo(
@@ -92,8 +94,7 @@ def seed_ativos_br():
                 tipo=TipoAtivo.FII,
                 classe=ClasseAtivo.RENDA_VARIAVEL,
                 mercado='BR',
-                bolsa_origem='B3',  # NOVO CAMPO
-                moeda='BRL',
+                moeda='BRL',          # FIX: removido bolsa_origem='B3' (campo removido em v0.7.8)
                 preco_atual=preco,
                 observacoes=f"Segmento: {segmento}",
                 ativo=True
@@ -101,7 +102,7 @@ def seed_ativos_br():
             db.session.add(ativo)
             created_ativos.append(ativo)
             print(f"  ✅ {ticker:8} - {nome:40} - R$ {preco}")
-        
+
         try:
             db.session.commit()
             print("=" * 50)

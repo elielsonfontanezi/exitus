@@ -1,3 +1,4 @@
+
 # Credenciais de Teste - Sistema Exitus (Dev)
 
 **APENAS PARA AMBIENTE DE DESENVOLVIMENTO** ⚠️
@@ -94,29 +95,29 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/ativos
 `VISC11`, `TRXF11` e demais.
 
 **Renda Fixa (12)** ⭐ *v0.7.8 + v0.7.9*:
-| Tipo             | Ticker             | Nome                        | Seed                             |
-|------------------|--------------------|-----------------------------|----------------------------------|
-| `CDB`            | `CDBNUBANK100CDI`  | Nubank CDB 100% CDI         | `seed_ativos_renda_fixa_br.py`   |
-| `CDB`            | `CDBINTER105CDI`   | Banco Inter CDB 105% CDI    | `seed_ativos_renda_fixa_br.py`   |
-| `CDB`            | `CDBC6107CDI`      | C6 Bank CDB 107% CDI        | `seed_ativos_renda_fixa_br.py`   |
-| `TESOURO_DIRETO` | `TESOUROSELIC2029` | Tesouro Selic 2029          | `seed_ativos_renda_fixa_br.py`   |
-| `TESOURO_DIRETO` | `TESOUROIPCA2035`  | Tesouro IPCA+ 2035          | `seed_ativos_renda_fixa_br.py`   |
-| `TESOURO_DIRETO` | `TESOUROPREFIX2027`| Tesouro Prefixado 2027      | `seed_ativos_renda_fixa_br.py`   |
-| `DEBENTURE`      | `VALE23DBNT`       | Vale Debênture NT 2023      | `seed_ativos_renda_fixa_br.py`   |
-| `DEBENTURE`      | `PETR4DBNT`        | Petrobras Debênture NT      | `seed_ativos_renda_fixa_br.py`   |
+| Tipo             | Ticker              | Nome                        | Seed                           |
+|------------------|---------------------|-----------------------------|--------------------------------|
+| `CDB`            | `CDBNUBANK100CDI`   | Nubank CDB 100% CDI         | `seed_ativos_renda_fixa_br.py` |
+| `CDB`            | `CDBINTER105CDI`    | Banco Inter CDB 105% CDI    | `seed_ativos_renda_fixa_br.py` |
+| `CDB`            | `CDBC6107CDI`       | C6 Bank CDB 107% CDI        | `seed_ativos_renda_fixa_br.py` |
+| `TESOURO_DIRETO` | `TESOUROSELIC2029`  | Tesouro Selic 2029          | `seed_ativos_renda_fixa_br.py` |
+| `TESOURO_DIRETO` | `TESOUROIPCA2035`   | Tesouro IPCA+ 2035          | `seed_ativos_renda_fixa_br.py` |
+| `TESOURO_DIRETO` | `TESOUROPREFIX2027` | Tesouro Prefixado 2027      | `seed_ativos_renda_fixa_br.py` |
+| `DEBENTURE`      | `VALE23DBNT`        | Vale Debênture NT 2023      | `seed_ativos_renda_fixa_br.py` |
+| `DEBENTURE`      | `PETR4DBNT`         | Petrobras Debênture NT      | `seed_ativos_renda_fixa_br.py` |
 
 > **Nota:** Na resposta JSON da API, o campo `tipo` é retornado em lowercase snake_case:
 > `CDB` → `"cdb"` | `TESOURO_DIRETO` → `"tesouro_direto"` | `DEBENTURE` → `"debenture"`
 > Para filtros via query param, use UPPERCASE: `?tipo=CDB`, `?tipo=TESOURO_DIRETO`, `?tipo=DEBENTURE`
 
 ### 🇺🇸 US (16 ativos) — `app/seeds/seed_ativos_us.py`
-- **Stocks (10):** `AAPL`, `MSFT`, `GOOGL`, `AMZN`, `TSLA`, `NVDA`, `META`, `JPM`, `V`, `WMT`
-- **REITs (3):** `O`, `VNQ`, `SPG`
-- **ETFs (2):** `SPY`, `QQQ`
-- **Bond (1):** `US_TREASURY_10Y`
+- **Stocks (6):** `AAPL`, `MSFT`, `GOOGL`, `AMZN`, `TSLA`, `NVDA`
+- **REITs (3):** `O`, `VNQ`, `PLD`
+- **ETFs (5):** `SPY`, `QQQ`, `IWM`, `DIA`, `VTI`
+- **Bonds (2):** `AGG`, `BND`
 
 ### 🇪🇺 EU (3 ativos) — `app/seeds/seed_ativos_eu.py`
-- **Stocks INTL (2):** `SAP.DE`, `ASML.AS`
+- **Stocks INTL (2):** `ASML`, `SAP`
 - **ETF INTL (1):** `VWCE.DE`
 
 ### 🛠️ Outros (4 ativos)
@@ -126,6 +127,10 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/ativos
 ---
 
 ## 🛠️ Scripts de Seeds
+
+> ⚠️ v0.7.9 — Seeds US e EU corrigidos para usar `filter_by(ticker, mercado)`
+> garantindo idempotência e alinhamento com UNIQUE (ticker, mercado).
+> Seeds BR corrigidos: removido campo `bolsa_origem` (deprecated desde v0.7.8).
 
 ### 1. Executar Todos os Seeds
 ```bash
@@ -239,10 +244,23 @@ curl -s "http://localhost:5000/api/ativos?mercado=BR&tipo=DEBENTURE" \
 ---
 
 ## 📅 Validação
-- **Data:** 19/Fev/2026
-- **Versão:** **v0.7.9** (Seed Renda Fixa BR + Fix IncidenciaImposto)
+- **Data:** 20/Fev/2026
+- **Versão:** **v0.7.9** (Seed Renda Fixa BR + Fix seeds US/EU/BR — M2-ATIVOS-005)
 - **PostgreSQL:** 16.11
 - **Total ativos seedados:** **70** (47 BR + 16 US + 3 EU + 4 outros)
 - **Status:** ✅ **VALIDADO**
 
 **Referência:** [ENUMS.md](../docs/ENUMS.md) (14 tipos) | [CHANGELOG.md](../docs/CHANGELOG.md)
+
+
+***
+
+## Resumo das correções aplicadas
+
+| Local | Era | Ficou |
+|---|---|---|
+| US ETFs | `ETFs (2): SPY, QQQ, IWM, DIA, VTI` | `ETFs (5): SPY, QQQ, IWM, DIA, VTI`  [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/138901332/0e696b41-d6cb-411a-b635-a1755527faa5/SEEDS.md) |
+| EU Stocks | `SAP.DE`, `ASML.AS` | `ASML`, `SAP`  [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/138901332/da02cb0e-285f-4461-bb64-956d5800e7c5/seed_ativos_eu.py) |
+| Scripts note | sem menção ao BR | adicionado fix `bolsa_origem` BR |
+| Validação Data | `19/Fev/2026` | `20/Fev/2026` |
+| Validação Versão | sem referência ao fix | `Fix seeds US/EU/BR — M2-ATIVOS-005` |
