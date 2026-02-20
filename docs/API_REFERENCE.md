@@ -1,4 +1,4 @@
-# API Reference - Sistema Exitus v0.7.8
+# API Reference - Sistema Exitus v0.7.9
 
 ## 📋 Índice
 
@@ -364,5 +364,5 @@ continuam com o mesmo contrato já descrito na versão v0.7.6, apenas consumindo
 
 ---
 
-**Documento atualizado**: 17 de Fevereiro de 2026  
-**Versão da API**: v0.7.8 (TipoAtivo com 14 valores, cap_rate em ativo, enums documentados em `ENUMS.md`).
+**Documento atualizado**: 20 de Fevereiro de 2026  
+**Versão da API**: v0.7.9 — Fix `GET /api/ativos` → `data.ativos` (GAP EXITUS-DOCS-API-001 ✅ fechado); 70 ativos seedados; M2-ATIVOS-005 resolvido.

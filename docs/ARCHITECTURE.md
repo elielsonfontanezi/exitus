@@ -533,7 +533,7 @@ O campo **`cap_rate`** foi adicionado à tabela `ativo` para FIIs/REITs e outros
 
 **Índices Críticos** (86+ total):[file:5]
 
-- `ativo.ticker` (UNIQUE, BTREE)
+- `ativo.(ticker, mercado)` (UNIQUE, BTREE) — ticker único por mercado
 - `ativo.mercado`, `ativo.classe`, `ativo.tipo`
 - `transacao(usuario_id, data_transacao DESC)`
 - `posicao(usuario_id, ativo_id)` (UNIQUE)
@@ -846,5 +846,5 @@ Cloud Provider
 
 ---
 
-**Documento atualizado**: 17 de Fevereiro de 2026  
-**Versão arquitetural**: v0.7.8 (Expansão de ENUMs e cap_rate)
+**Documento atualizado**: 20 de Fevereiro de 2026  
+**Versão arquitetural**: v0.7.9 (Expansão de ENUMs, cap_rate; seeds US/EU/BR normalizados — M2-ATIVOS-005)

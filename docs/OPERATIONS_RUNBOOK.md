@@ -1063,7 +1063,7 @@ rm -rf volumes/postgres/*
 # Gerar novo token
 export TOKEN=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}' | jq -r '.data.access_token')
+  -d '{"username":"admin","password":"senha123"}' | jq -r '.data.access_token')
 ```
 
 **Solução Permanente (M8)**:
@@ -1275,7 +1275,7 @@ curl http://localhost:8080/health
 # Testar login
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"admin","password":"senha123"}'
 ```
 
 ---
@@ -1283,7 +1283,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 ## Validação Seeds
 >  Módulo 2 Core
 
-**Versão:** `v0.7.6` | **Data:** `14/02/2026`
+**Versão:** `v0.7.9` | **Data:** `20/02/2026`
 
 ---
 
@@ -1295,7 +1295,7 @@ Use o comando abaixo para garantir que o path do Python seja reconhecido correta
 * **Tempo esperado:** < 2 segundos.
 
 ```bash
-podman exec -it exitus-backend bash -c "cd /app && PYTHONPATH=. python3 app/seeds/seed_modulo2.py"
+podman exec -it exitus-backend python -m app.seeds.run_all_seeds
 ```
 
 **Output esperado:**
@@ -1325,8 +1325,8 @@ UNION ALL SELECT 'provento', COUNT(*) FROM provento;"
 | Tabela | Qtd Esperada |
 | --- | --- |
 | **usuario** | 5 |
-| **corretora** | 14 |
-| **ativo** | 44+ |
+| **corretora** | 13 |
+| **ativo** | 70 |
 | **transacao** | 17+ |
 | **portfolio** | 4+ |
 | **posicao** | 17+ |
@@ -1351,11 +1351,11 @@ WHERE email='admin@exitus.com';"
 
 | Username | Email | Senha | Role |
 | --- | --- | --- | --- |
-| `admin` | admin@exitus.com | admin123 | **ADMIN** |
-| `joao.silva` | joao.silva@example.com | user123 | USER |
-| `maria.santos` | maria.santos@example.com | user123 | USER |
-| `viewer` | viewer@exitus.com | user123 | READONLY |
-| `teste.user` | teste@exitus.com | user123 | USER |
+| `admin` | admin@exitus.com | senha123 | **ADMIN** |
+| `joao.silva` | joao.silva@example.com | senha123 | USER |
+| `maria.santos` | maria.santos@example.com | senha123 | USER |
+| `viewer` | viewer@exitus.com | senha123 | READONLY |
+| `teste.user` | teste@exitus.com | senha123 | USER |
 
 > ⚠️ **IMPORTANTE:** Estas credenciais são exclusivas para desenvolvimento. **Nunca** utilize estas senhas em produção.
 
@@ -1390,7 +1390,7 @@ time podman exec exitus-db psql exitusdb -U exitus -c "SELECT COUNT(*) FROM usua
 ## Validação Usuários 
 > M2 Core: 5 Endpoints
 
-**Versão:** `v0.7.6` | **Data:** `15/02/2026`
+**Versão:** `v0.7.9` | **Data:** `20/02/2026`
 
 ---
 
@@ -1402,12 +1402,12 @@ time podman exec exitus-db psql exitusdb -U exitus -c "SELECT COUNT(*) FROM usua
 # Token ADMIN
 export TOKEN_ADMIN=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}' | jq -r '.data.access_token')
+  -d '{"username":"admin","password":"senha123"}' | jq -r '.data.access_token')
 
 # Token USER
 export TOKEN_USER=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"maria.santos","password":"user123"}' | jq -r '.data.access_token')
+  -d '{"username":"maria.santos","password":"senha123"}' | jq -r '.data.access_token')
 
 # Verificar tokens
 echo "Token ADMIN: ${TOKEN_ADMIN:0:50}..."
@@ -1562,6 +1562,11 @@ ORDER BY total DESC;
 ```
 
 ---
+
+---
+
+**Documento atualizado**: 20 de Fevereiro de 2026  
+**Versão**: v0.7.9 — Seeds atualizados para `run_all_seeds`; volumetrias v0.7.9; credenciais padronizadas (M2-ATIVOS-005)
 
 ## Referências
 

@@ -214,7 +214,7 @@ ORDER BY total DESC;
 "
 ```
 
-### Teste Filtros API Renda Fixa BR (validado 19/02/2026)
+### Teste Filtros API Renda Fixa BR (validado 20/02/2026)
 ```bash
 TOKEN=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
@@ -251,16 +251,3 @@ curl -s "http://localhost:5000/api/ativos?mercado=BR&tipo=DEBENTURE" \
 - **Status:** ✅ **VALIDADO**
 
 **Referência:** [ENUMS.md](../docs/ENUMS.md) (14 tipos) | [CHANGELOG.md](../docs/CHANGELOG.md)
-
-
-***
-
-## Resumo das correções aplicadas
-
-| Local | Era | Ficou |
-|---|---|---|
-| US ETFs | `ETFs (2): SPY, QQQ, IWM, DIA, VTI` | `ETFs (5): SPY, QQQ, IWM, DIA, VTI`  [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/138901332/0e696b41-d6cb-411a-b635-a1755527faa5/SEEDS.md) |
-| EU Stocks | `SAP.DE`, `ASML.AS` | `ASML`, `SAP`  [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/138901332/da02cb0e-285f-4461-bb64-956d5800e7c5/seed_ativos_eu.py) |
-| Scripts note | sem menção ao BR | adicionado fix `bolsa_origem` BR |
-| Validação Data | `19/Fev/2026` | `20/Fev/2026` |
-| Validação Versão | sem referência ao fix | `Fix seeds US/EU/BR — M2-ATIVOS-005` |

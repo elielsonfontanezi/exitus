@@ -1,7 +1,7 @@
 # Sistema Exitus - Documentação de ENUMs
 
 **Versão:** 0.7.9
-**Data:** 19/02/2026
+**Data:** 20/02/2026
 **Status:** ✅ Produção
 
 ---
@@ -241,8 +241,8 @@ Enum principal para classificação de instrumentos financeiros com suporte mult
 
 | Data | Versão | Mudança | Migration |
 |------|--------|---------|-----------|
-| 19/02/2026 | 0.7.9 | Documentada divergência ENUMs query param vs JSON vs DB | — |
-| 19/02/2026 | 0.7.9 | `IncidenciaImposto` adicionado ao `app/models/__init__.py` | — |
+| 20/02/2026 | 0.7.9 | Documentada divergência ENUMs query param vs JSON vs DB | — |
+| 20/02/2026 | 0.7.9 | `IncidenciaImposto` adicionado ao `app/models/__init__.py` | — |
 | 16/02/2026 | 0.7.8 | Expansão de 7 para 14 tipos em TipoAtivo | `202602162111`, `202602162130` |
 | 16/02/2026 | 0.7.8 | Adição do campo `cap_rate` em Ativo | `202602162130` |
 | 16/02/2026 | 0.7.8 | Remoção do campo `bolsa_origem` | `202602162130` |
@@ -303,4 +303,4 @@ class TipoAtivo(enum.Enum):
 - **Total de valores:** 62 valores únicos
 - **Ativos cadastrados:** 70 (47 BR + 16 US + 3 EU + 4 outros)
 - **Migrations aplicadas:** 2 (`202602162111`, `202602162130`)
-- **Última atualização:** 19/02/2026
+- **Última atualização:** 20/02/2026
