@@ -8,6 +8,7 @@ import sys
 from app.seeds.seed_usuarios import seed_usuarios
 from app.seeds.seed_ativos_br import seed_ativos_br
 from app.seeds.seed_regras_fiscais_br import seed_regras_fiscais_br
+from app.seeds.seed_ativos_renda_fixa_br import seed_renda_fixa_br
 from app.seeds.seed_feriados_b3 import seed_feriados_b3
 from app.seeds.seed_fontes_dados import seed_fontes_dados
 
@@ -34,9 +35,10 @@ def run_all_seeds():
     seeds = [
         ("Usuários", seed_usuarios),
         ("Ativos BR", seed_ativos_br),
-        ("Regras Fiscais BR", seed_regras_fiscais_br),
+        ("Renda Fixa BR", seed_renda_fixa_br),
         ("Feriados B3", seed_feriados_b3),
         ("Fontes de Dados", seed_fontes_dados),
+        ("Regras Fiscais BR", seed_regras_fiscais_br),
     ]
     
     sucessos = 0

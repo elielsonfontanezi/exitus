@@ -1,8 +1,46 @@
 # Sistema Exitus - Documentação de ENUMs
 
-**Versão:** 0.7.8  
-**Data:** 16/02/2026  
+**Versão:** 0.7.9
+**Data:** 19/02/2026
 **Status:** ✅ Produção
+
+---
+
+## ⚠️ Nota Importante — Comportamento dos ENUMs na API
+
+> **GAP EXITUS-ENUMS-001 (documentado em v0.7.9)**
+>
+> Existe uma divergência entre a forma como os ENUMs são usados como **query param** vs como são **retornados** na resposta JSON:
+>
+> | Contexto | Formato | Exemplo |
+> |----------|---------|---------|
+> | **Query param** (filtro) | UPPERCASE | `?tipo=TESOURO_DIRETO` |
+> | **Resposta JSON** (`tipo` field) | lowercase snake_case | `"tipo": "tesouro_direto"` |
+> | **Banco de dados** (PostgreSQL) | lowercase sem underscore | `tesourodireto` |
+> | **Python/SQLAlchemy** (Enum name) | UPPERCASE | `TipoAtivo.TESOURO_DIRETO` |
+>
+> **Tabela completa de mapeamento:**
+>
+> | Enum Python | Query Param | Resposta JSON | Banco (PostgreSQL) |
+> |-------------|-------------|---------------|--------------------|
+> | `ACAO` | `?tipo=ACAO` | `"acao"` | `acao` |
+> | `FII` | `?tipo=FII` | `"fii"` | `fii` |
+> | `CDB` | `?tipo=CDB` | `"cdb"` | `cdb` |
+> | `LCI_LCA` | `?tipo=LCI_LCA` | `"lci_lca"` | `lcilca` |
+> | `TESOURO_DIRETO` | `?tipo=TESOURO_DIRETO` | `"tesouro_direto"` | `tesourodireto` |
+> | `DEBENTURE` | `?tipo=DEBENTURE` | `"debenture"` | `debenture` |
+> | `STOCK` | `?tipo=STOCK` | `"stock"` | `stock` |
+> | `REIT` | `?tipo=REIT` | `"reit"` | `reit` |
+> | `BOND` | `?tipo=BOND` | `"bond"` | `bond` |
+> | `ETF` | `?tipo=ETF` | `"etf"` | `etf` |
+> | `STOCK_INTL` | `?tipo=STOCK_INTL` | `"stock_intl"` | `stockintl` |
+> | `ETF_INTL` | `?tipo=ETF_INTL` | `"etf_intl"` | `etfintl` |
+> | `CRIPTO` | `?tipo=CRIPTO` | `"cripto"` | `cripto` |
+> | `OUTRO` | `?tipo=OUTRO` | `"outro"` | `outro` |
+>
+> **Origem da divergência:** O Python serializa `.value` do Enum (que é lowercase sem underscore para o banco), mas o blueprint normaliza para lowercase snake_case na resposta. O query param aceita case-insensitive via `upper()` no service.
+>
+> **Status:** Comportamento intencional (banco usa formato compacto sem `_`). Sem necessidade de migration.
 
 ---
 
@@ -18,69 +56,52 @@ Enum principal para classificação de instrumentos financeiros com suporte mult
 
 ### **1.1 Mercado BR (Brasil) - 6 tipos**
 
-| Enum | Valor DB | Descrição | Classe Padrão | Moeda |
-|------|----------|-----------|---------------|-------|
-| `ACAO` | `acao` | Ações negociadas na B3 | `RENDA_VARIAVEL` | BRL |
-| `FII` | `fii` | Fundos de Investimento Imobiliário | `RENDA_VARIAVEL` | BRL |
-| `CDB` | `cdb` | Certificado de Depósito Bancário | `RENDA_FIXA` | BRL |
-| `LCI_LCA` | `lcilca` | Letra de Crédito Imobiliário/Agrícola | `RENDA_FIXA` | BRL |
-| `TESOURO_DIRETO` | `tesourodireto` | Títulos públicos federais | `RENDA_FIXA` | BRL |
-| `DEBENTURE` | `debenture` | Debêntures corporativas | `RENDA_FIXA` | BRL |
+| Enum | Valor DB | Resposta JSON | Descrição | Classe Padrão | Moeda |
+|------|----------|---------------|-----------|---------------|-------|
+| `ACAO` | `acao` | `"acao"` | Ações negociadas na B3 | `RENDA_VARIAVEL` | BRL |
+| `FII` | `fii` | `"fii"` | Fundos de Investimento Imobiliário | `RENDA_VARIAVEL` | BRL |
+| `CDB` | `cdb` | `"cdb"` | Certificado de Depósito Bancário | `RENDA_FIXA` | BRL |
+| `LCI_LCA` | `lcilca` | `"lci_lca"` | Letra de Crédito Imobiliário/Agrícola | `RENDA_FIXA` | BRL |
+| `TESOURO_DIRETO` | `tesourodireto` | `"tesouro_direto"` | Títulos públicos federais | `RENDA_FIXA` | BRL |
+| `DEBENTURE` | `debenture` | `"debenture"` | Debêntures corporativas | `RENDA_FIXA` | BRL |
 
-**Exemplos:**
-- ACAO: PETR4, VALE3, ITUB4
-- FII: HGLG11, KNRI11, MXRF11
-- CDB: Nubank CDB 100% CDI
-- TESOURO_DIRETO: Tesouro Selic 2029
+**Exemplos de uso:**
+- Filtro API: `GET /api/ativos?mercado=BR&tipo=TESOURO_DIRETO`
+- Resposta JSON: `"tipo": "tesouro_direto"`
+- psql: `WHERE tipo = 'tesourodireto'`
 
 ---
 
 ### **1.2 Mercado US (Estados Unidos) - 4 tipos**
 
-| Enum | Valor DB | Descrição | Classe Padrão | Moeda |
-|------|----------|-----------|---------------|-------|
-| `STOCK` | `stock` | Ações US (NYSE, NASDAQ) | `RENDA_VARIAVEL` | USD |
-| `REIT` | `reit` | Real Estate Investment Trust | `RENDA_VARIAVEL` | USD |
-| `BOND` | `bond` | Bonds corporativos/governamentais | `RENDA_FIXA` | USD |
-| `ETF` | `etf` | Exchange Traded Funds US | `RENDA_VARIAVEL` | USD |
-
-**Exemplos:**
-- STOCK: AAPL, MSFT, GOOGL
-- REIT: O, VNQ, SPG
-- BOND: US Treasury 10Y
-- ETF: SPY, QQQ, IWM
+| Enum | Valor DB | Resposta JSON | Descrição | Classe Padrão | Moeda |
+|------|----------|---------------|-----------|---------------|-------|
+| `STOCK` | `stock` | `"stock"` | Ações US (NYSE, NASDAQ) | `RENDA_VARIAVEL` | USD |
+| `REIT` | `reit` | `"reit"` | Real Estate Investment Trust | `RENDA_VARIAVEL` | USD |
+| `BOND` | `bond` | `"bond"` | Bonds corporativos/governamentais | `RENDA_FIXA` | USD |
+| `ETF` | `etf` | `"etf"` | Exchange Traded Funds US | `RENDA_VARIAVEL` | USD |
 
 ---
 
 ### **1.3 Mercado INTL (Internacional) - 2 tipos**
 
-| Enum | Valor DB | Descrição | Classe Padrão | Moeda |
-|------|----------|-----------|---------------|-------|
-| `STOCK_INTL` | `stockintl` | Ações Internacionais (EU, ASIA) | `RENDA_VARIAVEL` | EUR/GBP/JPY |
-| `ETF_INTL` | `etfintl` | ETFs Internacionais | `RENDA_VARIAVEL` | EUR/USD |
-
-**Exemplos:**
-- STOCK_INTL: SAP.DE, 7203.T (Toyota)
-- ETF_INTL: VWCE.DE (Vanguard FTSE All-World)
+| Enum | Valor DB | Resposta JSON | Descrição | Classe Padrão | Moeda |
+|------|----------|---------------|-----------|---------------|-------|
+| `STOCK_INTL` | `stockintl` | `"stock_intl"` | Ações Internacionais (EU, ASIA) | `RENDA_VARIAVEL` | EUR/GBP/JPY |
+| `ETF_INTL` | `etfintl` | `"etf_intl"` | ETFs Internacionais | `RENDA_VARIAVEL` | EUR/USD |
 
 ---
 
 ### **1.4 Outros (2 tipos)**
 
-| Enum | Valor DB | Descrição | Classe Padrão | Moeda |
-|------|----------|-----------|---------------|-------|
-| `CRIPTO` | `cripto` | Criptomoedas | `CRIPTO` | USD/BRL |
-| `OUTRO` | `outro` | Outros ativos não classificados | `HIBRIDO` | Variável |
-
-**Exemplos:**
-- CRIPTO: BTC, ETH, SOL
-- OUTRO: Commodities, derivatives
+| Enum | Valor DB | Resposta JSON | Descrição | Classe Padrão | Moeda |
+|------|----------|---------------|-----------|---------------|-------|
+| `CRIPTO` | `cripto` | `"cripto"` | Criptomoedas | `CRIPTO` | USD/BRL |
+| `OUTRO` | `outro` | `"outro"` | Outros ativos não classificados | `HIBRIDO` | Variável |
 
 ---
 
 ## 2. ClasseAtivo (5 valores)
-
-Classificação para alocação de portfólio.
 
 | Enum | Valor DB | Descrição | Tipos de Ativos Associados |
 |------|----------|-----------|----------------------------|
@@ -161,7 +182,7 @@ Classificação para alocação de portfólio.
 ## 8. TipoEventoCorporativo (12 valores)
 
 | Enum | Valor DB | Impacto Posições |
-|------|----------|------------------|
+|------|----------|-----------------|
 | `SPLIT` | `split` | Sim |
 | `GRUPAMENTO` | `grupamento` | Sim |
 | `BONIFICACAO` | `bonificacao` | Sim |
@@ -185,6 +206,9 @@ Classificação para alocação de portfólio.
 | `RECEITA` | `receita` | Incide sobre receita bruta |
 | `PROVENTO` | `provento` | Incide sobre proventos |
 | `OPERACAO` | `operacao` | Incide sobre cada operação |
+
+> **Nota v0.7.9:** `IncidenciaImposto` agora está corretamente exportado em `app/models/__init__.py`.
+> Fix: GAP EXITUS-SEEDS-RUN-001 resolvido.
 
 ---
 
@@ -217,6 +241,8 @@ Classificação para alocação de portfólio.
 
 | Data | Versão | Mudança | Migration |
 |------|--------|---------|-----------|
+| 19/02/2026 | 0.7.9 | Documentada divergência ENUMs query param vs JSON vs DB | — |
+| 19/02/2026 | 0.7.9 | `IncidenciaImposto` adicionado ao `app/models/__init__.py` | — |
 | 16/02/2026 | 0.7.8 | Expansão de 7 para 14 tipos em TipoAtivo | `202602162111`, `202602162130` |
 | 16/02/2026 | 0.7.8 | Adição do campo `cap_rate` em Ativo | `202602162130` |
 | 16/02/2026 | 0.7.8 | Remoção do campo `bolsa_origem` | `202602162130` |
@@ -224,8 +250,6 @@ Classificação para alocação de portfólio.
 ---
 
 ## Mapeamento Mercado → Sufixo (APIs externas)
-
-Para integração com yfinance:
 
 | Mercado | Sufixo | Exemplo |
 |---------|--------|---------|
@@ -241,20 +265,16 @@ Para integração com yfinance:
 
 ### No Banco de Dados (PostgreSQL)
 ```sql
--- Enum TipoAtivo com 14 valores
+-- Enum TipoAtivo com 14 valores (sem underscore)
 CREATE TYPE tipoativo AS ENUM (
     'acao', 'fii', 'cdb', 'lcilca', 'tesourodireto', 'debenture',
     'stock', 'reit', 'bond', 'etf',
     'stockintl', 'etfintl',
     'cripto', 'outro'
 );
-
--- Constraint de unicidade
-ALTER TABLE ativo ADD CONSTRAINT uq_ativo_ticker_mercado UNIQUE (ticker, mercado);
 ```
 
 ### No Python (SQLAlchemy)
-
 ```python
 class TipoAtivo(enum.Enum):
     # Brasil
@@ -264,17 +284,14 @@ class TipoAtivo(enum.Enum):
     LCI_LCA = "lcilca"
     TESOURO_DIRETO = "tesourodireto"
     DEBENTURE = "debenture"
-    
     # US
     STOCK = "stock"
     REIT = "reit"
     BOND = "bond"
     ETF = "etf"
-    
     # Internacional
     STOCK_INTL = "stockintl"
     ETF_INTL = "etfintl"
-    
     # Outros
     CRIPTO = "cripto"
     OUTRO = "outro"
@@ -282,15 +299,8 @@ class TipoAtivo(enum.Enum):
 
 ### Estatísticas Atuais do Sistema
 
-Total de ENUMs: 11 tipos diferentes
-
-Total de valores: 62 valores únicos
-
-Ativos cadastrados: 62 (39 BR + 16 US + 3 EU + 4 outros)
-
-Migrations aplicadas: 2 (202602162111, 202602162130)
-
-Versão Alembic: 202602162130
-
-Documentação completa: docs/ENUMS.md
-Última atualização: 16/02/2026 22:05 BRT
+- **Total de ENUMs:** 11 tipos diferentes
+- **Total de valores:** 62 valores únicos
+- **Ativos cadastrados:** 70 (47 BR + 16 US + 3 EU + 4 outros)
+- **Migrations aplicadas:** 2 (`202602162111`, `202602162130`)
+- **Última atualização:** 19/02/2026

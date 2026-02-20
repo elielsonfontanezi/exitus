@@ -19,7 +19,7 @@ from .evento_corporativo import EventoCorporativo
 # Módulo 4 - Dados de Suporte
 from .feriado_mercado import FeriadoMercado
 from .fonte_dados import FonteDados
-from .regra_fiscal import RegraFiscal
+from .regra_fiscal import RegraFiscal, IncidenciaImposto
 from .log_auditoria import LogAuditoria
 from .parametros_macro import ParametrosMacro
 
@@ -64,6 +64,7 @@ __all__ = [
     "FeriadoMercado",
     "FonteDados",
     "RegraFiscal",
+    "IncidenciaImposto",
     "LogAuditoria",
     "ParametrosMacro",
 
