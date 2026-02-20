@@ -53,7 +53,7 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### 🧪 Tested
 ```bash
-# Filtros Renda Fixa BR — validados 19/02/2026
+# Filtros Renda Fixa BR — validados 20/02/2026
 curl "http://localhost:5000/api/ativos?mercado=BR&tipo=CDB"            # total: 3 ✅
 curl "http://localhost:5000/api/ativos?mercado=BR&tipo=TESOURO_DIRETO" # total: 3 ✅
 curl "http://localhost:5000/api/ativos?mercado=BR&tipo=DEBENTURE"      # total: 2 ✅
@@ -194,16 +194,3 @@ podman exec exitus-db psql -U exitus -d exitusdb -c "
 **Contribuidores:**
 - Elielson Fontanezi
 - Perplexity AI (Documentação v0.7.8, v0.7.9)
-
-***
-
-## Resumo das alterações
-
-| Local | Mudança |
-|---|---|
-| Dois blocos `[0.7.9]` | Fundidos em um único bloco coeso  [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/138901332/be11111e-dbbc-4e6b-b9fb-200d68313ce3/CHANGELOG.md) |
-| `Fixed` | Adicionada entrada completa do **M2-ATIVOS-005** com os 3 seeds |
-| `Documentation` | Adicionados os fixes de tickers EU e lista US no SEEDS.md |
-| `Tested` | Adicionados os 3 comandos de validação do M2-ATIVOS-005 com resultados |
-| Data final | `19 de Fevereiro` → `20 de Fevereiro de 2026` |
-| Versão rodapé | Menção ao M2-ATIVOS-005 adicionada |

@@ -190,17 +190,20 @@ backend/migrations/versions/
 
 - Usuários: `seed_usuarios.py`
 - Corretoras: `seed_corretoras.py`
-- Ativos BR/US/EU: `seed_ativos.py`, `seed_ativos_us.py`, `seed_ativos_eu.py`
+- Ativos BR (Ações/FIIs): `seed_ativos_br.py`
+- Ativos BR (Renda Fixa): `seed_ativos_renda_fixa_br.py` ⭐ v0.7.9
+- Ativos US: `seed_ativos_us.py`
+- Ativos EU: `seed_ativos_eu.py`
 - Feriados: `seed_feriados.py`
 - Regras fiscais: `seed_regras_fiscais.py`
 
-Total atual (dev): **62 ativos** (39 BR, 16 US, 3 EU, 4 outros).[file:21][file:18]
+Total atual (dev): **70 ativos** (47 BR, 16 US, 3 EU, 4 outros).[file:21][file:18]
 
 #### 6. Índices e Otimizações
 
 Mais de **86 índices** criados para suportar queries de cálculo, relatórios e dashboards.[file:5][file:18]
 
-- `ativo.ticker`, `ativo.mercado`, `ativo.classe`, `ativo.tipo`
+- `ativo.(ticker, mercado)` (UNIQUE), `ativo.mercado`, `ativo.classe`, `ativo.tipo`
 - `historico_preco(ativo_id, data DESC)`
 - `transacao(usuario_id, data_transacao DESC)`
 - `posicao(usuario_id, ativo_id)` UNIQUE.[file:5]
@@ -355,5 +358,5 @@ Criar dashboards interativos com Chart.js, tabelas dinâmicas e integração com
 
 ---
 
-**Documento atualizado**: 17 de Fevereiro de 2026  
-**Versão**: v0.7.8 (Expansão de TipoAtivo para 14 valores + cap_rate em ativo).[file:18][file:25]
+**Documento atualizado**: 20 de Fevereiro de 2026  
+**Versão**: v0.7.9 (70 ativos seedados; `seed_ativos_renda_fixa_br` adicionado — M2-ATIVOS-005).[file:18][file:25]
