@@ -1063,7 +1063,7 @@ rm -rf volumes/postgres/*
 # Gerar novo token
 export TOKEN=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"senha123"}' | jq -r '.data.access_token')
+  -d '{"username":"admin","password":"admin123"}' | jq -r '.data.access_token')
 ```
 
 **Solução Permanente (M8)**:
@@ -1131,6 +1131,43 @@ podman exec exitus-db psql -U exitus -d exitusdb -c \
 - Adicionar índices em queries lentas
 - Implementar Redis cache (M8)
 - Escalar horizontalmente (múltiplas instâncias backend)
+
+---
+
+### GAP EXITUS-INFRA-001 — Volume `app/` read-only no container
+
+> ⚠️ **GAP EXITUS-INFRA-001 (v0.7.10 — documentado):** O volume `./backend:/app:Z` é montado como **read-only** pelo Podman em alguns ambientes SELinux/rootless. Comandos como `podman exec sed -i` falham com `Permission denied`.
+
+**Sintoma**:
+```bash
+podman exec exitus-backend sed -i 's/foo/bar/' /app/arquivo.py
+# sed: cannot open /app/arquivo.py: Permission denied
+```
+
+**Causa**: O flag `:Z` aplica relabeling SELinux mas não garante permissão de escrita ao usuário `exitus` (UID 1000) dentro do container quando o volume é montado pelo host com permissões restritas.
+
+**Workaround atual (v0.7.10)**:
+- **Sempre edite arquivos no host** (fora do container) — o volume é bidirecional; mudanças no host refletem imediatamente no container via hot reload:
+```bash
+# ✅ CORRETO — editar no host
+nano backend/app/seeds/seed_ativos_br.py
+
+# ✅ Verificar que o container enxerga a mudança
+podman exec exitus-backend cat /app/seeds/seed_ativos_br.py | head -5
+```
+
+- **Para scripts temporários**, copie via `podman cp`:
+```bash
+# Copiar script do host para o container
+podman cp ./meu_script.py exitus-backend:/tmp/meu_script.py
+
+# Executar (de /tmp, que é read-write)
+podman exec -it exitus-backend python3 /tmp/meu_script.py
+```
+
+**Resolução planejada (v0.8.0)**:
+- Avaliar remoção do flag `:Z` em ambientes sem SELinux obrigatório
+- Verificar se `podman unshare chown` resolve o problema de permissão sem comprometer segurança
 
 ---
 
@@ -1275,7 +1312,7 @@ curl http://localhost:8080/health
 # Testar login
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"senha123"}'
+  -d '{"username":"admin","password":"admin123"}'
 ```
 
 ---
@@ -1283,7 +1320,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 ## Validação Seeds
 >  Módulo 2 Core
 
-**Versão:** `v0.7.9` | **Data:** `20/02/2026`
+**Versão:** `v0.7.6` | **Data:** `14/02/2026`
 
 ---
 
@@ -1295,7 +1332,7 @@ Use o comando abaixo para garantir que o path do Python seja reconhecido correta
 * **Tempo esperado:** < 2 segundos.
 
 ```bash
-podman exec -it exitus-backend python -m app.seeds.run_all_seeds
+podman exec -it exitus-backend bash -c "cd /app && PYTHONPATH=. python3 app/seeds/seed_modulo2.py"
 ```
 
 **Output esperado:**
@@ -1325,8 +1362,8 @@ UNION ALL SELECT 'provento', COUNT(*) FROM provento;"
 | Tabela | Qtd Esperada |
 | --- | --- |
 | **usuario** | 5 |
-| **corretora** | 13 |
-| **ativo** | 70 |
+| **corretora** | 14 |
+| **ativo** | 44+ |
 | **transacao** | 17+ |
 | **portfolio** | 4+ |
 | **posicao** | 17+ |
@@ -1351,11 +1388,11 @@ WHERE email='admin@exitus.com';"
 
 | Username | Email | Senha | Role |
 | --- | --- | --- | --- |
-| `admin` | admin@exitus.com | senha123 | **ADMIN** |
-| `joao.silva` | joao.silva@example.com | senha123 | USER |
-| `maria.santos` | maria.santos@example.com | senha123 | USER |
-| `viewer` | viewer@exitus.com | senha123 | READONLY |
-| `teste.user` | teste@exitus.com | senha123 | USER |
+| `admin` | admin@exitus.com | admin123 | **ADMIN** |
+| `joao.silva` | joao.silva@example.com | user123 | USER |
+| `maria.santos` | maria.santos@example.com | user123 | USER |
+| `viewer` | viewer@exitus.com | user123 | READONLY |
+| `teste.user` | teste@exitus.com | user123 | USER |
 
 > ⚠️ **IMPORTANTE:** Estas credenciais são exclusivas para desenvolvimento. **Nunca** utilize estas senhas em produção.
 
@@ -1390,7 +1427,7 @@ time podman exec exitus-db psql exitusdb -U exitus -c "SELECT COUNT(*) FROM usua
 ## Validação Usuários 
 > M2 Core: 5 Endpoints
 
-**Versão:** `v0.7.9` | **Data:** `20/02/2026`
+**Versão:** `v0.7.6` | **Data:** `15/02/2026`
 
 ---
 
@@ -1402,12 +1439,12 @@ time podman exec exitus-db psql exitusdb -U exitus -c "SELECT COUNT(*) FROM usua
 # Token ADMIN
 export TOKEN_ADMIN=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"senha123"}' | jq -r '.data.access_token')
+  -d '{"username":"admin","password":"admin123"}' | jq -r '.data.access_token')
 
 # Token USER
 export TOKEN_USER=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"maria.santos","password":"senha123"}' | jq -r '.data.access_token')
+  -d '{"username":"maria.santos","password":"user123"}' | jq -r '.data.access_token')
 
 # Verificar tokens
 echo "Token ADMIN: ${TOKEN_ADMIN:0:50}..."
@@ -1562,11 +1599,6 @@ ORDER BY total DESC;
 ```
 
 ---
-
----
-
-**Documento atualizado**: 20 de Fevereiro de 2026  
-**Versão**: v0.7.9 — Seeds atualizados para `run_all_seeds`; volumetrias v0.7.9; credenciais padronizadas (M2-ATIVOS-005)
 
 ## Referências
 
