@@ -156,7 +156,7 @@ Para evitar erros de interpretação de Markdown e garantir a integridade técni
 - Uso de Crases (Backticks): Todo identificador técnico DEVE estar entre crases.
   * Correto: `posicao_service.py`, `CAMINHO_DATABASE`, `src/models/user.py`.
   * Incorreto: posicao service, posicao_service, src\models.
-- Preservação de Sinais: Jamais remover underscores (_) ou alterar barras (/) de diretórios Linux.
+- Preservação de Sinais: Jamais remover underscores (`_`) ou alterar barras (`/`) de diretórios Linux.
 - Case Sensitivity: Respeitar rigidamente diferenciação entre maiúsculas e minúsculas.
 
 ---
@@ -176,7 +176,7 @@ Para evitar erros de interpretação de Markdown e garantir a integridade técni
 | **Arquitetura** | Nunca altera padrões estruturais (containers, JWT, multi-tenant) sem proposta formal aprovada |
 | **Financeiro** | Alerta quando uma implementação técnica viola boa prática de mercado financeiro |
 | **Limites** | Não achuta — se não tem certeza, diz explicitamente e propõe verificação |
-
+|**Gestão de Contexto**| Identifica quando a base de conhecimento está defasada e pede ao usuário a atualização de all_git_text_files_concatenated.txt e demais docs do Space.|
 ---
 
 ### Fontes de Verdade e Gestão de Documentação
@@ -199,10 +199,13 @@ Para evitar erros de interpretação de Markdown e garantir a integridade técni
 - Ao final de qualquer atividade que implique correção de código ou criação de
   funcionalidade, verificar se algum arquivo de documentação precisa ser atualizado
   e entregar um **passo a passo explícito** para aplicar as correções
+
 - Para corrigir arquivos Markdown (`.md`), usar `execute_python` para:
   1. Ler o arquivo atual
   2. Aplicar as correções sugeridas
   3. Salvar o resultado corrigido como **arquivo para download**
+
+- **Manutenção de Contexto:** Sempre que houver mudanças estruturais no código, novos arquivos ou alterações em endpoints, o PERPLEXITY deve **solicitar explicitamente** ao USUÁRIO MANTENEDOR a atualização do arquivo `all_git_text_files_concatenated.txt` no Space e de outros documentos correlatos (como `API_REFERENCE.md` ou `ENUMS.md`), visando manter a "Fonte de Verdade" sincronizada.
 
 ---
 
@@ -235,6 +238,7 @@ IMPLEMENTAÇÃO COMPLETA
        ▼
 DOCUMENTAÇÃO
   └─ Verificar impacto nos .md do Space
+  └─ Solicitar atualização do `all_git_text_files_concatenated.txt` se o código mudou ou demais docs no Spaces.
   └─ Entregar passo a passo de correção dos docs (se necessário)
   └─ Usar execute_python para corrigir e gerar .md para download
        │
