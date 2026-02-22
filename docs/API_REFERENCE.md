@@ -1,148 +1,117 @@
-# API Reference - Sistema Exitus v0.7.10
+# API Reference — Sistema Exitus v0.7.10
 
-## 📋 Índice
-
-- [Informações Gerais](#informações-gerais)
-- [1. Autenticação](#1-autenticação)
-- [2. Usuários](#2-usuários)
-- [3. Corretoras](#3-corretoras)
-- [4. Ativos](#4-ativos)
-- [5. Portfólios](#5-portfólios)
-- [6. Posições](#6-posições)
-- [7. Transações](#7-transações)
-- [8. Proventos](#8-proventos)
-- [9. Movimentações de Caixa](#9-movimentações-de-caixa)
-- [10. Eventos Corporativos](#10-eventos-corporativos)
-- [11. Buy Signals](#11-buy-signals)
-- [12. Cálculos Financeiros](#12-cálculos-financeiros)
-- [13. Regras Fiscais](#13-regras-fiscais)
-- [14. Feriados](#14-feriados)
-- [15. Fontes de Dados](#15-fontes-de-dados)
-- [16. Alertas](#16-alertas)
-- [17. Relatórios](#17-relatórios)
-- [18. Cotações](#18-cotações)
-- [19. Projeções](#19-projeções)
-- [20. Performance](#20-performance)
-- [Health Checks](#health-checks)
+## Índice
+- Informações Gerais
+- 1. Autenticação
+- 2. Usuários
+- 3. Corretoras
+- 4. Ativos
+- 5. Portfólios
+- 6. Posições
+- 7. Transações
+- 8. Proventos
+- 9. Movimentações de Caixa
+- 10. Eventos Corporativos
+- 11. Buy Signals
+- 12. Cálculos Financeiros
+- 13. Regras Fiscais
+- 14. Feriados
+- 15. Fontes de Dados
+- 16. Alertas
+- 17. Relatórios
+- 18. Cotações
+- 19. Projeções
+- 20. Performance
+- Health Checks
 
 ---
 
 ## Informações Gerais
 
-### Endpoints
-
-Endpoints usam snake_case (ex: `api/portfolio/dashboard`).[file:31]
-
 ### Base URL
-
-```text
-http://localhost:5000/api
+```
+http://localhost:5000/api      # Desenvolvimento
+https://seu-dominio.com/api    # Produção (quando deployado)
 ```
 
-**Produção** (quando deployado):
-
-```text
-https://seu-dominio.com/api
-```
+Endpoints usam snake_case (ex.: `api/portfolio/dashboard`).
 
 ### Autenticação
+Todas as rotas exceto `/auth/login` e `/auth/register` requerem JWT Bearer Token.
 
-Todas as rotas (exceto `/auth/login` e `/auth/register`) requerem **JWT Bearer Token**.[file:31]
-
-**Header obrigatório**:
-
-```text
+Header obrigatório:
+```
 Authorization: Bearer <seu_token_jwt>
 ```
 
-**Obter Token**:
-
+Obter Token:
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"senha123"}'
+  -d '{"username": "admin", "password": "senha123"}'
 ```
 
-**Expiry**: 1 hora (3600 segundos).[file:31]
+Expiry: 1 hora (3600 segundos).
 
 ### Formato de Resposta
 
 Sucesso:
-
 ```json
-{
-  "success": true,
-  "data": { },
-  "message": "Operação realizada com sucesso"
-}
+{"success": true, "data": {}, "message": "Operação realizada com sucesso"}
 ```
 
 Erro:
-
 ```json
-{
-  "error": "Descrição do erro",
-  "statuscode": 400
-}
+{"error": "Descrição do erro", "status_code": 400}
 ```
 
 Lista paginada:
-
 ```json
 {
   "success": true,
-  "data": [],
+  "data": {},
   "total": 127,
   "pages": 13,
-  "current_page": 1,
+  "page": 1,
   "per_page": 10
 }
 ```
 
 ### Paginação
-
 Parâmetros de query:
-
-- `page` – Número da página (default: 1)
-- `per_page` – Itens por página (default: 10, max: 100)[file:31]
+- `page` — Número da página (default: 1)
+- `per_page` — Itens por página (default: 10, max: 100)
 
 Exemplo:
-
 ```bash
 GET /api/transacoes?page=2&per_page=20
 ```
 
 ### Códigos de Status HTTP
 
-| Código | Significado                              |
-|--------|------------------------------------------|
-| 200    | OK - Sucesso                            |
-| 201    | Created - Recurso criado                |
-| 400    | Bad Request - Dados inválidos           |
-| 401    | Unauthorized - Token ausente/inválido   |
-| 403    | Forbidden - Sem permissão               |
-| 404    | Not Found - Recurso não encontrado      |
-| 500    | Internal Server Error - Erro no servidor|
+| Código | Significado |
+|---|---|
+| 200 | OK — Sucesso |
+| 201 | Created — Recurso criado |
+| 400 | Bad Request — Dados inválidos |
+| 401 | Unauthorized — Token ausente/inválido |
+| 403 | Forbidden — Sem permissão |
+| 404 | Not Found — Recurso não encontrado |
+| 500 | Internal Server Error — Erro no servidor |
 
 ---
 
 ## 1. Autenticação
 
 ### POST /api/auth/login
+Autentica usuário e retorna token JWT.
 
-Autentica usuário e retorna token JWT.[file:31]
-
-**Request:**
-
+Request:
 ```json
-{
-  "username": "admin",
-  "password": "senha123"
-}
+{"username": "admin", "password": "senha123"}
 ```
 
-**Response (200):**
-
+Response 200:
 ```json
 {
   "success": true,
@@ -150,63 +119,56 @@ Autentica usuário e retorna token JWT.[file:31]
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "expires_in": 3600,
     "user": {
-      "id": "uuid-aqui",
+      "id": "<uuid>",
       "username": "admin",
-      "email": "admin@exitus.com"
+      "email": "admin@exitus.com",
+      "role": "admin"
     }
   },
   "message": "Login realizado com sucesso"
 }
 ```
 
----
-
 ### POST /api/auth/register
-
-Registra novo usuário.[file:31]
+Registra novo usuário.
 
 ---
 
 ## 2. Usuários
-
-CRUD básico de usuários (lista, detalhe, update, soft delete), conforme estrutura atual.[file:31]
+CRUD básico de usuários: lista, detalhe, update, soft delete, conforme estrutura atual.
 
 ---
 
 ## 3. Corretoras
-
-CRUD de corretoras com validação de propriedade do usuário (403 quando a corretora pertence a outro usuário).[file:31]
+CRUD de corretoras com validação de propriedade do usuário. Retorna `403` quando a
+corretora pertence a outro usuário (não `404`).
 
 ---
 
 ## 4. Ativos
 
 ### GET /api/ativos
+Lista ativos paginado, com filtros opcionais.
 
-Lista ativos (paginado, filtros opcionais).[file:31]
+Query Parameters:
+- `ticker` — Filtro por ticker (ex.: `?ticker=PETR4`)
+- `tipo` — Filtro por tipo (Enum TipoAtivo)
+- `mercado` — Filtro por mercado: `BR`, `US`, `EU`, `ASIA`, `GLOBAL`
 
-**Query Parameters:**
+**Enum TipoAtivo — 14 valores:**
+- Brasil (BR): `acao`, `fii`, `cdb`, `lci_lca`, `tesouro_direto`, `debenture`
+- Estados Unidos (US): `stock`, `reit`, `bond`, `etf`
+- Internacional: `stock_intl`, `etf_intl`
+- Outros: `cripto`, `outro`
 
-- `ticker` – Filtro por ticker (ex: `?ticker=PETR4`)
-- `tipo` – Filtro por tipo (Enum `TipoAtivo`)
-- `mercado` – Filtro por mercado (`BR`, `US`, `EU`, `ASIA`, `GLOBAL`)
-
-**Enum TipoAtivo (14 valores):**[file:28]
-
-- **Brasil (BR)**: `ACAO`, `FII`, `CDB`, `LCI_LCA`, `TESOURO_DIRETO`, `DEBENTURE`
-- **Estados Unidos (US)**: `STOCK`, `REIT`, `BOND`, `ETF`
-- **Internacional (INTL)**: `STOCK_INTL`, `ETF_INTL`
-- **Outros**: `CRIPTO`, `OUTRO`
-
-**Response (200):**
-
+Response 200:
 ```json
 {
   "success": true,
   "data": {
     "ativos": [
       {
-        "id": "uuid-1",
+        "id": "<uuid>",
         "ticker": "PETR4",
         "nome": "Petrobras PN",
         "tipo": "acao",
@@ -217,140 +179,172 @@ Lista ativos (paginado, filtros opcionais).[file:31]
         "pl": 4.8,
         "pvp": 1.2,
         "roe": 18.5,
-        "cap_rate": null,
-        "data_ultima_cotacao": "2026-01-06T18:00:00Z"
+        "cap_rate": null
       }
-    ],
-    "total": 70,
-    "pages": 7,
-    "current_page": 1,
-    "per_page": 10
+    ]
+  },
+  "total": 70,
+  "pages": 7,
+  "page": 1,
+  "per_page": 10
+}
+```
+
+### GET /api/ativos/{id}
+Detalha ativo.
+
+### POST /api/ativos
+Cria novo ativo (admin only).
+
+Campos obrigatórios: `ticker`, `nome`, `tipo`, `classe`, `mercado`, `moeda`.
+
+**Enum ClasseAtivo:** `renda_variavel`, `renda_fixa`, `cripto`, `commodity`, `hibrido`
+
+Para referência completa dos enums, consulte `ENUMS.md`.
+
+---
+
+## 5. Portfólios
+APIs de dashboard, alocação, performance e carteiras customizadas:
+- `GET /api/portfolio/dashboard`
+- `GET /api/portfolio/alocacao`
+- `GET /api/portfolio/performance`
+- `GET /api/portfolio/evolucao`
+- CRUD de `/api/portfolios`
+
+---
+
+## 6. Posições
+
+> **Atualizado em v0.7.10** — 7 GAPs resolvidos. Schema completo com nested.
+> Ver `M2_POSICOES.md` para histórico de validação.
+
+### GET /api/posicoes
+Lista posições do usuário autenticado com paginação e filtros.
+
+Query Parameters:
+- `page` — Página atual (default: 1)
+- `per_page` — Itens por página (default: 50, max: 100)
+- `ativo_id` — Filtrar por UUID do ativo
+- `corretora_id` — Filtrar por UUID da corretora
+- `ticker` — Filtrar por ticker do ativo (busca parcial, case-insensitive)
+- `lucro_positivo` — `true` retorna apenas posições com lucro realizado > 0
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "posicoes": [
+      {
+        "id": "4990b451-0dbd-4235-93e9-2a950b0758cf",
+        "usuario_id": "783c2bfd-9e36-4cbd-a4fb-901afae9fad3",
+        "ativo_id": "b8e4ccc8-3dfe-4a97-a8eb-e21a24c2e2ad",
+        "corretora_id": "c5c2bc9d-2dde-4d16-ad9b-868628a746d1",
+        "quantidade": 30,
+        "preco_medio": 150.233333,
+        "custo_total": 4507.0,
+        "taxas_acumuladas": 7.0,
+        "impostos_acumulados": 0.0,
+        "valor_atual": null,
+        "lucro_prejuizo_realizado": 0.0,
+        "lucro_prejuizo_nao_realizado": null,
+        "data_primeira_compra": "2025-06-09",
+        "data_ultima_atualizacao": "2025-12-13T01:11:48",
+        "ativo": {
+          "id": "b8e4ccc8-3dfe-4a97-a8eb-e21a24c2e2ad",
+          "ticker": "KNRI11",
+          "nome": "Kinea Renda Imobiliária FII",
+          "tipo": "fii",
+          "classe": "renda_variavel",
+          "mercado": "BR",
+          "moeda": "BRL",
+          "preco_atual": 149.51,
+          "dividend_yield": 9.8
+        },
+        "corretora": {
+          "id": "c5c2bc9d-2dde-4d16-ad9b-868628a746d1",
+          "nome": "Clear Corretora",
+          "tipo": "corretora",
+          "pais": "BR",
+          "moeda_padrao": "BRL"
+        }
+      }
+    ]
+  },
+  "total": 17,
+  "pages": 1,
+  "page": 1,
+  "per_page": 50,
+  "message": "17 posições encontradas"
+}
+```
+
+> **Nota:** `valor_atual` e `lucro_prejuizo_nao_realizado` são `null` até que o
+> serviço de cotações (M7.5) execute `atualizar_valores_atuais()`.
+
+### GET /api/posicoes/{id}
+Retorna posição pelo ID com nested `ativo` e `corretora`.
+
+- `403` se a posição pertence a outro usuário
+- `404` se o ID não existe
+
+### POST /api/posicoes/calcular
+Recalcula todas as posições do usuário a partir do histórico de transações.
+
+Quando usar:
+- Após importação de transações em lote
+- Quando posições aparecem inconsistentes
+- Após correção manual de transações
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "posicoes_criadas": 0,
+    "posicoes_atualizadas": 17,
+    "posicoes_zeradas": 0
+  },
+  "message": "Recalculo concluido: 0 criadas, 17 atualizadas, 0 zeradas"
+}
+```
+
+### GET /api/posicoes/resumo
+Retorna resumo consolidado das posições do usuário.
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "quantidade_posicoes": 17,
+    "total_investido": 45070.0,
+    "total_valor_atual": 0.0,
+    "total_lucro_realizado": 0.0,
+    "total_lucro_nao_realizado": 0.0,
+    "lucro_total": 0.0,
+    "roi_percentual": 0.0
   }
 }
 ```
 
 ---
 
-### GET /api/ativos/{id}
-
-Detalha ativo.[file:31]
-
----
-
-### POST /api/ativos
-
-Cria novo ativo.[file:31]
-
-**Campos obrigatórios:**
-
-- `ticker` (string, único por mercado)
-- `nome` (string)
-- `tipo` (Enum `TipoAtivo`, ver lista acima)
-- `classe` (Enum `ClasseAtivo`: `RENDA_VARIAVEL`, `RENDA_FIXA`, `CRIPTO`, `COMMODITY`, `HIBRIDO`)
-- `mercado` (`BR`, `US`, `EU`, `ASIA`, `GLOBAL`)
-- `moeda` (`BRL`, `USD`, `EUR`, etc.)[file:28]
-
-**Request – Exemplo Brasil (ACAO):**
-
-```json
-{
-  "ticker": "VALE3",
-  "nome": "Vale ON",
-  "tipo": "ACAO",
-  "classe": "RENDA_VARIAVEL",
-  "mercado": "BR",
-  "moeda": "BRL",
-  "setor": "Mineração"
-}
-```
-
-**Request – Exemplo Renda Fixa BR (CDB):**
-
-```json
-{
-  "ticker": "CDB_NUBANK_CDI",
-  "nome": "Nubank CDB 100% CDI",
-  "tipo": "CDB",
-  "classe": "RENDA_FIXA",
-  "mercado": "BR",
-  "moeda": "BRL"
-}
-```
-
-**Request – Exemplo US STOCK:**
-
-```json
-{
-  "ticker": "AAPL",
-  "nome": "Apple Inc.",
-  "tipo": "STOCK",
-  "classe": "RENDA_VARIAVEL",
-  "mercado": "US",
-  "moeda": "USD"
-}
-```
-
-**Request – Exemplo ETF_INTL:**
-
-```json
-{
-  "ticker": "VWCE.DE",
-  "nome": "Vanguard FTSE All-World UCITS ETF",
-  "tipo": "ETF_INTL",
-  "classe": "RENDA_VARIAVEL",
-  "mercado": "EU",
-  "moeda": "EUR"
-}
-```
-
-**Valores aceitos em `tipo`:**
-
-```text
-acao, fii, cdb, lcilca, tesourodireto, debenture,
-stock, reit, bond, etf, stockintl, etfintl, cripto, outro
-```
-
-Para referência completa dos enums, consulte `ENUMS.md`.[file:28]
-
----
-
-## 5. Portfólios
-
-APIs de dashboard, alocação, performance e carteiras customizadas, conforme já descrito (sem mudança de contrato).[file:31]
-
-- `GET /api/portfolios/dashboard`
-- `GET /api/portfolio/alocacao`
-- `GET /api/portfolio/performance`
-- `GET /api/portfolio/evolucao`
-- CRUD de `/api/portfolios`.[file:31]
-
----
-
-## 6. Posições
-
-- `GET /api/posicoes`
-- `GET /api/posicoes/{id}`
-
-Retornam holdings com join de `ativo` e `corretora`.[file:31]
-
----
-
 ## 7. Transações
-
-Filtros e payload mantidos; `tipo` é Enum `TipoTransacao` (ex.: `COMPRA`, `VENDA`, `DIVIDENDO`, `JCP`, etc.).[file:18][file:31]
+Filtros e payload mantidos — `tipo` usa Enum TipoTransacao
+(ex.: `COMPRA`, `VENDA`, `DIVIDENDO`, `JCP`, etc.).
 
 ---
 
 ## 8. Proventos
-
-APIs de listagem, criação, update e delete de proventos, com `tipo` como Enum `TipoProvento` (`DIVIDENDO`, `JCP`, `RENDIMENTO`, `CUPOM`, etc.).[file:18][file:31]
+APIs de listagem, criação, update e delete de proventos.
+`tipo` usa Enum TipoProvento: `DIVIDENDO`, `JCP`, `RENDIMENTO`, `CUPOM`, etc.
 
 ---
 
 ## 9–20. Demais Seções
-
 As seções de:
-
 - Movimentações de Caixa
 - Eventos Corporativos
 - Buy Signals
@@ -365,9 +359,13 @@ As seções de:
 - Performance
 - Health Checks
 
-continuam com o mesmo contrato já descrito na versão v0.7.6, apenas consumindo agora os novos valores de enums documentados em `ENUMS.md` e refletidos no schema atualizado (`TipoAtivo`, `ClasseAtivo`, `IncidenciaImposto`, etc.).[file:22][file:18][file:28]
+continuam com o mesmo contrato descrito na versão v0.7.6, consumindo os valores
+de enums documentados em `ENUMS.md` e refletidos no schema atual.
 
 ---
 
-**Documento atualizado**: 20 de Fevereiro de 2026  
-**Versão da API**: v0.7.10 — GAP EXITUS-DOCS-API-001 ✅ fechado: `GET /api/ativos` responde `.data.ativos[]`; total=70; senha padrão dev padronizada (`senha123`).
+*Documento atualizado: 22 de Fevereiro de 2026*
+*Versão da API: v0.7.10*
+*GAPs fechados nesta versão: EXITUS-POS-001 a EXITUS-POS-007 (M2-POSICOES)*
+*GAP EXITUS-DOCS-API-001 fechado — GET /api/ativos responde `.data.ativos`, total: 70*
+*Pendência menor: EXITUS-POS-008 — enum serialization em nested (não-bloqueante)*
