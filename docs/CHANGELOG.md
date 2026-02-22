@@ -8,7 +8,7 @@ e este projeto adere semanticamente à versão v0.7.10.
 
 ## [0.7.10] — 2026-02-22
 
-### Fixed — M2-POSICOES (7 GAPs resolvidos)
+### Fixed — M2-POSICOES (8 GAPs resolvidos)
 
 - **EXITUS-POS-001** — `PosicaoResponseSchema` reescrito com todos os campos
   do model `Posicao` e nested schemas `AtivoNestedSchema` e `CorretoraNestedSchema`.
@@ -37,6 +37,11 @@ e este projeto adere semanticamente à versão v0.7.10.
   retorna `403` quando posição pertence a outro usuário (não `404`).
   Mesmo padrão já aplicado em Corretoras (v0.7.7)
 
+- **EXITUS-POS-008** — Enum serialization corrigida em `AtivoNestedSchema`:
+  campos `ativo.tipo` e `ativo.classe` agora retornam o valor correto (`"fii"`, `"rendavariavel"`)
+  em vez da representação Python (`"TipoAtivo.FII"`, `"ClasseAtivo.RENDAVARIAVEL"`).
+  Fix aplicado via `fields.Method()` com `.value` — padrão idêntico ao `AtivoResponseSchema`
+
 ### Added
 
 - Rota `GET /api/posicoes/resumo` — Retorna resumo consolidado: `quantidade_posicoes`,
@@ -54,14 +59,6 @@ e este projeto adere semanticamente à versão v0.7.10.
   (Posições: 2 → 4); tabela de métricas atualizada; referência a `M2_POSICOES.md`
 
 - `M2_POSICOES.md` adicionado — Relatório de validação 12/12 cenários aprovados
-
-### Known Issues (não-bloqueantes)
-
-- **EXITUS-POS-008** (novo) — `ativo.tipo` e `ativo.classe` no nested de posições
-  retornam com prefixo Python (`"TipoAtivo.FII"` em vez de `"fii"`).
-  `AtivoNestedSchema` usa `fields.Str()` direto — serializa `repr()` do enum.
-  Fix: usar `fields.Method()` com `.value` no `AtivoNestedSchema`.
-  Prioridade: 🟡 Baixa — não bloqueia funcionalidade
 
 ### Tested
 
@@ -130,9 +127,9 @@ Status: **PRODUCTION READY**
 ### Tested
 ```bash
 # Filtros Renda Fixa BR validados 20/02/2026
-curl "http://localhost:5000/api/ativos?mercado=BR&tipo=CDB"        # total: 3
+curl "http://localhost:5000/api/ativos?mercado=BR&tipo=CDB"           # total: 3
 curl "http://localhost:5000/api/ativos?mercado=BR&tipo=TESOURODIRETO" # total: 3
-curl "http://localhost:5000/api/ativos?mercado=BR&tipo=DEBENTURE"  # total: 2
+curl "http://localhost:5000/api/ativos?mercado=BR&tipo=DEBENTURE"     # total: 2
 
 # Seeds idempotentes validados 20/02/2026
 podman exec -it exitus-backend python -m app.seeds.seed_ativos_us  # Criados: 0, Pulados: 16
@@ -234,7 +231,6 @@ Status: **PRODUCTION READY**
 ## Roadmap Futuro
 
 ### v0.7.11 (próxima)
-- Corrigir EXITUS-POS-008 — enum serialization em nested (AtivoNestedSchema)
 - Avaliar EXITUS-AUTH-001 Opção B — API aceitar email OU username
 - Verificar EXITUS-INFRA-001 — volume `app` read-write no container
 
@@ -254,5 +250,5 @@ Status: **PRODUCTION READY**
 ---
 
 *Última atualização: 22 de Fevereiro de 2026*
-*Versão atual: v0.7.10 — M2-POSICOES validado (7 GAPs fechados)*
+*Versão atual: v0.7.10 — M2-POSICOES validado (8 GAPs fechados)*
 *Contribuidores: Elielson Fontanezi, Perplexity AI (documentação v0.7.8–v0.7.10)*
