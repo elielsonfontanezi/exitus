@@ -522,6 +522,132 @@ flask db upgrade
 # INFO  [alembic.runtime.migration] Running upgrade 007 -> 008_add_historico_preco
 ```
 
+### Fluxo Alembic — Ciclo Completo (EXITUS-MIGRATION-001)
+
+> Referência rápida para o ciclo completo de migrations no ambiente Podman.
+> Sempre execute dentro do container `exitus-backend`.
+
+#### Pré-requisito — entrar no container
+
+```bash
+podman exec -it exitus-backend bash
+cd app
+```
+
+#### Passo 1 — Inspecionar estado atual
+
+```bash
+# Versão aplicada atualmente no banco
+flask db current
+# Output esperado (exemplo):
+# 008addhistoricopreco (head)
+
+# Histórico completo de migrations
+flask db history
+# Output esperado:
+# 008addhistoricopreco -> (head)
+# 007addreports -> 008addhistoricopreco
+# ...
+# <base> -> 001initialschema
+
+# Verificar se há migrations pendentes (não aplicadas)
+flask db heads
+# Se o output == flask db current → banco está atualizado
+```
+
+#### Passo 2 — Criar nova migration (após alterar models)
+
+```bash
+# Gera script de migration automaticamente por diff do model vs banco
+flask db migrate -m "Descrição clara da mudança"
+# Exemplo:
+flask db migrate -m "Adicionar coluna email_verificado em usuario"
+
+# IMPORTANTE: Sempre revisar o script gerado antes de aplicar
+ls migrations/versions/
+# Abrir o arquivo mais recente e validar upgrade() e downgrade()
+```
+
+#### Passo 3 — Revisar o script gerado (obrigatório)
+
+```bash
+# Verificar se o autogenerate capturou corretamente as mudanças
+# Pontos de atenção:
+# - ENUMs: create_type=False obrigatório para tipos já existentes no PG
+# - Colunas nullable: confirmar se há dados existentes que impedem NOT NULL
+# - Índices: conferir se foram gerados corretamente
+cat migrations/versions/<revision_id>_descricao.py
+```
+
+#### Passo 4 — Aplicar migration
+
+```bash
+# Aplicar todas as migrations pendentes
+flask db upgrade
+
+# Aplicar até uma revisão específica
+flask db upgrade 007addreports
+
+# Confirmar que foi aplicada
+flask db current
+# Output deve mostrar o novo head
+```
+
+#### Passo 5 — Rollback (se necessário)
+
+```bash
+# Voltar 1 migration
+flask db downgrade
+
+# Voltar para revisão específica
+flask db downgrade 007addreports
+
+# Voltar tudo ao estado inicial — CUIDADO: apaga todos os dados!
+flask db downgrade base
+```
+
+#### Passo 6 — Verificação pós-migration
+
+```bash
+# Confirmar versão atual
+flask db current
+
+# Validar tabelas no banco
+podman exec exitus-db psql -U exitus -d exitusdb -c \
+  "\dt" | grep -E "transacao|posicao|ativo"
+
+# Reiniciar backend para recarregar models
+exit  # sair do container
+podman restart exitus-backend
+podman logs --tail 20 exitus-backend
+# Verificar ausência de erros de schema/ENUM na inicialização
+```
+
+#### Referência rápida — comandos Alembic
+
+| Comando | Descrição |
+|---|---|
+| `flask db current` | Revisão atual aplicada no banco |
+| `flask db history` | Histórico completo de migrations |
+| `flask db heads` | Última revisão disponível |
+| `flask db migrate -m "..."` | Gera nova migration por autogenerate |
+| `flask db upgrade` | Aplica todas as migrations pendentes |
+| `flask db upgrade <rev>` | Aplica até revisão específica |
+| `flask db downgrade` | Reverte 1 migration |
+| `flask db downgrade <rev>` | Reverte até revisão específica |
+| `flask db downgrade base` | Reverte tudo ⚠️ |
+
+#### Histórico de migrations do projeto (v0.7.11)
+
+| Revisão | Descrição | Versão |
+|---|---|---|
+| `001initialschema` | Schema inicial — 13 tabelas, 11 ENUMs | v0.7.1 |
+| `007addreports` | Tabela `auditoria_relatorio` | v0.7.1 |
+| `008addhistoricopreco` | Tabela `historico_preco` | v0.7.1 |
+| `20260216_2111` | Expansão `tipoativo`: 7 → 14 valores | v0.7.8 |
+| `20260216_2130` | Campo `caprate` em `ativo`, remove `bolsa_origem` | v0.7.8 |
+
+
 #### Criar Nova Migration
 
 ```bash
