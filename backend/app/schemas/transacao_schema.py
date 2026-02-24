@@ -24,11 +24,21 @@ class TransacaoCreateSchema(Schema):
     
     @validates('tipo')
     def validate_tipo(self, value):
-        """Valida se tipo é válido"""
-        valid_tipos = ['compra', 'venda', 'dividendo', 'jcp', 'bonificacao', 'desdobramento', 'grupamento']
+        valid_tipos = [
+            'compra', 'venda',
+            'dividendo', 'jcp',
+            'aluguel',                  # ← NOVO
+            'bonificacao',
+            'split', 'grupamento',
+            'subscricao',               # ← NOVO
+            'amortizacao',              # ← NOVO
+        ]
         if value.lower() not in valid_tipos:
-            raise ValidationError(f"Tipo inválido. Opções: {', '.join(valid_tipos)}")
-    
+            raise ValidationError(
+                f'Tipo inválido: "{value}". '
+                f'Opções: {", ".join(valid_tipos)}'
+            )
+
     @validates('quantidade')
     def validate_quantidade(self, value):
         """Valida quantidade positiva"""

@@ -10,14 +10,19 @@ import uuid
 from app.database import db
 
 class TipoTransacao(enum.Enum):
-    """Enum para tipos de transação"""
-    COMPRA = "compra"
-    VENDA = "venda"
-    DIVIDENDO = "dividendo"
-    JCP = "jcp"
-    BONIFICACAO = "bonificacao"
-    DESDOBRAMENTO = "desdobramento"
-    GRUPAMENTO = "grupamento"
+    # Operações de mercado
+    COMPRA       = 'compra'
+    VENDA        = 'venda'
+    # Proventos recebidos em conta (registrados como transação)
+    DIVIDENDO    = 'dividendo'
+    JCP          = 'jcp'
+    # Operações especiais
+    ALUGUEL      = 'aluguel'       # ← NOVO
+    BONIFICACAO  = 'bonificacao'
+    SPLIT        = 'split'
+    GRUPAMENTO   = 'grupamento'
+    SUBSCRICAO   = 'subscricao'    # ← NOVO
+    AMORTIZACAO  = 'amortizacao'   # ← NOVO
 
 class Transacao(db.Model):
     """
