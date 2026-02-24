@@ -6,6 +6,47 @@ e este projeto adere semanticamente à versão v0.7.10.
 
 ---
 
+## [v0.7.12] — 2026-02-24
+
+### Fix Batch — M2-TRANSACOES (7 GAPs)
+
+#### Corrigido
+- **EXITUS-TRX-001** `transacao_schema.py`: `custos_totais` retornava null na resposta —
+  declarado explicitamente como `fields.Decimal(as_string=True)` no `TransacaoResponseSchema`
+  e no novo `TransacaoListSchema`.
+- **EXITUS-TRX-002** `transacao_service.py` + `routes.py`: PUT em TRX de outro usuário
+  retornava 400/404 — service agora lança `PermissionError` separado de `ValueError`;
+  route captura e retorna 403.
+- **EXITUS-TRX-003** `transacao_service.py` + `routes.py`: PUT com ID inexistente retornava
+  400 — service faz `Transacao.query.get()` sem filtro de usuário primeiro; se None lança
+  `ValueError` → 404.
+- **EXITUS-TRX-004** `transacao_service.py` + `routes.py`: DELETE em TRX de outro usuário
+  retornava 404 — mesmo padrão do TRX-002, ownership check após existência → 403.
+- **EXITUS-TRX-005** `transacao_schema.py`: listagem não serializava `valor_total`,
+  `data_transacao` e nested `ativo` — criado `TransacaoListSchema` com todos os campos
+  explícitos incluindo `fields.Method('get_ativo_info')`.
+- **EXITUS-TRX-006** `transacoes/routes.py`: paginação (`total`, `pages`, `page`,
+  `per_page`) estava aninhada dentro de `.data` — rota `GET /` refatorada com `jsonify`
+  manual, paginação promovida para raiz do response.
+- **EXITUS-TRX-007** `transacao_service.py`: `/resumo/{ativo_id}` retornava 200 com dados
+  zerados para UUID inexistente — adicionada validação `Ativo.query.get(ativo_id)` antes
+  dos cálculos; lança `ValueError` → 404.
+
+#### Hotfix incluso
+- `transacao_service.py`: enum `tipo` era gravado como `COMPRA` (uppercase) causando
+  `InvalidTextRepresentation` no PostgreSQL — corrigido para `.lower()` alinhado com
+  o enum `tipotransacao` do DB.
+- `transacoes/routes.py`: import `notfound` corrigido para `not_found` (nome real em
+  `app/utils/responses.py`); vírgula trailing no import de schemas removida.
+
+#### Validação
+- 7/7 GAPs aprovados em revalidação sequencial (2026-02-24)
+- Smoke test `/resumo/{ativo_id}` com UUID válido: HTTP 200 ✅
+- Smoke test `/resumo/{ativo_id}` com UUID inexistente: HTTP 404 ✅
+
+
+---
+
 ## [0.7.11] — 2026-02-24 — branch `feature/revapis`
 
 ### Fixed
