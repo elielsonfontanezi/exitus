@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-Exitus - Seed de Usuários
-Popular tabela usuario com dados iniciais
-"""
+# -- coding: utf-8 --
+# Exitus - Seed de Usuários — Popular tabela usuario com dados iniciais
+
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from app import create_app
 from app.database import db
@@ -15,100 +12,92 @@ from datetime import datetime
 
 
 def seed_usuarios():
-    """Cria usuários iniciais do sistema"""
-    
+    """Cria usuários iniciais do sistema."""
     app = create_app()
-    
     with app.app_context():
-        print("=" * 50)
-        print("SEED: Criando Usuários Iniciais")
-        print("=" * 50)
-        
-        # Verificar se já existem usuários
+        print('=' * 50)
+        print('SEED — Criando Usuários Iniciais')
+        print('=' * 50)
+
         count = Usuario.query.count()
         if count > 0:
-            print(f"⚠ Já existem {count} usuários cadastrados.")
-            resposta = input("Deseja recriar os usuários? (s/N): ").lower()
+            print(f'Já existem {count} usuários cadastrados.')
+            resposta = input('Deseja recriar os usuários? (s/N) ').lower()
             if resposta != 's':
-                print("✗ Seed cancelado pelo usuário.")
+                print('Seed cancelado pelo usuário.')
                 return
-            
-            # Limpar usuários existentes
             Usuario.query.delete()
             db.session.commit()
-            print("✓ Usuários anteriores removidos.")
-        
-        # Lista de usuários a criar
+            print('Usuários anteriores removidos.')
+
+        # ----------------------------------------------------------------
+        # EXITUS-SEEDS-002 — senhas corrigidas para senha123 (24/02/2026)
+        # Antes: admin123 / user123 / viewer123
+        # Depois: senha123 (padrão único de desenvolvimento)
+        # ----------------------------------------------------------------
         usuarios = [
             {
                 'username': 'admin',
                 'email': 'admin@exitus.com',
-                'password': 'admin123',  # Senha padrão para desenvolvimento
-                'nome_completo': 'Administrador do Sistema',
+                'password': 'senha123',          # ← corrigido
+                'nomecompleto': 'Administrador do Sistema',
                 'role': UserRole.ADMIN,
-                'ativo': True
+                'ativo': True,
             },
             {
                 'username': 'joao.silva',
                 'email': 'joao.silva@example.com',
-                'password': 'user123',
-                'nome_completo': 'João Silva',
+                'password': 'senha123',          # ← corrigido
+                'nomecompleto': 'João Silva',
                 'role': UserRole.USER,
-                'ativo': True
+                'ativo': True,
             },
             {
                 'username': 'maria.santos',
                 'email': 'maria.santos@example.com',
-                'password': 'user123',
-                'nome_completo': 'Maria Santos',
+                'password': 'senha123',          # ← corrigido
+                'nomecompleto': 'Maria Santos',
                 'role': UserRole.USER,
-                'ativo': True
+                'ativo': True,
             },
             {
                 'username': 'viewer',
                 'email': 'viewer@exitus.com',
-                'password': 'viewer123',
-                'nome_completo': 'Usuário Visualizador',
+                'password': 'senha123',          # ← corrigido
+                'nomecompleto': 'Usuário Visualizador',
                 'role': UserRole.READONLY,
-                'ativo': True
-            }
+                'ativo': True,
+            },
         ]
-        
-        # Criar usuários
+
         created_users = []
-        for user_data in usuarios:
+        for userdata in usuarios:
             user = Usuario(
-                username=user_data['username'],
-                email=user_data['email'],
-                nome_completo=user_data.get('nome_completo'),
-                role=user_data['role'],
-                ativo=user_data['ativo']
+                username=userdata['username'],
+                email=userdata['email'],
+                nomecompleto=userdata.get('nomecompleto'),
+                role=userdata['role'],
+                ativo=userdata['ativo'],
             )
-            user.set_password(user_data['password'])
-            
+            user.set_password(userdata['password'])
             db.session.add(user)
             created_users.append(user)
-            
-            print(f"✓ Usuário criado: {user.username} ({user.role.value}) - {user.email}")
-        
-        # Commit no banco
+            print(f"  Usuário criado: {user.username} [{user.role.value}] - {user.email}")
+
         try:
             db.session.commit()
-            print("\n" + "=" * 50)
-            print(f"✓ {len(created_users)} usuários criados com sucesso!")
-            print("=" * 50)
-            
-            # Exibir credenciais
-            print("\n📋 CREDENCIAIS DE ACESSO:")
-            print("-" * 50)
-            for user_data in usuarios:
-                print(f"Username: {user_data['username']:<15} | Senha: {user_data['password']}")
-            print("-" * 50)
-            print("⚠ ATENÇÃO: Altere as senhas em produção!\n")
-            
+            print('=' * 50)
+            print(f'{len(created_users)} usuários criados com sucesso!')
+            print('=' * 50)
+            print('\nCREDENCIAIS DE ACESSO')
+            print('-' * 50)
+            for userdata in usuarios:
+                print(f"  Username: {userdata['username']:<15}  Senha: {userdata['password']}")
+            print('-' * 50)
+            print('  ATENÇÃO: Altere as senhas em produção!')
         except Exception as e:
             db.session.rollback()
-            print(f"\n✗ Erro ao criar usuários: {e}")
+            print(f'Erro ao criar usuários: {e}')
             raise
 
 
