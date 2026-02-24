@@ -7,7 +7,7 @@ from marshmallow import ValidationError
 from datetime import datetime
 from app.services.transacao_service import TransacaoService
 from app.schemas.transacao_schema import TransacaoCreateSchema, TransacaoUpdateSchema, TransacaoResponseSchema
-from app.utils.responses import success, error, not_found
+from app.utils.responses import success, error, not_found, forbidden
 from uuid import UUID
 
 bp = Blueprint('transacoes', __name__, url_prefix='/api/transacoes')
@@ -50,12 +50,16 @@ def list_transacoes():
 def get_transacao(id):
     """Buscar transação por ID"""
     usuario_id = get_jwt_identity()
-    
-    transacao = TransacaoService.get_by_id(id, usuario_id)
-    if not transacao:
-        return not_found("Transação não encontrada")
-    
-    return success(TransacaoResponseSchema().dump(transacao), "Dados da transação")
+    try:
+        transacao = TransacaoService.get_by_id(id, usuario_id)
+        return success(TransacaoResponseSchema().dump(transacao), "Dados da transação")
+    except PermissionError as e:
+        return forbidden(str(e))   # 403 — existe mas é de outro usuário
+    except ValueError as e:
+        return not_found(str(e))   # 404 — não existe
+    except Exception as e:
+        return error(f"Erro ao buscar transação: {str(e)}", 500)
+
 
 @bp.route('', methods=['POST'])
 @jwt_required()

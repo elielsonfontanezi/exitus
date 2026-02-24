@@ -3,6 +3,7 @@
 
 from decimal import Decimal
 from datetime import datetime, date
+from sqlalchemy.orm import joinedload
 from sqlalchemy import and_, or_, func
 from app.database import db
 from app.models import Transacao, TipoTransacao, Ativo, Corretora
@@ -52,11 +53,28 @@ class TransacaoService:
     
     @staticmethod
     def get_by_id(transacao_id, usuario_id):
-        """Busca transação por ID (com verificação de ownership)"""
-        return Transacao.query.filter_by(
-            id=transacao_id,
-            usuario_id=usuario_id
-        ).first()
+        """
+        Busca transação por ID com isolamento seguro.
+        Raises:
+            PermissionError: se transação existe mas pertence a outro usuário → 403
+            ValueError:      se transação não existe → 404
+        """
+        # 1. Busca sem filtro de usuário — verifica se existe
+        transacao = Transacao.query.options(
+            joinedload(Transacao.ativo),
+            joinedload(Transacao.corretora)
+        ).filter_by(id=transacao_id).first()
+
+        # 2. Não existe → 404
+        if not transacao:
+            raise ValueError("Transação não encontrada")
+
+        # 3. Existe mas é de outro usuário → 403
+        if str(transacao.usuario_id) != str(usuario_id):
+            raise PermissionError("Acesso negado a esta transação")
+
+        return transacao
+
     
     @staticmethod
     def create(usuario_id, data):

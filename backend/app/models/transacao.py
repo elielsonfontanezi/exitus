@@ -38,7 +38,7 @@ class Transacao(db.Model):
     # Identificação
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuario.id'), nullable=False)
-    tipo = Column(Enum(TipoTransacao), nullable=False)
+    tipo = Column(Enum(TipoTransacao, name="tipotransacao", create_type=False, values_callable=lambda x: [e.value for e in x]), nullable=False)
     
     # Relacionamentos
     ativo_id = Column(UUID(as_uuid=True), ForeignKey('ativo.id'), nullable=False)
