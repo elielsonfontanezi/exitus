@@ -6,6 +6,30 @@ e este projeto adere semanticamente à versão v0.7.10.
 
 ---
 
+## [0.7.11] — 2026-02-24 — branch `feature/revapis`
+
+### Fixed
+
+- **EXITUS-ENUM-CASE-001** — `TipoTransacao` ENUM case mismatch corrigido
+  em `app/models/transacao.py`. SQLAlchemy usava `Enum.name` (UPPERCASE)
+  para bind no PostgreSQL, mas o tipo `tipotransacao` no banco possui
+  valores lowercase. Fix: `values_callable=lambda x: [e.value for e in x]`
+  + `create_type=False`. Causa raiz documentada em `ENUMS.md §3.1`.
+  Commit: `172e428` (TRX-005 ✅)
+
+- **EXITUS-SEEDS-002** — `app/seeds/seed_usuarios.py` corrigido: senhas
+  padronizadas para `senha123` em todos os usuários de teste
+  (`admin`, `joao.silva`, `maria.santos`, `viewer`).
+  Antes: `admin123` / `user123` / `viewer123`.
+
+### Notes
+
+- Branch: `feature/revapis` — validação M2-TRANSACOES em andamento
+- TRXs concluídos até este commit: TRX-001 ✅ TRX-002 ✅ TRX-005 ✅
+- TRXs pendentes: TRX-003, TRX-004, TRX-006, TRX-007, TRX-008
+
+---
+
 ## [0.7.10] — 2026-02-22
 
 ### Fixed — M2-POSICOES (8 GAPs resolvidos)

@@ -128,6 +128,55 @@ Enum principal para classificação de instrumentos financeiros com suporte mult
 | `SUBSCRICAO` | `subscricao` | Direito de subscrição | ✅ Sim (+) |
 | `AMORTIZACAO` | `amortizacao` | Amortização de título | ✅ Sim (-) |
 
+### 3.1 Causa Raiz — Case Mismatch (EXITUS-ENUM-CASE-001)
+
+**Problema identificado:** TRX-005 (branch `feature/revapis`, commit `172e428`)
+
+Por padrão, o SQLAlchemy vincula ENUMs ao banco usando `Enum.name`
+(sempre **UPPERCASE**, ex: `COMPRA`, `VENDA`). O PostgreSQL, porém,
+armazena o tipo `tipotransacao` com valores **lowercase**
+(`compra`, `venda`, ...), definidos na migration inicial.
+
+Esse desalinhamento causava o erro:
+```bash
+sqlalchemy.exc.LookupError: "COMPRA" is not among the valid values
+for this Enum: ['compra', 'venda', 'dividendo', ...]
+```
+
+**Fix aplicado em `app/models/transacao.py`:**
+
+```python
+# ANTES (problemático) — SQLAlchemy usava Enum.name → UPPERCASE
+tipo = Column(Enum(TipoTransacao, name='tipotransacao', create_type=False))
+
+# DEPOIS (correto) — força uso de Enum.value → lowercase
+tipo = Column(
+    Enum(
+        TipoTransacao,
+        name='tipotransacao',
+        create_type=False,                          # não recria o tipo no PG
+        values_callable=lambda x: [e.value for e in x]  # usa .value, não .name
+    ),
+    nullable=False
+)
+```
+**Por que `create_type=False`?**
+
+O tipo `tipotransacao` já existe no PostgreSQL (criado pela migration inicial).
+Sem esse flag, o SQLAlchemy tentaria recriar o tipo e lançaria
+DuplicateObject error na inicialização.
+
+**Regra geral para novos ENUMs no projeto:**
+
+- Sempre declarar `create_type=False` para ENUMs já existentes no banco
+- Sempre usar `values_callable=lambda x: [e.value for e in x]`
+- Manter `Enum.value` em lowercase (padrão do projeto — ver `CODING_STANDARDS.md`)
+
+**Afeta:** apenas `TipoTransacao`. Os demais ENUMs do projeto
+(`TipoAtivo`, `UserRole`, etc.) não apresentam esse problema pois
+seus valores `.name` e `.value` são tratados de forma consistente
+nos respectivos blueprints.
+
 ---
 
 ## 4. TipoProvento (7 valores)
