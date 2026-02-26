@@ -192,7 +192,8 @@ Para evitar erros de interpretação de Markdown e garantir a integridade técni
 | 5ª | `EXITUS_DB_STRUCTURE.txt` | 21 tabelas, constraints, índices |
 | 6ª | `ENUMS.md` | 14 tipos de ativos, mapeamentos API/DB/JSON |
 | 7ª | `ARCHITECTURE.md` | Stack, containers, filosofia de design |
-| 8ª | `CHANGELOG.md` | Versão atual, gaps abertos, histórico |
+| 8ª | `CODING_STANDARDS.md` | Padrões para codificar |
+| 9ª | `CHANGELOG.md` | Versão atual, gaps abertos, histórico |
 
 #### Gestão de Documentação
 
