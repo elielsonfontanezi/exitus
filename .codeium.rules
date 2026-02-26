@@ -1,0 +1,120 @@
+
+# .codeium.rules
+## Arquivo de configuração para Cascade AI Assistant
+### Gerado em 26/02/2026 v0.7.10 - Baseado em docs/ Space Sistema Exitus
+
+---
+
+## 🎯 FONTES DE VERDADE OBRIGATÓRIAS (docs/)
+```
+PRIORIDADE 1️⃣ - SEMPRE consultar ANTES de gerar código:
+├── all_git_text_files_concatenated.txt  # tratar como opcional (“use se existir; caso contrário use busca/leitura nos arquivos reais do repo.”)
+├── PERSONAS.md                          # Workflows, gaps GAP-XXX
+├── ARCHITECTURE.md                      # Stack, containers, convenções
+├── CODING_STANDARDS.md                  # snake_case MANDATÓRIO
+├── MODULES.md                           # Status M0-M7, 69 endpoints
+├── API_REFERENCE.md                     # Contratos API completos
+├── ENUMS.md                             # 14 TipoAtivo, mapeamentos
+├── EXITUS_DB_STRUCTURE.txt              # 21 tabelas, 86 índices
+├── CHANGELOG.md                         # v0.7.10, gaps abertos
+├── SEEDS.md                             # 70 ativos, credenciais dev
+└── OPERATIONS_RUNBOOK.md                # Podman, troubleshooting
+```
+
+## 🎯 VISÃO GERAL DO PROJETO
+Sistema **multi-mercado** (BR/US/EU/Asia) com **14 tipos de ativos**. 
+- **v0.7.10**: 69 endpoints, 21 tabelas PostgreSQL, 86+ índices
+- **Containers**: Podman rootless (`exitus-db`, `exitus-backend`, `exitus-frontend`)
+
+## 🚨 REGRA #1: snake_case OBRIGATÓRIO
+```
+✅ docs/CODING_STANDARDS.md: "Official snake_case naming standard"
+Tabelas: movimentacao_caixa
+Arquivos: *_service.py
+Endpoints: /api/buy-signals/buy-score/{ticker}
+❌ NUNCA: camelCase, PascalCase
+```
+
+## 🏗️ ARQUITETURA (docs/ARCHITECTURE.md)
+```
+3 Containers Podman rootless:
+├── exitus-db:5432         # PostgreSQL 16, 21 tabelas
+├── exitus-backend:5000    # Flask API, 16 blueprints, JWT
+└── exitus-frontend:8080   # HTMX + Tailwind SSR
+
+Rede: exitus-net (bridge isolada)
+```
+
+## 🔑 ENUMs (docs/ENUMS.md)
+```
+TipoAtivo (14 valores):
+ - Consultar obrigatoriamente: docs/ENUMS.md (valores oficiais)
+ - Consultar obrigatoriamente: docs/API_REFERENCE.md (contrato de filtros/payload)
+
+Serialização (regra):
+ - NUNCA assumir UPPER/lower no query/payload
+ - Usar exatamente o que está documentado em docs/ENUMS.md e refletido no contrato em docs/API_REFERENCE.md
+```
+
+## 🔐 SEGURANÇA MULTI-TENANT (docs/PERSONAS.md)
+```
+1. FILTER usuario_id TODAS queries → docs/CHANGELOG.md EXITUS-POS-007
+2. 403 Forbidden (NÃO 404) outros usuários
+3. JWT HS256 1h → docs/API_REFERENCE.md
+4. Non-root exitus:1000 → docs/ARCHITECTURE.md
+```
+
+## 📊 ENDPOINTS (docs/MODULES.md + API_REFERENCE.md)
+```
+M2 Core (22): /api/ativos, /api/posicoes, /api/transacoes
+M3 Portfolio (11): /api/portfolio/dashboard (Sharpe Ratio)
+M4 Buy Signals (12): /api/buy-signals/buy-score/{ticker}
+M7.5 Cotações (3): consultar rotas exatas em docs/API_REFERENCE.md (5 providers fallback)
+TOTAL: 69 endpoints validados v0.7.10
+```
+
+## 🧪 WORKFLOW (docs/PERSONAS.md)
+```
+1. ANALISAR → docs/ arquivos acima
+2. GAP → GAP EXITUS-XXX-NNN (CHANGELOG.md)
+3. APROVADO → Implementar código COMPLETO
+4. TESTAR → curl + validação (SEEDS.md)
+5. DOCS → Atualizar CHANGELOG.md, solicitar all_git_text_files_concatenated.txt, e não foi possível ler o repo.
+```
+
+## ✅ REGRA DE MUDANÇAS (APPROVAL)
+```
+1. PROPOR → Eu posso sugerir ideias/ajustes (código, docs, regras, comandos).
+2. AGUARDAR OK → Só editar código/docs (incl. docs/ e .codeium.rules) após "APROVADO".
+3. COMANDOS MUTANTES → Seeds/migrations/rebuild/restart: sempre aguardar OK.
+4. LEITURA/ANÁLISE → Liberado sem OK (ler arquivos, inspecionar contratos e apontar inconsistências).
+```
+
+## 🌐 COTAÇÕES M7.5 (docs/MODULES.md)
+```
+Fallback 5 camadas (15min TTL PostgreSQL):
+1. brapi.dev (B3 FREE 10req/min)
+2. yfinance (global)
+3. Alpha Vantage (US 500req/dia)
+4. Finnhub (US/EU 60req/min)
+5. Cache local (85-95% hit rate)
+```
+
+## 📝 COMANDOS (docs/OPERATIONS_RUNBOOK.md + SEEDS.md)
+```bash
+podman ps                    # Status containers
+podman exec -it exitus-db psql -U exitus -d exitusdb
+podman exec -it exitus-backend alembic upgrade head
+podman exec -it exitus-backend python -m app.seeds.run_all_seeds  # 70 ativos
+curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/ativos
+```
+
+## 🚀 STATUS PRODUÇÃO (docs/MODULES.md)
+```
+✅ M0-M7 PRODUCTION READY
+✅ 70 ativos seedados (47 BR, 16 US, 3 EU, 4 outros)
+✅ 86+ índices PostgreSQL otimizados
+✅ Multi-tenant 100% funcional
+✅ Cache hit rate 85-95%
+```
+
