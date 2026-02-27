@@ -70,5 +70,28 @@ podman exec -it exitus-backend python3 app/scripts/popular_historico_inicial.py 
 - **Solução**: Execute em lotes usando `--ticker` para ativos críticos primeiro
 
 ---
-
+ 
 **Relacionado**: Issues #1, #2, #3, #4 - Sistema de Histórico de Preços
+
+---
+
+## 📋 fix_us_acao_to_stock.py
+
+Script para corrigir dados legados em `ativo` onde `mercado='US'` está com `tipo=ACAO`.
+
+### Uso Básico
+
+```bash
+# Dry-run (default)
+podman exec -it exitus-backend python3 app/scripts/fix_us_acao_to_stock.py
+
+# Aplicar de fato (commit)
+podman exec -it exitus-backend python3 app/scripts/fix_us_acao_to_stock.py --apply
+```
+
+### Opções
+
+| Opção | Tipo | Default | Descrição |
+|-------|------|---------|-----------|
+| `--apply` | flag | False | Aplica e commita as alterações no banco |
+| `--ticker` | str | None | Corrige apenas um ticker específico (ex: AAPL) |

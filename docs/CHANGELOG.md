@@ -14,6 +14,10 @@ e este projeto adere semanticamente à versão v0.7.10.
 - **EXITUS-DOCS-AUTH-002** — Documentação de credenciais DEV divergente: `admin123`
   era citado em `docs/USER_GUIDE.md` e `docs/OPERATIONS_RUNBOOK.md`, mas as seeds atuais
   (ver `app/seeds/seed_usuarios.py`) usam `senha123`.
+- **EXITUS-ATIVOS-ENUM-001** — Ativo `AAPL` (e potencialmente outros ativos US legados)
+  estava persistido com `tipo=ACAO` no banco, em vez de `tipo=STOCK` conforme regra de negócio
+  (`TipoAtivo.STOCK` = ações US/NYSE/NASDAQ). Isso fazia filtros `?tipo=STOCK` não retornarem
+  o `AAPL` e contraditava a semântica multi-mercado do model.
 
 ### Fixed
 - **EXITUS-HEALTH-001** — `backend/app/__init__.py`: `/health` agora inclui
@@ -21,6 +25,11 @@ e este projeto adere semanticamente à versão v0.7.10.
   mantendo os campos existentes.
 - **EXITUS-DOCS-AUTH-002** — `docs/USER_GUIDE.md` e `docs/OPERATIONS_RUNBOOK.md` atualizados:
   exemplos de login/token e tabela de credenciais DEV alinhados para `senha123`.
+- **EXITUS-ATIVOS-ENUM-001** — Criado `backend/app/scripts/fix_us_acao_to_stock.py` (dry-run
+  por padrão, `--apply` para commitar). Executado em DEV: 1 registro corrigido (`AAPL`,
+  `mercado=US`, `tipo ACAO → STOCK`). Revalidado via `GET /api/ativos?mercado=US&tipo=STOCK`:
+  retornou `total=6` com todos os tickers US (AAPL, AMZN, GOOGL, MSFT, NVDA, TSLA) com
+  `tipo="stock"` ✅.
 
 ## [v0.7.12] — 2026-02-24
 
