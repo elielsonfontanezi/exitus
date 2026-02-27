@@ -130,14 +130,14 @@ Fallback 5 camadas (15min TTL PostgreSQL):
 podman ps                    # Status containers
 podman exec -it exitus-db psql -U exitus -d exitusdb
 podman exec -it exitus-backend alembic upgrade head
-podman exec -it exitus-backend python -m app.seeds.run_all_seeds  # 70 ativos
+podman exec -it exitus-backend python -m app.seeds.run_all_seeds  # 56 ativos reais (apos limpeza sinteticos)
 curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/ativos
 ```
 
 ## 🚀 STATUS PRODUÇÃO (docs/MODULES.md)
 ```
 ✅ M0-M7 PRODUCTION READY
-✅ 70 ativos seedados (47 BR, 16 US, 3 EU, 4 outros)
+✅ 56 ativos reais (33 BR, 16 US, 3 EU, 4 outros — 14 sinteticos removidos em 27/02/2026)
 ✅ 86+ índices PostgreSQL otimizados
 ✅ Multi-tenant 100% funcional
 ✅ Cache hit rate 85-95%
