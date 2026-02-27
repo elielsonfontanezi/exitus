@@ -8,25 +8,30 @@
 ## 🎯 FONTES DE VERDADE OBRIGATÓRIAS (docs/)
 ```
 PRIORIDADE 1️⃣ - SEMPRE consultar ANTES de gerar código:
-├── all_git_text_files_concatenated.txt  # tratar como opcional (“use se existir; caso contrário use busca/leitura nos arquivos reais do repo.”)
-├── PERSONAS.md                          # Workflows, gaps GAP-XXX
-├── ARCHITECTURE.md                      # Stack, containers, convenções
-├── CODING_STANDARDS.md                  # snake_case MANDATÓRIO
-├── MODULES.md                           # Status M0-M7, 69 endpoints
+├── docs/README.md                       # **Guia de toda a documentação**
+├── PERSONAS.md                          # **Manual de Operação da IA**
 ├── API_REFERENCE.md                     # Contratos API completos
 ├── ENUMS.md                             # 14 TipoAtivo, mapeamentos
+├── VISION.md                            # Visão de negócio, roadmap
+├── ARCHITECTURE.md                      # Stack, containers, convenções
+├── MODULES.md                           # Status M0-M7, 67 endpoints
+├── CODING_STANDARDS.md                  # snake_case MANDATÓRIO
 ├── EXITUS_DB_STRUCTURE.txt              # 21 tabelas, 86 índices
 ├── CHANGELOG.md                         # v0.7.10, gaps abertos
-├── SEEDS.md                             # 70 ativos, credenciais dev
+├── SEEDS.md                             # 56 ativos, credenciais dev
 └── OPERATIONS_RUNBOOK.md                # Podman, troubleshooting
 ```
 
 ## 🎯 VISÃO GERAL DO PROJETO
 Sistema **multi-mercado** (BR/US/EU/Asia) com **14 tipos de ativos**. 
-- **v0.7.10**: 69 endpoints, 21 tabelas PostgreSQL, 86+ índices
+- **v0.7.10**: 67 endpoints, 21 tabelas PostgreSQL, 86+ índices
 - **Containers**: Podman rootless (`exitus-db`, `exitus-backend`, `exitus-frontend`)
 
-## 🚨 REGRA #1: snake_case OBRIGATÓRIO
+## 🚨 REGRA #1: NUNCA EXECUTAR SEM APROVAÇÃO
+**CRÍTICO:** Pode opinar e mostrar ideias, mas **NUNCA** execute mudanças sem aprovação explícita.
+Fluxo obrigatório: 1) Propor → 2) Aguardar "APROVADO" → 3) Implementar
+
+## 🚨 REGRA #2: snake_case OBRIGATÓRIO
 ```
 ✅ docs/CODING_STANDARDS.md: "Official snake_case naming standard"
 Tabelas: movimentacao_caixa

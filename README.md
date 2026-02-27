@@ -44,7 +44,7 @@ O Exitus suporta **14 tipos de ativos** em 4 mercados diferentes:
 * **Criptomoedas** (CRIPTO): BTC, ETH, SOL
 * **Outros** (OUTRO): Commodities, derivatives
 
-**Total de ativos cadastrados**: 62 (39 BR + 16 US + 3 EU + 4 outros)
+**Total de ativos cadastrados**: 56 (33 BR + 16 US + 3 EU + 4 outros)
 
 **Documentação completa**: [ENUMS.md]()
 
@@ -188,7 +188,7 @@ podman logs -f exitus-backend
 **Credenciais padrão**:
 
 * **Usuário**: `admin`
-* **Senha**: `admin123`
+* **Senha**: `senha123`
 
 ---
 
@@ -203,9 +203,9 @@ podman logs -f exitus-backend
 | **M4** | ✅ PROD | Buy Signals & Cálculos Fiscais (Z-Score, Preço Teto) | 12 |
 | **M5** | ✅ PROD | Frontend Base (15 rotas, HTMX, Alpine.js) | 15 |
 | **M6** | ✅ PROD | Dashboards Frontend (4 telas, Chart.js) | 4 |
-| **M7.3** | ✅ PROD | Alertas (6 tipos, CRUD completo) | 4 |
-| **M7.4** | ✅ PROD | Relatórios (Performance, Export PDF stub) | 5 |
+| **M7.4** | ✅ PROD | Alertas (6 tipos, CRUD completo) | 4 |
 | **M7.5** | ✅ PROD | Cotações Live (Multi-provider, Cache 15min) | 3 |
+| **M7.6** | ✅ PROD | Relatórios (Performance, Export PDF stub) | 5 |
 | **M8** | 📅 PLAN | Analytics Avançados (Monte Carlo, Otimização) | - |
 | **M9** | 📅 PLAN | Deploy & Monitoramento (CI/CD, Prometheus) | - |
 
@@ -215,14 +215,17 @@ podman logs -f exitus-backend
 
 ## 📚 Documentação Completa
 
+**Ver [docs/README.md](docs/README.md) para o guia completo de toda a documentação.**
+
+Principais documentos:
 | Documento | Descrição |
 | --- | --- |
-| **[ARCHITECTURE.md]()** | Visão arquitetural, containers, modelo de dados, integrações |
-| **[MODULES.md]()** | Detalhamento de cada módulo M0-M7 (objetivos, features, status) |
-| **[API_REFERENCE.md]()** | Referência completa de todas as 67 APIs com exemplos cURL |
-| **[USER_GUIDE.md]()** | Guia do usuário: dashboards, operações, análises |
-| **[OPERATIONS_RUNBOOK.md]()** | Deploy, testes, troubleshooting, scripts úteis |
-| **[CHANGELOG.md]()** | Histórico de versões e roadmap futuro |
+| **[docs/README.md](docs/README.md)** | **Guia de toda a documentação** — estrutura e como usar |
+| **[docs/VISION.md](docs/VISION.md)** | Visão de negócio, proposta de valor, roadmap |
+| **[docs/PERSONAS.md](docs/PERSONAS.md)** | **Manual de Operação da IA** — como interagir com a assistente |
+| **[docs/API_REFERENCE.md](docs/API_REFERENCE.md)** | Referência completa de todas as 67 APIs |
+| **[docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md)** | Deploy, troubleshooting, scripts úteis |
+| **[docs/CHANGELOG.md](docs/CHANGELOG.md)** | Histórico de versões e GAPs registrados |
 
 ---
 
@@ -345,7 +348,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE]() para mais deta
 
 ---
 
-**Versão atual**: v0.7.7 (Database Optimization & Schema Update)
+**Versão atual**: v0.7.10 (API Validation & Documentation Update)
 
-**Última atualização**: 16 de Fevereiro de 2026
+**Última atualização**: 27 de Fevereiro de 2026
 

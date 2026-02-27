@@ -30,17 +30,17 @@ entregando funcionalidades completas e testadas.
 | M4 | Buy Signals & Fiscais | PROD | Dez 2025 | 12 |
 | M5 | Frontend Base | PROD | 04 Dez 2025 | 15 |
 | M6 | Dashboards Frontend | PROD | 06 Dez 2025 | 4 |
-| M7.3 | Alertas | PROD | Dez 2025 | 4 |
-| M7.4 | Relatórios | PROD | Jan 2026 | 5 |
+| M7.4 | Alertas | PROD | Dez 2025 | 4 |
 | M7.5 | Cotações Live | PROD | 09 Dez 2025 | 3 |
-| M7.6 | Histórico de Preços | PROD | 06 Jan 2026 | — |
+| M7.6 | Relatórios | PROD | Jan 2026 | 5 |
+| M7.7 | Histórico de Preços | PROD | 06 Jan 2026 | — |
 | M8 | Analytics Avançados | PLAN | Q2 2026 | — |
 | M9 | Deploy & Monitoramento | PLAN | Q1 2026 | — |
 
-**Total de Endpoints: 69 rotas RESTful validadas.**
+**Total de Endpoints: 67 rotas RESTful validadas.**
 
-> v0.7.10: M2 atualizado — Posições passou de 2 para 4 endpoints após resolução
-> dos GAPs EXITUS-POS-001 a EXITUS-POS-007. Ver `M2_POSICOES.md`.
+> v0.7.10: Validação completa de APIs — 16 GAPs corrigidos, envelope {success,data}
+> padronizado, strict_slashes aplicado, documentação atualizada. Ver CHANGELOG.md.
 
 ---
 
