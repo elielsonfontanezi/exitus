@@ -23,6 +23,7 @@
 - **[OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md)** — **Manual de Operações** — deploy, troubleshooting, scripts úteis
 - **[USER_GUIDE.md](USER_GUIDE.md)** — **Guia do Usuário Final** — como usar o sistema (dashboards, operações)
 - **[CHANGELOG.md](CHANGELOG.md)** — Histórico de versões, GAPs registrados, roadmap futuro
+- **[ROADMAP.md](ROADMAP.md)** — Roadmap de implementação — GAPs identificados e plano de desenvolvimento
 
 ---
 
@@ -33,6 +34,7 @@
 2. **API_REFERENCE.md** — Contratos dos endpoints
 3. **ARCHITECTURE.md** — Decisões arquiteturais
 4. **CHANGELOG.md** — O que mudou recentemente
+5. **ROADMAP.md** — O que falta implementar e plano de desenvolvimento
 
 ### Para Operações/DevOps
 1. **OPERATIONS_RUNBOOK.md** — Comandos e troubleshooting
