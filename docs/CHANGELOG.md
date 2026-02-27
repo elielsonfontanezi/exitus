@@ -30,6 +30,9 @@ e este projeto adere semanticamente à versão v0.7.10.
   Também: campo de resposta é `buy_score` (não `score`) — ausente na documentação.
 - **EXITUS-ALERTAS-RESP-001** — `GET /api/alertas` retornava `{"data": [...]}` sem o campo
   `success`, quebrando o contrato padrão do sistema. Idem para POST, PATCH toggle e DELETE.
+- **EXITUS-TRX-PAGIN-001** — `GET /api/transacoes` retornava `status: "success"` (string)
+  em vez de `success: true` (booleano), e `total/pages/page/per_page` na raiz do response
+  em vez de dentro de `.data`. Inconsistente com o padrão do sistema.
 - **EXITUS-COTACOES-RESP-001** — `GET /api/cotacoes/{ticker}` retornava response plano
   (`{"ticker": ..., "preco_atual": ...}`) sem envelope `{"success": true, "data": {...}}`,
   inconsistente com todos os demais módulos. `docs/API_REFERENCE.md` seções 9-20 eram apenas
@@ -46,6 +49,9 @@ e este projeto adere semanticamente à versão v0.7.10.
   `mercado=US`, `tipo ACAO → STOCK`). Revalidado via `GET /api/ativos?mercado=US&tipo=STOCK`:
   retornou `total=6` com todos os tickers US (AAPL, AMZN, GOOGL, MSFT, NVDA, TSLA) com
   `tipo="stock"` ✅.
+- **EXITUS-TRX-PAGIN-001** — `backend/app/blueprints/transacoes/routes.py`: `status: "success"`
+  corrigido para `success: True` (booleano); `total/pages/page/per_page` movidos para dentro
+  de `.data`; array de itens renomeado de `data` para `data.transacoes`.
 - **EXITUS-POS-PAGIN-001** — `backend/app/blueprints/posicao_blueprint.py`: campos de
   paginação movidos da raiz do response para dentro de `.data` (alinhado ao padrão do sistema).
 - **EXITUS-PROV-SLASH-001** — `backend/app/blueprints/provento_blueprint.py`: adicionado

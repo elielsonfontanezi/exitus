@@ -50,15 +50,16 @@ def list_transacoes():
         data_inicio, data_fim,
     )
 
-    # TRX-006: total/pages/page/per_page ficam na RAIZ, não dentro de data
     return jsonify({
-        'status':   'success',
-        'message':  f'{pagination.total} transações encontradas',
-        'data':     TransacaoListSchema(many=True).dump(pagination.items),
-        'total':    pagination.total,
-        'pages':    pagination.pages,
-        'page':     pagination.page,
-        'per_page': pagination.per_page,
+        'success': True,
+        'message': f'{pagination.total} transações encontradas',
+        'data': {
+            'transacoes': TransacaoListSchema(many=True).dump(pagination.items),
+            'total':      pagination.total,
+            'pages':      pagination.pages,
+            'page':       pagination.page,
+            'per_page':   pagination.per_page,
+        },
     }), 200
 
 
