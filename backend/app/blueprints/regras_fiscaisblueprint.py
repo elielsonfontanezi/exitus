@@ -26,25 +26,25 @@ regras_fiscais = [
     }
 ]
 
-@regrasbp.route('/', methods=['GET'])
+@regrasbp.route('/', methods=['GET'], strict_slashes=False)
 def listar_regras():
-    return jsonify(regras_fiscais), 200
+    return jsonify({"success": True, "data": regras_fiscais, "message": f"{len(regras_fiscais)} regras encontradas"}), 200
 
 @regrasbp.route('/<string:id>', methods=['GET'])
 def buscar_regra(id):
     regra = next((r for r in regras_fiscais if r["id"] == id), None)
     if regra:
-        return jsonify(regra), 200
-    return jsonify({"error": "Regra fiscal não encontrada"}), 404
+        return jsonify({"success": True, "data": regra}), 200
+    return jsonify({"success": False, "message": "Regra fiscal não encontrada"}), 404
 
-@regrasbp.route('/', methods=['POST'])
+@regrasbp.route('/', methods=['POST'], strict_slashes=False)
 def criar_regra():
     data = request.json
     regras_fiscais.append(data)
-    return jsonify(data), 201
+    return jsonify({"success": True, "data": data, "message": "Regra fiscal criada"}), 201
 
 @regrasbp.route('/<string:id>', methods=['DELETE'])
 def deletar_regra(id):
     global regras_fiscais
     regras_fiscais = [r for r in regras_fiscais if r["id"] != id]
-    return jsonify({"message": "Regra fiscal deletada"}), 200
+    return jsonify({"success": True, "message": "Regra fiscal deletada"}), 200

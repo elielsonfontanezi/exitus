@@ -22,25 +22,25 @@ fontes_dados = [
     }
 ]
 
-@fontesbp.route('/', methods=['GET'])
+@fontesbp.route('/', methods=['GET'], strict_slashes=False)
 def listar_fontes():
-    return jsonify(fontes_dados), 200
+    return jsonify({"success": True, "data": fontes_dados, "message": f"{len(fontes_dados)} fontes encontradas"}), 200
 
 @fontesbp.route('/<string:id>', methods=['GET'])
 def buscar_fonte(id):
     fonte = next((f for f in fontes_dados if f["id"] == id), None)
     if fonte:
-        return jsonify(fonte), 200
-    return jsonify({"error": "Fonte não encontrada"}), 404
+        return jsonify({"success": True, "data": fonte}), 200
+    return jsonify({"success": False, "message": "Fonte não encontrada"}), 404
 
-@fontesbp.route('/', methods=['POST'])
+@fontesbp.route('/', methods=['POST'], strict_slashes=False)
 def criar_fonte():
     data = request.json
     fontes_dados.append(data)
-    return jsonify(data), 201
+    return jsonify({"success": True, "data": data, "message": "Fonte criada"}), 201
 
 @fontesbp.route('/<string:id>', methods=['DELETE'])
 def deletar_fonte(id):
     global fontes_dados
     fontes_dados = [f for f in fontes_dados if f["id"] != id]
-    return jsonify({"message": "Fonte deletada"}), 200
+    return jsonify({"success": True, "message": "Fonte deletada"}), 200

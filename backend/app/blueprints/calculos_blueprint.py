@@ -15,7 +15,7 @@ def calcular_portfolio():
     metrics = PortfolioService.get_portfolio_metrics(usuario_id)
 
     if "erro" in metrics:
-        return jsonify(metrics), 404
+        return jsonify({"success": False, "message": metrics["erro"]}), 404
 
     resultado = {
         "portfolio_info": metrics.get("portfolio_info", {}),  # ✅ Safe get
@@ -35,7 +35,7 @@ def calcular_portfolio():
         "correlacao_ativos": metrics.get("correlacao_ativos", [])  # ✅ Safe get
     }
 
-    return jsonify(resultado), 200
+    return jsonify({"success": True, "data": resultado}), 200
 
 
 @calculos_bp.route('/preco_teto/<string:ticker>', methods=['GET'])
@@ -49,7 +49,7 @@ def calcular_preco_teto(ticker):
     ).first()
 
     if not ativo:
-        return jsonify({"erro": f"Ativo {ticker} não encontrado"}), 404
+        return jsonify({"success": False, "message": f"Ativo {ticker} não encontrado"}), 404
 
     # Parâmetros macroeconômicos regionais dinâmicos
     params = get_parametros_macro(ativo.mercado, ativo.mercado)
@@ -128,4 +128,4 @@ def calcular_preco_teto(ticker):
         "cor": cor
     }
 
-    return jsonify(resultado), 200
+    return jsonify({"success": True, "data": resultado}), 200

@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify
 
 bp = Blueprint('eventos', __name__, url_prefix='/api/eventos')
 
-@bp.route('', methods=['GET'])
+@bp.route('', methods=['GET'], strict_slashes=False)
 def list_eventos():
     """Lista todos os eventos corporativos"""
     return jsonify({

@@ -8,22 +8,22 @@ feriados = [
     {"id": "2", "pais": "BR", "data": "2025-04-21", "nome": "Tiradentes"}
 ]
 
-@feriadosbp.route('/', methods=['GET'])
+@feriadosbp.route('/', methods=['GET'], strict_slashes=False)
 def listar_feriados():
-    return jsonify(feriados), 200
+    return jsonify({"success": True, "data": feriados, "message": f"{len(feriados)} feriados encontrados"}), 200
 
 @feriadosbp.route('/<string:id>', methods=['GET'])
 def buscar_feriado(id):
     feriado = next((f for f in feriados if f["id"] == id), None)
     if feriado:
-        return jsonify(feriado), 200
-    return jsonify({"error": "Feriado não encontrado"}), 404
+        return jsonify({"success": True, "data": feriado}), 200
+    return jsonify({"success": False, "message": "Feriado não encontrado"}), 404
 
-@feriadosbp.route('/', methods=['POST'])
+@feriadosbp.route('/', methods=['POST'], strict_slashes=False)
 def criar_feriado():
     data = request.json
     feriados.append(data)
-    return jsonify(data), 201
+    return jsonify({"success": True, "data": data, "message": "Feriado criado"}), 201
 
 @feriadosbp.route('/<string:id>', methods=['DELETE'])
 def deletar_feriado(id):

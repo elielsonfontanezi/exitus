@@ -30,6 +30,17 @@ e este projeto adere semanticamente à versão v0.7.10.
   Também: campo de resposta é `buy_score` (não `score`) — ausente na documentação.
 - **EXITUS-ALERTAS-RESP-001** — `GET /api/alertas` retornava `{"data": [...]}` sem o campo
   `success`, quebrando o contrato padrão do sistema. Idem para POST, PATCH toggle e DELETE.
+- **EXITUS-CALCULOS-RESP-001** — `GET /api/calculos/portfolio` e `/preco_teto/{ticker}`
+  retornavam objeto plano sem envelope `{success, data}`; 404 em `preco_teto` usava `"erro"`
+  em vez de `"success": false, "message"`.
+- **EXITUS-EVENTOS-SLASH-001** — `GET /api/eventos` (sem barra final) retornava 308 redirect
+  pois rota `''` não tinha `strict_slashes=False`.
+- **EXITUS-REGRAS-SLASH-001** — `GET /api/regras-fiscais` (sem barra final) retornava 308
+  redirect; resposta era array puro sem envelope `{success, data}`.
+- **EXITUS-FERIADOS-SLASH-001** — `GET /api/feriados` (sem barra final) retornava 308
+  redirect; resposta era array puro sem envelope `{success, data}`.
+- **EXITUS-FONTES-SLASH-001** — `GET /api/fontes` (sem barra final) retornava 308 redirect;
+  resposta era array puro sem envelope `{success, data}`.
 - **EXITUS-TRX-PAGIN-001** — `GET /api/transacoes` retornava `status: "success"` (string)
   em vez de `success: true` (booleano), e `total/pages/page/per_page` na raiz do response
   em vez de dentro de `.data`. Inconsistente com o padrão do sistema.
@@ -49,6 +60,17 @@ e este projeto adere semanticamente à versão v0.7.10.
   `mercado=US`, `tipo ACAO → STOCK`). Revalidado via `GET /api/ativos?mercado=US&tipo=STOCK`:
   retornou `total=6` com todos os tickers US (AAPL, AMZN, GOOGL, MSFT, NVDA, TSLA) com
   `tipo="stock"` ✅.
+- **EXITUS-CALCULOS-RESP-001** — `backend/app/blueprints/calculos_blueprint.py`: ambas as
+  rotas (`/portfolio` e `/preco_teto/{ticker}`) envolvidas em `{success, data}`; 404 alinhado
+  ao padrão `{success: false, message}`.
+- **EXITUS-EVENTOS-SLASH-001** — `backend/app/blueprints/eventos/routes.py`: adicionado
+  `strict_slashes=False` na rota `GET ''`.
+- **EXITUS-REGRAS-SLASH-001** — `backend/app/blueprints/regras_fiscaisblueprint.py`:
+  `strict_slashes=False` + envelope `{success, data}` em GET / e GET /{id}.
+- **EXITUS-FERIADOS-SLASH-001** — `backend/app/blueprints/feriadosblueprint.py`:
+  `strict_slashes=False` + envelope `{success, data}` em GET / e GET /{id}.
+- **EXITUS-FONTES-SLASH-001** — `backend/app/blueprints/fontesblueprint.py`:
+  `strict_slashes=False` + envelope `{success, data}` em GET / e GET /{id}.
 - **EXITUS-TRX-PAGIN-001** — `backend/app/blueprints/transacoes/routes.py`: `status: "success"`
   corrigido para `success: True` (booleano); `total/pages/page/per_page` movidos para dentro
   de `.data`; array de itens renomeado de `data` para `data.transacoes`.
