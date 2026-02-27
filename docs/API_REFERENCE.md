@@ -600,10 +600,189 @@ Response 200:
 
 ---
 
-## 13–20. Demais Módulos
+## 13. Cálculos Financeiros (M4)
 
-As APIs de Eventos Corporativos, Cálculos Financeiros, Regras Fiscais, Feriados, Fontes de Dados,
-Relatórios, Projeções e Performance seguem o mesmo contrato padrão:
+**Base URL**: `/api/calculos`  
+**Auth**: Bearer JWT obrigatório.
+
+### GET /api/calculos/portfolio
+Retorna métricas avançadas do portfólio do usuário autenticado.
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "portfolio_info": {},
+    "rentabilidade": { "YTD": 0.08, "1A": 0.12, "3A": 0.36 },
+    "alocacao": {},
+    "dividend_yield_medio": 0.06,
+    "risco": {
+      "volatilidade_anualizada": 0.18,
+      "sharpe_ratio": 1.2,
+      "max_drawdown": "12.5%",
+      "beta_ibov": 0.95
+    },
+    "correlacao_ativos": []
+  }
+}
+```
+
+Response 404 (sem posições):
+```json
+{ "success": false, "message": "Portfólio vazio ou não encontrado" }
+```
+
+### GET /api/calculos/preco_teto/{ticker}
+Calcula preço teto multi-mercado com parâmetros macroeconômicos regionais.
+Métodos utilizados: Bazin, Graham, Gordon, DCF (ações) ou Cap Rate (FIIs).
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "ativo": "PETR4",
+    "mercado": "BR",
+    "preco_atual": 36.5,
+    "pt_medio": 38.0,
+    "margem_seguranca": 3.9,
+    "parametros_regiao": {
+      "taxa_livre_risco": "10.5%",
+      "crescimento": "4.0%",
+      "wacc": "12.0%"
+    },
+    "metodos": {
+      "bazin": { "pt": 40.0, "descricao": "DY Local" },
+      "graham": { "pt": 38.0, "descricao": "Graham Local" }
+    },
+    "sinal": "🟡 NEUTRO",
+    "cor": "yellow"
+  }
+}
+```
+
+Response 404:
+```json
+{ "success": false, "message": "Ativo XYZABC não encontrado" }
+```
+
+---
+
+## 14. Eventos Corporativos (M3.3)
+
+**Base URL**: `/api/eventos-corporativos`  
+**Auth**: Bearer JWT obrigatório.
+
+### GET /api/eventos-corporativos
+Lista eventos corporativos com paginação. Filtro opcional: `ativo_id`.
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": { "eventos": [], "total": 0 },
+  "message": "0 eventos encontrados"
+}
+```
+
+### POST /api/eventos-corporativos/{evento_id}/aplicar
+Aplica um evento corporativo às posições do usuário.
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": { "posicoes_afetadas": 2 },
+  "message": "Evento processado"
+}
+```
+
+Response 400:
+```json
+{ "success": false, "error": "Evento já aplicado" }
+```
+
+---
+
+## 15. Regras Fiscais (M4)
+
+**Base URL**: `/api/regras-fiscais`  
+**Auth**: Não requer JWT (dados de referência públicos).  
+**Nota**: Dados em memória (mock). Persistência em DB planejada.
+
+### GET /api/regras-fiscais
+Lista regras fiscais vigentes.
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "1",
+      "pais": "BR",
+      "tipoativo": "AÇÃO",
+      "tipooperacao": "VENDA",
+      "aliquotair": 15.0,
+      "incidesobre": "GANHO_CAPITAL",
+      "descricao": "IR sobre ganho de capital em ações (day trade)",
+      "ativa": true
+    }
+  ],
+  "message": "2 regras encontradas"
+}
+```
+
+### GET /api/regras-fiscais/{id}
+Response 200: `{"success": true, "data": {...}}`  
+Response 404: `{"success": false, "message": "Regra fiscal não encontrada"}`
+
+---
+
+## 16. Feriados (M4)
+
+**Base URL**: `/api/feriados`  
+**Auth**: Não requer JWT.  
+**Nota**: Dados em memória (mock). Filtro por `ano` não implementado.
+
+### GET /api/feriados
+Response 200:
+```json
+{
+  "success": true,
+  "data": [
+    { "id": "1", "pais": "BR", "data": "2025-01-01", "nome": "Ano Novo" }
+  ],
+  "message": "2 feriados encontrados"
+}
+```
+
+---
+
+## 17. Fontes de Dados (M4)
+
+**Base URL**: `/api/fontes`  
+**Auth**: Não requer JWT.  
+**Nota**: Dados em memória (mock).
+
+### GET /api/fontes
+Response 200:
+```json
+{
+  "success": true,
+  "data": [
+    { "id": "1", "nome": "yfinance", "tipofonte": "API_GERAL", "ativa": true, "prioridade": 1 }
+  ],
+  "message": "2 fontes encontradas"
+}
+```
+
+---
+
+## 18–20. Demais Módulos
+
+Relatórios, Projeções e Performance seguem o contrato padrão:
 - **Auth**: Bearer JWT obrigatório.
 - **Response sucesso**: `{"success": true, "data": {...}, "message": "..."}`.
 - **Response erro**: `{"success": false, "message": "..."}`.
@@ -614,4 +793,7 @@ Relatórios, Projeções e Performance seguem o mesmo contrato padrão:
 *Documento atualizado: 27 de Fevereiro de 2026*
 *Versão da API: v0.7.10*
 *GAPs fechados: EXITUS-POS-001→007, EXITUS-ATIVOS-ENUM-001, EXITUS-POS-PAGIN-001,*
-*EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001, EXITUS-COTACOES-RESP-001*
+*EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001,*
+*EXITUS-COTACOES-RESP-001, EXITUS-TRX-PAGIN-001, EXITUS-CALCULOS-RESP-001,*
+*EXITUS-REGRAS-SLASH-001, EXITUS-FERIADOS-SLASH-001, EXITUS-FONTES-SLASH-001,*
+*EXITUS-EVENTOS-SLASH-001, EXITUS-DOCS-CALCULOS-001*

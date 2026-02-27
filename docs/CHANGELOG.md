@@ -30,6 +30,13 @@ e este projeto adere semanticamente à versão v0.7.10.
   Também: campo de resposta é `buy_score` (não `score`) — ausente na documentação.
 - **EXITUS-ALERTAS-RESP-001** — `GET /api/alertas` retornava `{"data": [...]}` sem o campo
   `success`, quebrando o contrato padrão do sistema. Idem para POST, PATCH toggle e DELETE.
+- **EXITUS-DOCS-CALCULOS-001** — `docs/API_REFERENCE.md` documentava rota inexistente
+  `/api/calculos/indicadores/{ticker}`. Rotas reais implementadas: `/api/calculos/portfolio`
+  e `/api/calculos/preco_teto/{ticker}`.
+- **EXITUS-SEEDS-SINTETICOS-001** — 14 ativos sintéticos no banco (`ACAO15543`, `ACAO26893`,
+  `FII155411`, etc., `nome="Empresa Teste SA"/"Fundo Teste"`) gerados por testes automatizados
+  de recálculo de posições. Não são seeds intencionais. Impacto: poluem `GET /api/ativos`
+  e `watchlist-top`. Limpeza manual recomendada em DEV (ver script abaixo).
 - **EXITUS-CALCULOS-RESP-001** — `GET /api/calculos/portfolio` e `/preco_teto/{ticker}`
   retornavam objeto plano sem envelope `{success, data}`; 404 em `preco_teto` usava `"erro"`
   em vez de `"success": false, "message"`.
@@ -60,6 +67,14 @@ e este projeto adere semanticamente à versão v0.7.10.
   `mercado=US`, `tipo ACAO → STOCK`). Revalidado via `GET /api/ativos?mercado=US&tipo=STOCK`:
   retornou `total=6` com todos os tickers US (AAPL, AMZN, GOOGL, MSFT, NVDA, TSLA) com
   `tipo="stock"` ✅.
+- **EXITUS-DOCS-CALCULOS-001** — `docs/API_REFERENCE.md`: seção 13 reescrita com contratos
+  reais de `/api/calculos/portfolio` e `/api/calculos/preco_teto/{ticker}`; rota inexistente
+  `/indicadores/{ticker}` removida. Seções 14-17 documentadas (eventos-corporativos,
+  regras-fiscais, feriados, fontes).
+- **EXITUS-SEEDS-SINTETICOS-001** — Identificados 14 ativos sintéticos no banco gerados por
+  testes automatizados (`ACAO15543`, `FII155411`, etc., nome="Empresa Teste SA"/"Fundo Teste").
+  Registrado como GAP de dados. Limpeza: `DELETE FROM ativo WHERE nome IN ('Empresa Teste SA',
+  'Fundo Teste');` — executar manualmente em DEV após confirmar que não há posições associadas.
 - **EXITUS-CALCULOS-RESP-001** — `backend/app/blueprints/calculos_blueprint.py`: ambas as
   rotas (`/portfolio` e `/preco_teto/{ticker}`) envolvidas em `{success, data}`; 404 alinhado
   ao padrão `{success: false, message}`.
