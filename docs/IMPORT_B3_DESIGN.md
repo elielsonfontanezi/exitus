@@ -15,23 +15,36 @@
 
 ---
 
-## 🎯 APIs Propostas
+## 🎯 Abordagem Aprovada: Script Padrão + API
 
-### 1. Importar Movimentações (Proventos)
+### 1. Script Padrão (Recomendado para uso direto)
+```bash
+# scripts/import_b3.py
+python scripts/import_b3.py <arquivo_movimentacoes> <arquivo_negociacoes>
+
+# Exemplos:
+python scripts/import_b3.py movimentacao-20260101-20260131.csv negociacao-20260101-20260131.csv
+python scripts/import_b3.py movimentacao-20260101-20260131.csv  # Apenas movimentações
+```
+
+### 2. APIs (Para integrações futuras)
 ```http
 POST /api/import/b3/movimentacoes
 Content-Type: multipart/form-data
-
 file: movimentacao-20260101-20260131.csv
 ```
 
-### 2. Importar Negociações (Compras/Vendas)
 ```http
 POST /api/import/b3/negociacoes
 Content-Type: multipart/form-data
-
 file: negociacao-20260101-20260131.csv
 ```
+
+### 3. Vantagens do Script Padrão
+- ✅ **Flexibilidade:** Linha de comando, agendável (cron)
+- ✅ **Testabilidade:** Fácil testar localmente
+- ✅ **Independência:** Não depende da API estar rodando
+- ✅ **Backup:** Importação manual possível
 
 ---
 
@@ -315,7 +328,70 @@ def atualizar_posicoes_usuario(usuario_id):
 
 ---
 
-## � Dependências Necessárias
+## 📦 Estrutura do Script
+
+### scripts/import_b3.py
+```python
+#!/usr/bin/env python3
+"""
+Script padrão para importação de dados da B3
+Uso: python scripts/import_b3.py <arquivo_movimentacoes> <arquivo_negociacoes>
+"""
+
+import sys
+import os
+from pathlib import Path
+
+# Adicionar backend ao path
+sys.path.append(str(Path(__file__).parent.parent / "backend"))
+
+from backend.app import create_app
+from backend.app.services.import_b3_service import ImportB3Service
+
+def main():
+    app = create_app()
+    
+    with app.app_context():
+        service = ImportB3Service()
+        usuario_id = os.getenv('EXITUS_USER_ID')  # Opcional
+        
+        # Importar movimentações
+        if len(sys.argv) > 1:
+            arquivo_mov = Path(sys.argv[1])
+            if arquivo_mov.exists():
+                print(f"📁 Importando movimentações de: {arquivo_mov}")
+                result = service.importar_movimentacoes(arquivo_mov, usuario_id)
+                print(f"✅ Movimentações: {result}")
+        
+        # Importar negociações
+        if len(sys.argv) > 2:
+            arquivo_neg = Path(sys.argv[2])
+            if arquivo_neg.exists():
+                print(f"📁 Importando negociações de: {arquivo_neg}")
+                result = service.importar_negociacoes(arquivo_neg, usuario_id)
+                print(f"✅ Negociações: {result}")
+
+if __name__ == "__main__":
+    main()
+```
+
+### backend/app/services/import_b3_service.py
+```python
+"""Service compartilhado para importação B3 (usado por script e API)"""
+
+class ImportB3Service:
+    def importar_movimentacoes(self, arquivo, usuario_id=None):
+        """Importa arquivo de movimentações CSV"""
+        # Implementação usando B3CSVAdapter
+        pass
+    
+    def importar_negociacoes(self, arquivo, usuario_id=None):
+        """Importa arquivo de negociações CSV"""
+        # Implementação usando B3CSVAdapter
+        pass
+```
+
+## 📦 Dependências Necessárias
 
 ```bash
 # requirements.txt (adicionar)
@@ -325,15 +401,17 @@ yfinance>=0.2.18     # Fallback para dados de ativos
 
 ---
 
-## �📝 Próximos Passos
+## 📝 Próximos Passos
 
 1. Adicionar dependências ao requirements.txt
-2. Criar blueprint `import_export_blueprint.py`
-3. Implementar parsers CSV
-4. Criar services de importação
-5. Adicionar endpoints
-6. Escrever testes
-7. Documentar em API_REFERENCE.md
+2. Criar `scripts/import_b3.py` (script padrão)
+3. Criar `backend/app/services/import_b3_service.py` (service compartilhado)
+4. Criar `backend/app/services/import_b3_adapter.py` (adapter CSV)
+5. Implementar parsers CSV e lógica de importação
+6. Criar blueprint `import_export_blueprint.py` (APIs opcionais)
+7. Escrever testes para script e service
+8. Documentar em API_REFERENCE.md
+9. Testar com arquivos reais da B3
 
 ---
 

@@ -60,21 +60,23 @@
 ### EXITUS-IMPORT-001: Importação/Exportação
 **Problema:** Usuários não podem migrar dados ou exportar para análise externa
 
-**APIs necessárias:**
+**Abordagem aprovada:** Script padrão + APIs
 ```
-POST /api/import/csv
-POST /api/import/excel
-POST /api/import/json
-GET /api/export/{relatorio_id}/csv
-GET /api/export/{relatorio_id}/excel
-GET /api/export/{relatorio_id}/json
-GET /api/export/{relatorio_id}/pdf
+# Script principal (recomendado)
+python scripts/import_b3.py <movimentacoes.csv> <negociacoes.csv>
+
+# APIs (opcionais, para integrações)
+POST /api/import/b3/movimentacoes
+POST /api/import/b3/negociacoes
 ```
 
+**Foco:** Importação de arquivos CSV da B3 (movimentacao-*.csv, negociacao-*.csv)
+
 **Validações:**
-- Estrutura de arquivo obrigatória
+- Estrutura CSV da B3 obrigatória
 - Rollback automático em erro
-- Limite de 10.000 linhas por importação
+- Criação automática de ativos (API híbrida)
+- Sobrescrever duplicatas
 
 ### EXITUS-CRUD-001: CRUD Incompleto
 **Entidades afetadas:**
