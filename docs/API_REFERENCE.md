@@ -343,29 +343,275 @@ APIs de listagem, criação, update e delete de proventos.
 
 ---
 
-## 9–20. Demais Seções
-As seções de:
-- Movimentações de Caixa
-- Eventos Corporativos
-- Buy Signals
-- Cálculos Financeiros
-- Regras Fiscais
-- Feriados
-- Fontes de Dados
-- Alertas
-- Relatórios
-- Cotações
-- Projeções
-- Performance
-- Health Checks
+## 9. Movimentações de Caixa
 
-continuam com o mesmo contrato descrito na versão v0.7.6, consumindo os valores
-de enums documentados em `ENUMS.md` e refletidos no schema atual.
+**Base URL**: `/api/movimentacoes`  
+**Auth**: Bearer JWT obrigatório em todas as rotas.
+
+### GET /api/movimentacoes
+Lista movimentações de caixa do usuário autenticado.
+
+Query params: `page`, `per_page` (max 100), `corretora_id`, `data_inicio`, `data_fim`
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "movimentacoes": [...],
+    "total": 2
+  },
+  "message": "2 movimentações encontradas"
+}
+```
+
+### GET /api/movimentacoes/saldo/{corretora_id}
+Retorna saldo calculado para uma corretora.
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": { "saldo": 5000.0, "corretora_id": "uuid" }
+}
+```
 
 ---
 
-*Documento atualizado: 22 de Fevereiro de 2026*
+## 10. Buy Signals (M4)
+
+**Base URL**: `/api/buy-signals`  
+**Auth**: Não requer JWT (endpoints públicos de análise).  
+**Nota**: Retorna 404 se ticker não encontrado no banco.
+
+### GET /api/buy-signals/buy-score/{ticker}
+Calcula score de compra (0-100) baseado em margem de segurança, Z-Score, DY e Beta.
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "ticker": "VALE3",
+    "buy_score": 42
+  }
+}
+```
+
+Response 404 (ticker não existe):
+```json
+{ "success": false, "error": "Ativo XYZABC não encontrado" }
+```
+
+### GET /api/buy-signals/margem-seguranca/{ticker}
+Calcula margem de segurança em relação ao preço teto.
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "ticker": "PETR4",
+    "margem_seguranca": 12.5,
+    "sinal": "🟢 COMPRA"
+  },
+  "message": "Margem de segurança: 12.50% vs Teto R$38.00"
+}
+```
+
+Response 400 (preço teto não cadastrado):
+```json
+{ "success": false, "error": "Preço teto inválido." }
+```
+
+### GET /api/buy-signals/zscore/{ticker}
+Calcula Z-Score baseado no histórico de preços (mínimo 30 dias).
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": { "ticker": "VALE3", "z_score": -0.85 }
+}
+```
+
+Response 400 (histórico insuficiente):
+```json
+{ "success": false, "error": "Histórico insuficiente: 5 dias (mínimo 30)" }
+```
+
+### GET /api/buy-signals/watchlist-top
+Retorna top 10 ativos por buy_score.
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": [
+    { "ticker": "PETR4", "buy_score": 78, "preco_atual": 36.5, "preco_teto": 42.0 }
+  ]
+}
+```
+
+---
+
+## 11. Alertas (M7.4)
+
+**Base URL**: `/api/alertas`  
+**Auth**: Bearer JWT obrigatório em todas as rotas.
+
+### GET /api/alertas
+Lista alertas do usuário autenticado.
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": [ { "id": "uuid", "nome": "PETR4 > 40", "ativo": true, ... } ],
+  "message": "1 alerta(s) encontrado(s)"
+}
+```
+
+Response 401 (sem token):
+```json
+{ "msg": "Missing Authorization Header" }
+```
+
+### POST /api/alertas
+Cria novo alerta.
+
+Body obrigatório: `nome`. Campos opcionais: `tipo_alerta`, `frequencia_notificacao`.  
+Enums em minúsculo: `tipo_alerta` (ex.: `"preco_alvo"`), `frequencia_notificacao` (ex.: `"diaria"`).
+
+Response 201:
+```json
+{
+  "success": true,
+  "message": "Alerta criado com sucesso",
+  "data": { "id": "uuid", "nome": "PETR4 > 40", ... }
+}
+```
+
+### PATCH /api/alertas/{alerta_id}/toggle
+Alterna status ativo/inativo do alerta.
+
+Response 200:
+```json
+{ "success": true, "message": "Status atualizado" }
+```
+
+Response 404:
+```json
+{ "success": false, "message": "Alerta não encontrado" }
+```
+
+### DELETE /api/alertas/{alerta_id}
+Remove alerta.
+
+Response 200:
+```json
+{ "success": true, "message": "Alerta removido" }
+```
+
+---
+
+## 12. Cotações em Tempo Real (M7.5)
+
+**Base URL**: `/api/cotacoes`  
+**Auth**: Bearer JWT obrigatório.  
+**Cache**: TTL 15 minutos por ativo. Se `data_ultima_cotacao < 15min`, retorna dados do banco sem chamar API externa. Após expirar, consulta provedores externos (brapi.dev → yfinance → fallback banco).
+
+### GET /api/cotacoes/{ticker}
+Retorna cotação atual do ativo.
+
+Response 200 (cache válido):
+```json
+{
+  "success": true,
+  "data": {
+    "ticker": "VALE3",
+    "preco_atual": 68.5,
+    "dy_12m": 0.12,
+    "pl": 5.2,
+    "provider": "database_cache",
+    "cache_age_minutes": 3,
+    "cache_valid_until": "2026-02-27T18:45:00"
+  },
+  "message": "Cotação VALE3 (cache)"
+}
+```
+
+Response 200 (API externa):
+```json
+{
+  "success": true,
+  "data": {
+    "ticker": "VALE3",
+    "preco_atual": 68.5,
+    "provider": "brapi.dev",
+    "cache_ttl_minutes": 15
+  },
+  "message": "Cotação VALE3 atualizada"
+}
+```
+
+Response 200 (fallback banco — APIs indisponíveis):
+```json
+{
+  "success": true,
+  "data": {
+    "ticker": "VALE3",
+    "preco_atual": 67.0,
+    "provider": "database_fallback",
+    "warning": "APIs indisponíveis - dados podem estar desatualizados"
+  },
+  "message": "Cotação VALE3 (fallback - dados podem estar desatualizados)"
+}
+```
+
+Response 404:
+```json
+{ "error": "Ativo XYZABC não encontrado" }
+```
+
+### GET /api/cotacoes/batch?symbols=PETR4,VALE3
+Cotações em lote (máx 10 tickers por requisição).
+
+Response 200:
+```json
+{
+  "PETR4": { "ticker": "PETR4", "preco_atual": 36.5, "provider": "brapi.dev", "success": true },
+  "VALE3": { "ticker": "VALE3", "preco_atual": 68.5, "provider": "database_cache", "success": true }
+}
+```
+
+### GET /api/cotacoes/health
+Health check do módulo de cotações (não requer JWT).
+
+Response 200:
+```json
+{
+  "status": "ok",
+  "module": "cotacoes_m7.5",
+  "cache_ttl": "15 minutos",
+  "providers": ["brapi.dev (FREE tier)", "yfinance", "alphavantage", "database_cache"]
+}
+```
+
+---
+
+## 13–20. Demais Módulos
+
+As APIs de Eventos Corporativos, Cálculos Financeiros, Regras Fiscais, Feriados, Fontes de Dados,
+Relatórios, Projeções e Performance seguem o mesmo contrato padrão:
+- **Auth**: Bearer JWT obrigatório.
+- **Response sucesso**: `{"success": true, "data": {...}, "message": "..."}`.
+- **Response erro**: `{"success": false, "message": "..."}`.
+- **Enums**: consultar `docs/ENUMS.md`.
+
+---
+
+*Documento atualizado: 27 de Fevereiro de 2026*
 *Versão da API: v0.7.10*
-*GAPs fechados nesta versão: EXITUS-POS-001 a EXITUS-POS-007 (M2-POSICOES)*
-*GAP EXITUS-DOCS-API-001 fechado — GET /api/ativos responde `.data.ativos`, total: 70*
-*Pendência menor: EXITUS-POS-008 — enum serialization em nested (não-bloqueante)*
+*GAPs fechados: EXITUS-POS-001→007, EXITUS-ATIVOS-ENUM-001, EXITUS-POS-PAGIN-001,*
+*EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001, EXITUS-COTACOES-RESP-001*

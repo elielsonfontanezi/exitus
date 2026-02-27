@@ -90,6 +90,31 @@ TOTAL: 69 endpoints validados v0.7.10
 4. LEITURA/ANÁLISE → Liberado sem OK (ler arquivos, inspecionar contratos e apontar inconsistências).
 ```
 
+## 📦 COMMIT AO FIM DE CADA FASE DE VALIDAÇÃO
+```
+Ao concluir uma fase de validação (todos os testes passando), SEMPRE apresentar
+o comando de commit ANTES de propor a próxima fase:
+
+git add -A
+git commit -m "fix(mX): <resumo dos GAPs corrigidos>
+
+GAPs: EXITUS-XXX-001, EXITUS-YYY-002
+- Correção A: descrição breve
+- Correção B: descrição breve
+- docs: API_REFERENCE.md e CHANGELOG.md atualizados"
+
+Formato do commit: Conventional Commits (fix/docs/refactor/test)
+Escopo: módulo afetado (m2, m3, m4, m7)
+```
+
+## 🔄 RELOAD DO BACKEND (gunicorn sem --reload)
+```
+podman restart exitus-backend NÃO recarrega código Python em memória.
+Para recarregar código após edições:
+  podman stop exitus-backend && podman start exitus-backend
+Aguardar ~3s antes de testar. NUNCA usar apenas SIGHUP (kill -HUP 1) — sem efeito em workers sync.
+```
+
 ## 🌐 COTAÇÕES M7.5 (docs/MODULES.md)
 ```
 Fallback 5 camadas (15min TTL PostgreSQL):

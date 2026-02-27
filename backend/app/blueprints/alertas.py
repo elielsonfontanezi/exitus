@@ -20,9 +20,9 @@ def listar_alertas():
             .order_by(ConfiguracaoAlerta.timestamp_criacao.desc()).all()
         
         result = [a.to_dict() for a in alertas]
-        return jsonify({"data": result}), 200
+        return jsonify({"success": True, "data": result, "message": f"{len(result)} alerta(s) encontrado(s)"}), 200
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 @bp.route('', methods=['POST'], strict_slashes=False)
 @jwt_required()
@@ -42,10 +42,10 @@ def criar_alerta():
             dados['frequencia_notificacao'] = dados['frequencia_notificacao'].lower()
 
         novo_alerta = AlertaService.criar_alerta(usuario_id, dados)
-        return jsonify({"message": "Alerta criado com sucesso", "data": novo_alerta}), 201
+        return jsonify({"success": True, "message": "Alerta criado com sucesso", "data": novo_alerta}), 201
     except Exception as e:
         print(f"Erro criar alerta: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 @bp.route('/<alerta_id>/toggle', methods=['PATCH'])
 @jwt_required()
@@ -53,12 +53,12 @@ def toggle_alerta(alerta_id):
     try:
         usuario_id = UUID(get_jwt_identity())
         alerta = ConfiguracaoAlerta.query.filter_by(id=alerta_id, usuario_id=usuario_id).first()
-        if not alerta: return jsonify({"message": "Alerta não encontrado"}), 404
+        if not alerta: return jsonify({"success": False, "message": "Alerta não encontrado"}), 404
             
         AlertaService.atualizar_alerta(usuario_id, UUID(alerta_id), {'ativo': not alerta.ativo})
-        return jsonify({"message": "Status atualizado"}), 200
+        return jsonify({"success": True, "message": "Status atualizado"}), 200
     except Exception as e:
-        return jsonify({"message": str(e)}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 @bp.route('/<alerta_id>', methods=['DELETE'])
 @jwt_required()
@@ -66,6 +66,6 @@ def deletar_alerta(alerta_id):
     try:
         usuario_id = UUID(get_jwt_identity())
         AlertaService.deletar_alerta(usuario_id, UUID(alerta_id))
-        return jsonify({"message": "Alerta removido"}), 200
+        return jsonify({"success": True, "message": "Alerta removido"}), 200
     except Exception as e:
-        return jsonify({"message": str(e)}), 500
+        return jsonify({"success": False, "message": str(e)}), 500

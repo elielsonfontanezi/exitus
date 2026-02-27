@@ -10,6 +10,10 @@ buy_signals_bp = Blueprint('buy_signals_bp', __name__)
 
 @buy_signals_bp.route('/margem-seguranca/<string:ticker>', methods=['GET'])
 def margem_seguranca(ticker):
+    from app.models.ativo import Ativo
+    ativo = Ativo.query.filter_by(ticker=ticker.upper()).first()
+    if not ativo:
+        return jsonify({"success": False, "error": f"Ativo {ticker} não encontrado"}), 404
     try:
         margem, preco_teto = calcular_margem_seguranca(ticker)
         sinal = "🟢 COMPRA" if margem > 5 else "🟡 NEUTRO" if margem > 0 else "🔴 VENDA"
@@ -19,6 +23,10 @@ def margem_seguranca(ticker):
 
 @buy_signals_bp.route('/buy-score/<string:ticker>', methods=['GET'])
 def buy_score(ticker):
+    from app.models.ativo import Ativo
+    ativo = Ativo.query.filter_by(ticker=ticker.upper()).first()
+    if not ativo:
+        return jsonify({"success": False, "error": f"Ativo {ticker} não encontrado"}), 404
     try:
         score = calcular_buy_score(ticker)
         return jsonify({"success": True, "data": {"ticker": ticker, "buy_score": score}})
@@ -27,6 +35,10 @@ def buy_score(ticker):
 
 @buy_signals_bp.route('/zscore/<string:ticker>', methods=['GET'])
 def zscore(ticker):
+    from app.models.ativo import Ativo
+    ativo = Ativo.query.filter_by(ticker=ticker.upper()).first()
+    if not ativo:
+        return jsonify({"success": False, "error": f"Ativo {ticker} não encontrado"}), 404
     try:
         z = calcular_zscore(ticker)
         return jsonify({"success": True, "data": {"ticker": ticker, "z_score": z}})

@@ -32,14 +32,17 @@ def obter_cotacao(ticker):
             if delta.total_seconds() < TTL_SECONDS:
                 logger.info(f"✅ Cache {ticker} válido ({int(delta.total_seconds()/60)}min atrás)")
                 return jsonify({
-                    'ticker': ticker,
-                    'preco_atual': float(ativo.preco_atual or 0),
-                    'dy_12m': float(ativo.dividend_yield or 0),
-                    'pl': float(ativo.p_l or 0),
-                    'provider': 'database_cache',
-                    'cache_age_minutes': int(delta.total_seconds() / 60),
-                    'cache_valid_until': (ativo.data_ultima_cotacao + timedelta(seconds=TTL_SECONDS)).isoformat(),
-                    'success': True
+                    'success': True,
+                    'data': {
+                        'ticker': ticker,
+                        'preco_atual': float(ativo.preco_atual or 0),
+                        'dy_12m': float(ativo.dividend_yield or 0),
+                        'pl': float(ativo.p_l or 0),
+                        'provider': 'database_cache',
+                        'cache_age_minutes': int(delta.total_seconds() / 60),
+                        'cache_valid_until': (ativo.data_ultima_cotacao + timedelta(seconds=TTL_SECONDS)).isoformat(),
+                    },
+                    'message': f'Cotação {ticker} (cache)'
                 })
         
         # Cache expirou OU primeira consulta → Buscar API externa
@@ -55,20 +58,24 @@ def obter_cotacao(ticker):
             db.session.commit()
             
             logger.info(f"✅ {ticker}: R${cotacao['preco_atual']} via {cotacao['provider']}")
+            cotacao.pop('success', None)
             cotacao['cache_ttl_minutes'] = 15
-            return jsonify(cotacao)
+            return jsonify({'success': True, 'data': cotacao, 'message': f'Cotação {ticker} atualizada'})
         
         # Fallback: usar dados antigos (mesmo se > 15min)
         logger.warning(f"⚠️ APIs falharam {ticker} - usando dados antigos do banco")
         return jsonify({
-            'ticker': ticker,
-            'preco_atual': float(ativo.preco_atual or 0),
-            'dy_12m': float(ativo.dividend_yield or 0),
-            'pl': float(ativo.p_l or 0),
-            'provider': 'database_fallback',
-            'warning': 'APIs indisponíveis - dados podem estar desatualizados',
-            'last_update': ativo.data_ultima_cotacao.isoformat() if ativo.data_ultima_cotacao else None,
-            'success': True
+            'success': True,
+            'data': {
+                'ticker': ticker,
+                'preco_atual': float(ativo.preco_atual or 0),
+                'dy_12m': float(ativo.dividend_yield or 0),
+                'pl': float(ativo.p_l or 0),
+                'provider': 'database_fallback',
+                'warning': 'APIs indisponíveis - dados podem estar desatualizados',
+                'last_update': ativo.data_ultima_cotacao.isoformat() if ativo.data_ultima_cotacao else None,
+            },
+            'message': f'Cotação {ticker} (fallback - dados podem estar desatualizados)'
         })
     
     except Exception as e:

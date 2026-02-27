@@ -73,13 +73,12 @@ def listar_posicoes():
         return jsonify(
             success=True,
             data={
-                'posicoes': posicoes_schema.dump(paginacao.items)
+                'posicoes': posicoes_schema.dump(paginacao.items),
+                'total': paginacao.total,
+                'pages': paginacao.pages,
+                'page': paginacao.page,
+                'per_page': paginacao.per_page,
             },
-            # GAP EXITUS-POS-002: total na raiz da resposta
-            total=paginacao.total,
-            pages=paginacao.pages,
-            page=paginacao.page,
-            per_page=paginacao.per_page,
             message=f'{paginacao.total} posicoes encontradas'
         ), 200
 

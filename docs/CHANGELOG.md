@@ -18,6 +18,22 @@ e este projeto adere semanticamente à versão v0.7.10.
   estava persistido com `tipo=ACAO` no banco, em vez de `tipo=STOCK` conforme regra de negócio
   (`TipoAtivo.STOCK` = ações US/NYSE/NASDAQ). Isso fazia filtros `?tipo=STOCK` não retornarem
   o `AAPL` e contraditava a semântica multi-mercado do model.
+- **EXITUS-POS-PAGIN-001** — `GET /api/posicoes` retornava campos de paginação (`total`,
+  `pages`, `page`, `per_page`) na raiz do response em vez de dentro de `.data`, quebrando
+  o contrato padrão de todos os outros endpoints do sistema.
+- **EXITUS-PROV-SLASH-001** — `GET /api/proventos` (sem barra final) recebia um redirect 301
+  com body HTML antes do JSON, pois a rota estava declarada com `strict_slashes` padrão (True).
+  Isso causava `parse error: Invalid numeric literal` no jq ao processar a resposta.
+- **EXITUS-BUYSIG-SCORE-001** — `GET /api/buy-signals/buy-score/{ticker}` retornava HTTP 200
+  com `score=0` para tickers inexistentes em vez de 404, pois o `except` interno silenciava o
+  `ValueError("Ativo não encontrado")` do service. Idem para `/margem-seguranca` e `/zscore`.
+  Também: campo de resposta é `buy_score` (não `score`) — ausente na documentação.
+- **EXITUS-ALERTAS-RESP-001** — `GET /api/alertas` retornava `{"data": [...]}` sem o campo
+  `success`, quebrando o contrato padrão do sistema. Idem para POST, PATCH toggle e DELETE.
+- **EXITUS-COTACOES-RESP-001** — `GET /api/cotacoes/{ticker}` retornava response plano
+  (`{"ticker": ..., "preco_atual": ...}`) sem envelope `{"success": true, "data": {...}}`,
+  inconsistente com todos os demais módulos. `docs/API_REFERENCE.md` seções 9-20 eram apenas
+  placeholders sem contratos documentados.
 
 ### Fixed
 - **EXITUS-HEALTH-001** — `backend/app/__init__.py`: `/health` agora inclui
@@ -30,6 +46,20 @@ e este projeto adere semanticamente à versão v0.7.10.
   `mercado=US`, `tipo ACAO → STOCK`). Revalidado via `GET /api/ativos?mercado=US&tipo=STOCK`:
   retornou `total=6` com todos os tickers US (AAPL, AMZN, GOOGL, MSFT, NVDA, TSLA) com
   `tipo="stock"` ✅.
+- **EXITUS-POS-PAGIN-001** — `backend/app/blueprints/posicao_blueprint.py`: campos de
+  paginação movidos da raiz do response para dentro de `.data` (alinhado ao padrão do sistema).
+- **EXITUS-PROV-SLASH-001** — `backend/app/blueprints/provento_blueprint.py`: adicionado
+  `strict_slashes=False` na rota `GET /` para evitar redirect 301 e parse error no cliente.
+- **EXITUS-BUYSIG-SCORE-001** — `backend/app/blueprints/buy_signals_blueprint.py`: adicionada
+  verificação explícita de existência do ativo antes do `try/except` nas rotas `buy-score`,
+  `margem-seguranca` e `zscore`; retorna 404 para tickers inexistentes. Documentação corrigida
+  em `docs/API_REFERENCE.md` (campo `buy_score`, não `score`).
+- **EXITUS-ALERTAS-RESP-001** — `backend/app/blueprints/alertas.py`: adicionado `success`
+  em todas as respostas (GET, POST, PATCH toggle, DELETE) para alinhar ao contrato padrão.
+- **EXITUS-COTACOES-RESP-001** — `backend/app/blueprints/cotacoes_blueprint.py`: todos os
+  responses de `GET /api/cotacoes/{ticker}` envolvidos em `{"success": true, "data": {...}}`.
+  `docs/API_REFERENCE.md` expandido: seções 9-12 documentadas com contratos completos
+  (Movimentações, Buy Signals, Alertas, Cotações).
 
 ## [v0.7.12] — 2026-02-24
 

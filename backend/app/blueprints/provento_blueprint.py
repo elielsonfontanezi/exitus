@@ -21,7 +21,7 @@ from app.utils.responses import success_response, error_response, not_found
 provento_bp = Blueprint('proventos', __name__, url_prefix='/api/proventos')
 
 
-@provento_bp.route('/', methods=['GET'])
+@provento_bp.route('/', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def listar_proventos():
     """Lista proventos com filtros"""
