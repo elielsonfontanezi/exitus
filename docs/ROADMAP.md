@@ -46,6 +46,7 @@
 | **EXITUS-MULTICLIENTE-001** | Multi-cliente para assessoras | Não implementado | Médio-Alto | Média-Alta |
 | **EXITUS-MONITOR-001** | Monitoramento/alertas em tempo real | Não implementado | Médio | Média |
 | **EXITUS-NEWAPIS-001** | APIs de configuração | Não implementado | Médio | Média |
+| **EXITUS-UNITS-001** | Tratamento de UNITS (B3) | Não implementado | Médio | Média |
 
 ### 3. Funcionalidades Opcionais (Baixa Prioridade)
 
@@ -60,23 +61,21 @@
 ### EXITUS-IMPORT-001: Importação/Exportação
 **Problema:** Usuários não podem migrar dados ou exportar para análise externa
 
-**Abordagem aprovada:** Script padrão + APIs
+**APIs necessárias:**
 ```
-# Script principal (recomendado)
-python scripts/import_b3.py <movimentacoes.csv> <negociacoes.csv>
-
-# APIs (opcionais, para integrações)
-POST /api/import/b3/movimentacoes
-POST /api/import/b3/negociacoes
+POST /api/import/csv
+POST /api/import/excel
+POST /api/import/json
+GET /api/export/{relatorio_id}/csv
+GET /api/export/{relatorio_id}/excel
+GET /api/export/{relatorio_id}/json
+GET /api/export/{relatorio_id}/pdf
 ```
-
-**Foco:** Importação de arquivos CSV da B3 (movimentacao-*.csv, negociacao-*.csv)
 
 **Validações:**
-- Estrutura CSV da B3 obrigatória
+- Estrutura de arquivo obrigatória
 - Rollback automático em erro
-- Criação automática de ativos (API híbrida)
-- Sobrescrever duplicatas
+- Limite de 10.000 linhas por importação
 
 ### EXITUS-CRUD-001: CRUD Incompleto
 **Entidades afetadas:**
@@ -95,6 +94,21 @@ POST /api/import/b3/negociacoes
 3. **Validação de saldo disponível** antes de transação
 4. **Cálculo automático de taxas de corretagem**
 5. **Limite de operações day-trade** (fiscal)
+
+### EXITUS-UNITS-001: Tratamento de UNITS (B3)
+**Problema:** UNITS não são tratadas corretamente no sistema
+
+**Impactos:**
+- UNITS são derivadas de ações base (ex: PETR4 → PETR4U)
+- Desdobramentos afetam preço médio e quantidade
+- Conversões reversíveis (UNITS → ações)
+- Proventos geralmente não pagos às UNITS
+
+**Ajustes necessários:**
+- Adicionar tipo UNIT ao ENUM TipoAtivo
+- Relacionar UNITS com ação base
+- Ajustar cálculos de posição
+- Tratar conversões em transações
 
 ---
 
@@ -145,7 +159,8 @@ POST /api/import/b3/negociacoes
 | EXITUS-MULTIMOEDA-001 | 📋 Análise | 27/02/2026 | IA | Esperando decisão |
 | EXITUS-MONITOR-001 | 📋 Análise | 27/02/2026 | IA | Prioridade média |
 | EXITUS-NEWAPIS-001 | 📋 Análise | 27/02/2026 | IA | 3 APIs básicas |
-| EXITUS-MULTICLIENTE-001 | 📋 Análise | 27/02/2026 | IA | Discussão necessária |
+| EXITUS-MULTICLIENTE-001 | 📋 Análise | 27/02/2026 | IA | Reclassificado Média-Alta |
+| EXITUS-UNITS-001 | 📋 Análise | 27/02/2026 | IA | Adicionado roadmap |
 | EXITUS-CRIPTO-001 | 📋 Análise | 27/02/2026 | IA | Prioridade baixa |
 
 ---
@@ -157,6 +172,7 @@ POST /api/import/b3/negociacoes
 - **Fase 2 iniciada:** Análise sistemática de GAPs
 - **8 GAPs identificados** com priorização
 - **Decisão:** Multi-cliente reclassificado para Média-Alta (potencial comercial)
+- **Adicionado:** EXITUS-UNITS-001 para tratamento de UNITS B3
 
 ---
 
