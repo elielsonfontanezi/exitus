@@ -1189,7 +1189,7 @@ rm -rf volumes/postgres/*
 # Gerar novo token
 export TOKEN=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}' | jq -r '.data.access_token')
+  -d '{"username":"admin","password":"senha123"}' | jq -r '.data.access_token')
 ```
 
 **Solução Permanente (M8)**:
@@ -1514,11 +1514,11 @@ WHERE email='admin@exitus.com';"
 
 | Username | Email | Senha | Role |
 | --- | --- | --- | --- |
-| `admin` | admin@exitus.com | admin123 | **ADMIN** |
-| `joao.silva` | joao.silva@example.com | user123 | USER |
-| `maria.santos` | maria.santos@example.com | user123 | USER |
-| `viewer` | viewer@exitus.com | user123 | READONLY |
-| `teste.user` | teste@exitus.com | user123 | USER |
+| `admin` | admin@exitus.com | senha123 | **ADMIN** |
+| `joao.silva` | joao.silva@example.com | senha123 | USER |
+| `maria.santos` | maria.santos@example.com | senha123 | USER |
+| `viewer` | viewer@exitus.com | senha123 | READONLY |
+| `teste.user` | teste@exitus.com | senha123 | USER |
 
 > ⚠️ **IMPORTANTE:** Estas credenciais são exclusivas para desenvolvimento. **Nunca** utilize estas senhas em produção.
 
@@ -1565,12 +1565,12 @@ time podman exec exitus-db psql exitusdb -U exitus -c "SELECT COUNT(*) FROM usua
 # Token ADMIN
 export TOKEN_ADMIN=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}' | jq -r '.data.access_token')
+  -d '{"username":"admin","password":"senha123"}' | jq -r '.data.access_token')
 
 # Token USER
 export TOKEN_USER=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"maria.santos","password":"user123"}' | jq -r '.data.access_token')
+  -d '{"username":"maria.santos","password":"senha123"}' | jq -r '.data.access_token')
 
 # Verificar tokens
 echo "Token ADMIN: ${TOKEN_ADMIN:0:50}..."

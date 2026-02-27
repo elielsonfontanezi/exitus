@@ -4,6 +4,7 @@ Exitus Backend M4 - Application Factory
 Sistema de Gestão e Análise de Investimentos
 Módulos: M2 (API REST) + M3 (Portfolio) + M4 (Buy Signals + Fiscais) + M7.4 (Alertas) + M7.5 (Cotações)
 """
+import os
 from flask import Flask
 from flask.json.provider import DefaultJSONProvider
 from flask_cors import CORS
@@ -67,10 +68,15 @@ def create_app(testing=False):
     # ============================================
     @app.route('/health')
     def health():
+        app_version = os.getenv('EXITUS_VERSION') or os.getenv('APP_VERSION')
+        commit_sha = os.getenv('GIT_COMMIT') or os.getenv('COMMIT_SHA')
+
         return {
             "env": app.config.get('FLASK_ENV', 'development'),
             "service": "exitus-backend",
             "status": "ok",
+            "version": app_version,
+            "commit_sha": commit_sha,
             "module": "M4 - Buy Signals + Fiscais + Portfolio + Alertas ✅"
         }
 

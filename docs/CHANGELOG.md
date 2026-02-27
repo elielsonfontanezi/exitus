@@ -6,6 +6,22 @@ e este projeto adere semanticamente à versão v0.7.10.
 
 ---
 
+## [Unreleased]
+
+### Gaps Registrados
+- **EXITUS-HEALTH-001** — `GET /health` não expunha metadados de build (versão/commit)
+  e retornava apenas uma string de `module`, dificultando rastreabilidade durante validações.
+- **EXITUS-DOCS-AUTH-002** — Documentação de credenciais DEV divergente: `admin123`
+  era citado em `docs/USER_GUIDE.md` e `docs/OPERATIONS_RUNBOOK.md`, mas as seeds atuais
+  (ver `app/seeds/seed_usuarios.py`) usam `senha123`.
+
+### Fixed
+- **EXITUS-HEALTH-001** — `backend/app/__init__.py`: `/health` agora inclui
+  `version` (via `EXITUS_VERSION`/`APP_VERSION`) e `commit_sha` (via `GIT_COMMIT`/`COMMIT_SHA`)
+  mantendo os campos existentes.
+- **EXITUS-DOCS-AUTH-002** — `docs/USER_GUIDE.md` e `docs/OPERATIONS_RUNBOOK.md` atualizados:
+  exemplos de login/token e tabela de credenciais DEV alinhados para `senha123`.
+
 ## [v0.7.12] — 2026-02-24
 
 ### Fix Batch — M2-TRANSACOES (7 GAPs)
