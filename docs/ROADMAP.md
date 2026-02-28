@@ -34,9 +34,11 @@
 
 | GAP ID | Funcionalidade | Status Real | Impacto | Prioridade |
 |--------|---------------|-------------|---------|------------|
+| **EXITUS-SCRIPTS-001** | Otimização e unificação de scripts | 18 scripts analisados | Crítico | Crítica |
 | **EXITUS-IMPORT-001** | Importação/Exportação (CSV, Excel, JSON, PDF) | Apenas stub JSON | Alto | Alta |
 | **EXITUS-CRUD-001** | CRUD incompleto para entidades | Faltam POST/PUT/DELETE | Alto | Alta |
 | **EXITUS-BUSINESS-001** | Regras de negócio críticas | Não implementado | Alto | Alta |
+| **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | Não implementado | Alto | Alta |
 
 ### 2. Funcionalidades de Expansão (Média Prioridade)
 
@@ -58,6 +60,28 @@
 ---
 
 ## 🔍 Detalhamento dos GAPs
+
+### EXITUS-SCRIPTS-001: Otimização e Unificação de Scripts
+**Problema:** 18 scripts com redundâncias, bugs e falta de padronização
+
+**Impactos críticos:**
+- `cleanup_duplicates.sh` com bug (linha 23: `exit` impede execução)
+- `restore_complete.sh` chama script inexistente (`stop_services.sh`)
+- Múltiplos scripts para mesma função (start/stop/restart)
+- Inconsistência em validações e tratamento de erros
+- Scripts obsoletos (`validate_docs.sh` verifica docs antigos)
+
+**Análise completa:**
+- ✅ **10 scripts bem implementados** (backup, rebuild, setup, etc.)
+- ⚠️ **3 scripts com bugs** (cleanup_duplicates, restore_complete, validate_docs)
+- 🔄 **5 scripts redundantes** (start/stop/restart múltiplas versões)
+
+**Solução proposta:**
+1. **Corrigir bugs críticos** imediatamente
+2. **Unificar restart** em script único com parâmetros
+3. **Manter melhores scripts** (`startexitus-local.sh`, `populate_seeds.sh`)
+4. **Ajustar `exitus.sh`** para chamar scripts corrigidos
+5. **Remover redundantes** após validação
 
 ### EXITUS-IMPORT-001: Importação/Exportação
 **Problema:** Usuários não podem migrar dados ou exportar para análise externa
@@ -142,6 +166,12 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 
 ## 📅 Plano de Implementação Sugerido
 
+### Fase 2.0: Scripts Críticos (Sprint 0 - Prioridade Máxima)
+1. **Corrigir bugs críticos** (cleanup_duplicates, restore_complete)
+2. **Unificar scripts restart** (único com parâmetros)
+3. **Ajustar exitus.sh** para chamar scripts corrigidos
+4. **Remover redundantes** após validação
+
 ### Fase 2.1: Fundamentos (Sprint 1)
 1. **Completar CRUD** para entidades existentes
 2. **Implementar regras de negócio** críticas
@@ -181,6 +211,7 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 
 | GAP ID | Status | Data | Responsável | Observações |
 |--------|--------|------|-------------|-------------|
+| EXITUS-SCRIPTS-001 | 📋 Análise | 28/02/2026 | IA | 18 scripts analisados, bugs críticos |
 | EXITUS-IMPORT-001 | 📋 Análise | 27/02/2026 | IA | Proposta enviada |
 | EXITUS-CRUD-001 | 📋 Análise | 27/02/2026 | IA | Mapeado 5 entidades |
 | EXITUS-BUSINESS-001 | 📋 Análise | 27/02/2026 | IA | 5 regras críticas |
@@ -206,7 +237,10 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 ### 28/02/2026 - Discussão Adicional
 - **Analisado:** Arquivos reais B3 (Excel) para importação
 - **Adicionado:** EXITUS-SEED-001 para controle de seed/reset
-- **Total:** 10 GAPs identificados
+- **Analisado:** 18 scripts existentes detalhadamente
+- **Adicionado:** EXITUS-SCRIPTS-001 como prioridade crítica
+- **Identificados:** 3 bugs críticos, 5 scripts redundantes
+- **Total:** 11 GAPs identificados
 - **Design criado:** Sistema completo de seed controlado
 
 ---
@@ -214,7 +248,9 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 ## 🚀 Próximos Passos
 
 1. **Aprovar priorização** dos GAPs
-2. **Iniciar Fase 3** com primeiro GAP aprovado (sugerido: EXITUS-IMPORT-001)
+2. **Iniciar Fase 3** com GAP de prioridade crítica (EXITUS-SCRIPTS-001)
+3. **Corrigir bugs críticos** imediatamente
+4. **Unificar scripts** restart/start/stop
 
 ---
 
