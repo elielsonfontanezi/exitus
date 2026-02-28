@@ -15,53 +15,68 @@
 
 ---
 
-## 🎯 Abordagem Aprovada: Script Padrão + API
+## 🎯 APIs Propostas
 
-### 1. Script Padrão (Recomendado para uso direto)
-```bash
-# scripts/import_b3.py
-python scripts/import_b3.py <arquivo_movimentacoes> <arquivo_negociacoes>
-
-# Exemplos:
-python scripts/import_b3.py movimentacao-20260101-20260131.csv negociacao-20260101-20260131.csv
-python scripts/import_b3.py movimentacao-20260101-20260131.csv  # Apenas movimentações
-```
-
-### 2. APIs (Para integrações futuras)
+### 1. Importar Movimentações (Proventos)
 ```http
 POST /api/import/b3/movimentacoes
 Content-Type: multipart/form-data
+
 file: movimentacao-20260101-20260131.csv
 ```
 
+### 2. Importar Negociações (Compras/Vendas)
 ```http
 POST /api/import/b3/negociacoes
 Content-Type: multipart/form-data
+
 file: negociacao-20260101-20260131.csv
 ```
 
-### 3. Vantagens do Script Padrão
-- ✅ **Flexibilidade:** Linha de comando, agendável (cron)
-- ✅ **Testabilidade:** Fácil testar localmente
-- ✅ **Independência:** Não depende da API estar rodando
-- ✅ **Backup:** Importação manual possível
+---
+
+## 📊 Estrutura Real dos Arquivos B3 (Excel)
+
+### Movimentações (movimentacao-*.xlsx)
+**Colunas:**
+- `Entrada/Saída` (Credito)
+- `Data` (25/02/2026)
+- `Movimentação` (Rendimento, Dividendo, Juros Sobre Capital, etc.)
+- `Produto` (ALZR11 - ALIANZA TRUST RENDA IMOBILIARIA...)
+- `Instituição` (ITAU CV S/A)
+- `Quantidade`, `Preço unitário`, `Valor da Operação`
+
+### Negociações (negociacao-*.xlsx)
+**Colunas:**
+- `Data do Negócio` (20/01/2026)
+- `Tipo de Movimentação` (Compra, Venda)
+- `Mercado` (Mercado à Vista)
+- `Prazo/Vencimento` (-)
+- `Instituição` (ITAU CV S/A)
+- `Código de Negociação` (BTLG11)
+- `Quantidade`, `Preço`, `Valor`
 
 ---
 
-## 📊 Estrutura dos Arquivos B3
+## 🔄 Mapeamento Portal B3 → Exitus
 
-### Movimentações
-```csv
-Data;Tipo;Ativo;Quantidade;Valor Unitário;Valor Total;IR
-15/01/2026;DIVIDENDO;PETR4;100;0.50;50.00;0.00
-20/01/2026;JUROS SOBRE CAPITAL;VALE3;50;2.00;100.00;13.00
-```
+### Tipos de Movimentação
+| Portal B3 | ENUM Exitus | Observações |
+|---|---|---|
+| Rendimento | RENDIMENTO | ✅ Já previsto |
+| Juros Sobre Capital Próprio | JUROS_CAPITAL | ✅ Já previsto |
+| Dividendo | DIVIDENDO | ✅ Já previsto |
+| Direito de Subscrição | DIREITO_SUBSCRICAO | ✅ Já previsto |
+| Atualização | ATUALIZACAO | ✅ Já previsto |
+| Cessão de Direitos | CESSAO_DIREITOS | ✅ Já previsto |
+| Transferência - Liquidação | TRANSFERENCIA | ✅ Já previsto |
+| Reembolso | REEMBOLSO | ✅ Já previsto |
 
-### Negociações
-```csv
-Data;Tipo Operação;Mercado;Papel;Quantidade;Preço;Valor Total;Taxas
-10/01/2026;Compra;Vista;PETR4;100;35.50;3550.00;2.50
-15/01/2026;Venda;Vista;VALE3;200;42.00;8400.00;4.20
+### Formato Híbrido (CSV + Excel)
+```bash
+# Suporte a ambos os formatos
+python scripts/import_b3.py movimentacao.xlsx negociacao.xlsx
+python scripts/import_b3.py movimentacao.csv negociacao.csv
 ```
 
 ---
@@ -72,60 +87,88 @@ Data;Tipo Operação;Mercado;Papel;Quantidade;Preço;Valor Total;Taxas
 | Campo B3 | Campo Exitus | Transformação |
 |---|---|---|
 | Data | `data_pagamento` | DD/MM/YYYY → DATE |
-| Tipo | `tipo_provento` | Mapeamento direto |
-| Ativo | `ativo_id` | Criar se não existir |
+| Movimentação | `tipo_provento` | Mapeamento Portal B3 → ENUM |
+| Produto | `ativo_id` | Split no hífen, criar se não existir |
+| Instituição | `corretora_id` | Criar/associar corretora real |
 | Quantidade | `quantidade` | Direct |
-| Valor Unitário | `valor_unitario` | Direct |
-| Valor Total | `valor_bruto` | Direct |
-| IR | `imposto_retido` | Direct |
-| (calculado) | `valor_liquido` | `valor_bruto - imposto_retido` |
+| Preço unitário | `valor_unitario` | Direct |
+| Valor da Operação | `valor_bruto` | Direct |
+| (calculado) | `valor_liquido` | `valor_bruto` (sem IR explicito) |
 | (calculado) | `data_com` | `data_pagamento - 2 dias úteis` |
 
 ### Negociações → `transacao`
 | Campo B3 | Campo Exitus | Transformação |
 |---|---|---|
-| Data | `data_operacao` | DD/MM/YYYY → DATE |
-| Tipo Operação | `tipo_operacao` | "Compra"→COMPRA, "Venda"→VENDA |
-| Papel | `ativo_id` | Criar se não existir |
+| Data do Negócio | `data_operacao` | DD/MM/YYYY → DATE |
+| Tipo de Movimentação | `tipo_operacao` | "Compra"→COMPRA, "Venda"→VENDA |
+| Código de Negociação | `ativo_id` | Criar se não existir |
+| Instituição | `corretora_id` | Criar/associar corretora real |
 | Quantidade | `quantidade` | Direct |
 | Preço | `preco_unitario` | Direct |
-| Valor Total | `valor_total` | Direct |
-| Taxas | `taxas` | 0.00 (ignorar) |
+| Valor | `valor_total` | Direct |
+| (calculado) | `taxas` | 0.00 (não informado) |
 | (calculado) | `custo_total` | `valor_total + taxas` |
 
 ---
 
 ## ⚙️ Lógica de Implementação
 
-### 1. Upload e Parse
+### 1. Parse Híbrido (CSV + Excel)
 ```python
-def parse_b3_csv(file_content, tipo):
-    reader = csv.DictReader(file_content, delimiter=';')
+import pandas as pd
+import csv
+from pathlib import Path
+
+def parse_b3_file(arquivo_path, tipo):
+    """Parse CSV ou Excel do Portal B3"""
+    arquivo_path = Path(arquivo_path)
+    
+    # Detectar formato
+    if arquivo_path.suffix.lower() == '.xlsx':
+        return parse_excel(arquivo_path, tipo)
+    elif arquivo_path.suffix.lower() == '.csv':
+        return parse_csv(arquivo_path, tipo)
+    else:
+        raise ValueError("Formato não suportado. Use .csv ou .xlsx")
+
+def parse_excel(arquivo_path, tipo):
+    """Parse arquivo Excel do Portal B3"""
+    df = pd.read_excel(arquivo_path)
     operacoes = []
     
-    for row in reader:
+    for _, row in df.iterrows():
         if tipo == 'movimentacao':
+            # Extrair ticker do Produto (ex: "ALZR11 - ALIANZA TRUST...")
+            produto = row['Produto']
+            ticker = produto.split(' - ')[0].strip() if ' - ' in produto else produto
+            
             op = {
                 'data': parse_date(row['Data']),
-                'tipo_provento': mapear_tipo_provento(row['Tipo']),
-                'ticker': row['Ativo'],
-                'quantidade': int(row['Quantidade']),
-                'valor_unitario': float(row['Valor Unitário']),
-                'valor_bruto': float(row['Valor Total']),
-                'imposto_retido': float(row['IR'])
+                'tipo_provento': mapear_tipo_provento(row['Movimentação']),
+                'ticker': ticker,
+                'corretora': row['Instituição'],
+                'quantidade': int(row['Quantidade']) if pd.notna(row['Quantidade']) else 0,
+                'valor_unitario': float(row['Preço unitário']) if pd.notna(row['Preço unitário']) else 0.0,
+                'valor_bruto': float(row['Valor da Operação']) if pd.notna(row['Valor da Operação']) else 0.0
             }
         elif tipo == 'negociacao':
             op = {
-                'data': parse_date(row['Data']),
-                'tipo_operacao': mapear_tipo_operacao(row['Tipo Operação']),
-                'ticker': row['Papel'],
+                'data': parse_date(row['Data do Negócio']),
+                'tipo_operacao': mapear_tipo_operacao(row['Tipo de Movimentação']),
+                'ticker': row['Código de Negociação'],
+                'corretora': row['Instituição'],
                 'quantidade': int(row['Quantidade']),
                 'preco_unitario': float(row['Preço']),
-                'valor_total': float(row['Valor Total']),
-                'taxas': 0.00  # Ignorar taxas
+                'valor_total': float(row['Valor'])
             }
         operacoes.append(op)
     
+    return operacoes
+
+def parse_csv(arquivo_path, tipo):
+    """Parse arquivo CSV (se usuário converter)"""
+    df = pd.read_csv(arquivo_path, delimiter=';')
+    # Lógica similar ao parse_excel mas com colunas CSV
     return operacoes
 ```
 
@@ -328,67 +371,32 @@ def atualizar_posicoes_usuario(usuario_id):
 
 ---
 
-## 📦 Estrutura do Script
+## 🔄 Mapeamento Portal B3 → ENUMs
 
-### scripts/import_b3.py
 ```python
-#!/usr/bin/env python3
-"""
-Script padrão para importação de dados da B3
-Uso: python scripts/import_b3.py <arquivo_movimentacoes> <arquivo_negociacoes>
-"""
+def mapear_tipo_provento(tipo_b3):
+    """Mapeia tipo do Portal B3 para ENUM Exitus"""
+    mapeamento = {
+        "Rendimento": "RENDIMENTO",
+        "Juros Sobre Capital Próprio": "JUROS_CAPITAL",
+        "Dividendo": "DIVIDENDO",
+        "Direito de Subscrição": "DIREITO_SUBSCRICAO",
+        "Atualização": "ATUALIZACAO",
+        "Cessão de Direitos": "CESSAO_DIREITOS",
+        "Transferência - Liquidação": "TRANSFERENCIA",
+        "Reembolso": "REEMBOLSO",
+        "Direitos de Subscrição - Não Exercido": "DIREITO_SUBSCRICAO_NAO_EXERCIDO",
+        "Cessão de Direitos - Solicitada": "CESSAO_DIREITOS_SOLICITADA"
+    }
+    return mapeamento.get(tipo_b3, tipo_b3)  # Fallback para o próprio nome
 
-import sys
-import os
-from pathlib import Path
-
-# Adicionar backend ao path
-sys.path.append(str(Path(__file__).parent.parent / "backend"))
-
-from backend.app import create_app
-from backend.app.services.import_b3_service import ImportB3Service
-
-def main():
-    app = create_app()
-    
-    with app.app_context():
-        service = ImportB3Service()
-        usuario_id = os.getenv('EXITUS_USER_ID')  # Opcional
-        
-        # Importar movimentações
-        if len(sys.argv) > 1:
-            arquivo_mov = Path(sys.argv[1])
-            if arquivo_mov.exists():
-                print(f"📁 Importando movimentações de: {arquivo_mov}")
-                result = service.importar_movimentacoes(arquivo_mov, usuario_id)
-                print(f"✅ Movimentações: {result}")
-        
-        # Importar negociações
-        if len(sys.argv) > 2:
-            arquivo_neg = Path(sys.argv[2])
-            if arquivo_neg.exists():
-                print(f"📁 Importando negociações de: {arquivo_neg}")
-                result = service.importar_negociacoes(arquivo_neg, usuario_id)
-                print(f"✅ Negociações: {result}")
-
-if __name__ == "__main__":
-    main()
-```
-
-### backend/app/services/import_b3_service.py
-```python
-"""Service compartilhado para importação B3 (usado por script e API)"""
-
-class ImportB3Service:
-    def importar_movimentacoes(self, arquivo, usuario_id=None):
-        """Importa arquivo de movimentações CSV"""
-        # Implementação usando B3CSVAdapter
-        pass
-    
-    def importar_negociacoes(self, arquivo, usuario_id=None):
-        """Importa arquivo de negociações CSV"""
-        # Implementação usando B3CSVAdapter
-        pass
+def mapear_tipo_operacao(tipo_b3):
+    """Mapeia tipo do Portal B3 para ENUM Exitus"""
+    mapeamento = {
+        "Compra": "COMPRA",
+        "Venda": "VENDA"
+    }
+    return mapeamento.get(tipo_b3, tipo_b3)
 ```
 
 ## 📦 Dependências Necessárias
@@ -397,21 +405,25 @@ class ImportB3Service:
 # requirements.txt (adicionar)
 requests>=2.31.0      # Para APIs externas
 yfinance>=0.2.18     # Fallback para dados de ativos
+pandas>=2.0.0        # Parse Excel/CSV
+openpyxl>=3.1.0      # Suporte Excel
 ```
 
 ---
 
 ## 📝 Próximos Passos
 
-1. Adicionar dependências ao requirements.txt
-2. Criar `scripts/import_b3.py` (script padrão)
+1. Adicionar dependências ao requirements.txt (pandas, openpyxl)
+2. Criar `scripts/import_b3.py` (script padrão híbrido)
 3. Criar `backend/app/services/import_b3_service.py` (service compartilhado)
-4. Criar `backend/app/services/import_b3_adapter.py` (adapter CSV)
-5. Implementar parsers CSV e lógica de importação
-6. Criar blueprint `import_export_blueprint.py` (APIs opcionais)
-7. Escrever testes para script e service
-8. Documentar em API_REFERENCE.md
-9. Testar com arquivos reais da B3
+4. Criar `backend/app/services/import_b3_adapter.py` (adapter Excel/CSV)
+5. Implementar mapeamento Portal B3 → ENUMs
+6. Implementar parse híbrido (Excel prioritário, CSV fallback)
+7. Implementar criação automática de corretoras reais
+8. Criar blueprint `import_export_blueprint.py` (APIs opcionais)
+9. Escrever testes com arquivos reais da B3
+10. Documentar em API_REFERENCE.md
+11. Testar com seus arquivos reais (movimentacao-*.xlsx, negociacao-*.xlsx)
 
 ---
 
