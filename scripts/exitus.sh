@@ -225,8 +225,13 @@ cmd_rebuild() {
             cd frontend && podman build -t exitus-frontend:latest . && cd ..
             
             echo -e "${YELLOW}[3/3]${NC} Iniciando novo container..."
-            podman run -d --name exitus-frontend --network exitus-net -p 8080:80 \
-              --env-file frontend/.env \
+            podman run -d \
+              --name exitus-frontend \
+              --network exitus-net \
+              -p 8080:8080 \
+              -v ./frontend/app:/app/app:Z \
+              -v exitus-frontend-logs:/app/logs:Z \
+              --env-file ./frontend/.env \
               exitus-frontend:latest
               
             sleep 5
