@@ -47,6 +47,7 @@
 | **EXITUS-MONITOR-001** | Monitoramento/alertas em tempo real | Não implementado | Médio | Média |
 | **EXITUS-NEWAPIS-001** | APIs de configuração | Não implementado | Médio | Média |
 | **EXITUS-UNITS-001** | Tratamento de UNITS (B3) | Não implementado | Médio | Média |
+| **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | Não implementado | Alto | Alta |
 
 ### 3. Funcionalidades Opcionais (Baixa Prioridade)
 
@@ -110,6 +111,33 @@ GET /api/export/{relatorio_id}/pdf
 - Ajustar cálculos de posição
 - Tratar conversões em transações
 
+### EXITUS-SEED-001: Sistema de Seed/Reset Controlado
+**Problema:** Não há forma de resetar o DB para estado conhecido de testes
+
+**Impactos:**
+- Testes inconsistentes com dados acumulados
+- Dificuldade de debugar problemas
+- Desenvolvimento lento sem reset rápido
+- Impossível testar cenários específicos
+
+**Solução proposta:**
+```bash
+# Script principal
+python scripts/reset_and_seed.py [--clean] [--seed-type=full|minimal|custom]
+
+# Backup/Restore de cenários
+python scripts/backup_test_data.py --save|--restore scenario_name
+```
+
+**Tipos de seed:**
+- **minimal:** Usuários, estrutura básica
+- **full:** 56 ativos, transações, posições, relatórios
+- **custom:** JSON com dados específicos
+
+**Integração com testes:**
+- Fixture pytest para reset automático
+- Cenários padronizados para testes específicos
+
 ---
 
 ## 📅 Plano de Implementação Sugerido
@@ -161,6 +189,7 @@ GET /api/export/{relatorio_id}/pdf
 | EXITUS-NEWAPIS-001 | 📋 Análise | 27/02/2026 | IA | 3 APIs básicas |
 | EXITUS-MULTICLIENTE-001 | 📋 Análise | 27/02/2026 | IA | Reclassificado Média-Alta |
 | EXITUS-UNITS-001 | 📋 Análise | 27/02/2026 | IA | Adicionado roadmap |
+| EXITUS-SEED-001 | 📋 Análise | 28/02/2026 | IA | Design detalhado criado |
 | EXITUS-CRIPTO-001 | 📋 Análise | 27/02/2026 | IA | Prioridade baixa |
 
 ---
@@ -173,6 +202,12 @@ GET /api/export/{relatorio_id}/pdf
 - **8 GAPs identificados** com priorização
 - **Decisão:** Multi-cliente reclassificado para Média-Alta (potencial comercial)
 - **Adicionado:** EXITUS-UNITS-001 para tratamento de UNITS B3
+
+### 28/02/2026 - Discussão Adicional
+- **Analisado:** Arquivos reais B3 (Excel) para importação
+- **Adicionado:** EXITUS-SEED-001 para controle de seed/reset
+- **Total:** 10 GAPs identificados
+- **Design criado:** Sistema completo de seed controlado
 
 ---
 
