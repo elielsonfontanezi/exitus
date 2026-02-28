@@ -19,6 +19,9 @@ logs/
 *.db
 backups/
 
+# tmp
+tmp/
+
 # IDEs/editors
 .vscode/
 .idea/
