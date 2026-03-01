@@ -30,12 +30,12 @@ scripts/
 ├── start_exitus.sh                  # Inicia todos serviços
 ├── startexitus-local.sh             # Start local
 ├── stop_exitus.sh                   # Para todos serviços
-├── validate_docs.sh                 # Valida documentação
 └── exitus.sh                        # Script unificado (NOVO)
 
 # 🗑️ Scripts Removidos
 ├── cleanup_duplicates.sh           # REMOVIDO: complexidade desnecessária
 ├── restore_complete.sh              # REMOVIDO: função crítica mal implementada
+├── validate_docs.sh                 # REMOVIDO: intenção obsoleta
 ```
 
 ---
