@@ -72,17 +72,20 @@
 - Scripts obsoletos (`validate_docs.sh` verifica docs antigos)
 
 **Análise completa:**
-- ✅ **10 scripts bem implementados** (backup, rebuild, setup, etc.)
-- ⚠️ **1 script com bugs** (nenhum - todos resolvidos)
-- 🔄 **5 scripts redundantes** (start/stop/restart múltiplas versões)
+- ✅ **13 scripts bem implementados** (backup, rebuild, setup, start, restart, etc.)
+- ⚠️ **0 scripts com bugs** (todos resolvidos)
+- 🔄 **0 scripts redundantes** (todos têm propósitos distintos)
 - 🗑️ **3 scripts removidos** (cleanup_duplicates, restore_complete, validate_docs)
+- 📝 **1 script renomeado** (startexitus-local.sh → repair_containers.sh)
 
-**Solução proposta:**
-1. **Corrigir bugs críticos** imediatamente
-2. **Unificar restart** em script único com parâmetros
-3. **Manter melhores scripts** (`startexitus-local.sh`, `populate_seeds.sh`)
-4. **Ajustar `exitus.sh`** para chamar scripts corrigidos
-5. **Remover redundantes** após validação
+**Solução implementada:**
+1. ✅ **Corrigidos bugs críticos** (3 scripts removidos)
+2. ✅ **Padronizados volumes** (seguindo setup_containers.sh)
+3. ✅ **Renomeado script** (startexitus-local.sh → repair_containers.sh)
+4. ✅ **Mantidos todos scripts** (propósitos distintos, não redundantes)
+5. ✅ **Atualizada documentação** (README.md, ROADMAP.md)
+
+**Status:** Scripts otimizados e padronizados
 
 ### EXITUS-RECOVERY-001: Sistema de Restore/Recovery Robusto
 **Problema:** Script de restore removido por ser crítico e mal implementado

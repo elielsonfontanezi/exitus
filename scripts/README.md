@@ -28,7 +28,7 @@ scripts/
 ├── setup_containers.sh              # Setup inicial containers
 ├── setup_env.sh                     # Configura ambiente
 ├── start_exitus.sh                  # Inicia todos serviços
-├── startexitus-local.sh             # Start local
+├── repair_containers.sh             # Health check + repair containers
 ├── stop_exitus.sh                   # Para todos serviços
 └── exitus.sh                        # Script unificado (NOVO)
 
@@ -98,6 +98,21 @@ scripts/
 ./scripts/restart_backend.sh
 ```
 ❌ **Problemas:** Apenas restart, sem rebuild
+
+#### `repair_containers.sh` ⭐
+**Health check + repair dos containers**
+```bash
+./scripts/repair_containers.sh
+```
+- ✅ Verifica status de cada container (DB, Backend, Frontend)
+- ✅ Health checks específicos (psql, /health endpoints)
+- ✅ Reinicia automaticamente se health falhar
+- ✅ Aguarda container ficar saudável (timeout 40s)
+- ✅ Robusto com `set -euo pipefail`
+
+**Diferença de `start_exitus.sh`:**
+- `start_exitus.sh`: Apenas inicia containers parados
+- `repair_containers.sh`: Analisa + corrige + garante funcionamento
 
 ---
 
