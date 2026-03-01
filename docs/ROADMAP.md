@@ -35,8 +35,9 @@
 | GAP ID | Funcionalidade | Status Real | Impacto | Prioridade |
 |--------|---------------|-------------|---------|------------|
 | **EXITUS-SCRIPTS-001** | Otimização e unificação de scripts | 18 scripts analisados | Crítico | Crítica |
+| **EXITUS-RECOVERY-001** | Sistema de Restore/Recovery Robusto | Removido para replanejamento | Crítico | Crítica |
 | **EXITUS-IMPORT-001** | Importação/Exportação (CSV, Excel, JSON, PDF) | Apenas stub JSON | Alto | Alta |
-| **EXITUS-CRUD-001** | CRUD incompleto para entidades | Faltam POST/PUT/DELETE | Alto | Alta |
+| **EXITUS-CRUD-001** | CRUD incompleto para entidades | Faltan POST/PUT/DELETE | Alto | Alta |
 | **EXITUS-BUSINESS-001** | Regras de negócio críticas | Não implementado | Alto | Alta |
 | **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | Não implementado | Alto | Alta |
 
@@ -82,6 +83,25 @@
 3. **Manter melhores scripts** (`startexitus-local.sh`, `populate_seeds.sh`)
 4. **Ajustar `exitus.sh`** para chamar scripts corrigidos
 5. **Remover redundantes** após validação
+
+### EXITUS-RECOVERY-001: Sistema de Restore/Recovery Robusto
+**Problema:** Script de restore removido por ser crítico e mal implementado
+
+**Impactos críticos:**
+- Sistema de recovery é essencial para produção
+- Script atual era frágil (referências erradas, sem validações)
+- Restore envolve DB, containers, seeds - precisa arquitetura robusta
+- Risco de corrupção de dados com implementação precária
+
+**Requisitos futuros:**
+- **Validação de integridade** antes do restore
+- **Backup automático** pré-restore
+- **Rollback automático** em caso de falha
+- **Múltiplos cenários** (parcial, completo, point-in-time)
+- **Interface amigável** e segura
+- **Logs detalhados** e auditoria
+
+**Status:** Removido para replanejamento futuro como GAP dedicado
 
 ### EXITUS-IMPORT-001: Importação/Exportação
 **Problema:** Usuários não podem migrar dados ou exportar para análise externa

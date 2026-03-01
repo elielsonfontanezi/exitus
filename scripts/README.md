@@ -24,7 +24,6 @@ scripts/
 ├── restart_backend.sh               # Restart rápido backend
 ├── restart_exitus.sh               # Restart todos serviços
 ├── restart_frontend.sh              # Restart rápido frontend
-├── restore_complete.sh              # Restore completo
 ├── restore_db.sh                    # Restore do banco
 ├── setup_containers.sh              # Setup inicial containers
 ├── setup_env.sh                     # Configura ambiente
@@ -36,6 +35,7 @@ scripts/
 
 # 🗑️ Scripts Removidos
 ├── cleanup_duplicates.sh           # REMOVIDO: complexidade desnecessária
+├── restore_complete.sh              # REMOVIDO: função crítica mal implementada
 ```
 
 ---
