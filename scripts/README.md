@@ -30,7 +30,11 @@ scripts/
 ├── start_exitus.sh                  # Inicia todos serviços
 ├── repair_containers.sh             # Health check + repair containers
 ├── stop_exitus.sh                   # Para todos serviços
-└── exitus.sh                        # Script unificado (NOVO)
+├── exitus.sh                        # Script unificado (NOVO)
+├── recovery_manager.sh              # Orquestrador de recovery (NOVO)
+├── validate_recovery.sh             # Validações pós-operação (NOVO)
+├── rollback_recovery.sh             # Rollback automático (NOVO)
+└── recovery_dashboard.sh            # Interface TUI interativa (NOVO)
 
 # 🗑️ Scripts Removidos
 ├── cleanup_duplicates.sh           # REMOVIDO: complexidade desnecessária
@@ -160,7 +164,77 @@ scripts/
 
 ---
 
-## 🔧 Scripts de Desenvolvimento
+## � Scripts de Recovery (NOVO - EXITUS-RECOVERY-001)
+
+### `recovery_manager.sh` ⭐⭐⭐
+**Orquestrador principal do sistema de recovery**
+```bash
+./scripts/recovery_manager.sh [modo] [opções]
+
+# Exemplos:
+./scripts/recovery_manager.sh backup --type=full
+./scripts/recovery_manager.sh restore --from=backup_20260301.sql
+./scripts/recovery_manager.sh reset --mode=full
+./scripts/recovery_manager.sh validate --check=integrity
+./scripts/recovery_manager.sh dashboard
+```
+- ✅ **Backup:** Full, incremental, agendado
+- ✅ **Restore:** Com validação e rollback automático
+- ✅ **Reset:** Full, minimal, custom
+- ✅ **Validate:** Integridade, health, performance
+- ✅ **Dashboard:** Interface TUI interativa
+- ✅ **Enterprise:** Compressão, checksum, metadados
+
+### `validate_recovery.sh` ⭐⭐
+**Validações pós-operação do sistema**
+```bash
+./scripts/validate_recovery.sh [tipo]
+
+# Tipos:
+./scripts/validate_recovery.sh full      # Validação completa
+./scripts/validate_recovery.sh database  # Integridade do DB
+./scripts/validate_recovery.sh health    # Health checks
+./scripts/validate_recovery.sh endpoints # Endpoints críticos
+```
+- ✅ **Integridade do banco:** Tabelas, constraints, dados
+- ✅ **Health checks:** Database, backend, frontend
+- ✅ **Endpoints:** API críticas funcionando
+- ✅ **Consistência:** Dados órfãos, saldos
+- ✅ **Performance:** Tempos de resposta, memória
+- ✅ **Relatórios:** JSON com métricas detalhadas
+
+### `rollback_recovery.sh` ⭐⭐
+**Rollback automático de operações**
+```bash
+./scripts/rollback_recovery.sh [operação]
+
+# Operações:
+./scripts/rollback_recovery.sh list                    # Listar pontos
+./scripts/rollback_recovery.sh rollback --to=rollback_id
+./scripts/rollback_recovery.sh auto                     # Última operação
+./scripts/rollback_recovery.sh cleanup --days=7        # Limpar antigos
+```
+- ✅ **Pontos de rollback:** Automáticos pré-operação
+- ✅ **Validação:** Checksum, integridade
+- ✅ **Segurança:** Backup pré-rollback
+- ✅ **Recuperação:** Auto-recuperação em falhas
+- ✅ **Gerenciamento:** Limpeza automática
+
+### `recovery_dashboard.sh` ⭐⭐⭐
+**Interface TUI interativa para operações**
+```bash
+./scripts/recovery_dashboard.sh
+```
+- ✅ **Interface amigável:** Menu visual intuitivo
+- ✅ **Status em tempo real:** Containers, backups, disco
+- ✅ **Operações guiadas:** Backup, restore, reset, validate
+- ✅ **Logs integrados:** Visualização de logs
+- ✅ **Configurações:** Preferências do sistema
+- ✅ **Navegação:** Teclas de atalho, help integrado
+
+---
+
+## �🔧 Scripts de Desenvolvimento
 
 ### `get_backend_token.sh` ⭐
 **Obtém token JWT para testes**
