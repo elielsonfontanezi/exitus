@@ -8,6 +8,35 @@ e este projeto adere semanticamente à versão v0.7.10.
 
 ## [Unreleased]
 
+### Added
+- **EXITUS-SCRIPTS-001** — Otimização e unificação completa do sistema de scripts
+  - Removidos 3 scripts obsoletos (cleanup_duplicates.sh, restore_complete.sh, validate_docs.sh)
+  - Renomeado startexitus-local.sh → repair_containers.sh (nome mais descritivo)
+  - Padronizados volumes em todos os scripts (./backend:/app:Z, ./frontend:/app:Z)
+  - Mantidos 15 scripts funcionais com propósitos distintos
+  - Documentação completa em scripts/README.md
+
+- **EXITUS-RECOVERY-001** — Sistema enterprise-grade de backup/restore/recovery
+  - Criado recovery_manager.sh (orquestrador principal com 600+ linhas)
+  - Criado validate_recovery.sh (validações abrangentes pós-operação)
+  - Criado rollback_recovery.sh (rollback automático com segurança)
+  - Criado recovery_dashboard.sh (interface TUI interativa)
+  - Enterprise features: compressão gzip, checksum SHA-256, metadados JSON
+  - Segurança: backup pré-operação, rollback automático, validações
+  - Integração com scripts existentes (backup_db.sh, restore_db.sh, populate_seeds.sh)
+
+### Changed
+- **Scripts de volumes** — Padronização completa seguindo setup_containers.sh
+  - rebuild_restart_exitus-backend.sh: volumes corrigidos para ./backend:/app:Z
+  - rebuild_restart_exitus-frontend.sh: volumes corrigidos para ./frontend:/app:Z
+  - scripts/exitus.sh: volumes atualizados para consistência
+  - liberação de portas adicionada em rebuild_restart_exitus-frontend.sh
+
+### Fixed
+- **Inconsistência de volumes** entre setup_containers.sh e scripts de rebuild
+- **Scripts obsoletos** removidos (bugs e complexidade desnecessária)
+- **Nomenclatura confusa** em scripts (startexitus-local.sh → repair_containers.sh)
+
 ### Gaps Registrados
 - **EXITUS-HEALTH-001** — `GET /health` não expunha metadados de build (versão/commit)
   e retornava apenas uma string de `module`, dificultando rastreabilidade durante validações.
@@ -375,6 +404,6 @@ Status: **PRODUCTION READY**
 
 ---
 
-*Última atualização: 22 de Fevereiro de 2026*
-*Versão atual: v0.7.10 — M2-POSICOES validado (8 GAPs fechados)*
+*Última atualização: 01 de Março de 2026*
+*Versão atual: v0.7.10 — M2-POSICOES validado + EXITUS-SCRIPTS-001 + EXITUS-RECOVERY-001*
 *Contribuidores: Elielson Fontanezi, Perplexity AI (documentação v0.7.8–v0.7.10)*

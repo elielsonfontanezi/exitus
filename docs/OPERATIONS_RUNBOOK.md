@@ -278,7 +278,7 @@ podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ./scripts/restart_exitus.sh
 
 # Modo Seguro / Health Check
-./scripts/startexitus-local.sh
+./scripts/repair_containers.sh
 
 # Restart frontend
 ./scripts/restart_frontend.sh
@@ -306,7 +306,7 @@ podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 * **Quando usar:** No dia a dia, quando o ambiente já está configurado e você apenas precisa subir os serviços.
 * **Comportamento:** Executa o `podman start`, aguarda um `sleep` fixo e exibe a tabela de status ao final.
 
-#### `startexitus-local.sh` (Modo Seguro / Health Check)
+#### `repair_containers.sh` (Modo Seguro / Health Check)
 
 **Objetivo:** Garante que cada serviço esteja **realmente pronto** antes de prosseguir.
 
@@ -357,7 +357,7 @@ chmod +x scripts/*.sh
 | Ação | Comando |
 | --- | --- |
 | **Subir ambiente rápido** | `./scripts/start_exitus.sh` |
-| **Subir com validação (Safe)** | `./scripts/startexitus-local.sh` |
+| **Subir com validação (Safe)** | `./scripts/repair_containers.sh` |
 | **Parar tudo** | `./scripts/stop_exitus.sh` |
 | **Reiniciar tudo** | `./scripts/restart_exitus.sh` |
 
@@ -379,7 +379,7 @@ podman ps --filter name=exitus
 
 ---
 
-> **Nota:** Se algum serviço falhar persistentemente no `startexitus-local.sh`, verifique os logs específicos usando `podman logs [nome-do-container]`.
+> **Nota:** Se algum serviço falhar persistentemente no `repair_containers.sh`, verifique os logs específicos usando `podman logs [nome-do-container]`.
 
 ---
 

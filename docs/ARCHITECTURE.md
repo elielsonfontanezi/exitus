@@ -787,6 +787,58 @@ gunicorn --workers 4 --threads 2 --bind 0.0.0.0:5000 app:app
 | **Concurrent Users** | 20-40 | Teste de stress |
 | **Database Connections** | Max 100 | Pool SQLAlchemy |
 
+---
+
+## Sistema de Recovery (EXITUS-RECOVERY-001)
+
+### Arquitetura Enterprise de Backup/Restore
+
+**Componentes Principais**:
+```yaml
+Orquestrador: recovery_manager.sh (600+ linhas)
+Validações: validate_recovery.sh (300+ linhas)
+Rollback: rollback_recovery.sh (400+ linhas)
+Interface: recovery_dashboard.sh (500+ linhas)
+```
+
+**Enterprise Features**:
+- **Compressão gzip** automática de backups
+- **Checksum SHA-256** para integridade
+- **Metadados JSON** para rastreabilidade
+- **Backup pré-operação** para rollback
+- **Health checks** abrangentes
+- **Interface TUI** amigável
+- **Logs estruturados** em JSON
+
+**Modos de Operação**:
+```bash
+# Backup
+recovery_manager.sh backup --type=full|incremental|scheduled
+
+# Restore
+recovery_manager.sh restore --from=backup_20260301.sql --validate
+
+# Reset
+recovery_manager.sh reset --mode=full|minimal|custom
+
+# Validate
+validate_recovery.sh full|database|health|endpoints|consistency|performance
+
+# Rollback
+rollback_recovery.sh rollback --to=rollback_id
+rollback_recovery.sh auto
+
+# Dashboard
+recovery_dashboard.sh  # Interface TUI completa
+```
+
+**Segurança e Robustez**:
+- **Zero data loss** com backup pré-operação
+- **Rollback automático** em caso de falha
+- **Validação de checksums**
+- **Recuperação automática**
+- **Auditoria completa**
+
 ### Escalabilidade Futura
 
 **Horizontal Scaling (M8+)**:
