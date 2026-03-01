@@ -118,6 +118,9 @@ Dependências:
   - Flask-CORS 4.0
   - PyJWT 2.8
   - requests 2.31
+Volumes:
+  - ./backend:/app:Z
+  - exitus-backend-logs:/app/logs:Z
 Rede: exitus-net (bridge)
 Gunicorn Workers: 4
 User: non-root (exitus:1000)
@@ -150,6 +153,9 @@ Assets Frontend:
   - Alpine.js 3.14 (via CDN)
   - TailwindCSS 3.4 (via CDN)
   - Chart.js 4.4 (via CDN)
+Volumes:
+  - ./frontend:/app:Z
+  - exitus-frontend-logs:/app/logs:Z
 Rede: exitus-net (bridge)
 User: non-root (exitus:1000)
 ```

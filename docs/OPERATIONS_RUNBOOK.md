@@ -233,6 +233,7 @@ podman run -d \
   --network exitus-net \
   --env-file .env \
   -v ./backend:/app:Z \
+  -v exitus-backend-logs:/app/logs:Z \
   -p 5000:5000 \
   exitus-backend:latest
 ```
@@ -245,6 +246,7 @@ podman run -d \
   --network exitus-net \
   --env-file .env \
   -v ./frontend:/app:Z \
+  -v exitus-frontend-logs:/app/logs:Z \
   -p 8080:8080 \
   exitus-frontend:latest
 ```
