@@ -65,7 +65,6 @@
 **Problema:** 18 scripts com redundâncias, bugs e falta de padronização
 
 **Impactos críticos:**
-- `cleanup_duplicates.sh` com bug (linha 23: `exit` impede execução)
 - `restore_complete.sh` chama script inexistente (`stop_services.sh`)
 - Múltiplos scripts para mesma função (start/stop/restart)
 - Inconsistência em validações e tratamento de erros
@@ -73,8 +72,9 @@
 
 **Análise completa:**
 - ✅ **10 scripts bem implementados** (backup, rebuild, setup, etc.)
-- ⚠️ **3 scripts com bugs** (cleanup_duplicates, restore_complete, validate_docs)
+- ⚠️ **2 scripts com bugs** (restore_complete, validate_docs)
 - 🔄 **5 scripts redundantes** (start/stop/restart múltiplas versões)
+- 🗑️ **1 script removido** (cleanup_duplicates.sh - complexidade desnecessária)
 
 **Solução proposta:**
 1. **Corrigir bugs críticos** imediatamente

@@ -29,7 +29,17 @@ Sistema **multi-mercado** (BR/US/EU/Asia) com **14 tipos de ativos**.
 - **Containers**: Podman rootless (`exitus-db`, `exitus-backend`, `exitus-frontend`)
 
 ## 🚨 REGRA #1: NUNCA EXECUTAR SEM APROVAÇÃO
-**CRÍTICO:** Pode opinar e mostrar ideias, mas **NUNCA** execute mudanças sem aprovação explícita.
+**CRÍTICO:** Sempre propor mudanças e esperar aprovação antes de executar
+# NUNCA executar mudanças sem discussão prévia com o usuário
+#
+# REGRA CRÍTICA: Antes de qualquer alteração de código:
+# 1. Explicar O QUE pretende fazer
+# 2. Explicar POR QUE está fazendo 
+# 3. Perguntar explicitamente: "Tem sua aprovação para fazer isto?"
+# 4. Esperar resposta explícita do usuário
+# 5. Apenas então implementar a mudança
+#
+# Isto permite discussão da estratégia antes da implementação.
 Fluxo obrigatório: 1) Propor → 2) Aguardar "APROVADO" → 3) Implementar
 
 ## 🚨 REGRA #2: snake_case OBRIGATÓRIO

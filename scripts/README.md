@@ -15,7 +15,6 @@ Esta pasta contém scripts utilitários para operação, desenvolvimento e manut
 scripts/
 ├── backup_db.sh                    # Backup do banco PostgreSQL
 ├── cleanup_containers.sh           # Limpeza de containers
-├── cleanup_duplicates.sh            # Remove duplicatas do DB
 ├── exitus_db_doc.sh                 # Gera documentação do DB
 ├── generate_api_docs.sh             # Gera documentação da API
 ├── get_backend_token.sh            # Obtém token JWT
@@ -32,7 +31,11 @@ scripts/
 ├── start_exitus.sh                  # Inicia todos serviços
 ├── startexitus-local.sh             # Start local
 ├── stop_exitus.sh                   # Para todos serviços
-└── validate_docs.sh                 # Valida documentação
+├── validate_docs.sh                 # Valida documentação
+└── exitus.sh                        # Script unificado (NOVO)
+
+# 🗑️ Scripts Removidos
+├── cleanup_duplicates.sh           # REMOVIDO: complexidade desnecessária
 ```
 
 ---
