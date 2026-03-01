@@ -36,7 +36,7 @@ podman run -d \
   --name exitus-frontend \
   --network exitus-net \
   -p 8080:8080 \
-  -v ./frontend/app:/app/app:Z \
+  -v ./frontend:/app:Z \
   -v exitus-frontend-logs:/app/logs:Z \
   --env-file ./frontend/.env \
   exitus-frontend:latest

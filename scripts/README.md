@@ -52,7 +52,7 @@ scripts/
 - ✅ Libera porta 5000
 - ✅ Build sem cache
 - ✅ Remove container antigo
-- ✅ Inicia com volumes e env
+- ✅ Recria com volumes padrão (`./backend:/app:Z`)
 - ✅ Health check automático
 
 #### `rebuild_restart_exitus-frontend.sh` ⭐
@@ -62,7 +62,8 @@ scripts/
 ```
 - ✅ Stop e remove container
 - ✅ Rebuild da imagem
-- ✅ Inicia com configuração correta
+- ✅ Inicia com volumes padrão (`./frontend:/app:Z`)
+- ✅ Health check automático
 - ✅ Valida funcionamento
 
 #### `setup_containers.sh` ⭐

@@ -209,8 +209,8 @@ cmd_rebuild() {
             
             echo -e "${YELLOW}[4/4]${NC} Iniciando novo container..."
             podman run -d --name exitus-backend --network exitus-net -p 5000:5000 \
-              -v $(pwd)/backend/app:/app/app \
-              -v exitus-backend-logs:/app/logs \
+              -v ./backend:/app:Z \
+              -v exitus-backend-logs:/app/logs:Z \
               --env-file backend/.env \
               exitus-backend:latest
               

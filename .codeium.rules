@@ -42,6 +42,21 @@ Sistema **multi-mercado** (BR/US/EU/Asia) com **14 tipos de ativos**.
 # Isto permite discussão da estratégia antes da implementação.
 Fluxo obrigatório: 1) Propor → 2) Aguardar "APROVADO" → 3) Implementar
 
+## 🎓 LIÇÕES APRENDIDAS (28/02/2026)
+### Erro: Análise Incompleta dos Scripts
+- **Problema:** Assumir que scripts similares estavam corretos sem verificar cada um
+- **Exemplo:** Verificar apenas rebuild_restart_exitus-backend.sh e assumir frontend correto
+- **Lição:** **SEMPRE ler CADA arquivo** mencionado na análise
+- **Regra:** Nunca assumir - sempre verificar detalhadamente
+- **Impacto:** Evita correções incompletas e retrabalho
+
+### Processo de Análise Obrigatório:
+1. **Ler TODOS** os arquivos mencionados
+2. **Comparar CADA um** com o padrão de referência
+3. **Verificar detalhes** em vez de fazer suposições
+4. **Documentar diferenças** encontradas
+5. **Propor correções completas**
+
 ## 🚨 REGRA #2: snake_case OBRIGATÓRIO
 ```
 ✅ docs/CODING_STANDARDS.md: "Official snake_case naming standard"
