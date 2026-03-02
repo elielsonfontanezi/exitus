@@ -133,7 +133,73 @@ except:
 
 # ❌ Flush sem commit
 db.session.flush()  # Dados perdidos se der erro
+
+# ❌ DROP TABLE para reset de dados (LIÇÃO APRENDIDA 02/03/2026)
+db.drop_all()        # 😱 Destrói schema!
+db.create_all()      # 😱 Recria do zero!
+# → Perde constraints, índices, migrations
 ```
+
+---
+
+## 🎓 **Lições Aprendidas (Casos Reais)**
+
+### **📋 LIÇÃO 002 - Sempre Verificar Tabelas Existentes (02/03/2026)**
+
+**❌ Problema:** Deduzir nomes de tabelas sem verificar
+```python
+# ERRADO - causou erro em runtime
+tables = ['movimentacao', 'transacao']  # movimentacao não existe!
+```
+
+**✅ Solução:** Sempre consultar o banco primeiro
+```python
+# CORRETO - verificar antes de usar
+from sqlalchemy import inspect
+tables = inspect(db.engine).get_table_names()
+# → confirmar nomes reais antes de iterar
+```
+
+**📚 Regra de Ouro:** `"Nunca deduza nomes de tabelas. Sempre consulte o banco."`
+
+**🔍 Impacto do Erro:**
+- Um nome errado aborta **toda a transação** PostgreSQL
+- Os DELETEs seguintes falham em cascata por `InFailedSqlTransaction`
+- Runtime error difícil de debugar
+
+---
+
+### **📋 LIÇÃO 001 - DELETE vs DROP TABLE (02/03/2026)**
+
+**❌ Problema:** Usar `DROP TABLE` para reset de dados
+```python
+# ERRADO - Destrutivo e desnecessário
+db.drop_all()    # Perde schema inteiro
+db.create_all()  # Recria do zero (arriscado)
+```
+
+**✅ Solução:** Usar `DELETE` para limpar apenas dados
+```python
+# CORRETO - Seguro e eficiente
+db.session.execute(text("DELETE FROM usuario"))
+db.session.execute(text("ALTER SEQUENCE usuario_id_seq RESTART WITH 1"))
+```
+
+**🎯 Por Que DELETE é Melhor:**
+- **Preserva schema** (tabelas, constraints, índices)
+- **Mantém migrations** intactas
+- **Performance superior** (mais rápido)
+- **Mais seguro** (não perde definições)
+- **IDs controlados** (reset de sequences)
+
+**📚 Contexto:**
+- **Objetivo:** "Seed controlado" = limpar dados, não estrutura
+- **Schema:** Gerenciado por Alembic migrations
+- **Resultado:** Dados limpos, estrutura intacta
+
+**🔍 Pergunta-Chave:** "O que realmente preciso resetar?"
+- **Dados?** → DELETE ✅
+- **Schema?** → DROP (raramente necessário) ⚠️
 
 ---
 

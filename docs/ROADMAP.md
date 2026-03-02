@@ -35,11 +35,11 @@
 | GAP ID | Funcionalidade | Status Real | Impacto | Prioridade |
 |--------|---------------|-------------|---------|------------|
 | **EXITUS-SCRIPTS-001** | Otimização e unificação de scripts | 18 scripts analisados | Crítico | Crítica |
-| **EXITUS-RECOVERY-001** | Sistema de Restore/Recovery Robusto | Implementado | Crítico | Crítica |
+| **EXITUS-RECOVERY-001** | Sistema de Restore/Recovery Robusto | ✅ Implementado | Crítico | Crítica |
 | **EXITUS-IMPORT-001** | Importação/Exportação (CSV, Excel, JSON, PDF) | ✅ Implementado | Alto | Alta |
 | **EXITUS-CRUD-001** | CRUD incompleto para entidades | Faltan POST/PUT/DELETE | Alto | Alta |
 | **EXITUS-BUSINESS-001** | Regras de negócio críticas | Não implementado | Alto | Alta |
-| **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | Não implementado | Alto | Alta |
+| **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | ✅ Implementado | Alto | Alta |
 | **EXITUS-CASHFLOW-001** | Tratamento de "Transferência - Liquidação" B3 | ✅ Implementado | Médio | Média |
 | **EXITUS-ASSETS-001** | Importação de Ativos Exemplo (Massa de Teste) | Não implementado | Médio | Média |
 | **EXITUS-SQLALCHEMY-001** | Padrões e Boas Práticas SQLAlchemy | Não implementado | Alto | Alta |
@@ -53,7 +53,7 @@
 | **EXITUS-MONITOR-001** | Monitoramento/alertas em tempo real | Não implementado | Médio | Média |
 | **EXITUS-NEWAPIS-001** | APIs de configuração | Não implementado | Médio | Média |
 | **EXITUS-UNITS-001** | Tratamento de UNITS (B3) | Não implementado | Médio | Média |
-| **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | Não implementado | Alto | Alta |
+| **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | ✅ Implementado | Alto | Alta |
 
 ### 3. Funcionalidades Opcionais (Baixa Prioridade)
 
@@ -255,7 +255,7 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 | EXITUS-NEWAPIS-001 | 📋 Análise | 27/02/2026 | IA | 3 APIs básicas |
 | EXITUS-MULTICLIENTE-001 | 📋 Análise | 27/02/2026 | IA | Reclassificado Média-Alta |
 | EXITUS-UNITS-001 | 📋 Análise | 27/02/2026 | IA | Adicionado roadmap |
-| EXITUS-SEED-001 | 📋 Análise | 28/02/2026 | IA | Design detalhado criado |
+| EXITUS-SEED-001 | ✅ Implementado | 02/03/2026 | IA | Sistema completo com backup/restore |
 | EXITUS-CASHFLOW-001 | ✅ Implementado | 02/03/2026 | IA | Eventos de custódia D+2 |
 | EXITUS-ASSETS-001 | 📋 Análise | 02/03/2026 | IA | Adicionado ao roadmap |
 | EXITUS-SQLALCHEMY-001 | 📋 Análise | 02/03/2026 | IA | Problemas recorrentes documentados |
@@ -271,6 +271,14 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 - **8 GAPs identificados** com priorização
 - **Decisão:** Multi-cliente reclassificado para Média-Alta (potencial comercial)
 - **Adicionado:** EXITUS-UNITS-001 para tratamento de UNITS B3
+
+### 02/03/2026 - EXITUS-SEED-001 Implementado
+- **Implementado:** Script unificado `reset_and_seed.sh` substituindo múltiplos scripts legados
+- **Implementado:** Backup/restore de cenários para debugging
+- **Migrados:** Dados legacy para formato JSON (usuarios.json, ativos_br.json, full.json)
+- **Lição:** DELETE vs DROP TABLE para reset de dados
+- **Lição:** Sempre verificar tabelas existentes, nunca deduzir
+- **Testado:** Seed minimal (3 usuários, 3 ativos, 2 corretoras) ✅
 
 ### 28/02/2026 - Discussão Adicional
 - **Analisado:** Arquivos reais B3 (Excel) para importação

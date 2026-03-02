@@ -9,6 +9,14 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-SEED-001** — Sistema de Seed/Reset Controlado completo
+  - Script unificado `reset_and_seed.sh` substitui múltiplos scripts legados
+  - Implementado backup/restore de cenários para debugging
+  - Migrados todos os dados do sistema legacy para formato JSON
+  - Comandos flexíveis: minimal, full, usuarios, ativos, legacy
+  - Help detalhado com 8 formas de execução documentadas
+  - **LIÇÃO APRENDIDA**: DELETE vs DROP TABLE para reset de dados
+
 - **EXITUS-IMPORT-001** — Importação B3 Portal Investidor completa
   - Implementado parsing de arquivos Excel/CSV da B3
   - Corrigido parsing monetário (formato European)
