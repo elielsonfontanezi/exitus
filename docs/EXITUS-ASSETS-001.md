@@ -323,8 +323,15 @@ EOF
 
 ### **Dependências**
 - `EXITUS-IMPORT-001` (✅ completo)
+- `EXITUS-SEED-001` (recomendado primeiro)
 - Modelo `Ativo` (existente)
 - Sistema de importação (estabelecido)
+
+### **Relacionamento com EXITUS-SEED-001**
+- **EXITUS-SEED-001:** Dados essenciais do sistema (usuários, configurações)
+- **EXITUS-ASSETS-001:** Dados complementares de teste (ativos exemplo)
+- **Recomendação:** Implementar EXITUS-SEED-001 primeiro, depois EXITUS-ASSETS-001
+- **Independência:** Pode funcionar sem EXITUS-SEED-001, mas ideal com ambos
 
 ### **Estimativa**
 - **Esforço:** 2-3 dias
