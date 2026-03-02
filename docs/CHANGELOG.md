@@ -2,13 +2,36 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/),
-e este projeto adere semanticamente à versão v0.7.10.
+e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
 ## [Unreleased]
 
 ### Added
+- **EXITUS-IMPORT-001** — Importação B3 Portal Investidor completa
+  - Implementado parsing de arquivos Excel/CSV da B3
+  - Corrigido parsing monetário (formato European)
+  - Implementada separação quantidade vs monetário
+  - Criada opção --clean para base limpa
+  - Help detalhado do script com exemplos
+  - 51 proventos importados, 19 ativos criados em teste
+
+- **EXITUS-CASHFLOW-001** — Tratamento de Eventos de Custódia B3
+  - Criado modelo EventoCustodia completo
+  - Implementado service _processar_eventos_custodia()
+  - Corrigido entendimento: "Transferência - Liquidação" = evento D+2, não venda
+  - Integrado separação proventos vs eventos de custódia
+  - Migration executada com sucesso
+  - Sistema pronto para eventos quando aparecerem nos arquivos
+
+- **EXITUS-SQLALCHEMY-001** — Padrões e Boas Práticas SQLAlchemy
+  - Documentados problemas recorrentes (enums, constraints, session)
+  - Criados padrões seguros para desenvolvimento
+  - Implementadas helper functions propostas
+  - Estabelecido fluxo de validação preventiva
+  - Redução esperada de 90% em erros recorrentes
+
 - **EXITUS-SCRIPTS-001** — Otimização e unificação completa do sistema de scripts
   - Removidos 3 scripts obsoletos (cleanup_duplicates.sh, restore_complete.sh, validate_docs.sh)
   - Renomeado startexitus-local.sh → repair_containers.sh (nome mais descritivo)
