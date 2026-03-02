@@ -114,6 +114,87 @@ podman exec exitus-db psql -U exitus -c "\dt"
 
 ---
 
+## 📋 **LIÇÃO 003 - PKs são UUID, não Sequences Numéricas (02/03/2026)**
+
+### **Contexto**
+Ao implementar o reset de banco, o script tentou resetar sequences numéricas (`ALTER SEQUENCE usuario_id_seq RESTART WITH 1`) que **não existem** neste sistema.
+
+### **❌ Problema**
+```python
+# ERRADO - pressupôs PKs numéricas
+sequences_to_reset = ['usuario_id_seq', 'ativo_id_seq', ...]
+db.session.execute(text("ALTER SEQUENCE usuario_id_seq RESTART WITH 1"))
+# → relation "usuario_id_seq" does not exist
+```
+
+### **✅ Realidade do Sistema**
+Todas as PKs do sistema Exitus são **UUID v4**:
+```python
+# Todos os models usam:
+id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+```
+
+**Confirmado via consulta ao banco:**
+```python
+from sqlalchemy import text
+result = db.session.execute(text(
+    "SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = 'public'"
+))
+# → SEQUENCES: []  ← Nenhuma sequence existe
+```
+
+### **📚 Implicações**
+- **Não há reset de IDs** — UUIDs são sempre únicos por design
+- **Sem colisão** entre registros de diferentes seeds
+- **Sem necessidade** de resetar sequences no processo de seed
+- **Performance:** UUID v4 é gerado em memória, sem acesso ao banco
+
+### **🔍 Regra de Ouro**
+> **"Sempre verificar o tipo de PK antes de assumir comportamento de sequence."**
+
+---
+
+## 📋 **LIÇÃO 004 - Dedução de Campo por Regra de Negócio vs Model Real (02/03/2026)**
+
+### **Contexto**
+O campo `pais` foi adicionado ao seed de `Ativo` porque **fazia sentido no domínio** (sistema multi-mercado: BR, US, EU). A `Corretora` tem `pais`. Logo, `Ativo` deveria ter também.
+
+### **❌ Raciocínio Incorreto**
+```python
+# ERRADO - dedução por lógica de domínio
+ativo = Ativo(
+    ticker='PETR4',
+    pais='BR',   # ❌ Faz sentido no domínio, mas campo não existe!
+)
+```
+
+### **✅ Realidade do Model**
+```python
+# Ativo usa 'mercado' para indicar região
+id = Column(UUID(as_uuid=True), ...)
+ticker = Column(String(20), ...)
+nome = Column(String(200), ...)
+tipo = Column(Enum(TipoAtivo), ...)
+classe = Column(Enum(ClasseAtivo), ...)
+mercado = Column(String(10), ...)  # 'BR', 'US', 'EU', 'ASIA', 'GLOBAL'
+moeda = Column(String(3), ...)
+```
+
+### **🎯 Por Que Errei**
+- **Corretora tem `pais`** → assumi que Ativo também teria
+- **Lógica de domínio coerente** → não implica que o campo existe no model
+- **`mercado`** cumpre o mesmo papel que `pais` teria em `Ativo`
+
+### **📚 Regra de Ouro**
+> **"Regra de negócio coerente ≠ campo existente no model. Sempre ler o `__tablename__` e as colunas antes de usar."**
+
+### **✅ Checklist Antes de Usar Campos de um Model**
+- [ ] Li o arquivo `models/nome_model.py` completo?
+- [ ] Verifiquei todas as `Column(...)` definidas?
+- [ ] Não estou assumindo campos por analogia com outros models?
+
+---
+
 ## 🎓 **Como Aplicar Esta Lição**
 
 ### **✅ Fazer Sempre**
