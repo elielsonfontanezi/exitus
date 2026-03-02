@@ -161,6 +161,39 @@ Para evitar erros de interpretação de Markdown e garantir a integridade técni
 
 ---
 
+### 🎓 Lições Aprendidas — Regras Obrigatórias
+
+Estas lições foram aprendidas em implementações reais e **devem ser seguidas sempre**:
+
+#### LIÇÃO 001 — DELETE vs DROP TABLE
+- **NUNCA** usar `db.drop_all()` / `db.create_all()` para reset de dados
+- **SEMPRE** usar `DELETE FROM tabela` para limpar dados
+- Schema é controlado por Alembic migrations — nunca destruir estrutura
+
+#### LIÇÃO 002 — Sempre Verificar Tabelas Existentes
+- **NUNCA** deduzir nomes de tabelas pelo domínio de negócio
+- **SEMPRE** consultar `inspect(db.engine).get_table_names()` antes de referenciar tabelas
+- Um nome errado aborta **toda a transação** PostgreSQL (`InFailedSqlTransaction`)
+
+#### LIÇÃO 003 — PKs são UUID neste Sistema
+- Todas as PKs do Exitus usam `UUID(as_uuid=True)` — **não há sequences numéricas**
+- Confirmado: `SELECT sequence_name FROM information_schema.sequences` retorna vazio
+- **Nunca** tentar `ALTER SEQUENCE ... RESTART WITH 1` neste projeto
+
+#### LIÇÃO 004 — Verificar Fields do Model Antes de Usar
+- **NUNCA** assumir campos de um model por analogia com outros models ou lógica de domínio
+- Exemplo: `Corretora` tem `pais`, mas `Ativo` usa `mercado` para o mesmo conceito
+- **SEMPRE** ler o arquivo `models/nome_model.py` completo antes de usar qualquer campo
+- Regra de negócio coerente ≠ campo existente no model
+
+#### Checklist Obrigatório ao Manipular Models/Banco
+- [ ] Li o `models/nome_model.py` completo para verificar campos reais?
+- [ ] Consultei `inspect(db.engine).get_table_names()` antes de listar tabelas?
+- [ ] Verifiquei o tipo de PK (UUID vs serial) antes de resetar sequences?
+- [ ] Usei `DELETE` ao invés de `DROP TABLE` para limpar dados?
+
+---
+
 ### Comportamento e Tom
 
 | Atributo | Postura |

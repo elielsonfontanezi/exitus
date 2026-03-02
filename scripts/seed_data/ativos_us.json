@@ -1,0 +1,172 @@
+{
+  "version": "1.0",
+  "description": "Ativos do mercado americano (US) - migrado de seed_ativos_us.py",
+  "timestamp": "2026-03-02T18:35:00Z",
+  "ativos": [
+    {
+      "ticker": "AAPL",
+      "nome": "Apple Inc.",
+      "tipo": "STOCK",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 175.50,
+      "observacoes": "Setor: Technology",
+      "ativo": true
+    },
+    {
+      "ticker": "MSFT",
+      "nome": "Microsoft Corporation",
+      "tipo": "STOCK",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 380.25,
+      "observacoes": "Setor: Technology",
+      "ativo": true
+    },
+    {
+      "ticker": "GOOGL",
+      "nome": "Alphabet Inc. Class A",
+      "tipo": "STOCK",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 140.30,
+      "observacoes": "Setor: Technology",
+      "ativo": true
+    },
+    {
+      "ticker": "AMZN",
+      "nome": "Amazon.com Inc.",
+      "tipo": "STOCK",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 155.80,
+      "observacoes": "Setor: Consumer Cyclical",
+      "ativo": true
+    },
+    {
+      "ticker": "NVDA",
+      "nome": "NVIDIA Corporation",
+      "tipo": "STOCK",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 720.45,
+      "observacoes": "Setor: Technology",
+      "ativo": true
+    },
+    {
+      "ticker": "TSLA",
+      "nome": "Tesla Inc.",
+      "tipo": "STOCK",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 245.60,
+      "observacoes": "Setor: Automotive",
+      "ativo": true
+    },
+    {
+      "ticker": "VNQ",
+      "nome": "Vanguard Real Estate ETF",
+      "tipo": "REIT",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 92.30,
+      "observacoes": "Segmento: Real Estate",
+      "ativo": true
+    },
+    {
+      "ticker": "O",
+      "nome": "Realty Income Corporation",
+      "tipo": "REIT",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 58.75,
+      "observacoes": "Segmento: Retail REIT",
+      "ativo": true
+    },
+    {
+      "ticker": "PLD",
+      "nome": "Prologis Inc.",
+      "tipo": "REIT",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 125.40,
+      "observacoes": "Segmento: Industrial REIT",
+      "ativo": true
+    },
+    {
+      "ticker": "AGG",
+      "nome": "iShares Core US Aggregate Bond ETF",
+      "tipo": "BOND",
+      "classe": "RENDA_FIXA",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 102.15,
+      "observacoes": "Tipo: Bond Index",
+      "ativo": true
+    },
+    {
+      "ticker": "BND",
+      "nome": "Vanguard Total Bond Market ETF",
+      "tipo": "BOND",
+      "classe": "RENDA_FIXA",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 75.80,
+      "observacoes": "Tipo: Bond Index",
+      "ativo": true
+    },
+    {
+      "ticker": "SPY",
+      "nome": "SPDR S&P 500 ETF Trust",
+      "tipo": "ETF",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 485.20,
+      "observacoes": "Categoria: Large Cap Equity",
+      "ativo": true
+    },
+    {
+      "ticker": "QQQ",
+      "nome": "Invesco QQQ Trust",
+      "tipo": "ETF",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 420.35,
+      "observacoes": "Categoria: Technology Equity",
+      "ativo": true
+    },
+    {
+      "ticker": "IWM",
+      "nome": "iShares Russell 2000 ETF",
+      "tipo": "ETF",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 198.50,
+      "observacoes": "Categoria: Small Cap Equity",
+      "ativo": true
+    },
+    {
+      "ticker": "VTI",
+      "nome": "Vanguard Total Stock Market ETF",
+      "tipo": "ETF",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "preco_atual": 245.60,
+      "observacoes": "Categoria: Broad Market Equity",
+      "ativo": true
+    }
+  ]
+}
