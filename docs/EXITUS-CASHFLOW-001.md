@@ -11,13 +11,14 @@
 ## 📋 **Descrição do Problema**
 
 ### **Observação Identificada**
-Durante a implementação do `EXITUS-IMPORT-001`, foi identificado que o tipo de movimentação **"Transferência - Liquidação"** exportado pelo Portal da B3 representa **VENDAS de ativos** que liquidaram e geraram crédito em caixa, e não transferências de caixa da conta da corretora.
+Durante a implementação do `EXITUS-IMPORT-001`, foi identificado que o tipo de movimentação **"Transferência - Liquidação"** exportado pelo Portal da B3 representa **EVENTOS DE CUSTÓDIA** relacionados à liquidação D+2 de operações, e não vendas em si.
 
 ### **Análise Corrigida**
-- **Natureza:** VENDA de ativo (não transferência de caixa)
-- **Impacto:** Afeta preço médio do ativo
-- **Necessidade:** Importar como Transação (tipo VENDA)
-- **Resultado:** Reduz posição, recalcula custo médio
+- **Natureza:** Evento de custódia (liquidação D+2)
+- **Contexto:** Arquivo de movimentação vs arquivo de negociação
+- **Diferença:** "VENDA" já existe no arquivo de negociação (ordens)
+- **Impacto:** Não afeta preço médio (é evento de posição)
+- **Resultado:** Ajuste de custódia, não nova transação
 
 ### **Comportamento Atual**
 - **Status:** Identificado como venda, mas não implementado
@@ -28,7 +29,7 @@ Durante a implementação do `EXITUS-IMPORT-001`, foi identificado que o tipo de
 
 ## 🎯 **Objetivo do GAP**
 
-Implementar tratamento adequado para movimentações do tipo **"Transferência - Liquidação"** registrando-as como **Transações de VENDA** na tabela `transacao` para afetar corretamente o cálculo de preço médio dos ativos.
+Implementar tratamento adequado para movimentações do tipo **"Transferência - Liquidação"** registrando-as como **Eventos de Custódia** para rastrear liquidações D+2 e ajustes de posição sem afetar o cálculo de preço médio.
 
 ---
 
@@ -37,17 +38,17 @@ Implementar tratamento adequado para movimentações do tipo **"Transferência -
 ### **Tipos de Movimentação Identificados**
 | Tipo B3 | Natureza | Tratamento Atual | Tratamento Desejado |
 |---------|----------|------------------|-------------------|
-| "Transferência - Liquidação" | VENDA de ativo | Identificado, não implementado | Transação (VENDA) |
+| "Transferência - Liquidação" | Evento de custódia (D+2) | Identificado, não implementado | EventoCustodia |
 | "Cessão de Direitos - Solicitada" | Operação especial | Ignorado | Ignorar (não aplicável) |
 | "Transferência - Ingresso" | Aporte de caixa | Ignorado | Movimentação Caixa |
 | "Transferência - Saída" | Débito de caixa | Ignorado | Movimentação Caixa |
 
 ### **Mapeamento Proposto**
 ```python
-MAPEAMENTO_VENDAS = {
+MAPEAMENTO_CUSTODIA = {
     "Transferência - Liquidação": {
-        "tipo_transacao": "venda",
-        "descricao": "Venda - Liquidação B3"
+        "tipo_evento": "LIQUIDACAO_D2",
+        "descricao": "Liquidação D+2 - Evento de Custódia"
     }
 }
 
@@ -68,64 +69,63 @@ MAPEAMENTO_CAIXA = {
 ## 🏗️ **Design da Solução**
 
 ### **1. Modelo de Dados**
-Utilizar tabela existente `transacao` para vendas:
+Criar nova tabela para eventos de custódia:
 
 ```python
-class Transacao(db.Model):
+class EventoCustodia(db.Model):
     id = Column(UUID(as_uuid=True), primary_key=True)
     usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuario.id'))
     ativo_id = Column(UUID(as_uuid=True), ForeignKey('ativo.id'))
     corretora_id = Column(UUID(as_uuid=True), ForeignKey('corretora.id'))
-    tipo = Column(Enum(TipoTransacao))  # "venda"
-    data_transacao = Column(DateTime, nullable=False)
+    tipo_evento = Column(Enum(TipoEventoCustodia))  # "LIQUIDACAO_D2"
+    data_evento = Column(DateTime, nullable=False)
     quantidade = Column(Numeric(18, 8), nullable=False)
-    preco_unitario = Column(Numeric(18, 6), nullable=False)
-    valor_total = Column(Numeric(18, 2), nullable=False)
+    valor_operacao = Column(Numeric(18, 2), nullable=False)
     observacoes = Column(Text)
     fonte = Column(String(50))  # "B3_IMPORT"
+    created_at = Column(DateTime, default=datetime.utcnow)
 ```
 
 ### **2. Service Extension**
 Estender `ImportB3Service`:
 
 ```python
-def _processar_vendas(self, movimentacoes: List[Dict]) -> Dict:
-    """Processa Transferência - Liquidação como vendas de ativos"""
+def _processar_eventos_custodia(self, movimentacoes: List[Dict]) -> Dict:
+    """Processa Transferência - Liquidação como eventos de custódia"""
     resultado = {
         'sucesso': 0,
         'erros': 0,
         'erros_lista': []
     }
     
-    tipos_venda = ['Transferência - Liquidação']
+    tipos_custodia = ['Transferência - Liquidação']
     
     for mov in movimentacoes:
-        if mov['tipo_movimentacao'] in tipos_venda:
+        if mov['tipo_movimentacao'] in tipos_custodia:
             try:
                 # Obter ativo
                 ticker = self._extrair_ticker(mov['produto'])
                 ativo = self._obter_ou_criar_ativo(ticker, resultado)
                 corretora = self._obter_ou_criar_corretora(mov['instituicao'], resultado)
                 
-                # Criar transação de venda
-                venda = Transacao(
+                # Criar evento de custódia
+                evento = EventoCustodia(
                     usuario_id=self._get_usuario_id(),
                     ativo_id=ativo.id,
                     corretora_id=corretora.id,
-                    tipo=TipoTransacao.VENDA,
-                    data_transacao=mov['data'],
+                    tipo_evento=TipoEventoCustodia.LIQUIDACAO_D2,
+                    data_evento=mov['data'],
                     quantidade=mov['quantidade'],
-                    preco_unitario=mov['valor_operacao'] / mov['quantidade'],  # Calcular preço
-                    valor_total=mov['valor_operacao'],
-                    observacoes=f"Venda - Liquidação B3 - {mov['tipo_movimentacao']}"
+                    valor_operacao=mov['valor_operacao'],
+                    observacoes=f"Liquidação D+2 - {mov['tipo_movimentacao']}"
                 )
                 
-                db.session.add(venda)
+                db.session.add(evento)
                 resultado['sucesso'] += 1
                 
             except Exception as e:
                 resultado['erros'] += 1
-                resultado['erros_lista'].append(f"Erro na venda: {e}")
+                resultado['erros_lista'].append(f"Erro no evento de custódia: {e}")
     
     return resultado
 ```
@@ -135,22 +135,22 @@ Modificar fluxo principal:
 
 ```python
 def importar_movimentacoes(self, dados: List[Dict]) -> Dict:
-    """Importação completa com tratamento de vendas"""
+    """Importação completa com tratamento de eventos de custódia"""
     
     # Separar tipos
     proventos = [m for m in dados if m['tipo_movimentacao'] not in ['Transferência - Liquidação']]
-    vendas = [m for m in dados if m['tipo_movimentacao'] == 'Transferência - Liquidação']
+    eventos_custodia = [m for m in dados if m['tipo_movimentacao'] == 'Transferência - Liquidação']
     
     resultado = {
         'proventos': {'sucesso': 0, 'erros': 0},
-        'vendas': {'sucesso': 0, 'erros': 0}
+        'eventos_custodia': {'sucesso': 0, 'erros': 0}
     }
     
     # Importar proventos (existente)
     resultado['proventos'] = self._importar_proventos(proventos)
     
-    # Importar vendas (novo)
-    resultado['vendas'] = self._processar_vendas(vendas)
+    # Importar eventos de custódia (novo)
+    resultado['eventos_custodia'] = self._processar_eventos_custodia(eventos_custodia)
     
     return resultado
 ```
@@ -159,66 +159,71 @@ def importar_movimentacoes(self, dados: List[Dict]) -> Dict:
 
 ## 📈 **Benefícios Esperados**
 
-### **1. Cálculo de Preço Médio Correto**
-- **Vendas registradas:** Reduzem posição do ativo
-- **Custo médio recalculado:** Baseado em transações reais
-- **Performance precisa:** Métricas corretas de ganho/perda
+### **1. Rastreamento Completo de Liquidações**
+- **Eventos D+2 registrados:** Acompanhamento do ciclo completo
+- **Posição atualizada:** Visão clara da custódia
+- **Timeline completa:** Da negociação à liquidação
 
-### **2. Relatórios de Performance**
-- **Rentabilidade real:** Considerando todas as vendas
-- **IR correto:** Base de cálculo precisa com vendas
-- **Track record:** Histórico completo de operações
+### **2. Auditoria e Conformidade**
+- **Rastreabilidade:** Todos os eventos de custódia registrados
+- **Conformidade B3:** Alinhado com ciclo D+2
+- **Transparência:** Histórico completo de movimentações
 
-### **3. Auditoria e Conformidade**
-- **Rastreabilidade:** Todas as vendas registradas
-- **Transparência:** Histórico completo de operações
-- **Conformidade:** Registro para fiscalização
+### **3. Análise de Performance**
+- **Visão separada:** Ordens vs eventos de custódia
+- **Timing analysis:** Análise de prazos de liquidação
+- **Relatórios detalhados:** Diferentes tipos de movimentação
 
 ---
 
 ## 🔧 **Implementação**
 
-### **Fase 1 - Extensão Service**
-- [ ] Adicionar método `_processar_vendas`
-- [ ] Mapear "Transferência - Liquidação" como venda
-- [ ] Implementar criação de `Transacao` (VENDA)
+### **Fase 1 - Modelo de Dados**
+- [ ] Criar modelo `EventoCustodia`
+- [ ] Definir enum `TipoEventoCustodia`
+- [ ] Criar migration para nova tabela
 
-### **Fase 2 - Integração**
+### **Fase 2 - Extensão Service**
+- [ ] Adicionar método `_processar_eventos_custodia`
+- [ ] Mapear "Transferência - Liquidação" como evento D+2
+- [ ] Implementar criação de `EventoCustodia`
+
+### **Fase 3 - Integração**
 - [ ] Modificar fluxo principal de importação
-- [ ] Separar proventos vs vendas
-- [ ] Calcular preço unitário da venda
+- [ ] Separar proventos vs eventos de custódia
+- [ ] Unificar resultados
 
-### **Fase 3 - Testes**
+### **Fase 4 - Testes**
 - [ ] Testar com arquivos B3 reais
-- [ ] Validar impacto no preço médio
-- [ ] Verificar cálculo de performance
+- [ ] Validar rastreamento de eventos
+- [ ] Verificar timeline completa
 
-### **Fase 4 - Documentação**
+### **Fase 5 - Documentação**
 - [ ] Atualizar help do script
-- [ ] Documentar tratamento de vendas
-- [ ] Exemplos de impacto no preço médio
+- [ ] Documentar tratamento de eventos de custódia
+- [ ] Exemplos de ciclo D+2
 
 ---
 
 ## 📋 **Critérios de Aceite**
 
 ### **Funcional**
-- [ ] "Transferência - Liquidação" importada como `Transacao` (VENDA)
-- [ ] Preço médio recalculado após venda
-- [ ] Quantidade reduzida corretamente
-- [ ] Valores e datas preservados
+- [ ] "Transferência - Liquidação" importada como `EventoCustodia`
+- [ ] Evento D+2 registrado corretamente
+- [ ] Quantidade e valor preservados
+- [ ] Data do evento registrada
 
 ### **Qualidade**
-- [ ] Sem perda de dados de venda
+- [ ] Sem perda de dados de eventos
 - [ ] Tratamento de erros robusto
-- [ ] Logs detalhados de vendas
+- [ ] Logs detalhados de eventos de custódia
 - [ ] Performance adequada
 
 ### **Integração**
 - [ ] Compatível com importação existente
-- [ ] Preço médio atualizado corretamente
+- [ ] Não interfere em cálculo de preço médio
 - [ ] Script unificado funcionando
-- [ ] Relatórios de performance atualizados
+- [ ] Relatórios de eventos atualizados
 
 ---
 

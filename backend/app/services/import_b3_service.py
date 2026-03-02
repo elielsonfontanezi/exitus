@@ -97,12 +97,12 @@ class ImportB3Service:
                         continue
                     
                     # Pular tipos que não devem ser importados como proventos
-                    tipos_venda = ['Transferência - Liquidação']  # Tratar como venda de ativo
+                    tipos_custodia = ['Transferência - Liquidação']  # Tratar como evento de custódia
                     tipos_ignorados = ['Cessão de Direitos - Solicitada']  # Não tratável
                     
-                    if movimento['tipo_movimentacao'] in tipos_venda:
-                        logger.info(f"Tipo identificado como VENDA: {movimento['tipo_movimentacao']} - {movimento['produto']} em {movimento['data']}")
-                        # TODO: Implementar tratamento como venda (Transacao)
+                    if movimento['tipo_movimentacao'] in tipos_custodia:
+                        logger.info(f"Tipo identificado como EVENTO DE CUSTÓDIA: {movimento['tipo_movimentacao']} - {movimento['produto']} em {movimento['data']}")
+                        # TODO: Implementar tratamento como evento de custódia (EventoCustodia)
                         continue
                     
                     if movimento['tipo_movimentacao'] in tipos_ignorados:

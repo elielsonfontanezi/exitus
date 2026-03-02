@@ -82,7 +82,7 @@ show_help() {
        - Direito de Subscrição, Bonificação
     
     ⚠️  Identificados mas não implementados:
-       - "Transferência - Liquidação" → VENDA de ativo (futuro GAP)
+       - "Transferência - Liquidação" → Evento de custódia D+2 (futuro GAP)
     
     ❌ Ignorados (não aplicáveis):
        - "Cessão de Direitos - Solicitada"
