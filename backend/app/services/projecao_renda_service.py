@@ -1,5 +1,5 @@
 """M7.1 - ProjecaoRenda Service COMPLETO"""
-from app import db
+from app.database import db
 from app.models.projecao_renda import ProjecaoRenda
 from sqlalchemy import desc
 

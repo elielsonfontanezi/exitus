@@ -1,5 +1,5 @@
 """M7.1 - RelatorioPerformance Service COMPLETO"""
-from app import db
+from app.database import db
 from app.models.relatorio_performance import RelatorioPerformance
 from sqlalchemy import desc
 

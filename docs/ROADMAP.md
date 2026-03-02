@@ -36,10 +36,12 @@
 |--------|---------------|-------------|---------|------------|
 | **EXITUS-SCRIPTS-001** | Otimização e unificação de scripts | 18 scripts analisados | Crítico | Crítica |
 | **EXITUS-RECOVERY-001** | Sistema de Restore/Recovery Robusto | Implementado | Crítico | Crítica |
-| **EXITUS-IMPORT-001** | Importação/Exportação (CSV, Excel, JSON, PDF) | Apenas stub JSON | Alto | Alta |
+| **EXITUS-IMPORT-001** | Importação/Exportação (CSV, Excel, JSON, PDF) | ✅ Implementado | Alto | Alta |
 | **EXITUS-CRUD-001** | CRUD incompleto para entidades | Faltan POST/PUT/DELETE | Alto | Alta |
 | **EXITUS-BUSINESS-001** | Regras de negócio críticas | Não implementado | Alto | Alta |
 | **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | Não implementado | Alto | Alta |
+| **EXITUS-CASHFLOW-001** | Tratamento de "Transferência - Liquidação" B3 | Não implementado | Médio | Média |
+| **EXITUS-ASSETS-001** | Importação de Ativos Exemplo (Massa de Teste) | Não implementado | Médio | Média |
 
 ### 2. Funcionalidades de Expansão (Média Prioridade)
 
@@ -253,7 +255,9 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 | EXITUS-MULTICLIENTE-001 | 📋 Análise | 27/02/2026 | IA | Reclassificado Média-Alta |
 | EXITUS-UNITS-001 | 📋 Análise | 27/02/2026 | IA | Adicionado roadmap |
 | EXITUS-SEED-001 | 📋 Análise | 28/02/2026 | IA | Design detalhado criado |
-| EXITUS-CRIPTO-001 | 📋 Análise | 27/02/2026 | IA | Prioridade baixa |
+| EXITUS-CASHFLOW-001 | 📋 Análise | 02/03/2026 | IA | Identificado necessidade |
+| EXITUS-ASSETS-001 | 📋 Análise | 02/03/2026 | IA | Adicionado ao roadmap |
+| EXITUS-SCRIPTO-001 | 📋 Análise | 27/02/2026 | IA | Prioridade baixa |
 
 ---
 
@@ -274,6 +278,17 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 - **Identificados:** 3 bugs críticos, 5 scripts redundantes
 - **Total:** 11 GAPs identificados
 - **Design criado:** Sistema completo de seed controlado
+
+### 02/03/2026 - Implementação Importação B3
+- **Implementado:** EXITUS-IMPORT-001 (100% completo) ✅
+- **Corrigido:** Parsing de valores monetários (formato European)
+- **Corrigido:** Parsing diferenciado (quantidade vs monetário)
+- **Identificado:** "Transferência - Liquidação" como VENDA de ativo
+- **Adicionado:** EXITUS-CASHFLOW-001 para tratamento futuro
+- **Adicionado:** EXITUS-ASSETS-001 para massa de teste
+- **Testado:** Importação real com arquivos B3 (valores corretos)
+- **Implementado:** Opção --clean para base limpa
+- **Implementado:** Help detalhado do script
 
 ---
 
