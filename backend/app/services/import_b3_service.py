@@ -18,6 +18,7 @@ from app.models.ativo import Ativo, ClasseAtivo
 from app.models.corretora import Corretora
 from app.models.provento import Provento, TipoProvento
 from app.models.transacao import Transacao, TipoTransacao
+from app.models.evento_custodia import EventoCustodia, TipoEventoCustodia
 from app.models.usuario import Usuario
 from app.services.ativo_service import AtivoService
 from app.services.corretora_service import CorretoraService
@@ -91,9 +92,9 @@ class ImportB3Service:
                     if not movimento['tipo_movimentacao'] or not movimento['produto']:
                         continue
                     
-                    # Pular registros com valor zero (violates check constraint)
-                    if movimento['valor_operacao'] == 0:
-                        logger.warning(f"Registro com valor zero ignorado: {movimento['produto']} em {movimento['data']}")
+                    # Pular registros com valor zero ou quantidade zero (violates check constraint)
+                    if movimento['valor_operacao'] == 0 or movimento['quantidade'] == 0:
+                        logger.warning(f"Registro com valor/quantidade zero ignorado: {movimento['produto']} em {movimento['data']}")
                         continue
                     
                     # Pular tipos que não devem ser importados como proventos
@@ -177,66 +178,44 @@ class ImportB3Service:
 
     def importar_movimentacoes(self, movimentacoes: List[Dict], sobrescrever: bool = True) -> Dict:
         """
-        Importar movimentações como proventos
+        Importar movimentações como proventos e eventos de custódia
         """
         resultado = {
-            'sucesso': 0,
-            'erros': 0,
-            'erros_lista': [],
+            'proventos': {'sucesso': 0, 'erros': 0, 'erros_lista': []},
+            'eventos_custodia': {'sucesso': 0, 'erros': 0, 'erros_lista': []},
             'ativos_criados': 0,
             'corretoras_criadas': 0
         }
         
         try:
+            # Separar tipos
+            proventos = []
+            eventos_custodia = []
+            
             for mov in movimentacoes:
-                try:
-                    # Mapear tipo de provento
-                    tipo_provento_enum = self.mapeamento_tipos_provento.get(mov['tipo_movimentacao'])
-                    if not tipo_provento_enum:
-                        resultado['erros'] += 1
-                        resultado['erros_lista'].append(f"Tipo de provento não mapeado: {mov['tipo_movimentacao']}")
-                        continue
-                    
-                    # Obter ou criar ativo
-                    ticker = self._extrair_ticker(mov['produto'])
-                    ativo = self._obter_ou_criar_ativo(ticker, resultado)
-                    
-                    # Obter ou criar corretora
-                    corretora = self._obter_ou_criar_corretora(mov['instituicao'], resultado)
-                    
-                    # Verificar duplicata
-                    if not sobrescrever:
-                        existente = Provento.query.filter_by(
-                            ativo_id=ativo.id,
-                            data_pagamento=mov['data'],
-                            tipo_provento=tipo_provento_enum
-                        ).first()
-                        
-                        if existente:
-                            resultado['erros'] += 1
-                            resultado['erros_lista'].append(f"Provento duplicado: {ticker} em {mov['data']}")
-                            continue
-                    
-                    # Criar provento
-                    provento = Provento(
-                        ativo_id=ativo.id,
-                        data_pagamento=mov['data'],
-                        data_com=mov['data'] - timedelta(days=2),  # Estimativa
-                        tipo_provento=tipo_provento_enum,
-                        quantidade_ativos=mov['quantidade'],
-                        valor_por_acao=mov['preco_unitario'],
-                        valor_bruto=mov['valor_operacao'],
-                        valor_liquido=mov['valor_operacao']  # Sem IR explicito
-                    )
-                    
-                    db.session.add(provento)
-                    resultado['sucesso'] += 1
-                    
-                except Exception as e:
-                    resultado['erros'] += 1
-                    resultado['erros_lista'].append(f"Erro ao importar movimentação {mov.get('produto', 'N/A')}: {e}")
-                    logger.error(f"Erro detalhado: {e} - Dados: {mov}")
-                    continue
+                if mov['tipo_movimentacao'] in ['Transferência - Liquidação']:
+                    eventos_custodia.append(mov)
+                elif mov['tipo_movimentacao'] not in ['Cessão de Direitos - Solicitada']:
+                    proventos.append(mov)
+            
+            # Importar proventos
+            if proventos:
+                resultado_proventos = self._importar_proventos(proventos, sobrescrever)
+                resultado['proventos'] = resultado_proventos
+                resultado['ativos_criados'] += resultado_proventos.get('ativos_criados', 0)
+                resultado['corretoras_criadas'] += resultado_proventos.get('corretoras_criadas', 0)
+            
+            # Importar eventos de custódia
+            if eventos_custodia:
+                resultado_eventos = self._processar_eventos_custodia(eventos_custodia)
+                resultado['eventos_custodia'] = resultado_eventos
+                resultado['ativos_criados'] += resultado_eventos.get('ativos_criados', 0)
+                resultado['corretoras_criadas'] += resultado_eventos.get('corretoras_criadas', 0)
+            
+            # Calcular totais
+            resultado['sucesso'] = resultado['proventos']['sucesso'] + resultado['eventos_custodia']['sucesso']
+            resultado['erros'] = resultado['proventos']['erros'] + resultado['eventos_custodia']['erros']
+            resultado['erros_lista'] = resultado['proventos']['erros_lista'] + resultado['eventos_custodia']['erros_lista']
             
             db.session.commit()
             logger.info(f"Importação concluída: {resultado['sucesso']} sucessos, {resultado['erros']} erros")
@@ -442,10 +421,10 @@ class ImportB3Service:
             # Determinar tipo e classe baseado no ticker
             if ticker.endswith(('11', '12', '13', '31', '32', '33', '34', '35', '36')):
                 tipo_ativo = 'FII'
-                classe_ativo = ClasseAtivo.FII
+                classe_ativo = ClasseAtivo.RENDA_VARIAVEL
             else:
                 tipo_ativo = 'ACAO'
-                classe_ativo = ClasseAtivo.ACAO
+                classe_ativo = ClasseAtivo.RENDA_VARIAVEL
             
             ativo = Ativo(
                 ticker=ticker,
@@ -487,3 +466,113 @@ class ImportB3Service:
             logger.info(f"Corretora criada: {nome_normalizado}")
         
         return corretora
+
+    def _importar_proventos(self, proventos: List[Dict], sobrescrever: bool = True) -> Dict:
+        """Importa apenas proventos (método auxiliar)"""
+        resultado = {
+            'sucesso': 0,
+            'erros': 0,
+            'erros_lista': [],
+            'ativos_criados': 0,
+            'corretoras_criadas': 0
+        }
+        
+        try:
+            for mov in proventos:
+                try:
+                    # Mapear tipo de provento
+                    tipo_provento_enum = self.mapeamento_tipos_provento.get(mov['tipo_movimentacao'])
+                    if not tipo_provento_enum:
+                        resultado['erros'] += 1
+                        resultado['erros_lista'].append(f"Tipo de provento não mapeado: {mov['tipo_movimentacao']}")
+                        continue
+                    
+                    # Obter ou criar ativo
+                    ticker = self._extrair_ticker(mov['produto'])
+                    ativo = self._obter_ou_criar_ativo(ticker, resultado)
+                    
+                    # Obter ou criar corretora
+                    corretora = self._obter_ou_criar_corretora(mov['instituicao'], resultado)
+                    
+                    # Verificar duplicata
+                    if not sobrescrever:
+                        existente = Provento.query.filter_by(
+                            ativo_id=ativo.id,
+                            data_pagamento=mov['data'],
+                            tipo_provento=tipo_provento_enum
+                        ).first()
+                        
+                        if existente:
+                            resultado['erros'] += 1
+                            resultado['erros_lista'].append(f"Provento duplicado: {ticker} em {mov['data']}")
+                            continue
+                    
+                    # Criar provento
+                    provento = Provento(
+                        ativo_id=ativo.id,
+                        data_pagamento=mov['data'],
+                        data_com=mov['data'] - timedelta(days=2),  # Estimativa
+                        tipo_provento=tipo_provento_enum,
+                        quantidade_ativos=mov['quantidade'],
+                        valor_por_acao=mov['preco_unitario'],
+                        valor_bruto=mov['valor_operacao'],
+                        valor_liquido=mov['valor_operacao']  # Sem IR explicito
+                    )
+                    
+                    db.session.add(provento)
+                    resultado['sucesso'] += 1
+                    
+                except Exception as e:
+                    resultado['erros'] += 1
+                    resultado['erros_lista'].append(f"Erro ao importar provento {mov.get('produto', 'N/A')}: {e}")
+                    logger.error(f"Erro detalhado: {e} - Dados: {mov}")
+                    continue
+            
+            return resultado
+            
+        except Exception as e:
+            logger.error(f"Erro na importação de proventos: {e}")
+            raise
+
+    def _processar_eventos_custodia(self, movimentacoes: List[Dict]) -> Dict:
+        """Processa Transferência - Liquidação como eventos de custódia"""
+        resultado = {
+            'sucesso': 0,
+            'erros': 0,
+            'erros_lista': []
+        }
+        
+        tipos_custodia = ['Transferência - Liquidação']
+        
+        for mov in movimentacoes:
+            if mov['tipo_movimentacao'] in tipos_custodia:
+                try:
+                    # Obter ativo
+                    ticker = self._extrair_ticker(mov['produto'])
+                    ativo = self._obter_ou_criar_ativo(ticker, resultado)
+                    corretora = self._obter_ou_criar_corretora(mov['instituicao'], resultado)
+                    
+                    # Criar evento de custódia
+                    evento = EventoCustodia(
+                        usuario_id=self._get_usuario_id(),
+                        ativo_id=ativo.id,
+                        corretora_id=corretora.id,
+                        tipo_evento=TipoEventoCustodia.LIQUIDACAO_D2,
+                        data_evento=mov['data'],
+                        quantidade=mov['quantidade'],
+                        valor_operacao=mov['valor_operacao'],
+                        observacoes=f"Liquidação D+2 - {mov['tipo_movimentacao']}",
+                        fonte='B3_IMPORT',
+                        dados_origem=mov
+                    )
+                    
+                    db.session.add(evento)
+                    resultado['sucesso'] += 1
+                    logger.info(f"Evento de custódia criado: {ticker} - {mov['data']}")
+                    
+                except Exception as e:
+                    resultado['erros'] += 1
+                    resultado['erros_lista'].append(f"Erro no evento de custódia: {e}")
+                    logger.error(f"Erro ao processar evento de custódia: {e}")
+        
+        return resultado

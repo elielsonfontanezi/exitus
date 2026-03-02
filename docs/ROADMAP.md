@@ -40,8 +40,9 @@
 | **EXITUS-CRUD-001** | CRUD incompleto para entidades | Faltan POST/PUT/DELETE | Alto | Alta |
 | **EXITUS-BUSINESS-001** | Regras de negócio críticas | Não implementado | Alto | Alta |
 | **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | Não implementado | Alto | Alta |
-| **EXITUS-CASHFLOW-001** | Tratamento de "Transferência - Liquidação" B3 | Não implementado | Médio | Média |
+| **EXITUS-CASHFLOW-001** | Tratamento de "Transferência - Liquidação" B3 | ✅ Implementado | Médio | Média |
 | **EXITUS-ASSETS-001** | Importação de Ativos Exemplo (Massa de Teste) | Não implementado | Médio | Média |
+| **EXITUS-SQLALCHEMY-001** | Padrões e Boas Práticas SQLAlchemy | Não implementado | Alto | Alta |
 
 ### 2. Funcionalidades de Expansão (Média Prioridade)
 
@@ -255,8 +256,9 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 | EXITUS-MULTICLIENTE-001 | 📋 Análise | 27/02/2026 | IA | Reclassificado Média-Alta |
 | EXITUS-UNITS-001 | 📋 Análise | 27/02/2026 | IA | Adicionado roadmap |
 | EXITUS-SEED-001 | 📋 Análise | 28/02/2026 | IA | Design detalhado criado |
-| EXITUS-CASHFLOW-001 | 📋 Análise | 02/03/2026 | IA | Identificado necessidade |
+| EXITUS-CASHFLOW-001 | ✅ Implementado | 02/03/2026 | IA | Eventos de custódia D+2 |
 | EXITUS-ASSETS-001 | 📋 Análise | 02/03/2026 | IA | Adicionado ao roadmap |
+| EXITUS-SQLALCHEMY-001 | 📋 Análise | 02/03/2026 | IA | Problemas recorrentes documentados |
 | EXITUS-SCRIPTO-001 | 📋 Análise | 27/02/2026 | IA | Prioridade baixa |
 
 ---
@@ -279,16 +281,19 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 - **Total:** 11 GAPs identificados
 - **Design criado:** Sistema completo de seed controlado
 
-### 02/03/2026 - Implementação Importação B3
+### 02/03/2026 - Implementação Importação B3 e Eventos de Custódia
 - **Implementado:** EXITUS-IMPORT-001 (100% completo) ✅
+- **Implementado:** EXITUS-CASHFLOW-001 (100% completo) ✅
 - **Corrigido:** Parsing de valores monetários (formato European)
 - **Corrigido:** Parsing diferenciado (quantidade vs monetário)
-- **Identificado:** "Transferência - Liquidação" como VENDA de ativo
-- **Adicionado:** EXITUS-CASHFLOW-001 para tratamento futuro
+- **Corrigido:** "Transferência - Liquidação" como evento de custódia D+2
 - **Adicionado:** EXITUS-ASSETS-001 para massa de teste
-- **Testado:** Importação real com arquivos B3 (valores corretos)
+- **Adicionado:** EXITUS-SQLALCHEMY-001 para problemas recorrentes
+- **Testado:** Importação real com arquivos B3 (51 proventos, 19 ativos)
 - **Implementado:** Opção --clean para base limpa
 - **Implementado:** Help detalhado do script
+- **Criado:** Modelo EventoCustodia completo
+- **Integrado:** Service de eventos na importação
 
 ---
 
