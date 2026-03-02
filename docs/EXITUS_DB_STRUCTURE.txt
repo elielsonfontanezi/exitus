@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-02-27 16:55:24
+Gerado em: 2026-03-02 18:35:39
 ================================================================================
 
 ================================================================================
@@ -18,6 +18,7 @@ TABELAS DO BANCO EXITUS
  public | configuracoes_alertas  | exitus
  public | corretora              | exitus
  public | evento_corporativo     | exitus
+ public | evento_custodia        | exitus
  public | feriado_mercado        | exitus
  public | fonte_dados            | exitus
  public | historico_preco        | exitus
@@ -32,7 +33,7 @@ TABELAS DO BANCO EXITUS
  public | relatorios_performance | exitus
  public | transacao              | exitus
  public | usuario                | exitus
-(21 rows)
+(22 rows)
 
 
 ================================================================================
@@ -220,6 +221,7 @@ Referenced by:
     TABLE "configuracoes_alertas" CONSTRAINT "configuracoes_alertas_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE CASCADE
     TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_ativo_novo_id_fkey" FOREIGN KEY (ativo_novo_id) REFERENCES ativo(id) ON DELETE SET NULL
+    TABLE "evento_custodia" CONSTRAINT "evento_custodia_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
     TABLE "historico_preco" CONSTRAINT "historico_preco_ativoid_fkey" FOREIGN KEY (ativoid) REFERENCES ativo(id) ON DELETE CASCADE
     TABLE "posicao" CONSTRAINT "posicao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     TABLE "provento" CONSTRAINT "provento_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
@@ -518,6 +520,7 @@ Check constraints:
 Foreign-key constraints:
     "corretora_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 Referenced by:
+    TABLE "evento_custodia" CONSTRAINT "evento_custodia_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id)
     TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_corretora_destino_id_fkey" FOREIGN KEY (corretora_destino_id) REFERENCES corretora(id) ON DELETE SET NULL
     TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id) ON DELETE CASCADE
     TABLE "posicao" CONSTRAINT "posicao_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id) ON DELETE CASCADE
@@ -659,6 +662,92 @@ Unique Constraints:
  ix_evento_corporativo_impacto_posicoes | CREATE INDEX ix_evento_corporativo_impacto_posicoes ON public.evento_corporativo USING btree (impacto_posicoes)
  ix_evento_corporativo_tipo_evento      | CREATE INDEX ix_evento_corporativo_tipo_evento ON public.evento_corporativo USING btree (tipo_evento)
 (7 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: evento_custodia
+################################################################################
+
+                                                               Table "public.evento_custodia"
+     Column     |            Type             | Collation | Nullable |            Default             | Storage  | Compression | Stats target | Description 
+----------------+-----------------------------+-----------+----------+--------------------------------+----------+-------------+--------------+-------------
+ id             | uuid                        |           | not null | gen_random_uuid()              | plain    |             |              | 
+ usuario_id     | uuid                        |           | not null |                                | plain    |             |              | 
+ ativo_id       | uuid                        |           | not null |                                | plain    |             |              | 
+ corretora_id   | uuid                        |           | not null |                                | plain    |             |              | 
+ tipo_evento    | tipo_evento_custodia        |           | not null |                                | plain    |             |              | 
+ data_evento    | timestamp without time zone |           | not null |                                | plain    |             |              | 
+ quantidade     | numeric(18,8)               |           | not null |                                | main     |             |              | 
+ valor_operacao | numeric(18,2)               |           | not null |                                | main     |             |              | 
+ observacoes    | text                        |           |          |                                | extended |             |              | 
+ fonte          | character varying(50)       |           |          | 'B3_IMPORT'::character varying | extended |             |              | 
+ dados_origem   | json                        |           |          |                                | extended |             |              | 
+ created_at     | timestamp without time zone |           | not null | CURRENT_TIMESTAMP              | plain    |             |              | 
+ updated_at     | timestamp without time zone |           | not null | CURRENT_TIMESTAMP              | plain    |             |              | 
+Indexes:
+    "evento_custodia_pkey" PRIMARY KEY, btree (id)
+    "ix_evento_custodia_ativo_id" btree (ativo_id)
+    "ix_evento_custodia_data_evento" btree (data_evento)
+    "ix_evento_custodia_tipo_evento" btree (tipo_evento)
+    "ix_evento_custodia_usuario_id" btree (usuario_id)
+Foreign-key constraints:
+    "evento_custodia_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
+    "evento_custodia_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id)
+    "evento_custodia_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+Access method: heap
+
+ Pos |     Coluna     |            Tipo             | Tamanho | Null? |            Default             
+-----+----------------+-----------------------------+---------+-------+--------------------------------
+   1 | id             | uuid                        |         | NO    | gen_random_uuid()
+   2 | usuario_id     | uuid                        |         | NO    | 
+   3 | ativo_id       | uuid                        |         | NO    | 
+   4 | corretora_id   | uuid                        |         | NO    | 
+   5 | tipo_evento    | USER-DEFINED                |         | NO    | 
+   6 | data_evento    | timestamp without time zone |         | NO    | 
+   7 | quantidade     | numeric                     |         | NO    | 
+   8 | valor_operacao | numeric                     |         | NO    | 
+   9 | observacoes    | text                        |         | YES   | 
+  10 | fonte          | character varying           | (50)    | YES   | 'B3_IMPORT'::character varying
+  11 | dados_origem   | json                        |         | YES   | 
+  12 | created_at     | timestamp without time zone |         | NO    | CURRENT_TIMESTAMP
+  13 | updated_at     | timestamp without time zone |         | NO    | CURRENT_TIMESTAMP
+(13 rows)
+
+
+Foreign Keys:
+              Nome FK              |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+-----------------------------------+--------------+---------------------+---------------------
+ evento_custodia_usuario_id_fkey   | usuario_id   | usuario             | id
+ evento_custodia_ativo_id_fkey     | ativo_id     | ativo               | id
+ evento_custodia_corretora_id_fkey | corretora_id | corretora           | id
+(3 rows)
+
+
+Primary Keys:
+       Nome PK        | Coluna 
+----------------------+--------
+ evento_custodia_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+         Nome do Índice         |                                            Definição                                            
+--------------------------------+-------------------------------------------------------------------------------------------------
+ evento_custodia_pkey           | CREATE UNIQUE INDEX evento_custodia_pkey ON public.evento_custodia USING btree (id)
+ ix_evento_custodia_usuario_id  | CREATE INDEX ix_evento_custodia_usuario_id ON public.evento_custodia USING btree (usuario_id)
+ ix_evento_custodia_ativo_id    | CREATE INDEX ix_evento_custodia_ativo_id ON public.evento_custodia USING btree (ativo_id)
+ ix_evento_custodia_tipo_evento | CREATE INDEX ix_evento_custodia_tipo_evento ON public.evento_custodia USING btree (tipo_evento)
+ ix_evento_custodia_data_evento | CREATE INDEX ix_evento_custodia_data_evento ON public.evento_custodia USING btree (data_evento)
+(5 rows)
 
 
 ________________________________________________________________________________
@@ -1809,6 +1898,7 @@ Referenced by:
     TABLE "auditoria_relatorios" CONSTRAINT "auditoria_relatorios_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "configuracoes_alertas" CONSTRAINT "configuracoes_alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "corretora" CONSTRAINT "corretora_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    TABLE "evento_custodia" CONSTRAINT "evento_custodia_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
     TABLE "log_auditoria" CONSTRAINT "log_auditoria_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL
     TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "portfolio" CONSTRAINT "portfolio_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
@@ -1870,7 +1960,7 @@ RESUMO GERAL
 Total de Tabelas:
  Total 
 -------
-    21
+    22
 (1 row)
 
 
@@ -1884,6 +1974,7 @@ Total de Colunas por Tabela:
  configuracoes_alertas  |          16
  corretora              |          11
  evento_corporativo     |          12
+ evento_custodia        |          13
  feriado_mercado        |          11
  fonte_dados            |          14
  historico_preco        |          10
@@ -1898,7 +1989,7 @@ Total de Colunas por Tabela:
  relatorios_performance |          11
  transacao              |          19
  usuario                |           9
-(21 rows)
+(22 rows)
 
 
 Total de Foreign Keys por Tabela:
@@ -1909,6 +2000,7 @@ Total de Foreign Keys por Tabela:
  configuracoes_alertas  |       3
  corretora              |       1
  evento_corporativo     |       2
+ evento_custodia        |       3
  historico_preco        |       1
  log_auditoria          |       1
  movimentacao_caixa     |       4
@@ -1918,7 +2010,7 @@ Total de Foreign Keys por Tabela:
  provento               |       1
  relatorios_performance |       1
  transacao              |       3
-(14 rows)
+(15 rows)
 
 
 ================================================================================
