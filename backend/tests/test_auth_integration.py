@@ -14,10 +14,10 @@ import pytest
 # ===========================================================================
 class TestLogin:
 
-    def test_login_sucesso(self, auth_client):
+    def test_login_sucesso(self, auth_client, usuario_seed):
         """Login com credenciais corretas retorna tokens."""
         response = auth_client.post('/api/auth/login', json={
-            'username': 'test_admin',
+            'username': usuario_seed.username,
             'password': 'senha_teste_123',
         })
         data = response.get_json()
@@ -29,7 +29,7 @@ class TestLogin:
     def test_login_senha_errada(self, client, usuario_seed):
         """Login com senha errada retorna 401."""
         response = client.post('/api/auth/login', json={
-            'username': 'test_admin',
+            'username': usuario_seed.username,
             'password': 'senha_errada',
         })
         assert response.status_code == 401
@@ -59,26 +59,26 @@ class TestLogin:
     def test_login_sem_password_retorna_400(self, client):
         """Falta campo password → 400."""
         response = client.post('/api/auth/login', json={
-            'username': 'test_admin',
+            'username': 'qualquer_usuario',
         })
         assert response.status_code == 400
 
-    def test_login_retorna_dados_usuario(self, auth_client):
+    def test_login_retorna_dados_usuario(self, auth_client, usuario_seed):
         """Response de login deve incluir dados do usuário."""
         response = auth_client.post('/api/auth/login', json={
-            'username': 'test_admin',
+            'username': usuario_seed.username,
             'password': 'senha_teste_123',
         })
         data = response.get_json()
         assert response.status_code == 200
         user_data = data['data'].get('usuario') or data['data'].get('user')
         if user_data:
-            assert user_data['username'] == 'test_admin'
+            assert user_data['username'] == usuario_seed.username
 
-    def test_login_envelope_padrao(self, auth_client):
+    def test_login_envelope_padrao(self, auth_client, usuario_seed):
         """Response segue envelope {success, data, message}."""
         response = auth_client.post('/api/auth/login', json={
-            'username': 'test_admin',
+            'username': usuario_seed.username,
             'password': 'senha_teste_123',
         })
         data = response.get_json()

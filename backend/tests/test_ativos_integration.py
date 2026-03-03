@@ -96,13 +96,13 @@ class TestGetAtivoPorTicker:
 
     def test_ticker_existente_retorna_200(self, auth_client, ativo_seed):
         response = auth_client.get(
-            '/api/ativos/ticker/PETR4',
+            f'/api/ativos/ticker/{ativo_seed.ticker}',
             headers=auth_client._auth_headers,
         )
         assert response.status_code == 200
         data = response.get_json()
         assert data['success'] is True
-        assert data['data']['ticker'] == 'PETR4'
+        assert data['data']['ticker'] == ativo_seed.ticker
 
     def test_ticker_inexistente_retorna_404(self, auth_client, ativo_seed):
         response = auth_client.get(
@@ -113,12 +113,12 @@ class TestGetAtivoPorTicker:
 
     def test_ticker_retorna_dados_fundamentalistas(self, auth_client, ativo_seed):
         response = auth_client.get(
-            '/api/ativos/ticker/PETR4',
+            f'/api/ativos/ticker/{ativo_seed.ticker}',
             headers=auth_client._auth_headers,
         )
         data = response.get_json()['data']
         assert data['preco_atual'] is not None
-        assert float(data['preco_atual']) == pytest.approx(38.50, rel=1e-2)
+        assert float(data['preco_atual']) == pytest.approx(float(ativo_seed.preco_atual), rel=1e-2)
 
 
 # ===========================================================================
