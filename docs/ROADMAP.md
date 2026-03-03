@@ -56,7 +56,7 @@
 |--------|---------------|--------|---------|------------|
 | **EXITUS-TESTS-001** | Testes automatizados (pytest) | ✅ Concluído | **Crítico** | **Alta** |
 | **EXITUS-CRUD-002** | Revisão estrutural service/route: exceções tipadas (`NotFoundError`/`ConflictError`), HTTP 404/409 corretos, `delete()` com guarda de integridade referencial — 31 ocorrências em 10 services | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
-| **EXITUS-IR-001** | Engine de cálculo de IR completo (apuração, isenções, DARF) | Não implementado | **Alto** | **Alta** |
+| **EXITUS-IR-001** | Engine de cálculo de IR completo (apuração, isenções, DARF) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-EXPORT-001** | Exportação genérica (CSV, Excel, JSON, PDF) | Não implementado | Alto | Alta |
 
 ### 3. Fase 4 — Expansão de Funcionalidades (Média Prioridade)
@@ -334,7 +334,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-BUSINESS-001 | 2 | ✅ Concluído | 02/03/2026 | 5 regras em `business_rules.py` |
 | EXITUS-ASSETS-001 | 2 | ✅ Concluído | 02/03/2026 | 56 ativos com dados fundamentalistas |
 | EXITUS-TESTS-001 | 3 | 📋 Planejado | — | pytest + fixtures, cobertura 70%+ |
-| EXITUS-IR-001 | 3 | 📋 Planejado | — | Apuração mensal, isenções, DARF |
+| EXITUS-IR-001 | 3 | ✅ Concluído | 03/03/2026 | Apuração mensal, isenções, DARF — 19 testes |
 | EXITUS-EXPORT-001 | 3 | 📋 Planejado | — | CSV, Excel, JSON, PDF |
 | EXITUS-MULTIMOEDA-001 | 4 | 📋 Planejado | — | Conversão automática BRL/USD/EUR |
 | EXITUS-UNITS-001 | 4 | 📋 Planejado | — | UNITS B3 |

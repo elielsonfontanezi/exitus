@@ -183,6 +183,14 @@ def create_app(testing=False):
     except ImportError as e:
         print(f"⚠️  Buy Signals blueprint não encontrado: {e}")
 
+    # M4.6 - IR (Imposto de Renda — EXITUS-IR-001)
+    try:
+        from .blueprints.ir_blueprint import ir_bp
+        app.register_blueprint(ir_bp)
+        print("✅ IR blueprint registrado: /api/ir/*")
+    except ImportError as e:
+        print(f"⚠️  IR blueprint não encontrado: {e}")
+
     # ============================================
     # M7.4 - ALERTAS (NOVO!)
     # ============================================

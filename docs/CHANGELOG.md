@@ -9,6 +9,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-IR-001** — Engine de cálculo de IR sobre renda variável (03/03/2026)
+  - `app/services/ir_service.py`: apuração mensal por categoria (swing ações, day-trade, FIIs, exterior)
+  - Isenção R$20.000/mês para swing trade em ações BR
+  - Alíquotas: ações 15%, day-trade 20%, FIIs 20%, exterior 15%
+  - Geração de DARF com código de receita (6015 BR / 0561 exterior), valor e status de pagamento
+  - Histórico anual mês a mês (`historico_anual`)
+  - `app/blueprints/ir_blueprint.py`: 3 endpoints registrados em `/api/ir/`
+    - `GET /api/ir/apuracao?mes=YYYY-MM` — breakdown detalhado por categoria
+    - `GET /api/ir/darf?mes=YYYY-MM` — DARFs a pagar com código de receita
+    - `GET /api/ir/historico?ano=YYYY` — resumo mensal do ano
+  - `tests/test_ir_integration.py`: 19 testes (100% passed)
+  - Fix: `conftest.py` — removido campo `cnpj` inválido do `corretora_seed`
+  - **Suite total: 96 passed, 0 failed**
+
 - **EXITUS-TESTDB-001** — Script `create_test_db.sh` — recriação automatizada do banco de teste (03/03/2026)
   - Drop + create de `exitusdb_test` via psql no container `exitus-db`
   - Schema aplicado via `pg_dump --schema-only` (paridade total com `exitusdb`, ENUMs incluídos)

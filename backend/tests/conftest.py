@@ -135,7 +135,6 @@ def corretora_seed(app, usuario_seed):
     nome = f'Corretora Teste {suffix}'
     c = Corretora(
         nome=nome,
-        cnpj=f'00.000.000/000{suffix[:1]}-00',
         tipo=TipoCorretora.CORRETORA,
         pais='BR',
         usuario_id=usuario_seed.id,
