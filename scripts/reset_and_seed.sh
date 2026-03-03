@@ -101,11 +101,14 @@ execute_in_container() {
     echo -e "${BLUE}🔄 Preparando execução no container...${NC}"
     
     # Copiar script para container
-    podman cp scripts/reset_and_seed.py exitus-backend:/app/
+    podman cp scripts/reset_and_seed.py exitus-backend:/app/reset_and_seed.py
     
-    # Copiar seed_data para container
+    # Copiar seed_data para container (com trailing slash no destino para evitar resíduos no host)
     if [[ -d "scripts/seed_data" ]]; then
-        podman cp scripts/seed_data/ exitus-backend:/app/
+        podman exec exitus-backend mkdir -p /app/seed_data
+        for f in scripts/seed_data/*.json; do
+            [[ -f "$f" ]] && podman cp "$f" exitus-backend:/app/seed_data/
+        done
     fi
     
     echo -e "${GREEN}✅ Arquivos copiados para o container${NC}"
