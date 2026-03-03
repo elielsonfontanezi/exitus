@@ -36,11 +36,16 @@ entregando funcionalidades completas e testadas.
 | M7.7 | Histórico de Preços | PROD | 06 Jan 2026 | — |
 | M8 | Analytics Avançados | PLAN | Q2 2026 | — |
 | M9 | Deploy & Monitoramento | PLAN | Q1 2026 | — |
+| TESTS | Testes Automatizados | PROD | 03 Mar 2026 | — |
 
-**Total de Endpoints: 67 rotas RESTful validadas.**
+**Total de Endpoints: 67 rotas RESTful validadas.**  
+**Suite de testes: 77 passed, 0 failed** (`pytest` contra `exitusdb_test`).
 
 > v0.7.10: Validação completa de APIs — 16 GAPs corrigidos, envelope {success,data}
 > padronizado, strict_slashes aplicado, documentação atualizada. Ver CHANGELOG.md.
+>
+> v0.8.0-dev: CRUD-002, SQLALCHEMY-002, TESTFIX-001/002, TESTDB-001 concluídos.
+> Suite de testes verde: 77 passed, 0 failed. Ver CHANGELOG.md.
 
 ---
 

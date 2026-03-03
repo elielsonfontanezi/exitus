@@ -178,7 +178,19 @@ podman logs -f exitus-backend
 
 ```
 
-### 4. Acessar
+### 4. Rodar Testes (opcional)
+
+```bash
+# Recriar banco de teste (primeira vez ou após migrations)
+./scripts/create_test_db.sh
+
+# Executar suite completa (77 testes — dentro do container)
+podman exec exitus-backend python -m pytest tests/ -q --no-cov
+```
+
+> **Nota:** Testes rodam **dentro do container** `exitus-backend`. Não execute `pytest` diretamente no host.
+
+### 5. Acessar
 
 * **Frontend**: http://localhost:8080
 * **Backend API**: http://localhost:5000/api
@@ -206,6 +218,7 @@ podman logs -f exitus-backend
 | **M7.4** | ✅ PROD | Alertas (6 tipos, CRUD completo) | 4 |
 | **M7.5** | ✅ PROD | Cotações Live (Multi-provider, Cache 15min) | 3 |
 | **M7.6** | ✅ PROD | Relatórios (Performance, Export PDF stub) | 5 |
+| **TESTS** | ✅ PROD | Suite de testes automatizados — 77 testes (0 falhos) | - |
 | **M8** | 📅 PLAN | Analytics Avançados (Monte Carlo, Otimização) | - |
 | **M9** | 📅 PLAN | Deploy & Monitoramento (CI/CD, Prometheus) | - |
 

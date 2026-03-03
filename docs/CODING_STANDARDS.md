@@ -203,6 +203,79 @@ db.session.execute(text("ALTER SEQUENCE usuario_id_seq RESTART WITH 1"))
 
 ---
 
+## 🧪 **Padrões de Teste (pytest)**
+
+### **Fixtures — sempre usar as globais do conftest.py**
+```python
+# ✅ CORRETO — fixture dinâmica, teardown garantido
+def test_criar_ativo(auth_client, ativo_seed):
+    response = auth_client.get(
+        f'/api/ativos/ticker/{ativo_seed.ticker}',
+        headers=auth_client._auth_headers,
+    )
+    assert response.status_code == 200
+
+# ❌ ERRADO — fixture local com db.create_all/drop_all
+@pytest.fixture
+def client():
+    app = create_app()
+    with app.test_client() as c:
+        with app.app_context():
+            db.create_all()   # ❌ destrói ENUMs PostgreSQL
+        yield c
+        with app.app_context():
+            db.drop_all()     # ❌ destrói schema de teste
+```
+
+### **Dados — nunca hardcoded**
+```python
+# ❌ ERRADO — depende de dado do banco de produção
+def test_ticker(auth_client):
+    rv = auth_client.get('/api/ativos/ticker/PETR4')  # PETR4 só existe em prod!
+    assert rv.status_code == 200
+
+# ✅ CORRETO — dado criado pela fixture, independente de prod
+def test_ticker(auth_client, ativo_seed):
+    rv = auth_client.get(f'/api/ativos/ticker/{ativo_seed.ticker}')
+    assert rv.status_code == 200
+    assert rv.get_json()['data']['ticker'] == ativo_seed.ticker
+```
+
+### **Executar testes — sempre dentro do container**
+```bash
+# ✅ CORRETO
+podman exec exitus-backend python -m pytest tests/ -q --no-cov
+
+# ❌ ERRADO — ModuleNotFoundError no host
+python -m pytest tests/
+```
+
+### **Recriar banco de teste**
+```bash
+# Após migrations ou schema corrompido
+./scripts/create_test_db.sh
+
+# Nunca usar db.create_all() — falha com ENUMs PostgreSQL (L-TEST-002)
+```
+
+### **Anti-patterns de teste**
+```python
+# ❌ Username hardcoded
+response = client.post('/api/auth/login', json={'username': 'test_admin', ...})
+
+# ❌ Valor hardcoded
+assert float(data['preco_atual']) == 38.50
+
+# ❌ assert sem status code
+assert data['success'] is True  # pode mascarar 404/500
+
+# ✅ Sempre verificar status primeiro
+assert response.status_code == 200
+assert response.get_json()['success'] is True
+```
+
+---
+
 ## 📋 **GAPs e Documentação**
 
 ### **Fluxo Obrigatório**
@@ -229,5 +302,5 @@ db.session.execute(text("ALTER SEQUENCE usuario_id_seq RESTART WITH 1"))
 
 ---
 
-*Atualizado: 02 de Março de 2026*  
-*Versão: 2.0 - Padrões SQLAlchemy incluídos*
+*Atualizado: 03 de Março de 2026*  
+*Versão: 3.0 - Padrões de teste adicionados (EXITUS-TESTDB-001)*
