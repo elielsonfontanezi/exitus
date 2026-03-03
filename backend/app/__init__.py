@@ -38,10 +38,14 @@ def create_app(testing=False):
     app = Flask(__name__)
 
     # Carregar configurações
-    app.config.from_object(Config)
+    if testing:
+        from .config import TestingConfig
+        app.config.from_object(TestingConfig)
+    else:
+        app.config.from_object(Config)
 
     # Configurações JWT
-    app.config['JWT_SECRET_KEY'] = app.config.get('SECRET_KEY', 'super-secret-key-mudar-no-env')
+    app.config['JWT_SECRET_KEY'] = app.config.get('JWT_SECRET_KEY') or app.config.get('SECRET_KEY', 'super-secret-key-mudar-no-env')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hora
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = 2592000  # 30 dias
 

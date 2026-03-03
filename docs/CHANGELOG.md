@@ -9,6 +9,36 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-TESTS-001** — Testes Automatizados com Pytest (03/03/2026)
+  - **37 testes unitários** para `business_rules.py` com mocks corretos
+    - `TestValidarHorarioMercado` (5 testes) — horário de pregão B3/NYSE/NASDAQ
+    - `TestCalcularTaxasB3` (7 testes) — cálculo de taxas com precisão Decimal
+    - `TestValidarFeriado` (3 testes) — feriados de mercado com mock de query
+    - `TestValidarSaldoVenda` (5 testes) — saldo de posição com múltiplas corretoras
+    - `TestDetectarDayTrade` (4 testes) — detecção day-trade com mock de Transacao
+    - `TestValidarTransacao` (5 testes) — orquestração completa com todos os warnings
+  - **32 testes de integração** contra `exitusdb_test` (PostgreSQL real)
+    - `TestLogin` (8 testes) — login, JWT, envelope padrão, validações
+    - `TestHealthCheck` (2 testes) — health endpoint
+    - `TestJWTProtection` (3 testes) — endpoints protegidos sem/com token
+    - `TestListarAtivos` (5 testes) — listagem, filtros, paginação
+    - `TestGetAtivoPorTicker` (3 testes) — busca por ticker e fundamentalistas
+    - `TestCriarAtivo` (5 testes) — criação com validação e duplicidade
+    - `TestAtualizarAtivo` (3 testes) — update de preço, auth
+    - `TestDeletarAtivo` (3 testes) — delete com 404 e auth
+  - **Infraestrutura de testes criada:**
+    - `TestingConfig` no `config.py` apontando para `exitusdb_test`
+    - `tests/conftest.py` com fixtures `app` (session), `client`, `auth_client`, `usuario_seed`, `ativo_seed`, `corretora_seed`
+    - Estratégia: app_context session-scoped + cleanup explícito por DELETE
+    - `pytest.ini` com cobertura e configuração de warnings
+  - **Correções de migrations Alembic:**
+    - `9e4ef61dee5d` — adicionadas variáveis `revision`/`down_revision` obrigatórias + guard `IF EXISTS`
+    - `20251208_1004_m7` — substituído `ENUM.create()` por `DO $$ EXCEPTION WHEN duplicate_object` para idempotência
+  - **Correção em `business_rules.py`:**
+    - Imports de `FeriadoMercado`, `Posicao`, `Transacao` movidos para nível de módulo (permite mock correto)
+  - **Banco `exitusdb_test`** criado via `pg_dump --schema-only` do `exitusdb` de produção
+  - **LIÇÃO APRENDIDA**: Flask `test_client` usa conexões próprias do pool — não compartilha sessão com fixtures que fazem `session.configure(bind=connection)`. Solução: usar contexto session-scoped sem binding + cleanup explícito.
+
 - **EXITUS-SEED-001** — Sistema de Seed/Reset Controlado completo
   - Script unificado `reset_and_seed.sh` substitui múltiplos scripts legados
   - Implementado backup/restore de cenários para debugging

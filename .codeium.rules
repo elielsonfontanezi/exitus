@@ -42,7 +42,45 @@ Sistema **multi-mercado** (BR/US/EU/Asia) com **14 tipos de ativos**.
 # Isto permite discussão da estratégia antes da implementação.
 Fluxo obrigatório: 1) Propor → 2) Aguardar "APROVADO" → 3) Implementar
 
+## 🤖 REGRA #5: INDICAR MODELO DE IA RECOMENDADO POR ATIVIDADE
+**Obrigatório:** Ao iniciar qualquer GAP ou atividade relevante, indicar o modelo de IA mais adequado.
+#
+# Critérios de seleção:
+# - SWE-1.5 (free): Tarefas mecânicas/repetitivas — CRUD simples, refatorações pontuais,
+#   adição de endpoints com padrão já estabelecido, ajustes de documentação
+# - Claude Sonnet 4.6: Tarefas de complexidade moderada — integração de múltiplos arquivos,
+#   lógica de negócio com regras não-triviais, schemas com validações, testes de integração
+# - Claude Opus 4.6: Tarefas arquiteturais e de alta complexidade — design de novos subsistemas,
+#   decisões de modelagem de dados, análise de segurança/compliance, refatorações profundas
+#
+# Formato obrigatório no início de cada atividade:
+# "Modelo recomendado: [MODELO] — [justificativa em 1 linha]"
+
+## 🗺️ REGRA #6: APRESENTAR ESTRATÉGIA ANTES DE CODIFICAR
+**Obrigatório:** Após análise e planejamento, SEMPRE apresentar a estratégia completa ao usuário
+e aguardar aprovação ANTES de escrever qualquer linha de código.
+#
+# Formato obrigatório da apresentação de estratégia:
+# 1. **Diagnóstico:** o que foi encontrado na análise
+# 2. **Arquivos a criar/modificar:** lista completa com justificativa
+# 3. **Ordem de implementação:** sequência lógica das etapas
+# 4. **Decisões técnicas relevantes:** trade-offs, alternativas descartadas
+# 5. **Pergunta explícita:** "APROVADO para iniciar?"
+#
+# NUNCA iniciar implementação direto após análise, mesmo que a solução pareça óbvia.
+# A aprovação do usuário é mandatória — ele pode querer discutir a estratégia.
+
 ## 🎓 LIÇÕES APRENDIDAS
+
+### 03/03/2026 — LIÇÃO 005: Ler .codeium.rules ANTES de qualquer ação
+- **Problema:** O assistente iniciou implementação sem ler `.codeium.rules`, violando REGRA #1 e #6
+- **Lição:** O `.codeium.rules` é lido automaticamente pelo Windsurf — mas o assistente deve
+  **confirmar conscientemente** as regras ativas antes de agir, não apenas deixar o sistema injetar
+- **Regra:** Na primeira mensagem de qualquer sessão ou GAP novo, confirmar mentalmente:
+  1. Li o `.codeium.rules`?
+  2. Indiquei o modelo de IA recomendado? (REGRA #5)
+  3. Apresentei estratégia e aguardei aprovação? (REGRA #6)
+- **Consequência da violação:** Código criado sem aprovação precisa ser descartado ou revisado
 
 ### 28/02/2026 — Análise Incompleta dos Scripts
 - **Problema:** Assumir que scripts similares estavam corretos sem verificar cada um

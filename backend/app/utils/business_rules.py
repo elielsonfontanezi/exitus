@@ -16,6 +16,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Imports de models no topo para permitir mock em testes unitários
+# (imports circulares evitados pois db é inicializado antes dos utils)
+from app.models.feriado_mercado import FeriadoMercado
+from app.models.posicao import Posicao
+from app.models.transacao import Transacao
+
 
 # ---------------------------------------------------------------------------
 # Constantes de mercado
@@ -79,8 +85,6 @@ def validar_feriado(data_transacao, mercado=None):
     Returns:
         str or None: mensagem de warning, ou None se OK
     """
-    from app.models.feriado_mercado import FeriadoMercado
-
     if isinstance(data_transacao, datetime):
         data = data_transacao.date()
     else:
@@ -121,8 +125,6 @@ def validar_saldo_venda(usuario_id, ativo_id, quantidade_venda, corretora_id=Non
     Raises:
         ValueError: se saldo insuficiente
     """
-    from app.models.posicao import Posicao
-
     query = Posicao.query.filter_by(
         usuario_id=usuario_id,
         ativo_id=ativo_id,
@@ -183,8 +185,6 @@ def detectar_day_trade(usuario_id, ativo_id, data_transacao, tipo_transacao):
     Returns:
         bool: True se configura day-trade
     """
-    from app.models.transacao import Transacao
-
     if tipo_transacao not in ('compra', 'venda'):
         return False
 
@@ -195,7 +195,7 @@ def detectar_day_trade(usuario_id, ativo_id, data_transacao, tipo_transacao):
     else:
         data = data_transacao
 
-    from sqlalchemy import func, cast
+    from sqlalchemy import cast
     from sqlalchemy.types import Date
 
     existe = Transacao.query.filter(

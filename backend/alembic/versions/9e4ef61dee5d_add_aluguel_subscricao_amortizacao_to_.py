@@ -6,13 +6,23 @@ Create Date: 2026-02-23
 """
 from alembic import op
 
+revision = '9e4ef61dee5d'
+down_revision = '202602162130'
+branch_labels = None
+depends_on = None
+
 
 def upgrade():
-    op.execute("ALTER TYPE tipotransacao ADD VALUE IF NOT EXISTS 'aluguel'")
-    op.execute("ALTER TYPE tipotransacao ADD VALUE IF NOT EXISTS 'subscricao'")
-    op.execute("ALTER TYPE tipotransacao ADD VALUE IF NOT EXISTS 'amortizacao'")
+    op.execute("""
+        DO $$ BEGIN
+            IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipotransacao') THEN
+                ALTER TYPE tipotransacao ADD VALUE IF NOT EXISTS 'aluguel';
+                ALTER TYPE tipotransacao ADD VALUE IF NOT EXISTS 'subscricao';
+                ALTER TYPE tipotransacao ADD VALUE IF NOT EXISTS 'amortizacao';
+            END IF;
+        END $$
+    """)
 
 
 def downgrade():
-    # ADD VALUE em ENUM PostgreSQL não é reversível sem recriar o tipo
     pass

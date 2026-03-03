@@ -27,3 +27,21 @@ class Config:
         f"{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+class TestingConfig(Config):
+    """Configurações para testes automatizados (pytest) — PostgreSQL exitusdb_test"""
+    TESTING = True
+    SECRET_KEY = 'testing-secret-key-exitus'
+    JWT_SECRET_KEY = 'testing-jwt-secret-key-exitus'
+    POSTGRES_DB = os.getenv('POSTGRES_TEST_DB', 'exitusdb_test')
+    SQLALCHEMY_DATABASE_URI = (
+        f"postgresql://{os.getenv('POSTGRES_USER', 'exitus')}:"
+        f"{os.getenv('POSTGRES_PASSWORD', 'exitus123')}@"
+        f"{os.getenv('POSTGRES_HOST', 'localhost')}:"
+        f"{os.getenv('POSTGRES_PORT', '5432')}/"
+        f"{os.getenv('POSTGRES_TEST_DB', 'exitusdb_test')}"
+    )
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    WTF_CSRF_ENABLED = False
+    JWT_ACCESS_TOKEN_EXPIRES = False

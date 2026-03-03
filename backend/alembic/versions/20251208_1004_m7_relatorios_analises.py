@@ -26,49 +26,39 @@ def upgrade():
     """
     
     # ========================================
-    # ENUMS M7
+    # ENUMS M7 — idempotentes (DO EXCEPTION WHEN duplicate_object)
     # ========================================
-    
-    # Enum TipoRelatorio
-    tipo_relatorio_enum = postgresql.ENUM(
-        'portfolio', 'performance', 'renda_passiva', 'investimento', 'customizado',
-        name='tiporelatorio',
-        create_type=True
-    )
-    tipo_relatorio_enum.create(op.get_bind(), checkfirst=True)
-    
-    # Enum FormatoExport
-    formato_export_enum = postgresql.ENUM(
-        'visualizacao', 'pdf', 'excel',
-        name='formatoexport',
-        create_type=True
-    )
-    formato_export_enum.create(op.get_bind(), checkfirst=True)
-    
-    # Enum TipoAlerta
-    tipo_alerta_enum = postgresql.ENUM(
-        'queda_preco', 'alta_preco', 'dividendo_previsto', 'meta_rentabilidade',
-        'volatilidade_alta', 'desvio_alocacao', 'noticias_ativo',
-        name='tipoalerta',
-        create_type=True
-    )
-    tipo_alerta_enum.create(op.get_bind(), checkfirst=True)
-    
-    # Enum OperadorCondicao
-    operador_condicao_enum = postgresql.ENUM(
-        '>', '<', '==', '>=', '<=', 'ENTRE',
-        name='operadorcondicao',
-        create_type=True
-    )
-    operador_condicao_enum.create(op.get_bind(), checkfirst=True)
-    
-    # Enum FrequenciaNotificacao
-    frequencia_notificacao_enum = postgresql.ENUM(
-        'imediata', 'diaria', 'semanal', 'mensal',
-        name='frequencianotificacao',
-        create_type=True
-    )
-    frequencia_notificacao_enum.create(op.get_bind(), checkfirst=True)
+    op.execute("""
+        DO $$ BEGIN
+            CREATE TYPE tiporelatorio AS ENUM ('portfolio', 'performance', 'renda_passiva', 'investimento', 'customizado');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$
+    """)
+    op.execute("""
+        DO $$ BEGIN
+            CREATE TYPE formatoexport AS ENUM ('visualizacao', 'pdf', 'excel');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$
+    """)
+    op.execute("""
+        DO $$ BEGIN
+            CREATE TYPE tipoalerta AS ENUM ('queda_preco', 'alta_preco', 'dividendo_previsto', 'meta_rentabilidade', 'volatilidade_alta', 'desvio_alocacao', 'noticias_ativo');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$
+    """)
+    op.execute("""
+        DO $$ BEGIN
+            CREATE TYPE operadorcondicao AS ENUM ('>', '<', '==', '>=', '<=', 'ENTRE');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$
+    """)
+    op.execute("""
+        DO $$ BEGIN
+            CREATE TYPE frequencianotificacao AS ENUM ('imediata', 'diaria', 'semanal', 'mensal');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$
+    """)
+
+    tipo_relatorio_enum = postgresql.ENUM(name='tiporelatorio', create_type=False)
+    formato_export_enum = postgresql.ENUM(name='formatoexport', create_type=False)
+    tipo_alerta_enum = postgresql.ENUM(name='tipoalerta', create_type=False)
+    operador_condicao_enum = postgresql.ENUM(name='operadorcondicao', create_type=False)
+    frequencia_notificacao_enum = postgresql.ENUM(name='frequencianotificacao', create_type=False)
     
     # ========================================
     # TABELA: auditoria_relatorios

@@ -2,7 +2,7 @@
 
 > **Versão:** 2.0  
 > **Data:** 03 de Março de 2026  
-> **Status:** Em Implementação (Fase 2 concluída — Fase 3 em planejamento)  
+> **Status:** Em Implementação (Fase 2 concluída — Fase 3 em andamento)  
 > **Branch:** `feature/revisao-negocio-vision`
 
 ---
@@ -30,7 +30,7 @@
 - **3 usuários seed** para testes
 - **8 módulos PROD** (M0-M7.7)
 - **9 GAPs concluídos** na Fase 2
-- **0 testes automatizados** (dívida técnica crítica)
+- **69 testes automatizados** ✅ (37 unitários + 32 integração)
 
 ---
 
@@ -54,7 +54,7 @@
 
 | GAP ID | Funcionalidade | Status | Impacto | Prioridade |
 |--------|---------------|--------|---------|------------|
-| **EXITUS-TESTS-001** | Testes automatizados (pytest) | Não implementado | **Crítico** | **Alta** |
+| **EXITUS-TESTS-001** | Testes automatizados (pytest) | ✅ Concluído | **Crítico** | **Alta** |
 | **EXITUS-IR-001** | Engine de cálculo de IR completo (apuração, isenções, DARF) | Não implementado | **Alto** | **Alta** |
 | **EXITUS-EXPORT-001** | Exportação genérica (CSV, Excel, JSON, PDF) | Não implementado | Alto | Alta |
 
