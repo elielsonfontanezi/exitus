@@ -5,6 +5,7 @@ Exitus - MovimentacaoCaixa Service M3.2 (Corrigido)
 
 from app.database import db
 from app.models import MovimentacaoCaixa, Corretora
+from app.utils.exceptions import NotFoundError
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 from decimal import Decimal
@@ -38,7 +39,7 @@ class MovimentacaoCaixaService:
             # Validar se corretora existe e pertence ao usuário
             corretora = Corretora.query.filter_by(id=data['corretora_id'], usuario_id=usuario_id).first()
             if not corretora:
-                raise ValueError("Corretora não encontrada")
+                raise NotFoundError("Corretora não encontrada")
 
             # Criar objeto
             nova_mov = MovimentacaoCaixa(

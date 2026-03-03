@@ -12,6 +12,7 @@ from sqlalchemy.orm import joinedload
 from app.database import db
 from app.models import Transacao, Ativo, Corretora
 from app.utils.business_rules import validar_transacao
+from app.utils.exceptions import NotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -66,9 +67,9 @@ class TransacaoService:
                          joinedload(Transacao.ativo),
                          joinedload(Transacao.corretora),
                      )
-                     .get(transacao_id))
+                     .filter_by(id=transacao_id).first())
         if transacao is None:
-            raise ValueError(f'Transação {transacao_id} não encontrada')
+            raise NotFoundError(f'Transação {transacao_id} não encontrada')
         if str(transacao.usuario_id) != str(usuario_id):
             raise PermissionError('Acesso negado: transação pertence a outro usuário')
         return transacao
@@ -86,9 +87,9 @@ class TransacaoService:
             ValueError:      transação não existe (404)
             PermissionError: transação pertence a outro usuário (403)
         """
-        transacao = Transacao.query.get(transacao_id)
+        transacao = db.session.get(Transacao, transacao_id)
         if transacao is None:
-            raise ValueError(f'Transação {transacao_id} não encontrada')
+            raise NotFoundError(f'Transação {transacao_id} não encontrada')
         if str(transacao.usuario_id) != str(usuario_id):
             raise PermissionError('Acesso negado: transação pertence a outro usuário')
 
@@ -112,16 +113,16 @@ class TransacaoService:
             # Raises ValueError se saldo insuficiente (bloqueante)
             regras = validar_transacao(usuario_id, data)
 
-            ativo = Ativo.query.get(data['ativo_id'])
+            ativo = db.session.get(Ativo, data['ativo_id'])
             if not ativo:
-                raise ValueError(f'Ativo {data["ativo_id"]} não encontrado')
+                raise NotFoundError(f'Ativo {data["ativo_id"]} não encontrado')
 
             corretora = Corretora.query.filter_by(
                 id=data['corretora_id'],
                 usuario_id=usuario_id
             ).first()
             if not corretora:
-                raise ValueError('Corretora não encontrada ou não pertence ao usuário')
+                raise NotFoundError('Corretora não encontrada ou não pertence ao usuário')
 
             quantidade     = Decimal(str(data['quantidade']))
             preco_unitario = Decimal(str(data['preco_unitario']))
@@ -196,9 +197,9 @@ class TransacaoService:
             ValueError:      transação não existe (404)
             PermissionError: transação pertence a outro usuário (403)
         """
-        transacao = Transacao.query.get(transacao_id)
+        transacao = db.session.get(Transacao, transacao_id)
         if transacao is None:
-            raise ValueError(f'Transação {transacao_id} não encontrada')
+            raise NotFoundError(f'Transação {transacao_id} não encontrada')
         if str(transacao.usuario_id) != str(usuario_id):
             raise PermissionError('Acesso negado: transação pertence a outro usuário')  # TRX-002
 
@@ -246,9 +247,9 @@ class TransacaoService:
             ValueError:      transação não existe (404)
             PermissionError: transação pertence a outro usuário (403)
         """
-        transacao = Transacao.query.get(transacao_id)
+        transacao = db.session.get(Transacao, transacao_id)
         if transacao is None:
-            raise ValueError(f'Transação {transacao_id} não encontrada')
+            raise NotFoundError(f'Transação {transacao_id} não encontrada')
         if str(transacao.usuario_id) != str(usuario_id):
             raise PermissionError('Acesso negado: transação pertence a outro usuário')  # TRX-004
         try:
@@ -270,9 +271,9 @@ class TransacaoService:
         Raises:
             ValueError: ativo_id não existe no catálogo (404)
         """
-        ativo = Ativo.query.get(ativo_id)
+        ativo = db.session.get(Ativo, ativo_id)
         if not ativo:
-            raise ValueError(f'Ativo {ativo_id} não encontrado')
+            raise NotFoundError(f'Ativo {ativo_id} não encontrado')
 
         transacoes = (Transacao.query
                       .filter_by(usuario_id=usuario_id, ativo_id=ativo_id)

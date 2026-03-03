@@ -6,6 +6,7 @@ from app.database import db
 from app.models import EventoCorporativo, Posicao, Ativo
 from app.models.evento_corporativo import TipoEventoCorporativo
 from app.utils.db_utils import safe_commit, safe_delete_commit
+from app.utils.exceptions import NotFoundError
 from decimal import Decimal
 import logging
 
@@ -29,7 +30,7 @@ class EventoCorporativoService:
 
     @staticmethod
     def get_by_id(evento_id):
-        return EventoCorporativo.query.get(evento_id)
+        return db.session.get(EventoCorporativo, evento_id)
 
     @staticmethod
     def create(data):
@@ -56,9 +57,9 @@ class EventoCorporativoService:
     @staticmethod
     def update(evento_id, data):
         try:
-            evento = EventoCorporativo.query.get(evento_id)
+            evento = db.session.get(EventoCorporativo, evento_id)
             if not evento:
-                raise ValueError("Evento corporativo não encontrado")
+                raise NotFoundError("Evento corporativo não encontrado")
 
             if 'tipo_evento' in data:
                 evento.tipo_evento = TipoEventoCorporativo(data['tipo_evento'])
@@ -86,18 +87,18 @@ class EventoCorporativoService:
 
     @staticmethod
     def delete(evento_id):
-        evento = EventoCorporativo.query.get(evento_id)
+        evento = db.session.get(EventoCorporativo, evento_id)
         if not evento:
-            raise ValueError("Evento corporativo não encontrado")
+            raise NotFoundError("Evento corporativo não encontrado")
         safe_delete_commit(evento)
         return True
 
     @staticmethod
     def aplicar_evento(evento_id, usuario_id):
         try:
-            evento = EventoCorporativo.query.get(evento_id)
+            evento = db.session.get(EventoCorporativo, evento_id)
             if not evento:
-                raise ValueError("Evento não encontrado")
+                raise NotFoundError("Evento não encontrado")
 
             posicao = Posicao.query.filter_by(
                 usuario_id=usuario_id, 

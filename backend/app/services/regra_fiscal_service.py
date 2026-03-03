@@ -5,6 +5,7 @@ from decimal import Decimal
 from app.database import db
 from app.models.regra_fiscal import RegraFiscal, IncidenciaImposto
 from app.utils.db_utils import safe_commit, safe_delete_commit
+from app.utils.exceptions import NotFoundError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -26,7 +27,7 @@ class RegraFiscalService:
 
     @staticmethod
     def get_by_id(regra_id):
-        return RegraFiscal.query.get(regra_id)
+        return db.session.get(RegraFiscal, regra_id)
 
     @staticmethod
     def create(data):
@@ -49,9 +50,9 @@ class RegraFiscalService:
 
     @staticmethod
     def update(regra_id, data):
-        regra = RegraFiscal.query.get(regra_id)
+        regra = db.session.get(RegraFiscal, regra_id)
         if not regra:
-            raise ValueError("Regra fiscal não encontrada")
+            raise NotFoundError("Regra fiscal não encontrada")
 
         if 'pais' in data:
             regra.pais = data['pais'].upper()
@@ -79,8 +80,8 @@ class RegraFiscalService:
 
     @staticmethod
     def delete(regra_id):
-        regra = RegraFiscal.query.get(regra_id)
+        regra = db.session.get(RegraFiscal, regra_id)
         if not regra:
-            raise ValueError("Regra fiscal não encontrada")
+            raise NotFoundError("Regra fiscal não encontrada")
         safe_delete_commit(regra)
         return True

@@ -16,6 +16,7 @@ from app.schemas.provento_schema import (
     ProventoResponseSchema
 )
 from app.utils.responses import success_response, error_response, not_found
+from app.utils.exceptions import ExitusError
 
 
 provento_bp = Blueprint('proventos', __name__, url_prefix='/api/proventos')
@@ -115,6 +116,8 @@ def criar_provento():
         )
     except ValidationError as e:
         return error_response(str(e), 400)
+    except ExitusError as e:
+        return error_response(str(e), e.http_status)
     except Exception as e:
         return error_response(f"Erro ao criar provento: {str(e)}", 500)
 
@@ -133,8 +136,8 @@ def atualizar_provento(id):
         )
     except ValidationError as e:
         return error_response(str(e), 400)
-    except ValueError as e:
-        return not_found(str(e))
+    except ExitusError as e:
+        return error_response(str(e), e.http_status)
     except Exception as e:
         return error_response(f"Erro ao atualizar: {str(e)}", 500)
 
@@ -146,7 +149,7 @@ def deletar_provento(id):
     try:
         ProventoService.delete(id)
         return success_response(None, "Provento deletado com sucesso")
-    except ValueError as e:
-        return not_found(str(e))
+    except ExitusError as e:
+        return error_response(str(e), e.http_status)
     except Exception as e:
         return error_response(f"Erro ao deletar: {str(e)}", 500)

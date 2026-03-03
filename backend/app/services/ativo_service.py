@@ -7,6 +7,7 @@ from sqlalchemy import or_
 from app.database import db
 from app.models import Ativo, TipoAtivo, ClasseAtivo
 from app.utils.db_utils import safe_commit, safe_delete_commit
+from app.utils.exceptions import NotFoundError, ConflictError
 
 class AtivoService:
     """Serviço para operações de ativos"""
@@ -62,7 +63,7 @@ class AtivoService:
     @staticmethod
     def get_by_id(ativo_id):
         """Busca ativo por ID"""
-        return Ativo.query.get(ativo_id)
+        return db.session.get(Ativo, ativo_id)
     
     @staticmethod
     def get_by_ticker(ticker, mercado):
@@ -87,7 +88,7 @@ class AtivoService:
         ).first()
         
         if existing:
-            raise ValueError(f"Ativo {data['ticker']} já existe no mercado {data['mercado']}")
+            raise ConflictError(f"Ativo {data['ticker']} já existe no mercado {data['mercado']}")
         
         # ⚠️ CORREÇÃO: Usar p_l, p_vp (nomes das colunas no DB)
         ativo = Ativo(
@@ -119,9 +120,9 @@ class AtivoService:
             ativo_id: ID do ativo
             data: Dict com campos a atualizar
         """
-        ativo = Ativo.query.get(ativo_id)
+        ativo = db.session.get(Ativo, ativo_id)
         if not ativo:
-            raise ValueError("Ativo não encontrado")
+            raise NotFoundError("Ativo não encontrado")
         
         # Atualizar campos permitidos
         if 'nome' in data:
@@ -169,12 +170,19 @@ class AtivoService:
     @staticmethod
     def delete(ativo_id):
         """Deleta ativo"""
-        ativo = Ativo.query.get(ativo_id)
+        ativo = db.session.get(Ativo, ativo_id)
         if not ativo:
-            raise ValueError("Ativo não encontrado")
+            raise NotFoundError("Ativo não encontrado")
         
-        # TODO: Verificar se há posições/transações vinculadas
-        # Por enquanto, permite deletar
+        from app.models.transacao import Transacao
+        from app.models.posicao import Posicao
+        tem_transacoes = Transacao.query.filter_by(ativo_id=ativo_id).count() > 0
+        tem_posicoes   = Posicao.query.filter_by(ativo_id=ativo_id).count() > 0
+        if tem_transacoes or tem_posicoes:
+            raise ConflictError(
+                f"Ativo {ativo.ticker} possui transações/posições vinculadas. "
+                "Desative o ativo (ativo=False) em vez de deletar."
+            )
         
         safe_delete_commit(ativo)
         return True

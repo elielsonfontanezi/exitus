@@ -12,6 +12,7 @@ from sqlalchemy import extract
 
 from app.database import db
 from app.models import Provento, Ativo, Posicao
+from app.utils.exceptions import NotFoundError
 from app.services.posicao_service import PosicaoService
 
 logger = logging.getLogger(__name__)
@@ -74,7 +75,7 @@ class ProventoService:
     @staticmethod
     def get_by_id(provento_id):
         """Busca provento por ID"""
-        return Provento.query.options(joinedload(Provento.ativo)).get(provento_id)
+        return db.session.get(Provento, provento_id)
     
     
     @staticmethod
@@ -82,9 +83,9 @@ class ProventoService:
         """Cria novo provento"""
         try:
             # Validar ativo
-            ativo = Ativo.query.get(data['ativo_id'])
+            ativo = db.session.get(Ativo, data['ativo_id'])
             if not ativo:
-                raise ValueError("Ativo não encontrado")
+                raise NotFoundError("Ativo não encontrado")
             
             # ✅ GARANTIR que tipo_provento está em UPPERCASE
             if 'tipo_provento' in data:
@@ -129,9 +130,9 @@ class ProventoService:
     def update(provento_id, data):
         """Atualiza provento"""
         try:
-            provento = Provento.query.get(provento_id)
+            provento = db.session.get(Provento, provento_id)
             if not provento:
-                raise ValueError("Provento não encontrado")
+                raise NotFoundError("Provento não encontrado")
             
             campos_permitidos = [
                 'tipo_provento', 'valor_por_acao', 'quantidade_ativos',
@@ -154,9 +155,9 @@ class ProventoService:
     def delete(provento_id):
         """Deleta provento"""
         try:
-            provento = Provento.query.get(provento_id)
+            provento = db.session.get(Provento, provento_id)
             if not provento:
-                raise ValueError("Provento não encontrado")
+                raise NotFoundError("Provento não encontrado")
             
             db.session.delete(provento)
             db.session.commit()

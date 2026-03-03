@@ -8,6 +8,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
 from app.services.regra_fiscal_service import RegraFiscalService
+from app.utils.exceptions import ExitusError
 from app.schemas.regra_fiscal_schema import (
     RegraFiscalResponseSchema,
     RegraFiscalCreateSchema,
@@ -82,6 +83,8 @@ def criar_regra():
         }), 201
     except ValidationError as e:
         return jsonify({'success': False, 'error': e.messages}), 400
+    except ExitusError as e:
+        return jsonify({'success': False, 'error': str(e)}), e.http_status
     except Exception as e:
         logger.error(f"Erro ao criar regra fiscal: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -100,8 +103,8 @@ def atualizar_regra(regra_id):
         })
     except ValidationError as e:
         return jsonify({'success': False, 'error': e.messages}), 400
-    except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 404
+    except ExitusError as e:
+        return jsonify({'success': False, 'error': str(e)}), e.http_status
     except Exception as e:
         logger.error(f"Erro ao atualizar regra fiscal: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -113,8 +116,8 @@ def deletar_regra(regra_id):
     try:
         RegraFiscalService.delete(regra_id)
         return jsonify({'success': True, 'message': 'Regra fiscal deletada com sucesso'})
-    except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 404
+    except ExitusError as e:
+        return jsonify({'success': False, 'error': str(e)}), e.http_status
     except Exception as e:
         logger.error(f"Erro ao deletar regra fiscal: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500

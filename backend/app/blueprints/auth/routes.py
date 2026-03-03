@@ -38,22 +38,19 @@ def login():
         validated_data = schema.load(data)
         
         # Chama service com dados validados
-        tokens = AuthService.login(validated_data['username'], validated_data['password'])
+        result = AuthService.login(validated_data['username'], validated_data['password'])
         
-        # CORREÇÃO GAP-002: Adicionar dados do usuário na resposta
-        # Buscar usuário pelo username para incluir na response
-        user = Usuario.query.filter_by(username=validated_data['username']).first()
+        # Extrair usuário do resultado (sem query adicional)
+        user = result.pop('user')
+        result['user'] = {
+            'id': str(user.id),
+            'username': user.username,
+            'email': user.email,
+            'nome_completo': user.nome_completo,
+            'role': user.role.value if user.role else 'user'
+        }
         
-        if user:
-            tokens['user'] = {
-                'id': str(user.id),
-                'username': user.username,
-                'email': user.email,
-                'nome_completo': user.nome_completo,
-                'role': user.role.value if user.role else 'user'
-            }
-        
-        return success(tokens, "Login realizado com sucesso", 200)
+        return success(result, "Login realizado com sucesso", 200)
     
     except ValidationError as err:
         # CORREÇÃO GAP-001: ValidationError retorna 400, não 500
@@ -87,7 +84,7 @@ def refresh():
 def me():
     """Dados do usuário autenticado."""
     identity = get_jwt_identity()
-    user = Usuario.query.get(identity)
+    user = db.session.get(Usuario, identity)
     
     if not user:
         return unauthorized("Usuário não encontrado")
@@ -100,7 +97,7 @@ def me():
 def me_admin():
     """Endpoint de teste - apenas para ADMIN."""
     identity = get_jwt_identity()
-    user = Usuario.query.get(identity)
+    user = db.session.get(Usuario, identity)
     
     return success(
         {

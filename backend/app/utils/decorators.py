@@ -14,7 +14,7 @@ def admin_required(f):
     @jwt_required()
     def decorated_function(*args, **kwargs):
         identity = get_jwt_identity()
-        user = Usuario.query.get(identity)
+        user = db.session.get(Usuario, identity)
         # ✅ CORREÇÃO: comparação case-insensitive
         if not user or user.role.value.upper() != 'ADMIN':
             return forbidden("Acesso restrito a administradores")
@@ -32,7 +32,7 @@ def role_required(*roles):
         @jwt_required()
         def decorated_function(*args, **kwargs):
             identity = get_jwt_identity()
-            user = Usuario.query.get(identity)
+            user = db.session.get(Usuario, identity)
             # ✅ CORREÇÃO: comparação case-insensitive
             user_role = user.role.value.upper() if user else None
             roles_upper = [r.upper() for r in roles]
@@ -54,7 +54,7 @@ def owner_or_admin_required(resource_model):
         @jwt_required()
         def decorated_function(resource_id, *args, **kwargs):
             identity = get_jwt_identity()
-            current_user = Usuario.query.get(identity)
+            current_user = db.session.get(Usuario, identity)
             
             if not current_user:
                 return unauthorized("Usuário não encontrado")

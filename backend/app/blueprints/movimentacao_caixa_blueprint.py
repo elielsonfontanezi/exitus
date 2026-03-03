@@ -13,6 +13,7 @@ from app.schemas.movimentacao_caixa_schema import (
     MovimentacaoCaixaResponseSchema
 )
 from app.utils.responses import success_response, error_response
+from app.utils.exceptions import ExitusError
 from marshmallow import ValidationError
 from datetime import datetime
 import logging
@@ -106,8 +107,8 @@ def criar_movimentacao():
         
     except ValidationError as e:
         return error_response(e.messages, 400)
-    except ValueError as e:
-        return error_response(str(e), 400)
+    except ExitusError as e:
+        return error_response(str(e), e.http_status)
     except Exception as e:
         logger.error(f"Erro ao criar movimentação: {e}")
         return error_response(str(e), 500)
@@ -130,8 +131,8 @@ def atualizar_movimentacao(movimentacao_id):
         
     except ValidationError as e:
         return error_response(e.messages, 400)
-    except ValueError as e:
-        return error_response(str(e), 404)
+    except ExitusError as e:
+        return error_response(str(e), e.http_status)
     except Exception as e:
         logger.error(f"Erro ao atualizar movimentação: {e}")
         return error_response(str(e), 500)
@@ -147,8 +148,8 @@ def deletar_movimentacao(movimentacao_id):
         
         return success_response(message="Movimentação deletada com sucesso")
         
-    except ValueError as e:
-        return error_response(str(e), 404)
+    except ExitusError as e:
+        return error_response(str(e), e.http_status)
     except Exception as e:
         logger.error(f"Erro ao deletar movimentação: {e}")
         return error_response(str(e), 500)

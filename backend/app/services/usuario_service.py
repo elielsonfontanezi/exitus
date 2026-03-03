@@ -7,6 +7,7 @@ from sqlalchemy import or_
 from app.database import db
 from app.models import Usuario, UserRole
 from app.utils.db_utils import safe_commit, safe_delete_commit
+from app.utils.exceptions import NotFoundError, ConflictError, ForbiddenError
 
 
 class UsuarioService:
@@ -52,7 +53,7 @@ class UsuarioService:
     @staticmethod
     def get_by_id(user_id):
         """Busca usuário por ID"""
-        return Usuario.query.get(user_id)
+        return db.session.get(Usuario, user_id)
     
     @staticmethod
     def create(data):
@@ -82,9 +83,9 @@ class UsuarioService:
             ValueError: Se usuário não encontrado, email duplicado ou 
                        tentativa de alterar campos restritos sem permissão
         """
-        user = Usuario.query.get(user_id)
+        user = db.session.get(Usuario, user_id)
         if not user:
-            raise ValueError("Usuário não encontrado")
+            raise NotFoundError("Usuário não encontrado")
         
         # Verificar se é admin
         is_admin = current_user.role.value.upper() == 'ADMIN'
@@ -94,7 +95,7 @@ class UsuarioService:
         attempted_restricted = [field for field in restricted_fields if field in data]
         
         if attempted_restricted and not is_admin:
-            raise ValueError(
+            raise ForbiddenError(
                 f"Apenas administradores podem alterar: {', '.join(attempted_restricted)}"
             )
         
@@ -102,7 +103,7 @@ class UsuarioService:
         if 'email' in data:
             existing = Usuario.query.filter_by(email=data['email']).first()
             if existing and existing.id != user.id:
-                raise ValueError("Email já existe")
+                raise ConflictError("Email já existe")
             user.email = data['email']
         
         # Atualizar nome_completo
@@ -122,21 +123,21 @@ class UsuarioService:
     @staticmethod
     def delete(user_id):
         """Deleta usuário"""
-        user = Usuario.query.get(user_id)
+        user = db.session.get(Usuario, user_id)
         if not user:
-            raise ValueError("Usuário não encontrado")
+            raise NotFoundError("Usuário não encontrado")
         safe_delete_commit(user)
         return True
     
     @staticmethod
     def change_password(user_id, old_password, new_password):
         """Troca senha do usuário"""
-        user = Usuario.query.get(user_id)
+        user = db.session.get(Usuario, user_id)
         if not user:
-            raise ValueError("Usuário não encontrado")
+            raise NotFoundError("Usuário não encontrado")
         
         if not check_password_hash(user.password_hash, old_password):
-            raise ValueError("Senha atual incorreta")
+            raise ConflictError("Senha atual incorreta")
         
         user.password_hash = generate_password_hash(new_password)
         safe_commit()

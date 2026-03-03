@@ -18,6 +18,7 @@ from app.schemas.transacao_schema import (
     TransacaoListSchema,
 )
 from app.utils.responses import success, error, not_found, forbidden
+from app.utils.exceptions import ExitusError
 
 bp = Blueprint('transacoes', __name__, url_prefix='/api/transacoes')
 
@@ -75,9 +76,9 @@ def get_transacao(id):
         transacao = TransacaoService.get_by_id(id, usuario_id)
         return success(TransacaoResponseSchema().dump(transacao), 'Dados da transação')
     except PermissionError as e:
-        return forbidden(str(e))     # 403 — existe mas é de outro usuário
-    except ValueError as e:
-        return not_found(str(e))     # 404 — não existe
+        return forbidden(str(e))     # 403
+    except ExitusError as e:
+        return error(str(e), e.http_status)
     except Exception as e:
         return error(f'Erro ao buscar transação: {str(e)}', 500)
 
@@ -103,8 +104,10 @@ def create_transacao():
         )
     except ValidationError as e:
         return error(str(e), 400)
-    except ValueError as e:
-        return error(str(e), 400)
+    except PermissionError as e:
+        return forbidden(str(e))
+    except ExitusError as e:
+        return error(str(e), e.http_status)
     except Exception as e:
         return error(f'Erro ao criar transação: {str(e)}', 500)
 
@@ -130,9 +133,11 @@ def update_transacao(id):
     except PermissionError as e:
         return forbidden(str(e))     # 403 — TRX-002
     except ValidationError as e:
-        return error(str(e), 400)    # 400 — payload inválido
-    except ValueError as e:
-        return not_found(str(e))     # 404 — TRX-003
+        return error(str(e), 400)
+    except PermissionError as e:
+        return forbidden(str(e))
+    except ExitusError as e:
+        return error(str(e), e.http_status)
     except Exception as e:
         return error(f'Erro ao atualizar transação: {str(e)}', 500)
 
@@ -149,9 +154,9 @@ def delete_transacao(id):
         TransacaoService.delete(id, usuario_id)
         return success(None, 'Transação deletada com sucesso')
     except PermissionError as e:
-        return forbidden(str(e))     # 403 — TRX-004
-    except ValueError as e:
-        return not_found(str(e))     # 404
+        return forbidden(str(e))
+    except ExitusError as e:
+        return error(str(e), e.http_status)
     except Exception as e:
         return error(f'Erro ao deletar transação: {str(e)}', 500)
 
@@ -168,7 +173,7 @@ def get_resumo_ativo(ativo_id):
     try:
         resumo = TransacaoService.get_resumo_por_ativo(usuario_id, ativo_id)
         return success(resumo, 'Resumo do ativo')
-    except ValueError as e:
-        return not_found(str(e))     # 404 — TRX-007
+    except ExitusError as e:
+        return error(str(e), e.http_status)
     except Exception as e:
         return error(f'Erro ao buscar resumo: {str(e)}', 500)

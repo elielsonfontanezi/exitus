@@ -4,6 +4,7 @@
 from app.database import db
 from app.models.feriado_mercado import FeriadoMercado, TipoFeriado
 from app.utils.db_utils import safe_commit, safe_delete_commit
+from app.utils.exceptions import NotFoundError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ class FeriadoMercadoService:
 
     @staticmethod
     def get_by_id(feriado_id):
-        return FeriadoMercado.query.get(feriado_id)
+        return db.session.get(FeriadoMercado, feriado_id)
 
     @staticmethod
     def create(data):
@@ -48,9 +49,9 @@ class FeriadoMercadoService:
 
     @staticmethod
     def update(feriado_id, data):
-        feriado = FeriadoMercado.query.get(feriado_id)
+        feriado = db.session.get(FeriadoMercado, feriado_id)
         if not feriado:
-            raise ValueError("Feriado não encontrado")
+            raise NotFoundError("Feriado não encontrado")
 
         if 'pais' in data:
             feriado.pais = data['pais'].upper()
@@ -74,8 +75,8 @@ class FeriadoMercadoService:
 
     @staticmethod
     def delete(feriado_id):
-        feriado = FeriadoMercado.query.get(feriado_id)
+        feriado = db.session.get(FeriadoMercado, feriado_id)
         if not feriado:
-            raise ValueError("Feriado não encontrado")
+            raise NotFoundError("Feriado não encontrado")
         safe_delete_commit(feriado)
         return True

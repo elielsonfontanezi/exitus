@@ -13,6 +13,7 @@ from app.schemas.evento_corporativo_schema import (
     EventoCorporativoUpdateSchema,
 )
 from app.utils.decorators import admin_required
+from app.utils.exceptions import ExitusError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -79,8 +80,8 @@ def criar_evento():
         }), 201
     except ValidationError as e:
         return jsonify({'success': False, 'error': e.messages}), 400
-    except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+    except ExitusError as e:
+        return jsonify({'success': False, 'error': str(e)}), e.http_status
     except Exception as e:
         logger.error(f"Erro ao criar evento: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -99,8 +100,8 @@ def atualizar_evento(evento_id):
         })
     except ValidationError as e:
         return jsonify({'success': False, 'error': e.messages}), 400
-    except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 404
+    except ExitusError as e:
+        return jsonify({'success': False, 'error': str(e)}), e.http_status
     except Exception as e:
         logger.error(f"Erro ao atualizar evento: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -112,8 +113,8 @@ def deletar_evento(evento_id):
     try:
         EventoCorporativoService.delete(evento_id)
         return jsonify({'success': True, 'message': 'Evento corporativo deletado com sucesso'})
-    except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 404
+    except ExitusError as e:
+        return jsonify({'success': False, 'error': str(e)}), e.http_status
     except Exception as e:
         logger.error(f"Erro ao deletar evento: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -131,8 +132,8 @@ def aplicar_evento(evento_id):
             'data': resultado,
             'message': "Evento processado"
         })
-    except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+    except ExitusError as e:
+        return jsonify({'success': False, 'error': str(e)}), e.http_status
     except Exception as e:
         logger.error(f"Erro ao aplicar evento: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500

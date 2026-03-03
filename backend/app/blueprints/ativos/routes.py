@@ -10,6 +10,7 @@ from app.schemas.ativo_schema import (
 )
 from app.utils.responses import success, error, not_found, forbidden
 from app.utils.decorators import admin_required
+from app.utils.exceptions import ExitusError, NotFoundError
 
 bp = Blueprint('ativos', __name__, url_prefix='/api/ativos')
 
@@ -73,8 +74,8 @@ def create_ativo():
         )
     except ValidationError as e:
         return error(str(e), 400)
-    except ValueError as e:
-        return error(str(e), 400)
+    except ExitusError as e:
+        return error(str(e), e.http_status)
     except Exception as e:
         return error(f"Erro ao criar ativo: {str(e)}", 500)
 
@@ -88,8 +89,8 @@ def update_ativo(id):
         return success(AtivoResponseSchema().dump(ativo), "Ativo atualizado")
     except ValidationError as e:
         return error(str(e), 400)
-    except ValueError as e:
-        return error(str(e), 400)
+    except ExitusError as e:
+        return error(str(e), e.http_status)
     except Exception as e:
         return error(f"Erro ao atualizar: {str(e)}", 500)
 
@@ -100,8 +101,8 @@ def delete_ativo(id):
     try:
         AtivoService.delete(id)
         return success(None, "Ativo deletado com sucesso")
-    except ValueError as e:
-        return not_found(str(e))
+    except ExitusError as e:
+        return error(str(e), e.http_status)
     except Exception as e:
         return error(f"Erro ao deletar: {str(e)}", 500)
 

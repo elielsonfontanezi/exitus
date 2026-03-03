@@ -6,6 +6,7 @@ from sqlalchemy import or_
 from app.database import db
 from app.models import Corretora, TipoCorretora
 from app.utils.db_utils import safe_commit, safe_delete_commit
+from app.utils.exceptions import NotFoundError, ConflictError
 
 class CorretoraService:
     """Serviço para operações de corretoras"""
@@ -61,10 +62,10 @@ class CorretoraService:
             ValueError: Com mensagem específica para 404 ou 403
         """
         # Primeiro verifica se a corretora existe
-        corretora = Corretora.query.get(corretora_id)
+        corretora = db.session.get(Corretora, corretora_id)
         
         if not corretora:
-            raise ValueError("Corretora não encontrada")  # 404
+            raise NotFoundError("Corretora não encontrada")
         
         # Se existe, verifica se pertence ao usuário
         if corretora.usuario_id != usuario_id:
@@ -90,7 +91,7 @@ class CorretoraService:
         ).first()
         
         if existing:
-            raise ValueError(f"Já existe uma corretora '{data['nome']}' em {data['pais']}")
+            raise ConflictError(f"Já existe uma corretora '{data['nome']}' em {data['pais']}")
         
         corretora = Corretora(
             usuario_id=usuario_id,
@@ -133,7 +134,7 @@ class CorretoraService:
             ).first()
             
             if existing and existing.id != corretora.id:
-                raise ValueError(f"Já existe uma corretora '{data['nome']}' em {corretora.pais}")
+                raise ConflictError(f"Já existe uma corretora '{data['nome']}' em {corretora.pais}")
             
             corretora.nome = data['nome']
         
@@ -163,11 +164,19 @@ class CorretoraService:
             ValueError: Corretora não existe (404)
             PermissionError: Corretora existe mas pertence a outro (403)
         """
-        # Usa get_by_id que já faz a verificação 403/404
         corretora = CorretoraService.get_by_id(corretora_id, usuario_id)
         
-        # TODO: Verificar se há posições/transações vinculadas
-        # Por enquanto, permite deletar
+        from app.models.transacao import Transacao
+        from app.models.posicao import Posicao
+        from app.models.movimentacao_caixa import MovimentacaoCaixa
+        tem_transacoes   = Transacao.query.filter_by(corretora_id=corretora_id).count() > 0
+        tem_posicoes     = Posicao.query.filter_by(corretora_id=corretora_id).count() > 0
+        tem_movimentacoes = MovimentacaoCaixa.query.filter_by(corretora_id=corretora_id).count() > 0
+        if tem_transacoes or tem_posicoes or tem_movimentacoes:
+            raise ConflictError(
+                f"Corretora '{corretora.nome}' possui transações/posições/movimentações vinculadas. "
+                "Desative a corretora (ativa=False) em vez de deletar."
+            )
         
         safe_delete_commit(corretora)
         return True

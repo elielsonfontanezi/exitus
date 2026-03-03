@@ -55,6 +55,14 @@ def create_app(testing=False):
     # Inicializar extensões
     jwt = JWTManager(app)
 
+    # Handler genérico para exceções tipadas do sistema
+    from .utils.exceptions import ExitusError
+    from .utils.responses import error as error_response
+
+    @app.errorhandler(ExitusError)
+    def handle_exitus_error(e):
+        return error_response(str(e), e.http_status)
+
     # CORS configurado para frontend
     CORS(app, resources={
         r"/api/*": {

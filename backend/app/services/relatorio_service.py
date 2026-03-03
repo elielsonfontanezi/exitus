@@ -6,6 +6,7 @@ from datetime import date
 from uuid import UUID
 from app.database import db
 from app.models.auditoria_relatorio import AuditoriaRelatorio
+from app.utils.exceptions import NotFoundError
 
 class RelatorioService:
     @staticmethod
@@ -58,7 +59,7 @@ class RelatorioService:
             id=relatorio_id, usuario_id=usuario_id
         ).first()
         if not relatorio:
-            raise ValueError("Relatório não encontrado")
+            raise NotFoundError("Relatório não encontrado")
         return relatorio.to_dict()
 
     @staticmethod
@@ -68,7 +69,7 @@ class RelatorioService:
             id=relatorio_id, usuario_id=usuario_id
         ).first()
         if not relatorio:
-            raise ValueError("Relatório não encontrado")
+            raise NotFoundError("Relatório não encontrado")
         db.session.delete(relatorio)
         db.session.commit()
         return True
