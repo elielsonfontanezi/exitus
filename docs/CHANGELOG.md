@@ -38,6 +38,15 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Criados padrões seguros para desenvolvimento
   - Implementadas helper functions propostas
   - Estabelecido fluxo de validação preventiva
+
+- **EXITUS-CRUD-001** — CRUD Incompleto resolvido
+  - Mapeamento real de todos endpoints: 6 entidades já tinham CRUD completo
+  - Eventos Corporativos: adicionados GET by id, POST, PUT, DELETE (admin_required)
+  - Feriados: migrado de mock data estático para banco (tabela feriado_mercado)
+  - Regras Fiscais: migrado de mock data estático para banco (tabela regra_fiscal)
+  - Novos schemas com validação Marshmallow e serialização correta de enums
+  - Services usando safe_commit/safe_delete_commit (db_utils)
+  - ROADMAP atualizado com mapeamento real de CRUD por entidade
   - Redução esperada de 90% em erros recorrentes
 
 - **EXITUS-SCRIPTS-001** — Otimização e unificação completa do sistema de scripts

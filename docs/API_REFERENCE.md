@@ -600,10 +600,69 @@ Response 200:
 
 ---
 
-## 13–20. Demais Módulos
+## 10. Eventos Corporativos
 
-As APIs de Eventos Corporativos, Cálculos Financeiros, Regras Fiscais, Feriados, Fontes de Dados,
-Relatórios, Projeções e Performance seguem o mesmo contrato padrão:
+CRUD completo + ação de aplicar evento. **POST/PUT/DELETE requerem role `admin`.**
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/eventos-corporativos/` | Listar eventos (paginado, filtro `ativo_id`) |
+| GET | `/api/eventos-corporativos/<id>` | Obter evento por ID |
+| POST | `/api/eventos-corporativos/` | Criar evento corporativo |
+| PUT | `/api/eventos-corporativos/<id>` | Atualizar evento |
+| DELETE | `/api/eventos-corporativos/<id>` | Deletar evento |
+| POST | `/api/eventos-corporativos/<id>/aplicar` | Aplicar evento às posições do usuário |
+
+**Campos POST/PUT:**
+- `ativo_id` (UUID, obrigatório no POST)
+- `tipo_evento` (enum: split, grupamento, bonificacao, direito_sub, fusao, cisao, incorporacao, mudanca_ticker, deslistagem, relisting, cancelamento, outro)
+- `data_evento` (date, obrigatório no POST)
+- `descricao` (string min 3 chars, obrigatório no POST)
+- `data_com`, `proporcao`, `ativo_novo_id`, `observacoes` (opcionais)
+
+## 13. Regras Fiscais
+
+CRUD completo. **POST/PUT/DELETE requerem role `admin`.**
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/regras-fiscais/` | Listar regras (paginado, filtros: `pais`, `tipo_ativo`, `ativa`) |
+| GET | `/api/regras-fiscais/<id>` | Obter regra por ID |
+| POST | `/api/regras-fiscais/` | Criar regra fiscal |
+| PUT | `/api/regras-fiscais/<id>` | Atualizar regra |
+| DELETE | `/api/regras-fiscais/<id>` | Deletar regra |
+
+**Campos POST/PUT:**
+- `pais` (string 2 chars ISO, obrigatório no POST)
+- `aliquota_ir` (float 0-100, obrigatório no POST)
+- `incide_sobre` (enum: lucro, receita, provento, operacao)
+- `descricao` (string min 3 chars, obrigatório no POST)
+- `vigencia_inicio` (date, obrigatório no POST)
+- `tipo_ativo`, `tipo_operacao`, `valor_isencao`, `vigencia_fim`, `ativa` (opcionais)
+
+## 14. Feriados
+
+CRUD completo. **POST/PUT/DELETE requerem role `admin`.**
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/feriados/` | Listar feriados (paginado, filtros: `pais`, `mercado`, `ano`) |
+| GET | `/api/feriados/<id>` | Obter feriado por ID |
+| POST | `/api/feriados/` | Criar feriado |
+| PUT | `/api/feriados/<id>` | Atualizar feriado |
+| DELETE | `/api/feriados/<id>` | Deletar feriado |
+
+**Campos POST/PUT:**
+- `pais` (string 2 chars ISO, obrigatório no POST)
+- `data_feriado` (date, obrigatório no POST)
+- `tipo_feriado` (enum: nacional, bolsa, ponte, antecip, manutencao, outro)
+- `nome` (string min 3 chars, obrigatório no POST)
+- `mercado`, `horario_fechamento`, `recorrente`, `observacoes` (opcionais)
+
+## 15–20. Demais Módulos
+
+As APIs de Cálculos Financeiros, Fontes de Dados, Relatórios, Projeções e Performance
+seguem o mesmo contrato padrão:
 - **Auth**: Bearer JWT obrigatório.
 - **Response sucesso**: `{"success": true, "data": {...}, "message": "..."}`.
 - **Response erro**: `{"success": false, "message": "..."}`.
@@ -611,7 +670,8 @@ Relatórios, Projeções e Performance seguem o mesmo contrato padrão:
 
 ---
 
-*Documento atualizado: 27 de Fevereiro de 2026*
-*Versão da API: v0.7.10*
+*Documento atualizado: 02 de Março de 2026*
+*Versão da API: v0.8.0*
 *GAPs fechados: EXITUS-POS-001→007, EXITUS-ATIVOS-ENUM-001, EXITUS-POS-PAGIN-001,*
-*EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001, EXITUS-COTACOES-RESP-001*
+*EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001, EXITUS-COTACOES-RESP-001,*
+*EXITUS-SQLALCHEMY-001, EXITUS-CRUD-001*

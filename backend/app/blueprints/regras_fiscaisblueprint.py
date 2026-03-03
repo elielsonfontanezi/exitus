@@ -1,50 +1,120 @@
-from flask import Blueprint, jsonify, request
+# -*- coding: utf-8 -*-
+"""
+Exitus - Regras Fiscais Blueprint
+CRUD completo usando banco de dados (EXITUS-CRUD-001)
+Substituiu mock data estático por RegraFiscalService.
+"""
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
+from marshmallow import ValidationError
+from app.services.regra_fiscal_service import RegraFiscalService
+from app.schemas.regra_fiscal_schema import (
+    RegraFiscalResponseSchema,
+    RegraFiscalCreateSchema,
+    RegraFiscalUpdateSchema,
+)
+from app.utils.decorators import admin_required
+import logging
 
+logger = logging.getLogger(__name__)
 regrasbp = Blueprint('regras_fiscais', __name__, url_prefix='/api/regras-fiscais')
 
-# Dados mock baseados em regrafiscal (DB M3)
-regras_fiscais = [
-    {
-        "id": "1",
-        "pais": "BR",
-        "tipoativo": "AÇÃO",
-        "tipooperacao": "VENDA",
-        "aliquotair": 15.0,
-        "incidesobre": "GANHO_CAPITAL",
-        "descricao": "IR sobre ganho de capital em ações (day trade)",
-        "ativa": True
-    },
-    {
-        "id": "2", 
-        "pais": "BR",
-        "tipoativo": "FII",
-        "tipooperacao": "VENDA",
-        "aliquotair": 20.0,
-        "incidesobre": "GANHO_CAPITAL",
-        "descricao": "IR FIIs acima de 20k/mês",
-        "ativa": True
-    }
-]
+regras_schema = RegraFiscalResponseSchema(many=True)
+regra_schema = RegraFiscalResponseSchema()
+create_schema = RegraFiscalCreateSchema()
+update_schema = RegraFiscalUpdateSchema()
 
-@regrasbp.route('/', methods=['GET'])
+
+@regrasbp.route('/', methods=['GET'], strict_slashes=False)
+@jwt_required()
 def listar_regras():
-    return jsonify(regras_fiscais), 200
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = min(request.args.get('per_page', 50, type=int), 100)
+        pais = request.args.get('pais', type=str)
+        tipo_ativo = request.args.get('tipo_ativo', type=str)
+        ativa = request.args.get('ativa', type=lambda x: x.lower() == 'true')
 
-@regrasbp.route('/<string:id>', methods=['GET'])
-def buscar_regra(id):
-    regra = next((r for r in regras_fiscais if r["id"] == id), None)
-    if regra:
-        return jsonify(regra), 200
-    return jsonify({"error": "Regra fiscal não encontrada"}), 404
+        paginacao = RegraFiscalService.get_all(page, per_page, pais, tipo_ativo, ativa)
 
-@regrasbp.route('/', methods=['POST'])
+        return jsonify({
+            'success': True,
+            'data': {
+                'regras': regras_schema.dump(paginacao.items),
+                'total': paginacao.total,
+                'pages': paginacao.pages,
+                'page': paginacao.page,
+            },
+            'message': f"{paginacao.total} regras fiscais encontradas"
+        })
+    except Exception as e:
+        logger.error(f"Erro ao listar regras fiscais: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@regrasbp.route('/<uuid:regra_id>', methods=['GET'])
+@jwt_required()
+def buscar_regra(regra_id):
+    try:
+        regra = RegraFiscalService.get_by_id(regra_id)
+        if not regra:
+            return jsonify({'success': False, 'error': 'Regra fiscal não encontrada'}), 404
+        return jsonify({
+            'success': True,
+            'data': regra_schema.dump(regra),
+            'message': 'Dados da regra fiscal'
+        })
+    except Exception as e:
+        logger.error(f"Erro ao buscar regra fiscal: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@regrasbp.route('/', methods=['POST'], strict_slashes=False)
+@admin_required
 def criar_regra():
-    data = request.json
-    regras_fiscais.append(data)
-    return jsonify(data), 201
+    try:
+        data = create_schema.load(request.get_json())
+        regra = RegraFiscalService.create(data)
+        return jsonify({
+            'success': True,
+            'data': regra_schema.dump(regra),
+            'message': 'Regra fiscal criada com sucesso'
+        }), 201
+    except ValidationError as e:
+        return jsonify({'success': False, 'error': e.messages}), 400
+    except Exception as e:
+        logger.error(f"Erro ao criar regra fiscal: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-@regrasbp.route('/<string:id>', methods=['DELETE'])
-def deletar_regra(id):
-    global regras_fiscais
-    regras_fiscais = [r for r in regras_fiscais if r["id"] != id]
-    return jsonify({"message": "Regra fiscal deletada"}), 200
+
+@regrasbp.route('/<uuid:regra_id>', methods=['PUT'])
+@admin_required
+def atualizar_regra(regra_id):
+    try:
+        data = update_schema.load(request.get_json())
+        regra = RegraFiscalService.update(regra_id, data)
+        return jsonify({
+            'success': True,
+            'data': regra_schema.dump(regra),
+            'message': 'Regra fiscal atualizada'
+        })
+    except ValidationError as e:
+        return jsonify({'success': False, 'error': e.messages}), 400
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 404
+    except Exception as e:
+        logger.error(f"Erro ao atualizar regra fiscal: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@regrasbp.route('/<uuid:regra_id>', methods=['DELETE'])
+@admin_required
+def deletar_regra(regra_id):
+    try:
+        RegraFiscalService.delete(regra_id)
+        return jsonify({'success': True, 'message': 'Regra fiscal deletada com sucesso'})
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 404
+    except Exception as e:
+        logger.error(f"Erro ao deletar regra fiscal: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500

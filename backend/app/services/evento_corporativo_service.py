@@ -4,6 +4,8 @@ Exitus - EventoCorporativo Service M3.3 (Corrigido)
 """
 from app.database import db
 from app.models import EventoCorporativo, Posicao, Ativo
+from app.models.evento_corporativo import TipoEventoCorporativo
+from app.utils.db_utils import safe_commit, safe_delete_commit
 from decimal import Decimal
 import logging
 
@@ -24,6 +26,71 @@ class EventoCorporativoService:
         except Exception as e:
             logger.error(f"Erro ao listar eventos: {e}")
             raise
+
+    @staticmethod
+    def get_by_id(evento_id):
+        return EventoCorporativo.query.get(evento_id)
+
+    @staticmethod
+    def create(data):
+        try:
+            evento = EventoCorporativo(
+                ativo_id=data['ativo_id'],
+                tipo_evento=TipoEventoCorporativo(data['tipo_evento']),
+                data_evento=data['data_evento'],
+                descricao=data['descricao'],
+                data_com=data.get('data_com'),
+                proporcao=data.get('proporcao'),
+                ativo_novo_id=data.get('ativo_novo_id'),
+                observacoes=data.get('observacoes'),
+            )
+            db.session.add(evento)
+            safe_commit()
+            db.session.refresh(evento)
+            return evento
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Erro ao criar evento: {e}")
+            raise
+
+    @staticmethod
+    def update(evento_id, data):
+        try:
+            evento = EventoCorporativo.query.get(evento_id)
+            if not evento:
+                raise ValueError("Evento corporativo não encontrado")
+
+            if 'tipo_evento' in data:
+                evento.tipo_evento = TipoEventoCorporativo(data['tipo_evento'])
+            if 'data_evento' in data:
+                evento.data_evento = data['data_evento']
+            if 'descricao' in data:
+                evento.descricao = data['descricao']
+            if 'data_com' in data:
+                evento.data_com = data['data_com']
+            if 'proporcao' in data:
+                evento.proporcao = data['proporcao']
+            if 'ativo_novo_id' in data:
+                evento.ativo_novo_id = data['ativo_novo_id']
+            if 'observacoes' in data:
+                evento.observacoes = data['observacoes']
+
+            safe_commit()
+            return evento
+        except ValueError:
+            raise
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Erro ao atualizar evento: {e}")
+            raise
+
+    @staticmethod
+    def delete(evento_id):
+        evento = EventoCorporativo.query.get(evento_id)
+        if not evento:
+            raise ValueError("Evento corporativo não encontrado")
+        safe_delete_commit(evento)
+        return True
 
     @staticmethod
     def aplicar_evento(evento_id, usuario_id):

@@ -37,7 +37,7 @@
 | **EXITUS-SCRIPTS-001** | Otimização e unificação de scripts | ✅ Implementado | Crítico | Crítica |
 | **EXITUS-RECOVERY-001** | Sistema de Restore/Recovery Robusto | ✅ Implementado | Crítico | Crítica |
 | **EXITUS-IMPORT-001** | Importação/Exportação (CSV, Excel, JSON, PDF) | ✅ Implementado | Alto | Alta |
-| **EXITUS-CRUD-001** | CRUD incompleto para entidades | Faltan POST/PUT/DELETE | Alto | Alta |
+| **EXITUS-CRUD-001** | CRUD incompleto para entidades | ✅ Implementado | Alto | Alta |
 | **EXITUS-BUSINESS-001** | Regras de negócio críticas | Não implementado | Alto | Alta |
 | **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | ✅ Implementado | Alto | Alta |
 | **EXITUS-CASHFLOW-001** | Tratamento de "Transferência - Liquidação" B3 | ✅ Implementado | Médio | Média |
@@ -138,14 +138,25 @@ GET /api/export/{relatorio_id}/pdf
 - Limite de 10.000 linhas por importação
 
 ### EXITUS-CRUD-001: CRUD Incompleto
-**Entidades afetadas:**
-- **Movimentações:** Apenas GET listagem
-- **Buy Signals:** Apenas GET cálculos
-- **Cotações:** Apenas GET consulta
-- **Proventos:** Apenas GET listagem
-- **Eventos Corporativos:** Apenas GET listagem
+**Mapeamento real (atualizado 02/03/2026):**
 
-**Métodos faltando:** POST, PUT, DELETE para cada entidade
+**✅ CRUD Completo (6 entidades):**
+- **Usuarios:** GET, POST, PUT, DELETE, PATCH password
+- **Ativos:** GET, POST, PUT, DELETE + GET by ticker/mercado
+- **Corretoras:** GET, POST, PUT, DELETE + GET saldo-total
+- **Transações:** GET, POST, PUT, DELETE + GET resumo-ativo
+- **Proventos:** GET, POST, PUT, DELETE ✅
+- **Movimentações Caixa:** GET, POST, PUT, DELETE + saldo/extrato ✅
+
+**❌ CRUD Incompleto (3 entidades):**
+- **Eventos Corporativos:** Apenas GET list + POST aplicar → faltam GET id, POST create, PUT, DELETE
+- **Feriados:** Mock data (lista estática) → migrar para banco (tabela feriado_mercado)
+- **Regras Fiscais:** Mock data (lista estática) → migrar para banco (tabela regra_fiscal)
+
+**📖 Read-only por design (sem CRUD):**
+- **Buy Signals:** Cálculos derivados (margem, buy-score, zscore)
+- **Cotações:** Consulta a APIs externas com cache TTL 15min
+- **Posições:** Calculadas a partir de transações (POST /calcular)
 
 ### EXITUS-BUSINESS-001: Regras de Negócio
 **Regras críticas não implementadas:**
