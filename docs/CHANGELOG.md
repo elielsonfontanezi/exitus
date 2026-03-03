@@ -9,6 +9,25 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **docs/EXITUS-IR-001.md** — Documentação completa da engine de IR (03/03/2026)
+  - Objetivo, escopo, regras fiscais por categoria (tabela completa)
+  - Arquitetura: diagrama de fluxo de `apurar_mes()`, constantes fiscais
+  - API Reference completa: 3 endpoints com contratos JSON, parâmetros e erros
+  - Testes: tabela de cobertura das 3 classes (TestApuracao, TestDarf, TestHistorico)
+  - Tabelas do banco utilizadas e **não** utilizadas (com justificativa)
+  - Decisões de design: uso de `Decimal`, código DARF 0561, `historico_anual` fixo em 12 meses
+  - Exemplos cURL copiáveis
+  - Seção §6 com 6 limitações mapeadas como GAPs EXITUS-IR-002 a EXITUS-IR-007
+
+- **EXITUS-IR-002 a EXITUS-IR-007** — 6 GAPs derivados do EXITUS-IR-001 registrados no ROADMAP.md (03/03/2026)
+  - **IR-002:** Custo médio histórico (PM acumulado via tabela `posicao`) — impacto **Alto**
+  - **IR-003:** Compensação de prejuízo acumulado entre meses (nova tabela `saldo_prejuizo`) — impacto **Alto**
+  - **IR-004:** Proventos tributáveis — JCP (15% retido na fonte) e withholding tax US (30%) — impacto **Alto**
+  - **IR-005:** IR sobre renda fixa — tabela regressiva 22,5%→15% por prazo — impacto Alto
+  - **IR-006:** DIRPF anual — relatório para Declaração de Ajuste Anual (fichas Renda Variável e Bens e Direitos) — impacto Alto
+  - **IR-007:** Alíquotas dinâmicas via tabela `regra_fiscal` (atualmente hardcoded) — impacto Médio
+  - **IR-008:** Tratamento fiscal de UNITs B3 — classificação, isenção R$20k, desmembramento→PM (depende UNITS-001) — impacto Médio, prioridade **Baixa**
+
 - **EXITUS-EXPORT-001** — Exportação genérica de dados (03/03/2026)
   - `app/services/export_service.py`: engine de exportação para CSV, Excel, JSON e PDF
     - Filtros: `data_inicio`, `data_fim`, `ativo_id`, `corretora_id`, `tipo`

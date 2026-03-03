@@ -57,6 +57,13 @@
 | **EXITUS-TESTS-001** | Testes automatizados (pytest) | ✅ Concluído | **Crítico** | **Alta** |
 | **EXITUS-CRUD-002** | Revisão estrutural service/route: exceções tipadas (`NotFoundError`/`ConflictError`), HTTP 404/409 corretos, `delete()` com guarda de integridade referencial — 31 ocorrências em 10 services | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-001** | Engine de cálculo de IR completo (apuração, isenções, DARF) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
+| **EXITUS-IR-002** | Custo médio histórico (PM acumulado via tabela `posicao`) | Não implementado | **Alto** | **Alta** |
+| **EXITUS-IR-003** | Compensação de prejuízo acumulado entre meses (tabela `saldo_prejuizo`) | Não implementado | **Alto** | **Alta** |
+| **EXITUS-IR-004** | Proventos tributáveis: JCP (15% retido na fonte) e withholding tax US (30%) | Não implementado | **Alto** | **Alta** |
+| **EXITUS-IR-005** | IR sobre renda fixa: tabela regressiva 22,5%→15% por prazo de aplicação | Não implementado | Alto | Alta |
+| **EXITUS-IR-006** | DIRPF anual: relatório para Declaração de Ajuste Anual (fichas Renda Variável e Bens e Direitos) | Não implementado | Alto | Média |
+| **EXITUS-IR-007** | Alíquotas dinâmicas via tabela `regra_fiscal` (atualmente hardcoded em `ir_service.py`) | Não implementado | Médio | Média |
+| **EXITUS-IR-008** | Tratamento fiscal de UNITs B3 no engine de IR (classificação, isenção R$20k, desmembramento→PM) | Não implementado | Médio | Baixa |
 | **EXITUS-EXPORT-001** | Exportação genérica (CSV, Excel, JSON, PDF) | ✅ Concluído (03/03/2026) | Alto | Alta |
 
 ### 3. Fase 4 — Expansão de Funcionalidades (Média Prioridade)
@@ -225,18 +232,119 @@
 
 **Dependências:** Nenhuma — pode ser implementado a qualquer momento
 
-### EXITUS-IR-001: Engine de Cálculo de IR Completo
-**Problema:** Day-trade é detectado (BUSINESS-001) mas não há engine de cálculo fiscal real.
+### EXITUS-IR-001: Engine de Cálculo de IR Completo ✅
+**Status:** ✅ IMPLEMENTADO (03/03/2026)
 
-**Escopo proposto:**
-1. **Apuração mensal** de lucro/prejuízo por tipo de ativo
-2. **Isenção de R$20k/mês** para ações swing trade (BR)
-3. **Alíquotas diferenciadas:** ações 15%, FIIs 20%, day-trade 20%, RF tabela regressiva
-4. **Compensação** de prejuízos acumulados entre meses
-5. **Geração de DARF** (valor a pagar, código de receita)
-6. **Impostos US:** withholding tax 30% sobre dividendos (treaty BR-US)
+**Implementação:**
+- ✅ `app/services/ir_service.py` — apuração mensal por categoria (swing ações, day-trade, FIIs, exterior)
+- ✅ Isenção R$20.000/mês para swing trade em ações BR
+- ✅ Alíquotas: ações 15%, day-trade 20%, FIIs 20%, exterior 15%
+- ✅ Geração de DARF com código de receita (6015 BR / 0561 exterior)
+- ✅ Histórico anual mês a mês
+- ✅ Breakdown por corretora
+- ✅ `app/blueprints/ir_blueprint.py` — 3 endpoints em `/api/ir/`
+- ✅ `tests/test_ir_integration.py` — 19 testes
+- ✅ Documentação detalhada: `docs/EXITUS-IR-001.md`
 
-**Tabelas envolvidas:** `transacao`, `posicao`, `regra_fiscal`, `provento`
+**Tabelas usadas:** `transacao`, `ativo`, `corretora`
+
+**Limitações rastreadas como GAPs:** EXITUS-IR-002 a EXITUS-IR-007 (ver abaixo)
+
+### EXITUS-IR-002: Custo Médio Histórico (PM Acumulado)
+**Problema:** O engine atual usa `preco_unitario` da transação de venda como proxy do custo de aquisição. O correto é usar o preço médio ponderado acumulado de todas as compras anteriores, persistido na tabela `posicao`.
+
+**Impacto:** IR calculado pode divergir do real, subestimando ou superestimando lucro dependendo do histórico de compras.
+
+**Solução:** Integrar `PosicaoService` na apuração — buscar `posicao.preco_medio` para o ativo na data imediatamente anterior à venda.
+
+**Dependências:** `EXITUS-IR-001` (concluído), tabela `posicao` populada via `POST /api/posicoes/calcular`
+
+### EXITUS-IR-003: Compensação de Prejuízo Acumulado entre Meses
+**Problema:** Prejuízos de um mês não são persistidos. A regra fiscal (IN RFB 1.585/2015) permite compensar prejuízos de meses anteriores contra lucros futuros da mesma categoria (swing × swing, day-trade × day-trade). Sem persistência, o IR calculado pode ser maior que o real.
+
+**Solução:**
+- Criar tabela `saldo_prejuizo` com colunas: `usuario_id`, `categoria` (swing/day_trade/fii/exterior), `ano_mes`, `saldo`
+- `apurar_mes()` consulta saldo acumulado antes de calcular IR
+- Após apuração, persiste novo saldo (prejudízo acumulado ou zerado)
+
+**Dependências:** `EXITUS-IR-001` (concluído), migration nova
+
+### EXITUS-IR-004: Proventos Tributáveis (JCP e Withholding Tax US)
+**Problema:** O engine não processa proventos. JCP tem 15% retidos na fonte — não está consolidado no resumo fiscal. Dividendos de ações US têm withholding tax (30%, treaty BR-US pode reduzir).
+
+**Solução:**
+- JCP: buscar `provento` onde `tipo = 'JCP'`, consolidar IR retido na fonte e incluir em `/api/ir/apuracao`
+- Dividendos US: calcular withholding sobre proventos de `TIPOS_US`
+- Novo campo `proventos_tributaveis` na resposta de apuração
+
+**Dependências:** `EXITUS-IR-001` (concluído), tabela `provento`
+
+### EXITUS-IR-005: IR sobre Renda Fixa (Tabela Regressiva)
+**Problema:** Ativos `CDB`, `LCI_LCA`, `TESOURO_DIRETO`, `DEBENTURE` não são calculados no engine. A tabela regressiva vigente: até 180d→22,5%; 181-360d→20%; 361-720d→17,5%; >720d→15%. LCI/LCA são isentos para PF.
+
+**Solução:** Calcular IR retido na fonte para resgates de RF, usando `data_vencimento` e `data_compra` dos ativos. Integrar com `EXITUS-RFCALC-001`.
+
+**Dependências:** `EXITUS-IR-001` (concluído), `EXITUS-RFCALC-001` (Fase 4)
+
+### EXITUS-IR-006: DIRPF Anual (Declaração de Ajuste Anual)
+**Problema:** O sistema produz dados para DARF mensal mas não gera relatório estruturado para a Declaração de Ajuste Anual (fichas "Renda Variável" e "Bens e Direitos" do programa IRPF da RFB).
+
+**Solução:**
+- Novo endpoint `GET /api/ir/declaracao?ano=YYYY` retornando estrutura para DIRPF
+- Consolidar custo de aquisição e situação final de cada ativo em 31/12
+- Integrar com `EXITUS-EXPORT-001` para geração de PDF/Excel
+
+**Dependências:** `EXITUS-IR-002`, `EXITUS-IR-003`, `EXITUS-EXPORT-001` (concluídos)
+
+### EXITUS-IR-007: Alíquotas Dinâmicas via Tabela `regra_fiscal`
+**Problema:** As alíquotas e constantes fiscais estão hardcoded em `ir_service.py` (15%, 20%, R$20.000, etc). A tabela `regra_fiscal` existe no banco para armazenar essas regras dinamicamente, mas não é usada pelo engine de IR.
+
+**Solução:** Carregar alíquotas e limites de isenção da tabela `regra_fiscal` no início de `apurar_mes()`, com fallback para os valores hardcoded caso a tabela esteja vazia.
+
+**Dependências:** `EXITUS-IR-001` (concluído), `EXITUS-CRUD-001` (CRUD de regras fiscais já implementado)
+
+### EXITUS-IR-008: Tratamento Fiscal de UNITs B3 no Engine de IR
+**Problema:** O enum `TipoAtivo` (14 tipos) não inclui `UNIT`. UNITs (ex: `TAEE11`, `KLBN11`, `SANB11`) são certificados de depósito compostos por ações ON + PN (± bônus de subscrição). Se uma UNIT entrar no sistema hoje, cai no branch `default` de `apurar_mes()` e é tratada como `swing_acoes` — o que **por acaso** é fiscalmente correto para a maioria dos cenários, mas sem garantia estrutural.
+
+**Regra fiscal (confirmada com a Receita Federal e IN RFB):**
+- UNITs são **equiparadas a ações** para fins de IR sobre renda variável
+- Alíquota: **15% swing / 20% day-trade** (igual a ações)
+- Isenção de **R$20.000/mês** em vendas: **SIM, aplica-se** (Lei 11.033/2004, art. 3º, I)
+- Código DARF: **6015** (igual a ações)
+- Dividendos/JCP: seguem regime padrão (dividendos isentos, JCP 15% retido)
+
+**Problema real — desmembramento de UNIT:**
+Quando o investidor desmembra uma UNIT em ações ON + PN individuais, o **preço médio deve ser rateado proporcionalmente** entre os papéis resultantes. Exemplo:
+- Compra 100 TAEE11 a R$40 = PM R$40
+- Desmembramento: 1 UNIT = 1 ON + 2 PN
+- PM ON = (40 × proporção ON); PM PN = (40 × proporção PN)
+
+Sem esse rateio, o custo de aquisição das ações resultantes fica **zerado**, gerando IR inflado na venda.
+
+**Consequências de NÃO implementar (risco atual):**
+1. **Classificação acidental correta** — como UNITs caem no `default` (swing_acoes), a alíquota e isenção estão corretas hoje. O bug só se manifesta se alguém adicionar lógica que exclua tipos desconhecidos.
+2. **Desmembramento não tratado** — se o usuário desmembrar UNITs manualmente e registrar as ações resultantes como compras novas, o PM ficará errado e o IR calculado será incorreto.
+3. **DIRPF incorreta** — UNITs e ações resultantes precisam aparecer separadamente em "Bens e Direitos" (código 01).
+
+**Análise custo-benefício — vale o esforço?**
+
+| Aspecto | Avaliação |
+|---------|----------|
+| Impacto fiscal | **Baixo a médio** — UNITs são equiparadas a ações; a classificação acidental já funciona |
+| Frequência de uso | **Baixa** — poucos investidores PF compram UNITs diretamente |
+| Risco de bug silencioso | **Médio** — funciona hoje por acidente, pode quebrar com mudanças futuras |
+| Complexidade | **Média** — adicionar tipo enum é simples; tratar desmembramento exige evento corporativo |
+| Dependência de UNITS-001 | **Forte** — 80% do trabalho é do EXITUS-UNITS-001 (Fase 4) |
+
+**Recomendação: Prioridade BAIXA.** O cenário funciona acidentalmente hoje. A implementação real depende de `EXITUS-UNITS-001` (Fase 4) que adiciona o tipo `UNIT` ao enum e trata conversões. Este GAP (IR-008) deve ser implementado **junto** com UNITS-001, não antes. Registrar agora serve para **não esquecer** o aspecto fiscal quando UNITs forem implementadas.
+
+**Solução proposta (quando implementar):**
+1. Adicionar `UNIT = "unit"` ao enum `TipoAtivo` (migration) — escopo UNITS-001
+2. Incluir `TipoAtivo.UNIT` em `TIPOS_ACAO_BR` no `ir_service.py` → isenção R$20k correta
+3. Tratar evento corporativo "desmembramento de UNIT" rateando PM proporcional — escopo UNITS-001
+4. Testes: cenário de venda de UNIT (isento < R$20k, tributado > R$20k), cenário de desmembramento + venda
+
+**Dependências:** `EXITUS-IR-001` (concluído), `EXITUS-UNITS-001` (Fase 4 — pré-requisito forte)
 
 ### EXITUS-EXPORT-001: Exportação Genérica
 **Problema:** Apenas importação B3 existe. Usuários não conseguem exportar dados para análise externa.
@@ -286,9 +394,16 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 6. ✅ Massa de ativos fundamentalistas (ASSETS-001)
 
 ### Fase 3 — Qualidade e Cálculos (próximo sprint)
-1. **EXITUS-TESTS-001** — Testes automatizados (pytest + fixtures)
-2. **EXITUS-IR-001** — Engine de cálculo de IR completo
-3. **EXITUS-EXPORT-001** — Exportação genérica (CSV, Excel, JSON, PDF)
+1. **EXITUS-TESTS-001** — Testes automatizados (pytest + fixtures) ✅
+2. **EXITUS-IR-001** — Engine de cálculo de IR completo ✅
+3. **EXITUS-IR-002** — Custo médio histórico (PM acumulado)
+4. **EXITUS-IR-003** — Compensação de prejuízo acumulado entre meses
+5. **EXITUS-IR-004** — JCP (15% retido) e withholding tax US
+6. **EXITUS-IR-005** — IR renda fixa (tabela regressiva)
+7. **EXITUS-IR-006** — DIRPF anual (Declaração de Ajuste Anual)
+8. **EXITUS-IR-007** — Alíquotas dinâmicas via `regra_fiscal`
+9. **EXITUS-IR-008** — Tratamento fiscal de UNITs B3 (implementar junto com UNITS-001)
+10. **EXITUS-EXPORT-001** — Exportação genérica (CSV, Excel, JSON, PDF) ✅
 
 ### Fase 4 — Expansão de Funcionalidades
 1. **EXITUS-MULTIMOEDA-001** — Conversão multi-moeda
@@ -335,6 +450,13 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-ASSETS-001 | 2 | ✅ Concluído | 02/03/2026 | 56 ativos com dados fundamentalistas |
 | EXITUS-TESTS-001 | 3 | 📋 Planejado | — | pytest + fixtures, cobertura 70%+ |
 | EXITUS-IR-001 | 3 | ✅ Concluído | 03/03/2026 | Apuração mensal, isenções, DARF — 19 testes |
+| EXITUS-IR-002 | 3 | 📋 Planejado | — | Custo médio histórico (PM acumulado via `posicao`) |
+| EXITUS-IR-003 | 3 | 📋 Planejado | — | Compensação prejuízo acumulado (`saldo_prejuizo`) |
+| EXITUS-IR-004 | 3 | 📋 Planejado | — | JCP 15% retido na fonte + withholding tax US |
+| EXITUS-IR-005 | 3 | 📋 Planejado | — | IR renda fixa — tabela regressiva 22,5%→15% |
+| EXITUS-IR-006 | 3 | 📋 Planejado | — | DIRPF anual — fichas Renda Variável e Bens e Direitos |
+| EXITUS-IR-007 | 3 | 📋 Planejado | — | Alíquotas dinâmicas via tabela `regra_fiscal` |
+| EXITUS-IR-008 | 3 | 📋 Planejado | — | UNITs B3: classificação fiscal + desmembramento→PM (depende UNITS-001) |
 | EXITUS-EXPORT-001 | 3 | ✅ Concluído | 03/03/2026 | CSV, Excel, JSON, PDF — 32 testes |
 | EXITUS-MULTIMOEDA-001 | 4 | 📋 Planejado | — | Conversão automática BRL/USD/EUR |
 | EXITUS-UNITS-001 | 4 | 📋 Planejado | — | UNITS B3 |
