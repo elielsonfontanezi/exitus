@@ -878,23 +878,56 @@ podman exec -it exitus-backend bash -c "cd /app && python3 -c 'from app import c
 
 ## Testes e Validação
 
-### Rodar Testes Unitários
+### ⚠️ Pré-requisito: testes rodam DENTRO do container
+
+O ambiente de testes **não existe no host**. As dependências Python (`marshmallow-sqlalchemy`, `flask-testing`, etc.) estão instaladas apenas dentro do container `exitus-backend`. Tentar rodar `pytest` diretamente no host resulta em `ModuleNotFoundError`.
+
+**Regra:** sempre use `podman exec exitus-backend python -m pytest ...`
+
+---
+
+### Rodar Testes Automatizados (pytest)
 
 ```bash
-# Acessar backend
-podman exec -it exitus-backend bash
+# ✅ CORRETO — rodar suite completa dentro do container
+podman exec exitus-backend python -m pytest tests/ -q --no-cov
 
-# Rodar todos os testes
-pytest tests/ -v
+# Com verbose (detalhes por teste)
+podman exec exitus-backend python -m pytest tests/ -v --no-cov
 
-# Rodar testes de um módulo específico
-pytest tests/test_portfolio_service.py -v
+# Módulo específico
+podman exec exitus-backend python -m pytest tests/test_ativos_integration.py -v --no-cov
 
-# Com cobertura
-pytest tests/ --cov=app --cov-report=html
+# Teste específico
+podman exec exitus-backend python -m pytest tests/test_ativos_integration.py::TestCriarAtivo -v --no-cov
 
-# Ver relatório de cobertura
-# Abrir htmlcov/index.html no navegador
+# Parar no primeiro falho
+podman exec exitus-backend python -m pytest tests/ -x --no-cov
+```
+
+> **Por que `--no-cov`?** O coverage tenta gravar `.coverage` em `/app/`, que pode ter permissão negada no volume Podman (GAP EXITUS-INFRA-001). Use `--no-cov` para evitar `INTERNALERROR`.
+
+### Testes conhecidos como pré-existentemente falhos (não regredir)
+
+| Arquivo | Motivo | Status |
+|---|---|---|
+| `tests/test_buy_signals.py` | `ImportError: cannot import name 'db' from 'app'` — importação errada | ⚠️ Ignorar com `--ignore` |
+| `tests/test_calculos.py` | Endpoints `/api/calculos/` exigem JWT mas o teste não envia token | ⚠️ Pré-existente |
+
+```bash
+# Suite completa ignorando os falhos pré-existentes (69 testes verdes)
+podman exec exitus-backend python -m pytest tests/ -q --no-cov \
+  --ignore=tests/test_buy_signals.py
+```
+
+### ❌ Métodos INCORRETOS (não usar)
+
+```bash
+# ❌ No host — ModuleNotFoundError
+python -m pytest tests/
+
+# ❌ cd dentro do container — não tem shell interativo no CI
+cd /home/.../exitus/backend && pytest tests/
 ```
 
 ---
