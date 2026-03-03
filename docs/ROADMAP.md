@@ -55,7 +55,7 @@
 | GAP ID | Funcionalidade | Status | Impacto | Prioridade |
 |--------|---------------|--------|---------|------------|
 | **EXITUS-TESTS-001** | Testes automatizados (pytest) | ✅ Concluído | **Crítico** | **Alta** |
-| **EXITUS-CRUD-002** | Revisão do contrato service/route: HTTP status codes, `delete` com validação de integridade, exceções tipadas | Não implementado | **Alto** | **Alta** |
+| **EXITUS-CRUD-002** | Revisão estrutural service/route: exceções tipadas (`NotFoundError`/`ConflictError`), HTTP 404/409 corretos, `delete()` com guarda de integridade referencial — 31 ocorrências em 10 services | Não implementado | **Alto** | **Alta** |
 | **EXITUS-IR-001** | Engine de cálculo de IR completo (apuração, isenções, DARF) | Não implementado | **Alto** | **Alta** |
 | **EXITUS-EXPORT-001** | Exportação genérica (CSV, Excel, JSON, PDF) | Não implementado | Alto | Alta |
 
