@@ -28,11 +28,22 @@ def get_parametros_macro(pais, mercado):
         
         # Fallback Brasil B3
         result = db.session.execute(query, {'pais': 'BR', 'mercado': 'B3'}).fetchone()
+        if result:
+            return {
+                'taxa_livre_risco': float(result[0] or 0.10),
+                'crescimento_medio': float(result[1] or 0.05),
+                'custo_capital': float(result[2] or 0.12),
+                'inflacao_anual': float(result[3] or 0.03),
+                'cap_rate_fii': float(result[4] or 0.08),
+                'ytm_rf': float(result[5] or 0.10)
+            }
+
+        # Defaults hardcoded — tabela parametros_macro vazia (ex: banco de teste)
         return {
-            'taxa_livre_risco': float(result[0] or 0.10),
-            'crescimento_medio': float(result[1] or 0.05),
-            'custo_capital': float(result[2] or 0.12),
-            'inflacao_anual': float(result[3] or 0.03),
-            'cap_rate_fii': float(result[4] or 0.08),
-            'ytm_rf': float(result[5] or 0.10)
+            'taxa_livre_risco': 0.105,
+            'crescimento_medio': 0.05,
+            'custo_capital': 0.12,
+            'inflacao_anual': 0.045,
+            'cap_rate_fii': 0.08,
+            'ytm_rf': 0.105
         }

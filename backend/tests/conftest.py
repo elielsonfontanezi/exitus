@@ -111,6 +111,7 @@ def ativo_seed(app):
         tipo=TipoAtivo.ACAO, classe=ClasseAtivo.RENDA_VARIAVEL,
         mercado='BR', moeda='BRL',
         preco_atual=Decimal('38.50'),
+        preco_teto=Decimal('50.00'),
         dividend_yield=Decimal('12.5'),
         p_l=Decimal('4.2'),
         p_vp=Decimal('1.1'),
