@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Exitus - IR Service (EXITUS-IR-001)
+Exitus - IR Service (EXITUS-IR-001 + IR-002)
 Engine de cálculo de Imposto de Renda sobre operações de renda variável.
 
 Regras implementadas (Brasil):
 - Swing trade ações: 15% sobre lucro mensal, isenção R$20.000/mês em vendas
 - Day-trade (ações/FIIs): 20% sobre lucro, sem isenção
 - FIIs: 20% sobre lucro, sem isenção
-- Compensação de prejuízo: acumulado entre meses (por categoria: swing/day-trade)
+- Custo de aquisição via preço médio ponderado (PM) da tabela `posicao` (IR-002)
 - Proventos (dividendos BR): isentos; JCP: 15% retido na fonte
 - DARF: código de receita por categoria
 
-Tabelas usadas: transacao, ativo, regra_fiscal
+Tabelas usadas: transacao, ativo, corretora, posicao
 """
 
 import logging
@@ -26,6 +26,7 @@ from app.database import db
 from app.models.transacao import Transacao, TipoTransacao
 from app.models.ativo import Ativo, TipoAtivo
 from app.models.corretora import Corretora
+from app.models.posicao import Posicao
 from app.utils.exceptions import BusinessRuleError
 
 logger = logging.getLogger(__name__)
@@ -142,6 +143,15 @@ class IRService:
             .all()
         )
 
+        # Carregar preço médio da tabela posicao (IR-002)
+        # Mapa: (ativo_id_str, corretora_id_str) → preco_medio
+        posicoes = Posicao.query.filter_by(usuario_id=usuario_id).all()
+        pm_map = {
+            (str(p.ativo_id), str(p.corretora_id)): Decimal(str(p.preco_medio))
+            for p in posicoes
+            if p.preco_medio and p.preco_medio > 0
+        }
+
         # Separar por categoria
         swing_acoes   = []   # vendas swing ações BR
         day_trade     = []   # vendas day-trade (qualquer tipo)
@@ -182,11 +192,11 @@ class IRService:
             por_corretora[cid]['total_vendas'] += Decimal(str(t.valor_total))
             por_corretora[cid]['operacoes']    += 1
 
-        # Apurar cada categoria
-        res_swing    = IRService._apurar_swing_acoes(swing_acoes)
-        res_dt       = IRService._apurar_day_trade(day_trade)
-        res_fii      = IRService._apurar_fiis(fiis)
-        res_exterior = IRService._apurar_exterior(exterior)
+        # Apurar cada categoria (com PM da tabela posicao)
+        res_swing    = IRService._apurar_swing_acoes(swing_acoes, pm_map)
+        res_dt       = IRService._apurar_day_trade(day_trade, pm_map)
+        res_fii      = IRService._apurar_fiis(fiis, pm_map)
+        res_exterior = IRService._apurar_exterior(exterior, pm_map)
 
         # Totais
         ir_swing    = res_swing['ir_devido']
@@ -200,6 +210,14 @@ class IRService:
 
         # Alertas
         alertas = []
+        if not pm_map:
+            alertas.append(
+                "Tabela posicao vazia — execute POST /api/posicoes/calcular antes de apurar IR. "
+                "Sem PM, o custo de aquisição será zero e o IR calculado pode ser maior que o real."
+            )
+        # Coletar alertas de PM não encontrado das categorias
+        for res in (res_swing, res_dt, res_fii, res_exterior):
+            alertas.extend(res.pop('_alertas_pm', []))
         if res_swing.get('isento'):
             alertas.append(f"Vendas de ações em {mes_str} abaixo de R$20.000 — isento de IR (swing trade).")
         if ir_total < DARF_MINIMO and ir_total > 0:
@@ -236,15 +254,21 @@ class IRService:
     # -----------------------------------------------------------------------
 
     @staticmethod
-    def _apurar_swing_acoes(vendas: list) -> dict:
+    def _apurar_swing_acoes(vendas: list, pm_map: dict) -> dict:
         """Swing trade ações BR: 15%, isenção R$20k/mês em vendas."""
         total_vendas  = sum(Decimal(str(t.valor_total)) for t, _, _ in vendas)
         total_custos  = sum(Decimal(str(t.custos_totais)) for t, _, _ in vendas)
-        # Lucro estimado: receita líquida - custo de aquisição (preco_unitario × qtd)
-        lucro_bruto   = sum(
-            Decimal(str(t.valor_total)) - Decimal(str(t.preco_unitario)) * Decimal(str(t.quantidade))
-            for t, _, _ in vendas
-        )
+        alertas_pm = []
+
+        # Lucro: receita - custo de aquisição (PM da tabela posicao) - custos
+        lucro_bruto = Decimal('0')
+        for t, _, ticker in vendas:
+            pm = pm_map.get((str(t.ativo_id), str(t.corretora_id)), Decimal('0'))
+            if pm == 0:
+                alertas_pm.append(f"PM não encontrado para {ticker} — custo de aquisição assumido como zero.")
+            custo_aquisicao = pm * Decimal(str(t.quantidade))
+            lucro_bruto += Decimal(str(t.valor_total)) - custo_aquisicao
+
         lucro_liquido = lucro_bruto - total_custos
 
         isento = total_vendas <= ISENCAO_SWING_ACAO
@@ -259,15 +283,21 @@ class IRService:
             'isento':        isento,
             'ir_devido':     ir_devido,
             'operacoes':     len(vendas),
+            '_alertas_pm':   alertas_pm,
         }
 
     @staticmethod
-    def _apurar_day_trade(vendas: list) -> dict:
+    def _apurar_day_trade(vendas: list, pm_map: dict) -> dict:
         """Day-trade: 20%, sem isenção."""
-        lucro_bruto  = sum(
-            Decimal(str(t.valor_total)) - Decimal(str(t.preco_unitario)) * Decimal(str(t.quantidade))
-            for t, _, _ in vendas
-        )
+        alertas_pm = []
+        lucro_bruto = Decimal('0')
+        for t, _, ticker in vendas:
+            pm = pm_map.get((str(t.ativo_id), str(t.corretora_id)), Decimal('0'))
+            if pm == 0:
+                alertas_pm.append(f"PM não encontrado para {ticker} (day-trade) — custo assumido como zero.")
+            custo_aquisicao = pm * Decimal(str(t.quantidade))
+            lucro_bruto += Decimal(str(t.valor_total)) - custo_aquisicao
+
         total_custos = sum(Decimal(str(t.custos_totais)) for t, _, _ in vendas)
         lucro_liquido = lucro_bruto - total_custos
 
@@ -281,15 +311,21 @@ class IRService:
             'isento':        False,
             'ir_devido':     ir_devido,
             'operacoes':     len(vendas),
+            '_alertas_pm':   alertas_pm,
         }
 
     @staticmethod
-    def _apurar_fiis(vendas: list) -> dict:
+    def _apurar_fiis(vendas: list, pm_map: dict) -> dict:
         """FIIs: 20%, sem isenção."""
-        lucro_bruto  = sum(
-            Decimal(str(t.valor_total)) - Decimal(str(t.preco_unitario)) * Decimal(str(t.quantidade))
-            for t, _, _ in vendas
-        )
+        alertas_pm = []
+        lucro_bruto = Decimal('0')
+        for t, _, ticker in vendas:
+            pm = pm_map.get((str(t.ativo_id), str(t.corretora_id)), Decimal('0'))
+            if pm == 0:
+                alertas_pm.append(f"PM não encontrado para {ticker} (FII) — custo assumido como zero.")
+            custo_aquisicao = pm * Decimal(str(t.quantidade))
+            lucro_bruto += Decimal(str(t.valor_total)) - custo_aquisicao
+
         total_custos = sum(Decimal(str(t.custos_totais)) for t, _, _ in vendas)
         lucro_liquido = lucro_bruto - total_custos
 
@@ -303,15 +339,21 @@ class IRService:
             'isento':        False,
             'ir_devido':     ir_devido,
             'operacoes':     len(vendas),
+            '_alertas_pm':   alertas_pm,
         }
 
     @staticmethod
-    def _apurar_exterior(vendas: list) -> dict:
+    def _apurar_exterior(vendas: list, pm_map: dict) -> dict:
         """Ativos US/exterior: 15% ganho de capital."""
-        lucro_bruto  = sum(
-            Decimal(str(t.valor_total)) - Decimal(str(t.preco_unitario)) * Decimal(str(t.quantidade))
-            for t, _, _ in vendas
-        )
+        alertas_pm = []
+        lucro_bruto = Decimal('0')
+        for t, _, ticker in vendas:
+            pm = pm_map.get((str(t.ativo_id), str(t.corretora_id)), Decimal('0'))
+            if pm == 0:
+                alertas_pm.append(f"PM não encontrado para {ticker} (exterior) — custo assumido como zero.")
+            custo_aquisicao = pm * Decimal(str(t.quantidade))
+            lucro_bruto += Decimal(str(t.valor_total)) - custo_aquisicao
+
         total_custos = sum(Decimal(str(t.custos_totais)) for t, _, _ in vendas)
         lucro_liquido = lucro_bruto - total_custos
 
@@ -325,6 +367,7 @@ class IRService:
             'isento':        False,
             'ir_devido':     ir_devido,
             'operacoes':     len(vendas),
+            '_alertas_pm':   alertas_pm,
         }
 
     # -----------------------------------------------------------------------

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-EXITUS-IR-001 — Testes de integração para engine de IR.
+EXITUS-IR-001 + IR-002 — Testes de integração para engine de IR.
 Cobre os 3 endpoints: /api/ir/apuracao, /api/ir/darf, /api/ir/historico
+IR-002: valida cálculo de lucro via preco_medio da tabela posicao.
 """
 import uuid
 import pytest
@@ -61,6 +62,7 @@ def cenario_ir(app, auth_client, ativo_seed):
     from app.database import db
     from app.models.corretora import Corretora, TipoCorretora
     from app.models.transacao import Transacao
+    from app.models.posicao import Posicao
 
     # Descobrir o usuario_id a partir do token do auth_client
     token = auth_client._auth_headers['Authorization'].split(' ')[1]
@@ -87,6 +89,20 @@ def cenario_ir(app, auth_client, ativo_seed):
         db, usuario_id, ativo_seed.id, corretora.id,
         'venda', '2025-03-20T14:00:00', 100, 50.00,
     )
+
+    # Criar posição com preco_medio = 30.00 (preço da compra) — IR-002
+    posicao = Posicao(
+        usuario_id=usuario_id,
+        ativo_id=ativo_seed.id,
+        corretora_id=corretora.id,
+        quantidade=Decimal('0'),
+        preco_medio=Decimal('30.00'),
+        custo_total=Decimal('0'),
+        taxas_acumuladas=Decimal('0'),
+        impostos_acumulados=Decimal('0'),
+        lucro_prejuizo_realizado=Decimal('2000.00'),
+    )
+    db.session.add(posicao)
     db.session.commit()
 
     yield {
@@ -95,10 +111,12 @@ def cenario_ir(app, auth_client, ativo_seed):
         'mes': '2025-03',
         'usuario_id': str(usuario_id),
         'corretora_nome': corretora.nome,
+        'posicao_id': posicao.id,
     }
 
     Transacao.query.filter_by(id=compra.id).delete()
     Transacao.query.filter_by(id=venda.id).delete()
+    Posicao.query.filter_by(id=posicao.id).delete()
     Corretora.query.filter_by(id=corretora.id).delete()
     db.session.commit()
 
@@ -184,6 +202,25 @@ class TestApuracao:
         """Mês sem transações retorna por_corretora como lista vazia."""
         rv = auth_client.get('/api/ir/apuracao?mes=2000-01', headers=auth_client._auth_headers)
         assert rv.get_json()['data']['por_corretora'] == []
+
+    # --- IR-002: Testes de cálculo via preço médio (posicao) ---
+
+    def test_lucro_calculado_via_preco_medio_posicao(self, auth_client, cenario_ir):
+        """IR-002: Lucro = valor_venda - (PM × qtd). PM=30, venda 100×50 → lucro bruto R$2000."""
+        rv = auth_client.get(
+            f'/api/ir/apuracao?mes={cenario_ir["mes"]}',
+            headers=auth_client._auth_headers,
+        )
+        assert rv.status_code == 200
+        swing = rv.get_json()['data']['categorias']['swing_acoes']
+        # 100 × 50 = 5000 (receita) - 100 × 30 = 3000 (custo PM) = 2000 lucro bruto
+        assert swing['lucro_liquido'] == 2000.0
+
+    def test_alerta_posicao_vazia_quando_sem_pm(self, auth_client):
+        """IR-002: Se tabela posicao vazia, alertas deve conter aviso."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2000-01', headers=auth_client._auth_headers)
+        alertas = rv.get_json()['data']['alertas']
+        assert any('posicao vazia' in a.lower() for a in alertas)
 
 
 # ===========================================================================

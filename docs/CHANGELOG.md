@@ -9,6 +9,15 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-IR-002** — Custo médio histórico via tabela `posicao` (03/03/2026)
+  - **Bug fix crítico:** `ir_service.py` usava `t.preco_unitario` (preço de venda) como custo de aquisição, resultando em lucro sempre zero
+  - Agora carrega `preco_medio` da tabela `posicao` para cada `(ativo_id, corretora_id)` do usuário
+  - Mapa `pm_map` passado às 4 funções de apuração (swing, day-trade, FIIs, exterior)
+  - Alerta automático quando tabela `posicao` vazia ou PM não encontrado para um ativo
+  - Pré-requisito: `POST /api/posicoes/calcular` deve ser executado antes de apurar IR
+  - `tests/test_ir_integration.py`: +2 testes (lucro via PM, alerta posicao vazia)
+  - **Suite total: 132 passed, 0 failed**
+
 - **docs/EXITUS-IR-001.md** — Documentação completa da engine de IR (03/03/2026)
   - Objetivo, escopo, regras fiscais por categoria (tabela completa)
   - Arquitetura: diagrama de fluxo de `apurar_mes()`, constantes fiscais
