@@ -130,11 +130,12 @@ Resumo: 11 enums, 60 valores distintos. Para referência completa, ver `ENUMS.md
 - `202602162130_add_caprate_ativo.py`
 
 ### Seeds de Dados
-**Total dev: 70 ativos** (47 BR, 16 US, 3 EU, 4 outros)
+**Total dev: 56 ativos** (15 ações BR, 10 FIIs, 6 stocks US, 2 REITs, 8 ETFs, 5 RF BR, 10 EU)
 
 `seed_usuarios.py`, `seed_corretoras.py`, `seed_ativos_br.py`,
 `seed_ativos_renda_fixa_br.py`, `seed_ativos_us.py`, `seed_ativos_eu.py`,
-`seed_feriados.py`, `seed_regras_fiscais.py`
+`seed_feriados.py`, `seed_regras_fiscais.py`,
+`seed_ativos_fundamentalistas.py` (enriquecimento com DY, P/L, P/VP, ROE, beta, preco_teto, cap_rate)
 
 ### Índices e Otimizações
 Mais de 86 índices criados para suportar queries de cálculo, relatórios e dashboards.
@@ -271,7 +272,7 @@ CI/CD GitHub Actions, deploy Railway/Render, monitoramento com Prometheus/Grafan
 
 | Categoria | Métrica | Valor |
 |---|---|---|
-| Endpoints | Rotas totais | **69** |
+| Endpoints | Rotas totais | **67+** |
 | Tabelas | Database | 21 |
 | Índices | PostgreSQL | 86+ |
 | Blueprints | Flask | 16 |
@@ -281,7 +282,7 @@ CI/CD GitHub Actions, deploy Railway/Render, monitoramento com Prometheus/Grafan
 | Cache Hit Rate | Cotações | 85-95% |
 | Response Time | Médio | 50-500ms |
 | Usuários Teste | Concorrentes | 20-40 |
-| Ativos Seedados | — | 70 (47 BR, 16 US, 3 EU, 4 outros) |
+| Ativos Seedados | — | 56 (15 ações BR, 10 FIIs, 6 US, 2 REITs, 8 ETFs, 5 RF, 10 EU) |
 | Cobertura ENUMs | — | 14/14 tipos implementados e testados |
 
 ---
@@ -297,6 +298,6 @@ CI/CD GitHub Actions, deploy Railway/Render, monitoramento com Prometheus/Grafan
 
 ---
 
-*Documento atualizado: 22 de Fevereiro de 2026*
-*Versão: v0.7.10*
-*70 ativos seedados — M2-POSICOES validado (7 GAPs fechados)*
+*Documento atualizado: 03 de Março de 2026*
+*Versão: v0.8.0-dev*
+*56 ativos com dados fundamentalistas — 9 GAPs Fase 2 concluídos*

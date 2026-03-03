@@ -1,65 +1,90 @@
 # Roadmap de Implementação — Sistema Exitus
 
-> **Versão:** 1.0  
-> **Data:** 27 de Fevereiro de 2026  
-> **Status:** Planejamento  
+> **Versão:** 2.0  
+> **Data:** 03 de Março de 2026  
+> **Status:** Em Implementação (Fase 2 concluída — Fase 3 em planejamento)  
 > **Branch:** `feature/revisao-negocio-vision`
 
 ---
 
-## 📍 Onde Estamos (v0.7.10)
+## 📍 Onde Estamos (v0.8.0-dev)
 
 ### ✅ Implementado e Funcional
-- **67 endpoints** RESTful validados
+- **67+ endpoints** RESTful validados
 - **21 tabelas** PostgreSQL com constraints robustas
 - **Multi-tenant** por usuário (1:1)
-- **Autenticação JWT** com 3 roles (ADMIN, USER, READONLY)
-- **Relatórios básicos** com auditoria
-- **Logs de auditoria** completos
-- **Cotações em tempo real** com cache
-- **Buy Signals** (readonly)
-- **Alertas** configuráveis
-- **Dashboards** interativos
+- **Autenticação JWT** com 3 roles (ADMIN, USER, READONLY) e decorator `admin_required`
+- **CRUD completo** para 9 entidades (usuarios, ativos, corretoras, transações, proventos, movimentações, eventos corporativos, feriados, regras fiscais)
+- **Regras de negócio** (horário, feriados, saldo, taxas B3, day-trade)
+- **Importação B3** (Excel/CSV do Portal do Investidor)
+- **56 ativos** com dados fundamentalistas (DY, P/L, P/VP, ROE, beta, preco_teto, cap_rate)
+- **Cotações multi-provider** com cache TTL 15min (brapi.dev, yfinance, Alpha Vantage, Finnhub)
+- **Buy Signals** (Buy Score 0-100, Preço Teto 4 métodos, Z-Score)
+- **Alertas** configuráveis por preço/percentual/indicador
+- **Dashboards** interativos (Chart.js + HTMX)
+- **Relatórios** com auditoria
+- **Recovery enterprise-grade** (backup/restore/rollback com checksum SHA-256)
 
 ### 📊 Métricas Atuais
-- **56 ativos reais** no DB (33 BR, 16 US, 3 EU, 4 outros)
+- **56 ativos** no DB (15 ações BR, 10 FIIs, 6 stocks US, 2 REITs, 8 ETFs, 5 RF BR, 10 EU)
 - **3 usuários seed** para testes
-- **5 módulos PROD** (M0-M7.x)
+- **8 módulos PROD** (M0-M7.7)
+- **9 GAPs concluídos** na Fase 2
+- **0 testes automatizados** (dívida técnica crítica)
 
 ---
 
 ## 🎯 GAPs Identificados
 
-### 1. Funcionalidades Ausentes (Alta Prioridade)
+### 1. Fase 2 — Concluída ✅ (9 GAPs)
 
-| GAP ID | Funcionalidade | Status Real | Impacto | Prioridade |
-|--------|---------------|-------------|---------|------------|
-| **EXITUS-SCRIPTS-001** | Otimização e unificação de scripts | ✅ Implementado | Crítico | Crítica |
-| **EXITUS-RECOVERY-001** | Sistema de Restore/Recovery Robusto | ✅ Implementado | Crítico | Crítica |
-| **EXITUS-IMPORT-001** | Importação/Exportação (CSV, Excel, JSON, PDF) | ✅ Implementado | Alto | Alta |
-| **EXITUS-CRUD-001** | CRUD incompleto para entidades | ✅ Implementado | Alto | Alta |
-| **EXITUS-BUSINESS-001** | Regras de negócio críticas | ✅ Implementado | Alto | Alta |
-| **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | ✅ Implementado | Alto | Alta |
-| **EXITUS-CASHFLOW-001** | Tratamento de "Transferência - Liquidação" B3 | ✅ Implementado | Médio | Média |
-| **EXITUS-ASSETS-001** | Massa de Ativos Completa para Testes (dados ricos: preço, DY, P/L, ROE) | ✅ Implementado | Médio | Média |
-| **EXITUS-SQLALCHEMY-001** | Padrões e Boas Práticas SQLAlchemy | ✅ Implementado | Alto | Alta |
+| GAP ID | Funcionalidade | Status | Data |
+|--------|---------------|--------|------|
+| **EXITUS-SCRIPTS-001** | Otimização e unificação de scripts | ✅ Concluído | 28/02/2026 |
+| **EXITUS-RECOVERY-001** | Sistema de Restore/Recovery Robusto | ✅ Concluído | 28/02/2026 |
+| **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | ✅ Concluído | 02/03/2026 |
+| **EXITUS-IMPORT-001** | Importação B3 (Excel/CSV Portal do Investidor) | ✅ Concluído | 02/03/2026 |
+| **EXITUS-CASHFLOW-001** | Eventos de custódia B3 (Transferência - Liquidação D+2) | ✅ Concluído | 02/03/2026 |
+| **EXITUS-SQLALCHEMY-001** | Padrões e helpers SQLAlchemy (`db_utils.py`) | ✅ Concluído | 02/03/2026 |
+| **EXITUS-CRUD-001** | CRUD completo para 9 entidades | ✅ Concluído | 02/03/2026 |
+| **EXITUS-BUSINESS-001** | 5 regras de negócio críticas (`business_rules.py`) | ✅ Concluído | 02/03/2026 |
+| **EXITUS-ASSETS-001** | 56 ativos com dados fundamentalistas | ✅ Concluído | 02/03/2026 |
 
-### 2. Funcionalidades de Expansão (Média Prioridade)
+### 2. Fase 3 — Qualidade e Cálculos (Alta Prioridade)
 
-| GAP ID | Funcionalidade | Status Real | Impacto | Prioridade |
-|--------|---------------|-------------|---------|------------|
-| **EXITUS-MULTIMOEDA-001** | Multi-moeda com conversão | Apenas BRL | Médio | Média |
-| **EXITUS-MULTICLIENTE-001** | Multi-cliente para assessoras | Não implementado | Médio-Alto | Média-Alta |
-| **EXITUS-MONITOR-001** | Monitoramento/alertas em tempo real | Não implementado | Médio | Média |
-| **EXITUS-NEWAPIS-001** | APIs de configuração | Não implementado | Médio | Média |
+| GAP ID | Funcionalidade | Status | Impacto | Prioridade |
+|--------|---------------|--------|---------|------------|
+| **EXITUS-TESTS-001** | Testes automatizados (pytest) | Não implementado | **Crítico** | **Alta** |
+| **EXITUS-IR-001** | Engine de cálculo de IR completo (apuração, isenções, DARF) | Não implementado | **Alto** | **Alta** |
+| **EXITUS-EXPORT-001** | Exportação genérica (CSV, Excel, JSON, PDF) | Não implementado | Alto | Alta |
+
+### 3. Fase 4 — Expansão de Funcionalidades (Média Prioridade)
+
+| GAP ID | Funcionalidade | Status | Impacto | Prioridade |
+|--------|---------------|--------|---------|------------|
+| **EXITUS-MULTIMOEDA-001** | Multi-moeda com conversão automática | Apenas BRL | Médio | Média |
 | **EXITUS-UNITS-001** | Tratamento de UNITS (B3) | Não implementado | Médio | Média |
-| **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | ✅ Implementado | Alto | Alta |
+| **EXITUS-SWAGGER-001** | Auto-documentação OpenAPI/Swagger | Não implementado | Médio | Média |
+| **EXITUS-ANOMALY-001** | Detecção de anomalias em preços (≥20% sem evento) | Não implementado | Médio | Média |
+| **EXITUS-RFCALC-001** | Cálculos RF (Duration, YTM) e FII (FFO, AFFO) | Não implementado | Médio | Média |
+| **EXITUS-NEWAPIS-001** | APIs de configuração (parametros_macro, fonte_dados) | Não implementado | Médio | Média |
 
-### 3. Funcionalidades Opcionais (Baixa Prioridade)
+### 4. Fase 5 — Produção e Escala (Média-Alta Prioridade)
 
-| GAP ID | Funcionalidade | Status Real | Impacto | Prioridade |
-|--------|---------------|-------------|---------|------------|
-| **EXITUS-CRIPTO-001** | Criptografia AES-256 | Não implementado | Baixo | Baixa |
+| GAP ID | Funcionalidade | Status | Impacto | Prioridade |
+|--------|---------------|--------|---------|------------|
+| **EXITUS-MULTICLIENTE-001** | Multi-cliente para assessoras (multi-tenancy real) | Não implementado | **Alto** | **Média-Alta** |
+| **EXITUS-MONITOR-001** | Monitoramento/alertas operacionais | Não implementado | Médio | Média |
+| **EXITUS-RATELIMIT-001** | Rate limiting (Flask-Limiter) | Não implementado | Médio | Média |
+| **EXITUS-CICD-001** | CI/CD (GitHub Actions) + Deploy cloud | Não implementado | Médio | Média |
+
+### 5. Dívida Técnica e Opcionais (Baixa Prioridade)
+
+| GAP ID | Funcionalidade | Status | Impacto | Prioridade |
+|--------|---------------|--------|---------|------------|
+| **EXITUS-CRIPTO-001** | Criptografia AES-256 para dados sensíveis | Não implementado | Baixo | Baixa |
+| **EXITUS-AUDIT-001** | Logs de auditoria imutáveis (hash encadeado) | Não implementado | Baixo | Baixa |
+| **EXITUS-LGPD-001** | Conformidade LGPD/GDPR (consentimento, esquecimento) | Não implementado | Baixo (dev) | Baixa |
 
 ---
 
@@ -118,40 +143,31 @@
 - ✅ **Enterprise features** - Compressão, checksum, metadados, agendamento
 - ✅ **Segurança** - Backup pré-operação, rollback automático, validações
 
-### EXITUS-IMPORT-001: Importação/Exportação
-**Problema:** Usuários não podem migrar dados ou exportar para análise externa
+### EXITUS-IMPORT-001: Importação B3 ✅
+**Status:** ✅ IMPLEMENTADO
 
-**APIs necessárias:**
-```
-POST /api/import/csv
-POST /api/import/excel
-POST /api/import/json
-GET /api/export/{relatorio_id}/csv
-GET /api/export/{relatorio_id}/excel
-GET /api/export/{relatorio_id}/json
-GET /api/export/{relatorio_id}/pdf
-```
+**Implementação:**
+- ✅ Parsing de arquivos Excel/CSV do Portal do Investidor B3
+- ✅ Importação de proventos (51 testados) e criação automática de ativos (19 testados)
+- ✅ Parsing monetário corrigido (formato European)
+- ✅ Opção `--clean` para base limpa
+- ✅ Eventos de custódia "Transferência - Liquidação" tratados (EXITUS-CASHFLOW-001)
 
-**Validações:**
-- Estrutura de arquivo obrigatória
-- Rollback automático em erro
-- Limite de 10.000 linhas por importação
+**Nota:** Exportação genérica (CSV, Excel, JSON, PDF) é escopo do novo GAP EXITUS-EXPORT-001
 
-### EXITUS-CRUD-001: CRUD Incompleto
-**Mapeamento real (atualizado 02/03/2026):**
+### EXITUS-CRUD-001: CRUD Completo ✅
+**Status:** ✅ IMPLEMENTADO (02/03/2026)
 
-**✅ CRUD Completo (6 entidades):**
+**✅ CRUD Completo (9 entidades):**
 - **Usuarios:** GET, POST, PUT, DELETE, PATCH password
 - **Ativos:** GET, POST, PUT, DELETE + GET by ticker/mercado
 - **Corretoras:** GET, POST, PUT, DELETE + GET saldo-total
 - **Transações:** GET, POST, PUT, DELETE + GET resumo-ativo
-- **Proventos:** GET, POST, PUT, DELETE ✅
-- **Movimentações Caixa:** GET, POST, PUT, DELETE + saldo/extrato ✅
-
-**❌ CRUD Incompleto (3 entidades):**
-- **Eventos Corporativos:** Apenas GET list + POST aplicar → faltam GET id, POST create, PUT, DELETE
-- **Feriados:** Mock data (lista estática) → migrar para banco (tabela feriado_mercado)
-- **Regras Fiscais:** Mock data (lista estática) → migrar para banco (tabela regra_fiscal)
+- **Proventos:** GET, POST, PUT, DELETE
+- **Movimentações Caixa:** GET, POST, PUT, DELETE + saldo/extrato
+- **Eventos Corporativos:** GET, GET by id, POST, PUT, DELETE + POST /aplicar
+- **Feriados:** GET, POST, PUT, DELETE (migrado de mock para banco `feriado_mercado`)
+- **Regras Fiscais:** GET, POST, PUT, DELETE (migrado de mock para banco `regra_fiscal`)
 
 **📖 Read-only por design (sem CRUD):**
 - **Buy Signals:** Cálculos derivados (margem, buy-score, zscore)
@@ -181,61 +197,106 @@ GET /api/export/{relatorio_id}/pdf
 - Ajustar cálculos de posição
 - Tratar conversões em transações
 
-### EXITUS-SEED-001: Sistema de Seed/Reset Controlado
-**Problema:** Não há forma de resetar o DB para estado conhecido de testes
+### EXITUS-SEED-001: Sistema de Seed/Reset Controlado ✅
+**Status:** ✅ IMPLEMENTADO (02/03/2026)
 
-**Impactos:**
-- Testes inconsistentes com dados acumulados
-- Dificuldade de debugar problemas
-- Desenvolvimento lento sem reset rápido
-- Impossível testar cenários específicos
+**Implementação:**
+- ✅ Script unificado `reset_and_seed.sh` com modos minimal/full/custom
+- ✅ Backup/restore de cenários para debugging
+- ✅ Dados migrados para formato JSON
+- ✅ Seed fundamentalista (`seed_ativos_fundamentalistas.py`) com 56 ativos ricos
 
-**Solução proposta:**
-```bash
-# Script principal
-python scripts/reset_and_seed.py [--clean] [--seed-type=full|minimal|custom]
+### EXITUS-TESTS-001: Testes Automatizados (pytest)
+**Problema:** Zero testes automatizados. O Prompt Mestre promete pytest extensivo, mas nenhum test suite existe.
 
-# Backup/Restore de cenários
-python scripts/backup_test_data.py --save|--restore scenario_name
+**Impacto:** Crítico — impossível garantir regressão zero ao implementar novos GAPs.
+
+**Escopo proposto:**
+- **Unitários:** Models (validações, constraints), Services (CRUD, business rules), Utils (db_utils, business_rules)
+- **Integração:** Endpoints REST (auth, ativos, transações), Schemas (serialização/deserialização)
+- **Fixtures:** conftest.py com app de teste, DB in-memory ou transacional com rollback
+- **Cobertura alvo:** 70%+ nos services e utils críticos
+
+**Dependências:** Nenhuma — pode ser implementado a qualquer momento
+
+### EXITUS-IR-001: Engine de Cálculo de IR Completo
+**Problema:** Day-trade é detectado (BUSINESS-001) mas não há engine de cálculo fiscal real.
+
+**Escopo proposto:**
+1. **Apuração mensal** de lucro/prejuízo por tipo de ativo
+2. **Isenção de R$20k/mês** para ações swing trade (BR)
+3. **Alíquotas diferenciadas:** ações 15%, FIIs 20%, day-trade 20%, RF tabela regressiva
+4. **Compensação** de prejuízos acumulados entre meses
+5. **Geração de DARF** (valor a pagar, código de receita)
+6. **Impostos US:** withholding tax 30% sobre dividendos (treaty BR-US)
+
+**Tabelas envolvidas:** `transacao`, `posicao`, `regra_fiscal`, `provento`
+
+### EXITUS-EXPORT-001: Exportação Genérica
+**Problema:** Apenas importação B3 existe. Usuários não conseguem exportar dados para análise externa.
+
+**APIs necessárias:**
+```
+GET /api/export/transacoes?formato=csv|excel|json
+GET /api/export/proventos?formato=csv|excel|json
+GET /api/export/posicoes?formato=csv|excel|json
+GET /api/export/relatorio/{id}?formato=pdf|excel
 ```
 
-**Tipos de seed:**
-- **minimal:** Usuários, estrutura básica
-- **full:** 56 ativos, transações, posições, relatórios
-- **custom:** JSON com dados específicos
+**Funcionalidades:**
+- Filtros por período, ativo, corretora
+- Cabeçalhos com metadados (usuário, data geração, filtros aplicados)
+- Formatação localizada (BRL, datas dd/mm/yyyy)
+- Limite configurável de registros
 
-**Integração com testes:**
-- Fixture pytest para reset automático
-- Cenários padronizados para testes específicos
+### EXITUS-SWAGGER-001: Auto-documentação OpenAPI
+**Problema:** 67+ endpoints sem documentação interativa. API_REFERENCE.md é estática.
+
+**Implementação:** Flask-RESTX ou flasgger para geração automática de Swagger UI.
+
+### EXITUS-ANOMALY-001: Detecção de Anomalias em Preços
+**Problema:** Citado no Prompt Mestre mas não implementado.
+
+**Regra:** Alertar quando preço de ativo varia ≥20% sem evento corporativo registrado.
+Executar via job periódico ou on-demand ao atualizar cotações.
+
+### EXITUS-RFCALC-001: Cálculos Avançados RF e FII
+**Problema:** Indicadores avançados de renda fixa e FIIs não implementados.
+
+**Escopo:**
+- **Renda Fixa:** Duration (Macaulay, Modified), Yield to Maturity (YTM), curva de juros
+- **FIIs/REITs:** FFO (Funds From Operations), AFFO (Adjusted FFO), P/FFO
 
 ---
 
-## 📅 Plano de Implementação Sugerido
+## 📅 Plano de Implementação
 
-### Fase 2.0: Scripts Críticos (Sprint 0 - Prioridade Máxima)
-1. **Corrigir bugs críticos** (cleanup_duplicates, restore_complete)
-2. **Unificar scripts restart** (único com parâmetros)
-3. **Ajustar exitus.sh** para chamar scripts corrigidos
-4. **Remover redundantes** após validação
+### Fase 2 — Concluída ✅ (28/02 – 02/03/2026)
+1. ✅ Scripts e recovery (SCRIPTS-001, RECOVERY-001)
+2. ✅ Seed controlado (SEED-001)
+3. ✅ Importação B3 e cashflow (IMPORT-001, CASHFLOW-001)
+4. ✅ Padrões SQLAlchemy (SQLALCHEMY-001)
+5. ✅ CRUD completo + regras de negócio (CRUD-001, BUSINESS-001)
+6. ✅ Massa de ativos fundamentalistas (ASSETS-001)
 
-### Fase 2.1: Fundamentos (Sprint 1)
-1. **Completar CRUD** para entidades existentes
-2. **Implementar regras de negócio** críticas
-3. **Criar validações de horário/feriado**
+### Fase 3 — Qualidade e Cálculos (próximo sprint)
+1. **EXITUS-TESTS-001** — Testes automatizados (pytest + fixtures)
+2. **EXITUS-IR-001** — Engine de cálculo de IR completo
+3. **EXITUS-EXPORT-001** — Exportação genérica (CSV, Excel, JSON, PDF)
 
-### Fase 2.2: Importação/Exportação (Sprint 2)
-1. **Implementar importação CSV/Excel**
-2. **Implementar exportação múltiplos formatos**
-3. **Validações e rollback**
+### Fase 4 — Expansão de Funcionalidades
+1. **EXITUS-MULTIMOEDA-001** — Conversão multi-moeda
+2. **EXITUS-UNITS-001** — UNITS B3
+3. **EXITUS-SWAGGER-001** — OpenAPI/Swagger
+4. **EXITUS-ANOMALY-001** — Detecção de anomalias
+5. **EXITUS-RFCALC-001** — Cálculos RF/FII avançados
+6. **EXITUS-NEWAPIS-001** — APIs de configuração
 
-### Fase 2.3: Expansão (Sprint 3)
-1. **Multi-moeda** (se aprovado)
-2. **Monitoramento básico**
-3. **APIs de configuração**
-
-### Fase 2.4: Opcionais (Sprint 4)
-1. **Multi-cliente** (se aprovado)
-2. **Criptografia** (se aprovado)
+### Fase 5 — Produção e Escala
+1. **EXITUS-MULTICLIENTE-001** — Multi-tenancy para assessoras
+2. **EXITUS-MONITOR-001** — Monitoramento operacional
+3. **EXITUS-RATELIMIT-001** — Rate limiting
+4. **EXITUS-CICD-001** — CI/CD + deploy cloud
 
 ---
 
@@ -253,24 +314,35 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 
 ---
 
-## 🔄 Status Atual
+## 🔄 Status Atual (atualizado 03/03/2026)
 
-| GAP ID | Status | Data | Responsável | Observações |
-|--------|--------|------|-------------|-------------|
-| EXITUS-SCRIPTS-001 | 📋 Análise | 28/02/2026 | IA | 18 scripts analisados, bugs críticos |
-| EXITUS-IMPORT-001 | 📋 Análise | 27/02/2026 | IA | Proposta enviada |
-| EXITUS-CRUD-001 | 📋 Análise | 27/02/2026 | IA | Mapeado 5 entidades |
-| EXITUS-BUSINESS-001 | 📋 Análise | 27/02/2026 | IA | 5 regras críticas |
-| EXITUS-MULTIMOEDA-001 | 📋 Análise | 27/02/2026 | IA | Esperando decisão |
-| EXITUS-MONITOR-001 | 📋 Análise | 27/02/2026 | IA | Prioridade média |
-| EXITUS-NEWAPIS-001 | 📋 Análise | 27/02/2026 | IA | 3 APIs básicas |
-| EXITUS-MULTICLIENTE-001 | 📋 Análise | 27/02/2026 | IA | Reclassificado Média-Alta |
-| EXITUS-UNITS-001 | 📋 Análise | 27/02/2026 | IA | Adicionado roadmap |
-| EXITUS-SEED-001 | ✅ Implementado | 02/03/2026 | IA | Sistema completo com backup/restore |
-| EXITUS-CASHFLOW-001 | ✅ Implementado | 02/03/2026 | IA | Eventos de custódia D+2 |
-| EXITUS-ASSETS-001 | ✅ Implementado | 02/03/2026 | IA | 56 ativos com dados fundamentalistas (DY, P/L, P/VP, ROE, beta, preco_teto, cap_rate) |
-| EXITUS-SQLALCHEMY-001 | ✅ Implementado | 02/03/2026 | IA | app/utils/db_utils.py — 6 helpers, aplicado em 4 services |
-| EXITUS-SCRIPTO-001 | 📋 Análise | 27/02/2026 | IA | Prioridade baixa |
+| GAP ID | Fase | Status | Data | Observações |
+|--------|------|--------|------|-------------|
+| EXITUS-SCRIPTS-001 | 2 | ✅ Concluído | 28/02/2026 | 15 scripts padronizados, 3 removidos |
+| EXITUS-RECOVERY-001 | 2 | ✅ Concluído | 28/02/2026 | 4 scripts enterprise-grade |
+| EXITUS-SEED-001 | 2 | ✅ Concluído | 02/03/2026 | `reset_and_seed.sh` + cenários |
+| EXITUS-IMPORT-001 | 2 | ✅ Concluído | 02/03/2026 | B3 Excel/CSV, 51 proventos testados |
+| EXITUS-CASHFLOW-001 | 2 | ✅ Concluído | 02/03/2026 | Eventos de custódia D+2 |
+| EXITUS-SQLALCHEMY-001 | 2 | ✅ Concluído | 02/03/2026 | `db_utils.py` — 6 helpers |
+| EXITUS-CRUD-001 | 2 | ✅ Concluído | 02/03/2026 | 9 entidades com CRUD completo |
+| EXITUS-BUSINESS-001 | 2 | ✅ Concluído | 02/03/2026 | 5 regras em `business_rules.py` |
+| EXITUS-ASSETS-001 | 2 | ✅ Concluído | 02/03/2026 | 56 ativos com dados fundamentalistas |
+| EXITUS-TESTS-001 | 3 | 📋 Planejado | — | pytest + fixtures, cobertura 70%+ |
+| EXITUS-IR-001 | 3 | 📋 Planejado | — | Apuração mensal, isenções, DARF |
+| EXITUS-EXPORT-001 | 3 | 📋 Planejado | — | CSV, Excel, JSON, PDF |
+| EXITUS-MULTIMOEDA-001 | 4 | 📋 Planejado | — | Conversão automática BRL/USD/EUR |
+| EXITUS-UNITS-001 | 4 | 📋 Planejado | — | UNITS B3 |
+| EXITUS-SWAGGER-001 | 4 | 📋 Planejado | — | OpenAPI auto-documentação |
+| EXITUS-ANOMALY-001 | 4 | 📋 Planejado | — | Alertas de preço anômalo |
+| EXITUS-RFCALC-001 | 4 | 📋 Planejado | — | Duration, YTM, FFO, AFFO |
+| EXITUS-NEWAPIS-001 | 4 | 📋 Planejado | — | `parametros_macro`, `fonte_dados` |
+| EXITUS-MULTICLIENTE-001 | 5 | 📋 Planejado | — | Multi-tenancy para assessoras |
+| EXITUS-MONITOR-001 | 5 | 📋 Planejado | — | Monitoramento operacional |
+| EXITUS-RATELIMIT-001 | 5 | 📋 Planejado | — | Flask-Limiter |
+| EXITUS-CICD-001 | 5 | 📋 Planejado | — | GitHub Actions + deploy cloud |
+| EXITUS-CRIPTO-001 | 5 | 📋 Planejado | — | AES-256 dados sensíveis |
+| EXITUS-AUDIT-001 | 5 | 📋 Planejado | — | Hash encadeado em logs |
+| EXITUS-LGPD-001 | 5 | 📋 Planejado | — | LGPD/GDPR compliance |
 
 ---
 
@@ -314,14 +386,30 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 - **Criado:** Modelo EventoCustodia completo
 - **Integrado:** Service de eventos na importação
 
+### 03/03/2026 - Revisão Geral: Prompt Mestre × Implementação × ROADMAP
+- **Auditoria completa:** Prompt Mestre comparado com implementação real
+- **Identificadas 7 lacunas** não rastreadas: TESTS-001, IR-001, EXPORT-001, SWAGGER-001, ANOMALY-001, RATELIMIT-001, RFCALC-001
+- **Identificadas 3 dívidas técnicas:** AUDIT-001, LGPD-001, CICD-001
+- **Corrigidas inconsistências:** duplicata SEED-001, status desatualizados, seções obsoletas
+- **Reorganizado ROADMAP:** 5 fases claras (Fase 2 concluída, Fases 3-5 planejadas)
+- **Total GAPs:** 9 concluídos + 16 planejados = 25 GAPs rastreados
+- **Decisão:** EXITUS-TESTS-001 é prioridade máxima na Fase 3 (dívida técnica crítica)
+- **Decisão:** Separar EXPORT-001 de IMPORT-001 (escopos distintos)
+- **Observação:** MODULES.md e ARCHITECTURE.md precisam sincronização com estado real
+
 ---
 
 ## 🚀 Próximos Passos
 
-1. **Aprovar priorização** dos GAPs
-2. **Iniciar Fase 3** com GAP de prioridade crítica (EXITUS-SCRIPTS-001)
-3. **Corrigir bugs críticos** imediatamente
-4. **Unificar scripts** restart/start/stop
+1. **Fase 3 — Sprint imediato:**
+   - EXITUS-TESTS-001 (testes automatizados — dívida técnica crítica)
+   - EXITUS-IR-001 (engine de cálculo de IR — regra de negócio essencial)
+   - EXITUS-EXPORT-001 (exportação genérica — funcionalidade básica faltante)
+2. **Sincronizar documentação:** MODULES.md, ARCHITECTURE.md com estado real v0.8.0-dev
+3. **Modelo recomendado para Fase 3:**
+   - TESTS-001 → **Sonnet 4.6** (integração moderada com múltiplos arquivos)
+   - IR-001 → **Sonnet 4.6** (lógica de negócio com regras fiscais complexas)
+   - EXPORT-001 → **SWE-1.5** (CRUD mecânico de endpoints de exportação)
 
 ---
 

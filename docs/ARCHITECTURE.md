@@ -904,5 +904,5 @@ Cloud Provider
 
 ---
 
-**Documento atualizado**: 20 de Fevereiro de 2026  
-**Versão arquitetural**: v0.7.9 (Expansão de ENUMs, cap_rate; seeds US/EU/BR normalizados — M2-ATIVOS-005)
+**Documento atualizado**: 03 de Março de 2026  
+**Versão arquitetural**: v0.8.0-dev (Fase 2 concluída — 9 GAPs implementados, 56 ativos com dados fundamentalistas)
