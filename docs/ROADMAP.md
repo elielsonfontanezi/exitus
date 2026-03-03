@@ -55,6 +55,7 @@
 | GAP ID | Funcionalidade | Status | Impacto | Prioridade |
 |--------|---------------|--------|---------|------------|
 | **EXITUS-TESTS-001** | Testes automatizados (pytest) | ✅ Concluído | **Crítico** | **Alta** |
+| **EXITUS-CRUD-002** | Revisão do contrato service/route: HTTP status codes, `delete` com validação de integridade, exceções tipadas | Não implementado | **Alto** | **Alta** |
 | **EXITUS-IR-001** | Engine de cálculo de IR completo (apuração, isenções, DARF) | Não implementado | **Alto** | **Alta** |
 | **EXITUS-EXPORT-001** | Exportação genérica (CSV, Excel, JSON, PDF) | Não implementado | Alto | Alta |
 
@@ -69,6 +70,7 @@
 | **EXITUS-RFCALC-001** | Cálculos RF (Duration, YTM) e FII (FFO, AFFO) | Não implementado | Médio | Média |
 | **EXITUS-NEWAPIS-001** | APIs de configuração (parametros_macro, fonte_dados) | Não implementado | Médio | Média |
 | **EXITUS-ENUM-001** | Padronizar todos ENUMs PostgreSQL para lowercase (migration) | Não implementado | Médio | Média |
+| **EXITUS-SQLALCHEMY-002** | Migrar `Query.get()` depreciado para `db.session.get()` em 11 arquivos (27 ocorrências) | Não implementado | Médio | Média |
 
 ### 4. Fase 5 — Produção e Escala (Média-Alta Prioridade)
 

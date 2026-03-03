@@ -187,6 +187,25 @@ Operam diretamente no contexto já ativo.
 
 ---
 
+### L-SA-004 — `Query.get()` está depreciado no SQLAlchemy 2.x — 27 ocorrências no codebase
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+```python
+# ❌ DEPRECIADO — SQLAlchemy 2.x emite warning; será removido
+ativo = Ativo.query.get(ativo_id)
+
+# ✅ CORRETO — SQLAlchemy 2.x
+ativo = db.session.get(Ativo, ativo_id)
+```
+
+Afeta 11 arquivos: `ativo_service.py`, `usuario_service.py`, `corretora_service.py`,
+`provento_service.py`, `transacao_service.py`, `feriado_mercado_service.py`,
+`regra_fiscal_service.py`, `evento_corporativo_service.py`, `historico_service.py`,
+`alerta_service.py`, `decorators.py`, `auth/routes.py`.  
+**Fix planejado:** EXITUS-SQLALCHEMY-002.
+
+---
+
 ## 🌐 Contrato da API
 
 ### L-API-001 — Endpoint de listagem usa envelope de paginação aninhado
@@ -244,6 +263,45 @@ ativo = Ativo(ticker='PETR4', mercado='BR')
 
 **Regra:** Sempre ler o arquivo `models/nome_model.py` e verificar as `Column(...)` definidas
 antes de usar um campo. Nunca assumir campos por analogia com outros models.
+
+---
+
+### L-API-004 — `ValueError` usado para 404 E 400 — contrato de exceções ambíguo
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+Os services lançam `ValueError` para **dois significados distintos**:
+
+```python
+# ❌ AMBÍGUO — route não sabe se é 404 ou 400
+raise ValueError("Ativo não encontrado")    # deveria ser 404
+raise ValueError("Ticker já existe")        # deveria ser 400
+```
+
+O route captura tudo como 400:
+```python
+except ValueError as e:
+    return error(str(e), 400)  # ← engloba casos de 404 incorretamente
+```
+
+**Padrão correto (a implementar em EXITUS-CRUD-002):**
+```python
+# No service — exceções tipadas
+class NotFoundError(Exception): pass
+class ConflictError(Exception): pass
+
+raise NotFoundError("Ativo não encontrado")  # → 404
+raise ConflictError("Ticker já existe")      # → 409
+
+# No route — mapeamento semântico
+except NotFoundError as e:
+    return not_found(str(e))      # 404
+except ConflictError as e:
+    return error(str(e), 409)     # 409
+except ValidationError as e:
+    return error(str(e), 400)     # 400
+```
+
+**Fix planejado:** EXITUS-CRUD-002.
 
 ---
 
