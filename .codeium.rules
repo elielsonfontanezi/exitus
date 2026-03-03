@@ -42,13 +42,12 @@ Sistema **multi-mercado** (BR/US/EU/Asia) com **14 tipos de ativos**.
 # Isto permite discussão da estratégia antes da implementação.
 Fluxo obrigatório: 1) Propor → 2) Aguardar "APROVADO" → 3) Implementar
 
-## 🎓 LIÇÕES APRENDIDAS (28/02/2026)
-### Erro: Análise Incompleta dos Scripts
+## 🎓 LIÇÕES APRENDIDAS
+
+### 28/02/2026 — Análise Incompleta dos Scripts
 - **Problema:** Assumir que scripts similares estavam corretos sem verificar cada um
-- **Exemplo:** Verificar apenas rebuild_restart_exitus-backend.sh e assumir frontend correto
 - **Lição:** **SEMPRE ler CADA arquivo** mencionado na análise
-- **Regra:** Nunca assumir - sempre verificar detalhadamente
-- **Impacto:** Evita correções incompletas e retrabalho
+- **Regra:** Nunca assumir — sempre verificar detalhadamente
 
 ### Processo de Análise Obrigatório:
 1. **Ler TODOS** os arquivos mencionados
@@ -56,6 +55,33 @@ Fluxo obrigatório: 1) Propor → 2) Aguardar "APROVADO" → 3) Implementar
 3. **Verificar detalhes** em vez de fazer suposições
 4. **Documentar diferenças** encontradas
 5. **Propor correções completas**
+
+### 02/03/2026 — LIÇÃO 001: DELETE vs DROP TABLE
+- **NUNCA** usar `db.drop_all()` / `db.create_all()` para reset de dados
+- **SEMPRE** usar `DELETE FROM tabela` para limpar dados de teste/seed
+- **Razão:** Schema é controlado por Alembic migrations — destruir estrutura é perigoso e desnecessário
+
+### 02/03/2026 — LIÇÃO 002: Sempre Verificar Tabelas Existentes
+- **NUNCA** deduzir nomes de tabelas pelo domínio de negócio (ex: assumir `movimentacao` quando existe `movimentacao_caixa`)
+- **SEMPRE** consultar `inspect(db.engine).get_table_names()` antes de referenciar tabelas
+- **Razão:** Um nome errado aborta **toda a transação** PostgreSQL (`InFailedSqlTransaction` em cascata)
+
+### 02/03/2026 — LIÇÃO 003: PKs são UUID neste Sistema
+- **Todas** as PKs do Exitus usam `UUID(as_uuid=True)` — **não há sequences numéricas**
+- **NUNCA** tentar `ALTER SEQUENCE ... RESTART WITH 1` neste projeto
+- **Verificar:** `SELECT sequence_name FROM information_schema.sequences` → retorna vazio
+
+### 02/03/2026 — LIÇÃO 004: Verificar Fields do Model Antes de Usar
+- **NUNCA** assumir campos de um model por analogia com outros models ou lógica de domínio
+- **Exemplo real:** `Corretora` tem `pais`, mas `Ativo` usa `mercado` para o mesmo conceito
+- **SEMPRE** ler o arquivo `models/nome_model.py` completo antes de usar qualquer campo
+- **Regra:** Regra de negócio coerente ≠ campo existente no model
+
+### ✅ Checklist Obrigatório ao Manipular Models/Banco
+- [ ] Li o `models/nome_model.py` completo para verificar campos reais?
+- [ ] Consultei `inspect(db.engine).get_table_names()` antes de listar tabelas?
+- [ ] Verifiquei o tipo de PK (UUID vs serial) antes de resetar sequences?
+- [ ] Usei `DELETE` ao invés de `DROP TABLE` para limpar dados?
 
 ## 🧠 REGRA #3: PROPOR IDEIAS E SOLUÇÕES
 ### O Assistente DEVE propor suas próprias ideias:
@@ -207,7 +233,7 @@ Fallback 5 camadas (15min TTL PostgreSQL):
 podman ps                    # Status containers
 podman exec -it exitus-db psql -U exitus -d exitusdb
 podman exec -it exitus-backend alembic upgrade head
-podman exec -it exitus-backend python -m app.seeds.run_all_seeds  # 70 ativos
+./scripts/reset_and_seed.sh --clean --seed-type=full  # seed controlado (novo sistema)
 curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/ativos
 ```
 
