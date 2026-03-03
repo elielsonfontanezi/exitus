@@ -29,7 +29,7 @@
 - **56 ativos** no DB (15 ações BR, 10 FIIs, 6 stocks US, 2 REITs, 8 ETFs, 5 RF BR, 10 EU)
 - **3 usuários seed** para testes
 - **8 módulos PROD** (M0-M7.7)
-- **9 GAPs concluídos** na Fase 2
+- **9 GAPs concluídos** na Fase 2 + 1 na Fase 3 (TESTS-001)
 - **69 testes automatizados** ✅ (37 unitários + 32 integração)
 
 ---
@@ -68,6 +68,7 @@
 | **EXITUS-ANOMALY-001** | Detecção de anomalias em preços (≥20% sem evento) | Não implementado | Médio | Média |
 | **EXITUS-RFCALC-001** | Cálculos RF (Duration, YTM) e FII (FFO, AFFO) | Não implementado | Médio | Média |
 | **EXITUS-NEWAPIS-001** | APIs de configuração (parametros_macro, fonte_dados) | Não implementado | Médio | Média |
+| **EXITUS-ENUM-001** | Padronizar todos ENUMs PostgreSQL para lowercase (migration) | Não implementado | Médio | Média |
 
 ### 4. Fase 5 — Produção e Escala (Média-Alta Prioridade)
 
@@ -85,6 +86,7 @@
 | **EXITUS-CRIPTO-001** | Criptografia AES-256 para dados sensíveis | Não implementado | Baixo | Baixa |
 | **EXITUS-AUDIT-001** | Logs de auditoria imutáveis (hash encadeado) | Não implementado | Baixo | Baixa |
 | **EXITUS-LGPD-001** | Conformidade LGPD/GDPR (consentimento, esquecimento) | Não implementado | Baixo (dev) | Baixa |
+| **EXITUS-TESTDB-001** | Script `create_test_db.sh` — recriação automatizada do banco de teste | Não implementado | Baixo | Baixa |
 
 ---
 
