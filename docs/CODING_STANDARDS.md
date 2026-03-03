@@ -203,6 +203,74 @@ db.session.execute(text("ALTER SEQUENCE usuario_id_seq RESTART WITH 1"))
 
 ---
 
+## 🚨 **Exceções Tipadas nos Services (CRUD-002)**
+
+Nunca usar `ValueError` para sinalizar erros semânticos — o route não consegue distinguir 404 de 400.
+
+```python
+# ❌ ERRADO — ValueError vira 400 mesmo quando deveria ser 404 ou 409
+def get_ativo(id):
+    ativo = db.session.get(Ativo, id)
+    if not ativo:
+        raise ValueError("Ativo não encontrado")  # → route captura como 400
+
+# ✅ CORRETO — exceções tipadas em app/utils/exceptions.py
+from app.utils.exceptions import NotFoundError, ConflictError
+
+def get_ativo(id):
+    ativo = db.session.get(Ativo, id)
+    if not ativo:
+        raise NotFoundError("Ativo não encontrado")  # → route retorna 404
+
+def criar_ativo(ticker):
+    if Ativo.query.filter_by(ticker=ticker).first():
+        raise ConflictError("Ticker já existe")  # → route retorna 409
+```
+
+**Hierarquia disponível em `app/utils/exceptions.py`:**
+
+| Exceção | HTTP | Uso |
+|---|---|---|
+| `ExitusError` | base | Erro genérico do sistema |
+| `NotFoundError` | 404 | Entidade não encontrada |
+| `ConflictError` | 409 | Duplicidade / conflito |
+| `ForbiddenError` | 403 | Sem permissão |
+| `BusinessRuleError` | 422 | Regra de negócio violada |
+
+**No route — capturar antes do `except Exception`:**
+```python
+from app.utils.exceptions import ExitusError
+
+@bp.route('/<uuid:id>', methods=['DELETE'])
+def delete_ativo(id):
+    try:
+        AtivoService.delete(id)
+        return success({}, "Ativo removido")
+    except ExitusError as e:          # ✅ Primeiro — retorna HTTP correto
+        return e.to_response()
+    except Exception as e:            # ✅ Último — fallback 500
+        return error(str(e), 500)
+```
+
+---
+
+## 🔍 **SQLAlchemy — `db.session.get()` obrigatório (SQLALCHEMY-002)**
+
+`Model.query.get()` foi depreciado no SQLAlchemy 2.0 e removido no 2.1.
+
+```python
+# ❌ ERRADO — depreciado, emite SADeprecationWarning
+ativo = Ativo.query.get(id)
+
+# ✅ CORRETO — padrão SQLAlchemy 2.0
+ativo = db.session.get(Ativo, id)
+```
+
+**Regra:** Em todo service ou decorator, usar sempre `db.session.get(Model, pk)`.  
+`filter_by().first()` continua correto para buscas por campos não-PK.
+
+---
+
 ## 🧪 **Padrões de Teste (pytest)**
 
 ### **Fixtures — sempre usar as globais do conftest.py**

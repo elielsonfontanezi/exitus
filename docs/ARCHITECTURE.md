@@ -294,6 +294,47 @@ Todo código segue snake_case (PEP 8 Python + PostgreSQL):[file:24]
 - Variáveis/funções: `get_portfolio_metrics()`
 - Endpoints: `api/buy-signals/buy-score`
 
+### Exceções Tipadas — `app/utils/exceptions.py` (CRUD-002)
+
+Todos os services devem usar exceções tipadas em vez de `ValueError`. O handler genérico em `app/__init__.py` converte automaticamente para o HTTP correto.
+
+| Exceção | HTTP | Quando usar |
+|---|---|---|
+| `NotFoundError` | 404 | Entidade não encontrada por ID/ticker |
+| `ConflictError` | 409 | Duplicidade (ticker, username, etc.) |
+| `ForbiddenError` | 403 | Sem permissão para a operação |
+| `BusinessRuleError` | 422 | Regra de negócio violada |
+
+```python
+# Service — exceção tipada
+from app.utils.exceptions import NotFoundError, ConflictError
+raise NotFoundError("Ativo não encontrado")   # → 404
+raise ConflictError("Ticker já existe")       # → 409
+
+# Route — capturar ExitusError ANTES de Exception
+from app.utils.exceptions import ExitusError
+try:
+    result = AtivoService.delete(id)
+except ExitusError as e:
+    return e.to_response()   # HTTP correto automático
+except Exception as e:
+    return error(str(e), 500)
+```
+
+### SQLAlchemy — `db.session.get()` obrigatório (SQLALCHEMY-002)
+
+`Model.query.get()` foi depreciado no SQLAlchemy 2.0.
+
+```python
+# ❌ Depreciado
+ativo = Ativo.query.get(id)
+
+# ✅ Padrão atual
+ativo = db.session.get(Ativo, id)
+```
+
+`filter_by().first()` continua correto para buscas por campos não-PK.
+
 ---
 
 ## Modelo de Dados
