@@ -305,6 +305,45 @@ except ValidationError as e:
 
 ---
 
+### L-TEST-001 — Nunca usar dados hardcoded em testes de integração
+**Origem:** EXITUS-TESTDB-001 | **Data:** 03/03/2026
+
+Testes com usernames, tickers ou valores fixos (`'test_admin'`, `'PETR4'`, `38.50`) passam enquanto o banco de teste tem esses dados herdados do banco de produção. Ao zerar o banco (ex: via `create_test_db.sh`), os testes quebram silenciosamente.
+
+```python
+# ❌ ERRADO — depende de dado pré-existente no banco
+response = client.get('/api/ativos/ticker/PETR4')
+assert data['data']['ticker'] == 'PETR4'
+
+# ✅ CORRETO — dado dinâmico criado e destruído pela própria fixture
+def test_ticker_existente(auth_client, ativo_seed):
+    response = client.get(f'/api/ativos/ticker/{ativo_seed.ticker}')
+    assert data['data']['ticker'] == ativo_seed.ticker
+```
+
+**Regra:** Toda fixture de entidade deve ser criada no `conftest.py` com sufixo UUID e destruída no teardown. Nenhum teste deve depender de dados que existam apenas no banco de produção.
+
+---
+
+### L-TEST-002 — `db.create_all()` falha com ENUMs PostgreSQL nativos
+**Origem:** EXITUS-TESTDB-001 | **Data:** 03/03/2026
+
+`db.create_all()` tenta criar tabelas com CHECK constraints que referenciam valores de ENUMs (`'split'`, `'grupamento'`) antes de criar o tipo ENUM no PostgreSQL, causando `InvalidTextRepresentation`.
+
+```python
+# ❌ ERRADO — não respeita ordem de criação de tipos ENUM PostgreSQL
+with app.app_context():
+    db.create_all()  # DataError: invalid input value for enum tipoeventocorporativo
+
+# ✅ CORRETO — pg_dump garante ordem correta (ENUMs antes das tabelas)
+podman exec exitus-db pg_dump -U exitus --schema-only --no-owner exitusdb | \
+    podman exec -i exitus-db psql -U exitus -d exitusdb_test
+```
+
+**Regra:** Para recriar o banco de teste, usar sempre `pg_dump --schema-only` do banco de produção via `scripts/create_test_db.sh`. Nunca usar `db.create_all()` para setup de banco de teste em projetos com ENUMs PostgreSQL nativos.
+
+---
+
 ## 📋 Referências
 
 | Documento | Papel |
