@@ -9,6 +9,15 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-IR-007** — Alíquotas dinâmicas via tabela `regra_fiscal` (03/03/2026)
+  - `ir_service.py`: nova função `_carregar_regras_fiscais(data_ref)` — busca regras vigentes do banco
+  - Nova função `_regra_para_categoria(regras, categoria)` — resolve alíquota/isenção por categoria
+  - Funções `_apurar_*` refatoradas para receber `regras: dict` (IR-007) em vez de constantes hardcoded
+  - Fallback automático para constantes hardcoded se `regra_fiscal` estiver vazia (resiliência)
+  - Seed: 5 regras fiscais inseridas em `exitusdb` e `exitusdb_test` (BR/ACAO/SWING_TRADE, BR/DAY_TRADE, BR/FII/VENDA, US/STOCK/VENDA, US/REIT/VENDA)
+  - `tests/test_ir_integration.py`: +2 testes (`TestRegrasFiscais`: alíquota carregada do banco, fallback quando tabela vazia)
+  - **Suite total: 139 passed, 0 failed**
+
 - **EXITUS-IR-003** — Compensação de prejuízo acumulado entre meses (03/03/2026)
   - Nova tabela `saldo_prejuizo` com unique constraint `(usuario_id, categoria, ano_mes)`
   - Model `app/models/saldo_prejuizo.py` + migration Alembic `20260303_1840`

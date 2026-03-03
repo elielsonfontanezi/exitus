@@ -1,10 +1,10 @@
 # EXITUS-IR-001 — Engine de Cálculo de IR sobre Renda Variável
 
 > **Status:** ✅ Concluído (03/03/2026)  
-> **Versão:** 1.2 (inclui IR-002 + IR-003)  
+> **Versão:** 1.3 (inclui IR-002 + IR-003 + IR-007)  
 > **Branch:** `feature/revisao-negocio-vision`  
-> **Testes:** 28 testes de integração — 100% passou  
-> **Suite total:** 137 passed, 0 failed
+> **Testes:** 30 testes de integração — 100% passou  
+> **Suite total:** 139 passed, 0 failed
 
 ---
 
@@ -136,17 +136,29 @@ apurar_mes(usuario_id, "YYYY-MM")
 └── 7. Retorna dict com categorias, por_corretora, ir_total, darf, alertas
 ```
 
-### 3.3 Constantes fiscais (`ir_service.py`)
+### 3.3 Constantes fiscais (`ir_service.py`) — fallback (IR-007)
+
+Desde IR-007, as alíquotas são carregadas da tabela `regra_fiscal` via `_carregar_regras_fiscais(data_ref)`. As constantes abaixo são usadas **somente como fallback** quando a tabela estiver vazia:
 
 ```python
 ISENCAO_SWING_ACAO = Decimal('20000.00')   # Isenção mensal vendas ações swing
-ALIQUOTA_SWING_ACAO = Decimal('0.15')      # 15%
-ALIQUOTA_DAY_TRADE  = Decimal('0.20')      # 20%
-ALIQUOTA_FII        = Decimal('0.20')      # 20%
-ALIQUOTA_REIT       = Decimal('0.15')      # 15% (ETF/REIT US — simplificado)
-ALIQUOTA_STOCK_US   = Decimal('0.15')      # 15% ganho capital US
-DARF_MINIMO         = Decimal('10.00')     # Mínimo para recolhimento
+ALIQUOTA_SWING_ACAO = Decimal('0.15')      # 15% — fallback
+ALIQUOTA_DAY_TRADE  = Decimal('0.20')      # 20% — fallback
+ALIQUOTA_FII        = Decimal('0.20')      # 20% — fallback
+ALIQUOTA_REIT       = Decimal('0.15')      # 15% (ETF/REIT US) — fallback
+ALIQUOTA_STOCK_US   = Decimal('0.15')      # 15% ganho capital US — fallback
+DARF_MINIMO         = Decimal('10.00')     # Mínimo para recolhimento (não vem do banco)
 ```
+
+**Regras seedadas na tabela `regra_fiscal`:**
+
+| `pais` | `tipo_ativo` | `tipo_operacao` | `aliquota_ir` | `valor_isencao` | Vigência |
+|--------|-------------|----------------|--------------|----------------|----------|
+| BR | ACAO | SWING_TRADE | 15% | R\$20.000 | 2004-01-01 |
+| BR | NULL | DAY_TRADE | 20% | — | 2015-01-01 |
+| BR | FII | VENDA | 20% | — | 1999-01-01 |
+| US | STOCK | VENDA | 15% | — | 2016-01-01 |
+| US | REIT | VENDA | 15% | — | 2016-01-01 |
 
 ---
 
@@ -291,13 +303,14 @@ Resumo de apuração mês a mês para o ano inteiro. Retorna sempre **12 entrada
 
 ## 5. Testes
 
-Suite em `backend/tests/test_ir_integration.py` — **28 testes**, 100% passou.
+Suite em `backend/tests/test_ir_integration.py` — **30 testes**, 100% passou.
 
 | Classe | Testes | O que cobre |
 |--------|--------|-------------|
 | `TestApuracao` | 17 | 401 sem token, 400 sem parâmetro, 422 formato inválido, mês vazio, 4 categorias na estrutura, isenção R$20k, campo `mes`, `por_corretora`, **lucro via PM** (IR-002), **alerta posicao vazia** (IR-002), **campos prejuizo** (IR-003), **compensação total** (IR-003), **compensação parcial** (IR-003), **mês vazio preserva saldo** (IR-003) |
 | `TestDarf` | 5 | 401 sem token, 400 sem parâmetro, mês sem lucro → lista vazia, campo `mes`, envelope padrão |
 | `TestHistorico` | 6 | 401 sem token, 400 sem parâmetro, ano não numérico, 12 meses, campos obrigatórios, formato `YYYY-MM` |
+| `TestRegrasFiscais` | 2 | **alíquota carregada do banco** (IR-007), **fallback quando regra_fiscal vazia** (IR-007) |
 
 **Fixture `cenario_ir`:** cria corretora + compra 100×R$30 + venda 100×R$50 + **posição com PM=30** em 2025-03. Total vendas = R$5.000 → abaixo de R$20k → swing isento. Lucro bruto = R$2.000 (IR-002).
 
@@ -437,7 +450,8 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 | 03/03/2026 | 1.0 | Implementação inicial — engine, 3 endpoints, 19 testes |
 | 03/03/2026 | 1.1 | IR-002: Custo de aquisição via PM da tabela `posicao` — +2 testes (21 total) |
 | 03/03/2026 | 1.2 | IR-003: Compensação de prejuízo acumulado por categoria — tabela `saldo_prejuizo`, +7 testes (28 total) |
+| 03/03/2026 | 1.3 | IR-007: Alíquotas dinâmicas via `regra_fiscal` — seed 5 regras, fallback hardcoded, +2 testes (30 total) |
 
 ---
 
-*Próximos passos: EXITUS-IR-004 (JCP/withholding), EXITUS-IR-005 (RF tabela regressiva), EXITUS-IR-006 (DIRPF anual), EXITUS-IR-007 (alíquotas dinâmicas via `regra_fiscal`), EXITUS-IR-008 (UNITs B3).*
+*Próximos passos: EXITUS-IR-004 (JCP/withholding), EXITUS-IR-005 (RF tabela regressiva), EXITUS-IR-006 (DIRPF anual), EXITUS-IR-008 (UNITs B3).*

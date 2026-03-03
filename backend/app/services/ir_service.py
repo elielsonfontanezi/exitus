@@ -29,6 +29,7 @@ from app.models.ativo import Ativo, TipoAtivo
 from app.models.corretora import Corretora
 from app.models.posicao import Posicao
 from app.models.saldo_prejuizo import SaldoPrejuizo
+from app.models.regra_fiscal import RegraFiscal
 from app.utils.exceptions import BusinessRuleError
 
 logger = logging.getLogger(__name__)
@@ -102,6 +103,64 @@ def _is_day_trade(t: Transacao, todas: list) -> bool:
         ):
             return True
     return False
+
+
+def _carregar_regras_fiscais(data_ref: date) -> dict:
+    """
+    Carrega regras fiscais vigentes do banco para a data de referência.
+    Retorna dict por chave (pais, tipo_ativo, tipo_operacao) → {aliquota, valor_isencao}.
+    Fallback: retorna constantes hardcoded se tabela vazia.
+    """
+    regras = RegraFiscal.query.filter(
+        RegraFiscal.ativa == True,
+        RegraFiscal.vigencia_inicio <= data_ref,
+        db.or_(
+            RegraFiscal.vigencia_fim == None,
+            RegraFiscal.vigencia_fim >= data_ref,
+        )
+    ).all()
+
+    if not regras:
+        logger.warning(
+            "IR-007: tabela regra_fiscal vazia — usando alíquotas hardcoded como fallback."
+        )
+        return {
+            ('BR', 'ACAO',  'SWING_TRADE'): {'aliquota': ALIQUOTA_SWING_ACAO, 'isencao': ISENCAO_SWING_ACAO},
+            ('BR', None,    'DAY_TRADE'):   {'aliquota': ALIQUOTA_DAY_TRADE,  'isencao': None},
+            ('BR', 'FII',   'VENDA'):       {'aliquota': ALIQUOTA_FII,         'isencao': None},
+            ('US', 'STOCK', 'VENDA'):       {'aliquota': ALIQUOTA_STOCK_US,    'isencao': None},
+            ('US', 'REIT',  'VENDA'):       {'aliquota': ALIQUOTA_REIT,        'isencao': None},
+        }
+
+    mapa = {}
+    for r in regras:
+        chave = (r.pais, r.tipo_ativo, r.tipo_operacao)
+        mapa[chave] = {
+            'aliquota': Decimal(str(r.aliquota_ir)) / Decimal('100'),
+            'isencao':  Decimal(str(r.valor_isencao)) if r.valor_isencao else None,
+        }
+    return mapa
+
+
+def _regra_para_categoria(regras: dict, categoria: str) -> dict:
+    """
+    Retorna {aliquota, isencao} para a categoria fiscal, buscando no mapa de regras.
+    Fallback por categoria se chave exata não encontrada.
+    """
+    mapa_categoria = {
+        'swing_acoes': ('BR', 'ACAO',  'SWING_TRADE'),
+        'day_trade':   ('BR', None,    'DAY_TRADE'),
+        'fiis':        ('BR', 'FII',   'VENDA'),
+        'exterior':    ('US', 'STOCK', 'VENDA'),
+    }
+    fallback = {
+        'swing_acoes': {'aliquota': ALIQUOTA_SWING_ACAO, 'isencao': ISENCAO_SWING_ACAO},
+        'day_trade':   {'aliquota': ALIQUOTA_DAY_TRADE,  'isencao': None},
+        'fiis':        {'aliquota': ALIQUOTA_FII,         'isencao': None},
+        'exterior':    {'aliquota': ALIQUOTA_STOCK_US,    'isencao': None},
+    }
+    chave = mapa_categoria.get(categoria)
+    return regras.get(chave, fallback[categoria])
 
 
 def _custo_medio(compras: list) -> Decimal:
@@ -204,11 +263,14 @@ class IRService:
             por_corretora[cid]['total_vendas'] += Decimal(str(t.valor_total))
             por_corretora[cid]['operacoes']    += 1
 
-        # Apurar cada categoria (com PM da tabela posicao)
-        res_swing    = IRService._apurar_swing_acoes(swing_acoes, pm_map)
-        res_dt       = IRService._apurar_day_trade(day_trade, pm_map)
-        res_fii      = IRService._apurar_fiis(fiis, pm_map)
-        res_exterior = IRService._apurar_exterior(exterior, pm_map)
+        # Carregar regras fiscais vigentes do banco (IR-007) — fallback para hardcoded
+        regras_fiscais = _carregar_regras_fiscais(dt_fim)
+
+        # Apurar cada categoria (com PM da tabela posicao e regras dinâmicas)
+        res_swing    = IRService._apurar_swing_acoes(swing_acoes, pm_map, regras_fiscais)
+        res_dt       = IRService._apurar_day_trade(day_trade, pm_map, regras_fiscais)
+        res_fii      = IRService._apurar_fiis(fiis, pm_map, regras_fiscais)
+        res_exterior = IRService._apurar_exterior(exterior, pm_map, regras_fiscais)
 
         # --- IR-003: Compensação de prejuízo acumulado ---
         mes_ant = _mes_anterior(ano, mes)
@@ -335,13 +397,16 @@ class IRService:
     # -----------------------------------------------------------------------
 
     @staticmethod
-    def _apurar_swing_acoes(vendas: list, pm_map: dict) -> dict:
-        """Swing trade ações BR: 15%, isenção R$20k/mês em vendas."""
+    def _apurar_swing_acoes(vendas: list, pm_map: dict, regras: dict) -> dict:
+        """Swing trade ações BR: alíquota e isenção via regra_fiscal (IR-007)."""
+        regra = _regra_para_categoria(regras, 'swing_acoes')
+        aliquota = regra['aliquota']
+        isencao  = regra['isencao'] or ISENCAO_SWING_ACAO
+
         total_vendas  = sum(Decimal(str(t.valor_total)) for t, _, _ in vendas)
         total_custos  = sum(Decimal(str(t.custos_totais)) for t, _, _ in vendas)
         alertas_pm = []
 
-        # Lucro: receita - custo de aquisição (PM da tabela posicao) - custos
         lucro_bruto = Decimal('0')
         for t, _, ticker in vendas:
             pm = pm_map.get((str(t.ativo_id), str(t.corretora_id)), Decimal('0'))
@@ -352,15 +417,15 @@ class IRService:
 
         lucro_liquido = lucro_bruto - total_custos
 
-        isento = total_vendas <= ISENCAO_SWING_ACAO
+        isento = total_vendas <= isencao
         ir_devido = Decimal('0')
         if not isento and lucro_liquido > 0:
-            ir_devido = (lucro_liquido * ALIQUOTA_SWING_ACAO).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            ir_devido = (lucro_liquido * aliquota).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
         return {
             'total_vendas':  float(total_vendas),
             'lucro_liquido': float(lucro_liquido),
-            'aliquota':      float(ALIQUOTA_SWING_ACAO * 100),
+            'aliquota':      float(aliquota * 100),
             'isento':        isento,
             'ir_devido':     ir_devido,
             'operacoes':     len(vendas),
@@ -368,8 +433,11 @@ class IRService:
         }
 
     @staticmethod
-    def _apurar_day_trade(vendas: list, pm_map: dict) -> dict:
-        """Day-trade: 20%, sem isenção."""
+    def _apurar_day_trade(vendas: list, pm_map: dict, regras: dict) -> dict:
+        """Day-trade: alíquota via regra_fiscal (IR-007), sem isenção."""
+        regra = _regra_para_categoria(regras, 'day_trade')
+        aliquota = regra['aliquota']
+
         alertas_pm = []
         lucro_bruto = Decimal('0')
         for t, _, ticker in vendas:
@@ -384,11 +452,11 @@ class IRService:
 
         ir_devido = Decimal('0')
         if lucro_liquido > 0:
-            ir_devido = (lucro_liquido * ALIQUOTA_DAY_TRADE).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            ir_devido = (lucro_liquido * aliquota).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
         return {
             'lucro_liquido': float(lucro_liquido),
-            'aliquota':      float(ALIQUOTA_DAY_TRADE * 100),
+            'aliquota':      float(aliquota * 100),
             'isento':        False,
             'ir_devido':     ir_devido,
             'operacoes':     len(vendas),
@@ -396,8 +464,11 @@ class IRService:
         }
 
     @staticmethod
-    def _apurar_fiis(vendas: list, pm_map: dict) -> dict:
-        """FIIs: 20%, sem isenção."""
+    def _apurar_fiis(vendas: list, pm_map: dict, regras: dict) -> dict:
+        """FIIs: alíquota via regra_fiscal (IR-007), sem isenção."""
+        regra = _regra_para_categoria(regras, 'fiis')
+        aliquota = regra['aliquota']
+
         alertas_pm = []
         lucro_bruto = Decimal('0')
         for t, _, ticker in vendas:
@@ -412,11 +483,11 @@ class IRService:
 
         ir_devido = Decimal('0')
         if lucro_liquido > 0:
-            ir_devido = (lucro_liquido * ALIQUOTA_FII).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            ir_devido = (lucro_liquido * aliquota).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
         return {
             'lucro_liquido': float(lucro_liquido),
-            'aliquota':      float(ALIQUOTA_FII * 100),
+            'aliquota':      float(aliquota * 100),
             'isento':        False,
             'ir_devido':     ir_devido,
             'operacoes':     len(vendas),
@@ -424,8 +495,11 @@ class IRService:
         }
 
     @staticmethod
-    def _apurar_exterior(vendas: list, pm_map: dict) -> dict:
-        """Ativos US/exterior: 15% ganho de capital."""
+    def _apurar_exterior(vendas: list, pm_map: dict, regras: dict) -> dict:
+        """Ativos US/exterior: alíquota via regra_fiscal (IR-007)."""
+        regra = _regra_para_categoria(regras, 'exterior')
+        aliquota = regra['aliquota']
+
         alertas_pm = []
         lucro_bruto = Decimal('0')
         for t, _, ticker in vendas:
@@ -440,11 +514,11 @@ class IRService:
 
         ir_devido = Decimal('0')
         if lucro_liquido > 0:
-            ir_devido = (lucro_liquido * ALIQUOTA_STOCK_US).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            ir_devido = (lucro_liquido * aliquota).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
         return {
             'lucro_liquido': float(lucro_liquido),
-            'aliquota':      float(ALIQUOTA_STOCK_US * 100),
+            'aliquota':      float(aliquota * 100),
             'isento':        False,
             'ir_devido':     ir_devido,
             'operacoes':     len(vendas),

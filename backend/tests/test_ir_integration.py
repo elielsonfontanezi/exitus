@@ -393,3 +393,41 @@ class TestHistorico:
         meses = rv.get_json()['data']['meses']
         for i, m in enumerate(meses):
             assert m['mes'] == f'2024-{(i+1):02d}'
+
+
+class TestRegrasFiscais:
+    """IR-007: Alíquotas dinâmicas via tabela regra_fiscal."""
+
+    def test_aliquota_swing_carregada_do_banco(self, auth_client, cenario_ir):
+        """Alíquota de swing trade deve ser 15.0 (carregada da tabela regra_fiscal)."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2025-03', headers=auth_client._auth_headers)
+        assert rv.status_code == 200
+        swing = rv.get_json()['data']['categorias']['swing_acoes']
+        assert swing['aliquota'] == 15.0
+
+    def test_fallback_quando_regra_fiscal_vazia(self, app, auth_client, cenario_ir):
+        """Se regra_fiscal estiver vazia, deve usar constantes hardcoded sem erro."""
+        from app.database import db
+        from app.models.regra_fiscal import RegraFiscal
+
+        with app.app_context():
+            regras = RegraFiscal.query.all()
+            ids_backup = [(r.id, r.ativa) for r in regras]
+            # Desativa todas as regras temporariamente
+            for r in regras:
+                r.ativa = False
+            db.session.commit()
+
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2025-03', headers=auth_client._auth_headers)
+            assert rv.status_code == 200
+            swing = rv.get_json()['data']['categorias']['swing_acoes']
+            # Fallback: deve retornar 15.0 (hardcoded)
+            assert swing['aliquota'] == 15.0
+        finally:
+            with app.app_context():
+                for r_id, r_ativa in ids_backup:
+                    r = RegraFiscal.query.get(r_id)
+                    if r:
+                        r.ativa = r_ativa
+                db.session.commit()

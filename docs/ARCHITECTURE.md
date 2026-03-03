@@ -256,7 +256,7 @@ User: non-root (exitus:1000)
 | `TestingConfig` | `backend/app/config.py` | Aponta para `exitusdb_test`, JWT sem expiração, CSRF desabilitado |
 | Testes unitários | `tests/test_business_rules.py` | 37 testes com mocks — `business_rules.py` |
 | Testes integração | `tests/test_*_integration.py` | 91 testes contra PostgreSQL real (`exitusdb_test`) |
-| Testes IR (IR-001 + IR-002 + IR-003) | `tests/test_ir_integration.py` | 28 testes — apuração, DARF, histórico, PM posicao, compensação prejuízo |
+| Testes IR (IR-001 a IR-007) | `tests/test_ir_integration.py` | 30 testes — apuração, DARF, histórico, PM posicao, compensação prejuízo, regras dinâmicas |
 | Testes Export (EXITUS-EXPORT-001) | `tests/test_export_integration.py` | 32 testes — CSV, Excel, JSON, PDF, filtros |
 
 **Estratégia de isolamento:**
@@ -264,7 +264,7 @@ User: non-root (exitus:1000)
 - Fixtures de entidade com escopo `function` — criação com UUID único + DELETE no teardown
 - Sem `db.drop_all()`/`db.create_all()` entre testes — apenas DELETE explícito
 - Banco de teste recriável a qualquer momento via `./scripts/create_test_db.sh`
-- **Suite total: 137 passed, 0 failed**
+- **Suite total: 139 passed, 0 failed**
 
 **Executar testes:**
 ```bash

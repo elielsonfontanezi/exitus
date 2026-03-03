@@ -62,7 +62,7 @@
 | **EXITUS-IR-004** | Proventos tributáveis: JCP (15% retido na fonte) e withholding tax US (30%) | Não implementado | **Alto** | **Alta** |
 | **EXITUS-IR-005** | IR sobre renda fixa: tabela regressiva 22,5%→15% por prazo de aplicação | Não implementado | Alto | Alta |
 | **EXITUS-IR-006** | DIRPF anual: relatório para Declaração de Ajuste Anual (fichas Renda Variável e Bens e Direitos) | Não implementado | Alto | Média |
-| **EXITUS-IR-007** | Alíquotas dinâmicas via tabela `regra_fiscal` (atualmente hardcoded em `ir_service.py`) | Não implementado | Médio | Média |
+| **EXITUS-IR-007** | Alíquotas dinâmicas via tabela `regra_fiscal` (atualmente hardcoded em `ir_service.py`) | ✅ Concluído (03/03/2026) | Médio | Média |
 | **EXITUS-IR-008** | Tratamento fiscal de UNITs B3 no engine de IR (classificação, isenção R$20k, desmembramento→PM) | Não implementado | Médio | Baixa |
 | **EXITUS-EXPORT-001** | Exportação genérica (CSV, Excel, JSON, PDF) | ✅ Concluído (03/03/2026) | Alto | Alta |
 
@@ -460,7 +460,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-IR-004 | 3 | 📋 Planejado | — | JCP 15% retido na fonte + withholding tax US |
 | EXITUS-IR-005 | 3 | 📋 Planejado | — | IR renda fixa — tabela regressiva 22,5%→15% |
 | EXITUS-IR-006 | 3 | 📋 Planejado | — | DIRPF anual — fichas Renda Variável e Bens e Direitos |
-| EXITUS-IR-007 | 3 | 📋 Planejado | — | Alíquotas dinâmicas via tabela `regra_fiscal` |
+| EXITUS-IR-007 | 3 | ✅ Concluído | 03/03/2026 | Alíquotas dinâmicas via `regra_fiscal` — seed 5 regras, fallback hardcoded, 2 testes |
 | EXITUS-IR-008 | 3 | 📋 Planejado | — | UNITs B3: classificação fiscal + desmembramento→PM (depende UNITS-001) |
 | EXITUS-EXPORT-001 | 3 | ✅ Concluído | 03/03/2026 | CSV, Excel, JSON, PDF — 32 testes |
 | EXITUS-MULTIMOEDA-001 | 4 | 📋 Planejado | — | Conversão automática BRL/USD/EUR |
