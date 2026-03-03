@@ -30,7 +30,7 @@
 - **3 usuários seed** para testes
 - **8 módulos PROD** (M0-M7.7)
 - **9 GAPs concluídos** na Fase 2 + 1 na Fase 3 (TESTS-001)
-- **69 testes automatizados** ✅ (37 unitários + 32 integração)
+- **77 testes automatizados** ✅ (0 falhos) — suite completa verde
 
 ---
 
@@ -89,8 +89,8 @@
 | **EXITUS-AUDIT-001** | Logs de auditoria imutáveis (hash encadeado) | Não implementado | Baixo | Baixa |
 | **EXITUS-LGPD-001** | Conformidade LGPD/GDPR (consentimento, esquecimento) | Não implementado | Baixo (dev) | Baixa |
 | **EXITUS-TESTDB-001** | Script `create_test_db.sh` — recriação automatizada do banco de teste | Não implementado | Baixo | Baixa |
-| **EXITUS-TESTFIX-001** | `test_calculos.py` — 2 testes sem token JWT retornam 401 em vez de 200 | Não implementado | Baixo | Baixa |
-| **EXITUS-TESTFIX-002** | `test_buy_signals.py` — `ImportError: cannot import name 'db' from 'app'` (importação errada no teste) | Não implementado | Baixo | Baixa |
+| **EXITUS-TESTFIX-001** | `test_calculos.py` — 2 testes sem token JWT retornam 401 em vez de 200 | ✅ Concluído (03/03/2026) | Baixo | Baixa |
+| **EXITUS-TESTFIX-002** | `test_buy_signals.py` — `ImportError: cannot import name 'db' from 'app'` (importação errada no teste) | ✅ Concluído (03/03/2026) | Baixo | Baixa |
 
 ---
 
