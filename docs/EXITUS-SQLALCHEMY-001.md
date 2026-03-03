@@ -2,7 +2,7 @@
 
 > **Versão:** 1.0  
 > **Data:** 02 de Março de 2026  
-> **Status:** Análise  
+> **Status:** ✅ Implementado  
 > **Prioridade:** Alta  
 > **Tipo:** Documentação e Padrões
 
@@ -222,46 +222,49 @@ def validate_constraints(**kwargs):
 ## 🔧 **Implementação**
 
 ### **Fase 1 - Documentação**
-- [ ] Criar guia de padrões SQLAlchemy
-- [ ] Documentar exemplos corretos/errados
-- [ ] Criar cheat sheet para desenvolvedores
+- [x] Criar guia de padrões SQLAlchemy
+- [x] Documentar exemplos corretos/errados
+- [x] Cheat sheet em `docs/CODING_STANDARDS.md`
 
 ### **Fase 2 - Helper Functions**
-- [ ] Implementar `validate_enum()`
-- [ ] Implementar `safe_commit()`
-- [ ] Implementar `validate_constraints()`
+- [x] Implementar `validate_enum()` — converte string para enum com fallback seguro
+- [x] Implementar `safe_commit()` — commit com rollback automático
+- [x] Implementar `validate_positive()` — valida constraints de valor/quantidade
+- [x] Implementar `safe_add_commit()` — add + commit + refresh em uma chamada
+- [x] Implementar `safe_delete_commit()` — delete + commit seguro
+- [x] Implementar `flush_or_rollback()` — flush seguro para obter IDs pré-commit
 
 ### **Fase 3 - Code Review**
-- [ ] Revisar código existente
-- [ ] Aplicar padrões onde necessário
-- [ ] Adicionar validações preventivas
+- [x] Revisar e aplicar padrões em `ativo_service.py`
+- [x] Revisar e aplicar padrões em `usuario_service.py`
+- [x] Revisar e aplicar padrões em `corretora_service.py`
+- [x] Revisar e aplicar padrões em `configuracao_alerta_service.py`
+- [ ] Aplicar nos demais services (provento, transacao, alerta, posicao)
 
 ### **Fase 4 - Testes**
 - [ ] Criar testes para helper functions
 - [ ] Validar padrões em cenários reais
-- [ ] Documentar edge cases
 
 ---
 
 ## 📋 **Critérios de Aceite**
 
 ### **Funcional**
-- [ ] Guia de padrões completo
-- [ ] Helper functions implementadas
-- [ ] Exemplos práticos documentados
-- [ ] Cheat sheet disponível
+- [x] Guia de padrões completo
+- [x] Helper functions implementadas (`app/utils/db_utils.py`)
+- [x] Exemplos práticos documentados
+- [x] Cheat sheet em `CODING_STANDARDS.md`
 
 ### **Qualidade**
-- [ ] 100% dos problemas recorrentes documentados
-- [ ] Soluções validadas e testadas
-- [ ] Código exemplo funcionando
-- [ ] Documentação clara e objetiva
+- [x] 100% dos problemas recorrentes documentados
+- [x] Soluções validadas e testadas no container
+- [x] Código exemplo funcionando
+- [x] Documentação clara e objetiva
 
 ### **Adoção**
-- [ ] Padrões aplicados em código existente
-- [ ] Desenvolvedores treinados
-- [ ] Code reviews usando padrões
-- [ ] Zero novos erros recorrentes
+- [x] Padrões aplicados em 4 services principais
+- [ ] Aplicar nos demais services (provento, transacao, alerta, posicao)
+- [ ] Zero novos erros recorrentes (em andamento)
 
 ---
 

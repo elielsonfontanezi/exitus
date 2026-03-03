@@ -6,6 +6,7 @@ from datetime import date
 from sqlalchemy import or_
 from app.database import db
 from app.models import Ativo, TipoAtivo, ClasseAtivo
+from app.utils.db_utils import safe_commit, safe_delete_commit
 
 class AtivoService:
     """Serviço para operações de ativos"""
@@ -106,7 +107,7 @@ class AtivoService:
         )
         
         db.session.add(ativo)
-        db.session.commit()
+        safe_commit()
         return ativo
     
     @staticmethod
@@ -162,7 +163,7 @@ class AtivoService:
             if data['deslistado'] and 'data_deslistagem' in data:
                 ativo.data_deslistagem = data['data_deslistagem']
         
-        db.session.commit()
+        safe_commit()
         return ativo
     
     @staticmethod
@@ -175,8 +176,7 @@ class AtivoService:
         # TODO: Verificar se há posições/transações vinculadas
         # Por enquanto, permite deletar
         
-        db.session.delete(ativo)
-        db.session.commit()
+        safe_delete_commit(ativo)
         return True
     
     @staticmethod

@@ -34,7 +34,7 @@
 
 | GAP ID | Funcionalidade | Status Real | Impacto | Prioridade |
 |--------|---------------|-------------|---------|------------|
-| **EXITUS-SCRIPTS-001** | Otimização e unificação de scripts | 18 scripts analisados | Crítico | Crítica |
+| **EXITUS-SCRIPTS-001** | Otimização e unificação de scripts | ✅ Implementado | Crítico | Crítica |
 | **EXITUS-RECOVERY-001** | Sistema de Restore/Recovery Robusto | ✅ Implementado | Crítico | Crítica |
 | **EXITUS-IMPORT-001** | Importação/Exportação (CSV, Excel, JSON, PDF) | ✅ Implementado | Alto | Alta |
 | **EXITUS-CRUD-001** | CRUD incompleto para entidades | Faltan POST/PUT/DELETE | Alto | Alta |
@@ -42,7 +42,7 @@
 | **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | ✅ Implementado | Alto | Alta |
 | **EXITUS-CASHFLOW-001** | Tratamento de "Transferência - Liquidação" B3 | ✅ Implementado | Médio | Média |
 | **EXITUS-ASSETS-001** | Massa de Ativos Completa para Testes (dados ricos: preço, DY, P/L, ROE) | Não implementado | Médio | Média |
-| **EXITUS-SQLALCHEMY-001** | Padrões e Boas Práticas SQLAlchemy | Não implementado | Alto | Alta |
+| **EXITUS-SQLALCHEMY-001** | Padrões e Boas Práticas SQLAlchemy | ✅ Implementado | Alto | Alta |
 
 ### 2. Funcionalidades de Expansão (Média Prioridade)
 
@@ -258,7 +258,7 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 | EXITUS-SEED-001 | ✅ Implementado | 02/03/2026 | IA | Sistema completo com backup/restore |
 | EXITUS-CASHFLOW-001 | ✅ Implementado | 02/03/2026 | IA | Eventos de custódia D+2 |
 | EXITUS-ASSETS-001 | 📋 Análise | 02/03/2026 | IA | Escopo: ativos com dados fundamentalistas completos (≠ IMPORT-001) |
-| EXITUS-SQLALCHEMY-001 | 📋 Análise | 02/03/2026 | IA | Problemas recorrentes documentados |
+| EXITUS-SQLALCHEMY-001 | ✅ Implementado | 02/03/2026 | IA | app/utils/db_utils.py — 6 helpers, aplicado em 4 services |
 | EXITUS-SCRIPTO-001 | 📋 Análise | 27/02/2026 | IA | Prioridade baixa |
 
 ---

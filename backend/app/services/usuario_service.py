@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import or_
 from app.database import db
 from app.models import Usuario, UserRole
+from app.utils.db_utils import safe_commit, safe_delete_commit
 
 
 class UsuarioService:
@@ -64,7 +65,7 @@ class UsuarioService:
             role=UserRole[data.get('role', 'user').upper()]
         )
         db.session.add(user)
-        db.session.commit()
+        safe_commit()
         return user
     
     @staticmethod
@@ -115,7 +116,7 @@ class UsuarioService:
         if 'role' in data and is_admin:
             user.role = UserRole[data['role'].upper()]
         
-        db.session.commit()
+        safe_commit()
         return user
     
     @staticmethod
@@ -124,8 +125,7 @@ class UsuarioService:
         user = Usuario.query.get(user_id)
         if not user:
             raise ValueError("Usuário não encontrado")
-        db.session.delete(user)
-        db.session.commit()
+        safe_delete_commit(user)
         return True
     
     @staticmethod
@@ -139,5 +139,5 @@ class UsuarioService:
             raise ValueError("Senha atual incorreta")
         
         user.password_hash = generate_password_hash(new_password)
-        db.session.commit()
+        safe_commit()
         return True

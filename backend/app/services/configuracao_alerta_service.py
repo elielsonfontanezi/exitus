@@ -1,5 +1,7 @@
 """M7.1 - ConfiguracaoAlerta Service"""
 from app.models.configuracao_alerta import ConfiguracaoAlerta
+from app.database import db
+from app.utils.db_utils import safe_commit, safe_delete_commit
 from sqlalchemy import desc
 
 class ConfiguracaoAlertaService:
@@ -14,7 +16,7 @@ class ConfiguracaoAlertaService:
     def create(usuario_id, data):
         alerta = ConfiguracaoAlerta(usuario_id=usuario_id, **data)
         db.session.add(alerta)
-        db.session.commit()
+        safe_commit()
         db.session.refresh(alerta)
         return alerta.to_dict()
 
@@ -23,11 +25,10 @@ class ConfiguracaoAlertaService:
         alerta = ConfiguracaoAlerta.query.filter_by(usuario_id=usuario_id, id=alerta_id).first_or_404()
         for key, value in data.items():
             setattr(alerta, key, value)
-        db.session.commit()
+        safe_commit()
         return alerta.to_dict()
 
     @staticmethod
     def delete(usuario_id, alerta_id):
         alerta = ConfiguracaoAlerta.query.filter_by(usuario_id=usuario_id, id=alerta_id).first_or_404()
-        db.session.delete(alerta)
-        db.session.commit()
+        safe_delete_commit(alerta)

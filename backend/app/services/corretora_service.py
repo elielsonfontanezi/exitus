@@ -5,6 +5,7 @@ from decimal import Decimal
 from sqlalchemy import or_
 from app.database import db
 from app.models import Corretora, TipoCorretora
+from app.utils.db_utils import safe_commit, safe_delete_commit
 
 class CorretoraService:
     """Serviço para operações de corretoras"""
@@ -103,7 +104,7 @@ class CorretoraService:
         )
         
         db.session.add(corretora)
-        db.session.commit()
+        safe_commit()
         return corretora
     
     @staticmethod
@@ -150,7 +151,7 @@ class CorretoraService:
         if 'observacoes' in data:
             corretora.observacoes = data['observacoes']
         
-        db.session.commit()
+        safe_commit()
         return corretora
     
     @staticmethod
@@ -168,8 +169,7 @@ class CorretoraService:
         # TODO: Verificar se há posições/transações vinculadas
         # Por enquanto, permite deletar
         
-        db.session.delete(corretora)
-        db.session.commit()
+        safe_delete_commit(corretora)
         return True
 
     
