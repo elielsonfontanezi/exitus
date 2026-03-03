@@ -10,6 +10,7 @@
 PRIORIDADE 1️⃣ - SEMPRE consultar ANTES de gerar código:
 ├── docs/README.md                       # **Guia de toda a documentação**
 ├── PERSONAS.md                          # **Manual de Operação da IA**
+├── LESSONS_LEARNED.md                   # **Erros reais — ler ANTES de qualquer ação**
 ├── API_REFERENCE.md                     # Contratos API completos
 ├── ENUMS.md                             # 14 TipoAtivo, mapeamentos
 ├── VISION.md                            # Visão de negócio, roadmap
@@ -17,7 +18,7 @@ PRIORIDADE 1️⃣ - SEMPRE consultar ANTES de gerar código:
 ├── MODULES.md                           # Status M0-M7, 67 endpoints
 ├── CODING_STANDARDS.md                  # snake_case MANDATÓRIO
 ├── EXITUS_DB_STRUCTURE.txt              # 21 tabelas, 86 índices
-├── CHANGELOG.md                         # v0.7.10, gaps abertos
+├── CHANGELOG.md                         # v0.8.0-dev, gaps abertos
 ├── ROADMAP.md                           # GAPs identificados, plano de implementação
 ├── SEEDS.md                             # 56 ativos, credenciais dev
 └── OPERATIONS_RUNBOOK.md                # Podman, troubleshooting

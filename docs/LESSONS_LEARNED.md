@@ -1,257 +1,257 @@
-# Lições Aprendidas - Exitus Development
+# Lições Aprendidas — Sistema Exitus
 
-> **Propósito:** Histórico do contexto e raciocínio por trás das lições — **não** duplicar regras.  
-> **Regras ativas estão em:** `.codeium.rules` (para IA) e `docs/CODING_STANDARDS.md` (para humanos).  
-> **Data:** 02 de Março de 2026
-
----
-
-## 📋 **LIÇÃO 001 - DELETE vs DROP TABLE (02/03/2026)**
-
-### **❌ Problema Identificado**
-Durante implementação do `EXITUS-SEED-001`, optei por usar `DROP TABLE` para reset de dados:
-
-```python
-# ERRADO - Destrutivo e desnecessário
-db.drop_all()    # Perde schema inteiro
-db.create_all()  # Recria do zero (arriscado)
-```
-
-### **🎯 Pensamento Incorreto**
-- **"Reset completo"** → Pensei em "recriar tudo"
-- **"Limpar banco"** → Interpretei como "apagar e refazer"
-- **Preocupação excessiva** com dados residuais
-- **Mentalidade de "Fresh Start"** equivocada
-
-### **✅ Solução Correta**
-Usar `DELETE` para limpar apenas dados:
-
-```python
-# CORRETO - Seguro e eficiente
-db.session.execute(text("DELETE FROM usuario"))
-db.session.execute(text("ALTER SEQUENCE usuario_id_seq RESTART WITH 1"))
-```
-
-### **🎯 Por Que DELETE é Superior**
-- **🛡️ Preserva schema** (tabelas, constraints, índices)
-- **📦 Mantém migrations** intactas
-- **⚡ Performance superior** (mais rápido)
-- **🔒 Mais seguro** (não perde definições)
-- **🎲 IDs controlados** (reset de sequences)
-
-### **📚 Contexto do Problema**
-- **Objetivo:** "Seed controlado" = limpar dados, não estrutura
-- **Schema:** Gerenciado por Alembic migrations
-- **Resultado:** Dados limpos, estrutura intacta
-
-### **🔍 Pergunta-Chave Aprendida**
-"O que realmente preciso resetar?"
-- **Dados?** → DELETE ✅
-- **Schema?** → DROP (raramente necessário) ⚠️
-
-### **💡 Impacto da Lição**
-- **Implementação corrigida** do sistema de seed
-- **Documentação atualizada** com padrões
-- **Futuros desenvolvedores** evitarão o mesmo erro
-- **Performance melhorada** do sistema
+> **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
+> Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
+> **Atualizado:** 03/03/2026 — unificado de EXITUS-SEED-001 + EXITUS-TESTS-001  
+> **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
 
-## 📋 **LIÇÃO 002 - Sempre Verificar Tabelas Existentes (02/03/2026)**
+## 🗄️ Banco de Dados
 
-### **❌ Problema Identificado**
-Durante implementação do `EXITUS-SEED-001`, a lista de tabelas para DELETE foi escrita **deduzindo** os nomes baseado no domínio:
-
-```python
-# ERRADO - Dedução sem verificar
-tables_to_clean = [
-    'movimentacao',   # ❌ Não existe! É movimentacao_caixa
-    'transacao',
-    ...
-]
-```
-
-Resultado: Erro em runtime + transação abortada bloqueando os DELETEs seguintes.
-
-### **✅ Solução Correta**
-**Sempre consultar o banco antes de listar tabelas:**
+### L-DB-001 — Usar DELETE, nunca DROP, para reset de dados
+**Origem:** EXITUS-SEED-001 | **Data:** 02/03/2026
 
 ```python
-# CORRETO - Verificar tabelas reais
-from sqlalchemy import inspect
-inspector = inspect(db.engine)
-tables = inspector.get_table_names()
-print(sorted(tables))
-# → ['ativo', 'corretora', 'evento_corporativo', 'evento_custodia',
-#    'movimentacao_caixa', 'portfolio', 'posicao', 'provento',
-#    'transacao', 'usuario', ...]
-```
-
-### **🎯 Por Que Deduzir é Errado**
-- **Nome != Domínio:** `movimentacao` não existe, existe `movimentacao_caixa`
-- **Efeito cascata:** Um erro aborta toda a transação PostgreSQL
-- **Tabelas extras:** `evento_corporativo` não estava na lista inicial
-- **Tabelas de suporte:** `feriado_mercado`, `fonte_dados`, `regra_fiscal` também existem
-
-### **🔍 Comando de Verificação (usar antes de implementar)**
-```python
-# Dentro do app context
-from sqlalchemy import inspect
-inspector = inspect(db.engine)
-print(sorted(inspector.get_table_names()))
-
-# Ou via psql/podman
-podman exec exitus-db psql -U exitus -c "\dt"
-```
-
-### **📚 Regra de Ouro**
-> **"Nunca deduza nomes de tabelas. Sempre consulte o banco."**
-
-### **✅ Checklist Antes de Listar Tabelas**
-- [ ] Consultei `inspect(db.engine).get_table_names()`?
-- [ ] Verifiquei os `__tablename__` dos models?
-- [ ] Testei com uma tabela antes de iterar todas?
-
----
-
-## 📋 **LIÇÃO 003 - PKs são UUID, não Sequences Numéricas (02/03/2026)**
-
-### **Contexto**
-Ao implementar o reset de banco, o script tentou resetar sequences numéricas (`ALTER SEQUENCE usuario_id_seq RESTART WITH 1`) que **não existem** neste sistema.
-
-### **❌ Problema**
-```python
-# ERRADO - pressupôs PKs numéricas
-sequences_to_reset = ['usuario_id_seq', 'ativo_id_seq', ...]
-db.session.execute(text("ALTER SEQUENCE usuario_id_seq RESTART WITH 1"))
-# → relation "usuario_id_seq" does not exist
-```
-
-### **✅ Realidade do Sistema**
-Todas as PKs do sistema Exitus são **UUID v4**:
-```python
-# Todos os models usam:
-id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-```
-
-**Confirmado via consulta ao banco:**
-```python
-from sqlalchemy import text
-result = db.session.execute(text(
-    "SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = 'public'"
-))
-# → SEQUENCES: []  ← Nenhuma sequence existe
-```
-
-### **📚 Implicações**
-- **Não há reset de IDs** — UUIDs são sempre únicos por design
-- **Sem colisão** entre registros de diferentes seeds
-- **Sem necessidade** de resetar sequences no processo de seed
-- **Performance:** UUID v4 é gerado em memória, sem acesso ao banco
-
-### **🔍 Regra de Ouro**
-> **"Sempre verificar o tipo de PK antes de assumir comportamento de sequence."**
-
----
-
-## 📋 **LIÇÃO 004 - Dedução de Campo por Regra de Negócio vs Model Real (02/03/2026)**
-
-### **Contexto**
-O campo `pais` foi adicionado ao seed de `Ativo` porque **fazia sentido no domínio** (sistema multi-mercado: BR, US, EU). A `Corretora` tem `pais`. Logo, `Ativo` deveria ter também.
-
-### **❌ Raciocínio Incorreto**
-```python
-# ERRADO - dedução por lógica de domínio
-ativo = Ativo(
-    ticker='PETR4',
-    pais='BR',   # ❌ Faz sentido no domínio, mas campo não existe!
-)
-```
-
-### **✅ Realidade do Model**
-```python
-# Ativo usa 'mercado' para indicar região
-id = Column(UUID(as_uuid=True), ...)
-ticker = Column(String(20), ...)
-nome = Column(String(200), ...)
-tipo = Column(Enum(TipoAtivo), ...)
-classe = Column(Enum(ClasseAtivo), ...)
-mercado = Column(String(10), ...)  # 'BR', 'US', 'EU', 'ASIA', 'GLOBAL'
-moeda = Column(String(3), ...)
-```
-
-### **🎯 Por Que Errei**
-- **Corretora tem `pais`** → assumi que Ativo também teria
-- **Lógica de domínio coerente** → não implica que o campo existe no model
-- **`mercado`** cumpre o mesmo papel que `pais` teria em `Ativo`
-
-### **📚 Regra de Ouro**
-> **"Regra de negócio coerente ≠ campo existente no model. Sempre ler o `__tablename__` e as colunas antes de usar."**
-
-### **✅ Checklist Antes de Usar Campos de um Model**
-- [ ] Li o arquivo `models/nome_model.py` completo?
-- [ ] Verifiquei todas as `Column(...)` definidas?
-- [ ] Não estou assumindo campos por analogia com outros models?
-
----
-
-## 🎓 **Como Aplicar Esta Lição**
-
-### **✅ Fazer Sempre**
-```python
-# Para reset de dados:
-DELETE FROM tabela;
-ALTER SEQUENCE tabela_id_seq RESTART WITH 1;
-```
-
-### **❌ Evitar**
-```python
-# Nunca para reset de dados:
+# ❌ ERRADO — perde schema, constraints, índices, migrations
 db.drop_all()
 db.create_all()
+
+# ✅ CORRETO — limpa dados, preserva estrutura
+db.session.execute(text("DELETE FROM tabela"))
+```
+**Regra:** "O que preciso resetar?" → Dados = DELETE. Schema = DROP (raramente).  
+**PKs são UUID** neste sistema — não existem sequences para resetar.
+
+---
+
+### L-DB-002 — Nunca deduzir nomes de tabelas — sempre consultar
+**Origem:** EXITUS-SEED-001 | **Data:** 02/03/2026
+
+```python
+# ❌ ERRADO — 'movimentacao' não existe; é 'movimentacao_caixa'
+tables = ['movimentacao', 'transacao', ...]
+
+# ✅ CORRETO — listar do banco
+from sqlalchemy import inspect
+print(sorted(inspect(db.engine).get_table_names()))
+# ou: podman exec exitus-db psql -U exitus -d exitusdb -c "\dt"
+```
+**Tabelas reais (22):** `ativo`, `alertas`, `auditoria_relatorios`, `configuracoes_alertas`,
+`corretora`, `evento_corporativo`, `evento_custodia`, `feriado_mercado`, `fonte_dados`,
+`historico_preco`, `log_auditoria`, `movimentacao_caixa`, `parametros_macro`, `portfolio`,
+`posicao`, `projecoes_renda`, `provento`, `regra_fiscal`, `relatorios_performance`,
+`transacao`, `usuario`, `alembic_version`.
+
+---
+
+### L-DB-003 — PKs são UUID v4 — não existem sequences
+**Origem:** EXITUS-SEED-001 | **Data:** 02/03/2026
+
+Todos os models usam `id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)`.  
+Não há sequences no schema. `ALTER SEQUENCE ... RESTART` vai falhar.
+
+---
+
+### L-DB-004 — ENUMs PostgreSQL têm case inconsistente (bug de design conhecido)
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+| ENUM | No PostgreSQL | No Python (model) | Status |
+|------|--------------|-------------------|--------|
+| `tipotransacao` | lowercase | lowercase | ✅ ok |
+| `tiporelatorio`, `tipoalerta` | lowercase | lowercase | ✅ ok |
+| `tipoativo`, `tipoeventocorporativo` | **UPPERCASE** | lowercase | ⚠️ inconsistente |
+| `userrole`, `tipoprovento`, `incidenciaimposto` | **UPPERCASE** | lowercase | ⚠️ inconsistente |
+
+O ORM resolve a conversão automaticamente. Queries SQL diretas com `WHERE tipo = 'acao'`
+**vão falhar** para ENUMs UPPERCASE — usar `WHERE tipo = 'ACAO'` nesse caso.  
+**Fix planejado:** EXITUS-ENUM-001.
+
+---
+
+### L-DB-005 — Banco de teste deve ser criado via pg_dump, não via migrations
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+A cadeia de migrations Alembic **não consegue criar um banco do zero** de forma confiável
+(inconsistências acumuladas de ENUM case, migrations quebradas, dependências circulares).
+
+```bash
+# ✅ Forma correta de criar/recriar exitusdb_test
+podman exec exitus-db pg_dump -U exitus -d exitusdb --schema-only --no-owner --no-acl \
+  | podman exec -i exitus-db psql -U exitus -d exitusdb_test
 ```
 
-### **🎯 Testar Aplicação**
-- **Schema intacto?** ✅
-- **Constraints preservadas?** ✅
-- **Índices mantidos?** ✅
-- **IDs reiniciados?** ✅
+**Fix planejado:** Script automatizado EXITUS-TESTDB-001.
 
 ---
 
-## 📋 **Padrão Estabelecido**
+## 🔧 Alembic / Migrations
 
-### **Para Sistemas de Seed/Reset:**
-1. **Identificar objetivo** (dados vs schema)
-2. **Usar DELETE** para limpar dados
-3. **Reset sequences** para IDs controlados
-4. **Preservar estrutura** do banco
-5. **Documentar padrão** para equipe
+### L-MIG-001 — Toda migration criada manualmente precisa das 4 variáveis no corpo
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
 
-### **Para Debugging:**
-- **Backup/Restore** de cenários
-- **Dados controlados** para testes
-- **Schema estável** para consistência
+```python
+# ❌ ERRADO — Alembic não lê do docstring
+"""Revision ID: 9e4ef61dee5d ..."""
 
----
-
-## 🔄 **Próximos Passos**
-
-1. **✅ Documentar** lição aprendida
-2. **✅ Implementar** solução correta
-3. **✅ Testar** funcionalidade
-4. **✅ Compartilhar** com equipe
-5. **📋 Monitorar** aplicações futuras
+# ✅ CORRETO — variáveis obrigatórias no corpo do módulo
+revision = '9e4ef61dee5d'
+down_revision = '202602162130'  # ou None para a primeira
+branch_labels = None
+depends_on = None
+```
 
 ---
 
-*Esta lição foi aprendida graças a uma excelente pergunta do usuário sobre a necessidade de DROP TABLE.*  
-*Sempre questione "por que" das decisões técnicas!*
+### L-MIG-002 — ENUMs em migrations devem ser idempotentes
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+```python
+# ❌ ERRADO — falha com DuplicateObject se ENUM já existe
+postgresql.ENUM('a', 'b', name='meuenum', create_type=True).create(op.get_bind())
+
+# ✅ CORRETO — idempotente
+op.execute("""
+    DO $$ BEGIN
+        CREATE TYPE meuenum AS ENUM ('a', 'b');
+    EXCEPTION WHEN duplicate_object THEN NULL; END $$
+""")
+```
+
+Ao referenciar o tipo na coluna, usar `create_type=False`:
+```python
+sa.Column('campo', postgresql.ENUM(name='meuenum', create_type=False))
+```
 
 ---
 
-## 📞 **Referências**
+## 🐍 SQLAlchemy + Flask
 
-- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** - Padrões atualizados
-- **[EXITUS-SEED-001.md](EXITUS-SEED-001.md)** - Implementação corrigida
-- **[CHANGELOG.md](CHANGELOG.md)** - Histórico de mudanças
+### L-SA-001 — Imports locais em funções impedem mocking em testes
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+```python
+# ❌ ERRADO — patch('app.utils.business_rules.Posicao') falha
+def validar_saldo(usuario_id):
+    from app.models.posicao import Posicao  # não fica no namespace do módulo
+    ...
+
+# ✅ CORRETO — import no topo, mockável normalmente
+from app.models.posicao import Posicao
+
+def validar_saldo(usuario_id):
+    ...
+```
+
+**Regra:** Imports de models em `utils/` e `services/` devem estar no **topo do arquivo**.
+Exceção aceita apenas para imports circulares comprovados e documentados.
+
+---
+
+### L-SA-002 — session.configure(bind=connection) é incompatível com Flask test_client
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+```python
+# ❌ NÃO FUNCIONA — Flask test_client abre conexões próprias do pool
+connection = db.engine.connect()
+db.session.configure(bind=connection)
+yield db
+connection.rollback()  # não desfaz commits feitos via HTTP request
+
+# ✅ CORRETO — app context session-scoped + DELETE no teardown
+@pytest.fixture(scope='session')
+def app():
+    ctx = application.app_context()
+    ctx.push()
+    yield application
+    ctx.pop()
+
+@pytest.fixture(scope='function')
+def auth_client(app):
+    u = Usuario(...)
+    db.session.add(u)
+    db.session.commit()
+    yield client
+    Usuario.query.filter_by(username=u.username).delete()
+    db.session.commit()
+```
+
+---
+
+### L-SA-003 — Múltiplos app_context() aninhados causam "Popped wrong app context"
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+Com `app` fixture de escopo `session` que já mantém um contexto ativo via `ctx.push()`,
+fixtures de escopo `function` **não devem** abrir `with app.app_context()`.
+Operam diretamente no contexto já ativo.
+
+---
+
+## 🌐 Contrato da API
+
+### L-API-001 — Endpoint de listagem usa envelope de paginação aninhado
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+```json
+// ✅ Endpoints de entidade única (padrão)
+{ "success": true, "data": { "id": "...", "ticker": "PETR4" } }
+
+// ⚠️  Endpoints de listagem com paginação (diferente!)
+{ "success": true, "data": { "ativos": [...], "total": 65, "pages": 4, "page": 1, "per_page": 20 } }
+```
+
+Em testes e no frontend, extrair a lista com:
+```python
+inner = data.get('data', {})
+lista = inner.get('ativos', []) if isinstance(inner, dict) else inner
+```
+
+---
+
+### L-API-002 — Flask-JWT-Extended retorna 422 para token malformado, não 401
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+- **401** → token ausente ou expirado
+- **422** → token presente mas malformado/inválido
+
+```python
+# ✅ Testes devem aceitar ambos
+assert response.status_code in (401, 422)
+```
+
+---
+
+### L-API-003 — Ticker tem validação restritiva (sem underscore)
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+
+O endpoint `POST /api/ativos/` aceita apenas letras, números, pontos e hífens.
+Underscore (`_`) retorna 400. Em testes, usar sufixos numéricos: `f'TST{uuid4().int[:4]}'`.
+
+---
+
+## 🏗️ Models
+
+### L-MOD-001 — Regra de negócio coerente ≠ campo existente no model
+**Origem:** EXITUS-SEED-001 | **Data:** 02/03/2026
+
+```python
+# ❌ ERRADO — 'pais' faz sentido no domínio mas não existe em Ativo
+ativo = Ativo(ticker='PETR4', pais='BR')
+
+# ✅ CORRETO — Ativo usa 'mercado' para indicar região
+ativo = Ativo(ticker='PETR4', mercado='BR')
+```
+
+**Regra:** Sempre ler o arquivo `models/nome_model.py` e verificar as `Column(...)` definidas
+antes de usar um campo. Nunca assumir campos por analogia com outros models.
+
+---
+
+## 📋 Referências
+
+| Documento | Papel |
+|---|---|
+| `docs/CODING_STANDARDS.md` | Padrões de código para humanos |
+| `docs/ROADMAP.md` | GAPs registrados (ENUM-001, TESTDB-001) |
+| `.codeium.rules` | Regras operacionais da IA |
+| `docs/EXITUS-SQLALCHEMY-001.md` | Padrões SQLAlchemy detalhados |
