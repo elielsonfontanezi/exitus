@@ -222,6 +222,105 @@ class TestApuracao:
         alertas = rv.get_json()['data']['alertas']
         assert any('posicao vazia' in a.lower() for a in alertas)
 
+    # --- IR-003: Testes de compensação de prejuízo acumulado ---
+
+    def test_apuracao_retorna_campos_prejuizo(self, auth_client, cenario_ir):
+        """IR-003: Resposta deve conter prejuizo_compensado e prejuizo_acumulado."""
+        rv = auth_client.get(
+            f'/api/ir/apuracao?mes={cenario_ir["mes"]}',
+            headers=auth_client._auth_headers,
+        )
+        assert rv.status_code == 200
+        swing = rv.get_json()['data']['categorias']['swing_acoes']
+        assert 'prejuizo_compensado' in swing
+        assert 'prejuizo_acumulado' in swing
+
+    def test_prejuizo_acumulado_quando_sem_historico(self, auth_client, cenario_ir):
+        """IR-003: Sem prejuízo anterior, prejuizo_acumulado = 0."""
+        rv = auth_client.get(
+            f'/api/ir/apuracao?mes={cenario_ir["mes"]}',
+            headers=auth_client._auth_headers,
+        )
+        swing = rv.get_json()['data']['categorias']['swing_acoes']
+        assert swing['prejuizo_acumulado'] == 0.0
+        assert swing['prejuizo_compensado'] == 0.0
+
+    def test_compensacao_prejuizo_entre_meses(self, app, auth_client, cenario_ir):
+        """IR-003: Prejuízo de mês anterior é compensado contra lucro do mês atual."""
+        from app.database import db
+        from app.models.saldo_prejuizo import SaldoPrejuizo
+
+        # Inserir prejuízo anterior de R$500 em swing_acoes para 2025-02
+        saldo = SaldoPrejuizo(
+            usuario_id=cenario_ir['usuario_id'],
+            categoria='swing_acoes',
+            ano_mes='2025-02',
+            saldo=Decimal('500.00'),
+        )
+        db.session.add(saldo)
+        db.session.commit()
+
+        try:
+            rv = auth_client.get(
+                f'/api/ir/apuracao?mes={cenario_ir["mes"]}',
+                headers=auth_client._auth_headers,
+            )
+            assert rv.status_code == 200
+            swing = rv.get_json()['data']['categorias']['swing_acoes']
+            # Lucro bruto era R$2000; com compensação de R$500 → lucro líquido R$1500
+            assert swing['prejuizo_compensado'] == 500.0
+            assert swing['lucro_liquido'] == 1500.0
+            # Prejuízo acumulado após compensação = 0 (todo compensado)
+            assert swing['prejuizo_acumulado'] == 0.0
+        finally:
+            SaldoPrejuizo.query.filter_by(
+                usuario_id=cenario_ir['usuario_id'],
+                categoria='swing_acoes',
+            ).delete()
+            db.session.commit()
+
+    def test_compensacao_parcial_preserva_saldo(self, app, auth_client, cenario_ir):
+        """IR-003: Se prejuízo > lucro (isento), saldo não deve crescer por lucro isento."""
+        from app.database import db
+        from app.models.saldo_prejuizo import SaldoPrejuizo
+
+        # Prejuízo anterior de R$5000 — lucro de R$2000 (isento, vendas < 20k)
+        saldo = SaldoPrejuizo(
+            usuario_id=cenario_ir['usuario_id'],
+            categoria='swing_acoes',
+            ano_mes='2025-02',
+            saldo=Decimal('5000.00'),
+        )
+        db.session.add(saldo)
+        db.session.commit()
+
+        try:
+            rv = auth_client.get(
+                f'/api/ir/apuracao?mes={cenario_ir["mes"]}',
+                headers=auth_client._auth_headers,
+            )
+            assert rv.status_code == 200
+            swing = rv.get_json()['data']['categorias']['swing_acoes']
+            # Houve compensação parcial: R$2000 de lucro compensa parte do R$5000
+            assert swing['prejuizo_compensado'] == 2000.0
+            # Saldo restante: 5000 - 2000 = 3000
+            assert swing['prejuizo_acumulado'] == 3000.0
+            # IR = 0 porque swing é isento (vendas < 20k)
+            assert swing['ir_devido'] == 0.0
+        finally:
+            SaldoPrejuizo.query.filter_by(
+                usuario_id=cenario_ir['usuario_id'],
+                categoria='swing_acoes',
+            ).delete()
+            db.session.commit()
+
+    def test_mes_vazio_preserva_saldo_anterior(self, auth_client):
+        """IR-003: Mês sem transações preserva saldo = 0 (sem prejuízo e sem lucro)."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2000-01', headers=auth_client._auth_headers)
+        swing = rv.get_json()['data']['categorias']['swing_acoes']
+        assert swing['prejuizo_acumulado'] == 0.0
+        assert swing['prejuizo_compensado'] == 0.0
+
 
 # ===========================================================================
 # GET /api/ir/darf

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Exitus - IR Service (EXITUS-IR-001 + IR-002)
+Exitus - IR Service (EXITUS-IR-001 + IR-002 + IR-003)
 Engine de cálculo de Imposto de Renda sobre operações de renda variável.
 
 Regras implementadas (Brasil):
@@ -8,10 +8,11 @@ Regras implementadas (Brasil):
 - Day-trade (ações/FIIs): 20% sobre lucro, sem isenção
 - FIIs: 20% sobre lucro, sem isenção
 - Custo de aquisição via preço médio ponderado (PM) da tabela `posicao` (IR-002)
+- Compensação de prejuízo acumulado entre meses por categoria (IR-003)
 - Proventos (dividendos BR): isentos; JCP: 15% retido na fonte
 - DARF: código de receita por categoria
 
-Tabelas usadas: transacao, ativo, corretora, posicao
+Tabelas usadas: transacao, ativo, corretora, posicao, saldo_prejuizo
 """
 
 import logging
@@ -27,6 +28,7 @@ from app.models.transacao import Transacao, TipoTransacao
 from app.models.ativo import Ativo, TipoAtivo
 from app.models.corretora import Corretora
 from app.models.posicao import Posicao
+from app.models.saldo_prejuizo import SaldoPrejuizo
 from app.utils.exceptions import BusinessRuleError
 
 logger = logging.getLogger(__name__)
@@ -75,6 +77,16 @@ def _parse_mes(mes_str: str) -> tuple[int, int]:
 def _primeiro_ultimo_dia(ano: int, mes: int) -> tuple[date, date]:
     ultimo = monthrange(ano, mes)[1]
     return date(ano, mes, 1), date(ano, mes, ultimo)
+
+
+def _mes_anterior(ano: int, mes: int) -> str:
+    """Retorna 'YYYY-MM' do mês anterior."""
+    if mes == 1:
+        return f'{ano - 1}-12'
+    return f'{ano}-{(mes - 1):02d}'
+
+
+CATEGORIAS_FISCAIS = ('swing_acoes', 'day_trade', 'fiis', 'exterior')
 
 
 def _is_day_trade(t: Transacao, todas: list) -> bool:
@@ -198,11 +210,80 @@ class IRService:
         res_fii      = IRService._apurar_fiis(fiis, pm_map)
         res_exterior = IRService._apurar_exterior(exterior, pm_map)
 
-        # Totais
-        ir_swing    = res_swing['ir_devido']
-        ir_dt       = res_dt['ir_devido']
-        ir_fii      = res_fii['ir_devido']
-        ir_exterior = res_exterior['ir_devido']
+        # --- IR-003: Compensação de prejuízo acumulado ---
+        mes_ant = _mes_anterior(ano, mes)
+        resultados = {
+            'swing_acoes': res_swing,
+            'day_trade':   res_dt,
+            'fiis':        res_fii,
+            'exterior':    res_exterior,
+        }
+        for cat in CATEGORIAS_FISCAIS:
+            res = resultados[cat]
+            # Buscar saldo de prejuízo do mês anterior
+            saldo_ant = (
+                SaldoPrejuizo.query
+                .filter_by(usuario_id=usuario_id, categoria=cat, ano_mes=mes_ant)
+                .first()
+            )
+            prejuizo_anterior = Decimal(str(saldo_ant.saldo)) if saldo_ant else Decimal('0')
+
+            lucro_liq = Decimal(str(res['lucro_liquido']))
+
+            if lucro_liq < 0:
+                # Mês com prejuízo: acumular (somar ao anterior)
+                novo_saldo = prejuizo_anterior + abs(lucro_liq)
+                res['prejuizo_compensado'] = 0.0
+            elif lucro_liq > 0 and prejuizo_anterior > 0:
+                # Mês com lucro + prejuízo anterior: compensar
+                compensacao = min(lucro_liq, prejuizo_anterior)
+                lucro_apos = lucro_liq - compensacao
+                novo_saldo = prejuizo_anterior - compensacao
+
+                # Recalcular IR sobre lucro após compensação
+                aliquota = Decimal(str(res['aliquota'])) / 100
+                ir_recalculado = Decimal('0')
+                if lucro_apos > 0:
+                    # Para swing_acoes, respeitar isenção
+                    if cat == 'swing_acoes' and res.get('isento'):
+                        ir_recalculado = Decimal('0')
+                    else:
+                        ir_recalculado = (lucro_apos * aliquota).quantize(
+                            Decimal('0.01'), rounding=ROUND_HALF_UP
+                        )
+                res['lucro_liquido'] = float(lucro_apos)
+                res['ir_devido'] = ir_recalculado
+                res['prejuizo_compensado'] = float(compensacao)
+            else:
+                novo_saldo = prejuizo_anterior
+                res['prejuizo_compensado'] = 0.0
+
+            res['prejuizo_acumulado'] = float(novo_saldo)
+
+            # Persistir novo saldo do mês atual
+            saldo_atual = (
+                SaldoPrejuizo.query
+                .filter_by(usuario_id=usuario_id, categoria=cat, ano_mes=mes_str)
+                .first()
+            )
+            if saldo_atual:
+                saldo_atual.saldo = novo_saldo
+            else:
+                saldo_atual = SaldoPrejuizo(
+                    usuario_id=usuario_id,
+                    categoria=cat,
+                    ano_mes=mes_str,
+                    saldo=novo_saldo,
+                )
+                db.session.add(saldo_atual)
+
+        db.session.commit()
+
+        # Totais (após compensação)
+        ir_swing    = resultados['swing_acoes']['ir_devido']
+        ir_dt       = resultados['day_trade']['ir_devido']
+        ir_fii      = resultados['fiis']['ir_devido']
+        ir_exterior = resultados['exterior']['ir_devido']
         ir_total    = ir_swing + ir_dt + ir_fii + ir_exterior
 
         # DARF

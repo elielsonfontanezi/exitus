@@ -97,7 +97,7 @@ Configurações:
 - Persistência via volume mapeado
 - Backup automático configurável
 - Migrations gerenciadas por Alembic
-- 21 tabelas + 86+ índices otimizados
+- 22 tabelas + 86+ índices otimizados
 
 ### Container 2: Flask Backend API
 
@@ -256,7 +256,7 @@ User: non-root (exitus:1000)
 | `TestingConfig` | `backend/app/config.py` | Aponta para `exitusdb_test`, JWT sem expiração, CSRF desabilitado |
 | Testes unitários | `tests/test_business_rules.py` | 37 testes com mocks — `business_rules.py` |
 | Testes integração | `tests/test_*_integration.py` | 91 testes contra PostgreSQL real (`exitusdb_test`) |
-| Testes IR (EXITUS-IR-001 + IR-002) | `tests/test_ir_integration.py` | 23 testes — apuração, DARF, histórico, por_corretora, PM posicao |
+| Testes IR (IR-001 + IR-002 + IR-003) | `tests/test_ir_integration.py` | 28 testes — apuração, DARF, histórico, PM posicao, compensação prejuízo |
 | Testes Export (EXITUS-EXPORT-001) | `tests/test_export_integration.py` | 32 testes — CSV, Excel, JSON, PDF, filtros |
 
 **Estratégia de isolamento:**
@@ -264,7 +264,7 @@ User: non-root (exitus:1000)
 - Fixtures de entidade com escopo `function` — criação com UUID único + DELETE no teardown
 - Sem `db.drop_all()`/`db.create_all()` entre testes — apenas DELETE explícito
 - Banco de teste recriável a qualquer momento via `./scripts/create_test_db.sh`
-- **Suite total: 132 passed, 0 failed**
+- **Suite total: 137 passed, 0 failed**
 
 **Executar testes:**
 ```bash
@@ -342,7 +342,7 @@ ativo = db.session.get(Ativo, id)
 
 ## Modelo de Dados
 
-### Entidades Principais (21 Tabelas)
+### Entidades Principais (22 Tabelas)
 
 #### Core Tables
 
@@ -413,7 +413,16 @@ ativo = db.session.get(Ativo, id)
    - `data_ultima_atualizacao` (TIMESTAMP)
    - `created_at`, `updated_at`
 
-5. **transacao** - Compras/Vendas/Operações
+5. **saldo_prejuizo** - Prejuízo acumulado por categoria fiscal (IR-003)
+   - `id` (UUID, PK)
+   - `usuario_id` (FK → usuario, CASCADE)
+   - `categoria` (VARCHAR(20): `swing_acoes`, `day_trade`, `fiis`, `exterior`)
+   - `ano_mes` (VARCHAR(7): `YYYY-MM`)
+   - `saldo` (NUMERIC(18,2), ≥ 0)
+   - `created_at`, `updated_at`
+   - UNIQUE(`usuario_id`, `categoria`, `ano_mes`)
+
+6. **transacao** - Compras/Vendas/Operações
    - `id` (UUID, PK)
    - `usuario_id`, `ativo_id`, `corretora_id` (FKs)
    - `tipo` (Enum `TipoTransacao`: `COMPRA`, `VENDA`, `DIVIDENDO`, `JCP`, `ALUGUEL`, etc.)
@@ -422,7 +431,7 @@ ativo = db.session.get(Ativo, id)
    - `taxa_corretagem`, `emolumentos`, `taxa_liquidacao`, `imposto`
    - `data_transacao` (TIMESTAMP)
 
-6. **provento** - Dividendos/JCP/Rendimentos
+7. **provento** - Dividendos/JCP/Rendimentos
    - `id` (UUID, PK)
    - `ativo_id`, `usuario_id` (FKs)
    - `tipo_provento` (Enum `TipoProvento`: `DIVIDENDO`, `JCP`, `RENDIMENTO`, `CUPOM`, etc.)
@@ -433,7 +442,7 @@ ativo = db.session.get(Ativo, id)
 
 #### Financial Operations
 
-7. **movimentacao_caixa** - Depósitos/Saques
+8. **movimentacao_caixa** - Depósitos/Saques
    - `id` (UUID, PK)
    - `corretora_id`, `usuario_id` (FKs)
    - `provento_id` (FK opcional)
@@ -443,7 +452,7 @@ ativo = db.session.get(Ativo, id)
    - `descricao`, `comprovante`
    - `created_at`, `updated_at`
 
-8. **evento_corporativo** - Splits, Bonificações
+9. **evento_corporativo** - Splits, Bonificações
    - `id` (UUID, PK)
    - `ativo_id` (FK), `ativo_novo_id` (FK opcional)
    - `tipo_evento` (Enum `TipoEventoCorporativo`: `SPLIT`, `GRUPAMENTO`, `BONIFICACAO`, `FUSAO`, `SPINOFF`, etc.)
@@ -456,7 +465,7 @@ ativo = db.session.get(Ativo, id)
 
 #### Reference Data
 
-9. **feriado_mercado** - Calendário de mercado
+10. **feriado_mercado** - Calendário de mercado
    - `id` (UUID, PK)
    - `pais` (ISO 3166-1 alpha-2)
    - `mercado` (ex: `B3`, `NYSE`, `NASDAQ`, `EURONEXT`)
@@ -468,7 +477,7 @@ ativo = db.session.get(Ativo, id)
    - `observacoes`
    - `created_at`, `updated_at`
 
-10. **fonte_dados** - APIs externas
+11. **fonte_dados** - APIs externas
     - `id` (UUID, PK)
     - `nome` (yfinance, brapi.dev, etc.)
     - `tipo_fonte` (Enum `TipoFonteDados`: `API`, `SCRAPER`, `MANUAL`, etc.)
@@ -481,7 +490,7 @@ ativo = db.session.get(Ativo, id)
     - `observacoes`
     - `created_at`, `updated_at`
 
-11. **regra_fiscal** - Impostos por país
+12. **regra_fiscal** - Impostos por país
     - `id` (UUID, PK)
     - `pais` (ex: BR, US)
     - `tipo_ativo` (string, ex: `ACAO`, `FII`, `REIT`, etc.)
@@ -496,7 +505,7 @@ ativo = db.session.get(Ativo, id)
 
 #### Analytics Tables (M7)
 
-12. **portfolio** - Carteiras customizadas
+13. **portfolio** - Carteiras customizadas
     - `id` (UUID, PK)
     - `usuario_id` (FK)
     - `nome`, `descricao`, `objetivo`
@@ -504,7 +513,7 @@ ativo = db.session.get(Ativo, id)
     - `valor_inicial`, `percentual_alocacao_target`
     - `created_at`, `updated_at`
 
-13. **alerta** / **configuracoes_alertas** - Sistema de alertas
+14. **alerta** / **configuracoes_alertas** - Sistema de alertas
     - `id` (UUID, PK)
     - `usuario_id`, `ativo_id`, `portfolio_id` (FKs)
     - `nome`
@@ -517,7 +526,7 @@ ativo = db.session.get(Ativo, id)
     - `timestamp_criacao`, `timestamp_ultimo_acionamento`
     - `created_at`, `updated_at`
 
-14. **relatorios_performance** / **auditoria_relatorio** - Relatórios salvos
+15. **relatorios_performance** / **auditoria_relatorio** - Relatórios salvos
     - `id` (UUID, PK)
     - `usuario_id` (FK)
     - `tipo_relatorio` (Enum `TipoRelatorio`)
@@ -529,14 +538,14 @@ ativo = db.session.get(Ativo, id)
     - `timestamp_criacao`, `timestamp_download`
     - `created_at`, `updated_at`
 
-15. **projecoes_renda** - Projeções de renda
+16. **projecoes_renda** - Projeções de renda
     - `id` (UUID, PK)
     - `portfolio_id` (FK)
     - `periodo`
     - `renda_estimada`
     - `created_at`, `updated_at`
 
-16. **historico_preco** - Histórico de preços (M7.6)[file:5]
+17. **historico_preco** - Histórico de preços (M7.6)[file:5]
     - `id` (UUID, PK)
     - `ativo_id` (FK → ativo)
     - `data`
@@ -547,7 +556,7 @@ ativo = db.session.get(Ativo, id)
 
 #### Audit & System
 
-17. **log_auditoria** - Rastreabilidade
+18. **log_auditoria** - Rastreabilidade
     - `id` (UUID, PK)
     - `usuario_id` (FK)
     - `acao`, `entidade`, `entidade_id`
@@ -557,7 +566,7 @@ ativo = db.session.get(Ativo, id)
     - `sucesso` (boolean)
     - `mensagem`
 
-18. **parametros_macro** - Parâmetros macroeconômicos por país/mercado
+19. **parametros_macro** - Parâmetros macroeconômicos por país/mercado
     - `id` (UUID, PK)
     - `pais` (ex: BR, US, EU, JP)
     - `mercado` (ex: B3, NYSE, EURONEXT)
@@ -570,17 +579,18 @@ ativo = db.session.get(Ativo, id)
     - `ativo` (boolean)
     - `created_at`, `updated_at`
 
-19. **relatorios_performance** (já citado acima) — tabelas de métricas de performance agregadas.
+20. **relatorios_performance** (já citado acima) — tabelas de métricas de performance agregadas.
 
-20. **projecaorenda** / **relatoriosperformance** — tabelas auxiliares de analytics (detalhadas em `MODULES.md`).[file:10]
+21. **projecaorenda** / **relatoriosperformance** — tabelas auxiliares de analytics (detalhadas em `MODULES.md`).[file:10]
 
-21. **outros metadados** (ex.: tabelas auxiliares futuras para monitoramento/parametrização).
+22. **outros metadados** (ex.: tabelas auxiliares futuras para monitoramento/parametrização).
 
 ### Relacionamentos Chave
 
 ```
 usuario (1) ─────> (N) corretora
 usuario (1) ─────> (N) posicao
+usuario (1) ─────> (N) saldo_prejuizo
 usuario (1) ─────> (N) transacao
 usuario (1) ─────> (N) alerta
 usuario (1) ─────> (N) portfolio

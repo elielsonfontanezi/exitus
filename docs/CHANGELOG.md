@@ -9,6 +9,16 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-IR-003** — Compensação de prejuízo acumulado entre meses (03/03/2026)
+  - Nova tabela `saldo_prejuizo` com unique constraint `(usuario_id, categoria, ano_mes)`
+  - Model `app/models/saldo_prejuizo.py` + migration Alembic `20260303_1840`
+  - Compensação automática por categoria fiscal (swing × swing, day-trade × day-trade, etc.)
+  - Campos `prejuizo_compensado` e `prejuizo_acumulado` na resposta de cada categoria
+  - Persistência automática do saldo a cada chamada de `apurar_mes()`
+  - `tests/test_ir_integration.py`: +5 testes (campos, sem histórico, compensação total, parcial, mês vazio)
+  - `docs/EXITUS-IR-001.md` atualizado para v1.2 com seções 2.6, 3.1, 3.2, 5, 6, 7, 10
+  - **Suite total: 137 passed, 0 failed**
+
 - **EXITUS-IR-002** — Custo médio histórico via tabela `posicao` (03/03/2026)
   - **Bug fix crítico:** `ir_service.py` usava `t.preco_unitario` (preço de venda) como custo de aquisição, resultando em lucro sempre zero
   - Agora carrega `preco_medio` da tabela `posicao` para cada `(ativo_id, corretora_id)` do usuário

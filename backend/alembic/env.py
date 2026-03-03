@@ -26,7 +26,8 @@ with app.app_context():
     from app.models import (
         Usuario, Corretora, Ativo, Posicao, Transacao,
         Provento, MovimentacaoCaixa, EventoCorporativo,
-        FonteDados, RegraFiscal, FeriadoMercado, LogAuditoria
+        FonteDados, RegraFiscal, FeriadoMercado, LogAuditoria,
+        SaldoPrejuizo,
     )
     target_metadata = db.metadata
     

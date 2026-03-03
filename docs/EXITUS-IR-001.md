@@ -1,9 +1,10 @@
 # EXITUS-IR-001 — Engine de Cálculo de IR sobre Renda Variável
 
 > **Status:** ✅ Concluído (03/03/2026)  
-> **Versão:** 1.0  
+> **Versão:** 1.2 (inclui IR-002 + IR-003)  
 > **Branch:** `feature/revisao-negocio-vision`  
-> **Testes:** 19 testes de integração — 100% passou
+> **Testes:** 28 testes de integração — 100% passou  
+> **Suite total:** 137 passed, 0 failed
 
 ---
 
@@ -33,20 +34,57 @@ Implementar engine completa de apuração mensal de Imposto de Renda (IR) sobre 
 
 Venda é classificada como day-trade quando existe uma compra do **mesmo ativo** (`ativo_id`) no **mesmo dia calendário** (`data_transacao.date()`). A classificação ocorre antes da separação por categoria.
 
-### 2.4 Cálculo de lucro
+### 2.4 Cálculo de lucro (IR-002)
 
-O lucro por venda é calculado como:
+O lucro por venda é calculado usando o **preço médio ponderado (PM)** da tabela `posicao`:
 
 ```
-lucro_bruto  = valor_total_venda − (preco_unitario_venda × quantidade)
-lucro_liquido = lucro_bruto − custos_totais
+custo_aquisicao = preco_medio_posicao × quantidade_vendida
+lucro_bruto     = valor_total_venda − custo_aquisicao
+lucro_liquido   = lucro_bruto − custos_totais
 ```
 
-> **Nota:** O `preco_unitario` da transação de venda é usado como proxy do custo de aquisição. Esta é uma simplificação — veja [Limitações](#6-limitações-e-gaps-derivados).
+**Fluxo de obtenção do PM:**
+1. No início de `apurar_mes()`, carrega todas as posições do usuário
+2. Monta mapa `pm_map = {(ativo_id, corretora_id): preco_medio}`
+3. Cada função `_apurar_*()` recebe `pm_map` e busca o PM por `(ativo_id, corretora_id)` da venda
+4. Se PM não encontrado, assume custo zero e emite alerta
+
+> **Pré-requisito:** `POST /api/posicoes/calcular` deve ser executado antes de apurar IR para garantir que os PMs estejam atualizados.
+
+> **Alerta automático:** Se a tabela `posicao` estiver vazia, a resposta inclui um alerta orientando o usuário a executar o cálculo de posições.
 
 ### 2.5 Breakdown por corretora
 
 Cada resposta de apuração inclui `por_corretora`: lista com `corretora_id`, `corretora_nome`, `total_vendas` e `operacoes`. Útil para preencher a DIRPF anualmente.
+
+### 2.6 Compensação de prejuízo acumulado (IR-003)
+
+Prejuízos de meses anteriores são automaticamente compensados contra lucros futuros da **mesma categoria fiscal** (conforme IN RFB 1.585/2015):
+
+| Categoria com prejuízo | Compensa com |
+|---|---|
+| `swing_acoes` | Apenas `swing_acoes` |
+| `day_trade` | Apenas `day_trade` |
+| `fiis` | Apenas `fiis` |
+| `exterior` | Apenas `exterior` |
+
+**Regras de compensação:**
+- Prejuízo **não expira** — acumula indefinidamente até ser compensado
+- Compensação ocorre **antes** do cálculo da alíquota
+- Se lucro > prejuízo anterior: compensa totalmente, IR sobre saldo restante
+- Se prejuízo anterior > lucro: compensa parcialmente, saldo de prejuízo é reduzido
+- Mês com prejuízo: acumula ao saldo existente
+
+**Persistência:**
+- Tabela `saldo_prejuizo` com unique constraint `(usuario_id, categoria, ano_mes)`
+- Saldo armazenado como valor **positivo** (prejuízo a compensar ≥ 0)
+- Cada chamada a `apurar_mes()` persiste o saldo atualizado do mês corrente
+- O mês anterior é consultado automaticamente para obter o saldo de entrada
+
+**Campos adicionados na resposta de cada categoria:**
+- `prejuizo_compensado` (float): valor compensado do prejuízo anterior neste mês
+- `prejuizo_acumulado` (float): saldo de prejuízo após a apuração deste mês
 
 ---
 
@@ -55,10 +93,12 @@ Cada resposta de apuração inclui `por_corretora`: lista com `corretora_id`, `c
 ### 3.1 Arquivos
 
 | Arquivo | Responsabilidade |
-|---------|-----------------|
-| `backend/app/services/ir_service.py` | Engine de cálculo — toda a lógica fiscal |
+|---------|------------------|
+| `backend/app/services/ir_service.py` | Engine de cálculo — toda a lógica fiscal (IR-001 + IR-002 + IR-003) |
 | `backend/app/blueprints/ir_blueprint.py` | 3 endpoints REST em `/api/ir/` |
-| `backend/tests/test_ir_integration.py` | Suite de 19 testes de integração |
+| `backend/app/models/saldo_prejuizo.py` | Model `SaldoPrejuizo` — persistência de prejuízo acumulado (IR-003) |
+| `backend/alembic/versions/20260303_1840_*.py` | Migration: criação da tabela `saldo_prejuizo` |
+| `backend/tests/test_ir_integration.py` | Suite de 28 testes de integração |
 
 ### 3.2 Diagrama de fluxo — `apurar_mes()`
 
@@ -68,23 +108,32 @@ apurar_mes(usuario_id, "YYYY-MM")
 ├── 1. Busca transações (COMPRA + VENDA) do período
 │       JOIN Ativo + Corretora
 │
-├── 2. Classifica cada VENDA em categoria:
+├── 2. Carrega PM da tabela posicao (IR-002)
+│       pm_map = {(ativo_id, corretora_id): preco_medio}
+│
+├── 3. Classifica cada VENDA em categoria:
 │       ├── is_day_trade? → day_trade[]
 │       ├── tipo in TIPOS_FII? → fiis[]
 │       ├── tipo in TIPOS_US? → exterior[]
 │       └── default → swing_acoes[]
 │
-├── 3. Apura cada categoria:
-│       ├── _apurar_swing_acoes()  → isenção R$20k
-│       ├── _apurar_day_trade()    → 20%, sem isenção
-│       ├── _apurar_fiis()         → 20%, sem isenção
-│       └── _apurar_exterior()     → 15%, sem isenção
+├── 4. Apura cada categoria (com pm_map):
+│       ├── _apurar_swing_acoes(vendas, pm_map) → isenção R$20k
+│       ├── _apurar_day_trade(vendas, pm_map)   → 20%, sem isenção
+│       ├── _apurar_fiis(vendas, pm_map)        → 20%, sem isenção
+│       └── _apurar_exterior(vendas, pm_map)    → 15%, sem isenção
 │
-├── 4. Gera DARF:
+├── 5. Compensação de prejuízo por categoria (IR-003):
+│       ├── Busca saldo_prejuizo do mês anterior
+│       ├── Se lucro > 0 e prejuízo > 0: compensa e recalcula IR
+│       ├── Se prejuízo novo: acumula ao saldo
+│       └── Persiste saldo_prejuizo do mês atual
+│
+├── 6. Gera DARF:
 │       ├── IR BR (swing + day-trade + FIIs) → código 6015
 │       └── IR exterior                       → código 0561
 │
-└── 5. Retorna dict com categorias, por_corretora, ir_total, darf, alertas
+└── 7. Retorna dict com categorias, por_corretora, ir_total, darf, alertas
 ```
 
 ### 3.3 Constantes fiscais (`ir_service.py`)
@@ -129,17 +178,21 @@ Apuração detalhada por categoria para o mês informado.
         "aliquota": 15.0,
         "isento": true,
         "ir_devido": 0.0,
-        "operacoes": 1
+        "operacoes": 1,
+        "prejuizo_compensado": 0.0,
+        "prejuizo_acumulado": 0.0
       },
       "day_trade": {
         "lucro_liquido": 0.0,
         "aliquota": 20.0,
         "isento": false,
         "ir_devido": 0.0,
-        "operacoes": 0
+        "operacoes": 0,
+        "prejuizo_compensado": 0.0,
+        "prejuizo_acumulado": 0.0
       },
-      "fiis": { "lucro_liquido": 0.0, "aliquota": 20.0, "isento": false, "ir_devido": 0.0, "operacoes": 0 },
-      "exterior": { "lucro_liquido": 0.0, "aliquota": 15.0, "isento": false, "ir_devido": 0.0, "operacoes": 0 }
+      "fiis": { "...mesmo formato..." },
+      "exterior": { "...mesmo formato..." }
     },
     "por_corretora": [
       {
@@ -238,15 +291,15 @@ Resumo de apuração mês a mês para o ano inteiro. Retorna sempre **12 entrada
 
 ## 5. Testes
 
-Suite em `backend/tests/test_ir_integration.py` — 19 testes, 100% passou.
+Suite em `backend/tests/test_ir_integration.py` — **28 testes**, 100% passou.
 
 | Classe | Testes | O que cobre |
 |--------|--------|-------------|
-| `TestApuracao` | 9 | 401 sem token, 400 sem parâmetro, 422 formato inválido, mês vazio, 4 categorias na estrutura, isenção R$20k, campo `mes`, `por_corretora` |
+| `TestApuracao` | 17 | 401 sem token, 400 sem parâmetro, 422 formato inválido, mês vazio, 4 categorias na estrutura, isenção R$20k, campo `mes`, `por_corretora`, **lucro via PM** (IR-002), **alerta posicao vazia** (IR-002), **campos prejuizo** (IR-003), **compensação total** (IR-003), **compensação parcial** (IR-003), **mês vazio preserva saldo** (IR-003) |
 | `TestDarf` | 5 | 401 sem token, 400 sem parâmetro, mês sem lucro → lista vazia, campo `mes`, envelope padrão |
 | `TestHistorico` | 6 | 401 sem token, 400 sem parâmetro, ano não numérico, 12 meses, campos obrigatórios, formato `YYYY-MM` |
 
-**Fixture `cenario_ir`:** cria corretora + compra 100×R$30 + venda 100×R$50 em 2025-03. Total vendas = R$5.000 → abaixo de R$20k → swing isento.
+**Fixture `cenario_ir`:** cria corretora + compra 100×R$30 + venda 100×R$50 + **posição com PM=30** em 2025-03. Total vendas = R$5.000 → abaixo de R$20k → swing isento. Lucro bruto = R$2.000 (IR-002).
 
 ---
 
@@ -254,23 +307,15 @@ Suite em `backend/tests/test_ir_integration.py` — 19 testes, 100% passou.
 
 As limitações abaixo foram identificadas durante a implementação e **são escopo de GAPs futuros** registrados no ROADMAP.md.
 
-### 6.1 EXITUS-IR-002 — Custo Médio Histórico (PM Acumulado)
+### 6.1 ~~EXITUS-IR-002 — Custo Médio Histórico (PM Acumulado)~~ ✅ Concluído (03/03/2026)
 
-**Limitação atual:** O lucro é calculado usando `preco_unitario` da transação de venda como proxy do custo de aquisição. Isso é **impreciso** — o custo real depende do preço médio ponderado acumulado de todas as compras anteriores ao mês de apuração.
-
-**Correto seria:** buscar o PM acumulado da tabela `posicao` (campo `preco_medio`) para o ativo na data imediatamente anterior à venda.
-
-**Impacto:** IR calculado pode divergir do real, subestimando ou superestimando lucro.
+Implementado na versão 1.1. Lucro agora calculado via `preco_medio` da tabela `posicao`. Ver [seção 2.4](#24-cálculo-de-lucro-ir-002).
 
 ---
 
-### 6.2 EXITUS-IR-003 — Compensação de Prejuízo Acumulado entre Meses
+### 6.2 ~~EXITUS-IR-003 — Compensação de Prejuízo Acumulado~~ ✅ Concluído (03/03/2026)
 
-**Limitação atual:** Prejuízos de um mês não são persistidos e compensados automaticamente em meses seguintes. A lógica de aplicar compensação existe nos métodos de apuração, mas não há tabela `saldo_prejuizo` para persistir o acumulado.
-
-**Regra fiscal (IN RFB 1.585/2015):** Prejuízos de swing trade compensam apenas lucros de swing trade futuros. Prejuízos de day-trade compensam apenas day-trade. A compensação não expira.
-
-**Impacto:** IR calculado pode ser maior que o real quando há prejuízos acumulados de meses anteriores.
+Implementado na versão 1.2. Tabela `saldo_prejuizo` criada, compensação por categoria integrada em `apurar_mes()`. Ver [seção 2.6](#26-compensação-de-prejuízo-acumulado-ir-003).
 
 ---
 
@@ -332,8 +377,9 @@ LCI/LCA: isentas de IR para pessoa física.
 | `transacao` | Fonte das operações (COMPRA/VENDA) do período |
 | `ativo` | Tipo do ativo (para classificação de categoria) |
 | `corretora` | Nome da corretora para breakdown por corretora |
-| `posicao` | **Não utilizada** (ver EXITUS-IR-002 — custo médio) |
-| `regra_fiscal` | **Não utilizada** (constantes hardcoded no service) |
+| `posicao` | ✅ Preço médio ponderado (PM) como custo de aquisição (IR-002) |
+| `saldo_prejuizo` | ✅ Persistência de prejuízo acumulado por categoria e mês (IR-003) |
+| `regra_fiscal` | **Não utilizada** (constantes hardcoded no service — ver EXITUS-IR-007) |
 | `provento` | **Não utilizada** (ver EXITUS-IR-004) |
 
 > A tabela `regra_fiscal` existe no banco mas as alíquotas estão hardcoded no `ir_service.py`. O GAP `EXITUS-IR-007` rastreia a integração dinâmica com essa tabela.
@@ -389,7 +435,9 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 | Data | Versão | Alteração |
 |------|--------|-----------|
 | 03/03/2026 | 1.0 | Implementação inicial — engine, 3 endpoints, 19 testes |
+| 03/03/2026 | 1.1 | IR-002: Custo de aquisição via PM da tabela `posicao` — +2 testes (21 total) |
+| 03/03/2026 | 1.2 | IR-003: Compensação de prejuízo acumulado por categoria — tabela `saldo_prejuizo`, +7 testes (28 total) |
 
 ---
 
-*Próximos passos: EXITUS-IR-002 (custo médio histórico), EXITUS-IR-003 (compensação prejuízo), EXITUS-IR-004 (JCP/withholding), EXITUS-IR-005 (RF tabela regressiva), EXITUS-IR-006 (DIRPF anual), EXITUS-IR-007 (alíquotas dinâmicas via `regra_fiscal`).*
+*Próximos passos: EXITUS-IR-004 (JCP/withholding), EXITUS-IR-005 (RF tabela regressiva), EXITUS-IR-006 (DIRPF anual), EXITUS-IR-007 (alíquotas dinâmicas via `regra_fiscal`), EXITUS-IR-008 (UNITs B3).*

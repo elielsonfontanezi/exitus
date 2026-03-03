@@ -116,11 +116,18 @@ e aguardar aprovação ANTES de escrever qualquer linha de código.
 - **SEMPRE** ler o arquivo `models/nome_model.py` completo antes de usar qualquer campo
 - **Regra:** Regra de negócio coerente ≠ campo existente no model
 
+### 03/03/2026 — LIÇÃO 006: Atualizar docs/EXITUS_DB_STRUCTURE.txt após mudanças no banco
+- **SEMPRE** executar `scripts/exitus_db_doc.sh` ao final de qualquer atividade que altere o banco
+  (nova tabela, migration, ALTER TABLE, novo índice, etc.)
+- **Razão:** `docs/EXITUS_DB_STRUCTURE.txt` é fonte de verdade do schema — deve refletir o banco real
+- **Quando:** Após o último SQL/migration ser aplicado, antes do commit final
+
 ### ✅ Checklist Obrigatório ao Manipular Models/Banco
 - [ ] Li o `models/nome_model.py` completo para verificar campos reais?
 - [ ] Consultei `inspect(db.engine).get_table_names()` antes de listar tabelas?
 - [ ] Verifiquei o tipo de PK (UUID vs serial) antes de resetar sequences?
 - [ ] Usei `DELETE` ao invés de `DROP TABLE` para limpar dados?
+- [ ] Executei `scripts/exitus_db_doc.sh` para atualizar `docs/EXITUS_DB_STRUCTURE.txt`?
 
 ## 🧠 REGRA #3: PROPOR IDEIAS E SOLUÇÕES
 ### O Assistente DEVE propor suas próprias ideias:

@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-02 18:35:39
+Gerado em: 2026-03-03 19:00:56
 ================================================================================
 
 ================================================================================
@@ -31,9 +31,10 @@ TABELAS DO BANCO EXITUS
  public | provento               | exitus
  public | regra_fiscal           | exitus
  public | relatorios_performance | exitus
+ public | saldo_prejuizo         | exitus
  public | transacao              | exitus
  public | usuario                | exitus
-(22 rows)
+(23 rows)
 
 
 ================================================================================
@@ -1784,6 +1785,78 @@ ________________________________________________________________________________
 
 
 ################################################################################
+TABELA: saldo_prejuizo
+################################################################################
+
+                                                Table "public.saldo_prejuizo"
+   Column   |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id         | uuid                     |           | not null |         | plain    |             |              | 
+ usuario_id | uuid                     |           | not null |         | plain    |             |              | 
+ categoria  | character varying(20)    |           | not null |         | extended |             |              | 
+ ano_mes    | character varying(7)     |           | not null |         | extended |             |              | 
+ saldo      | numeric(18,2)            |           | not null | 0       | main     |             |              | 
+ created_at | timestamp with time zone |           | not null | now()   | plain    |             |              | 
+ updated_at | timestamp with time zone |           | not null | now()   | plain    |             |              | 
+Indexes:
+    "saldo_prejuizo_pkey" PRIMARY KEY, btree (id)
+    "ix_saldo_prejuizo_usuario_id" btree (usuario_id)
+    "unique_saldo_prejuizo_usuario_categoria_mes" UNIQUE CONSTRAINT, btree (usuario_id, categoria, ano_mes)
+Check constraints:
+    "saldo_prejuizo_categoria_valida" CHECK (categoria::text = ANY (ARRAY['swing_acoes'::character varying, 'day_trade'::character varying, 'fiis'::character varying, 'exterior'::character varying]::text[]))
+    "saldo_prejuizo_nao_negativo" CHECK (saldo >= 0::numeric)
+Foreign-key constraints:
+    "saldo_prejuizo_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |   Coluna   |           Tipo           | Tamanho | Null? | Default 
+-----+------------+--------------------------+---------+-------+---------
+   1 | id         | uuid                     |         | NO    | 
+   2 | usuario_id | uuid                     |         | NO    | 
+   3 | categoria  | character varying        | (20)    | NO    | 
+   4 | ano_mes    | character varying        | (7)     | NO    | 
+   5 | saldo      | numeric                  |         | NO    | 0
+   6 | created_at | timestamp with time zone |         | NO    | now()
+   7 | updated_at | timestamp with time zone |         | NO    | now()
+(7 rows)
+
+
+Foreign Keys:
+            Nome FK             |   Coluna   | Tabela Referenciada | Coluna Referenciada 
+--------------------------------+------------+---------------------+---------------------
+ saldo_prejuizo_usuario_id_fkey | usuario_id | usuario             | id
+(1 row)
+
+
+Primary Keys:
+       Nome PK       | Coluna 
+---------------------+--------
+ saldo_prejuizo_pkey | id
+(1 row)
+
+
+Unique Constraints:
+               Nome Constraint               |   Coluna   
+---------------------------------------------+------------
+ unique_saldo_prejuizo_usuario_categoria_mes | usuario_id
+ unique_saldo_prejuizo_usuario_categoria_mes | categoria
+ unique_saldo_prejuizo_usuario_categoria_mes | ano_mes
+(3 rows)
+
+
+Índices:
+               Nome do Índice                |                                                               Definição                                                               
+---------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------
+ saldo_prejuizo_pkey                         | CREATE UNIQUE INDEX saldo_prejuizo_pkey ON public.saldo_prejuizo USING btree (id)
+ unique_saldo_prejuizo_usuario_categoria_mes | CREATE UNIQUE INDEX unique_saldo_prejuizo_usuario_categoria_mes ON public.saldo_prejuizo USING btree (usuario_id, categoria, ano_mes)
+ ix_saldo_prejuizo_usuario_id                | CREATE INDEX ix_saldo_prejuizo_usuario_id ON public.saldo_prejuizo USING btree (usuario_id)
+(3 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
 TABELA: transacao
 ################################################################################
 
@@ -1905,6 +1978,7 @@ Referenced by:
     TABLE "posicao" CONSTRAINT "posicao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "projecoes_renda" CONSTRAINT "projecoes_renda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
     TABLE "relatorios_performance" CONSTRAINT "relatorios_performance_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+    TABLE "saldo_prejuizo" CONSTRAINT "saldo_prejuizo_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "transacao" CONSTRAINT "transacao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 Access method: heap
 
@@ -1960,7 +2034,7 @@ RESUMO GERAL
 Total de Tabelas:
  Total 
 -------
-    22
+    23
 (1 row)
 
 
@@ -1987,9 +2061,10 @@ Total de Colunas por Tabela:
  provento               |          13
  regra_fiscal           |          13
  relatorios_performance |          11
+ saldo_prejuizo         |           7
  transacao              |          19
  usuario                |           9
-(22 rows)
+(23 rows)
 
 
 Total de Foreign Keys por Tabela:
@@ -2009,8 +2084,9 @@ Total de Foreign Keys por Tabela:
  projecoes_renda        |       1
  provento               |       1
  relatorios_performance |       1
+ saldo_prejuizo         |       1
  transacao              |       3
-(15 rows)
+(16 rows)
 
 
 ================================================================================

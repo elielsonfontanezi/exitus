@@ -58,7 +58,7 @@
 | **EXITUS-CRUD-002** | Revisão estrutural service/route: exceções tipadas (`NotFoundError`/`ConflictError`), HTTP 404/409 corretos, `delete()` com guarda de integridade referencial — 31 ocorrências em 10 services | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-001** | Engine de cálculo de IR completo (apuração, isenções, DARF) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-002** | Custo médio histórico (PM acumulado via tabela `posicao`) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
-| **EXITUS-IR-003** | Compensação de prejuízo acumulado entre meses (tabela `saldo_prejuizo`) | Não implementado | **Alto** | **Alta** |
+| **EXITUS-IR-003** | Compensação de prejuízo acumulado entre meses (tabela `saldo_prejuizo`) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-004** | Proventos tributáveis: JCP (15% retido na fonte) e withholding tax US (30%) | Não implementado | **Alto** | **Alta** |
 | **EXITUS-IR-005** | IR sobre renda fixa: tabela regressiva 22,5%→15% por prazo de aplicação | Não implementado | Alto | Alta |
 | **EXITUS-IR-006** | DIRPF anual: relatório para Declaração de Ajuste Anual (fichas Renda Variável e Bens e Direitos) | Não implementado | Alto | Média |
@@ -456,7 +456,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-TESTS-001 | 3 | 📋 Planejado | — | pytest + fixtures, cobertura 70%+ |
 | EXITUS-IR-001 | 3 | ✅ Concluído | 03/03/2026 | Apuração mensal, isenções, DARF — 19 testes |
 | EXITUS-IR-002 | 3 | ✅ Concluído | 03/03/2026 | PM da tabela `posicao` no cálculo de IR — 2 testes |
-| EXITUS-IR-003 | 3 | 📋 Planejado | — | Compensação prejuízo acumulado (`saldo_prejuizo`) |
+| EXITUS-IR-003 | 3 | ✅ Concluído | 03/03/2026 | Compensação prejuízo acumulado — tabela `saldo_prejuizo`, 5 testes |
 | EXITUS-IR-004 | 3 | 📋 Planejado | — | JCP 15% retido na fonte + withholding tax US |
 | EXITUS-IR-005 | 3 | 📋 Planejado | — | IR renda fixa — tabela regressiva 22,5%→15% |
 | EXITUS-IR-006 | 3 | 📋 Planejado | — | DIRPF anual — fichas Renda Variável e Bens e Direitos |
