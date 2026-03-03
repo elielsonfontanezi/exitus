@@ -88,13 +88,16 @@ def get_transacao(id):
 @bp.route('', methods=['POST'])
 @jwt_required()
 def create_transacao():
-    """Criar nova transação."""
+    """Criar nova transação (EXITUS-BUSINESS-001: regras de negócio)."""
     usuario_id = get_jwt_identity()
     try:
         data      = TransacaoCreateSchema().load(request.json)
-        transacao = TransacaoService.create(usuario_id, data)
+        resultado = TransacaoService.create(usuario_id, data)
+        response_data = TransacaoResponseSchema().dump(resultado['transacao'])
+        response_data['warnings'] = resultado.get('warnings', [])
+        response_data['is_day_trade'] = resultado.get('is_day_trade', False)
         return success(
-            TransacaoResponseSchema().dump(transacao),
+            response_data,
             'Transação criada com sucesso',
             201,
         )

@@ -38,7 +38,7 @@
 | **EXITUS-RECOVERY-001** | Sistema de Restore/Recovery Robusto | ✅ Implementado | Crítico | Crítica |
 | **EXITUS-IMPORT-001** | Importação/Exportação (CSV, Excel, JSON, PDF) | ✅ Implementado | Alto | Alta |
 | **EXITUS-CRUD-001** | CRUD incompleto para entidades | ✅ Implementado | Alto | Alta |
-| **EXITUS-BUSINESS-001** | Regras de negócio críticas | Não implementado | Alto | Alta |
+| **EXITUS-BUSINESS-001** | Regras de negócio críticas | ✅ Implementado | Alto | Alta |
 | **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | ✅ Implementado | Alto | Alta |
 | **EXITUS-CASHFLOW-001** | Tratamento de "Transferência - Liquidação" B3 | ✅ Implementado | Médio | Média |
 | **EXITUS-ASSETS-001** | Massa de Ativos Completa para Testes (dados ricos: preço, DY, P/L, ROE) | Não implementado | Médio | Média |
@@ -158,13 +158,13 @@ GET /api/export/{relatorio_id}/pdf
 - **Cotações:** Consulta a APIs externas com cache TTL 15min
 - **Posições:** Calculadas a partir de transações (POST /calcular)
 
-### EXITUS-BUSINESS-001: Regras de Negócio
-**Regras críticas não implementadas:**
-1. **Validação de horário de mercado** (B3: 10h-17h, NYSE: 9:30h-16h)
-2. **Bloqueio de operações em feriados** (tabela existe mas não usada)
-3. **Validação de saldo disponível** antes de transação
-4. **Cálculo automático de taxas de corretagem**
-5. **Limite de operações day-trade** (fiscal)
+### EXITUS-BUSINESS-001: Regras de Negócio ✅
+**5 regras implementadas em `app/utils/business_rules.py`, integradas no `TransacaoService.create()`:**
+1. **Validação de horário de mercado** — warning se fora do pregão (B3: 10h-17h, NYSE: 9:30h-16h)
+2. **Validação de feriados** — warning se data coincide com feriado cadastrado (tabela `feriado_mercado`)
+3. **Validação de saldo antes de venda** — bloqueante, consulta tabela `posicao`
+4. **Cálculo automático de taxas B3** — auto-fill emolumentos (0.003297%) e taxa liquidação (0.0275%)
+5. **Detecção de day-trade** — flag + warning quando compra/venda no mesmo dia/ativo (IR 20%)
 
 ### EXITUS-UNITS-001: Tratamento de UNITS (B3)
 **Problema:** UNITS não são tratadas corretamente no sistema

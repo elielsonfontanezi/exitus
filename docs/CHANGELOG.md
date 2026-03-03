@@ -47,7 +47,15 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Novos schemas com validação Marshmallow e serialização correta de enums
   - Services usando safe_commit/safe_delete_commit (db_utils)
   - ROADMAP atualizado com mapeamento real de CRUD por entidade
-  - Redução esperada de 90% em erros recorrentes
+
+- **EXITUS-BUSINESS-001** — Regras de Negócio Críticas implementadas
+  - Módulo `app/utils/business_rules.py` com 5 regras integradas no TransacaoService
+  - Regra 1: Validação de horário de mercado (warning, B3/NYSE/NASDAQ)
+  - Regra 2: Validação de feriados via tabela feriado_mercado (warning)
+  - Regra 3: Validação de saldo antes de venda (bloqueante, consulta posicao)
+  - Regra 4: Cálculo automático de taxas B3 (emolumentos 0.003297%, liquidação 0.0275%)
+  - Regra 5: Detecção de day-trade com flag e warning (IR 20% vs 15%)
+  - Response de POST /transacoes agora inclui `warnings[]` e `is_day_trade`
 
 - **EXITUS-SCRIPTS-001** — Otimização e unificação completa do sistema de scripts
   - Removidos 3 scripts obsoletos (cleanup_duplicates.sh, restore_complete.sh, validate_docs.sh)

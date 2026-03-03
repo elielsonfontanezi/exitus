@@ -11,6 +11,7 @@ from sqlalchemy.orm import joinedload
 
 from app.database import db
 from app.models import Transacao, Ativo, Corretora
+from app.utils.business_rules import validar_transacao
 
 logger = logging.getLogger(__name__)
 
@@ -92,12 +93,25 @@ class TransacaoService:
             raise PermissionError('Acesso negado: transação pertence a outro usuário')
 
     # -----------------------------------------------------------------------
-    # CREATE
+    # CREATE  (EXITUS-BUSINESS-001: regras de negócio integradas)
     # -----------------------------------------------------------------------
     @staticmethod
     def create(usuario_id, data):
-        """Cria nova transação com cálculos automáticos."""
+        """
+        Cria nova transação com cálculos automáticos e regras de negócio.
+
+        Returns:
+            dict: {'transacao': Transacao, 'warnings': list, 'is_day_trade': bool}
+
+        Raises:
+            ValueError: saldo insuficiente para venda ou dados inválidos
+        """
         try:
+            # --- Regras de negócio (EXITUS-BUSINESS-001) ---
+            # Executa validações: saldo, horário, feriado, day-trade, taxas
+            # Raises ValueError se saldo insuficiente (bloqueante)
+            regras = validar_transacao(usuario_id, data)
+
             ativo = Ativo.query.get(data['ativo_id'])
             if not ativo:
                 raise ValueError(f'Ativo {data["ativo_id"]} não encontrado')
@@ -112,10 +126,17 @@ class TransacaoService:
             quantidade     = Decimal(str(data['quantidade']))
             preco_unitario = Decimal(str(data['preco_unitario']))
             taxa_corretagem = Decimal(str(data.get('taxa_corretagem', 0)))
-            taxa_liquidacao = Decimal(str(data.get('taxa_liquidacao', 0)))
-            emolumentos    = Decimal(str(data.get('emolumentos', 0)))
             imposto        = Decimal(str(data.get('imposto', 0)))
             outros_custos  = Decimal(str(data.get('outros_custos', 0)))
+
+            # Auto-fill taxas B3 quando não informadas (regra 4)
+            taxas_b3 = regras.get('taxas_calculadas') or {}
+            taxa_liquidacao = Decimal(str(
+                data.get('taxa_liquidacao') or taxas_b3.get('taxa_liquidacao', 0)
+            ))
+            emolumentos = Decimal(str(
+                data.get('emolumentos') or taxas_b3.get('emolumentos', 0)
+            ))
 
             valor_total   = quantidade * preco_unitario
             custos_totais = taxa_corretagem + taxa_liquidacao + emolumentos + outros_custos
@@ -150,7 +171,11 @@ class TransacaoService:
             db.session.add(transacao)
             db.session.commit()
             db.session.refresh(transacao)
-            return transacao
+            return {
+                'transacao': transacao,
+                'warnings': regras.get('warnings', []),
+                'is_day_trade': regras.get('is_day_trade', False),
+            }
         except (ValueError, PermissionError):
             db.session.rollback()
             raise
