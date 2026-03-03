@@ -1,8 +1,8 @@
 # Lições Aprendidas - Exitus Development
 
-> **Registro de lições aprendidas durante o desenvolvimento**  
-> **Data:** 02 de Março de 2026  
-> **Status:** Documento em evolução
+> **Propósito:** Histórico do contexto e raciocínio por trás das lições — **não** duplicar regras.  
+> **Regras ativas estão em:** `.codeium.rules` (para IA) e `docs/CODING_STANDARDS.md` (para humanos).  
+> **Data:** 02 de Março de 2026
 
 ---
 
