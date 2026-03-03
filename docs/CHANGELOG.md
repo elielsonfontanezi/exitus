@@ -57,6 +57,12 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Regra 5: Detecção de day-trade com flag e warning (IR 20% vs 15%)
   - Response de POST /transacoes agora inclui `warnings[]` e `is_day_trade`
 
+- **EXITUS-ASSETS-001** — Massa de Ativos com Dados Fundamentalistas
+  - 56 ativos no banco (15 ações BR, 10 FIIs, 6 stocks US, 2 REITs, 8 ETFs, 5 renda fixa BR, 10 EU existentes)
+  - Dados ricos: preco_atual, dividend_yield, p_l, p_vp, roe, beta, preco_teto, cap_rate
+  - JSON centralizado em `app/seeds/data/ativos_fundamentalistas.json`
+  - Script `seed_ativos_fundamentalistas.py` enriquece existentes e cria novos (idempotente)
+
 - **EXITUS-SCRIPTS-001** — Otimização e unificação completa do sistema de scripts
   - Removidos 3 scripts obsoletos (cleanup_duplicates.sh, restore_complete.sh, validate_docs.sh)
   - Renomeado startexitus-local.sh → repair_containers.sh (nome mais descritivo)

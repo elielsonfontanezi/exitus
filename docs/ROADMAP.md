@@ -41,7 +41,7 @@
 | **EXITUS-BUSINESS-001** | Regras de negócio críticas | ✅ Implementado | Alto | Alta |
 | **EXITUS-SEED-001** | Sistema de Seed/Reset Controlado | ✅ Implementado | Alto | Alta |
 | **EXITUS-CASHFLOW-001** | Tratamento de "Transferência - Liquidação" B3 | ✅ Implementado | Médio | Média |
-| **EXITUS-ASSETS-001** | Massa de Ativos Completa para Testes (dados ricos: preço, DY, P/L, ROE) | Não implementado | Médio | Média |
+| **EXITUS-ASSETS-001** | Massa de Ativos Completa para Testes (dados ricos: preço, DY, P/L, ROE) | ✅ Implementado | Médio | Média |
 | **EXITUS-SQLALCHEMY-001** | Padrões e Boas Práticas SQLAlchemy | ✅ Implementado | Alto | Alta |
 
 ### 2. Funcionalidades de Expansão (Média Prioridade)
@@ -268,7 +268,7 @@ python scripts/backup_test_data.py --save|--restore scenario_name
 | EXITUS-UNITS-001 | 📋 Análise | 27/02/2026 | IA | Adicionado roadmap |
 | EXITUS-SEED-001 | ✅ Implementado | 02/03/2026 | IA | Sistema completo com backup/restore |
 | EXITUS-CASHFLOW-001 | ✅ Implementado | 02/03/2026 | IA | Eventos de custódia D+2 |
-| EXITUS-ASSETS-001 | 📋 Análise | 02/03/2026 | IA | Escopo: ativos com dados fundamentalistas completos (≠ IMPORT-001) |
+| EXITUS-ASSETS-001 | ✅ Implementado | 02/03/2026 | IA | 56 ativos com dados fundamentalistas (DY, P/L, P/VP, ROE, beta, preco_teto, cap_rate) |
 | EXITUS-SQLALCHEMY-001 | ✅ Implementado | 02/03/2026 | IA | app/utils/db_utils.py — 6 helpers, aplicado em 4 services |
 | EXITUS-SCRIPTO-001 | 📋 Análise | 27/02/2026 | IA | Prioridade baixa |
 

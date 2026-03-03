@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "EXITUS-ASSETS-001: Massa de ativos com dados fundamentalistas para testes",
+    "date": "2026-03-02",
+    "nota": "Valores baseados em dados públicos reais aproximados (não são recomendação de investimento)"
+  },
+  "ativos_br_acoes": [
+    {"ticker": "PETR4",  "nome": "Petrobras PN",           "setor": "Petróleo e Gás",          "preco_atual": 38.50,  "dividend_yield": 0.1420, "p_l": 4.80,   "p_vp": 1.15, "roe": 0.2530, "beta": 1.25, "preco_teto": 45.00},
+    {"ticker": "VALE3",  "nome": "Vale ON",                 "setor": "Mineração",               "preco_atual": 62.80,  "dividend_yield": 0.0920, "p_l": 5.60,   "p_vp": 1.45, "roe": 0.2780, "beta": 1.10, "preco_teto": 75.00},
+    {"ticker": "ITUB4",  "nome": "Itaú Unibanco PN",        "setor": "Bancos",                  "preco_atual": 28.45,  "dividend_yield": 0.0680, "p_l": 8.20,   "p_vp": 1.72, "roe": 0.2100, "beta": 0.85, "preco_teto": 34.00},
+    {"ticker": "BBDC4",  "nome": "Bradesco PN",             "setor": "Bancos",                  "preco_atual": 13.20,  "dividend_yield": 0.0520, "p_l": 9.50,   "p_vp": 1.05, "roe": 0.1120, "beta": 0.95, "preco_teto": 18.00},
+    {"ticker": "BBAS3",  "nome": "Banco do Brasil ON",      "setor": "Bancos",                  "preco_atual": 25.60,  "dividend_yield": 0.0980, "p_l": 4.50,   "p_vp": 0.82, "roe": 0.1850, "beta": 0.90, "preco_teto": 32.00},
+    {"ticker": "MGLU3",  "nome": "Magazine Luiza ON",        "setor": "Varejo",                  "preco_atual": 8.75,   "dividend_yield": 0.0020, "p_l": -15.30, "p_vp": 2.80, "roe": -0.1850, "beta": 2.10, "preco_teto": 6.00},
+    {"ticker": "WEGE3",  "nome": "WEG ON",                  "setor": "Máquinas e Equipamentos", "preco_atual": 42.30,  "dividend_yield": 0.0150, "p_l": 35.20,  "p_vp": 9.50, "roe": 0.2750, "beta": 0.75, "preco_teto": 38.00},
+    {"ticker": "RENT3",  "nome": "Localiza ON",             "setor": "Locação de Veículos",     "preco_atual": 56.90,  "dividend_yield": 0.0210, "p_l": 18.70,  "p_vp": 3.20, "roe": 0.1720, "beta": 1.15, "preco_teto": 52.00},
+    {"ticker": "RAIL3",  "nome": "Rumo ON",                 "setor": "Transporte",              "preco_atual": 18.45,  "dividend_yield": 0.0100, "p_l": 22.50,  "p_vp": 2.10, "roe": 0.0950, "beta": 1.05, "preco_teto": 22.00},
+    {"ticker": "SUZB3",  "nome": "Suzano ON",               "setor": "Papel e Celulose",        "preco_atual": 52.80,  "dividend_yield": 0.0250, "p_l": 8.90,   "p_vp": 1.60, "roe": 0.1820, "beta": 1.20, "preco_teto": 60.00},
+    {"ticker": "KLBN11", "nome": "Klabin Units",            "setor": "Papel e Celulose",        "preco_atual": 22.15,  "dividend_yield": 0.0480, "p_l": 12.30,  "p_vp": 2.30, "roe": 0.1900, "beta": 0.95, "preco_teto": 26.00},
+    {"ticker": "ELET3",  "nome": "Eletrobras ON",           "setor": "Energia Elétrica",        "preco_atual": 42.10,  "dividend_yield": 0.0350, "p_l": 7.80,   "p_vp": 0.90, "roe": 0.1150, "beta": 0.80, "preco_teto": 50.00},
+    {"ticker": "CMIG4",  "nome": "Cemig PN",                "setor": "Energia Elétrica",        "preco_atual": 10.85,  "dividend_yield": 0.1050, "p_l": 5.20,   "p_vp": 1.10, "roe": 0.2120, "beta": 0.70, "preco_teto": 14.00},
+    {"ticker": "CPLE6",  "nome": "Copel PNB",               "setor": "Energia Elétrica",        "preco_atual": 8.95,   "dividend_yield": 0.0780, "p_l": 6.40,   "p_vp": 0.95, "roe": 0.1480, "beta": 0.65, "preco_teto": 12.00},
+    {"ticker": "ABEV3",  "nome": "Ambev ON",                "setor": "Bebidas",                 "preco_atual": 11.20,  "dividend_yield": 0.0580, "p_l": 14.50,  "p_vp": 2.60, "roe": 0.1800, "beta": 0.55, "preco_teto": 14.00}
+  ],
+  "ativos_br_fiis": [
+    {"ticker": "HGLG11", "nome": "CSHG Logística FII",                  "segmento": "Logística",          "preco_atual": 152.30, "dividend_yield": 0.0820, "p_vp": 0.98, "cap_rate": 0.0890, "preco_teto": 165.00},
+    {"ticker": "VISC11", "nome": "Vinci Shopping Centers FII",           "segmento": "Shopping",           "preco_atual": 105.80, "dividend_yield": 0.0750, "p_vp": 0.92, "cap_rate": 0.0810, "preco_teto": 115.00},
+    {"ticker": "KNRI11", "nome": "Kinea Renda Imobiliária FII",          "segmento": "Híbrido",            "preco_atual": 98.45,  "dividend_yield": 0.0680, "p_vp": 0.88, "cap_rate": 0.0720, "preco_teto": 110.00},
+    {"ticker": "BTLG11", "nome": "BTG Pactual Logística FII",            "segmento": "Logística",          "preco_atual": 102.70, "dividend_yield": 0.0790, "p_vp": 0.95, "cap_rate": 0.0850, "preco_teto": 112.00},
+    {"ticker": "XPML11", "nome": "XP Malls FII",                        "segmento": "Shopping",           "preco_atual": 95.60,  "dividend_yield": 0.0710, "p_vp": 0.90, "cap_rate": 0.0780, "preco_teto": 105.00},
+    {"ticker": "MXRF11", "nome": "Maxi Renda FII",                       "segmento": "Papel",              "preco_atual": 10.25,  "dividend_yield": 0.1050, "p_vp": 1.02, "cap_rate": 0.1100, "preco_teto": 11.00},
+    {"ticker": "TRXF11", "nome": "TRX Real Estate FII",                  "segmento": "Lajes Corporativas", "preco_atual": 95.30,  "dividend_yield": 0.0830, "p_vp": 0.97, "cap_rate": 0.0880, "preco_teto": 104.00},
+    {"ticker": "KNCR11", "nome": "Kinea Rendimentos Imobiliários FII",   "segmento": "Papel",              "preco_atual": 110.50, "dividend_yield": 0.1120, "p_vp": 1.05, "cap_rate": 0.1150, "preco_teto": 115.00},
+    {"ticker": "LVBI11", "nome": "VBI Logístico FII",                    "segmento": "Logística",          "preco_atual": 98.20,  "dividend_yield": 0.0760, "p_vp": 0.91, "cap_rate": 0.0820, "preco_teto": 108.00},
+    {"ticker": "GGRC11", "nome": "GGR Covepi Renda FII",                 "segmento": "Lajes Corporativas", "preco_atual": 105.40, "dividend_yield": 0.0880, "p_vp": 0.94, "cap_rate": 0.0920, "preco_teto": 114.00}
+  ],
+  "ativos_us_stocks": [
+    {"ticker": "AAPL",  "nome": "Apple Inc.",                "setor": "Technology",        "preco_atual": 175.50, "dividend_yield": 0.0055, "p_l": 28.50,  "p_vp": 45.20, "roe": 1.6000, "beta": 1.20, "preco_teto": 160.00},
+    {"ticker": "MSFT",  "nome": "Microsoft Corporation",     "setor": "Technology",        "preco_atual": 380.25, "dividend_yield": 0.0075, "p_l": 35.40,  "p_vp": 12.80, "roe": 0.3650, "beta": 0.95, "preco_teto": 350.00},
+    {"ticker": "GOOGL", "nome": "Alphabet Inc. Class A",     "setor": "Technology",        "preco_atual": 140.30, "dividend_yield": 0.0050, "p_l": 25.20,  "p_vp": 6.50,  "roe": 0.2580, "beta": 1.05, "preco_teto": 130.00},
+    {"ticker": "AMZN",  "nome": "Amazon.com Inc.",           "setor": "Consumer Cyclical", "preco_atual": 155.80, "dividend_yield": 0.0000, "p_l": 58.90,  "p_vp": 8.70,  "roe": 0.1480, "beta": 1.15, "preco_teto": 140.00},
+    {"ticker": "NVDA",  "nome": "NVIDIA Corporation",        "setor": "Technology",        "preco_atual": 720.45, "dividend_yield": 0.0004, "p_l": 65.30,  "p_vp": 38.50, "roe": 0.5900, "beta": 1.65, "preco_teto": 600.00},
+    {"ticker": "TSLA",  "nome": "Tesla Inc.",                "setor": "Automotive",        "preco_atual": 245.60, "dividend_yield": 0.0000, "p_l": 72.50,  "p_vp": 15.80, "roe": 0.2180, "beta": 2.05, "preco_teto": 180.00}
+  ],
+  "ativos_us_reits": [
+    {"ticker": "O",   "nome": "Realty Income Corporation", "setor": "Retail REIT",    "preco_atual": 58.75,  "dividend_yield": 0.0520, "p_l": 45.60,  "p_vp": 1.35, "roe": 0.0300, "beta": 0.65, "preco_teto": 65.00, "cap_rate": 0.0550},
+    {"ticker": "PLD", "nome": "Prologis Inc.",             "setor": "Industrial REIT", "preco_atual": 125.40, "dividend_yield": 0.0280, "p_l": 38.20,  "p_vp": 2.10, "roe": 0.0550, "beta": 0.90, "preco_teto": 130.00, "cap_rate": 0.0420}
+  ],
+  "ativos_us_etfs": [
+    {"ticker": "SPY",  "nome": "SPDR S&P 500 ETF Trust",              "setor": "Large Cap Equity",    "preco_atual": 485.20, "dividend_yield": 0.0135, "p_l": 22.50, "beta": 1.00, "preco_teto": null},
+    {"ticker": "QQQ",  "nome": "Invesco QQQ Trust",                   "setor": "Technology Equity",   "preco_atual": 420.35, "dividend_yield": 0.0058, "p_l": 30.80, "beta": 1.10, "preco_teto": null},
+    {"ticker": "IWM",  "nome": "iShares Russell 2000 ETF",            "setor": "Small Cap Equity",    "preco_atual": 198.50, "dividend_yield": 0.0140, "p_l": 15.20, "beta": 1.25, "preco_teto": null},
+    {"ticker": "DIA",  "nome": "SPDR Dow Jones Industrial Average ETF","setor": "Large Cap Equity",   "preco_atual": 375.90, "dividend_yield": 0.0180, "p_l": 18.50, "beta": 0.90, "preco_teto": null},
+    {"ticker": "VTI",  "nome": "Vanguard Total Stock Market ETF",     "setor": "Broad Market Equity", "preco_atual": 245.60, "dividend_yield": 0.0140, "p_l": 21.80, "beta": 1.00, "preco_teto": null},
+    {"ticker": "VNQ",  "nome": "Vanguard Real Estate ETF",            "setor": "Real Estate",         "preco_atual": 92.30,  "dividend_yield": 0.0380, "p_l": 32.50, "beta": 0.85, "preco_teto": null},
+    {"ticker": "AGG",  "nome": "iShares Core US Aggregate Bond ETF",  "setor": "Bond Index",          "preco_atual": 102.15, "dividend_yield": 0.0340, "p_l": null,   "beta": 0.05, "preco_teto": null},
+    {"ticker": "BND",  "nome": "Vanguard Total Bond Market ETF",      "setor": "Bond Index",          "preco_atual": 75.80,  "dividend_yield": 0.0320, "p_l": null,   "beta": 0.05, "preco_teto": null}
+  ],
+  "ativos_br_renda_fixa": [
+    {"ticker": "TESOURO_SELIC_2029",  "nome": "Tesouro Selic 2029",           "preco_atual": 14250.00, "dividend_yield": 0.1340},
+    {"ticker": "TESOURO_IPCA_2035",   "nome": "Tesouro IPCA+ 2035",          "preco_atual": 2180.50,  "dividend_yield": 0.0620},
+    {"ticker": "TESOURO_PRE_2028",    "nome": "Tesouro Prefixado 2028",      "preco_atual": 720.30,   "dividend_yield": 0.1180},
+    {"ticker": "CDB_INTER_2026",      "nome": "CDB Banco Inter 120% CDI",    "preco_atual": 1000.00,  "dividend_yield": 0.1600},
+    {"ticker": "LCI_CAIXA_2027",      "nome": "LCI Caixa 95% CDI",           "preco_atual": 1000.00,  "dividend_yield": 0.1270}
+  ]
+}
