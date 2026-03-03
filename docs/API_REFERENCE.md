@@ -670,8 +670,90 @@ seguem o mesmo contrato padrão:
 
 ---
 
-*Documento atualizado: 02 de Março de 2026*
-*Versão da API: v0.8.0*
+## 21. Exportação de Dados
+
+> **GAP:** EXITUS-EXPORT-001 ✅ — Documentação detalhada: `docs/EXITUS-EXPORT-001.md`
+
+Exportação de dados do portfólio em múltiplos formatos para análise externa.
+
+**Auth:** Bearer JWT obrigatório em todos os endpoints.  
+**Resposta:** arquivo para download direto (não usa envelope `success/data`).
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/export/transacoes` | Exporta transações (compras, vendas, etc.) |
+| GET | `/api/export/proventos` | Exporta proventos (dividendos, JCP, aluguéis) |
+| GET | `/api/export/posicoes` | Exporta posição consolidada atual |
+
+**Parâmetros (query string):**
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `formato` | string | `csv` \| `excel` \| `json` \| `pdf` (default: `json`) |
+| `data_inicio` | YYYY-MM-DD | Filtro de data inicial |
+| `data_fim` | YYYY-MM-DD | Filtro de data final |
+| `ativo_id` | UUID | Filtrar por ativo |
+| `corretora_id` | UUID | Filtrar por corretora (apenas transações) |
+| `tipo` | string | Tipo da operação/provento (depende da entidade) |
+
+**Headers da resposta:**
+```
+Content-Disposition: attachment; filename="exitus_transacoes_20250303_1800.csv"
+Content-Type: text/csv; charset=utf-8          (CSV)
+Content-Type: application/json                 (JSON)
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet  (Excel)
+Content-Type: application/pdf                  (PDF)
+X-Total-Records: <tamanho_em_bytes>
+```
+
+**Erros:**
+
+| HTTP | Situação |
+|------|----------|
+| 401 | Token ausente ou inválido |
+| 422 | Formato inválido, data mal formatada, tipo desconhecido |
+| 500 | Erro interno (render, query) |
+
+**Exemplos:**
+```bash
+# CSV de transações — período 2025
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:5000/api/export/transacoes?formato=csv&data_inicio=2025-01-01&data_fim=2025-12-31" \
+  -o transacoes_2025.csv
+
+# Excel de proventos
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:5000/api/export/proventos?formato=excel" -o proventos.xlsx
+
+# PDF de posições
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:5000/api/export/posicoes?formato=pdf" -o posicoes.pdf
+```
+
+---
+
+## 22. IR — Apuração de Imposto de Renda
+
+> **GAP:** EXITUS-IR-001 ✅ — Documentação detalhada: `docs/EXITUS-IR-001.md`
+
+Engine de apuração mensal de IR sobre renda variável.
+
+**Auth:** Bearer JWT obrigatório.  
+**Resposta:** envelope padrão `{"success": true, "data": {...}}`.
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/ir/apuracao?mes=YYYY-MM` | Apuração detalhada por categoria (swing, day-trade, FIIs, exterior) |
+| GET | `/api/ir/darf?mes=YYYY-MM` | DARFs a pagar no mês (código de receita, valor, status) |
+| GET | `/api/ir/historico?ano=YYYY` | Resumo anual mês a mês (sempre 12 entradas) |
+
+**Categorias e alíquotas:** ações BR 15% (isenção R$20k/mês), day-trade 20%, FIIs 20%, exterior 15%.  
+**Códigos DARF:** 6015 (BR) / 0561 (exterior). Mínimo para recolhimento: R$10,00.
+
+---
+
+*Documento atualizado: 03 de Março de 2026*
+*Versão da API: v0.8.0-dev*
 *GAPs fechados: EXITUS-POS-001→007, EXITUS-ATIVOS-ENUM-001, EXITUS-POS-PAGIN-001,*
 *EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001, EXITUS-COTACOES-RESP-001,*
-*EXITUS-SQLALCHEMY-001, EXITUS-CRUD-001*
+*EXITUS-SQLALCHEMY-001, EXITUS-CRUD-001, EXITUS-IR-001, EXITUS-EXPORT-001*

@@ -28,6 +28,20 @@ e este projeto adere semanticamente à versão v0.8.0.
   - **IR-007:** Alíquotas dinâmicas via tabela `regra_fiscal` (atualmente hardcoded) — impacto Médio
   - **IR-008:** Tratamento fiscal de UNITs B3 — classificação, isenção R$20k, desmembramento→PM (depende UNITS-001) — impacto Médio, prioridade **Baixa**
 
+- **docs/EXITUS-EXPORT-001.md** — Documentação completa da engine de exportação (03/03/2026)
+  - Objetivo, escopo, entidades exportáveis (transações, proventos, posições)
+  - Arquitetura: diagrama de fluxo de `ExportService.exportar()`, dependências de bibliotecas (`openpyxl`, `reportlab`)
+  - Características por formato: JSON (envelope meta/dados/total), CSV (separador `;`, UTF-8-BOM), Excel (estilos openpyxl), PDF (A4 landscape, zebra-stripe)
+  - API Reference completa: 3 endpoints, parâmetros, headers de resposta, códigos de erro
+  - Testes: tabela de cobertura das 3 classes (TestExportTransacoes 17 testes, TestExportProventos 7, TestExportPosicoes 8)
+  - Decisão de design: isolamento multi-tenant em proventos via subquery; resposta como download direto (sem envelope `success/data`)
+  - Limitações mapeadas: EXITUS-EXPORT-002 (relatórios customizados), limite 10k fixo, posições sem snapshot histórico
+  - Exemplos cURL copiáveis
+
+- **API_REFERENCE.md** — Adicionadas seções 21 (Exportação) e 22 (IR) com resumo dos endpoints e exemplos
+
+- **USER_GUIDE.md** — Seção "Exportação de Dados" substituiu stub antigo; tabelas de entidades, formatos, filtros e exemplos cURL
+
 - **EXITUS-EXPORT-001** — Exportação genérica de dados (03/03/2026)
   - `app/services/export_service.py`: engine de exportação para CSV, Excel, JSON e PDF
     - Filtros: `data_inicio`, `data_fim`, `ativo_id`, `corretora_id`, `tipo`

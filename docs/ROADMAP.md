@@ -346,22 +346,27 @@ Sem esse rateio, o custo de aquisição das ações resultantes fica **zerado**,
 
 **Dependências:** `EXITUS-IR-001` (concluído), `EXITUS-UNITS-001` (Fase 4 — pré-requisito forte)
 
-### EXITUS-EXPORT-001: Exportação Genérica
-**Problema:** Apenas importação B3 existe. Usuários não conseguem exportar dados para análise externa.
+### EXITUS-EXPORT-001: Exportação Genérica ✅
+**Status:** ✅ IMPLEMENTADO (03/03/2026)
 
-**APIs necessárias:**
-```
-GET /api/export/transacoes?formato=csv|excel|json
-GET /api/export/proventos?formato=csv|excel|json
-GET /api/export/posicoes?formato=csv|excel|json
-GET /api/export/relatorio/{id}?formato=pdf|excel
-```
+**Implementação:**
+- ✅ `app/services/export_service.py` — engine de exportação (queries + renderers)
+- ✅ Formatos: CSV (separador `;`, UTF-8-BOM, cabeçalho metadados), Excel (openpyxl, cabeçalho azul, auto-ajuste), JSON (envelope `{meta, dados, total}`), PDF (reportlab, A4 landscape, zebra-stripe)
+- ✅ Entidades: `transacoes`, `proventos`, `posicoes`
+- ✅ Filtros: `data_inicio`, `data_fim`, `ativo_id`, `corretora_id`, `tipo`
+- ✅ Limite: 10.000 registros por exportação
+- ✅ Filename automático: `exitus_{entidade}_{YYYYMMDD_HHMM}.{ext}`
+- ✅ Isolamento multi-tenant em proventos via subquery de `ativo_id`
+- ✅ `app/blueprints/export_blueprint.py` — 3 endpoints em `/api/export/`
+- ✅ `tests/test_export_integration.py` — 32 testes
+- ✅ Documentação detalhada: `docs/EXITUS-EXPORT-001.md`
 
-**Funcionalidades:**
-- Filtros por período, ativo, corretora
-- Cabeçalhos com metadados (usuário, data geração, filtros aplicados)
-- Formatação localizada (BRL, datas dd/mm/yyyy)
-- Limite configurável de registros
+**Tabelas usadas:** `transacao`, `ativo`, `corretora`, `provento` + `PortfolioService` (posições)
+
+**Limitações rastreadas:**
+- `GET /api/export/relatorio/{id}` não implementado → GAP **EXITUS-EXPORT-002**
+- Posições sem snapshot histórico (data passada) → depende de **EXITUS-IR-006**
+- Limite de 10.000 registros fixo (futura paginação/streaming)
 
 ### EXITUS-SWAGGER-001: Auto-documentação OpenAPI
 **Problema:** 67+ endpoints sem documentação interativa. API_REFERENCE.md é estática.

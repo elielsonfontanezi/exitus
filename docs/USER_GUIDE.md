@@ -315,15 +315,52 @@ Clique em um ativo para ver detalhes:
 - Rentabilidade Período: +8,5%
 - Volatilidade: 18,2% (anualizada)[file:14]
 
-### Exportar Relatório
-Funcionalidade: Exportar para **PDF** (stub implementado).
+### Exportação de Dados (EXITUS-EXPORT-001)
+**Rota API:** `/api/export/{entidade}?formato={csv|excel|json|pdf}`
 
-**Passos:**
-1. Clique no ícone de download
-2. Selecione formato: PDF ou Excel
-3. Download inicia automaticamente
+Exporte seus dados de investimento para análise externa, declaração de IR ou planilhas pessoais.
 
-**Status:** PDF básico implementado, layout avançado planejado para M8.[file:14]
+**Entidades disponíveis:**
+
+| Entidade | URL | O que exporta |
+|----------|-----|--------------|
+| Transações | `/api/export/transacoes` | Compras, vendas, histórico completo de operações |
+| Proventos | `/api/export/proventos` | Dividendos, JCP, aluguéis, amortizações |
+| Posições | `/api/export/posicoes` | Snapshot atual do portfólio com rentabilidade |
+
+**Formatos disponíveis:**
+
+| Formato | Ideal para |
+|---------|-----------|
+| `csv` | Importar em Excel, Google Sheets, ferramentas de análise |
+| `excel` | Planilha formatada com cabeçalhos e estilos prontos |
+| `json` | Integração com outras ferramentas ou APIs |
+| `pdf` | Relatório imprimível |
+
+**Filtros opcionais (query string):**
+- `data_inicio=YYYY-MM-DD` — filtrar a partir de uma data
+- `data_fim=YYYY-MM-DD` — filtrar até uma data
+- `ativo_id=<uuid>` — filtrar por ativo específico
+- `corretora_id=<uuid>` — filtrar por corretora (apenas transações)
+- `tipo=compra|venda|dividendo|...` — filtrar por tipo de operação
+
+**Exemplos via cURL:**
+```bash
+# Exportar todas as transações de 2025 em CSV
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:5000/api/export/transacoes?formato=csv&data_inicio=2025-01-01&data_fim=2025-12-31" \
+  -o transacoes_2025.csv
+
+# Exportar proventos em Excel
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:5000/api/export/proventos?formato=excel" -o proventos.xlsx
+
+# Exportar posição atual em PDF
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:5000/api/export/posicoes?formato=pdf" -o posicoes.pdf
+```
+
+> **Documentação técnica completa:** `docs/EXITUS-EXPORT-001.md`
 
 ## Sistema de Alertas
 **Rota:** `/alertas`
