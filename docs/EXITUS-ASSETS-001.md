@@ -10,6 +10,20 @@
 
 ## 📋 **Descrição do Problema**
 
+### **Distinção em relação ao EXITUS-IMPORT-001**
+
+> ⚠️ **Estes dois GAPs NÃO se sobrepõem — têm escopos distintos:**
+
+| | EXITUS-IMPORT-001 | EXITUS-ASSETS-001 |
+|---|---|---|
+| **O quê** | Importar transações reais do usuário via arquivo B3 | Popular banco com ativos de todos os tipos |
+| **Fonte** | Arquivo Excel/CSV do Portal B3 | Seed JSON controlado |
+| **Audiência** | Usuário final | Desenvolvedor / testes |
+| **Resultado** | `transacao`, `provento`, `evento_custodia` | `ativo` com dados fundamentalistas |
+| **Status** | ✅ Implementado | Não implementado |
+
+**Nota:** IMPORT-001 cria ativos automaticamente durante importação, mas apenas com dados mínimos (ticker + tipo). ASSETS-001 quer ativos **completos** com preço, DY, P/L, ROE, setor — para testes realistas de valuation e buy signals.
+
 ### **Necessidade Identificada**
 O Sistema Exitus precisa de uma massa de dados robusta e realista para testes, desenvolvimento e demonstrações. Atualmente, os ativos existentes são limitados e não cobrem todos os tipos previstos no sistema.
 
