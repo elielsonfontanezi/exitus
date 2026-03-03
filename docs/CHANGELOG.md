@@ -9,6 +9,22 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-EXPORT-001** — Exportação genérica de dados (03/03/2026)
+  - `app/services/export_service.py`: engine de exportação para CSV, Excel, JSON e PDF
+    - Filtros: `data_inicio`, `data_fim`, `ativo_id`, `corretora_id`, `tipo`
+    - CSV: cabeçalho com metadados (entidade, data geração, filtros aplicados), separador `;`, encoding UTF-8-BOM
+    - Excel: título e metadados nas primeiras linhas, cabeçalho colorido, auto-ajuste de colunas
+    - PDF: layout A4 landscape, tabela com zebra-stripe, título e metadados
+    - JSON: envelope `{meta, dados, total}` com metadados completos
+    - Proventos filtrados via subquery de ativos do usuário (sem `usuario_id` direto na tabela)
+    - Limite configurável: 10.000 registros por exportação
+  - `app/blueprints/export_blueprint.py`: 3 endpoints registrados em `/api/export/`
+    - `GET /api/export/transacoes?formato=csv|excel|json|pdf`
+    - `GET /api/export/proventos?formato=csv|excel|json|pdf`
+    - `GET /api/export/posicoes?formato=csv|excel|json|pdf`
+  - `tests/test_export_integration.py`: 32 testes (100% passed)
+  - **Suite total: 130 passed, 0 failed**
+
 - **EXITUS-IR-001** — Engine de cálculo de IR sobre renda variável (03/03/2026)
   - `app/services/ir_service.py`: apuração mensal por categoria (swing ações, day-trade, FIIs, exterior)
   - Isenção R$20.000/mês para swing trade em ações BR

@@ -191,6 +191,14 @@ def create_app(testing=False):
     except ImportError as e:
         print(f"⚠️  IR blueprint não encontrado: {e}")
 
+    # M4.7 - Export (Exportação CSV/Excel/JSON/PDF — EXITUS-EXPORT-001)
+    try:
+        from .blueprints.export_blueprint import export_bp
+        app.register_blueprint(export_bp)
+        print("✅ Export blueprint registrado: /api/export/*")
+    except ImportError as e:
+        print(f"⚠️  Export blueprint não encontrado: {e}")
+
     # ============================================
     # M7.4 - ALERTAS (NOVO!)
     # ============================================
