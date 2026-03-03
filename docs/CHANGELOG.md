@@ -9,6 +9,41 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-TESTDB-001** — Script `create_test_db.sh` — recriação automatizada do banco de teste (03/03/2026)
+  - Drop + create de `exitusdb_test` via psql no container `exitus-db`
+  - Schema aplicado via `pg_dump --schema-only` (paridade total com `exitusdb`, ENUMs incluídos)
+  - Suporte a `--dry-run` para validação sem alterações
+  - Idempotente: seguro para executar múltiplas vezes
+  - **L-TEST-001**: nunca usar dados hardcoded em testes (`test_admin`, `PETR4`) — usar fixtures dinâmicas do `conftest.py`
+  - **L-TEST-002**: `db.create_all()` falha com ENUMs PostgreSQL nativos — usar `pg_dump --schema-only`
+  - Corrigidos 5 testes com dados hardcoded que dependiam do banco de produção
+
+- **EXITUS-TESTFIX-001** + **EXITUS-TESTFIX-002** — Correção de testes quebrados (03/03/2026)
+  - `test_calculos.py`: corrigido `create_app()` → `create_app(testing=True)`, adicionado JWT via `auth_client`, assertions sem valor hardcoded
+  - `test_buy_signals.py`: corrigido `from app import db` → `from app.database import db`, removida fixture local perigosa (`db.create_all/drop_all`), reescrito com `ativo_seed` dinâmico
+  - `parametros_macro_service.py`: fix bug — fallback retornava `TypeError` quando tabela `parametros_macro` vazia
+  - `conftest.py`: `ativo_seed` agora inclui `preco_teto=Decimal('50.00')`
+  - `pytest.ini`: `cache_dir = /tmp/pytest_cache` — elimina `Permission Denied` no volume Podman rootless
+  - **Suite: 77 passed, 0 failed, 0 warnings**
+
+### Changed
+- **EXITUS-CRUD-002** — Revisão estrutural service/route: exceções tipadas (03/03/2026)
+  - Criado `app/utils/exceptions.py` com hierarquia: `ExitusError`, `NotFoundError`, `ConflictError`, `ForbiddenError`, `BusinessRuleError`
+  - Handler genérico registrado em `app/__init__.py`
+  - `ValueError` substituído por exceções tipadas em 10 services
+  - Blueprints atualizados para capturar `ExitusError` antes de `Exception` genérico
+  - HTTP 404/409 corretos em vez de 400/500 para erros semânticos
+
+- **EXITUS-SQLALCHEMY-002** — Migração `Query.get()` depreciado (03/03/2026)
+  - `Query.get()` → `db.session.get()` em 11 arquivos (27 ocorrências)
+  - Arquivos: `ativo_service`, `usuario_service`, `corretora_service`, `provento_service`, `feriado_mercado_service`, `regra_fiscal_service`, `evento_corporativo_service`, `transacao_service`, `movimentacao_caixa_service`, `relatorio_service`, `decorators.py`
+
+### Fixed
+- `auth/routes.py`: eliminada query duplicada no login — `AuthService.login()` agora retorna o usuário diretamente
+- `test_ativos_integration.py`: `test_listar_inclui_ativo_criado` agora usa `?search=<ticker>` para evitar dependência de paginação
+
+---
+
 - **EXITUS-TESTS-001** — Testes Automatizados com Pytest (03/03/2026)
   - **37 testes unitários** para `business_rules.py` com mocks corretos
     - `TestValidarHorarioMercado` (5 testes) — horário de pregão B3/NYSE/NASDAQ

@@ -238,6 +238,40 @@ User: non-root (exitus:1000)
 - Enums para tipos fixos (`ClasseAtivo`, `TipoTransacao`, `TipoAtivo`, etc.)[file:5][file:18]
 - Triggers para auditoria (planejado)
 
+**Bancos de dados:**
+
+| Nome | Uso | Criação |
+|------|-----|---------|
+| `exitusdb` | Produção/desenvolvimento | `setup_containers.sh` |
+| `exitusdb_test` | Testes automatizados (pytest) | `scripts/create_test_db.sh` |
+
+> `exitusdb_test` é criado via `pg_dump --schema-only` do `exitusdb` — garante paridade total de schema, ENUMs e constraints. Nunca usar `db.create_all()` para isso (L-TEST-002).
+
+### Testes Automatizados
+
+| Componente | Localização | Função |
+|---|---|---|
+| `pytest.ini` | `backend/pytest.ini` | Configuração: `cache_dir=/tmp/pytest_cache`, `addopts=-v --tb=short` |
+| `conftest.py` | `backend/tests/conftest.py` | Fixtures globais: `app` (session), `client`, `auth_client`, `usuario_seed`, `ativo_seed`, `corretora_seed` |
+| `TestingConfig` | `backend/app/config.py` | Aponta para `exitusdb_test`, JWT sem expiração, CSRF desabilitado |
+| Testes unitários | `tests/test_business_rules.py` | 37 testes com mocks — `business_rules.py` |
+| Testes integração | `tests/test_*_integration.py` | 40 testes contra PostgreSQL real (`exitusdb_test`) |
+
+**Estratégia de isolamento:**
+- `app` fixture com escopo `session` — contexto Flask ativo durante toda a suite
+- Fixtures de entidade com escopo `function` — criação com UUID único + DELETE no teardown
+- Sem `db.drop_all()`/`db.create_all()` entre testes — apenas DELETE explícito
+- Banco de teste recriável a qualquer momento via `./scripts/create_test_db.sh`
+
+**Executar testes:**
+```bash
+# Suite completa (dentro do container — obrigatório)
+podman exec exitus-backend python -m pytest tests/ -q --no-cov
+
+# Recriar banco de teste antes de rodar (após migrations)
+./scripts/create_test_db.sh && podman exec exitus-backend python -m pytest tests/ -q --no-cov
+```
+
 ### Containerização
 
 | Componente | Versão | Função |

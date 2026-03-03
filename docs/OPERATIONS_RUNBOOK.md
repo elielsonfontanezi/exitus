@@ -907,18 +907,25 @@ podman exec exitus-backend python -m pytest tests/ -x --no-cov
 
 > **Por que `--no-cov`?** O coverage tenta gravar `.coverage` em `/app/`, que pode ter permissão negada no volume Podman (GAP EXITUS-INFRA-001). Use `--no-cov` para evitar `INTERNALERROR`.
 
-### Testes conhecidos como pré-existentemente falhos (não regredir)
+### Recriar o banco de teste do zero
 
-| Arquivo | Motivo | Status |
-|---|---|---|
-| `tests/test_buy_signals.py` | `ImportError: cannot import name 'db' from 'app'` — importação errada | ⚠️ Ignorar com `--ignore` |
-| `tests/test_calculos.py` | Endpoints `/api/calculos/` exigem JWT mas o teste não envia token | ⚠️ Pré-existente |
+Quando o banco `exitusdb_test` precisar ser recriado (ex: após migrations, schema corrompido, ou primeiro setup em nova máquina):
 
 ```bash
-# Suite completa ignorando os falhos pré-existentes (69 testes verdes)
-podman exec exitus-backend python -m pytest tests/ -q --no-cov \
-  --ignore=tests/test_buy_signals.py
+# Recria exitusdb_test com schema idêntico ao exitusdb de produção
+./scripts/create_test_db.sh
+
+# Apenas valida containers sem alterar nada
+./scripts/create_test_db.sh --dry-run
 ```
+
+**O que o script faz:**
+1. Verifica que `exitus-db` e `exitus-backend` estão rodando
+2. Encerra conexões ativas no banco de teste
+3. Drop + create de `exitusdb_test`
+4. Aplica schema via `pg_dump --schema-only` do `exitusdb` (garante paridade total, inclusive ENUMs)
+
+> **⚠️ Importante:** Usar sempre `create_test_db.sh` para recriar o banco de teste — nunca `db.create_all()` diretamente, pois não respeita a ordem de criação de ENUMs PostgreSQL (L-TEST-002).
 
 ### ❌ Métodos INCORRETOS (não usar)
 
@@ -1339,15 +1346,32 @@ podman exec -it exitus-backend python3 /tmp/meu_script.py
 ```bash
 ls -lh scripts/
 
-# Output:
-# start_exitus.sh
-# stop_exitus.sh
-# restart_exitus.sh
-# rebuild_restart_exitus-backend.sh
-# rebuild_restart_exitus-frontend.sh
-# generate_api_docs.sh
-# validate_docs.sh
-# test_performance.sh
+# Output (24 scripts):
+# backup_db.sh                       — backup do banco de dados
+# cleanup_containers.sh              — limpeza de containers parados
+# create_test_db.sh                  — recriação do banco de teste exitusdb_test
+# exitus.sh                          — CLI unificado do sistema
+# exitus_db_doc.sh                   — documentação do schema do banco
+# generate_api_docs.sh               — geração de docs da API (legado)
+# get_backend_token.sh               — obtém token JWT para testes manuais
+# import_b3.sh                       — importação de arquivos B3 (Excel/CSV)
+# populate_seeds.sh                  — popula dados de seed no banco
+# rebuild_restart_exitus-backend.sh  — rebuild + restart do backend
+# rebuild_restart_exitus-frontend.sh — rebuild + restart do frontend
+# recovery_dashboard.sh              — dashboard TUI de recovery
+# recovery_manager.sh                — orquestrador de backup/restore
+# repair_containers.sh               — reparo e health check dos containers
+# reset_and_seed.sh                  — reset completo + seed controlado
+# restart_backend.sh                 — restart apenas do backend
+# restart_exitus.sh                  — restart de todos os containers
+# restart_frontend.sh                — restart apenas do frontend
+# restore_db.sh                      — restaura backup do banco
+# rollback_recovery.sh               — rollback automático de recovery
+# setup_containers.sh                — configuração inicial dos containers
+# setup_env.sh                       — configuração de variáveis de ambiente
+# start_exitus.sh                    — inicia todos os containers
+# stop_exitus.sh                     — para todos os containers
+# validate_recovery.sh               — validações pós-recovery
 ```
 
 ---
