@@ -51,7 +51,7 @@ class TestListarAtivos:
         assert isinstance(_get_ativos(data), list)
 
     def test_listar_inclui_ativo_criado(self, auth_client):
-        """Ativo criado via API aparece na listagem."""
+        """Ativo criado via API aparece na listagem (busca por search para evitar paginação)."""
         ticker = _unique_ticker('LST')
         r = auth_client.post(
             '/api/ativos/',
@@ -60,7 +60,10 @@ class TestListarAtivos:
             headers=auth_client._auth_headers,
         )
         assert r.status_code in (200, 201)
-        response = auth_client.get('/api/ativos/', headers=auth_client._auth_headers)
+        response = auth_client.get(
+            f'/api/ativos/?search={ticker}',
+            headers=auth_client._auth_headers,
+        )
         data = response.get_json()
         tickers = [a['ticker'] for a in _get_ativos(data)]
         assert ticker in tickers
