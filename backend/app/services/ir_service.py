@@ -25,6 +25,7 @@ from sqlalchemy.types import Date
 from app.database import db
 from app.models.transacao import Transacao, TipoTransacao
 from app.models.ativo import Ativo, TipoAtivo
+from app.models.corretora import Corretora
 from app.utils.exceptions import BusinessRuleError
 
 logger = logging.getLogger(__name__)
@@ -130,7 +131,13 @@ class IRService:
                 cast(Transacao.data_transacao, Date) <= dt_fim,
             )
             .join(Ativo, Transacao.ativo_id == Ativo.id)
-            .add_columns(Ativo.tipo.label('tipo_ativo'), Ativo.ticker)
+            .join(Corretora, Transacao.corretora_id == Corretora.id)
+            .add_columns(
+                Ativo.tipo.label('tipo_ativo'),
+                Ativo.ticker,
+                Corretora.id.label('corretora_id'),
+                Corretora.nome.label('corretora_nome'),
+            )
             .order_by(Transacao.data_transacao)
             .all()
         )
@@ -142,8 +149,11 @@ class IRService:
         exterior      = []   # vendas US/exterior
         compras_todas = []   # todas as compras (para custo médio)
 
+        # Acumulador por corretora: {corretora_id: {nome, vendas, lucro, ir}}
+        por_corretora: dict = {}
+
         for row in transacoes:
-            t, tipo_ativo, ticker = row
+            t, tipo_ativo, ticker, corretora_id, corretora_nome = row
             if t.tipo == TipoTransacao.COMPRA:
                 compras_todas.append(t)
                 continue
@@ -159,6 +169,18 @@ class IRService:
                 exterior.append((t, tipo_ativo, ticker))
             else:
                 swing_acoes.append((t, tipo_ativo, ticker))
+
+            # Acumular por corretora (vendas)
+            cid = str(corretora_id)
+            if cid not in por_corretora:
+                por_corretora[cid] = {
+                    'corretora_id':   cid,
+                    'corretora_nome': corretora_nome,
+                    'total_vendas':   Decimal('0'),
+                    'operacoes':      0,
+                }
+            por_corretora[cid]['total_vendas'] += Decimal(str(t.valor_total))
+            por_corretora[cid]['operacoes']    += 1
 
         # Apurar cada categoria
         res_swing    = IRService._apurar_swing_acoes(swing_acoes)
@@ -183,6 +205,17 @@ class IRService:
         if ir_total < DARF_MINIMO and ir_total > 0:
             alertas.append(f"IR total R${ir_total:.2f} abaixo do mínimo de DARF (R$10,00) — acumular para mês seguinte.")
 
+        # Serializar por_corretora
+        corretoras_lista = [
+            {
+                'corretora_id':   v['corretora_id'],
+                'corretora_nome': v['corretora_nome'],
+                'total_vendas':   float(v['total_vendas'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'operacoes':      v['operacoes'],
+            }
+            for v in por_corretora.values()
+        ]
+
         return {
             'mes': mes_str,
             'usuario_id': str(usuario_id),
@@ -192,6 +225,7 @@ class IRService:
                 'fiis':        res_fii,
                 'exterior':    res_exterior,
             },
+            'por_corretora': corretoras_lista,
             'ir_total': float(ir_total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
             'darf':    darf,
             'alertas': alertas,

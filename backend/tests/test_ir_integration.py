@@ -51,20 +51,40 @@ def _criar_transacao(db, usuario_id, ativo_id, corretora_id, tipo, data_str,
 # ---------------------------------------------------------------------------
 
 @pytest.fixture
-def cenario_ir(app, auth_client, usuario_seed, ativo_seed, corretora_seed):
+def cenario_ir(app, auth_client, ativo_seed):
     """
-    Cria compra + venda de ações no mês 2025-03 para testar apuração.
+    Cria corretora + compra + venda vinculadas ao usuário do auth_client.
     Venda total: R$5.000 (abaixo de R$20k) → swing trade isento.
     """
+    import uuid as uuid_lib
+    from flask_jwt_extended import decode_token
     from app.database import db
+    from app.models.corretora import Corretora, TipoCorretora
     from app.models.transacao import Transacao
 
+    # Descobrir o usuario_id a partir do token do auth_client
+    token = auth_client._auth_headers['Authorization'].split(' ')[1]
+    with app.app_context():
+        decoded = decode_token(token)
+    usuario_id = decoded['sub']
+
+    # Criar corretora vinculada ao mesmo usuário
+    suffix = str(uuid_lib.uuid4())[:8]
+    corretora = Corretora(
+        nome=f'XP Teste {suffix}',
+        tipo=TipoCorretora.CORRETORA,
+        pais='BR',
+        usuario_id=usuario_id,
+    )
+    db.session.add(corretora)
+    db.session.flush()
+
     compra = _criar_transacao(
-        db, usuario_seed.id, ativo_seed.id, corretora_seed.id,
+        db, usuario_id, ativo_seed.id, corretora.id,
         'compra', '2025-03-10T10:00:00', 100, 30.00,
     )
     venda = _criar_transacao(
-        db, usuario_seed.id, ativo_seed.id, corretora_seed.id,
+        db, usuario_id, ativo_seed.id, corretora.id,
         'venda', '2025-03-20T14:00:00', 100, 50.00,
     )
     db.session.commit()
@@ -73,11 +93,13 @@ def cenario_ir(app, auth_client, usuario_seed, ativo_seed, corretora_seed):
         'compra': compra,
         'venda': venda,
         'mes': '2025-03',
-        'usuario_id': str(usuario_seed.id),
+        'usuario_id': str(usuario_id),
+        'corretora_nome': corretora.nome,
     }
 
     Transacao.query.filter_by(id=compra.id).delete()
     Transacao.query.filter_by(id=venda.id).delete()
+    Corretora.query.filter_by(id=corretora.id).delete()
     db.session.commit()
 
 
@@ -140,6 +162,28 @@ class TestApuracao:
             headers=auth_client._auth_headers,
         )
         assert rv.get_json()['data']['mes'] == cenario_ir['mes']
+
+    def test_apuracao_inclui_por_corretora(self, auth_client, cenario_ir):
+        """Resposta deve incluir breakdown por_corretora com nome e total_vendas."""
+        rv = auth_client.get(
+            f'/api/ir/apuracao?mes={cenario_ir["mes"]}',
+            headers=auth_client._auth_headers,
+        )
+        assert rv.status_code == 200
+        data = rv.get_json()['data']
+        assert 'por_corretora' in data
+        assert isinstance(data['por_corretora'], list)
+        assert len(data['por_corretora']) >= 1
+        corretora = data['por_corretora'][0]
+        assert 'corretora_id' in corretora
+        assert 'corretora_nome' in corretora
+        assert 'total_vendas' in corretora
+        assert 'operacoes' in corretora
+
+    def test_apuracao_mes_vazio_por_corretora_lista_vazia(self, auth_client):
+        """Mês sem transações retorna por_corretora como lista vazia."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2000-01', headers=auth_client._auth_headers)
+        assert rv.get_json()['data']['por_corretora'] == []
 
 
 # ===========================================================================
