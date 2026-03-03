@@ -55,7 +55,7 @@
 | GAP ID | Funcionalidade | Status | Impacto | Prioridade |
 |--------|---------------|--------|---------|------------|
 | **EXITUS-TESTS-001** | Testes automatizados (pytest) | ✅ Concluído | **Crítico** | **Alta** |
-| **EXITUS-CRUD-002** | Revisão estrutural service/route: exceções tipadas (`NotFoundError`/`ConflictError`), HTTP 404/409 corretos, `delete()` com guarda de integridade referencial — 31 ocorrências em 10 services | Não implementado | **Alto** | **Alta** |
+| **EXITUS-CRUD-002** | Revisão estrutural service/route: exceções tipadas (`NotFoundError`/`ConflictError`), HTTP 404/409 corretos, `delete()` com guarda de integridade referencial — 31 ocorrências em 10 services | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-001** | Engine de cálculo de IR completo (apuração, isenções, DARF) | Não implementado | **Alto** | **Alta** |
 | **EXITUS-EXPORT-001** | Exportação genérica (CSV, Excel, JSON, PDF) | Não implementado | Alto | Alta |
 
@@ -70,7 +70,7 @@
 | **EXITUS-RFCALC-001** | Cálculos RF (Duration, YTM) e FII (FFO, AFFO) | Não implementado | Médio | Média |
 | **EXITUS-NEWAPIS-001** | APIs de configuração (parametros_macro, fonte_dados) | Não implementado | Médio | Média |
 | **EXITUS-ENUM-001** | Padronizar todos ENUMs PostgreSQL para lowercase (migration) | Não implementado | Médio | Média |
-| **EXITUS-SQLALCHEMY-002** | Migrar `Query.get()` depreciado para `db.session.get()` em 11 arquivos (27 ocorrências) | Não implementado | Médio | Média |
+| **EXITUS-SQLALCHEMY-002** | Migrar `Query.get()` depreciado para `db.session.get()` em 11 arquivos (27 ocorrências) | ✅ Concluído (03/03/2026) | Médio | Média |
 
 ### 4. Fase 5 — Produção e Escala (Média-Alta Prioridade)
 
@@ -89,6 +89,8 @@
 | **EXITUS-AUDIT-001** | Logs de auditoria imutáveis (hash encadeado) | Não implementado | Baixo | Baixa |
 | **EXITUS-LGPD-001** | Conformidade LGPD/GDPR (consentimento, esquecimento) | Não implementado | Baixo (dev) | Baixa |
 | **EXITUS-TESTDB-001** | Script `create_test_db.sh` — recriação automatizada do banco de teste | Não implementado | Baixo | Baixa |
+| **EXITUS-TESTFIX-001** | `test_calculos.py` — 2 testes sem token JWT retornam 401 em vez de 200 | Não implementado | Baixo | Baixa |
+| **EXITUS-TESTFIX-002** | `test_buy_signals.py` — `ImportError: cannot import name 'db' from 'app'` (importação errada no teste) | Não implementado | Baixo | Baixa |
 
 ---
 
