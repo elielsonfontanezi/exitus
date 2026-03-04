@@ -1351,7 +1351,7 @@ ls -lh scripts/
 # cleanup_containers.sh              — limpeza de containers parados
 # create_test_db.sh                  — recriação do banco de teste exitusdb_test
 # exitus.sh                          — CLI unificado do sistema
-# exitus_db_doc.sh                   — documentação do schema do banco
+# update_db_structure.sh             — sobrescreve docs/EXITUS_DB_STRUCTURE.txt com o schema atual
 # generate_api_docs.sh               — geração de docs da API (legado)
 # get_backend_token.sh               — obtém token JWT para testes manuais
 # import_b3.sh                       — importação de arquivos B3 (Excel/CSV)

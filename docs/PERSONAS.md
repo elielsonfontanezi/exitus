@@ -242,7 +242,7 @@ Estas lições foram aprendidas em implementações reais e **devem ser seguidas
 
 - O USUÁRIO MANTENEDOR **nunca** deve precisar perguntar "e a documentação?" — ela já vem junto.
 
-- Quando o banco for alterado (nova tabela, migration, índice), executar `./scripts/exitus_db_doc.sh` para atualizar `docs/EXITUS_DB_STRUCTURE.txt` antes do commit final.
+- Quando o banco for alterado (nova tabela, migration, índice), executar `./scripts/update_db_structure.sh` para sobrescrever `docs/EXITUS_DB_STRUCTURE.txt` antes do commit final.
 
 ---
 
@@ -276,7 +276,7 @@ TESTES
        ▼
 DOCUMENTAÇÃO (REGRA #8)
   └─ CHANGELOG, ROADMAP e demais docs no mesmo commit
-  └─ exitus_db_doc.sh se banco foi alterado (REGRA #9)
+  └─ update_db_structure.sh se banco foi alterado (REGRA #9)
        │
        ▼
 COMMIT (REGRA #7)

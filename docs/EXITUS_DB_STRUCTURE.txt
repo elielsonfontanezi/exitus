@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-04 17:23:58
+Gerado em: 2026-03-04 18:40:50
 ================================================================================
 
 ================================================================================
@@ -41,7 +41,6 @@ TABELAS DO BANCO EXITUS
 ESTRUTURA DETALHADA DAS TABELAS
 ================================================================================
 
-DO
 
 ################################################################################
 TABELA: alembic_version
@@ -2087,6 +2086,33 @@ Total de Foreign Keys por Tabela:
  saldo_prejuizo         |       1
  transacao              |       3
 (16 rows)
+
+
+================================================================================
+ENUMS DO BANCO
+================================================================================
+
+         Enum          |                                                                           Valores                                                                           
+-----------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ classeativo           | RENDA_VARIAVEL, RENDA_FIXA, CRIPTO, HIBRIDO
+ formatoexport         | visualizacao, pdf, excel
+ frequencianotificacao | imediata, diaria, semanal, mensal
+ incidenciaimposto     | LUCRO, RECEITA, PROVENTO, OPERACAO
+ operadorcondicao      | >, <, ==, >=, <=, ENTRE
+ tipo_evento_custodia  | LIQUIDACAO_D2, TRANSFERENCIA_ENTRADA, TRANSFERENCIA_SAIDA, AJUSTE_POSICAO, DESDOBRAMENTO, AGRUPAMENTO, AMORTIZACAO, OUTRO
+ tipoalerta            | queda_preco, alta_preco, dividendo_previsto, meta_rentabilidade, volatilidade_alta, desvio_alocacao, noticias_ativo
+ tipoativo             | ACAO, FII, REIT, BOND, ETF, CRIPTO, OUTRO, CDB, LCI_LCA, TESOURO_DIRETO, DEBENTURE, STOCK, STOCK_INTL, ETF_INTL, UNIT
+ tipocorretora         | CORRETORA, EXCHANGE
+ tipoeventocorporativo | SPLIT, GRUPAMENTO, BONIFICACAO, DIREITO_SUBSCRICAO, FUSAO, CISAO, INCORPORACAO, MUDANCA_TICKER, DESLISTAGEM, RELISTING, CANCELAMENTO, OUTRO, DESMEMBRAMENTO
+ tipoferiado           | NACIONAL, BOLSA, PONTE, FECHAMENTO_ANTECIPADO, MANUTENCAO, OUTRO
+ tipofontedados        | API, SCRAPER, MANUAL, ARQUIVO, OUTRO
+ tipomovimentacao      | DEPOSITO, SAQUE, TRANSFERENCIA_ENVIADA, TRANSFERENCIA_RECEBIDA, CREDITO_PROVENTO, PAGAMENTO_TAXA, PAGAMENTO_IMPOSTO, AJUSTE, OUTRO
+ tipooperacao          | COMPRA, VENDA
+ tipoprovento          | DIVIDENDO, JCP, RENDIMENTO, CUPOM, BONIFICACAO, DIREITO_SUBSCRICAO, OUTRO
+ tiporelatorio         | portfolio, performance, renda_passiva, investimento, customizado
+ tipotransacao         | compra, venda, dividendo, jcp, aluguel, bonificacao, split, grupamento, subscricao, amortizacao
+ userrole              | ADMIN, USER, READONLY
+(18 rows)
 
 
 ================================================================================

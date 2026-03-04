@@ -114,10 +114,10 @@ O usuário **nunca** deve precisar perguntar "e a documentação?" — ela já v
 Sempre que uma atividade alterar o banco (nova tabela, migration, ALTER TABLE, novo índice):
 
 ```bash
-./scripts/exitus_db_doc.sh
+./scripts/update_db_structure.sh
 ```
 
-Isso atualiza `docs/EXITUS_DB_STRUCTURE.txt`. Executar antes do commit final.
+Isso sobrescreve `docs/EXITUS_DB_STRUCTURE.txt`. Executar antes do commit final.
 
 ---
 

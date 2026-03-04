@@ -18,7 +18,7 @@ Use este workflow quando for necessário atualizar docs sem fechar um GAP comple
    | `docs/ARCHITECTURE.md` | Componente, endpoint ou container novo |
    | `docs/API_REFERENCE.md` | Endpoint novo ou contrato alterado |
    | `docs/OPERATIONS_RUNBOOK.md` | Script ou procedimento novo |
-   | `docs/EXITUS_DB_STRUCTURE.txt` | Schema do banco alterado → rodar `./scripts/exitus_db_doc.sh` |
+   | `docs/EXITUS_DB_STRUCTURE.txt` | Schema do banco alterado → rodar `./scripts/update_db_structure.sh` |
 
 2. Aplicar as atualizações nos arquivos relevantes.
 

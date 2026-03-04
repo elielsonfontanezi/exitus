@@ -11,7 +11,7 @@ description: Fechar GAP com commit — testes, docs e commit atômico por ativid
 
 2. Se o banco foi alterado (nova tabela, migration, índice), atualizar schema:
    ```bash
-   ./scripts/exitus_db_doc.sh
+   ./scripts/update_db_structure.sh
    ```
 
 3. Atualizar documentação no mesmo commit (REGRA #8):

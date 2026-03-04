@@ -15,7 +15,7 @@ Esta pasta contém scripts utilitários para operação, desenvolvimento e manut
 scripts/
 ├── backup_db.sh                    # Backup do banco PostgreSQL
 ├── cleanup_containers.sh           # Limpeza de containers
-├── exitus_db_doc.sh                 # Gera documentação do DB
+├── update_db_structure.sh           # Atualiza docs/EXITUS_DB_STRUCTURE.txt
 ├── generate_api_docs.sh             # Gera documentação da API
 ├── get_backend_token.sh            # Obtém token JWT
 ├── populate_seeds.sh               # Popula dados iniciais
@@ -122,17 +122,17 @@ scripts/
 
 ## 🗄️ Scripts de Banco de Dados
 
-### `exitus_db_doc.sh` ⭐
-**Gera documentação completa do DB**
+### `update_db_structure.sh` ⭐
+**Atualiza `docs/EXITUS_DB_STRUCTURE.txt` com o schema atual do banco**
 ```bash
-./scripts/exitus_db_doc.sh
+./scripts/update_db_structure.sh
 ```
 - ✅ Conecta no container exitus-db
 - ✅ Extrai estrutura completa (tabelas, colunas, PKs, FKs, constraints)
 - ✅ Gera arquivo `EXITUS_DB_STRUCTURE.txt`
 - ✅ Valida se container está rodando
 
-**Output:** `exitus_db_structure_YYYYMMDD_HHMMSS.txt`
+**Output:** sobrescreve diretamente `docs/EXITUS_DB_STRUCTURE.txt` (sem cópia com timestamp)
 
 ### `backup_db.sh` ⭐
 **Backup do banco PostgreSQL**
