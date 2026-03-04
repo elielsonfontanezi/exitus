@@ -59,7 +59,7 @@
 | **EXITUS-IR-001** | Engine de cálculo de IR completo (apuração, isenções, DARF) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-002** | Custo médio histórico (PM acumulado via tabela `posicao`) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-003** | Compensação de prejuízo acumulado entre meses (tabela `saldo_prejuizo`) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
-| **EXITUS-IR-004** | Proventos tributáveis: JCP, dividendos, aluguel, withholding tax US (baseline pré-2026) | Não implementado | **Alto** | **Alta** |
+| **EXITUS-IR-004** | Proventos tributáveis: JCP, dividendos, aluguel, withholding tax US (baseline pré-2026) | ✅ Concluído (04/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-005** | IR sobre renda fixa: tabela regressiva 22,5%→15% por prazo de aplicação | Não implementado | Alto | Alta |
 | **EXITUS-IR-006** | DIRPF anual: relatório para Declaração de Ajuste Anual (fichas Renda Variável e Bens e Direitos) | Não implementado | Alto | Média |
 | **EXITUS-IR-007** | Alíquotas dinâmicas via tabela `regra_fiscal` (atualmente hardcoded em `ir_service.py`) | ✅ Concluído (03/03/2026) | Médio | Média |
@@ -458,7 +458,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-IR-001 | 3 | ✅ Concluído | 03/03/2026 | Apuração mensal, isenções, DARF — 19 testes |
 | EXITUS-IR-002 | 3 | ✅ Concluído | 03/03/2026 | PM da tabela `posicao` no cálculo de IR — 2 testes |
 | EXITUS-IR-003 | 3 | ✅ Concluído | 03/03/2026 | Compensação prejuízo acumulado — tabela `saldo_prejuizo`, 5 testes |
-| EXITUS-IR-004 | 3 | 📋 Planejado | — | Proventos tributáveis: JCP, dividendos, aluguel, withholding US (baseline) |
+| EXITUS-IR-004 | 3 | ✅ Concluído | 04/03/2026 | Proventos: JCP 15%, dividendos BR isentos, dividendos US 15%, aluguel 15% — seção `proventos` na API, 4 testes |
 | EXITUS-IR-005 | 3 | 📋 Planejado | — | IR renda fixa — tabela regressiva 22,5%→15% |
 | EXITUS-IR-006 | 3 | 📋 Planejado | — | DIRPF anual — fichas Renda Variável e Bens e Direitos |
 | EXITUS-IR-007 | 3 | ✅ Concluído | 03/03/2026 | Alíquotas dinâmicas via `regra_fiscal` — seed 5 regras, fallback hardcoded, 2 testes |

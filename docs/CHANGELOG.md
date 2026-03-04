@@ -14,6 +14,14 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Mudanças mapeadas: JCP 15%→17,5% (PLP 128/2025), dividendos BR isenção limitada R$50k/mês/CNPJ com 10% acima, imposto mínimo até 10% progressivo para renda>R$600k/ano, aluguel tabela regressiva 22,5%→15%
   - ROADMAP atualizado: IR-009 registrado na Fase 3 (Alta prioridade), IR-004 descrição revisada
 
+- **EXITUS-IR-004** — Proventos tributáveis (baseline pré-2026) (04/03/2026)
+  - `ir_service.py`: novo método `_apurar_proventos()` — JCP, dividendos BR/US, aluguel
+  - `apurar_mes()` agora busca transações `DIVIDENDO`, `JCP`, `ALUGUEL` + nova seção `proventos` na resposta
+  - Constante `DARF_JCP_DIVIDENDO = '9453'` e `TIPOS_BR` adicionados
+  - Seed: 4 regras de proventos em `exitusdb` + `exitusdb_test` (DIVIDENDO BR 0%, JCP 15%, DIVIDENDO US 15%, ALUGUEL BR 15%)
+  - `tests/test_ir_integration.py`: fixture `cenario_proventos` + classe `TestProventos` (+4 testes)
+  - **Suite total: 143 passed, 0 failed**
+
 - **EXITUS-IR-007** — Alíquotas dinâmicas via tabela `regra_fiscal` (03/03/2026)
   - `ir_service.py`: nova função `_carregar_regras_fiscais(data_ref)` — busca regras vigentes do banco
   - Nova função `_regra_para_categoria(regras, categoria)` — resolve alíquota/isenção por categoria

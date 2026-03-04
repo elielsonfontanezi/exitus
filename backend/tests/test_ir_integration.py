@@ -395,6 +395,136 @@ class TestHistorico:
             assert m['mes'] == f'2024-{(i+1):02d}'
 
 
+@pytest.fixture
+def cenario_proventos(app, auth_client, ativo_seed):
+    """
+    IR-004: Cria transações de JCP, dividendo BR, dividendo US e aluguel
+    para o mês 2025-06. O campo `imposto` simula o IR retido na fonte.
+    """
+    import uuid as uuid_lib
+    from flask_jwt_extended import decode_token
+    from app.database import db
+    from app.models.corretora import Corretora, TipoCorretora
+    from app.models.transacao import Transacao, TipoTransacao
+    from app.models.ativo import Ativo, TipoAtivo
+
+    token = auth_client._auth_headers['Authorization'].split(' ')[1]
+    with app.app_context():
+        decoded = decode_token(token)
+    usuario_id = decoded['sub']
+
+    suffix = str(uuid_lib.uuid4())[:8]
+    corretora = Corretora(
+        nome=f'Inter Teste {suffix}',
+        tipo=TipoCorretora.CORRETORA,
+        pais='BR',
+        usuario_id=usuario_id,
+    )
+    db.session.add(corretora)
+    db.session.flush()
+
+    # Ativo BR (ACAO já existe em ativo_seed)
+    ativo_br = ativo_seed  # tipo ACAO, país BR
+
+    # Ativo US (STOCK) — criar separado
+    from app.models.ativo import ClasseAtivo
+    ativo_us = Ativo(
+        ticker=f'AAPL{suffix}',
+        nome='Apple Inc Test',
+        tipo=TipoAtivo.STOCK,
+        classe=ClasseAtivo.RENDA_VARIAVEL,
+        mercado='US',
+        moeda='USD',
+        ativo=True,
+    )
+    db.session.add(ativo_us)
+    db.session.flush()
+
+    def _criar_provento(tipo_str, ativo_id, valor, imposto_retido):
+        qtd = Decimal('1')
+        val = Decimal(str(valor))
+        imp = Decimal(str(imposto_retido))
+        t = Transacao(
+            usuario_id=usuario_id,
+            ativo_id=ativo_id,
+            corretora_id=corretora.id,
+            tipo=TipoTransacao(tipo_str),
+            data_transacao=__import__('datetime').datetime(2025, 6, 15, 10, 0),
+            quantidade=qtd,
+            preco_unitario=val,
+            valor_total=val,
+            taxa_corretagem=Decimal('0'),
+            taxa_liquidacao=Decimal('0'),
+            emolumentos=Decimal('0'),
+            imposto=imp,
+            outros_custos=Decimal('0'),
+            custos_totais=imp,
+            valor_liquido=val - imp,
+        )
+        db.session.add(t)
+        db.session.flush()
+        return t
+
+    t_dividendo_br = _criar_provento('dividendo', ativo_br.id, 1000.00, 0.00)
+    t_jcp          = _criar_provento('jcp',        ativo_br.id, 2000.00, 300.00)  # 15% retido
+    t_dividendo_us = _criar_provento('dividendo',  ativo_us.id, 500.00,  150.00)  # 30% IRS retido
+    t_aluguel      = _criar_provento('aluguel',    ativo_br.id, 400.00,  60.00)   # 15% retido
+
+    db.session.commit()
+
+    yield {
+        'mes': '2025-06',
+        'usuario_id': str(usuario_id),
+        't_dividendo_br': t_dividendo_br,
+        't_jcp': t_jcp,
+        't_dividendo_us': t_dividendo_us,
+        't_aluguel': t_aluguel,
+        'ativo_us_id': ativo_us.id,
+        'corretora_id': corretora.id,
+    }
+
+    for tid in [t_dividendo_br.id, t_jcp.id, t_dividendo_us.id, t_aluguel.id]:
+        Transacao.query.filter_by(id=tid).delete()
+    Ativo.query.filter_by(id=ativo_us.id).delete()
+    Corretora.query.filter_by(id=corretora.id).delete()
+    db.session.commit()
+
+
+class TestProventos:
+    """IR-004: Proventos tributáveis — JCP, dividendos, aluguel, withholding US."""
+
+    def test_apuracao_retorna_secao_proventos(self, auth_client, cenario_proventos):
+        """Resposta de apuração deve conter a seção 'proventos'."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2025-06', headers=auth_client._auth_headers)
+        assert rv.status_code == 200
+        data = rv.get_json()['data']
+        assert 'proventos' in data
+
+    def test_proventos_tem_campos_obrigatorios(self, auth_client, cenario_proventos):
+        """Seção proventos deve conter subseções e campo ir_retido_total."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2025-06', headers=auth_client._auth_headers)
+        proventos = rv.get_json()['data']['proventos']
+        for campo in ('dividendos_br', 'jcp', 'dividendos_us', 'aluguel', 'ir_retido_total'):
+            assert campo in proventos
+
+    def test_dividendo_br_isento(self, auth_client, cenario_proventos):
+        """Dividendos BR devem ser isentos (alíquota 0%, ir_retido 0)."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2025-06', headers=auth_client._auth_headers)
+        div_br = rv.get_json()['data']['proventos']['dividendos_br']
+        assert div_br['isento'] is True
+        assert div_br['aliquota'] == 0.0
+        assert div_br['valor_bruto'] == 1000.0
+
+    def test_jcp_aliquota_e_ir_retido(self, auth_client, cenario_proventos):
+        """JCP deve registrar 15% de alíquota e o IR retido da transação."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2025-06', headers=auth_client._auth_headers)
+        jcp = rv.get_json()['data']['proventos']['jcp']
+        assert jcp['aliquota'] == 15.0
+        assert jcp['valor_bruto'] == 2000.0
+        assert jcp['ir_retido'] == 300.0
+        assert jcp['isento'] is False
+
+
 class TestRegrasFiscais:
     """IR-007: Alíquotas dinâmicas via tabela regra_fiscal."""
 

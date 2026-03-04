@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Exitus - IR Service (EXITUS-IR-001 + IR-002 + IR-003)
+Exitus - IR Service (EXITUS-IR-001 + IR-002 + IR-003 + IR-004)
 Engine de cálculo de Imposto de Renda sobre operações de renda variável.
 
 Regras implementadas (Brasil):
@@ -9,10 +9,11 @@ Regras implementadas (Brasil):
 - FIIs: 20% sobre lucro, sem isenção
 - Custo de aquisição via preço médio ponderado (PM) da tabela `posicao` (IR-002)
 - Compensação de prejuízo acumulado entre meses por categoria (IR-003)
-- Proventos (dividendos BR): isentos; JCP: 15% retido na fonte
+- Proventos (IR-004): dividendos BR isentos, JCP 15% retido na fonte, dividendos US 15% CRÉDITO IRS, aluguel 15%
+- Alíquotas dinâmicas via tabela `regra_fiscal` (IR-007)
 - DARF: código de receita por categoria
 
-Tabelas usadas: transacao, ativo, corretora, posicao, saldo_prejuizo
+Tabelas usadas: transacao, ativo, corretora, posicao, saldo_prejuizo, regra_fiscal
 """
 
 import logging
@@ -49,6 +50,7 @@ DARF_SWING_ACAO = '6015'
 DARF_DAY_TRADE = '6015'   # mesmo código, campo "day-trade" diferencia
 DARF_FII = '6015'
 DARF_RENDA_FIXA = '0561'
+DARF_JCP_DIVIDENDO = '9453'  # JCP e dividendos tributados (info — retido na fonte)
 
 # Valor mínimo de DARF (abaixo disso acumula para mês seguinte)
 DARF_MINIMO = Decimal('10.00')
@@ -57,6 +59,8 @@ DARF_MINIMO = Decimal('10.00')
 TIPOS_ACAO_BR = {TipoAtivo.ACAO}
 TIPOS_FII = {TipoAtivo.FII}
 TIPOS_US = {TipoAtivo.STOCK, TipoAtivo.REIT, TipoAtivo.ETF, TipoAtivo.BOND}
+TIPOS_BR = {TipoAtivo.ACAO, TipoAtivo.FII, TipoAtivo.CDB, TipoAtivo.LCI_LCA,
+            TipoAtivo.TESOURO_DIRETO, TipoAtivo.DEBENTURE}
 
 
 # ---------------------------------------------------------------------------
@@ -193,12 +197,15 @@ class IRService:
         ano, mes = _parse_mes(mes_str)
         dt_ini, dt_fim = _primeiro_ultimo_dia(ano, mes)
 
-        # Buscar todas as transações do mês (compras e vendas)
+        # Buscar todas as transações do mês (compras, vendas e proventos)
         transacoes = (
             Transacao.query
             .filter(
                 Transacao.usuario_id == usuario_id,
-                Transacao.tipo.in_([TipoTransacao.COMPRA, TipoTransacao.VENDA]),
+                Transacao.tipo.in_([
+                    TipoTransacao.COMPRA, TipoTransacao.VENDA,
+                    TipoTransacao.DIVIDENDO, TipoTransacao.JCP, TipoTransacao.ALUGUEL,
+                ]),
                 cast(Transacao.data_transacao, Date) >= dt_ini,
                 cast(Transacao.data_transacao, Date) <= dt_fim,
             )
@@ -233,8 +240,29 @@ class IRService:
         # Acumulador por corretora: {corretora_id: {nome, vendas, lucro, ir}}
         por_corretora: dict = {}
 
+        # Listas de proventos por tipo
+        proventos_dividendos_br = []
+        proventos_jcp           = []
+        proventos_dividendos_us = []
+        proventos_aluguel       = []
+
         for row in transacoes:
             t, tipo_ativo, ticker, corretora_id, corretora_nome = row
+
+            # Proventos (IR-004)
+            if t.tipo == TipoTransacao.DIVIDENDO:
+                if tipo_ativo in TIPOS_US:
+                    proventos_dividendos_us.append((t, tipo_ativo, ticker))
+                else:
+                    proventos_dividendos_br.append((t, tipo_ativo, ticker))
+                continue
+            if t.tipo == TipoTransacao.JCP:
+                proventos_jcp.append((t, tipo_ativo, ticker))
+                continue
+            if t.tipo == TipoTransacao.ALUGUEL:
+                proventos_aluguel.append((t, tipo_ativo, ticker))
+                continue
+
             if t.tipo == TipoTransacao.COMPRA:
                 compras_todas.append(t)
                 continue
@@ -271,6 +299,13 @@ class IRService:
         res_dt       = IRService._apurar_day_trade(day_trade, pm_map, regras_fiscais)
         res_fii      = IRService._apurar_fiis(fiis, pm_map, regras_fiscais)
         res_exterior = IRService._apurar_exterior(exterior, pm_map, regras_fiscais)
+
+        # Apurar proventos (IR-004)
+        res_proventos = IRService._apurar_proventos(
+            proventos_dividendos_br, proventos_jcp,
+            proventos_dividendos_us, proventos_aluguel,
+            regras_fiscais,
+        )
 
         # --- IR-003: Compensação de prejuízo acumulado ---
         mes_ant = _mes_anterior(ano, mes)
@@ -386,6 +421,7 @@ class IRService:
                 'fiis':        res_fii,
                 'exterior':    res_exterior,
             },
+            'proventos': res_proventos,
             'por_corretora': corretoras_lista,
             'ir_total': float(ir_total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
             'darf':    darf,
@@ -523,6 +559,75 @@ class IRService:
             'ir_devido':     ir_devido,
             'operacoes':     len(vendas),
             '_alertas_pm':   alertas_pm,
+        }
+
+    # -----------------------------------------------------------------------
+    # Proventos (IR-004)
+    # -----------------------------------------------------------------------
+
+    @staticmethod
+    def _apurar_proventos(
+        dividendos_br: list,
+        jcp: list,
+        dividendos_us: list,
+        aluguel: list,
+        regras: dict,
+    ) -> dict:
+        """
+        Apura proventos recebidos no mês (IR-004).
+
+        - Dividendos BR: isentos (Lei 9.249/1995) — alíquota 0%
+        - JCP: 15% retido na fonte pela empresa pagadora
+        - Dividendos US: 15% alíquota BR; 30% retido pelo IRS → crédito na DIRPF
+        - Aluguel ações: 15% retido pela corretora (tabela RF simplificada)
+
+        O IR já está retido na fonte (campo `imposto` da transação).
+        Não gera DARF a pagar pelo contribuinte neste mês.
+        """
+        def _aliquota_provento(pais: str, tipo_op: str) -> Decimal:
+            chave = (pais, None, tipo_op)
+            r = regras.get(chave)
+            if r:
+                return r['aliquota']
+            fallback = {'JCP': Decimal('0.15'), 'DIVIDENDO': Decimal('0'), 'ALUGUEL': Decimal('0.15')}
+            return fallback.get(tipo_op, Decimal('0'))
+
+        def _sumarizar(lista: list, pais: str, tipo_op: str) -> dict:
+            total_bruto   = sum(Decimal(str(t.valor_total)) for t, _, _ in lista)
+            total_retido  = sum(Decimal(str(t.imposto or 0)) for t, _, _ in lista)
+            aliquota      = _aliquota_provento(pais, tipo_op)
+            ir_esperado   = (total_bruto * aliquota).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            return {
+                'valor_bruto':   float(total_bruto),
+                'ir_retido':     float(total_retido),
+                'ir_esperado':   float(ir_esperado),
+                'aliquota':      float(aliquota * 100),
+                'operacoes':     len(lista),
+                'isento':        aliquota == Decimal('0'),
+            }
+
+        res_div_br  = _sumarizar(dividendos_br, 'BR', 'DIVIDENDO')
+        res_jcp     = _sumarizar(jcp,           'BR', 'JCP')
+        res_div_us  = _sumarizar(dividendos_us, 'US', 'DIVIDENDO')
+        res_aluguel = _sumarizar(aluguel,       'BR', 'ALUGUEL')
+
+        ir_retido_total = (
+            Decimal(str(res_jcp['ir_retido']))
+            + Decimal(str(res_div_us['ir_retido']))
+            + Decimal(str(res_aluguel['ir_retido']))
+        )
+
+        return {
+            'dividendos_br':   res_div_br,
+            'jcp':             res_jcp,
+            'dividendos_us':   res_div_us,
+            'aluguel':         res_aluguel,
+            'ir_retido_total': float(ir_retido_total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+            'obs': (
+                'IR de proventos retido na fonte. '
+                'Dividendos BR isentos até 2025. '
+                'Declarar na DIRPF anual para crédito/compensação.'
+            ),
         }
 
     # -----------------------------------------------------------------------

@@ -1,10 +1,10 @@
 # EXITUS-IR-001 — Engine de Cálculo de IR sobre Renda Variável
 
 > **Status:** ✅ Concluído (03/03/2026)  
-> **Versão:** 1.3 (inclui IR-002 + IR-003 + IR-007)  
+> **Versão:** 1.4 (inclui IR-002 + IR-003 + IR-004 + IR-007)  
 > **Branch:** `feature/revisao-negocio-vision`  
-> **Testes:** 30 testes de integração — 100% passou  
-> **Suite total:** 139 passed, 0 failed
+> **Testes:** 34 testes de integração — 100% passou  
+> **Suite total:** 143 passed, 0 failed
 
 ---
 
@@ -303,16 +303,19 @@ Resumo de apuração mês a mês para o ano inteiro. Retorna sempre **12 entrada
 
 ## 5. Testes
 
-Suite em `backend/tests/test_ir_integration.py` — **30 testes**, 100% passou.
+Suite em `backend/tests/test_ir_integration.py` — **34 testes**, 100% passou.
 
 | Classe | Testes | O que cobre |
 |--------|--------|-------------|
 | `TestApuracao` | 17 | 401 sem token, 400 sem parâmetro, 422 formato inválido, mês vazio, 4 categorias na estrutura, isenção R$20k, campo `mes`, `por_corretora`, **lucro via PM** (IR-002), **alerta posicao vazia** (IR-002), **campos prejuizo** (IR-003), **compensação total** (IR-003), **compensação parcial** (IR-003), **mês vazio preserva saldo** (IR-003) |
 | `TestDarf` | 5 | 401 sem token, 400 sem parâmetro, mês sem lucro → lista vazia, campo `mes`, envelope padrão |
 | `TestHistorico` | 6 | 401 sem token, 400 sem parâmetro, ano não numérico, 12 meses, campos obrigatórios, formato `YYYY-MM` |
+| `TestProventos` | 4 | **seção proventos na resposta** (IR-004), **campos obrigatórios** (IR-004), **dividendo BR isento** (IR-004), **JCP 15% retido** (IR-004) |
 | `TestRegrasFiscais` | 2 | **alíquota carregada do banco** (IR-007), **fallback quando regra_fiscal vazia** (IR-007) |
 
 **Fixture `cenario_ir`:** cria corretora + compra 100×R$30 + venda 100×R$50 + **posição com PM=30** em 2025-03. Total vendas = R$5.000 → abaixo de R$20k → swing isento. Lucro bruto = R$2.000 (IR-002).
+
+**Fixture `cenario_proventos`:** cria corretora + ativo US + transações em 2025-06: DIVIDENDO BR R$1k (isento), JCP R$2k (R$300 retido), DIVIDENDO US R$500 (R$150 retido IRS), ALUGUEL R$400 (R$60 retido).
 
 ---
 
@@ -451,7 +454,8 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 | 03/03/2026 | 1.1 | IR-002: Custo de aquisição via PM da tabela `posicao` — +2 testes (21 total) |
 | 03/03/2026 | 1.2 | IR-003: Compensação de prejuízo acumulado por categoria — tabela `saldo_prejuizo`, +7 testes (28 total) |
 | 03/03/2026 | 1.3 | IR-007: Alíquotas dinâmicas via `regra_fiscal` — seed 5 regras, fallback hardcoded, +2 testes (30 total) |
+| 04/03/2026 | 1.4 | IR-004: Proventos tributáveis — `_apurar_proventos()`, seção `proventos` na API, seed 4 regras, +4 testes (34 total) |
 
 ---
 
-*Próximos passos: EXITUS-IR-004 (JCP/withholding), EXITUS-IR-005 (RF tabela regressiva), EXITUS-IR-006 (DIRPF anual), EXITUS-IR-008 (UNITs B3).*
+*Próximos passos: EXITUS-IR-009 (regras fiscais 2026 — Lei 15.270/2025), EXITUS-IR-005 (RF tabela regressiva), EXITUS-IR-006 (DIRPF anual), EXITUS-IR-008 (UNITs B3).*
