@@ -9,6 +9,15 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-RFCALC-001** — Cálculos avançados RF e FII (04/03/2026)
+  - `alembic/versions/20260304_1900_add_rfcalc_fields_to_ativo.py`: migration `ADD COLUMN` em `ativo` — `taxa_cupom`, `valor_nominal`, `data_vencimento`, `ffo_por_cota`, `affo_por_cota` + índice `ix_ativo_data_vencimento`
+  - `app/models/ativo.py`: 5 novos campos RF/FII + `to_dict()` atualizado
+  - `app/services/rfcalc_service.py`: `RFCalcService` — Duration Macaulay, Duration Modificada, YTM (Newton-Raphson), FFO, AFFO, P/FFO, análise qualitativa de FIIs
+  - `app/blueprints/calculos_blueprint.py`: 3 novos endpoints — `POST /api/calculos/rf/simular`, `GET /api/calculos/rf/<ticker>`, `GET /api/calculos/fii/<ticker>`
+  - `tests/test_rfcalc_integration.py`: 24 testes unitários (fórmulas matemáticas + edge cases)
+  - `docs/EXITUS_DB_STRUCTURE.txt`: regenerado com novos campos da tabela `ativo`
+  - **Suite: 64 passed, 0 failed** (173 errors pré-existentes de setup, não relacionados)
+
 - **EXITUS-NEWAPIS-001** — APIs de configuração (parametros_macro, fonte_dados) (04/03/2026)
   - `app/schemas/parametros_macro_schema.py`: schemas Create/Update/Response para validação
   - `app/schemas/fonte_dados_schema.py`: schemas Create/Update/Response com validações de rate_limit

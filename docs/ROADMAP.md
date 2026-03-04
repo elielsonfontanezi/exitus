@@ -75,7 +75,7 @@
 | **EXITUS-UNITS-001** | Tratamento de UNITS (B3) | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-SWAGGER-001** | Auto-documentação OpenAPI/Swagger | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-ANOMALY-001** | Detecção de anomalias em preços (≥20% sem evento) | ✅ Concluído (04/03/2026) | Médio | Média |
-| **EXITUS-RFCALC-001** | Cálculos RF (Duration, YTM) e FII (FFO, AFFO) | Não implementado | Médio | Média |
+| **EXITUS-RFCALC-001** | Cálculos RF (Duration, YTM) e FII (FFO, AFFO) | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-NEWAPIS-001** | APIs de configuração (parametros_macro, fonte_dados) | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-ENUM-001** | Padronizar todos ENUMs PostgreSQL para lowercase (migration) | Não implementado | Médio | Média |
 | **EXITUS-SQLALCHEMY-002** | Migrar `Query.get()` depreciado para `db.session.get()` em 11 arquivos (27 ocorrências) | ✅ Concluído (03/03/2026) | Médio | Média |
@@ -99,6 +99,7 @@
 | **EXITUS-TESTDB-001** | Script `create_test_db.sh` — recriação automatizada do banco de teste | ✅ Concluído (03/03/2026) | Baixo | Baixa |
 | **EXITUS-TESTFIX-001** | `test_calculos.py` — 2 testes sem token JWT retornam 401 em vez de 200 | ✅ Concluído (03/03/2026) | Baixo | Baixa |
 | **EXITUS-TESTFIX-002** | `test_buy_signals.py` — `ImportError: cannot import name 'db' from 'app'` (importação errada no teste) | ✅ Concluído (03/03/2026) | Baixo | Baixa |
+| **EXITUS-TESTENV-001** | 173 testes com `ERROR at setup` — `marshmallow_sqlalchemy` não instalado no ambiente local; testes só funcionam dentro do container | Não implementado | Médio | Média |
 
 ---
 
@@ -510,7 +511,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | EXITUS-UNITS-001 | 4 | ✅ Concluído | 04/03/2026 | `TipoAtivo.UNIT` (15º tipo), `DESMEMBRAMENTO` evento, schema + migration — 8 testes |
 | EXITUS-SWAGGER-001 | 4 | ✅ Concluído | 04/03/2026 | Swagger UI `/api/docs`, spec JSON `/api/swagger.json`, 5 namespaces (auth, ativos, transacoes, ir, export) — flask-restx 1.3 |
 | EXITUS-ANOMALY-001 | 4 | ✅ Concluído | 04/03/2026 | `AnomalyService` + `GET /api/cotacoes/anomalias` + detecção inline — 17 testes |
-| EXITUS-RFCALC-001 | 4 | 📋 Planejado | — | Duration, YTM, FFO, AFFO |
+| EXITUS-RFCALC-001 | 4 | ✅ Concluído | 04/03/2026 | Duration Macaulay/Modificada, YTM (Newton-Raphson), FFO, AFFO, P/FFO — migration + 24 testes |
 | EXITUS-NEWAPIS-001 | 4 | ✅ Concluído | 04/03/2026 | CRUD completo para `parametros_macro` e `fonte_dados` — 8 endpoints cada |
 | EXITUS-MULTICLIENTE-001 | 5 | 📋 Planejado | — | Multi-tenancy para assessoras |
 | EXITUS-MONITOR-001 | 5 | 📋 Planejado | — | Monitoramento operacional |

@@ -4,7 +4,7 @@ Exitus - Model Ativo - Entidade para instrumentos financeiros (COBERTURA GLOBAL)
 """
 import enum
 from datetime import datetime
-from sqlalchemy import Column, String, Boolean, DateTime, Enum, Numeric, Text, Date
+from sqlalchemy import Column, String, Boolean, DateTime, Enum, Numeric, Text, Date, Index
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from app.database import db
@@ -123,6 +123,15 @@ class Ativo(db.Model):
     # Indicadores para Valuation
     preco_teto = Column(Numeric(15, 2), nullable=True)
     cap_rate = Column(Numeric(8, 4), nullable=True)  # Para FIIs/REITs
+
+    # Campos de Renda Fixa (RFCALC-001)
+    taxa_cupom = Column(Numeric(8, 6), nullable=True)      # Taxa de cupom anual (ex: 0.1050 = 10,50%)
+    valor_nominal = Column(Numeric(15, 2), nullable=True)  # Valor nominal/face do título
+    data_vencimento = Column(Date, nullable=True)          # Vencimento do título RF
+
+    # Campos de FII/REIT (RFCALC-001)
+    ffo_por_cota = Column(Numeric(10, 4), nullable=True)   # Funds From Operations por cota
+    affo_por_cota = Column(Numeric(10, 4), nullable=True)  # Adjusted FFO por cota
     
     # Status
     ativo = Column(Boolean, default=True, nullable=False, index=True)
@@ -138,6 +147,7 @@ class Ativo(db.Model):
     # Constraint de unicidade: ticker deve ser único por mercado
     __table_args__ = (
         db.UniqueConstraint('ticker', 'mercado', name='uq_ativo_ticker_mercado'),
+        db.Index('ix_ativo_data_vencimento', 'data_vencimento'),
     )
     
     def __repr__(self):
@@ -161,6 +171,11 @@ class Ativo(db.Model):
             'beta': float(self.beta) if self.beta else None,
             'preco_teto': float(self.preco_teto) if self.preco_teto else None,
             'cap_rate': float(self.cap_rate) if self.cap_rate else None,
+            'taxa_cupom': float(self.taxa_cupom) if self.taxa_cupom else None,
+            'valor_nominal': float(self.valor_nominal) if self.valor_nominal else None,
+            'data_vencimento': self.data_vencimento.isoformat() if self.data_vencimento else None,
+            'ffo_por_cota': float(self.ffo_por_cota) if self.ffo_por_cota else None,
+            'affo_por_cota': float(self.affo_por_cota) if self.affo_por_cota else None,
             'ativo': self.ativo,
             'deslistado': self.deslistado,
             'data_deslistagem': self.data_deslistagem.isoformat() if self.data_deslistagem else None,

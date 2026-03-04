@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-04 18:40:50
+Gerado em: 2026-03-04 19:32:07
 ================================================================================
 
 ================================================================================
@@ -202,11 +202,17 @@ TABELA: ativo
  preco_teto          | numeric(18,6)            |           |          |         | main     |             |              | 
  beta                | numeric(8,4)             |           |          |         | main     |             |              | 
  cap_rate            | numeric(8,4)             |           |          |         | main     |             |              | Cap Rate - Taxa de capitalização para FIIs/REITs (ex: 0.06 = 6%)
+ taxa_cupom          | numeric(8,6)             |           |          |         | main     |             |              | Taxa de cupom anual (ex: 0.1050 = 10,50% a.a.)
+ valor_nominal       | numeric(15,2)            |           |          |         | main     |             |              | Valor nominal/face do título (ex: 1000.00)
+ data_vencimento     | date                     |           |          |         | plain    |             |              | Data de vencimento do título de renda fixa
+ ffo_por_cota        | numeric(10,4)            |           |          |         | main     |             |              | Funds From Operations por cota (FFO — FII/REIT)
+ affo_por_cota       | numeric(10,4)            |           |          |         | main     |             |              | Adjusted FFO por cota (AFFO — FFO menos capex de manutenção)
 Indexes:
     "ativo_pkey" PRIMARY KEY, btree (id)
     "ix_ativo_ativo" btree (ativo)
     "ix_ativo_classe" btree (classe)
     "ix_ativo_data_ultima_cotacao" btree (data_ultima_cotacao)
+    "ix_ativo_data_vencimento" btree (data_vencimento)
     "ix_ativo_deslistado" btree (deslistado)
     "ix_ativo_mercado" btree (mercado)
     "ix_ativo_moeda" btree (moeda)
@@ -252,7 +258,12 @@ Access method: heap
   20 | preco_teto          | numeric                  |         | YES   | 
   21 | beta                | numeric                  |         | YES   | 
   22 | cap_rate            | numeric                  |         | YES   | 
-(22 rows)
+  23 | taxa_cupom          | numeric                  |         | YES   | 
+  24 | valor_nominal       | numeric                  |         | YES   | 
+  25 | data_vencimento     | date                     |         | YES   | 
+  26 | ffo_por_cota        | numeric                  |         | YES   | 
+  27 | affo_por_cota       | numeric                  |         | YES   | 
+(27 rows)
 
 
 Foreign Keys:
@@ -287,7 +298,8 @@ Unique Constraints:
  ix_ativo_nome                | CREATE INDEX ix_ativo_nome ON public.ativo USING btree (nome)
  ix_ativo_ticker              | CREATE INDEX ix_ativo_ticker ON public.ativo USING btree (ticker)
  ix_ativo_tipo                | CREATE INDEX ix_ativo_tipo ON public.ativo USING btree (tipo)
-(10 rows)
+ ix_ativo_data_vencimento     | CREATE INDEX ix_ativo_data_vencimento ON public.ativo USING btree (data_vencimento)
+(11 rows)
 
 
 ________________________________________________________________________________
@@ -2042,7 +2054,7 @@ Total de Colunas por Tabela:
 ------------------------+-------------
  alembic_version        |           1
  alertas                |          15
- ativo                  |          22
+ ativo                  |          27
  auditoria_relatorios   |          13
  configuracoes_alertas  |          16
  corretora              |          11
