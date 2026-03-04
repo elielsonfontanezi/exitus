@@ -64,7 +64,7 @@
 | **EXITUS-IR-006** | DIRPF anual: relatório para Declaração de Ajuste Anual (fichas Renda Variável e Bens e Direitos) | Não implementado | Alto | Média |
 | **EXITUS-IR-007** | Alíquotas dinâmicas via tabela `regra_fiscal` (atualmente hardcoded em `ir_service.py`) | ✅ Concluído (03/03/2026) | Médio | Média |
 | **EXITUS-IR-008** | Tratamento fiscal de UNITs B3 no engine de IR (classificação, isenção R$20k, desmembramento→PM) | Não implementado | Médio | Baixa |
-| **EXITUS-IR-009** | Atualização regras fiscais 2026 (Lei 15.270/2025): JCP 17,5%, dividendos BR 10% acima R$50k, imposto mínimo | Não implementado | **Alto** | **Alta** |
+| **EXITUS-IR-009** | Atualização regras fiscais 2026 (Lei 15.270/2025): JCP 17,5%, dividendos BR 10% acima R$50k, imposto mínimo | ✅ Concluído (04/03/2026) | **Alto** | **Alta** |
 | **EXITUS-EXPORT-001** | Exportação genérica (CSV, Excel, JSON, PDF) | ✅ Concluído (03/03/2026) | Alto | Alta |
 
 ### 3. Fase 4 — Expansão de Funcionalidades (Média Prioridade)
@@ -463,7 +463,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-IR-006 | 3 | 📋 Planejado | — | DIRPF anual — fichas Renda Variável e Bens e Direitos |
 | EXITUS-IR-007 | 3 | ✅ Concluído | 03/03/2026 | Alíquotas dinâmicas via `regra_fiscal` — seed 5 regras, fallback hardcoded, 2 testes |
 | EXITUS-IR-008 | 3 | 📋 Planejado | — | UNITs B3: classificação fiscal + desmembramento→PM (depende UNITS-001) |
-| EXITUS-IR-009 | 3 | 📋 Planejado | — | Regras fiscais 2026 (Lei 15.270/2025): JCP 17,5%, dividendos 10%>R$50k (depende IR-004) |
+| EXITUS-IR-009 | 3 | ✅ Concluído | 04/03/2026 | JCP 17,5% (2026+), dividendos BR 10%>R$50k/CNPJ, regras seedadas — 3 testes |
 | EXITUS-EXPORT-001 | 3 | ✅ Concluído | 03/03/2026 | CSV, Excel, JSON, PDF — 32 testes |
 | EXITUS-MULTIMOEDA-001 | 4 | 📋 Planejado | — | Conversão automática BRL/USD/EUR |
 | EXITUS-UNITS-001 | 4 | 📋 Planejado | — | UNITS B3 |

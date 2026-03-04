@@ -1,10 +1,12 @@
 # EXITUS-IR-009 — Atualização de Regras Fiscais 2026 (Lei 15.270/2025)
 
-> **Status:** 📋 Planejado  
+> **Status:** ✅ Concluído (04/03/2026)  
 > **Prioridade:** Alta  
 > **Impacto:** Alto  
-> **Dependências:** EXITUS-IR-007 (alíquotas dinâmicas via `regra_fiscal`), EXITUS-IR-004 (proventos tributáveis)  
-> **Base legal:** Lei 15.270/2025 (sancionada 26/11/2025), PLP 128/2025 (JCP), vigência 01/01/2026
+> **Dependências:** EXITUS-IR-007 ✅, EXITUS-IR-004 ✅  
+> **Base legal:** Lei 15.270/2025 (sancionada 26/11/2025), PLP 128/2025 (JCP), vigência 01/01/2026  
+> **Testes:** 3 testes de integração (`TestRegrasFiscais2026`) — 100% passou  
+> **Suite total:** 146 passed, 0 failed
 
 ---
 
@@ -173,4 +175,34 @@ Para aplicar o limite de R$50k por CNPJ, o sistema precisa:
 
 ---
 
-*Criado em 04/03/2026. Aguarda conclusão de IR-004 para implementação.*
+---
+
+## 8. Implementação
+
+### 8.1 Seed realizado
+
+As seguintes regras foram inseridas em `exitusdb` e `exitusdb_test` com `vigencia_inicio = 2026-01-01`:
+
+| `tipo_operacao` | `aliquota_ir` | `valor_isencao` | Descrição |
+|---|---|---|---|
+| JCP | 17,5% | NULL | PLP 128/2025 |
+| DIVIDENDO | 0% | R\$50.000 | Lei 15.270/2025 — isenção até R\$50k por fonte |
+| DIVIDENDO_TRIBUTADO | 10% | NULL | Lei 15.270/2025 — acima de R\$50k |
+
+As regras pré-2026 (JCP 15%, DIVIDENDO BR 0% irrestrito) já tinham `vigencia_fim = 2025-12-31` e são ignoradas automaticamente pelo `_carregar_regras_fiscais(data_ref)` para meses de 2026+.
+
+### 8.2 Lógica implementada em `_apurar_proventos()`
+
+- **JCP:** aliquota resolvida dinamicamente pela data do mês — 15% até dez/2025, 17,5% a partir de jan/2026
+- **Dividendos BR (2026+):** agrupa por `ativo_id` (proxy CNPJ); se valor do ativo > R\$50k no mês → aplica 10% sobre **todo** o valor; caso contrário, isento
+- Resposta inclui campos `limite_isencao_por_cnpj` e `regime` (`'2026+'` ou `'pré-2026'`)
+
+### 8.3 Testes (`TestRegrasFiscais2026`)
+
+| Teste | Cenário | Verificação |
+|---|---|---|
+| `test_jcp_aliquota_17_5_em_2026` | JCP R\$1k em 2026-03 | alíquota=17.5, ir_retido=175 |
+| `test_dividendo_br_tributado_acima_50k_em_2026` | Dividendo R\$60k em 2026-03 | isento=False, ir_esperado=6000, regime='2026+' |
+| `test_dividendo_br_isento_abaixo_50k_em_2026` | Dividendo R\$30k em 2026-03 | isento=True, ir_esperado=0 |
+
+*Concluído em 04/03/2026.*

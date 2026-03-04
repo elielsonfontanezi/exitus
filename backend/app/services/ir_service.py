@@ -589,7 +589,7 @@ class IRService:
             r = regras.get(chave)
             if r:
                 return r['aliquota']
-            fallback = {'JCP': Decimal('0.15'), 'DIVIDENDO': Decimal('0'), 'ALUGUEL': Decimal('0.15')}
+            fallback = {'JCP': Decimal('0.175'), 'DIVIDENDO': Decimal('0'), 'ALUGUEL': Decimal('0.15')}
             return fallback.get(tipo_op, Decimal('0'))
 
         def _sumarizar(lista: list, pais: str, tipo_op: str) -> dict:
@@ -606,13 +606,57 @@ class IRService:
                 'isento':        aliquota == Decimal('0'),
             }
 
-        res_div_br  = _sumarizar(dividendos_br, 'BR', 'DIVIDENDO')
+        # --- Dividendos BR (IR-009): lógica de isenção com limite por fonte pagadora ---
+        # Regra pré-2026: 100% isento (alíquota 0%, sem valor_isencao relevante)
+        # Regra 2026+: isento até R$50k/mês por ativo_id (proxy CNPJ), 10% acima
+        regra_div_br = regras.get(('BR', None, 'DIVIDENDO'))
+        regra_div_trib = regras.get(('BR', None, 'DIVIDENDO_TRIBUTADO'))
+
+        if regra_div_trib and regra_div_br and regra_div_br.get('isencao'):
+            # Modo 2026+: limite R$50k por ativo_id
+            limite_isencao = regra_div_br['isencao']
+            aliquota_trib  = regra_div_trib['aliquota']
+            total_bruto_div_br  = Decimal('0')
+            total_retido_div_br = Decimal('0')
+            ir_esperado_div_br  = Decimal('0')
+
+            por_ativo: dict = {}
+            for t, _, _ in dividendos_br:
+                aid = str(t.ativo_id)
+                por_ativo.setdefault(aid, Decimal('0'))
+                por_ativo[aid] += Decimal(str(t.valor_total))
+                total_retido_div_br += Decimal(str(t.imposto or 0))
+                total_bruto_div_br  += Decimal(str(t.valor_total))
+
+            for valor_ativo in por_ativo.values():
+                if valor_ativo > limite_isencao:
+                    ir_esperado_div_br += (valor_ativo * aliquota_trib).quantize(
+                        Decimal('0.01'), rounding=ROUND_HALF_UP
+                    )
+
+            res_div_br = {
+                'valor_bruto':   float(total_bruto_div_br),
+                'ir_retido':     float(total_retido_div_br),
+                'ir_esperado':   float(ir_esperado_div_br),
+                'aliquota':      float(aliquota_trib * 100),
+                'operacoes':     len(dividendos_br),
+                'isento':        ir_esperado_div_br == Decimal('0'),
+                'limite_isencao_por_cnpj': float(limite_isencao),
+                'regime':        '2026+',
+            }
+        else:
+            # Modo pré-2026: 100% isento
+            res_div_br = _sumarizar(dividendos_br, 'BR', 'DIVIDENDO')
+            res_div_br['limite_isencao_por_cnpj'] = None
+            res_div_br['regime'] = 'pré-2026'
+
         res_jcp     = _sumarizar(jcp,           'BR', 'JCP')
         res_div_us  = _sumarizar(dividendos_us, 'US', 'DIVIDENDO')
         res_aluguel = _sumarizar(aluguel,       'BR', 'ALUGUEL')
 
         ir_retido_total = (
-            Decimal(str(res_jcp['ir_retido']))
+            Decimal(str(res_div_br['ir_retido']))
+            + Decimal(str(res_jcp['ir_retido']))
             + Decimal(str(res_div_us['ir_retido']))
             + Decimal(str(res_aluguel['ir_retido']))
         )
@@ -625,7 +669,8 @@ class IRService:
             'ir_retido_total': float(ir_retido_total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
             'obs': (
                 'IR de proventos retido na fonte. '
-                'Dividendos BR isentos até 2025. '
+                'A partir de 2026: dividendos BR tributados em 10% acima de R$50k/mês por empresa (CNPJ). '
+                'JCP: 17,5% IRRF (2026+). '
                 'Declarar na DIRPF anual para crédito/compensação.'
             ),
         }

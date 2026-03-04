@@ -561,3 +561,148 @@ class TestRegrasFiscais:
                     if r:
                         r.ativa = r_ativa
                 db.session.commit()
+
+
+@pytest.fixture
+def cenario_proventos_2026(app, auth_client, ativo_seed):
+    """
+    IR-009: Cria transações de JCP e dividendo BR em 2026-03.
+    - JCP R$1.000 → 17,5% retido = R$175
+    - Dividendo BR R$60.000 (acima do limite de R$50k) → 10% esperado sobre todo o valor = R$6.000
+    """
+    import uuid as uuid_lib
+    from flask_jwt_extended import decode_token
+    from app.database import db
+    from app.models.corretora import Corretora, TipoCorretora
+    from app.models.transacao import Transacao, TipoTransacao
+
+    token = auth_client._auth_headers['Authorization'].split(' ')[1]
+    with app.app_context():
+        decoded = decode_token(token)
+    usuario_id = decoded['sub']
+
+    suffix = str(uuid_lib.uuid4())[:8]
+    corretora = Corretora(
+        nome=f'BTG 2026 {suffix}',
+        tipo=TipoCorretora.CORRETORA,
+        pais='BR',
+        usuario_id=usuario_id,
+    )
+    db.session.add(corretora)
+    db.session.flush()
+
+    def _criar_provento_2026(tipo_str, ativo_id, valor, imposto_retido):
+        val = Decimal(str(valor))
+        imp = Decimal(str(imposto_retido))
+        t = Transacao(
+            usuario_id=usuario_id,
+            ativo_id=ativo_id,
+            corretora_id=corretora.id,
+            tipo=TipoTransacao(tipo_str),
+            data_transacao=__import__('datetime').datetime(2026, 3, 15, 10, 0),
+            quantidade=Decimal('1'),
+            preco_unitario=val,
+            valor_total=val,
+            taxa_corretagem=Decimal('0'),
+            taxa_liquidacao=Decimal('0'),
+            emolumentos=Decimal('0'),
+            imposto=imp,
+            outros_custos=Decimal('0'),
+            custos_totais=imp,
+            valor_liquido=val - imp,
+        )
+        db.session.add(t)
+        db.session.flush()
+        return t
+
+    t_jcp      = _criar_provento_2026('jcp',       ativo_seed.id, 1000.00, 175.00)   # 17,5% retido
+    t_div_br   = _criar_provento_2026('dividendo', ativo_seed.id, 60000.00, 6000.00)  # 10% retido (>R$50k)
+
+    db.session.commit()
+
+    yield {
+        'mes': '2026-03',
+        't_jcp': t_jcp,
+        't_div_br': t_div_br,
+        'corretora_id': corretora.id,
+    }
+
+    for tid in [t_jcp.id, t_div_br.id]:
+        Transacao.query.filter_by(id=tid).delete()
+    Corretora.query.filter_by(id=corretora.id).delete()
+    db.session.commit()
+
+
+class TestRegrasFiscais2026:
+    """IR-009: Regras fiscais 2026 — Lei 15.270/2025 e PLP 128/2025."""
+
+    def test_jcp_aliquota_17_5_em_2026(self, auth_client, cenario_proventos_2026):
+        """JCP em 2026 deve usar alíquota 17,5% (PLP 128/2025)."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2026-03', headers=auth_client._auth_headers)
+        assert rv.status_code == 200
+        jcp = rv.get_json()['data']['proventos']['jcp']
+        assert jcp['aliquota'] == 17.5
+        assert jcp['ir_retido'] == 175.0
+
+    def test_dividendo_br_tributado_acima_50k_em_2026(self, auth_client, cenario_proventos_2026):
+        """Dividendo BR de R$60k em 2026: deve ser tributado (isento=False, regime='2026+')."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2026-03', headers=auth_client._auth_headers)
+        div_br = rv.get_json()['data']['proventos']['dividendos_br']
+        assert div_br['isento'] is False
+        assert div_br['regime'] == '2026+'
+        assert div_br['ir_esperado'] == 6000.0
+        assert div_br['limite_isencao_por_cnpj'] == 50000.0
+
+    def test_dividendo_br_isento_abaixo_50k_em_2026(self, app, auth_client, ativo_seed):
+        """Dividendo BR de R$30k em 2026: deve ser isento (abaixo do limite)."""
+        import uuid as uuid_lib
+        from flask_jwt_extended import decode_token
+        from app.database import db
+        from app.models.corretora import Corretora, TipoCorretora
+        from app.models.transacao import Transacao, TipoTransacao
+
+        token = auth_client._auth_headers['Authorization'].split(' ')[1]
+        with app.app_context():
+            decoded = decode_token(token)
+        usuario_id = decoded['sub']
+
+        suffix = str(uuid_lib.uuid4())[:8]
+        corretora = Corretora(
+            nome=f'Rico 2026 {suffix}',
+            tipo=TipoCorretora.CORRETORA,
+            pais='BR',
+            usuario_id=usuario_id,
+        )
+        db.session.add(corretora)
+        db.session.flush()
+
+        val = Decimal('30000.00')
+        t = Transacao(
+            usuario_id=usuario_id,
+            ativo_id=ativo_seed.id,
+            corretora_id=corretora.id,
+            tipo=TipoTransacao.DIVIDENDO,
+            data_transacao=__import__('datetime').datetime(2026, 3, 20, 10, 0),
+            quantidade=Decimal('1'),
+            preco_unitario=val,
+            valor_total=val,
+            taxa_corretagem=Decimal('0'),
+            taxa_liquidacao=Decimal('0'),
+            emolumentos=Decimal('0'),
+            imposto=Decimal('0'),
+            outros_custos=Decimal('0'),
+            custos_totais=Decimal('0'),
+            valor_liquido=val,
+        )
+        db.session.add(t)
+        db.session.commit()
+
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2026-03', headers=auth_client._auth_headers)
+            div_br = rv.get_json()['data']['proventos']['dividendos_br']
+            assert div_br['isento'] is True
+            assert div_br['ir_esperado'] == 0.0
+        finally:
+            Transacao.query.filter_by(id=t.id).delete()
+            Corretora.query.filter_by(id=corretora.id).delete()
+            db.session.commit()
