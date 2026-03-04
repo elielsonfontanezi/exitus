@@ -241,6 +241,17 @@ def create_app(testing=False):
         pass
 
     # ============================================
+    # SWAGGER / OpenAPI (EXITUS-SWAGGER-001)
+    # ============================================
+    if not testing:
+        try:
+            from .swagger import init_swagger
+            init_swagger(app)
+            print("✅ Swagger UI registrado: /api/docs")
+        except Exception as e:
+            print(f"⚠️  Swagger não iniciado: {e}")
+
+    # ============================================
     # LOGS DE INICIALIZAÇÃO
     # ============================================
     print("=" * 60)

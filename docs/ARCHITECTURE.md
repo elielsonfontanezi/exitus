@@ -247,6 +247,20 @@ User: non-root (exitus:1000)
 
 > `exitusdb_test` é criado via `pg_dump --schema-only` do `exitusdb` — garante paridade total de schema, ENUMs e constraints. Nunca usar `db.create_all()` para isso (L-TEST-002).
 
+### OpenAPI / Swagger (EXITUS-SWAGGER-001)
+
+| Componente | Localização | Função |
+|---|---|---|
+| `swagger.py` | `backend/app/swagger.py` | `Api` flask-restx + 5 namespaces + modelos de schema |
+| Swagger UI | `GET /api/docs` | Interface interativa (desabilitada em `testing`) |
+| Spec JSON | `GET /api/swagger.json` | OpenAPI 2.0 spec (consumível por Postman, Insomnia, etc.) |
+
+**Namespaces documentados:** `auth` (4 endpoints), `ativos` (5), `transacoes` (3), `ir` (4), `export` (3) — 16 paths no total.
+
+**Integração:** `init_swagger(app)` registra o Blueprint `/api` com a `Api`. Ativado apenas se `not testing` — testes continuam usando os blueprints Flask nativos sem interferência.
+
+---
+
 ### Testes Automatizados
 
 | Componente | Localização | Função |

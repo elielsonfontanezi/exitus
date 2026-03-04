@@ -73,7 +73,7 @@
 |--------|---------------|--------|---------|------------|
 | **EXITUS-MULTIMOEDA-001** | Multi-moeda com conversão automática | Apenas BRL | Médio | Média |
 | **EXITUS-UNITS-001** | Tratamento de UNITS (B3) | Não implementado | Médio | Média |
-| **EXITUS-SWAGGER-001** | Auto-documentação OpenAPI/Swagger | Não implementado | Médio | Média |
+| **EXITUS-SWAGGER-001** | Auto-documentação OpenAPI/Swagger | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-ANOMALY-001** | Detecção de anomalias em preços (≥20% sem evento) | Não implementado | Médio | Média |
 | **EXITUS-RFCALC-001** | Cálculos RF (Duration, YTM) e FII (FFO, AFFO) | Não implementado | Médio | Média |
 | **EXITUS-NEWAPIS-001** | APIs de configuração (parametros_macro, fonte_dados) | Não implementado | Médio | Média |
@@ -370,9 +370,13 @@ Sem esse rateio, o custo de aquisição das ações resultantes fica **zerado**,
 - Limite de 10.000 registros fixo (futura paginação/streaming)
 
 ### EXITUS-SWAGGER-001: Auto-documentação OpenAPI
-**Problema:** 67+ endpoints sem documentação interativa. API_REFERENCE.md é estática.
+**Status:** ✅ Concluído (04/03/2026)
 
-**Implementação:** Flask-RESTX ou flasgger para geração automática de Swagger UI.
+**Implementação:**
+- `app/swagger.py`: `Api` flask-restx montada em Blueprint `/api` — Swagger UI em `/api/docs`, spec JSON em `/api/swagger.json`
+- Namespaces documentados: auth, ativos, transacoes, ir (apuracao/darf/historico/dirpf), export
+- Ativado apenas em modo `production`/`development` (desabilitado em `testing` para isolar testes)
+- JWT Bearer security scheme configurado na UI
 
 ### EXITUS-ANOMALY-001: Detecção de Anomalias em Preços
 **Problema:** Citado no Prompt Mestre mas não implementado.
@@ -467,7 +471,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-EXPORT-001 | 3 | ✅ Concluído | 03/03/2026 | CSV, Excel, JSON, PDF — 32 testes |
 | EXITUS-MULTIMOEDA-001 | 4 | 📋 Planejado | — | Conversão automática BRL/USD/EUR |
 | EXITUS-UNITS-001 | 4 | 📋 Planejado | — | UNITS B3 |
-| EXITUS-SWAGGER-001 | 4 | 📋 Planejado | — | OpenAPI auto-documentação |
+| EXITUS-SWAGGER-001 | 4 | ✅ Concluído | 04/03/2026 | Swagger UI `/api/docs`, spec JSON `/api/swagger.json`, 5 namespaces (auth, ativos, transacoes, ir, export) — flask-restx 1.3 |
 | EXITUS-ANOMALY-001 | 4 | 📋 Planejado | — | Alertas de preço anômalo |
 | EXITUS-RFCALC-001 | 4 | 📋 Planejado | — | Duration, YTM, FFO, AFFO |
 | EXITUS-NEWAPIS-001 | 4 | 📋 Planejado | — | `parametros_macro`, `fonte_dados` |
