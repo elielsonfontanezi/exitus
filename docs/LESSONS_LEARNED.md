@@ -344,6 +344,60 @@ podman exec exitus-db pg_dump -U exitus --schema-only --no-owner exitusdb | \
 
 ---
 
+### L-TEST-003 — `DetachedInstanceError` em teardown de testes — salvar IDs antes de sair do contexto
+**Origem:** EXITUS-IR-005 | **Data:** 04/03/2026
+
+```python
+# ❌ ERRADO — objeto fica detached ao sair do with app.app_context()
+with app.app_context():
+    resgate = Transacao(...)
+    db.session.commit()
+try:
+    ...
+finally:
+    Transacao.query.filter_by(id=resgate.id).delete()  # DetachedInstanceError!
+
+# ✅ CORRETO — salvar IDs escalares antes de sair do contexto
+with app.app_context():
+    resgate = Transacao(...)
+    db.session.commit()
+    resgate_id = resgate.id   # UUID copiado enquanto session está ativa
+try:
+    ...
+finally:
+    Transacao.query.filter_by(id=resgate_id).delete()  # ID escalar, sem detach
+    db.session.commit()
+```
+
+**Regra:** Em testes `function`-scoped com `app` fixture `session`-scoped, objetos SQLAlchemy
+não devem ser acessados fora do bloco que os criou. Copiar sempre `.id` (e outros escalares
+necessitários) antes de fechar o `with app.app_context()` ou antes do `commit` final.
+
+---
+
+### L-TEST-004 — Usar `decode_token` para obter `usuario_id` do `auth_client` em fixtures
+**Origem:** EXITUS-IR-005 | **Data:** 04/03/2026
+
+```python
+# ❌ ERRADO — busca um usuário aleatório do banco (pode não ser o do token JWT)
+from app.models.usuario import Usuario
+u = Usuario.query.filter(Usuario.username.like('ta%')).first()
+# Cria dados vinculados a u.id, mas auth_client tem token de outro usuário
+
+# ✅ CORRETO — extrair usuario_id diretamente do token JWT do auth_client
+from flask_jwt_extended import decode_token
+token = auth_client._auth_headers['Authorization'].split(' ')[1]
+with app.app_context():
+    decoded = decode_token(token)
+usuario_id = decoded['sub']  # UUID do usuário que o endpoint irá usar
+```
+
+**Regra:** Em testes que criam dados de setup e chamam endpoints autenticados via `auth_client`,
+os dados devem ser criados com o `usuario_id` extraido do token — nunca via query heurística
+no banco. Isso garante que a apuração encontre exatamente os dados criados pelo teste.
+
+---
+
 ## 📋 Referências
 
 | Documento | Papel |

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Exitus - IR Service (EXITUS-IR-001 + IR-002 + IR-003 + IR-004 + IR-006)
-Engine de cálculo de Imposto de Renda sobre operações de renda variável.
+Exitus - IR Service (EXITUS-IR-001 + IR-002 + IR-003 + IR-004 + IR-005 + IR-006)
+Engine de cálculo de Imposto de Renda sobre operações de renda variável e renda fixa.
 
 Regras implementadas (Brasil):
 - Swing trade ações: 15% sobre lucro mensal, isenção R$20.000/mês em vendas
@@ -10,6 +10,7 @@ Regras implementadas (Brasil):
 - Custo de aquisição via preço médio ponderado (PM) da tabela `posicao` (IR-002)
 - Compensação de prejuízo acumulado entre meses por categoria (IR-003)
 - Proventos (IR-004): dividendos BR isentos, JCP 15% retido na fonte, dividendos US 15% CRÉDITO IRS, aluguel 15%
+- Renda fixa (IR-005): tabela regressiva 22,5%→15% por prazo; LCI/LCA isento PF
 - Alíquotas dinâmicas via tabela `regra_fiscal` (IR-007)
 - DARF: código de receita por categoria
 
@@ -61,6 +62,19 @@ TIPOS_FII = {TipoAtivo.FII}
 TIPOS_US = {TipoAtivo.STOCK, TipoAtivo.REIT, TipoAtivo.ETF, TipoAtivo.BOND}
 TIPOS_BR = {TipoAtivo.ACAO, TipoAtivo.FII, TipoAtivo.CDB, TipoAtivo.LCI_LCA,
             TipoAtivo.TESOURO_DIRETO, TipoAtivo.DEBENTURE}
+
+# Renda fixa (IR-005)
+TIPOS_RF_TRIBUTADO = {TipoAtivo.CDB, TipoAtivo.TESOURO_DIRETO, TipoAtivo.DEBENTURE}
+TIPOS_RF_ISENTO    = {TipoAtivo.LCI_LCA}   # Isentos para PF (Lei 12.431)
+TIPOS_RF           = TIPOS_RF_TRIBUTADO | TIPOS_RF_ISENTO
+
+# Tabela regressiva IR RF (IN RFB 1.585/2015)
+TABELA_REGRESSIVA_RF = [
+    (180, Decimal('0.225')),   # ≤180 dias
+    (360, Decimal('0.200')),   # 181–360 dias
+    (720, Decimal('0.175')),   # 361–720 dias
+]  # >720 dias → 15%
+ALIQUOTA_RF_MINIMA = Decimal('0.150')
 
 
 # ---------------------------------------------------------------------------
@@ -167,6 +181,23 @@ def _regra_para_categoria(regras: dict, categoria: str) -> dict:
     return regras.get(chave, fallback[categoria])
 
 
+def _aliquota_rf(prazo_dias: int) -> Decimal:
+    """
+    Retorna a alíquota de IR aplicada ao resgate de renda fixa conforme
+    tabela regressiva (IN RFB 1.585/2015).
+
+    Args:
+        prazo_dias: número de dias corridos entre compra e resgate
+
+    Returns:
+        Decimal com a alíquota (0.225, 0.200, 0.175 ou 0.150)
+    """
+    for limite, aliquota in TABELA_REGRESSIVA_RF:
+        if prazo_dias <= limite:
+            return aliquota
+    return ALIQUOTA_RF_MINIMA
+
+
 def _custo_medio(compras: list) -> Decimal:
     """Custo médio ponderado de compras (PEPS simplificado: usa PM geral do mês)."""
     total_qtd = sum(Decimal(str(c.quantidade)) for c in compras)
@@ -232,11 +263,19 @@ class IRService:
             if p.preco_medio and p.preco_medio > 0
         }
 
+        # Mapa: (ativo_id_str, corretora_id_str) → data_primeira_compra (IR-005)
+        data_compra_map = {
+            (str(p.ativo_id), str(p.corretora_id)): p.data_primeira_compra
+            for p in posicoes
+            if p.data_primeira_compra
+        }
+
         # Separar por categoria
         swing_acoes   = []   # vendas swing ações BR
         day_trade     = []   # vendas day-trade (qualquer tipo)
         fiis          = []   # vendas FIIs
         exterior      = []   # vendas US/exterior
+        resgates_rf   = []   # resgates renda fixa (IR-005)
         compras_todas = []   # todas as compras (para custo médio)
 
         # Acumulador por corretora: {corretora_id: {nome, vendas, lucro, ir}}
@@ -272,7 +311,9 @@ class IRService:
             # É venda — classificar
             is_dt = _is_day_trade(t, [r[0] for r in transacoes if r[0].tipo == TipoTransacao.COMPRA])
 
-            if is_dt:
+            if tipo_ativo in TIPOS_RF:
+                resgates_rf.append((t, tipo_ativo, ticker))
+            elif is_dt:
                 day_trade.append((t, tipo_ativo, ticker))
             elif tipo_ativo in TIPOS_FII:
                 fiis.append((t, tipo_ativo, ticker))
@@ -301,6 +342,7 @@ class IRService:
         res_dt       = IRService._apurar_day_trade(day_trade, pm_map, regras_fiscais)
         res_fii      = IRService._apurar_fiis(fiis, pm_map, regras_fiscais)
         res_exterior = IRService._apurar_exterior(exterior, pm_map, regras_fiscais)
+        res_rf       = IRService._apurar_renda_fixa(resgates_rf, pm_map, data_compra_map, dt_fim)
 
         # Apurar proventos (IR-004)
         res_proventos = IRService._apurar_proventos(
@@ -385,10 +427,11 @@ class IRService:
         ir_dt       = Decimal(str(resultados['day_trade']['ir_devido']))
         ir_fii      = Decimal(str(resultados['fiis']['ir_devido']))
         ir_exterior = Decimal(str(resultados['exterior']['ir_devido']))
-        ir_total    = ir_swing + ir_dt + ir_fii + ir_exterior
+        ir_rf       = Decimal(str(res_rf['ir_devido']))
+        ir_total    = ir_swing + ir_dt + ir_fii + ir_exterior + ir_rf
 
         # DARF
-        darf = IRService._calcular_darf(ir_swing + ir_dt + ir_fii, ir_exterior)
+        darf = IRService._calcular_darf(ir_swing + ir_dt + ir_fii, ir_exterior, ir_rf)
 
         # Alertas
         alertas = []
@@ -398,7 +441,7 @@ class IRService:
                 "Sem PM, o custo de aquisição será zero e o IR calculado pode ser maior que o real."
             )
         # Coletar alertas de PM não encontrado das categorias
-        for res in (res_swing, res_dt, res_fii, res_exterior):
+        for res in (res_swing, res_dt, res_fii, res_exterior, res_rf):
             alertas.extend(res.pop('_alertas_pm', []))
         if res_swing.get('isento'):
             alertas.append(f"Vendas de ações em {mes_str} abaixo de R$20.000 — isento de IR (swing trade).")
@@ -424,6 +467,7 @@ class IRService:
                 'day_trade':   res_dt,
                 'fiis':        res_fii,
                 'exterior':    res_exterior,
+                'renda_fixa':  res_rf,
             },
             'proventos': res_proventos,
             'por_corretora': corretoras_lista,
@@ -680,11 +724,141 @@ class IRService:
         }
 
     # -----------------------------------------------------------------------
+    # Renda Fixa (IR-005)
+    # -----------------------------------------------------------------------
+
+    @staticmethod
+    def _apurar_renda_fixa(
+        resgates: list,
+        pm_map: dict,
+        data_compra_map: dict,
+        dt_ref: date,
+    ) -> dict:
+        """
+        Apura IR sobre resgates de renda fixa (IR-005).
+
+        Regras:
+        - CDB / Tesouro Direto / Debêntures: tabela regressiva por prazo
+          (≤18 dias 22,5% → 181-360d 20% → 361-720d 17,5% → >720d 15%)
+        - LCI/LCA: isento para PF (Lei 12.431)
+        - Prazo calculado a partir de `posicao.data_primeira_compra`;
+          se não encontrado, assume prazo 0 (alíquota máxima 22,5%).
+        - IR é retido na fonte; o campo `imposto` da transação registra o retido.
+        - Não gera compensação de prejuízo entre meses.
+
+        Args:
+            resgates: lista de (Transacao, tipo_ativo, ticker)
+            pm_map: mapa (ativo_id, corretora_id) → preco_medio
+            data_compra_map: mapa (ativo_id, corretora_id) → data_primeira_compra
+            dt_ref: data de referência do mês (usado para calcular prazo)
+
+        Returns:
+            dict com breakdown de renda_fixa compatível com as demais categorias
+        """
+        if not resgates:
+            return {
+                'valor_resgatado':  0.0,
+                'rendimento_bruto': 0.0,
+                'ir_devido':        Decimal('0'),
+                'ir_retido':        0.0,
+                'aliquota_media':   0.0,
+                'operacoes':        0,
+                'isento':           True,
+                'detalhes':         [],
+                '_alertas_pm':      [],
+            }
+
+        total_resgatado  = Decimal('0')
+        total_rendimento = Decimal('0')
+        total_ir_devido  = Decimal('0')
+        total_ir_retido  = Decimal('0')
+        alertas_pm       = []
+        detalhes         = []
+
+        for t, tipo_ativo, ticker in resgates:
+            valor_resgate = Decimal(str(t.valor_total))
+            ir_retido_op  = Decimal(str(t.imposto or 0))
+
+            # Isento para LCI/LCA
+            if tipo_ativo in TIPOS_RF_ISENTO:
+                detalhes.append({
+                    'ticker':    ticker,
+                    'tipo':      tipo_ativo.value,
+                    'valor':     float(valor_resgate),
+                    'aliquota':  0.0,
+                    'ir_devido': 0.0,
+                    'ir_retido': float(ir_retido_op),
+                    'prazo_dias': None,
+                    'isento':    True,
+                    'motivo_isencao': 'LCI/LCA — isento PF (Lei 12.431)',
+                })
+                total_resgatado  += valor_resgate
+                total_ir_retido  += ir_retido_op
+                continue
+
+            # Calcular PM e rendimento
+            chave = (str(t.ativo_id), str(t.corretora_id))
+            pm = pm_map.get(chave, Decimal('0'))
+            if pm == 0:
+                alertas_pm.append(
+                    f"PM não encontrado para {ticker} (RF) — custo de aquisição assumido como zero."
+                )
+            custo = pm * Decimal(str(t.quantidade))
+            rendimento = valor_resgate - custo - Decimal(str(t.custos_totais or 0))
+
+            # Calcular prazo para tabela regressiva
+            data_compra = data_compra_map.get(chave)
+            if data_compra:
+                dt_resgate = t.data_transacao.date() if hasattr(t.data_transacao, 'date') else t.data_transacao
+                prazo_dias = (dt_resgate - data_compra).days
+            else:
+                prazo_dias = 0  # sem info: assume prazo mínimo (alíquota máxima)
+
+            aliquota = _aliquota_rf(prazo_dias)
+            ir_op = Decimal('0')
+            if rendimento > 0:
+                ir_op = (rendimento * aliquota).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+            total_resgatado  += valor_resgate
+            total_rendimento += rendimento
+            total_ir_devido  += ir_op
+            total_ir_retido  += ir_retido_op
+
+            detalhes.append({
+                'ticker':    ticker,
+                'tipo':      tipo_ativo.value,
+                'valor':     float(valor_resgate),
+                'aliquota':  float(aliquota * 100),
+                'ir_devido': float(ir_op),
+                'ir_retido': float(ir_retido_op),
+                'prazo_dias': prazo_dias,
+                'isento':    False,
+                'motivo_isencao': None,
+            })
+
+        aliquota_media = (
+            float((total_ir_devido / total_rendimento * 100).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP))
+            if total_rendimento > 0 else 0.0
+        )
+
+        return {
+            'valor_resgatado':  float(total_resgatado.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+            'rendimento_bruto': float(total_rendimento.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+            'ir_devido':        total_ir_devido,
+            'ir_retido':        float(total_ir_retido.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+            'aliquota_media':   aliquota_media,
+            'operacoes':        len(resgates),
+            'isento':           total_ir_devido == Decimal('0'),
+            'detalhes':         detalhes,
+            '_alertas_pm':      alertas_pm,
+        }
+
+    # -----------------------------------------------------------------------
     # DARF
     # -----------------------------------------------------------------------
 
     @staticmethod
-    def _calcular_darf(ir_br: Decimal, ir_exterior: Decimal) -> dict:
+    def _calcular_darf(ir_br: Decimal, ir_exterior: Decimal, ir_rf: Decimal = Decimal('0')) -> dict:
         """Monta resumo de DARF a pagar."""
         darfs = []
 
@@ -704,6 +878,15 @@ class IRService:
                 'valor':          float(ir_exterior.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
                 'pagar':          ir_exterior >= DARF_MINIMO,
                 'obs':            None if ir_exterior >= DARF_MINIMO else f'Abaixo do mínimo (R$10,00) — acumular',
+            })
+
+        if ir_rf > 0:
+            darfs.append({
+                'codigo_receita': DARF_RENDA_FIXA,
+                'descricao':      'IR renda fixa — tabela regressiva (retido na fonte)',
+                'valor':          float(ir_rf.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'pagar':          False,
+                'obs':            'Retido na fonte pela instituição financeira — informativo',
             })
 
         return darfs
@@ -773,6 +956,14 @@ class IRService:
             'fiis':        {'lucro': Decimal('0'), 'prejuizo': Decimal('0'), 'ir_pago': Decimal('0'), 'operacoes': 0},
             'exterior':    {'lucro': Decimal('0'), 'prejuizo': Decimal('0'), 'ir_pago': Decimal('0'), 'operacoes': 0},
         }
+        # Renda fixa: acumulador separado (IR-005) — sem lucro/prejuízo, só rendimento e IR
+        rf_total: dict = {
+            'valor_resgatado':  Decimal('0'),
+            'rendimento_bruto': Decimal('0'),
+            'ir_pago':          Decimal('0'),
+            'ir_retido':        Decimal('0'),
+            'operacoes':        0,
+        }
         prov_total: dict = {
             'dividendos_br': {'valor_bruto': Decimal('0'), 'ir_retido': Decimal('0'), 'operacoes': 0},
             'jcp':           {'valor_bruto': Decimal('0'), 'ir_retido': Decimal('0'), 'operacoes': 0},
@@ -789,8 +980,18 @@ class IRService:
                 logger.warning(f"IR-006: erro ao apurar {mes_str}: {e}")
                 continue
 
-            # Renda variável
+            # Renda variável (categorias swing/dt/fii/exterior)
             for cat_key, cat in ap['categorias'].items():
+                if cat_key == 'renda_fixa':
+                    # Acumular RF separadamente
+                    rf_total['valor_resgatado']  += Decimal(str(cat.get('valor_resgatado', 0) or 0))
+                    rf_total['rendimento_bruto'] += Decimal(str(cat.get('rendimento_bruto', 0) or 0))
+                    rf_total['ir_pago']          += Decimal(str(cat.get('ir_devido', 0) or 0))
+                    rf_total['ir_retido']        += Decimal(str(cat.get('ir_retido', 0) or 0))
+                    rf_total['operacoes']        += int(cat.get('operacoes', 0) or 0)
+                    continue
+                if cat_key not in rv_por_categoria:
+                    continue
                 acc = rv_por_categoria[cat_key]
                 lucro_mes  = Decimal(str(cat.get('lucro_liquido', 0) or 0))
                 ir_mes     = Decimal(str(cat.get('ir_devido', 0) or 0))
@@ -883,6 +1084,13 @@ class IRService:
             'renda_variavel': {
                 cat: _ser_rv(acc)
                 for cat, acc in rv_por_categoria.items()
+            },
+            'renda_fixa': {
+                'valor_resgatado':  float(rf_total['valor_resgatado'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'rendimento_bruto': float(rf_total['rendimento_bruto'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'ir_pago':          float(rf_total['ir_pago'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'ir_retido':        float(rf_total['ir_retido'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'operacoes':        rf_total['operacoes'],
             },
             'ir_total_ano': float(ir_total_ano.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
             'proventos': {

@@ -775,3 +775,203 @@ class TestDirpf:
         assert rv.status_code == 200
         swing = rv.get_json()['data']['renda_variavel']['swing_acoes']
         assert swing['operacoes'] > 0
+
+    def test_dirpf_contem_ficha_renda_fixa(self, auth_client):
+        """DIRPF deve conter ficha renda_fixa com campos obrigatórios (IR-005)."""
+        rv = auth_client.get('/api/ir/dirpf?ano=2025', headers=auth_client._auth_headers)
+        assert rv.status_code == 200
+        data = rv.get_json()['data']
+        assert 'renda_fixa' in data
+        rf = data['renda_fixa']
+        for campo in ('valor_resgatado', 'rendimento_bruto', 'ir_pago', 'ir_retido', 'operacoes'):
+            assert campo in rf, f"Campo {campo} ausente em renda_fixa"
+
+
+class TestRendaFixa:
+    """IR-005: Apuração de IR sobre renda fixa — tabela regressiva 22,5%→15%, isenção LCI/LCA."""
+
+    def _setup(self, app, auth_client, tipo_ativo_str, data_compra_str,
+               data_resgate_str, preco_resgate, nome_prefix, imposto=Decimal('0')):
+        """Helper: cria ativo RF, posição e resgate vinculados ao usuário do auth_client."""
+        from flask_jwt_extended import decode_token
+        from app.database import db
+        from app.models.ativo import Ativo, TipoAtivo, ClasseAtivo
+        from app.models.corretora import Corretora, TipoCorretora
+        from app.models.posicao import Posicao
+        from app.models.transacao import Transacao, TipoTransacao
+        from datetime import date
+
+        token = auth_client._auth_headers['Authorization'].split(' ')[1]
+        with app.app_context():
+            decoded = decode_token(token)
+        usuario_id = decoded['sub']
+
+        suffix = str(uuid.uuid4())[:8]
+        corretora = Corretora(nome=f'{nome_prefix} {suffix}', tipo=TipoCorretora.CORRETORA,
+                              pais='BR', usuario_id=usuario_id)
+        db.session.add(corretora)
+        db.session.flush()
+
+        ativo = Ativo(
+            ticker=f'RF{suffix}', nome=f'Ativo RF {suffix}',
+            tipo=TipoAtivo(tipo_ativo_str), classe=ClasseAtivo.RENDA_FIXA,
+            mercado='BR', moeda='BRL', preco_atual=Decimal('1000.00'),
+        )
+        db.session.add(ativo)
+        db.session.flush()
+
+        custo = Decimal('1000.00')
+        posicao = Posicao(
+            usuario_id=usuario_id, ativo_id=ativo.id, corretora_id=corretora.id,
+            quantidade=Decimal('1'), preco_medio=Decimal('1000.00'), custo_total=custo,
+            data_primeira_compra=date.fromisoformat(data_compra_str),
+        )
+        db.session.add(posicao)
+        db.session.flush()
+
+        preco_d = Decimal(str(preco_resgate))
+        resgate = Transacao(
+            usuario_id=usuario_id, ativo_id=ativo.id, corretora_id=corretora.id,
+            tipo=TipoTransacao.VENDA,
+            data_transacao=datetime.fromisoformat(data_resgate_str),
+            quantidade=Decimal('1'), preco_unitario=preco_d,
+            valor_total=preco_d,
+            taxa_corretagem=Decimal('0'), taxa_liquidacao=Decimal('0'),
+            emolumentos=Decimal('0'), imposto=imposto,
+            outros_custos=Decimal('0'), custos_totais=Decimal('0'),
+            valor_liquido=preco_d - imposto,
+        )
+        db.session.add(resgate)
+        db.session.commit()
+
+        return {
+            'resgate_id':  resgate.id,
+            'posicao_id':  posicao.id,
+            'ativo_id':    ativo.id,
+            'corretora_id': corretora.id,
+        }
+
+    def _teardown(self, ids):
+        from app.database import db
+        from app.models.transacao import Transacao
+        from app.models.posicao import Posicao
+        from app.models.ativo import Ativo
+        from app.models.corretora import Corretora
+        Transacao.query.filter_by(id=ids['resgate_id']).delete()
+        Posicao.query.filter_by(id=ids['posicao_id']).delete()
+        Ativo.query.filter_by(id=ids['ativo_id']).delete()
+        Corretora.query.filter_by(id=ids['corretora_id']).delete()
+        db.session.commit()
+
+    def test_sem_resgates_rf_retorna_zero(self, auth_client):
+        """Mês sem resgates RF: renda_fixa deve ter operacoes=0 e ir_devido=0."""
+        rv = auth_client.get('/api/ir/apuracao?mes=2020-01', headers=auth_client._auth_headers)
+        assert rv.status_code == 200
+        rf = rv.get_json()['data']['categorias']['renda_fixa']
+        assert rf['operacoes'] == 0
+        assert rf['ir_devido'] == 0.0
+        assert rf['isento'] is True
+
+    def test_lci_isento(self, app, auth_client):
+        """Resgate de LCI/LCA deve ser isento (alíquota 0%, ir_devido=0)."""
+        ids = self._setup(app, auth_client, 'lci_lca',
+                          data_compra_str='2024-01-01',
+                          data_resgate_str='2025-03-15T10:00:00',
+                          preco_resgate=1100, nome_prefix='Corr LCI')
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2025-03', headers=auth_client._auth_headers)
+            assert rv.status_code == 200
+            rf = rv.get_json()['data']['categorias']['renda_fixa']
+            assert rf['operacoes'] == 1
+            assert rf['ir_devido'] == 0.0
+            assert rf['isento'] is True
+            det = rf['detalhes'][0]
+            assert det['isento'] is True
+            assert 'LCI/LCA' in det['motivo_isencao']
+        finally:
+            self._teardown(ids)
+
+    def test_cdb_curto_prazo_22_5(self, app, auth_client):
+        """CDB com prazo ≤180 dias (90d): alíquota 22,5%, rendimento R$100, IR=R$22,50."""
+        ids = self._setup(app, auth_client, 'cdb',
+                          data_compra_str='2025-01-04',
+                          data_resgate_str='2025-04-04T10:00:00',
+                          preco_resgate=1100, nome_prefix='Corr CDB')
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2025-04', headers=auth_client._auth_headers)
+            assert rv.status_code == 200
+            rf = rv.get_json()['data']['categorias']['renda_fixa']
+            assert rf['operacoes'] == 1
+            det = rf['detalhes'][0]
+            assert det['aliquota'] == 22.5
+            assert det['prazo_dias'] == 90
+            assert det['isento'] is False
+            assert rf['rendimento_bruto'] == pytest.approx(100.0, abs=0.01)
+            assert det['ir_devido'] == pytest.approx(22.5, abs=0.01)
+        finally:
+            self._teardown(ids)
+
+    def test_tesouro_direto_prazo_medio_20(self, app, auth_client):
+        """Tesouro Direto com prazo 181–360 dias (~270d): alíquota 20%."""
+        ids = self._setup(app, auth_client, 'tesouro_direto',
+                          data_compra_str='2024-07-09',
+                          data_resgate_str='2025-04-04T10:00:00',
+                          preco_resgate=1150, nome_prefix='Corr TD')
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2025-04', headers=auth_client._auth_headers)
+            assert rv.status_code == 200
+            rf = rv.get_json()['data']['categorias']['renda_fixa']
+            det = rf['detalhes'][0]
+            assert det['aliquota'] == 20.0
+            assert 181 <= det['prazo_dias'] <= 360
+        finally:
+            self._teardown(ids)
+
+    def test_debenture_prazo_longo_15(self, app, auth_client):
+        """Debênture com prazo >720 dias (~800d): alíquota 15%, IR=R$30."""
+        ids = self._setup(app, auth_client, 'debenture',
+                          data_compra_str='2022-12-21',
+                          data_resgate_str='2025-03-01T10:00:00',
+                          preco_resgate=1200, nome_prefix='Corr DEB')
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2025-03', headers=auth_client._auth_headers)
+            assert rv.status_code == 200
+            rf = rv.get_json()['data']['categorias']['renda_fixa']
+            det = rf['detalhes'][0]
+            assert det['aliquota'] == 15.0
+            assert det['prazo_dias'] > 720
+            assert det['ir_devido'] == pytest.approx(30.0, abs=0.01)
+        finally:
+            self._teardown(ids)
+
+    def test_rf_aparece_no_darf_informativo(self, app, auth_client):
+        """IR de RF deve aparecer no DARF com pagar=False (retido na fonte)."""
+        ids = self._setup(app, auth_client, 'cdb',
+                          data_compra_str='2025-01-01',
+                          data_resgate_str='2025-04-01T10:00:00',
+                          preco_resgate=1100, nome_prefix='Corr DARF',
+                          imposto=Decimal('22.50'))
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2025-04', headers=auth_client._auth_headers)
+            assert rv.status_code == 200
+            darf = rv.get_json()['data']['darf']
+            rf_darfs = [d for d in darf if 'renda fixa' in d.get('descricao', '').lower()]
+            assert len(rf_darfs) >= 1
+            assert rf_darfs[0]['pagar'] is False
+        finally:
+            self._teardown(ids)
+
+    def test_rf_nao_afeta_swing_acoes(self, app, auth_client, cenario_ir):
+        """Resgate de CDB no mesmo mês não deve poluir swing_acoes."""
+        ids = self._setup(app, auth_client, 'cdb',
+                          data_compra_str='2025-01-01',
+                          data_resgate_str='2025-03-15T10:00:00',
+                          preco_resgate=1100, nome_prefix='Corr ISO')
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2025-03', headers=auth_client._auth_headers)
+            assert rv.status_code == 200
+            cats = rv.get_json()['data']['categorias']
+            assert cats['swing_acoes']['operacoes'] > 0
+            assert cats['renda_fixa']['operacoes'] >= 1
+        finally:
+            self._teardown(ids)

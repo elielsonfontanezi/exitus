@@ -9,6 +9,24 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-ANOMALY-001** — Detecção de preços anômalos (04/03/2026)
+  - `app/services/anomaly_service.py`: novo serviço `AnomalyService` com dois métodos:
+    - `detectar_anomalias(limiar, ativo_id, data_ref)` — varre `historico_preco`, detecta variações ≥ limiar, suprime se houver `EventoCorporativo` na janela de ±5 dias
+    - `verificar_ativo(ativo_id, preco_novo, data_novo, limiar)` — detecção inline ao salvar nova cotação
+  - `app/blueprints/cotacoes_blueprint.py`: novo endpoint `GET /api/cotacoes/anomalias` (params: `limiar`, `ativo_id`, `data_ref`); integração inline ao salvar preço no `GET /<ticker>`
+  - `tests/test_anomaly_integration.py`: 17 testes (endpoint 401/400/200, service detectar 8 cenários, service verificar_ativo 4 cenários)
+  - **Suite total: 179 passed, 0 failed**
+
+- **EXITUS-IR-005** — IR sobre renda fixa — tabela regressiva (04/03/2026)
+  - `ir_service.py`: constantes `TIPOS_RF`, `TABELA_RF`, helper `_aliquota_rf(prazo_dias)`
+  - `ir_service.py`: novo método `_apurar_renda_fixa(resgates, pm_map, data_compra_map, dt_ref)` — aplica tabela regressiva 22,5%→20%→17,5%→15%, isenção total para LCI/LCA (PF)
+  - `ir_service.py`: `apurar_mes()` coleta resgates RF, monta `data_compra_map` de `Posicao`, chama `_apurar_renda_fixa`, inclui `renda_fixa` em `categorias`
+  - `ir_service.py`: `_calcular_darf()` aceita `ir_rf` — adiciona entrada informativa DARF código `0561` com `pagar=False` (retido na fonte)
+  - `ir_service.py`: `gerar_dirpf()` — acumulador `rf_total`, agrega ficha `renda_fixa` no relatório anual
+  - `tests/test_ir_integration.py`: classe `TestRendaFixa` (+7 testes: sem resgates, LCI isento, CDB 22,5%, TD 20%, Debênture 15%, DARF informativo, isolamento swing)
+  - Padrão de fixtures `_setup()/_teardown()` com `decode_token` para obter `usuario_id` do `auth_client`
+  - **Suite total: 162 passed, 0 failed** (antes de ANOMALY-001)
+
 - **EXITUS-IR-009** — GAP: Atualização de Regras Fiscais 2026 (04/03/2026)
   - `docs/EXITUS-IR-009.md`: design completo criado
   - Mudanças mapeadas: JCP 15%→17,5% (PLP 128/2025), dividendos BR isenção limitada R$50k/mês/CNPJ com 10% acima, imposto mínimo até 10% progressivo para renda>R$600k/ano, aluguel tabela regressiva 22,5%→15%

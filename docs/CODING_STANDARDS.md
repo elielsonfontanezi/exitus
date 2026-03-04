@@ -326,6 +326,46 @@ python -m pytest tests/
 # Nunca usar db.create_all() — falha com ENUMs PostgreSQL (L-TEST-002)
 ```
 
+### **Fixtures com setup/teardown inline — padrão _setup/_teardown (IR-005)**
+
+Quando um teste precisa criar dados diretamente no banco (sem fixture de módulo),
+usar o padrão helper `_setup() / _teardown()` com `decode_token` para garantir
+que os dados pertencem ao mesmo usuário do `auth_client`:
+
+```python
+def _setup(self, app, auth_client, ...):
+    from flask_jwt_extended import decode_token
+    token = auth_client._auth_headers['Authorization'].split(' ')[1]
+    with app.app_context():
+        decoded = decode_token(token)
+    usuario_id = decoded['sub']   # ✅ mesmo usuário do token JWT
+
+    # criar objetos com usuario_id correto
+    obj = Modelo(usuario_id=usuario_id, ...)
+    db.session.add(obj)
+    db.session.commit()
+    return {'obj_id': obj.id}     # ✅ retornar IDs escalares, não objetos
+
+def _teardown(self, ids):
+    Modelo.query.filter_by(id=ids['obj_id']).delete()
+    db.session.commit()
+
+def test_algo(self, app, auth_client):
+    ids = self._setup(app, auth_client, ...)
+    try:
+        rv = auth_client.get('/api/...', headers=auth_client._auth_headers)
+        assert rv.status_code == 200
+    finally:
+        self._teardown(ids)        # ✅ teardown garantido mesmo com falha
+```
+
+**Regras:**
+- Nunca buscar usuário por `query.filter(username.like(...))` em testes — usar `decode_token`
+- Nunca acessar atributos de objetos ORM fora do bloco que os criou (ver L-TEST-003)
+- Sempre retornar IDs escalares de `_setup()`, nunca objetos SQLAlchemy
+
+---
+
 ### **Anti-patterns de teste**
 ```python
 # ❌ Username hardcoded
@@ -370,5 +410,5 @@ assert response.get_json()['success'] is True
 
 ---
 
-*Atualizado: 03 de Março de 2026*  
-*Versão: 3.0 - Padrões de teste adicionados (EXITUS-TESTDB-001)*
+*Atualizado: 04 de Março de 2026*  
+*Versão: 3.1 - Padrão _setup/_teardown com decode_token adicionado (EXITUS-IR-005)*

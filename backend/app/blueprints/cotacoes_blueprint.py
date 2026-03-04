@@ -4,7 +4,9 @@ from flask_jwt_extended import jwt_required
 from app.database import db
 from app.models import Ativo
 from app.services.cotacoes_service import CotacoesService
-from datetime import datetime, timedelta
+from app.services.anomaly_service import AnomalyService
+from datetime import datetime, date, timedelta
+from decimal import Decimal
 import logging
 
 logger = logging.getLogger(__name__)
@@ -50,16 +52,28 @@ def obter_cotacao(ticker):
         cotacao = CotacoesService.obter_cotacao(ticker, ativo.mercado)
         
         if cotacao.get('success'):
+            preco_novo = cotacao['preco_atual']
+            # Verificar anomalia antes de persistir (ANOMALY-001)
+            anomalia = None
+            if ativo.preco_atual and ativo.preco_atual > 0:
+                anomalia = AnomalyService.verificar_ativo(
+                    ativo_id=ativo.id,
+                    preco_novo=Decimal(str(preco_novo)),
+                    data_novo=date.today(),
+                )
+
             # Atualizar banco
-            ativo.preco_atual = cotacao['preco_atual']
+            ativo.preco_atual = preco_novo
             ativo.dividend_yield = cotacao.get('dy_12m', ativo.dividend_yield or 0)
             ativo.p_l = cotacao.get('pl', ativo.p_l or 0)
             ativo.data_ultima_cotacao = now
             db.session.commit()
-            
-            logger.info(f"✅ {ticker}: R${cotacao['preco_atual']} via {cotacao['provider']}")
+
+            logger.info(f"✅ {ticker}: R${preco_novo} via {cotacao['provider']}")
             cotacao.pop('success', None)
             cotacao['cache_ttl_minutes'] = 15
+            if anomalia:
+                cotacao['anomalia'] = anomalia
             return jsonify({'success': True, 'data': cotacao, 'message': f'Cotação {ticker} atualizada'})
         
         # Fallback: usar dados antigos (mesmo se > 15min)
@@ -112,6 +126,58 @@ def cotacoes_batch():
     return jsonify(resultados)
 
 
+@cotacoes_bp.route('/anomalias', methods=['GET'])
+@jwt_required()
+def listar_anomalias():
+    """
+    ANOMALY-001: Detecção on-demand de preços anômalos.
+
+    Query params:
+      limiar   — percentual mínimo de variação (padrão: 20). Ex: ?limiar=15
+      ativo_id — filtrar por ativo específico (UUID)
+      data_ref — data de referência ISO (padrão: hoje). Ex: ?data_ref=2025-03-01
+    """
+    try:
+        limiar_raw = request.args.get('limiar', '20')
+        try:
+            limiar = Decimal(str(limiar_raw)) / 100
+            if limiar <= 0 or limiar > 10:
+                return jsonify({'success': False, 'error': 'limiar deve estar entre 0 e 1000%'}), 400
+        except Exception:
+            return jsonify({'success': False, 'error': 'limiar inválido'}), 400
+
+        ativo_id = request.args.get('ativo_id')
+
+        data_ref_raw = request.args.get('data_ref')
+        data_ref = None
+        if data_ref_raw:
+            try:
+                data_ref = date.fromisoformat(data_ref_raw)
+            except ValueError:
+                return jsonify({'success': False, 'error': 'data_ref inválida (use YYYY-MM-DD)'}), 400
+
+        anomalias = AnomalyService.detectar_anomalias(
+            limiar=limiar,
+            ativo_id=ativo_id,
+            data_ref=data_ref,
+        )
+
+        return jsonify({
+            'success': True,
+            'data': {
+                'anomalias':  anomalias,
+                'total':      len(anomalias),
+                'limiar_pct': float(limiar * 100),
+                'data_ref':   (data_ref or date.today()).isoformat(),
+            },
+            'message': f'{len(anomalias)} anomalia(s) detectada(s)',
+        })
+
+    except Exception as e:
+        logger.error(f"Erro ao detectar anomalias: {e}", exc_info=True)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @cotacoes_bp.route('/health', methods=['GET'])
 def cotacoes_health():
     return jsonify({
@@ -119,5 +185,6 @@ def cotacoes_health():
         'module': 'cotacoes_m7.5',
         'cache_ttl': '15 minutos (Prompt Mestre)',
         'providers': ['brapi.dev (FREE tier)', 'yfinance', 'alphavantage', 'database_cache'],
-        'update_trigger': 'on_demand (somente quando usuário acessa tela)'
+        'update_trigger': 'on_demand (somente quando usuário acessa tela)',
+        'anomaly_detection': 'EXITUS-ANOMALY-001 — GET /api/cotacoes/anomalias',
     })

@@ -60,7 +60,7 @@
 | **EXITUS-IR-002** | Custo médio histórico (PM acumulado via tabela `posicao`) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-003** | Compensação de prejuízo acumulado entre meses (tabela `saldo_prejuizo`) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-004** | Proventos tributáveis: JCP, dividendos, aluguel, withholding tax US (baseline pré-2026) | ✅ Concluído (04/03/2026) | **Alto** | **Alta** |
-| **EXITUS-IR-005** | IR sobre renda fixa: tabela regressiva 22,5%→15% por prazo de aplicação | Não implementado | Alto | Alta |
+| **EXITUS-IR-005** | IR sobre renda fixa: tabela regressiva 22,5%→15% por prazo de aplicação | ✅ Concluído (04/03/2026) | Alto | Alta |
 | **EXITUS-IR-006** | DIRPF anual: relatório para Declaração de Ajuste Anual (fichas Renda Variável, Proventos e Bens e Direitos) | ✅ Concluído (04/03/2026) | **Alto** | **Média** |
 | **EXITUS-IR-007** | Alíquotas dinâmicas via tabela `regra_fiscal` (atualmente hardcoded em `ir_service.py`) | ✅ Concluído (03/03/2026) | Médio | Média |
 | **EXITUS-IR-008** | Tratamento fiscal de UNITs B3 no engine de IR (classificação, isenção R$20k, desmembramento→PM) | Não implementado | Médio | Baixa |
@@ -74,7 +74,7 @@
 | **EXITUS-MULTIMOEDA-001** | Multi-moeda com conversão automática | Apenas BRL | Médio | Média |
 | **EXITUS-UNITS-001** | Tratamento de UNITS (B3) | Não implementado | Médio | Média |
 | **EXITUS-SWAGGER-001** | Auto-documentação OpenAPI/Swagger | ✅ Concluído (04/03/2026) | Médio | Média |
-| **EXITUS-ANOMALY-001** | Detecção de anomalias em preços (≥20% sem evento) | Não implementado | Médio | Média |
+| **EXITUS-ANOMALY-001** | Detecção de anomalias em preços (≥20% sem evento) | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-RFCALC-001** | Cálculos RF (Duration, YTM) e FII (FFO, AFFO) | Não implementado | Médio | Média |
 | **EXITUS-NEWAPIS-001** | APIs de configuração (parametros_macro, fonte_dados) | Não implementado | Médio | Média |
 | **EXITUS-ENUM-001** | Padronizar todos ENUMs PostgreSQL para lowercase (migration) | Não implementado | Médio | Média |
@@ -463,7 +463,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-IR-002 | 3 | ✅ Concluído | 03/03/2026 | PM da tabela `posicao` no cálculo de IR — 2 testes |
 | EXITUS-IR-003 | 3 | ✅ Concluído | 03/03/2026 | Compensação prejuízo acumulado — tabela `saldo_prejuizo`, 5 testes |
 | EXITUS-IR-004 | 3 | ✅ Concluído | 04/03/2026 | Proventos: JCP 15%, dividendos BR isentos, dividendos US 15%, aluguel 15% — seção `proventos` na API, 4 testes |
-| EXITUS-IR-005 | 3 | 📋 Planejado | — | IR renda fixa — tabela regressiva 22,5%→15% |
+| EXITUS-IR-005 | 3 | ✅ Concluído | 04/03/2026 | `_apurar_renda_fixa`, `_aliquota_rf`, DARF 0561, ficha renda_fixa no DIRPF — 7 testes |
 | EXITUS-IR-006 | 3 | ✅ Concluído | 04/03/2026 | DIRPF anual — endpoint `/api/ir/dirpf`, fichas RV + Proventos + Bens e Direitos, `persist=False`, 8 testes |
 | EXITUS-IR-007 | 3 | ✅ Concluído | 03/03/2026 | Alíquotas dinâmicas via `regra_fiscal` — seed 5 regras, fallback hardcoded, 2 testes |
 | EXITUS-IR-008 | 3 | 📋 Planejado | — | UNITs B3: classificação fiscal + desmembramento→PM (depende UNITS-001) |
@@ -472,7 +472,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-MULTIMOEDA-001 | 4 | 📋 Planejado | — | Conversão automática BRL/USD/EUR |
 | EXITUS-UNITS-001 | 4 | 📋 Planejado | — | UNITS B3 |
 | EXITUS-SWAGGER-001 | 4 | ✅ Concluído | 04/03/2026 | Swagger UI `/api/docs`, spec JSON `/api/swagger.json`, 5 namespaces (auth, ativos, transacoes, ir, export) — flask-restx 1.3 |
-| EXITUS-ANOMALY-001 | 4 | 📋 Planejado | — | Alertas de preço anômalo |
+| EXITUS-ANOMALY-001 | 4 | ✅ Concluído | 04/03/2026 | `AnomalyService` + `GET /api/cotacoes/anomalias` + detecção inline — 17 testes |
 | EXITUS-RFCALC-001 | 4 | 📋 Planejado | — | Duration, YTM, FFO, AFFO |
 | EXITUS-NEWAPIS-001 | 4 | 📋 Planejado | — | `parametros_macro`, `fonte_dados` |
 | EXITUS-MULTICLIENTE-001 | 5 | 📋 Planejado | — | Multi-tenancy para assessoras |
