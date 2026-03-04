@@ -26,6 +26,7 @@ class TipoEventoCorporativo(enum.Enum):
     DESLISTAGEM = "deslistagem"              # Deslistagem da bolsa
     RELISTING = "relisting"                  # Relistagem
     CANCELAMENTO = "cancelamento"            # Cancelamento de ações
+    DESMEMBRAMENTO = "desmembramento"        # Desmembramento de UNIT em ações constituintes
     OUTRO = "outro"                          # Outros eventos
 
 
@@ -187,6 +188,10 @@ class EventoCorporativo(db.Model):
         """Verifica se é bonificação"""
         return self.tipo_evento == TipoEventoCorporativo.BONIFICACAO
     
+    def is_desmembramento(self):
+        """Verifica se é desmembramento de UNIT em ações constituintes"""
+        return self.tipo_evento == TipoEventoCorporativo.DESMEMBRAMENTO
+
     def is_mudanca_ticker(self):
         """Verifica se é mudança de ticker"""
         return self.tipo_evento == TipoEventoCorporativo.MUDANCA_TICKER

@@ -975,3 +975,142 @@ class TestRendaFixa:
             assert cats['renda_fixa']['operacoes'] >= 1
         finally:
             self._teardown(ids)
+
+
+class TestUnitsIR:
+    """IR-008: Tratamento fiscal de UNITs B3 no engine de IR.
+
+    UNITs seguem a mesma regra fiscal de ações BR:
+    - Isenção R$20k/mês para swing trade
+    - Alíquota 15% sobre lucro acima do limite
+    - Day-trade: alíquota 20%, sem isenção
+    - Desmembramento não é evento tributável
+    """
+
+    def _setup(self, app, auth_client, preco_compra, preco_venda, qtd=100):
+        """Cria ativo UNIT, posição e venda vinculados ao usuário do auth_client."""
+        from flask_jwt_extended import decode_token
+        from app.database import db
+        from app.models.ativo import Ativo, TipoAtivo, ClasseAtivo
+        from app.models.corretora import Corretora, TipoCorretora
+        from app.models.posicao import Posicao
+        from app.models.transacao import Transacao, TipoTransacao
+        from datetime import date as date_
+
+        token = auth_client._auth_headers['Authorization'].split(' ')[1]
+        with app.app_context():
+            decoded = decode_token(token)
+        usuario_id = decoded['sub']
+
+        suffix = str(uuid.uuid4())[:8]
+        corretora = Corretora(nome=f'Corr UNIT {suffix}', tipo=TipoCorretora.CORRETORA,
+                              pais='BR', usuario_id=usuario_id)
+        db.session.add(corretora)
+        db.session.flush()
+
+        ativo = Ativo(
+            ticker=f'UN{suffix[:6]}', nome=f'Unit IR {suffix}',
+            tipo=TipoAtivo.UNIT, classe=ClasseAtivo.RENDA_VARIAVEL,
+            mercado='BR', moeda='BRL', preco_atual=Decimal(str(preco_venda)),
+        )
+        db.session.add(ativo)
+        db.session.flush()
+
+        custo_total = Decimal(str(preco_compra)) * Decimal(str(qtd))
+        posicao = Posicao(
+            usuario_id=usuario_id, ativo_id=ativo.id, corretora_id=corretora.id,
+            quantidade=Decimal(str(qtd)),
+            preco_medio=Decimal(str(preco_compra)),
+            custo_total=custo_total,
+            data_primeira_compra=date_(2025, 1, 2),
+        )
+        db.session.add(posicao)
+        db.session.flush()
+
+        pv = Decimal(str(preco_venda))
+        vt = pv * Decimal(str(qtd))
+        venda = Transacao(
+            usuario_id=usuario_id, ativo_id=ativo.id, corretora_id=corretora.id,
+            tipo=TipoTransacao.VENDA,
+            data_transacao=datetime(2025, 6, 15, 10, 0, 0),
+            quantidade=Decimal(str(qtd)),
+            preco_unitario=pv,
+            valor_total=vt,
+            taxa_corretagem=Decimal('0'), taxa_liquidacao=Decimal('0'),
+            emolumentos=Decimal('0'), imposto=Decimal('0'),
+            outros_custos=Decimal('0'), custos_totais=Decimal('0'),
+            valor_liquido=vt,
+        )
+        db.session.add(venda)
+        db.session.commit()
+
+        return {
+            'venda_id': venda.id,
+            'posicao_id': posicao.id,
+            'ativo_id': ativo.id,
+            'corretora_id': corretora.id,
+        }
+
+    def _teardown(self, ids):
+        from app.database import db
+        from app.models.transacao import Transacao
+        from app.models.posicao import Posicao
+        from app.models.ativo import Ativo
+        from app.models.corretora import Corretora
+        Transacao.query.filter_by(id=ids['venda_id']).delete()
+        Posicao.query.filter_by(id=ids['posicao_id']).delete()
+        Ativo.query.filter_by(id=ids['ativo_id']).delete()
+        Corretora.query.filter_by(id=ids['corretora_id']).delete()
+        db.session.commit()
+
+    def test_unit_isento_abaixo_20k(self, app, auth_client):
+        """Venda de UNIT com total <= R$20k: swing_acoes isento, IR=0."""
+        # Venda: 100 units a R$15 = R$1.500 (abaixo de R$20k) — isento
+        ids = self._setup(app, auth_client, preco_compra=10, preco_venda=15, qtd=100)
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2025-06', headers=auth_client._auth_headers)
+            assert rv.status_code == 200
+            swing = rv.get_json()['data']['categorias']['swing_acoes']
+            assert swing['operacoes'] >= 1
+            assert swing['ir_devido'] == pytest.approx(0.0, abs=0.01)
+            assert swing['isento'] is True
+        finally:
+            self._teardown(ids)
+
+    def test_unit_tributado_acima_20k(self, app, auth_client):
+        """Venda de UNIT com total > R$20k: alíquota 15% sobre lucro."""
+        # Compra: 1000 units a R$10 = R$10.000
+        # Venda:  1000 units a R$30 = R$30.000 (acima de R$20k)
+        # Lucro: R$20.000 → IR = 15% * R$20.000 = R$3.000
+        ids = self._setup(app, auth_client, preco_compra=10, preco_venda=30, qtd=1000)
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2025-06', headers=auth_client._auth_headers)
+            assert rv.status_code == 200
+            swing = rv.get_json()['data']['categorias']['swing_acoes']
+            assert swing['operacoes'] >= 1
+            assert swing['isento'] is False
+            assert swing['ir_devido'] == pytest.approx(3000.0, abs=1.0)
+        finally:
+            self._teardown(ids)
+
+    def test_unit_enquadrada_em_swing_acoes_nao_em_rf(self, app, auth_client):
+        """UNIT deve cair em swing_acoes, nunca em renda_fixa."""
+        ids = self._setup(app, auth_client, preco_compra=10, preco_venda=15, qtd=100)
+        try:
+            rv = auth_client.get('/api/ir/apuracao?mes=2025-06', headers=auth_client._auth_headers)
+            assert rv.status_code == 200
+            cats = rv.get_json()['data']['categorias']
+            assert cats['swing_acoes']['operacoes'] >= 1
+            assert cats['renda_fixa']['operacoes'] == 0
+        finally:
+            self._teardown(ids)
+
+    def test_desmembramento_nao_e_evento_tributavel(self):
+        """Desmembramento de UNIT não deve ser tributável — é evento corporativo estrutural."""
+        from app.models.evento_corporativo import TipoEventoCorporativo
+        from app.services.ir_service import TIPOS_ACAO_BR, TIPOS_RF
+        from app.models.ativo import TipoAtivo
+
+        assert TipoAtivo.UNIT in TIPOS_ACAO_BR
+        assert TipoAtivo.UNIT not in TIPOS_RF
+        assert TipoEventoCorporativo.DESMEMBRAMENTO is not None

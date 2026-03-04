@@ -28,7 +28,7 @@ class EventoCorporativoCreateSchema(Schema):
     tipo_evento = fields.Str(required=True, validate=validate.OneOf([
         'split', 'grupamento', 'bonificacao', 'direito_sub',
         'fusao', 'cisao', 'incorporacao', 'mudanca_ticker',
-        'deslistagem', 'relisting', 'cancelamento', 'outro'
+        'deslistagem', 'relisting', 'cancelamento', 'desmembramento', 'outro'
     ]))
     data_evento = fields.Date(required=True)
     descricao = fields.Str(required=True, validate=validate.Length(min=3))
@@ -42,7 +42,7 @@ class EventoCorporativoUpdateSchema(Schema):
     tipo_evento = fields.Str(validate=validate.OneOf([
         'split', 'grupamento', 'bonificacao', 'direito_sub',
         'fusao', 'cisao', 'incorporacao', 'mudanca_ticker',
-        'deslistagem', 'relisting', 'cancelamento', 'outro'
+        'deslistagem', 'relisting', 'cancelamento', 'desmembramento', 'outro'
     ]))
     data_evento = fields.Date()
     descricao = fields.Str(validate=validate.Length(min=3))

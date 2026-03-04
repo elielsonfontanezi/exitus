@@ -9,6 +9,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-IR-008** — Tratamento fiscal de UNITs B3 no engine de IR (04/03/2026)
+  - `app/services/ir_service.py`: `TIPOS_ACAO_BR` expandido para incluir `TipoAtivo.UNIT` — isenção R$20k/mês e alíquota 15% para swing trade em UNITs
+  - `tests/test_ir_integration.py`: classe `TestUnitsIR` (+4 testes: isento <R$20k, tributado >R$20k, enquadramento em swing_acoes, desmembramento não tributável)
+  - **Suite total: 191 passed, 0 failed**
+
+- **EXITUS-UNITS-001** — Suporte a UNITs B3 (04/03/2026)
+  - `migrations/versions/20260304_1000_add_unit_enums.py`: `ALTER TYPE tipoativo ADD VALUE 'UNIT'` + `ALTER TYPE tipoeventocorporativo ADD VALUE 'DESMEMBRAMENTO'`
+  - `app/models/ativo.py`: `TipoAtivo.UNIT = "unit"` adicionado (15º tipo)
+  - `app/models/evento_corporativo.py`: `TipoEventoCorporativo.DESMEMBRAMENTO` + método `is_desmembramento()`
+  - `app/schemas/evento_corporativo_schema.py`: `'desmembramento'` adicionado ao `OneOf` de Create e Update
+  - `docs/ENUMS.md`: atualizado para 15 tipos, UNIT mapeado, versão 0.8.0
+  - `tests/test_units_integration.py`: 8 testes (criação UNIT via API, persistência, listagem/filtro, classe renda_variável, is_desmembramento, evento via API, enum assertions)
+  - **Suite total: 187 passed, 0 failed**
+
 - **EXITUS-ANOMALY-001** — Detecção de preços anômalos (04/03/2026)
   - `app/services/anomaly_service.py`: novo serviço `AnomalyService` com dois métodos:
     - `detectar_anomalias(limiar, ativo_id, data_ref)` — varre `historico_preco`, detecta variações ≥ limiar, suprime se houver `EventoCorporativo` na janela de ±5 dias

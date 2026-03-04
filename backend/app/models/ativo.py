@@ -30,6 +30,9 @@ class TipoAtivo(enum.Enum):
     STOCK_INTL = "stock_intl"       # Ações Internacionais (EU, ASIA)
     ETF_INTL = "etf_intl"           # ETFs Internacionais
     
+    # Mercado BR — especial
+    UNIT = "unit"                    # Certificados de depósito (UNITs B3 — ex: TAEE11, KLBN11)
+
     # Outros
     CRIPTO = "cripto"                # Criptomoedas
     OUTRO = "outro"                  # Outros ativos

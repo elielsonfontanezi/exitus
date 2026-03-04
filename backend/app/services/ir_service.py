@@ -57,7 +57,9 @@ DARF_JCP_DIVIDENDO = '9453'  # JCP e dividendos tributados (info — retido na f
 DARF_MINIMO = Decimal('10.00')
 
 # Tipos de ativo que se enquadram como "ação BR" para isenção de R$20k
-TIPOS_ACAO_BR = {TipoAtivo.ACAO}
+# TipoAtivo.UNIT: UNITs B3 (TAEE11, KLBN11, SANB11) seguem a mesma regra fiscal de ações BR
+# — isenção de R$20k/mês para swing trade, alíquota 15%, day-trade 20% (EXITUS-IR-008)
+TIPOS_ACAO_BR = {TipoAtivo.ACAO, TipoAtivo.UNIT}
 TIPOS_FII = {TipoAtivo.FII}
 TIPOS_US = {TipoAtivo.STOCK, TipoAtivo.REIT, TipoAtivo.ETF, TipoAtivo.BOND}
 TIPOS_BR = {TipoAtivo.ACAO, TipoAtivo.FII, TipoAtivo.CDB, TipoAtivo.LCI_LCA,

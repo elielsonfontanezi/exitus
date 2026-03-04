@@ -1,7 +1,7 @@
 # Sistema Exitus - Documentação de ENUMs
 
-**Versão:** 0.7.9
-**Data:** 20/02/2026
+**Versão:** 0.8.0
+**Data:** 04/03/2026
 **Status:** ✅ Produção
 
 ---
@@ -25,6 +25,7 @@
 > |-------------|-------------|---------------|--------------------|
 > | `ACAO` | `?tipo=ACAO` | `"acao"` | `acao` |
 > | `FII` | `?tipo=FII` | `"fii"` | `fii` |
+> | `UNIT` | `?tipo=UNIT` | `"unit"` | `unit` |
 > | `CDB` | `?tipo=CDB` | `"cdb"` | `cdb` |
 > | `LCI_LCA` | `?tipo=LCI_LCA` | `"lci_lca"` | `lcilca` |
 > | `TESOURO_DIRETO` | `?tipo=TESOURO_DIRETO` | `"tesouro_direto"` | `tesourodireto` |
@@ -46,20 +47,21 @@
 
 ## Visão Geral
 
-Este documento descreve todos os ENUMs (enumerações) utilizados no Sistema Exitus, incluindo a **expansão para 14 tipos de ativos** implementada nas migrations `202602162111` e `202602162130`.
+Este documento descreve todos os ENUMs (enumerações) utilizados no Sistema Exitus, incluindo a **expansão para 15 tipos de ativos** (UNIT adicionado em `20260304_1000`).
 
 ---
 
-## 1. TipoAtivo (14 valores)
+## 1. TipoAtivo (15 valores)
 
 Enum principal para classificação de instrumentos financeiros com suporte multi-mercado.
 
-### **1.1 Mercado BR (Brasil) - 6 tipos**
+### **1.1 Mercado BR (Brasil) - 7 tipos**
 
 | Enum | Valor DB | Resposta JSON | Descrição | Classe Padrão | Moeda |
 |------|----------|---------------|-----------|---------------|-------|
 | `ACAO` | `acao` | `"acao"` | Ações negociadas na B3 | `RENDA_VARIAVEL` | BRL |
 | `FII` | `fii` | `"fii"` | Fundos de Investimento Imobiliário | `RENDA_VARIAVEL` | BRL |
+| `UNIT` | `unit` | `"unit"` | Certificados de depósito (UNITs B3 — ex: TAEE11, KLBN11, SANB11) | `RENDA_VARIAVEL` | BRL |
 | `CDB` | `cdb` | `"cdb"` | Certificado de Depósito Bancário | `RENDA_FIXA` | BRL |
 | `LCI_LCA` | `lcilca` | `"lci_lca"` | Letra de Crédito Imobiliário/Agrícola | `RENDA_FIXA` | BRL |
 | `TESOURO_DIRETO` | `tesourodireto` | `"tesouro_direto"` | Títulos públicos federais | `RENDA_FIXA` | BRL |
