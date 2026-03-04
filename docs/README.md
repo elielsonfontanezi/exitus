@@ -54,13 +54,15 @@
 1. **USER_GUIDE.md** — Como usar o sistema
 2. **VISION.md** — O que o sistema oferece
 
-### Para IA Assistente (Cascade/Perplexity)
-1. **PERSONAS.md** — **Manual de operação principal**
-2. **CODING_STANDARDS.md** — Padrões SQLAlchemy (CRÍTICO para evitar erros)
-3. **EXITUS-SQLALCHEMY-001.md** — Problemas recorrentes e soluções
+### Para IA Assistente (Cascade/Windsurf)
+1. **LESSONS_LEARNED.md** — **Ler PRIMEIRO — erros reais, regras ativas**
+2. **PERSONAS.md** — Manual de operação do Cascade
+3. **CODING_STANDARDS.md** — Padrões SQLAlchemy (CRÍTICO para evitar erros)
 4. **API_REFERENCE.md** — Contratos para validação
 5. **ENUMS.md** — Valores válidos para campos
 6. **ROADMAP.md** — Status dos GAPs para planejamento
+
+**Regras operacionais da IA:** `.windsurfrules` na raiz do projeto (lido automaticamente pelo Cascade)
 
 **🚨 REGRA CRÍTICA:** A IA pode opinar e propor ideias, mas **NUNCA** deve executar mudanças sem aprovação explícita. Fluxo: 1) Propor → 2) Aguardar "APROVADO" → 3) Implementar
 
@@ -69,11 +71,11 @@
 ## 📈 Fluxo de Trabalho com IA
 
 ```
-1. PERSONAS.md define o comportamento da IA
-2. CODING_STANDARDS.md define padrões SQLAlchemy (OBRIGATÓRIO)
-3. IA consulta as Fontes de Verdade (API_REFERENCE, ENUMS, etc.)
-4. IA segue o fluxo: ANÁLISE → PROPOSTA → APROVADO → IMPLEMENTAÇÃO
-5. Problemas recorrentes? → Criar GAP (EXITUS-SQLAlchemy-001)
+1. .windsurfrules define regras operacionais do Cascade (injetado automaticamente)
+2. PERSONAS.md define comportamento, fontes de verdade e fluxo de trabalho
+3. LESSONS_LEARNED.md é lido ANTES de qualquer ação
+4. Cascade segue: ANÁLISE → MODELO IA → ESTRATÉGIA → APROVADO → IMPLEMENTAÇÃO → TESTES → DOCS → COMMIT
+5. Problemas recorrentes? → Criar GAP + registrar em LESSONS_LEARNED.md
 6. CHANGELOG.md registra todos os GAPs e correções
 ```
 
@@ -100,5 +102,5 @@
 
 ---
 
-*Atualizado: 02 de Março de 2026*  
-*Versão: 2.0 — Padrões SQLAlchemy e GAPs incluídos*
+*Atualizado: 04 de Março de 2026*  
+*Versão: 3.0 — Migrado de Perplexity/Spaces para Cascade/Windsurf*

@@ -404,5 +404,5 @@ no banco. Isso garante que a apuração encontre exatamente os dados criados pel
 |---|---|
 | `docs/CODING_STANDARDS.md` | Padrões de código para humanos |
 | `docs/ROADMAP.md` | GAPs registrados (ENUM-001, TESTDB-001) |
-| `.codeium.rules` | Regras operacionais da IA |
+| `.windsurfrules` | Regras operacionais do Cascade (Windsurf) |
 | `docs/EXITUS-SQLALCHEMY-001.md` | Padrões SQLAlchemy detalhados |
