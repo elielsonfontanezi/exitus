@@ -9,6 +9,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-NEWAPIS-001** — APIs de configuração (parametros_macro, fonte_dados) (04/03/2026)
+  - `app/schemas/parametros_macro_schema.py`: schemas Create/Update/Response para validação
+  - `app/schemas/fonte_dados_schema.py`: schemas Create/Update/Response com validações de rate_limit
+  - `app/services/parametros_macro_service.py`: refatorado para remover antipadrão `create_app()`, CRUD completo, compatibilidade legada mantida
+  - `app/services/fonte_dados_service.py`: service completo com health monitoring, registro de consultas/erros
+  - `app/blueprints/parametros_macro_blueprint.py`: 8 endpoints REST em `/api/parametros-macro/*`
+  - `app/blueprints/fonte_dados_blueprint.py`: 8 endpoints REST em `/api/fontes-dados/*` + health monitoring
+  - `app/__init__.py`: blueprints registrados com logging de sucesso
+  - `app/seeds/seed_fontes_dados.py`: import corrigido para `app.models.fonte_dados`
+  - `tests/test_newapis_integration.py`: 25 testes CRUD para ambos endpoints
+  - `scripts/get_backend_token.sh`: senha corrigida de `admin123` → `senha123`
+  - `docs/ROADMAP.md`: seção "🛠️ Execução de Seeds" adicionada com comandos e tabela de seeds
+  - **Endpoints validados:** `/api/parametros-macro` (4 registros) e `/api/fontes-dados` (4 registros)
+
 - **EXITUS-IR-008** — Tratamento fiscal de UNITs B3 no engine de IR (04/03/2026)
   - `app/services/ir_service.py`: `TIPOS_ACAO_BR` expandido para incluir `TipoAtivo.UNIT` — isenção R$20k/mês e alíquota 15% para swing trade em UNITs
   - `tests/test_ir_integration.py`: classe `TestUnitsIR` (+4 testes: isento <R$20k, tributado >R$20k, enquadramento em swing_acoes, desmembramento não tributável)

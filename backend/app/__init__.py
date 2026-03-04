@@ -241,6 +241,23 @@ def create_app(testing=False):
         pass
 
     # ============================================
+    # NEWAPIS-001 - CONFIGURAÇÃO (PARÂMETROS + FONTES)
+    # ============================================
+    try:
+        from .blueprints.parametros_macro_blueprint import bp as parametros_macro_bp
+        app.register_blueprint(parametros_macro_bp)
+        print("✅ Parâmetros Macro blueprint registrado: /api/parametros-macro/*")
+    except ImportError as e:
+        print(f"⚠️  Parâmetros Macro blueprint não encontrado: {e}")
+
+    try:
+        from .blueprints.fonte_dados_blueprint import bp as fonte_dados_bp
+        app.register_blueprint(fonte_dados_bp)
+        print("✅ Fontes de Dados blueprint registrado: /api/fontes-dados/*")
+    except ImportError as e:
+        print(f"⚠️  Fontes de Dados blueprint não encontrado: {e}")
+
+    # ============================================
     # SWAGGER / OpenAPI (EXITUS-SWAGGER-001)
     # ============================================
     if not testing:

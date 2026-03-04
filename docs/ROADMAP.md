@@ -76,7 +76,7 @@
 | **EXITUS-SWAGGER-001** | Auto-documentação OpenAPI/Swagger | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-ANOMALY-001** | Detecção de anomalias em preços (≥20% sem evento) | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-RFCALC-001** | Cálculos RF (Duration, YTM) e FII (FFO, AFFO) | Não implementado | Médio | Média |
-| **EXITUS-NEWAPIS-001** | APIs de configuração (parametros_macro, fonte_dados) | Não implementado | Médio | Média |
+| **EXITUS-NEWAPIS-001** | APIs de configuração (parametros_macro, fonte_dados) | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-ENUM-001** | Padronizar todos ENUMs PostgreSQL para lowercase (migration) | Não implementado | Médio | Média |
 | **EXITUS-SQLALCHEMY-002** | Migrar `Query.get()` depreciado para `db.session.get()` em 11 arquivos (27 ocorrências) | ✅ Concluído (03/03/2026) | Médio | Média |
 
@@ -445,7 +445,44 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 
 ---
 
-## 🔄 Status Atual (atualizado 03/03/2026)
+## �️ Execução de Seeds
+
+### Como popular dados iniciais
+
+Os seeds populam o banco com dados fundamentais para testes e desenvolvimento:
+
+```bash
+# Acessar o container e executar seeds individuais
+podman exec exitus-backend bash -c "cd /app && PYTHONPATH=/app python app/seeds/seed_parametros_macro.py"
+podman exec exitus-backend bash -c "cd /app && echo 's' | PYTHONPATH=/app python app/seeds/seed_fontes_dados.py"
+
+# Ou usar script unificado (recomendado)
+bash scripts/populate_seeds.sh
+# Responder 's' quando solicitado para recriar dados existentes
+```
+
+### Seeds disponíveis
+
+| Seed | Descrição | Registros criados |
+|------|-----------|-------------------|
+| `seed_parametros_macro.py` | Parâmetros macroeconômicos (CDI, SELIC, etc.) | 4 mercados (BR, US, EU, JP) |
+| `seed_fontes_dados.py` | Fontes de dados externas (APIs, scrapers) | 7 fontes (yfinance, brapi.dev, etc.) |
+| `seed_ativos_fundamentalistas.py` | Ativos com dados fundamentalistas | 56 ativos brasileiros |
+| `seed_feriados_b3.py` | Feriados do calendário B3 | Datas anuais |
+
+### Autenticação para testes de API
+
+```bash
+# Obter token JWT (credenciais: admin/senha123)
+export TOKEN=$(bash scripts/get_backend_token.sh)
+
+# Usar token em requisições
+curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macro
+```
+
+---
+
+## �� Status Atual (atualizado 04/03/2026)
 
 | GAP ID | Fase | Status | Data | Observações |
 |--------|------|--------|------|-------------|
@@ -474,7 +511,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-SWAGGER-001 | 4 | ✅ Concluído | 04/03/2026 | Swagger UI `/api/docs`, spec JSON `/api/swagger.json`, 5 namespaces (auth, ativos, transacoes, ir, export) — flask-restx 1.3 |
 | EXITUS-ANOMALY-001 | 4 | ✅ Concluído | 04/03/2026 | `AnomalyService` + `GET /api/cotacoes/anomalias` + detecção inline — 17 testes |
 | EXITUS-RFCALC-001 | 4 | 📋 Planejado | — | Duration, YTM, FFO, AFFO |
-| EXITUS-NEWAPIS-001 | 4 | 📋 Planejado | — | `parametros_macro`, `fonte_dados` |
+| EXITUS-NEWAPIS-001 | 4 | ✅ Concluído | 04/03/2026 | CRUD completo para `parametros_macro` e `fonte_dados` — 8 endpoints cada |
 | EXITUS-MULTICLIENTE-001 | 5 | 📋 Planejado | — | Multi-tenancy para assessoras |
 | EXITUS-MONITOR-001 | 5 | 📋 Planejado | — | Monitoramento operacional |
 | EXITUS-RATELIMIT-001 | 5 | 📋 Planejado | — | Flask-Limiter |

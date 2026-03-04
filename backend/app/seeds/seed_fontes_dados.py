@@ -6,7 +6,7 @@ Popular tabela fonte_dados com APIs de cotações
 
 from app import create_app
 from app.database import db
-from app.models import FonteDados, TipoFonteDados
+from app.models.fonte_dados import FonteDados, TipoFonteDados
 
 
 def seed_fontes_dados():
