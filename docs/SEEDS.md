@@ -3,7 +3,7 @@
 
 **APENAS PARA AMBIENTE DE DESENVOLVIMENTO** ⚠️
 
-> **v0.7.9** — Corrigido: login usa `username` (não `email`). Adicionados 8 ativos Renda Fixa BR.
+> **v0.8.3** — Regras fiscais atualizadas: IR-004 (+4 regras proventos) + IR-009 (+3 regras 2026). Total: 12 regras.
 
 ---
 
@@ -76,7 +76,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/ativos
 | **posicao**            | **17**        | Posições ativas vinculadas a portfolios                    |
 | **provento**           | **29**        | DIVIDENDO, JCP, RENDIMENTO por ativo                       |
 | **movimentacao_caixa** | **2**         | Transferências, depósitos, retiradas                       |
-| **regra_fiscal**       | **6**         | Regras de IR brasileiras (Ações, FIIs, JCP)                |
+| **regra_fiscal**       | **12**        | Regras de IR: venções (swing/DT/FII/US), proventos (JCP/DIV/aluguel) pré-2026 e 2026+ |
 | **feriado_mercado**    | **30**        | Feriados B3 2025-2026                                      |
 | **fonte_dados**        | **7**         | APIs: yfinance, brapi.dev, Alpha Vantage, etc.             |
 
@@ -154,8 +154,13 @@ podman exec -it exitus-backend python -m app.seeds.seed_ativos_us
 # Ativos EU (3)
 podman exec -it exitus-backend python -m app.seeds.seed_ativos_eu
 
-# Regras Fiscais BR (6)
+# Regras Fiscais BR — base (5 originais)
 podman exec -it exitus-backend python -m app.seeds.seed_regras_fiscais_br
+
+# Regras Fiscais Proventos pré-2026 (IR-004: +4 regras: DIVIDENDO BR, JCP 15%, DIVIDENDO US, ALUGUEL)
+# Regras Fiscais 2026+ (IR-009: +3 regras: JCP 17,5%, DIVIDENDO 0%+R$50k, DIVIDENDO_TRIBUTADO 10%)
+# ⚠️  Inseridas via psql diretamente (não há seed script individual)
+# Ver: docs/EXITUS-IR-001.md seção 5
 
 # Feriados B3 2025-2026 (30)
 podman exec -it exitus-backend python -m app.seeds.seed_feriados_b3
@@ -192,7 +197,7 @@ ORDER BY tabela;
 "
 ```
 
-**Resultado esperado (v0.7.9):**
+**Resultado esperado (v0.8.3):**
 ```
 tabela            | registros
 ------------------+----------
@@ -200,8 +205,26 @@ ativo             | 70
 corretora         | 13
 feriado_mercado   | 30
 fonte_dados       | 7
-regra_fiscal      | 6
+regra_fiscal      | 12
 usuario           | 5
+```
+
+**Detalhamento `regra_fiscal` (12 regras):**
+```
+tipo_operacao       | pais | aliquota_ir | vigencia_inicio | vigencia_fim
+--------------------+------+-------------+-----------------+-------------
+DIVIDENDO           | BR   |  0,00%      | 1995-01-01      | 2025-12-31   <- expirada
+JCP                 | BR   | 15,00%      | 1995-01-01      | 2025-12-31   <- expirada
+VENDA               | BR   | 20,00%      | 1999-01-01      | -
+SWING_TRADE         | BR   | 15,00%      | 2004-01-01      | -
+ALUGUEL             | BR   | 15,00%      | 2015-01-01      | -
+DAY_TRADE           | BR   | 20,00%      | 2015-01-01      | -
+DIVIDENDO           | US   | 15,00%      | 2016-01-01      | -
+VENDA               | US   | 15,00%      | 2016-01-01      | -  (STOCK)
+VENDA               | US   | 15,00%      | 2016-01-01      | -  (REIT)
+DIVIDENDO           | BR   |  0,00%      | 2026-01-01      | -  (isento <=R$50k/CNPJ)
+DIVIDENDO_TRIBUTADO | BR   | 10,00%      | 2026-01-01      | -  (>R$50k/CNPJ)
+JCP                 | BR   | 17,50%      | 2026-01-01      | -
 ```
 
 ### Contagem por Tipo de Ativo (v0.7.9)
@@ -244,10 +267,11 @@ curl -s "http://localhost:5000/api/ativos?mercado=BR&tipo=DEBENTURE" \
 ---
 
 ## 📅 Validação
-- **Data:** 20/Fev/2026
-- **Versão:** **v0.7.9** (Seed Renda Fixa BR + Fix seeds US/EU/BR — M2-ATIVOS-005)
+- **Data:** 04/Mar/2026
+- **Versão:** **v0.8.3** (Regras fiscais proventos IR-004 + regras 2026 IR-009)
 - **PostgreSQL:** 16.11
 - **Total ativos seedados:** **70** (47 BR + 16 US + 3 EU + 4 outros)
+- **Total regras fiscais:** **12** (5 originais + 4 proventos pré-2026 + 3 regras 2026+)
 - **Status:** ✅ **VALIDADO**
 
-**Referência:** [ENUMS.md](../docs/ENUMS.md) (14 tipos) | [CHANGELOG.md](../docs/CHANGELOG.md)
+**Referência:** [ENUMS.md](../docs/ENUMS.md) (14 tipos) | [CHANGELOG.md](../docs/CHANGELOG.md) | [EXITUS-IR-001.md](./EXITUS-IR-001.md)
