@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-04 19:32:07
+Gerado em: 2026-03-04 20:34:47
 ================================================================================
 
 ================================================================================
@@ -183,8 +183,6 @@ TABELA: ativo
  id                  | uuid                     |           | not null |         | plain    |             |              | 
  ticker              | character varying(20)    |           | not null |         | extended |             |              | 
  nome                | character varying(200)   |           | not null |         | extended |             |              | 
- tipo                | tipoativo                |           | not null |         | plain    |             |              | 
- classe              | classeativo              |           | not null |         | plain    |             |              | 
  mercado             | character varying(10)    |           | not null |         | extended |             |              | 
  moeda               | character varying(3)     |           | not null |         | extended |             |              | 
  preco_atual         | numeric(18,6)            |           |          |         | main     |             |              | 
@@ -207,10 +205,11 @@ TABELA: ativo
  data_vencimento     | date                     |           |          |         | plain    |             |              | Data de vencimento do título de renda fixa
  ffo_por_cota        | numeric(10,4)            |           |          |         | main     |             |              | Funds From Operations por cota (FFO — FII/REIT)
  affo_por_cota       | numeric(10,4)            |           |          |         | main     |             |              | Adjusted FFO por cota (AFFO — FFO menos capex de manutenção)
+ tipo                | tipoativo                |           | not null |         | plain    |             |              | 
+ classe              | classeativo              |           | not null |         | plain    |             |              | 
 Indexes:
     "ativo_pkey" PRIMARY KEY, btree (id)
     "ix_ativo_ativo" btree (ativo)
-    "ix_ativo_classe" btree (classe)
     "ix_ativo_data_ultima_cotacao" btree (data_ultima_cotacao)
     "ix_ativo_data_vencimento" btree (data_vencimento)
     "ix_ativo_deslistado" btree (deslistado)
@@ -218,7 +217,6 @@ Indexes:
     "ix_ativo_moeda" btree (moeda)
     "ix_ativo_nome" btree (nome)
     "ix_ativo_ticker" btree (ticker)
-    "ix_ativo_tipo" btree (tipo)
 Check constraints:
     "ativo_nome_min_length" CHECK (length(nome::text) >= 2)
     "ativo_preco_positivo" CHECK (preco_atual IS NULL OR preco_atual >= 0::numeric)
@@ -239,8 +237,6 @@ Access method: heap
    1 | id                  | uuid                     |         | NO    | 
    2 | ticker              | character varying        | (20)    | NO    | 
    3 | nome                | character varying        | (200)   | NO    | 
-   4 | tipo                | USER-DEFINED             |         | NO    | 
-   5 | classe              | USER-DEFINED             |         | NO    | 
    6 | mercado             | character varying        | (10)    | NO    | 
    7 | moeda               | character varying        | (3)     | NO    | 
    8 | preco_atual         | numeric                  |         | YES   | 
@@ -263,6 +259,8 @@ Access method: heap
   25 | data_vencimento     | date                     |         | YES   | 
   26 | ffo_por_cota        | numeric                  |         | YES   | 
   27 | affo_por_cota       | numeric                  |         | YES   | 
+  29 | tipo                | USER-DEFINED             |         | NO    | 
+  31 | classe              | USER-DEFINED             |         | NO    | 
 (27 rows)
 
 
@@ -290,16 +288,14 @@ Unique Constraints:
 ------------------------------+---------------------------------------------------------------------------------------------
  ativo_pkey                   | CREATE UNIQUE INDEX ativo_pkey ON public.ativo USING btree (id)
  ix_ativo_ativo               | CREATE INDEX ix_ativo_ativo ON public.ativo USING btree (ativo)
- ix_ativo_classe              | CREATE INDEX ix_ativo_classe ON public.ativo USING btree (classe)
  ix_ativo_data_ultima_cotacao | CREATE INDEX ix_ativo_data_ultima_cotacao ON public.ativo USING btree (data_ultima_cotacao)
  ix_ativo_deslistado          | CREATE INDEX ix_ativo_deslistado ON public.ativo USING btree (deslistado)
  ix_ativo_mercado             | CREATE INDEX ix_ativo_mercado ON public.ativo USING btree (mercado)
  ix_ativo_moeda               | CREATE INDEX ix_ativo_moeda ON public.ativo USING btree (moeda)
  ix_ativo_nome                | CREATE INDEX ix_ativo_nome ON public.ativo USING btree (nome)
  ix_ativo_ticker              | CREATE INDEX ix_ativo_ticker ON public.ativo USING btree (ticker)
- ix_ativo_tipo                | CREATE INDEX ix_ativo_tipo ON public.ativo USING btree (tipo)
  ix_ativo_data_vencimento     | CREATE INDEX ix_ativo_data_vencimento ON public.ativo USING btree (data_vencimento)
-(11 rows)
+(9 rows)
 
 
 ________________________________________________________________________________
@@ -508,7 +504,6 @@ TABELA: corretora
  id           | uuid                     |           | not null |         | plain    |             |              | 
  usuario_id   | uuid                     |           | not null |         | plain    |             |              | 
  nome         | character varying(100)   |           | not null |         | extended |             |              | 
- tipo         | tipocorretora            |           | not null |         | plain    |             |              | 
  pais         | character varying(2)     |           | not null |         | extended |             |              | 
  moeda_padrao | character varying(3)     |           | not null |         | extended |             |              | 
  saldo_atual  | numeric(18,2)            |           | not null |         | main     |             |              | 
@@ -516,13 +511,13 @@ TABELA: corretora
  observacoes  | text                     |           |          |         | extended |             |              | 
  created_at   | timestamp with time zone |           | not null |         | plain    |             |              | 
  updated_at   | timestamp with time zone |           | not null |         | plain    |             |              | 
+ tipo         | tipocorretora            |           | not null |         | plain    |             |              | 
 Indexes:
     "corretora_pkey" PRIMARY KEY, btree (id)
     "ix_corretora_ativa" btree (ativa)
     "ix_corretora_moeda_padrao" btree (moeda_padrao)
     "ix_corretora_nome" btree (nome)
     "ix_corretora_pais" btree (pais)
-    "ix_corretora_tipo" btree (tipo)
     "ix_corretora_usuario_id" btree (usuario_id)
 Check constraints:
     "corretora_moeda_iso_format" CHECK (moeda_padrao::text ~* '^[A-Z]{3}$'::text)
@@ -544,7 +539,6 @@ Access method: heap
    1 | id           | uuid                     |         | NO    | 
    2 | usuario_id   | uuid                     |         | NO    | 
    3 | nome         | character varying        | (100)   | NO    | 
-   4 | tipo         | USER-DEFINED             |         | NO    | 
    5 | pais         | character varying        | (2)     | NO    | 
    6 | moeda_padrao | character varying        | (3)     | NO    | 
    7 | saldo_atual  | numeric                  |         | NO    | 
@@ -552,6 +546,7 @@ Access method: heap
    9 | observacoes  | text                     |         | YES   | 
   10 | created_at   | timestamp with time zone |         | NO    | 
   11 | updated_at   | timestamp with time zone |         | NO    | 
+  13 | tipo         | USER-DEFINED             |         | NO    | 
 (11 rows)
 
 
@@ -583,9 +578,8 @@ Unique Constraints:
  ix_corretora_moeda_padrao | CREATE INDEX ix_corretora_moeda_padrao ON public.corretora USING btree (moeda_padrao)
  ix_corretora_nome         | CREATE INDEX ix_corretora_nome ON public.corretora USING btree (nome)
  ix_corretora_pais         | CREATE INDEX ix_corretora_pais ON public.corretora USING btree (pais)
- ix_corretora_tipo         | CREATE INDEX ix_corretora_tipo ON public.corretora USING btree (tipo)
  ix_corretora_usuario_id   | CREATE INDEX ix_corretora_usuario_id ON public.corretora USING btree (usuario_id)
-(7 rows)
+(6 rows)
 
 
 ________________________________________________________________________________
@@ -601,7 +595,6 @@ TABELA: evento_corporativo
  id               | uuid                     |           | not null |         | plain    |             |              | Identificador único do evento
  ativo_id         | uuid                     |           | not null |         | plain    |             |              | ID do ativo afetado pelo evento
  ativo_novo_id    | uuid                     |           |          |         | plain    |             |              | ID do novo ativo (fusões, mudanças de ticker)
- tipo_evento      | tipoeventocorporativo    |           | not null |         | plain    |             |              | Tipo do evento corporativo
  data_evento      | date                     |           | not null |         | plain    |             |              | Data do evento
  data_com         | date                     |           |          |         | plain    |             |              | Data COM (último dia para ter direito ao evento)
  proporcao        | character varying(20)    |           |          |         | extended |             |              | Proporção do evento (ex: '2:1', '1:10', '1:1.5')
@@ -610,6 +603,7 @@ TABELA: evento_corporativo
  observacoes      | text                     |           |          |         | extended |             |              | Observações adicionais sobre o evento
  created_at       | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
  updated_at       | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+ tipo_evento      | tipoeventocorporativo    |           | not null |         | plain    |             |              | 
 Indexes:
     "evento_corporativo_pkey" PRIMARY KEY, btree (id)
     "ix_evento_corporativo_ativo_id" btree (ativo_id)
@@ -617,7 +611,6 @@ Indexes:
     "ix_evento_corporativo_data_com" btree (data_com)
     "ix_evento_corporativo_data_evento" btree (data_evento)
     "ix_evento_corporativo_impacto_posicoes" btree (impacto_posicoes)
-    "ix_evento_corporativo_tipo_evento" btree (tipo_evento)
 Check constraints:
     "evento_data_com_valida" CHECK (data_com IS NULL OR data_com <= data_evento)
 Foreign-key constraints:
@@ -630,7 +623,6 @@ Access method: heap
    1 | id               | uuid                     |         | NO    | 
    2 | ativo_id         | uuid                     |         | NO    | 
    3 | ativo_novo_id    | uuid                     |         | YES   | 
-   4 | tipo_evento      | USER-DEFINED             |         | NO    | 
    5 | data_evento      | date                     |         | NO    | 
    6 | data_com         | date                     |         | YES   | 
    7 | proporcao        | character varying        | (20)    | YES   | 
@@ -639,6 +631,7 @@ Access method: heap
   10 | observacoes      | text                     |         | YES   | 
   11 | created_at       | timestamp with time zone |         | NO    | 
   12 | updated_at       | timestamp with time zone |         | NO    | 
+  14 | tipo_evento      | USER-DEFINED             |         | NO    | 
 (12 rows)
 
 
@@ -672,8 +665,7 @@ Unique Constraints:
  ix_evento_corporativo_data_com         | CREATE INDEX ix_evento_corporativo_data_com ON public.evento_corporativo USING btree (data_com)
  ix_evento_corporativo_data_evento      | CREATE INDEX ix_evento_corporativo_data_evento ON public.evento_corporativo USING btree (data_evento)
  ix_evento_corporativo_impacto_posicoes | CREATE INDEX ix_evento_corporativo_impacto_posicoes ON public.evento_corporativo USING btree (impacto_posicoes)
- ix_evento_corporativo_tipo_evento      | CREATE INDEX ix_evento_corporativo_tipo_evento ON public.evento_corporativo USING btree (tipo_evento)
-(7 rows)
+(6 rows)
 
 
 ________________________________________________________________________________
@@ -690,7 +682,6 @@ TABELA: evento_custodia
  usuario_id     | uuid                        |           | not null |                                | plain    |             |              | 
  ativo_id       | uuid                        |           | not null |                                | plain    |             |              | 
  corretora_id   | uuid                        |           | not null |                                | plain    |             |              | 
- tipo_evento    | tipo_evento_custodia        |           | not null |                                | plain    |             |              | 
  data_evento    | timestamp without time zone |           | not null |                                | plain    |             |              | 
  quantidade     | numeric(18,8)               |           | not null |                                | main     |             |              | 
  valor_operacao | numeric(18,2)               |           | not null |                                | main     |             |              | 
@@ -699,11 +690,11 @@ TABELA: evento_custodia
  dados_origem   | json                        |           |          |                                | extended |             |              | 
  created_at     | timestamp without time zone |           | not null | CURRENT_TIMESTAMP              | plain    |             |              | 
  updated_at     | timestamp without time zone |           | not null | CURRENT_TIMESTAMP              | plain    |             |              | 
+ tipo_evento    | tipo_evento_custodia        |           |          |                                | plain    |             |              | 
 Indexes:
     "evento_custodia_pkey" PRIMARY KEY, btree (id)
     "ix_evento_custodia_ativo_id" btree (ativo_id)
     "ix_evento_custodia_data_evento" btree (data_evento)
-    "ix_evento_custodia_tipo_evento" btree (tipo_evento)
     "ix_evento_custodia_usuario_id" btree (usuario_id)
 Foreign-key constraints:
     "evento_custodia_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
@@ -717,7 +708,6 @@ Access method: heap
    2 | usuario_id     | uuid                        |         | NO    | 
    3 | ativo_id       | uuid                        |         | NO    | 
    4 | corretora_id   | uuid                        |         | NO    | 
-   5 | tipo_evento    | USER-DEFINED                |         | NO    | 
    6 | data_evento    | timestamp without time zone |         | NO    | 
    7 | quantidade     | numeric                     |         | NO    | 
    8 | valor_operacao | numeric                     |         | NO    | 
@@ -726,6 +716,7 @@ Access method: heap
   11 | dados_origem   | json                        |         | YES   | 
   12 | created_at     | timestamp without time zone |         | NO    | CURRENT_TIMESTAMP
   13 | updated_at     | timestamp without time zone |         | NO    | CURRENT_TIMESTAMP
+  15 | tipo_evento    | USER-DEFINED                |         | YES   | 
 (13 rows)
 
 
@@ -757,9 +748,8 @@ Unique Constraints:
  evento_custodia_pkey           | CREATE UNIQUE INDEX evento_custodia_pkey ON public.evento_custodia USING btree (id)
  ix_evento_custodia_usuario_id  | CREATE INDEX ix_evento_custodia_usuario_id ON public.evento_custodia USING btree (usuario_id)
  ix_evento_custodia_ativo_id    | CREATE INDEX ix_evento_custodia_ativo_id ON public.evento_custodia USING btree (ativo_id)
- ix_evento_custodia_tipo_evento | CREATE INDEX ix_evento_custodia_tipo_evento ON public.evento_custodia USING btree (tipo_evento)
  ix_evento_custodia_data_evento | CREATE INDEX ix_evento_custodia_data_evento ON public.evento_custodia USING btree (data_evento)
-(5 rows)
+(4 rows)
 
 
 ________________________________________________________________________________
@@ -776,20 +766,19 @@ TABELA: feriado_mercado
  pais               | character varying(2)     |           | not null |         | extended |             |              | Código ISO do país (BR, US, etc.)
  mercado            | character varying(20)    |           |          |         | extended |             |              | Mercado/bolsa específica (B3, NYSE, NASDAQ, etc.) - NULL = todos
  data_feriado       | date                     |           | not null |         | plain    |             |              | Data do feriado
- tipo_feriado       | tipoferiado              |           | not null |         | plain    |             |              | Tipo do feriado
  nome               | character varying(200)   |           | not null |         | extended |             |              | Nome do feriado
  horario_fechamento | time without time zone   |           |          |         | plain    |             |              | Horário de fechamento antecipado (se aplicável)
  recorrente         | boolean                  |           | not null |         | plain    |             |              | Indica se é feriado anual fixo (sempre no mesmo dia/mês)
  observacoes        | text                     |           |          |         | extended |             |              | Observações sobre o feriado
  created_at         | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
  updated_at         | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+ tipo_feriado       | tipoferiado              |           | not null |         | plain    |             |              | 
 Indexes:
     "feriado_mercado_pkey" PRIMARY KEY, btree (id)
     "ix_feriado_mercado_data_feriado" btree (data_feriado)
     "ix_feriado_mercado_mercado" btree (mercado)
     "ix_feriado_mercado_pais" btree (pais)
     "ix_feriado_mercado_recorrente" btree (recorrente)
-    "ix_feriado_mercado_tipo_feriado" btree (tipo_feriado)
     "unique_feriado_pais_mercado_data" UNIQUE CONSTRAINT, btree (pais, mercado, data_feriado)
 Check constraints:
     "feriado_nome_min_length" CHECK (length(nome::text) >= 3)
@@ -802,13 +791,13 @@ Access method: heap
    2 | pais               | character varying        | (2)     | NO    | 
    3 | mercado            | character varying        | (20)    | YES   | 
    4 | data_feriado       | date                     |         | NO    | 
-   5 | tipo_feriado       | USER-DEFINED             |         | NO    | 
    6 | nome               | character varying        | (200)   | NO    | 
    7 | horario_fechamento | time without time zone   |         | YES   | 
    8 | recorrente         | boolean                  |         | NO    | 
    9 | observacoes        | text                     |         | YES   | 
   10 | created_at         | timestamp with time zone |         | NO    | 
   11 | updated_at         | timestamp with time zone |         | NO    | 
+  13 | tipo_feriado       | USER-DEFINED             |         | NO    | 
 (11 rows)
 
 
@@ -843,8 +832,7 @@ Unique Constraints:
  ix_feriado_mercado_mercado       | CREATE INDEX ix_feriado_mercado_mercado ON public.feriado_mercado USING btree (mercado)
  ix_feriado_mercado_pais          | CREATE INDEX ix_feriado_mercado_pais ON public.feriado_mercado USING btree (pais)
  ix_feriado_mercado_recorrente    | CREATE INDEX ix_feriado_mercado_recorrente ON public.feriado_mercado USING btree (recorrente)
- ix_feriado_mercado_tipo_feriado  | CREATE INDEX ix_feriado_mercado_tipo_feriado ON public.feriado_mercado USING btree (tipo_feriado)
-(7 rows)
+(6 rows)
 
 
 ________________________________________________________________________________
@@ -859,7 +847,6 @@ TABELA: fonte_dados
 ---------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+------------------------------------------------------
  id                  | uuid                     |           | not null |         | plain    |             |              | Identificador único da fonte
  nome                | character varying(100)   |           | not null |         | extended |             |              | Nome da fonte de dados (ex: yfinance, Alpha Vantage)
- tipo_fonte          | tipofontedados           |           | not null |         | plain    |             |              | Tipo da fonte de dados
  url_base            | character varying(500)   |           |          |         | extended |             |              | URL base da API ou site
  requer_autenticacao | boolean                  |           | not null |         | plain    |             |              | Indica se requer chave API ou autenticação
  rate_limit          | character varying(50)    |           |          |         | extended |             |              | Limite de requisições (ex: '5/minute', '500/day')
@@ -871,12 +858,12 @@ TABELA: fonte_dados
  observacoes         | text                     |           |          |         | extended |             |              | Observações sobre a fonte de dados
  created_at          | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
  updated_at          | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+ tipo_fonte          | tipofontedados           |           | not null |         | plain    |             |              | 
 Indexes:
     "fonte_dados_pkey" PRIMARY KEY, btree (id)
     "ix_fonte_dados_ativa" btree (ativa)
     "ix_fonte_dados_nome" UNIQUE, btree (nome)
     "ix_fonte_dados_prioridade" btree (prioridade)
-    "ix_fonte_dados_tipo_fonte" btree (tipo_fonte)
     "ix_fonte_dados_ultima_consulta" btree (ultima_consulta)
 Check constraints:
     "fonte_consultas_positivas" CHECK (total_consultas >= 0)
@@ -889,7 +876,6 @@ Access method: heap
 -----+---------------------+--------------------------+---------+-------+---------
    1 | id                  | uuid                     |         | NO    | 
    2 | nome                | character varying        | (100)   | NO    | 
-   3 | tipo_fonte          | USER-DEFINED             |         | NO    | 
    4 | url_base            | character varying        | (500)   | YES   | 
    5 | requer_autenticacao | boolean                  |         | NO    | 
    6 | rate_limit          | character varying        | (50)    | YES   | 
@@ -901,6 +887,7 @@ Access method: heap
   12 | observacoes         | text                     |         | YES   | 
   13 | created_at          | timestamp with time zone |         | NO    | 
   14 | updated_at          | timestamp with time zone |         | NO    | 
+  16 | tipo_fonte          | USER-DEFINED             |         | NO    | 
 (14 rows)
 
 
@@ -930,9 +917,8 @@ Unique Constraints:
  ix_fonte_dados_ativa           | CREATE INDEX ix_fonte_dados_ativa ON public.fonte_dados USING btree (ativa)
  ix_fonte_dados_nome            | CREATE UNIQUE INDEX ix_fonte_dados_nome ON public.fonte_dados USING btree (nome)
  ix_fonte_dados_prioridade      | CREATE INDEX ix_fonte_dados_prioridade ON public.fonte_dados USING btree (prioridade)
- ix_fonte_dados_tipo_fonte      | CREATE INDEX ix_fonte_dados_tipo_fonte ON public.fonte_dados USING btree (tipo_fonte)
  ix_fonte_dados_ultima_consulta | CREATE INDEX ix_fonte_dados_ultima_consulta ON public.fonte_dados USING btree (ultima_consulta)
-(6 rows)
+(5 rows)
 
 
 ________________________________________________________________________________
@@ -1115,7 +1101,6 @@ TABELA: movimentacao_caixa
  corretora_id         | uuid                     |           | not null |         | plain    |             |              | ID da corretora (origem)
  corretora_destino_id | uuid                     |           |          |         | plain    |             |              | ID da corretora destino (apenas para transferências)
  provento_id          | uuid                     |           |          |         | plain    |             |              | ID do provento (apenas para crédito de provento)
- tipo_movimentacao    | tipomovimentacao         |           | not null |         | plain    |             |              | Tipo da movimentação
  valor                | numeric(18,2)            |           | not null |         | main     |             |              | Valor da movimentação
  moeda                | character varying(3)     |           | not null |         | extended |             |              | Código ISO 4217 da moeda (BRL, USD, EUR)
  data_movimentacao    | date                     |           | not null |         | plain    |             |              | Data da movimentação
@@ -1123,6 +1108,7 @@ TABELA: movimentacao_caixa
  comprovante          | character varying(200)   |           |          |         | extended |             |              | Referência ao comprovante (número, hash, arquivo)
  created_at           | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
  updated_at           | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+ tipo_movimentacao    | tipomovimentacao         |           | not null |         | plain    |             |              | 
 Indexes:
     "movimentacao_caixa_pkey" PRIMARY KEY, btree (id)
     "ix_movimentacao_caixa_corretora_destino_id" btree (corretora_destino_id)
@@ -1130,7 +1116,6 @@ Indexes:
     "ix_movimentacao_caixa_data_movimentacao" btree (data_movimentacao)
     "ix_movimentacao_caixa_moeda" btree (moeda)
     "ix_movimentacao_caixa_provento_id" btree (provento_id)
-    "ix_movimentacao_caixa_tipo_movimentacao" btree (tipo_movimentacao)
     "ix_movimentacao_caixa_usuario_id" btree (usuario_id)
 Check constraints:
     "movimentacao_moeda_iso_format" CHECK (moeda::text ~* '^[A-Z]{3}$'::text)
@@ -1149,7 +1134,6 @@ Access method: heap
    3 | corretora_id         | uuid                     |         | NO    | 
    4 | corretora_destino_id | uuid                     |         | YES   | 
    5 | provento_id          | uuid                     |         | YES   | 
-   6 | tipo_movimentacao    | USER-DEFINED             |         | NO    | 
    7 | valor                | numeric                  |         | NO    | 
    8 | moeda                | character varying        | (3)     | NO    | 
    9 | data_movimentacao    | date                     |         | NO    | 
@@ -1157,6 +1141,7 @@ Access method: heap
   11 | comprovante          | character varying        | (200)   | YES   | 
   12 | created_at           | timestamp with time zone |         | NO    | 
   13 | updated_at           | timestamp with time zone |         | NO    | 
+  15 | tipo_movimentacao    | USER-DEFINED             |         | NO    | 
 (13 rows)
 
 
@@ -1192,9 +1177,8 @@ Unique Constraints:
  ix_movimentacao_caixa_data_movimentacao    | CREATE INDEX ix_movimentacao_caixa_data_movimentacao ON public.movimentacao_caixa USING btree (data_movimentacao)
  ix_movimentacao_caixa_moeda                | CREATE INDEX ix_movimentacao_caixa_moeda ON public.movimentacao_caixa USING btree (moeda)
  ix_movimentacao_caixa_provento_id          | CREATE INDEX ix_movimentacao_caixa_provento_id ON public.movimentacao_caixa USING btree (provento_id)
- ix_movimentacao_caixa_tipo_movimentacao    | CREATE INDEX ix_movimentacao_caixa_tipo_movimentacao ON public.movimentacao_caixa USING btree (tipo_movimentacao)
  ix_movimentacao_caixa_usuario_id           | CREATE INDEX ix_movimentacao_caixa_usuario_id ON public.movimentacao_caixa USING btree (usuario_id)
-(8 rows)
+(7 rows)
 
 
 ________________________________________________________________________________
@@ -1543,12 +1527,11 @@ ________________________________________________________________________________
 TABELA: provento
 ################################################################################
 
-                                                                           Table "public.provento"
-      Column       |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                     Description                     
--------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-----------------------------------------------------
+                                                                          Table "public.provento"
+      Column       |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                    Description                     
+-------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+----------------------------------------------------
  id                | uuid                     |           | not null |         | plain    |             |              | Identificador único do provento
  ativo_id          | uuid                     |           | not null |         | plain    |             |              | ID do ativo que pagou o provento
- tipo_provento     | tipoprovento             |           | not null |         | plain    |             |              | Tipo do provento (dividendo, JCP, rendimento, etc.)
  valor_por_acao    | numeric(18,6)            |           | not null |         | main     |             |              | Valor unitário por ativo
  quantidade_ativos | numeric(18,8)            |           | not null |         | main     |             |              | Quantidade de ativos que geraram o provento
  valor_bruto       | numeric(18,2)            |           | not null |         | main     |             |              | Valor bruto recebido
@@ -1559,12 +1542,12 @@ TABELA: provento
  observacoes       | text                     |           |          |         | extended |             |              | Observações sobre o provento
  created_at        | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
  updated_at        | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+ tipo_provento     | tipoprovento             |           | not null |         | plain    |             |              | 
 Indexes:
     "provento_pkey" PRIMARY KEY, btree (id)
     "ix_provento_ativo_id" btree (ativo_id)
     "ix_provento_data_com" btree (data_com)
     "ix_provento_data_pagamento" btree (data_pagamento)
-    "ix_provento_tipo_provento" btree (tipo_provento)
 Check constraints:
     "provento_data_pagamento_valida" CHECK (data_pagamento >= data_com)
     "provento_imposto_positivo" CHECK (imposto_retido >= 0::numeric)
@@ -1583,7 +1566,6 @@ Access method: heap
 -----+-------------------+--------------------------+---------+-------+---------
    1 | id                | uuid                     |         | NO    | 
    2 | ativo_id          | uuid                     |         | NO    | 
-   3 | tipo_provento     | USER-DEFINED             |         | NO    | 
    4 | valor_por_acao    | numeric                  |         | NO    | 
    5 | quantidade_ativos | numeric                  |         | NO    | 
    6 | valor_bruto       | numeric                  |         | NO    | 
@@ -1594,6 +1576,7 @@ Access method: heap
   11 | observacoes       | text                     |         | YES   | 
   12 | created_at        | timestamp with time zone |         | NO    | 
   13 | updated_at        | timestamp with time zone |         | NO    | 
+  15 | tipo_provento     | USER-DEFINED             |         | NO    | 
 (13 rows)
 
 
@@ -1624,8 +1607,7 @@ Unique Constraints:
  ix_provento_ativo_id       | CREATE INDEX ix_provento_ativo_id ON public.provento USING btree (ativo_id)
  ix_provento_data_com       | CREATE INDEX ix_provento_data_com ON public.provento USING btree (data_com)
  ix_provento_data_pagamento | CREATE INDEX ix_provento_data_pagamento ON public.provento USING btree (data_pagamento)
- ix_provento_tipo_provento  | CREATE INDEX ix_provento_tipo_provento ON public.provento USING btree (tipo_provento)
-(5 rows)
+(4 rows)
 
 
 ________________________________________________________________________________
@@ -1644,17 +1626,16 @@ TABELA: regra_fiscal
  tipo_operacao   | character varying(20)    |           |          |         | extended |             |              | Tipo de operação (COMPRA, VENDA, DAY_TRADE, SWING_TRADE) - NULL = todas
  aliquota_ir     | numeric(6,4)             |           | not null |         | main     |             |              | Alíquota de IR em % (ex: 15.0000 = 15%)
  valor_isencao   | numeric(18,2)            |           |          |         | main     |             |              | Valor de isenção mensal (ex: R$ 20.000,00 no Brasil)
- incide_sobre    | incidenciaimposto        |           | not null |         | plain    |             |              | Sobre o que incide o imposto
  descricao       | text                     |           | not null |         | extended |             |              | Descrição detalhada da regra fiscal
  vigencia_inicio | date                     |           | not null |         | plain    |             |              | Data de início da vigência da regra
  vigencia_fim    | date                     |           |          |         | plain    |             |              | Data de fim da vigência (NULL = vigente indefinidamente)
  ativa           | boolean                  |           | not null |         | plain    |             |              | Indica se regra está ativa
  created_at      | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
  updated_at      | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
+ incide_sobre    | incidenciaimposto        |           |          |         | plain    |             |              | 
 Indexes:
     "regra_fiscal_pkey" PRIMARY KEY, btree (id)
     "ix_regra_fiscal_ativa" btree (ativa)
-    "ix_regra_fiscal_incide_sobre" btree (incide_sobre)
     "ix_regra_fiscal_pais" btree (pais)
     "ix_regra_fiscal_tipo_ativo" btree (tipo_ativo)
     "ix_regra_fiscal_tipo_operacao" btree (tipo_operacao)
@@ -1675,13 +1656,13 @@ Access method: heap
    4 | tipo_operacao   | character varying        | (20)    | YES   | 
    5 | aliquota_ir     | numeric                  |         | NO    | 
    6 | valor_isencao   | numeric                  |         | YES   | 
-   7 | incide_sobre    | USER-DEFINED             |         | NO    | 
    8 | descricao       | text                     |         | NO    | 
    9 | vigencia_inicio | date                     |         | NO    | 
   10 | vigencia_fim    | date                     |         | YES   | 
   11 | ativa           | boolean                  |         | NO    | 
   12 | created_at      | timestamp with time zone |         | NO    | 
   13 | updated_at      | timestamp with time zone |         | NO    | 
+  15 | incide_sobre    | USER-DEFINED             |         | YES   | 
 (13 rows)
 
 
@@ -1709,13 +1690,12 @@ Unique Constraints:
 ---------------------------------+---------------------------------------------------------------------------------------------------
  regra_fiscal_pkey               | CREATE UNIQUE INDEX regra_fiscal_pkey ON public.regra_fiscal USING btree (id)
  ix_regra_fiscal_ativa           | CREATE INDEX ix_regra_fiscal_ativa ON public.regra_fiscal USING btree (ativa)
- ix_regra_fiscal_incide_sobre    | CREATE INDEX ix_regra_fiscal_incide_sobre ON public.regra_fiscal USING btree (incide_sobre)
  ix_regra_fiscal_pais            | CREATE INDEX ix_regra_fiscal_pais ON public.regra_fiscal USING btree (pais)
  ix_regra_fiscal_tipo_ativo      | CREATE INDEX ix_regra_fiscal_tipo_ativo ON public.regra_fiscal USING btree (tipo_ativo)
  ix_regra_fiscal_tipo_operacao   | CREATE INDEX ix_regra_fiscal_tipo_operacao ON public.regra_fiscal USING btree (tipo_operacao)
  ix_regra_fiscal_vigencia_fim    | CREATE INDEX ix_regra_fiscal_vigencia_fim ON public.regra_fiscal USING btree (vigencia_fim)
  ix_regra_fiscal_vigencia_inicio | CREATE INDEX ix_regra_fiscal_vigencia_inicio ON public.regra_fiscal USING btree (vigencia_inicio)
-(8 rows)
+(7 rows)
 
 
 ________________________________________________________________________________
@@ -1876,7 +1856,6 @@ TABELA: transacao
 -----------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
  id              | uuid                     |           | not null |         | plain    |             |              | 
  usuario_id      | uuid                     |           | not null |         | plain    |             |              | 
- tipo            | tipotransacao            |           | not null |         | plain    |             |              | 
  ativo_id        | uuid                     |           | not null |         | plain    |             |              | 
  corretora_id    | uuid                     |           | not null |         | plain    |             |              | 
  data_transacao  | timestamp with time zone |           | not null |         | plain    |             |              | 
@@ -1893,6 +1872,7 @@ TABELA: transacao
  observacoes     | text                     |           |          |         | extended |             |              | 
  created_at      | timestamp with time zone |           | not null |         | plain    |             |              | 
  updated_at      | timestamp with time zone |           | not null |         | plain    |             |              | 
+ tipo            | tipooperacao             |           | not null |         | plain    |             |              | 
 Indexes:
     "transacao_pkey" PRIMARY KEY, btree (id)
 Foreign-key constraints:
@@ -1905,7 +1885,6 @@ Access method: heap
 -----+-----------------+--------------------------+---------+-------+---------
    1 | id              | uuid                     |         | NO    | 
    2 | usuario_id      | uuid                     |         | NO    | 
-   3 | tipo            | USER-DEFINED             |         | NO    | 
    4 | ativo_id        | uuid                     |         | NO    | 
    5 | corretora_id    | uuid                     |         | NO    | 
    6 | data_transacao  | timestamp with time zone |         | NO    | 
@@ -1922,6 +1901,7 @@ Access method: heap
   17 | observacoes     | text                     |         | YES   | 
   18 | created_at      | timestamp with time zone |         | NO    | 
   19 | updated_at      | timestamp with time zone |         | NO    | 
+  21 | tipo            | USER-DEFINED             |         | NO    | 
 (19 rows)
 
 
@@ -1970,9 +1950,9 @@ TABELA: usuario
  password_hash | character varying(255)   |           | not null |         | extended |             |              | 
  nome_completo | character varying(200)   |           |          |         | extended |             |              | 
  ativo         | boolean                  |           | not null |         | plain    |             |              | 
- role          | userrole                 |           | not null |         | plain    |             |              | 
  created_at    | timestamp with time zone |           | not null |         | plain    |             |              | 
  updated_at    | timestamp with time zone |           | not null |         | plain    |             |              | 
+ role          | userrole                 |           | not null |         | plain    |             |              | 
 Indexes:
     "usuario_pkey" PRIMARY KEY, btree (id)
     "ix_usuario_email" UNIQUE, btree (email)
@@ -2001,9 +1981,9 @@ Access method: heap
    4 | password_hash | character varying        | (255)   | NO    | 
    5 | nome_completo | character varying        | (200)   | YES   | 
    6 | ativo         | boolean                  |         | NO    | 
-   7 | role          | USER-DEFINED             |         | NO    | 
    8 | created_at    | timestamp with time zone |         | NO    | 
    9 | updated_at    | timestamp with time zone |         | NO    | 
+  11 | role          | USER-DEFINED             |         | NO    | 
 (9 rows)
 
 
@@ -2106,24 +2086,24 @@ ENUMS DO BANCO
 
          Enum          |                                                                           Valores                                                                           
 -----------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------
- classeativo           | RENDA_VARIAVEL, RENDA_FIXA, CRIPTO, HIBRIDO
+ classeativo           | renda_variavel, renda_fixa, cripto, commodity, hibrido
  formatoexport         | visualizacao, pdf, excel
  frequencianotificacao | imediata, diaria, semanal, mensal
- incidenciaimposto     | LUCRO, RECEITA, PROVENTO, OPERACAO
+ incidenciaimposto     | lucro, receita, provento, operacao
  operadorcondicao      | >, <, ==, >=, <=, ENTRE
- tipo_evento_custodia  | LIQUIDACAO_D2, TRANSFERENCIA_ENTRADA, TRANSFERENCIA_SAIDA, AJUSTE_POSICAO, DESDOBRAMENTO, AGRUPAMENTO, AMORTIZACAO, OUTRO
+ tipo_evento_custodia  | liquidacao_d2, transferencia_entrada, transferencia_saida, ajuste_posicao, desdobramento, agrupamento, amortizacao, outro
  tipoalerta            | queda_preco, alta_preco, dividendo_previsto, meta_rentabilidade, volatilidade_alta, desvio_alocacao, noticias_ativo
- tipoativo             | ACAO, FII, REIT, BOND, ETF, CRIPTO, OUTRO, CDB, LCI_LCA, TESOURO_DIRETO, DEBENTURE, STOCK, STOCK_INTL, ETF_INTL, UNIT
- tipocorretora         | CORRETORA, EXCHANGE
- tipoeventocorporativo | SPLIT, GRUPAMENTO, BONIFICACAO, DIREITO_SUBSCRICAO, FUSAO, CISAO, INCORPORACAO, MUDANCA_TICKER, DESLISTAGEM, RELISTING, CANCELAMENTO, OUTRO, DESMEMBRAMENTO
- tipoferiado           | NACIONAL, BOLSA, PONTE, FECHAMENTO_ANTECIPADO, MANUTENCAO, OUTRO
- tipofontedados        | API, SCRAPER, MANUAL, ARQUIVO, OUTRO
- tipomovimentacao      | DEPOSITO, SAQUE, TRANSFERENCIA_ENVIADA, TRANSFERENCIA_RECEBIDA, CREDITO_PROVENTO, PAGAMENTO_TAXA, PAGAMENTO_IMPOSTO, AJUSTE, OUTRO
- tipooperacao          | COMPRA, VENDA
- tipoprovento          | DIVIDENDO, JCP, RENDIMENTO, CUPOM, BONIFICACAO, DIREITO_SUBSCRICAO, OUTRO
+ tipoativo             | acao, fii, reit, bond, etf, cripto, outro, cdb, lci_lca, tesouro_direto, debenture, stock, stock_intl, etf_intl, unit
+ tipocorretora         | corretora, exchange
+ tipoeventocorporativo | split, grupamento, bonificacao, direito_subscricao, fusao, cisao, incorporacao, mudanca_ticker, deslistagem, relisting, cancelamento, outro, desmembramento
+ tipoferiado           | nacional, bolsa, ponte, fechamento_antecipado, manutencao, outro
+ tipofontedados        | api, scraper, manual, arquivo, outro
+ tipomovimentacao      | deposito, saque, transferencia_enviada, transferencia_recebida, credito_provento, pagamento_taxa, pagamento_imposto, ajuste, outro
+ tipooperacao          | compra, venda
+ tipoprovento          | dividendo, jcp, rendimento, cupom, bonificacao, direito_subscricao, outro
  tiporelatorio         | portfolio, performance, renda_passiva, investimento, customizado
  tipotransacao         | compra, venda, dividendo, jcp, aluguel, bonificacao, split, grupamento, subscricao, amortizacao
- userrole              | ADMIN, USER, READONLY
+ userrole              | admin, user, readonly
 (18 rows)
 
 

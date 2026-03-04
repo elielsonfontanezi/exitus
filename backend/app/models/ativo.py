@@ -107,8 +107,8 @@ class Ativo(db.Model):
     nome = Column(String(200), nullable=False)
     
     # Classificação
-    tipo = Column(Enum(TipoAtivo), nullable=False, index=True)
-    classe = Column(Enum(ClasseAtivo), nullable=False, index=True)
+    tipo = Column(Enum(TipoAtivo, values_callable=lambda x: [e.value for e in x]), nullable=False, index=True)
+    classe = Column(Enum(ClasseAtivo, values_callable=lambda x: [e.value for e in x]), nullable=False, index=True)
     mercado = Column(String(10), nullable=False, index=True)  # BR, US, EU, ASIA, GLOBAL
     moeda = Column(String(3), nullable=False)
     

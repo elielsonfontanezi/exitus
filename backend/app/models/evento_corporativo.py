@@ -82,7 +82,7 @@ class EventoCorporativo(db.Model):
     
     # Dados do evento
     tipo_evento = db.Column(
-        Enum(TipoEventoCorporativo),
+        Enum(TipoEventoCorporativo, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         index=True,
         comment="Tipo do evento corporativo"

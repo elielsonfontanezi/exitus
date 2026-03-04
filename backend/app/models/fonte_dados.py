@@ -62,7 +62,7 @@ class FonteDados(db.Model):
     )
     
     tipo_fonte = db.Column(
-        Enum(TipoFonteDados),
+        Enum(TipoFonteDados, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         index=True,
         comment="Tipo da fonte de dados"

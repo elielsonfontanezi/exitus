@@ -28,7 +28,7 @@ class EventoCustodia(db.Model):
     corretora_id = db.Column(db.UUID(as_uuid=True), db.ForeignKey('corretora.id'), nullable=False)
     
     # Dados do evento
-    tipo_evento = db.Column(db.Enum(TipoEventoCustodia), nullable=False)
+    tipo_evento = db.Column(db.Enum(TipoEventoCustodia, values_callable=lambda x: [e.value for e in x]), nullable=False)
     data_evento = db.Column(db.DateTime, nullable=False)
     quantidade = db.Column(db.Numeric(18, 8), nullable=False)
     valor_operacao = db.Column(db.Numeric(18, 2), nullable=False)

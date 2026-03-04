@@ -86,7 +86,7 @@ class RegraFiscal(db.Model):
     )
     
     incide_sobre = db.Column(
-        Enum(IncidenciaImposto),
+        Enum(IncidenciaImposto, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         index=True,
         comment="Sobre o que incide o imposto"

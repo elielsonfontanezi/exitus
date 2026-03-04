@@ -67,7 +67,7 @@ class Provento(db.Model):
     
     # Tipo de provento
     tipo_provento = db.Column(
-        Enum(TipoProvento),
+        Enum(TipoProvento, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         index=True,
         comment="Tipo do provento (dividendo, JCP, rendimento, etc.)"

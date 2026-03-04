@@ -74,7 +74,7 @@ class FeriadoMercado(db.Model):
     )
     
     tipo_feriado = db.Column(
-        Enum(TipoFeriado),
+        Enum(TipoFeriado, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         index=True,
         comment="Tipo do feriado"

@@ -24,7 +24,7 @@ class Corretora(db.Model):
     
     # Dados
     nome = Column(String(100), nullable=False, index=True)
-    tipo = Column(Enum(TipoCorretora), default=TipoCorretora.CORRETORA, nullable=False, index=True)
+    tipo = Column(Enum(TipoCorretora, values_callable=lambda x: [e.value for e in x]), default=TipoCorretora.CORRETORA, nullable=False, index=True)
     pais = Column(String(2), nullable=False, default='BR', index=True)
     moeda_padrao = Column(String(3), nullable=False, default='BRL', index=True)
     saldo_atual = Column(Numeric(18, 2), default=0.00, nullable=False)

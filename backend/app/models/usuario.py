@@ -29,7 +29,7 @@ class Usuario(db.Model):
 
     # Controle
     ativo = db.Column(Boolean, default=True, nullable=False)
-    role = db.Column(Enum(UserRole), default=UserRole.USER, nullable=False)
+    role = db.Column(Enum(UserRole, values_callable=lambda x: [e.value for e in x]), default=UserRole.USER, nullable=False)
 
     # Timestamps
     created_at = db.Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)

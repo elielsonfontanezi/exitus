@@ -9,6 +9,23 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-ENUM-001** — Normalização de ENUMs PostgreSQL para lowercase (04/03/2026)
+  - `alembic/versions/20260304_2000_normalize_enums_lowercase.py`: migration para 12 ENUMs — `tipoativo`, `classeativo`, `tipoprovento`, `tipomovimentacao`, `tipooperacao`, `tipoferiado`, `tipofontedados`, `tipoeventocorporativo`, `tipocorretora`, `tipo_evento_custodia`, `incidenciaimposto`, `userrole`
+  - `app/models/ativo.py`: `values_callable` adicionado em `TipoAtivo` e `ClasseAtivo`
+  - `app/models/usuario.py`: `values_callable` adicionado em `UserRole`
+  - `app/models/corretora.py`: `values_callable` adicionado em `TipoCorretora`
+  - `app/models/provento.py`: `values_callable` adicionado em `TipoProvento`
+  - `app/models/movimentacao_caixa.py`: `values_callable` adicionado em `TipoMovimentacao`
+  - `app/models/feriado_mercado.py`: `values_callable` adicionado em `TipoFeriado`
+  - `app/models/evento_corporativo.py`: `values_callable` adicionado em `TipoEventoCorporativo`
+  - `app/models/evento_custodia.py`: `values_callable` adicionado em `TipoEventoCustodia`
+  - `app/models/regra_fiscal.py`: `values_callable` adicionado em `IncidenciaImposto`
+  - `app/models/fonte_dados.py`: `values_callable` adicionado em `TipoFonteDados`
+  - `docs/CODING_STANDARDS.md`: seção "ENUMs — Padrão Obrigatório" com exemplos de `values_callable`
+  - `docs/ROADMAP.md`: GAPs `EXITUS-ENUMFIX-001`, `EXITUS-ENUMFIX-002`, `EXITUS-SCHEMA-001` registrados
+  - `docs/EXITUS_DB_STRUCTURE.txt`: regenerado
+  - **Suite: 64 passed, 0 failed**
+
 - **EXITUS-RFCALC-001** — Cálculos avançados RF e FII (04/03/2026)
   - `alembic/versions/20260304_1900_add_rfcalc_fields_to_ativo.py`: migration `ADD COLUMN` em `ativo` — `taxa_cupom`, `valor_nominal`, `data_vencimento`, `ffo_por_cota`, `affo_por_cota` + índice `ix_ativo_data_vencimento`
   - `app/models/ativo.py`: 5 novos campos RF/FII + `to_dict()` atualizado

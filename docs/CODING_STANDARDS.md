@@ -400,6 +400,42 @@ assert response.get_json()['success'] is True
 
 ---
 
+## 🔢 **ENUMs — Padrão Obrigatório (EXITUS-ENUM-001)**
+
+### Definição de Enum Python
+```python
+# ✅ CORRETO — valores em snake_case lowercase
+class TipoAtivo(enum.Enum):
+    ACAO = "acao"
+    FII  = "fii"
+    CDB  = "cdb"
+
+# ❌ ERRADO — valores UPPERCASE causam LookupError ao ler do banco lowercase
+class TipoAtivo(enum.Enum):
+    ACAO = "ACAO"
+```
+
+### Coluna SQLAlchemy — values_callable OBRIGATÓRIO
+```python
+# ✅ CORRETO — usa os .value do Enum (lowercase) no banco
+tipo = Column(
+    Enum(TipoAtivo, values_callable=lambda x: [e.value for e in x]),
+    nullable=False
+)
+
+# ❌ ERRADO — SQLAlchemy usa os nomes dos membros (ACAO, FII) causando LookupError
+tipo = Column(Enum(TipoAtivo), nullable=False)
+```
+
+### Migration de ENUM com dados existentes
+```python
+# ✅ Usar a função helper _rename_enum_values() — ver migration 20260304_2000
+# A função preserva NOT NULL e converte dados existentes em 8 passos seguros.
+# Nunca fazer DROP TYPE diretamente sem migrar os dados primeiro.
+```
+
+---
+
 ## 🎯 **Regras de Ouro**
 
 1. **🔍 SEMPRE validar** enums antes de usar
