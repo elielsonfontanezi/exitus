@@ -706,3 +706,72 @@ class TestRegrasFiscais2026:
             Transacao.query.filter_by(id=t.id).delete()
             Corretora.query.filter_by(id=corretora.id).delete()
             db.session.commit()
+
+
+class TestDirpf:
+    """IR-006: Relatório DIRPF anual — GET /api/ir/dirpf?ano=YYYY."""
+
+    def test_401_sem_token(self, client):
+        rv = client.get('/api/ir/dirpf?ano=2025')
+        assert rv.status_code == 401
+
+    def test_400_sem_parametro(self, auth_client):
+        rv = auth_client.get('/api/ir/dirpf', headers=auth_client._auth_headers)
+        assert rv.status_code == 400
+
+    def test_400_ano_invalido(self, auth_client):
+        rv = auth_client.get('/api/ir/dirpf?ano=abc', headers=auth_client._auth_headers)
+        assert rv.status_code == 400
+
+    def test_estrutura_resposta(self, auth_client):
+        """Resposta deve conter as fichas obrigatórias da DIRPF."""
+        rv = auth_client.get('/api/ir/dirpf?ano=2025', headers=auth_client._auth_headers)
+        assert rv.status_code == 200
+        data = rv.get_json()['data']
+        assert 'ano' in data
+        assert data['ano'] == 2025
+        assert 'renda_variavel' in data
+        assert 'proventos' in data
+        assert 'bens_e_direitos' in data
+        assert 'ir_total_ano' in data
+        assert 'prejuizo_remanescente' in data
+        assert 'obs' in data
+
+    def test_campos_renda_variavel(self, auth_client):
+        """Ficha renda_variavel deve ter subcategorias com campos obrigatórios."""
+        rv = auth_client.get('/api/ir/dirpf?ano=2025', headers=auth_client._auth_headers)
+        rv_data = rv.get_json()['data']['renda_variavel']
+        for cat in ('swing_acoes', 'day_trade', 'fiis', 'exterior'):
+            assert cat in rv_data, f"Categoria {cat} ausente em renda_variavel"
+            c = rv_data[cat]
+            assert 'lucro' in c
+            assert 'prejuizo' in c
+            assert 'ir_pago' in c
+            assert 'operacoes' in c
+
+    def test_campos_proventos(self, auth_client):
+        """Ficha proventos deve ter subcategorias com campos obrigatórios."""
+        rv = auth_client.get('/api/ir/dirpf?ano=2025', headers=auth_client._auth_headers)
+        prov = rv.get_json()['data']['proventos']
+        for key in ('dividendos_br', 'jcp', 'dividendos_us', 'aluguel'):
+            assert key in prov, f"Chave {key} ausente em proventos"
+            p = prov[key]
+            assert 'valor_bruto' in p
+            assert 'ir_retido' in p
+            assert 'operacoes' in p
+
+    def test_campos_bens_e_direitos(self, auth_client):
+        """Ficha bens_e_direitos deve ter campos e data_referencia = 31/dez."""
+        rv = auth_client.get('/api/ir/dirpf?ano=2025', headers=auth_client._auth_headers)
+        bd = rv.get_json()['data']['bens_e_direitos']
+        assert 'posicoes' in bd
+        assert 'total_posicoes' in bd
+        assert 'custo_total_carteira' in bd
+        assert bd['data_referencia'] == '2025-12-31'
+
+    def test_dirpf_agrega_dados_do_cenario(self, auth_client, cenario_ir):
+        """Com transações em 2025-03, renda_variavel.swing_acoes deve ter operacoes > 0."""
+        rv = auth_client.get('/api/ir/dirpf?ano=2025', headers=auth_client._auth_headers)
+        assert rv.status_code == 200
+        swing = rv.get_json()['data']['renda_variavel']['swing_acoes']
+        assert swing['operacoes'] > 0

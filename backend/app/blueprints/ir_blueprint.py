@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Exitus - IR Blueprint (EXITUS-IR-001)
+Exitus - IR Blueprint (EXITUS-IR-001 + IR-006)
 Endpoints para apuração de Imposto de Renda sobre renda variável.
 
 Rotas:
   GET /api/ir/apuracao?mes=YYYY-MM   — apuração detalhada do mês
   GET /api/ir/darf?mes=YYYY-MM       — DARFs a pagar no mês
   GET /api/ir/historico?ano=YYYY     — resumo anual mês a mês
+  GET /api/ir/dirpf?ano=YYYY         — relatório DIRPF anual (IR-006)
 """
 
 from flask import Blueprint, request
@@ -93,3 +94,31 @@ def historico():
         return error(str(e), e.http_status)
     except Exception as e:
         return error(f"Erro ao buscar histórico IR: {str(e)}", 500)
+
+
+# ---------------------------------------------------------------------------
+# GET /api/ir/dirpf?ano=YYYY
+# ---------------------------------------------------------------------------
+@ir_bp.route('/dirpf', methods=['GET'])
+@jwt_required()
+def dirpf():
+    """Relatório DIRPF anual: Renda Variável, Proventos e Bens e Direitos."""
+    usuario_id = get_jwt_identity()
+    ano_str = request.args.get('ano', '')
+    if not ano_str:
+        return error("Parâmetro 'ano' obrigatório. Formato: YYYY", 400)
+
+    try:
+        ano = int(ano_str)
+        if not (2000 <= ano <= 2100):
+            return error("Ano inválido.", 400)
+    except ValueError:
+        return error("Parâmetro 'ano' deve ser um número inteiro (ex: 2025).", 400)
+
+    try:
+        resultado = IRService.gerar_dirpf(usuario_id, ano)
+        return success(resultado, f"DIRPF {ano}")
+    except ExitusError as e:
+        return error(str(e), e.http_status)
+    except Exception as e:
+        return error(f"Erro ao gerar DIRPF: {str(e)}", 500)

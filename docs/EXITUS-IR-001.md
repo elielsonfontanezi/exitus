@@ -1,10 +1,10 @@
 # EXITUS-IR-001 — Engine de Cálculo de IR sobre Renda Variável
 
 > **Status:** ✅ Concluído (03/03/2026)  
-> **Versão:** 1.5 (inclui IR-002 + IR-003 + IR-004 + IR-007 + IR-009)  
+> **Versão:** 1.6 (inclui IR-002 + IR-003 + IR-004 + IR-006 + IR-007 + IR-009)  
 > **Branch:** `feature/revisao-negocio-vision`  
-> **Testes:** 37 testes de integração — 100% passou  
-> **Suite total:** 146 passed, 0 failed
+> **Testes:** 45 testes de integração — 100% passou  
+> **Suite total:** 154 passed, 0 failed
 
 ---
 
@@ -303,7 +303,7 @@ Resumo de apuração mês a mês para o ano inteiro. Retorna sempre **12 entrada
 
 ## 5. Testes
 
-Suite em `backend/tests/test_ir_integration.py` — **37 testes**, 100% passou.
+Suite em `backend/tests/test_ir_integration.py` — **45 testes**, 100% passou.
 
 | Classe | Testes | O que cobre |
 |--------|--------|-------------|
@@ -313,6 +313,7 @@ Suite em `backend/tests/test_ir_integration.py` — **37 testes**, 100% passou.
 | `TestProventos` | 4 | **seção proventos na resposta** (IR-004), **campos obrigatórios** (IR-004), **dividendo BR isento** (IR-004), **JCP 15% retido** (IR-004) |
 | `TestRegrasFiscais` | 2 | **alíquota carregada do banco** (IR-007), **fallback quando regra_fiscal vazia** (IR-007) |
 | `TestRegrasFiscais2026` | 3 | **JCP 17,5% em 2026** (IR-009), **dividendo BR tributado >R$50k** (IR-009), **dividendo BR isento ≤R$50k** (IR-009) |
+| `TestDirpf` | 8 | **401 sem token** (IR-006), **400 sem parâmetro** (IR-006), **400 ano inválido** (IR-006), **estrutura resposta** (IR-006), **campos renda_variavel** (IR-006), **campos proventos** (IR-006), **campos bens_e_direitos** (IR-006), **agrega dados do cenário** (IR-006) |
 
 **Fixture `cenario_ir`:** cria corretora + compra 100×R$30 + venda 100×R$50 + **posição com PM=30** em 2025-03. Total vendas = R$5.000 → abaixo de R$20k → swing isento. Lucro bruto = R$2.000 (IR-002).
 
@@ -457,7 +458,8 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 | 03/03/2026 | 1.3 | IR-007: Alíquotas dinâmicas via `regra_fiscal` — seed 5 regras, fallback hardcoded, +2 testes (30 total) |
 | 04/03/2026 | 1.4 | IR-004: Proventos tributáveis — `_apurar_proventos()`, seção `proventos` na API, seed 4 regras, +4 testes (34 total) |
 | 04/03/2026 | 1.5 | IR-009: Regras fiscais 2026 — JCP 17,5%, dividendos BR limite R\$50k/CNPJ, seed 3 regras, +3 testes (37 total) |
+| 04/03/2026 | 1.6 | IR-006: DIRPF anual — `gerar_dirpf()`, endpoint `/api/ir/dirpf`, `persist=False`, +8 testes (45 total) |
 
 ---
 
-*Próximos passos: EXITUS-IR-005 (IR sobre renda fixa — tabela regressiva), EXITUS-IR-006 (DIRPF anual), EXITUS-IR-008 (UNITs B3).*
+*Próximos passos: EXITUS-IR-005 (IR sobre renda fixa — tabela regressiva), EXITUS-IR-008 (UNITs B3).*

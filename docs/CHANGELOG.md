@@ -14,6 +14,14 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Mudanças mapeadas: JCP 15%→17,5% (PLP 128/2025), dividendos BR isenção limitada R$50k/mês/CNPJ com 10% acima, imposto mínimo até 10% progressivo para renda>R$600k/ano, aluguel tabela regressiva 22,5%→15%
   - ROADMAP atualizado: IR-009 registrado na Fase 3 (Alta prioridade), IR-004 descrição revisada
 
+- **EXITUS-IR-006** — DIRPF anual (04/03/2026)
+  - `ir_service.py`: novo método `gerar_dirpf(usuario_id, ano)` — fichas Renda Variável, Proventos, Bens e Direitos
+  - `ir_blueprint.py`: novo endpoint `GET /api/ir/dirpf?ano=YYYY`
+  - `apurar_mes()`: novo parâmetro `persist=False` (read-only mode) — fix upstream para evitar writes em chamadas de agregação
+  - `apurar_mes()`: fix `ir_total` como `Decimal` (antes falhava com `int.quantize()`)
+  - `tests/test_ir_integration.py`: classe `TestDirpf` (+8 testes)
+  - **Suite total: 154 passed, 0 failed**
+
 - **EXITUS-IR-009** — Regras fiscais 2026 — implementação (04/03/2026)
   - `ir_service.py`: `_apurar_proventos()` refatorado — JCP aliquota dinâmica (17,5% em 2026+), dividendos BR com limite R$50k/mês por ativo_id (proxy CNPJ)
   - Seed: 3 regras 2026 em `exitusdb` + `exitusdb_test` (JCP 17,5%, DIVIDENDO 0% com isenção R$50k, DIVIDENDO_TRIBUTADO 10%)

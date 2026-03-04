@@ -61,7 +61,7 @@
 | **EXITUS-IR-003** | Compensação de prejuízo acumulado entre meses (tabela `saldo_prejuizo`) | ✅ Concluído (03/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-004** | Proventos tributáveis: JCP, dividendos, aluguel, withholding tax US (baseline pré-2026) | ✅ Concluído (04/03/2026) | **Alto** | **Alta** |
 | **EXITUS-IR-005** | IR sobre renda fixa: tabela regressiva 22,5%→15% por prazo de aplicação | Não implementado | Alto | Alta |
-| **EXITUS-IR-006** | DIRPF anual: relatório para Declaração de Ajuste Anual (fichas Renda Variável e Bens e Direitos) | Não implementado | Alto | Média |
+| **EXITUS-IR-006** | DIRPF anual: relatório para Declaração de Ajuste Anual (fichas Renda Variável, Proventos e Bens e Direitos) | ✅ Concluído (04/03/2026) | **Alto** | **Média** |
 | **EXITUS-IR-007** | Alíquotas dinâmicas via tabela `regra_fiscal` (atualmente hardcoded em `ir_service.py`) | ✅ Concluído (03/03/2026) | Médio | Média |
 | **EXITUS-IR-008** | Tratamento fiscal de UNITs B3 no engine de IR (classificação, isenção R$20k, desmembramento→PM) | Não implementado | Médio | Baixa |
 | **EXITUS-IR-009** | Atualização regras fiscais 2026 (Lei 15.270/2025): JCP 17,5%, dividendos BR 10% acima R$50k, imposto mínimo | ✅ Concluído (04/03/2026) | **Alto** | **Alta** |
@@ -460,7 +460,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 | EXITUS-IR-003 | 3 | ✅ Concluído | 03/03/2026 | Compensação prejuízo acumulado — tabela `saldo_prejuizo`, 5 testes |
 | EXITUS-IR-004 | 3 | ✅ Concluído | 04/03/2026 | Proventos: JCP 15%, dividendos BR isentos, dividendos US 15%, aluguel 15% — seção `proventos` na API, 4 testes |
 | EXITUS-IR-005 | 3 | 📋 Planejado | — | IR renda fixa — tabela regressiva 22,5%→15% |
-| EXITUS-IR-006 | 3 | 📋 Planejado | — | DIRPF anual — fichas Renda Variável e Bens e Direitos |
+| EXITUS-IR-006 | 3 | ✅ Concluído | 04/03/2026 | DIRPF anual — endpoint `/api/ir/dirpf`, fichas RV + Proventos + Bens e Direitos, `persist=False`, 8 testes |
 | EXITUS-IR-007 | 3 | ✅ Concluído | 03/03/2026 | Alíquotas dinâmicas via `regra_fiscal` — seed 5 regras, fallback hardcoded, 2 testes |
 | EXITUS-IR-008 | 3 | 📋 Planejado | — | UNITs B3: classificação fiscal + desmembramento→PM (depende UNITS-001) |
 | EXITUS-IR-009 | 3 | ✅ Concluído | 04/03/2026 | JCP 17,5% (2026+), dividendos BR 10%>R$50k/CNPJ, regras seedadas — 3 testes |

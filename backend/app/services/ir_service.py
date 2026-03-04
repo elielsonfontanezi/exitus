@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Exitus - IR Service (EXITUS-IR-001 + IR-002 + IR-003 + IR-004)
+Exitus - IR Service (EXITUS-IR-001 + IR-002 + IR-003 + IR-004 + IR-006)
 Engine de cálculo de Imposto de Renda sobre operações de renda variável.
 
 Regras implementadas (Brasil):
@@ -183,13 +183,15 @@ def _custo_medio(compras: list) -> Decimal:
 class IRService:
 
     @staticmethod
-    def apurar_mes(usuario_id: str, mes_str: str) -> dict:
+    def apurar_mes(usuario_id: str, mes_str: str, *, persist: bool = True) -> dict:
         """
         Apura IR de renda variável para um mês/usuário.
 
         Args:
             usuario_id: UUID do usuário (string)
             mes_str: mês no formato 'YYYY-MM'
+            persist: se True (default), persiste SaldoPrejuizo no banco.
+                     Usar False em chamadas read-only (ex: gerar_dirpf).
 
         Returns:
             dict com breakdown por categoria, IR devido, DARF e alertas
@@ -357,30 +359,32 @@ class IRService:
 
             res['prejuizo_acumulado'] = float(novo_saldo)
 
-            # Persistir novo saldo do mês atual
-            saldo_atual = (
-                SaldoPrejuizo.query
-                .filter_by(usuario_id=usuario_id, categoria=cat, ano_mes=mes_str)
-                .first()
-            )
-            if saldo_atual:
-                saldo_atual.saldo = novo_saldo
-            else:
-                saldo_atual = SaldoPrejuizo(
-                    usuario_id=usuario_id,
-                    categoria=cat,
-                    ano_mes=mes_str,
-                    saldo=novo_saldo,
+            # Persistir novo saldo do mês atual (skip em modo read-only)
+            if persist:
+                saldo_atual = (
+                    SaldoPrejuizo.query
+                    .filter_by(usuario_id=usuario_id, categoria=cat, ano_mes=mes_str)
+                    .first()
                 )
-                db.session.add(saldo_atual)
+                if saldo_atual:
+                    saldo_atual.saldo = novo_saldo
+                else:
+                    saldo_atual = SaldoPrejuizo(
+                        usuario_id=usuario_id,
+                        categoria=cat,
+                        ano_mes=mes_str,
+                        saldo=novo_saldo,
+                    )
+                    db.session.add(saldo_atual)
 
-        db.session.commit()
+        if persist:
+            db.session.commit()
 
-        # Totais (após compensação)
-        ir_swing    = resultados['swing_acoes']['ir_devido']
-        ir_dt       = resultados['day_trade']['ir_devido']
-        ir_fii      = resultados['fiis']['ir_devido']
-        ir_exterior = resultados['exterior']['ir_devido']
+        # Totais (após compensação) — forçar Decimal para segurança
+        ir_swing    = Decimal(str(resultados['swing_acoes']['ir_devido']))
+        ir_dt       = Decimal(str(resultados['day_trade']['ir_devido']))
+        ir_fii      = Decimal(str(resultados['fiis']['ir_devido']))
+        ir_exterior = Decimal(str(resultados['exterior']['ir_devido']))
         ir_total    = ir_swing + ir_dt + ir_fii + ir_exterior
 
         # DARF
@@ -738,3 +742,165 @@ class IRService:
                 logger.warning(f"Erro ao apurar {mes_str}: {e}")
                 resultado.append({'mes': mes_str, 'ir_total': 0.0, 'alertas': [], 'operacoes': 0})
         return resultado
+
+    # -----------------------------------------------------------------------
+    # DIRPF Anual (IR-006)
+    # -----------------------------------------------------------------------
+
+    @staticmethod
+    def gerar_dirpf(usuario_id: str, ano: int) -> dict:
+        """
+        Gera relatório anual para Declaração de Ajuste Anual (DIRPF).
+
+        Fichas geradas:
+        - renda_variavel: ganhos/perdas realizados por categoria, IR pago mês a mês
+        - proventos: JCP, dividendos BR/US, aluguel recebidos no ano
+        - bens_e_direitos: posições em carteira ao final de 31/dez do ano
+
+        Args:
+            usuario_id: UUID do usuário
+            ano: ano-calendário (ex: 2025)
+
+        Returns:
+            dict com fichas DIRPF e totais consolidados
+        """
+        # ------------------------------------------------------------------
+        # Ficha: Renda Variável — agregar os 12 meses
+        # ------------------------------------------------------------------
+        rv_por_categoria: dict = {
+            'swing_acoes': {'lucro': Decimal('0'), 'prejuizo': Decimal('0'), 'ir_pago': Decimal('0'), 'operacoes': 0},
+            'day_trade':   {'lucro': Decimal('0'), 'prejuizo': Decimal('0'), 'ir_pago': Decimal('0'), 'operacoes': 0},
+            'fiis':        {'lucro': Decimal('0'), 'prejuizo': Decimal('0'), 'ir_pago': Decimal('0'), 'operacoes': 0},
+            'exterior':    {'lucro': Decimal('0'), 'prejuizo': Decimal('0'), 'ir_pago': Decimal('0'), 'operacoes': 0},
+        }
+        prov_total: dict = {
+            'dividendos_br': {'valor_bruto': Decimal('0'), 'ir_retido': Decimal('0'), 'operacoes': 0},
+            'jcp':           {'valor_bruto': Decimal('0'), 'ir_retido': Decimal('0'), 'operacoes': 0},
+            'dividendos_us': {'valor_bruto': Decimal('0'), 'ir_retido': Decimal('0'), 'operacoes': 0},
+            'aluguel':       {'valor_bruto': Decimal('0'), 'ir_retido': Decimal('0'), 'operacoes': 0},
+        }
+        ir_total_ano = Decimal('0')
+
+        for mes in range(1, 13):
+            mes_str = f'{ano}-{mes:02d}'
+            try:
+                ap = IRService.apurar_mes(usuario_id, mes_str, persist=False)
+            except Exception as e:
+                logger.warning(f"IR-006: erro ao apurar {mes_str}: {e}")
+                continue
+
+            # Renda variável
+            for cat_key, cat in ap['categorias'].items():
+                acc = rv_por_categoria[cat_key]
+                lucro_mes  = Decimal(str(cat.get('lucro_liquido', 0) or 0))
+                ir_mes     = Decimal(str(cat.get('ir_devido', 0) or 0))
+                ops        = int(cat.get('operacoes', 0) or 0)
+                if lucro_mes >= 0:
+                    acc['lucro']    += lucro_mes
+                else:
+                    acc['prejuizo'] += abs(lucro_mes)
+                acc['ir_pago']   += ir_mes
+                acc['operacoes'] += ops
+
+            ir_total_ano += Decimal(str(ap.get('ir_total', 0) or 0))
+
+            # Proventos
+            prov = ap.get('proventos', {})
+            for prov_key in prov_total:
+                src = prov.get(prov_key, {})
+                acc = prov_total[prov_key]
+                acc['valor_bruto'] += Decimal(str(src.get('valor_bruto', 0) or 0))
+                acc['ir_retido']   += Decimal(str(src.get('ir_retido', 0) or 0))
+                acc['operacoes']   += int(src.get('operacoes', 0) or 0)
+
+        # ------------------------------------------------------------------
+        # Ficha: Bens e Direitos — posições em carteira em 31/dez do ano
+        # ------------------------------------------------------------------
+        dt_fim_ano = date(ano, 12, 31)
+        posicoes = (
+            Posicao.query
+            .filter(Posicao.usuario_id == usuario_id)
+            .join(Ativo, Posicao.ativo_id == Ativo.id)
+            .all()
+        )
+        bens = []
+        for p in posicoes:
+            if p.quantidade and Decimal(str(p.quantidade)) > 0:
+                ativo = p.ativo
+                bens.append({
+                    'ticker':            ativo.ticker,
+                    'nome':              ativo.nome,
+                    'tipo':              ativo.tipo.value if ativo.tipo else None,
+                    'mercado':           ativo.mercado,
+                    'quantidade':        float(p.quantidade),
+                    'preco_medio':       float(p.preco_medio or 0),
+                    'custo_total':       float(p.custo_total or 0),
+                    'corretora_id':      str(p.corretora_id),
+                    'data_primeira_compra': p.data_primeira_compra.isoformat() if p.data_primeira_compra else None,
+                })
+
+        custo_total_carteira = sum((Decimal(str(b['custo_total'])) for b in bens), Decimal('0'))
+
+        # ------------------------------------------------------------------
+        # Saldo de prejuízo remanescente ao final do ano
+        # ------------------------------------------------------------------
+        ultimo_mes = f'{ano}-12'
+        saldos_pj = (
+            SaldoPrejuizo.query
+            .filter(
+                SaldoPrejuizo.usuario_id == usuario_id,
+                SaldoPrejuizo.ano_mes == ultimo_mes,
+            )
+            .all()
+        )
+        prejuizo_remanescente = {
+            s.categoria: float(s.saldo or 0)
+            for s in saldos_pj
+            if (s.saldo or 0) > 0
+        }
+
+        # ------------------------------------------------------------------
+        # Serializar
+        # ------------------------------------------------------------------
+        def _ser_rv(acc: dict) -> dict:
+            return {
+                'lucro':      float(acc['lucro'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'prejuizo':   float(acc['prejuizo'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'ir_pago':    float(acc['ir_pago'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'operacoes':  acc['operacoes'],
+            }
+
+        def _ser_prov(acc: dict) -> dict:
+            return {
+                'valor_bruto': float(acc['valor_bruto'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'ir_retido':   float(acc['ir_retido'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'operacoes':   acc['operacoes'],
+            }
+
+        return {
+            'ano':        ano,
+            'usuario_id': str(usuario_id),
+            'renda_variavel': {
+                cat: _ser_rv(acc)
+                for cat, acc in rv_por_categoria.items()
+            },
+            'ir_total_ano': float(ir_total_ano.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+            'proventos': {
+                prov_key: _ser_prov(acc)
+                for prov_key, acc in prov_total.items()
+            },
+            'bens_e_direitos': {
+                'posicoes':              bens,
+                'total_posicoes':        len(bens),
+                'custo_total_carteira':  float(custo_total_carteira.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'data_referencia':       dt_fim_ano.isoformat(),
+            },
+            'prejuizo_remanescente': prejuizo_remanescente,
+            'obs': (
+                f'Relatório DIRPF {ano}. '
+                'Renda variável: preencher Ficha Renda Variável. '
+                'Proventos: preencher Ficha Rendimentos Sujeitos à Tributação Exclusiva (JCP) '
+                'e Ficha Rendimentos Isentos (dividendos BR). '
+                'Bens e Direitos: preencher com custo de aquisição (preço médio × quantidade).'
+            ),
+        }
