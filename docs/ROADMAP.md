@@ -71,7 +71,7 @@
 
 | GAP ID | Funcionalidade | Status | Impacto | Prioridade |
 |--------|---------------|--------|---------|------------|
-| **EXITUS-MULTIMOEDA-001** | Multi-moeda com conversão automática | Apenas BRL | Médio | Média |
+| **EXITUS-MULTIMOEDA-001** | Multi-moeda com conversão automática | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-UNITS-001** | Tratamento de UNITS (B3) | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-SWAGGER-001** | Auto-documentação OpenAPI/Swagger | ✅ Concluído (04/03/2026) | Médio | Média |
 | **EXITUS-ANOMALY-001** | Detecção de anomalias em preços (≥20% sem evento) | ✅ Concluído (04/03/2026) | Médio | Média |
@@ -510,7 +510,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | EXITUS-IR-008 | 3 | ✅ Concluído | 04/03/2026 | `TIPOS_ACAO_BR` inclui `TipoAtivo.UNIT`, isenção R$20k, alíquota 15% — 4 testes |
 | EXITUS-IR-009 | 3 | ✅ Concluído | 04/03/2026 | JCP 17,5% (2026+), dividendos BR 10%>R$50k/CNPJ, regras seedadas — 3 testes |
 | EXITUS-EXPORT-001 | 3 | ✅ Concluído | 03/03/2026 | CSV, Excel, JSON, PDF — 32 testes |
-| EXITUS-MULTIMOEDA-001 | 4 | 📋 Planejado | — | Conversão automática BRL/USD/EUR |
+| EXITUS-MULTIMOEDA-001 | 4 | ✅ Concluído | 04/03/2026 | Tabela `taxa_cambio`, `CambioService` (3 camadas: banco→cruzamento→fallback), 6 endpoints `/api/cambio/*`, integração em `portfolio_service` — 234 passed |
 | EXITUS-ENUM-001 | 4 | ✅ Concluído | 04/03/2026 | 12 ENUMs normalizados para lowercase, `values_callable` em 10 models, padrão documentado — 64 passed |
 | EXITUS-UNITS-001 | 4 | ✅ Concluído | 04/03/2026 | `TipoAtivo.UNIT` (15º tipo), `DESMEMBRAMENTO` evento, schema + migration — 8 testes |
 | EXITUS-SWAGGER-001 | 4 | ✅ Concluído | 04/03/2026 | Swagger UI `/api/docs`, spec JSON `/api/swagger.json`, 5 namespaces (auth, ativos, transacoes, ir, export) — flask-restx 1.3 |

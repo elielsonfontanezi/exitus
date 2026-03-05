@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 from typing import Dict, Optional, List
 from uuid import UUID
 from sqlalchemy.exc import SQLAlchemyError
@@ -180,14 +181,24 @@ class PortfolioService:
         alocacao = {}
         total_patrimonio = 0.0
         
+        from app.services.cambio_service import CambioService
         for posicao in posicoes:
             ativo = posicao.ativo
             if not ativo:
                 continue
-            
+
             # Valor da posição = quantidade * preço atual (ou custo médio se preco_atual nulo)
-            preco = float(ativo.preco_atual) if ativo.preco_atual else float(posicao.preco_medio)
-            valor_posicao = float(posicao.quantidade) * preco
+            preco = Decimal(str(ativo.preco_atual)) if ativo.preco_atual else Decimal(str(posicao.preco_medio))
+            valor_posicao_moeda = Decimal(str(posicao.quantidade)) * preco
+
+            # Converter para BRL se necessário
+            moeda = getattr(ativo, 'moeda', 'BRL') or 'BRL'
+            if moeda.upper() != 'BRL':
+                valor_brl = CambioService.converter_para_brl(valor_posicao_moeda, moeda)
+                valor_posicao = float(valor_brl) if valor_brl is not None else float(valor_posicao_moeda)
+            else:
+                valor_posicao = float(valor_posicao_moeda)
+
             total_patrimonio += valor_posicao
             
             # Obter classe do ativo (enum -> string lowercase)

@@ -9,6 +9,17 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-MULTIMOEDA-001** — Suporte multi-moeda com conversão automática para BRL (04/03/2026)
+  - `alembic/versions/20260304_2100_add_taxa_cambio_table.py`: tabela `taxa_cambio` com índice único `par_moeda+data_referencia`
+  - `app/models/taxa_cambio.py`: model `TaxaCambio` com `get_taxa_atual()`, `get_taxa_na_data()`, `TAXAS_FALLBACK` para 7 pares
+  - `app/services/cambio_service.py`: `CambioService` — resolução em 3 camadas (banco → cruzamento BRL → fallback), `converter()`, `converter_para_brl()`, `registrar_taxa()`, `atualizar_taxas_yfinance()`
+  - `app/blueprints/cambio_blueprint.py`: 5 endpoints — `GET /api/cambio/taxa/<par>`, `POST /api/cambio/converter`, `GET /api/cambio/pares`, `GET /api/cambio/taxa/<par>/historico`, `POST /api/cambio/taxa`, `POST /api/cambio/atualizar`
+  - `app/__init__.py`: blueprint câmbio registrado
+  - `app/services/portfolio_service.py`: `get_alocacao()` converte posições USD/EUR para BRL via `CambioService`
+  - `tests/test_cambio_integration.py`: 17 testes — unitários (identidade, fallback, converter, par) + fixtures de endpoint
+  - `docs/EXITUS_DB_STRUCTURE.txt`: regenerado
+  - **Suite: 234 passed, 0 failed**
+
 - **EXITUS-ENUM-001** — Normalização de ENUMs PostgreSQL para lowercase (04/03/2026)
   - `alembic/versions/20260304_2000_normalize_enums_lowercase.py`: migration para 12 ENUMs — `tipoativo`, `classeativo`, `tipoprovento`, `tipomovimentacao`, `tipooperacao`, `tipoferiado`, `tipofontedados`, `tipoeventocorporativo`, `tipocorretora`, `tipo_evento_custodia`, `incidenciaimposto`, `userrole`
   - `app/models/ativo.py`: `values_callable` adicionado em `TipoAtivo` e `ClasseAtivo`

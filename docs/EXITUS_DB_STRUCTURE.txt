@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-04 20:34:47
+Gerado em: 2026-03-04 21:57:15
 ================================================================================
 
 ================================================================================
@@ -32,9 +32,10 @@ TABELAS DO BANCO EXITUS
  public | regra_fiscal           | exitus
  public | relatorios_performance | exitus
  public | saldo_prejuizo         | exitus
+ public | taxa_cambio            | exitus
  public | transacao              | exitus
  public | usuario                | exitus
-(23 rows)
+(24 rows)
 
 
 ================================================================================
@@ -1848,6 +1849,75 @@ ________________________________________________________________________________
 
 
 ################################################################################
+TABELA: taxa_cambio
+################################################################################
+
+                                                                                   Table "public.taxa_cambio"
+     Column      |           Type           | Collation | Nullable |           Default           | Storage  | Compression | Stats target |                      Description                      
+-----------------+--------------------------+-----------+----------+-----------------------------+----------+-------------+--------------+-------------------------------------------------------
+ id              | uuid                     |           | not null |                             | plain    |             |              | 
+ par_moeda       | character varying(7)     |           | not null |                             | extended |             |              | Par de moeda ISO 4217 (ex: BRL/USD, BRL/EUR, USD/BRL)
+ moeda_base      | character varying(3)     |           | not null |                             | extended |             |              | Moeda base do par (ex: BRL)
+ moeda_cotacao   | character varying(3)     |           | not null |                             | extended |             |              | Moeda de cotação do par (ex: USD)
+ taxa            | numeric(18,8)            |           | not null |                             | main     |             |              | Taxa de câmbio: 1 moeda_base = taxa * moeda_cotacao
+ data_referencia | date                     |           | not null |                             | plain    |             |              | Data de referência da cotação
+ fonte           | character varying(50)    |           | not null | 'manual'::character varying | extended |             |              | Fonte da cotação (yfinance, bcb, manual, etc.)
+ created_at      | timestamp with time zone |           | not null |                             | plain    |             |              | 
+Indexes:
+    "taxa_cambio_pkey" PRIMARY KEY, btree (id)
+    "ix_taxa_cambio_data_referencia" btree (data_referencia)
+    "ix_taxa_cambio_par_data" btree (par_moeda, data_referencia)
+    "uq_taxa_cambio_par_data" UNIQUE CONSTRAINT, btree (par_moeda, data_referencia)
+Access method: heap
+
+ Pos |     Coluna      |           Tipo           | Tamanho | Null? |           Default           
+-----+-----------------+--------------------------+---------+-------+-----------------------------
+   1 | id              | uuid                     |         | NO    | 
+   2 | par_moeda       | character varying        | (7)     | NO    | 
+   3 | moeda_base      | character varying        | (3)     | NO    | 
+   4 | moeda_cotacao   | character varying        | (3)     | NO    | 
+   5 | taxa            | numeric                  |         | NO    | 
+   6 | data_referencia | date                     |         | NO    | 
+   7 | fonte           | character varying        | (50)    | NO    | 'manual'::character varying
+   8 | created_at      | timestamp with time zone |         | NO    | 
+(8 rows)
+
+
+Foreign Keys:
+ Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
+---------+--------+---------------------+---------------------
+(0 rows)
+
+
+Primary Keys:
+     Nome PK      | Coluna 
+------------------+--------
+ taxa_cambio_pkey | id
+(1 row)
+
+
+Unique Constraints:
+     Nome Constraint     |     Coluna      
+-------------------------+-----------------
+ uq_taxa_cambio_par_data | par_moeda
+ uq_taxa_cambio_par_data | data_referencia
+(2 rows)
+
+
+Índices:
+         Nome do Índice         |                                                 Definição                                                  
+--------------------------------+------------------------------------------------------------------------------------------------------------
+ taxa_cambio_pkey               | CREATE UNIQUE INDEX taxa_cambio_pkey ON public.taxa_cambio USING btree (id)
+ ix_taxa_cambio_par_data        | CREATE INDEX ix_taxa_cambio_par_data ON public.taxa_cambio USING btree (par_moeda, data_referencia)
+ ix_taxa_cambio_data_referencia | CREATE INDEX ix_taxa_cambio_data_referencia ON public.taxa_cambio USING btree (data_referencia)
+ uq_taxa_cambio_par_data        | CREATE UNIQUE INDEX uq_taxa_cambio_par_data ON public.taxa_cambio USING btree (par_moeda, data_referencia)
+(4 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
 TABELA: transacao
 ################################################################################
 
@@ -2025,7 +2095,7 @@ RESUMO GERAL
 Total de Tabelas:
  Total 
 -------
-    23
+    24
 (1 row)
 
 
@@ -2053,9 +2123,10 @@ Total de Colunas por Tabela:
  regra_fiscal           |          13
  relatorios_performance |          11
  saldo_prejuizo         |           7
+ taxa_cambio            |           8
  transacao              |          19
  usuario                |           9
-(23 rows)
+(24 rows)
 
 
 Total de Foreign Keys por Tabela:

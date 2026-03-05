@@ -258,6 +258,16 @@ def create_app(testing=False):
         print(f"⚠️  Fontes de Dados blueprint não encontrado: {e}")
 
     # ============================================
+    # MULTIMOEDA-001 - CÂMBIO
+    # ============================================
+    try:
+        from .blueprints.cambio_blueprint import cambio_bp
+        app.register_blueprint(cambio_bp)
+        print("✅ Câmbio blueprint registrado: /api/cambio/*")
+    except ImportError as e:
+        print(f"⚠️  Câmbio blueprint não encontrado: {e}")
+
+    # ============================================
     # SWAGGER / OpenAPI (EXITUS-SWAGGER-001)
     # ============================================
     if not testing:
