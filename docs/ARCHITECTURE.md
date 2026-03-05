@@ -1006,5 +1006,11 @@ Cloud Provider
 
 ---
 
-**Documento atualizado**: 03 de Março de 2026  
-**Versão arquitetural**: v0.8.0-dev (Fase 2 concluída — 9 GAPs implementados, 56 ativos com dados fundamentalistas)
+### Nota sobre Frontend (05/03/2026)
+
+O frontend atual (Flask + HTMX + Tailwind, container `exitus-frontend:8080`) é funcional mas **não consome** as APIs implementadas nas Fases 3-4 (IR, Export, Câmbio, Anomaly, RFCALC, Swagger). **Poderá ser refeito do zero** em framework moderno (React/Next.js ou similar) quando o backend estiver estabilizado. O foco atual de desenvolvimento é exclusivamente **backend + banco de dados**. Ver `ROADMAP.md` v3.0.
+
+---
+
+**Documento atualizado**: 05 de Março de 2026  
+**Versão arquitetural**: v0.8.0-dev (Fases 2-4 concluídas — 30 GAPs implementados, 255+ testes, ver ROADMAP.md v3.0)

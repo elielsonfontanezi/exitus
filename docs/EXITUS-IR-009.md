@@ -1,5 +1,8 @@
 # EXITUS-IR-009 — Atualização de Regras Fiscais 2026 (Lei 15.270/2025)
 
+> **⚠️ DOCUMENTO CONSOLIDADO em `EXITUS-IR-001.md` (Seção 9) — versão 2.0, 05/03/2026**  
+> O conteúdo abaixo é mantido para referência histórica. A fonte de verdade é `EXITUS-IR-001.md`.
+
 > **Status:** ✅ Concluído (04/03/2026)  
 > **Prioridade:** Alta  
 > **Impacto:** Alto  

@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 03/03/2026 — unificado de EXITUS-SEED-001 + EXITUS-TESTS-001  
+> **Atualizado:** 05/03/2026 — L-DB-004 corrigido (ENUM-001 concluído)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -53,19 +53,16 @@ Não há sequences no schema. `ALTER SEQUENCE ... RESTART` vai falhar.
 
 ---
 
-### L-DB-004 — ENUMs PostgreSQL têm case inconsistente (bug de design conhecido)
-**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026
+### L-DB-004 — ENUMs PostgreSQL devem ser lowercase (resolvido)
+**Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026 | **Resolvido:** 04/03/2026
 
 | ENUM | No PostgreSQL | No Python (model) | Status |
 |------|--------------|-------------------|--------|
-| `tipotransacao` | lowercase | lowercase | ✅ ok |
-| `tiporelatorio`, `tipoalerta` | lowercase | lowercase | ✅ ok |
-| `tipoativo`, `tipoeventocorporativo` | **UPPERCASE** | lowercase | ⚠️ inconsistente |
-| `userrole`, `tipoprovento`, `incidenciaimposto` | **UPPERCASE** | lowercase | ⚠️ inconsistente |
+| Todos os 12 ENUMs | lowercase | lowercase | ✅ normalizado |
 
-O ORM resolve a conversão automaticamente. Queries SQL diretas com `WHERE tipo = 'acao'`
-**vão falhar** para ENUMs UPPERCASE — usar `WHERE tipo = 'ACAO'` nesse caso.  
-**Fix planejado:** EXITUS-ENUM-001.
+**✅ Fix aplicado:** EXITUS-ENUM-001 (04/03/2026) — migration normalizou todos os 12 ENUMs para lowercase. `values_callable` obrigatório em todos os models (verificado por `test_model_standards.py`).
+
+**Regra ativa:** Sempre usar `values_callable=lambda x: [e.value for e in x]` e `create_type=False` em colunas ENUM. Ver `CODING_STANDARDS.md`.
 
 ---
 

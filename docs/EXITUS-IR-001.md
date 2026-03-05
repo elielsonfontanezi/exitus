@@ -1,10 +1,11 @@
-# EXITUS-IR-001 — Engine de Cálculo de IR sobre Renda Variável
+# EXITUS-IR-001 — Engine de Cálculo de IR (Documento Consolidado)
 
 > **Status:** ✅ Concluído (03/03/2026)  
-> **Versão:** 1.6 (inclui IR-002 + IR-003 + IR-004 + IR-006 + IR-007 + IR-009)  
+> **Versão:** 2.0 (consolidado: IR-001 a IR-009 em documento único)  
 > **Branch:** `feature/revisao-negocio-vision`  
-> **Testes:** 45 testes de integração — 100% passou  
-> **Suite total:** 154 passed, 0 failed
+> **Testes:** 45+ testes de integração — 100% passou  
+> **Suite total:** 255+ passed, 0 failed  
+> **Nota:** Este documento consolida o conteúdo de `EXITUS-IR-009.md` (regras 2026). O arquivo IR-009.md foi mantido com redirecionamento.
 
 ---
 
@@ -424,7 +425,102 @@ A detecção usa `ativo_id` (UUID) e não `ticker` para evitar falsos positivos 
 
 ---
 
-## 9. Exemplos de uso (cURL)
+## 9. Regras Fiscais 2026 (ex-EXITUS-IR-009)
+
+> **Base legal:** Lei 15.270/2025 (sancionada 26/11/2025), PLP 128/2025 (JCP), vigência 01/01/2026
+
+### 9.1 JCP — Juros sobre Capital Próprio
+
+| Item | Regra anterior | Regra 2026+ |
+|------|---------------|-------------|
+| **Alíquota IRRF** | 15% | **17,5%** |
+| **Base de cálculo** | Lucros acumulados (sem restrição) | Apenas lucros acumulados de **anos anteriores** |
+| **Código DARF** | 9453 | 9453 (mantido) |
+
+**Regra de transição:** JCP deliberado e creditado até 31/12/2025 usa alíquota antiga (15%), mesmo que pago em 2026.
+
+### 9.2 Dividendos Brasil
+
+| Item | Regra anterior | Regra 2026+ |
+|------|---------------|-------------|
+| **Isenção** | Total (Lei 9.249/1995) | Limitada a **R$ 50.000/mês por fonte pagadora (CNPJ)** |
+| **Alíquota acima da isenção** | — | **10% IRRF** sobre o **valor total** distribuído no mês |
+| **Crédito IRRF** | — | Valor retido entra como crédito na DIRPF anual |
+
+**Implementação:** Agrupa por `ativo_id` (proxy CNPJ). Se soma > R$50k/mês → 10% sobre **todo** o valor.
+
+### 9.3 Imposto Mínimo Anual (Renda Global)
+
+| Item | Detalhe |
+|------|---------|
+| **Quem é atingido** | Contribuintes com renda anual > **R$ 600.000** |
+| **Alíquota** | Progressiva: 0% a **10%** (máximo para renda > R$1,2M/ano) |
+| **Vigência** | Declaração a partir de abril/2027 (referente a 2026) |
+
+**Impacto:** Escopo de EXITUS-IR-006 (DIRPF anual). O engine mensal registra valores para consolidação anual.
+
+### 9.4 Investimentos no Exterior (EUA)
+
+| Item | Regra 2026+ |
+|------|-------------|
+| **Retenção IRS (EUA)** | 30% na fonte (inalterado) |
+| **Alíquota BR** | **15%** fixa |
+| **Crédito tributário** | 30% retido > 15% devido → sem DARF adicional |
+
+### 9.5 Aluguel de Ações
+
+Tabela regressiva de Renda Fixa. Retenção automática pela corretora (DARF 0561):
+
+| Prazo de aplicação | Alíquota |
+|---|---|
+| Até 180 dias | 22,5% |
+| 181 a 360 dias | 20,0% |
+| 361 a 720 dias | 17,5% |
+| Acima de 720 dias | 15,0% |
+
+### 9.6 Regras seedadas em `regra_fiscal`
+
+| `tipo_operacao` | `aliquota_ir` | `valor_isencao` | Vigência |
+|---|---|---|---|
+| JCP | 17,5% | NULL | 2026-01-01+ |
+| DIVIDENDO | 0% | R$50.000 | 2026-01-01+ |
+| DIVIDENDO_TRIBUTADO | 10% | NULL | 2026-01-01+ |
+
+Regras pré-2026 com `vigencia_fim = 2025-12-31` são ignoradas por `_carregar_regras_fiscais(data_ref)`.
+
+### 9.7 Tabela Resumo — Regras Fiscais Vigentes 2026
+
+| Tipo | País | Alíquota | Isenção | DARF | Retenção |
+|------|------|----------|---------|------|----------|
+| Swing trade ações | BR | 15% | R$20k/mês em vendas | 6015 | Contribuinte |
+| Day-trade | BR | 20% | — | 6015 | Contribuinte |
+| FIIs (venda cotas) | BR | 20% | — | 6015 | Contribuinte |
+| **JCP** | BR | **17,5%** | — | 9453 | Na fonte |
+| **Dividendo BR** | BR | **0% ou 10%** | **R$50k/mês/CNPJ** | 9453 | Na fonte |
+| Dividendo US | US | 15% (BR) | — | — | 30% IRS (crédito) |
+| Aluguel ações | BR | 15%–22,5% | — | 0561 | Na fonte |
+| Ganho capital US | US | 15% | — | — | Contribuinte |
+
+### 9.8 Referências Legais
+
+| Lei/PLP | Assunto |
+|---------|---------|
+| Lei 15.270/2025 | Tributação de dividendos + imposto mínimo |
+| PLP 128/2025 | JCP 17,5% |
+| Lei 9.249/1995 | Isenção de dividendos (revogada parcialmente) |
+| IN RFB 1.585/2015 | Day-trade e operações em bolsa |
+
+### 9.9 Testes IR-009 (`TestRegrasFiscais2026`)
+
+| Teste | Cenário | Verificação |
+|---|---|---|
+| `test_jcp_aliquota_17_5_em_2026` | JCP R$1k em 2026-03 | alíquota=17.5, ir_retido=175 |
+| `test_dividendo_br_tributado_acima_50k_em_2026` | Dividendo R$60k em 2026-03 | isento=False, ir=6000, regime='2026+' |
+| `test_dividendo_br_isento_abaixo_50k_em_2026` | Dividendo R$30k em 2026-03 | isento=True, ir=0 |
+
+---
+
+## 10. Exemplos de uso (cURL)
 
 ```bash
 # Obter token
@@ -448,7 +544,7 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 
 ---
 
-## 10. Histórico de revisões
+## 11. Histórico de revisões
 
 | Data | Versão | Alteração |
 |------|--------|-----------|
@@ -459,7 +555,8 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 | 04/03/2026 | 1.4 | IR-004: Proventos tributáveis — `_apurar_proventos()`, seção `proventos` na API, seed 4 regras, +4 testes (34 total) |
 | 04/03/2026 | 1.5 | IR-009: Regras fiscais 2026 — JCP 17,5%, dividendos BR limite R\$50k/CNPJ, seed 3 regras, +3 testes (37 total) |
 | 04/03/2026 | 1.6 | IR-006: DIRPF anual — `gerar_dirpf()`, endpoint `/api/ir/dirpf`, `persist=False`, +8 testes (45 total) |
+| 05/03/2026 | 2.0 | **Consolidação:** EXITUS-IR-009.md absorvido como Seção 9 (regras 2026, referências legais, tabela resumo) |
 
 ---
 
-*Próximos passos: EXITUS-IR-005 (IR sobre renda fixa — tabela regressiva), EXITUS-IR-008 (UNITs B3).*
+*Engine de IR completo: IR-001 a IR-009 implementados. Próximos GAPs fiscais: EXITUS-IOF-001 (IOF regressivo RF), EXITUS-DARF-ACUMULADO-001 (persistir DARF <R$10).*

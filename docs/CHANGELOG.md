@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Changed — ROADMAP v3.0: Revisão Abrangente Pós-Fases 3-4 (05/03/2026)
+
+- **EXITUS-DOCS-IRCONSOLIDAR-001** — Consolidação `EXITUS-IR-001.md` + `EXITUS-IR-009.md`
+  - `docs/EXITUS-IR-001.md` v2.0: absorve Seção 9 (regras 2026, referências legais, tabela resumo)
+  - `docs/EXITUS-IR-009.md`: mantido com redirecionamento para IR-001.md
+- **ROADMAP.md v3.0** — Reestruturação completa do roadmap
+  - Fases 2, 3, 4 marcadas como concluídas (30 GAPs)
+  - 17 novos GAPs identificados em revisão abrangente do backend e banco
+  - Novas fases: 5 (Robustez/Qualidade), 6 (Integridade), 7 (Produção), 8 (Expansão Futura)
+  - Proposta futura registrada: EXITUS-FUNDOS-001 (Fundos de Investimento)
+  - Seção "Registrado para Avaliação Futura" (Monte Carlo, Markowitz, Redis, etc.)
+  - Nota explícita: frontend pode ser refeito do zero
+  - Total: 30 concluídos + 22 planejados + 1 proposta = 53 GAPs rastreados
+- **MODULES.md** — Atualização de métricas e status
+  - Suite de testes: 77 → 255+ passed
+  - GAPs concluídos: 9 → 30
+  - Seção de Fases Planejadas (5-8) adicionada
+- **LESSONS_LEARNED.md** — Correção referência L-DB-004
+  - EXITUS-ENUM-001 atualizado de "Fix planejado" para "✅ Concluído (04/03/2026)"
+- **ARCHITECTURE.md** — Nota sobre escopo frontend
+
 ### Added
 - **EXITUS-TESTFIX-003** — Correção fixtures `test_newapis_integration.py` (04/03/2026)
   - `tests/test_newapis_integration.py`: fixture `auth_headers` corrigido (`nome_completo`, `set_password`, JWT direto sem login); fixtures `sample_parametro_macro` e `sample_fonte_dados` com nomes/pares únicos + cleanup por teste; asserts `==0` em banco não-vazio substituídos por asserts de estrutura
