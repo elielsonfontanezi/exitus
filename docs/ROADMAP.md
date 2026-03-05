@@ -99,10 +99,10 @@
 | **EXITUS-TESTDB-001** | Script `create_test_db.sh` — recriação automatizada do banco de teste | ✅ Concluído (03/03/2026) | Baixo | Baixa |
 | **EXITUS-TESTFIX-001** | `test_calculos.py` — 2 testes sem token JWT retornam 401 em vez de 200 | ✅ Concluído (03/03/2026) | Baixo | Baixa |
 | **EXITUS-TESTFIX-002** | `test_buy_signals.py` — `ImportError: cannot import name 'db' from 'app'` (importação errada no teste) | ✅ Concluído (03/03/2026) | Baixo | Baixa |
-| **EXITUS-TESTENV-001** | 173 testes com `ERROR at setup` — `marshmallow_sqlalchemy` não instalado no ambiente local; testes só funcionam dentro do container | Não implementado | Médio | Média |
-| **EXITUS-ENUMFIX-001** | Migration `_rename_enum_values` não preserva `NOT NULL` ao recriar colunas ENUM — requer `ALTER COLUMN ... SET NOT NULL` pós-migration; corrigir função helper na próxima migration que use ENUMs | Não implementado | Médio | Média |
-| **EXITUS-ENUMFIX-002** | Models Python sem `values_callable` causam `LookupError` ao ler ENUMs lowercase do banco — todos corrigidos em ENUM-001, mas padrão deve ser documentado em `CODING_STANDARDS.md` e enforçado em novos models | Não implementado | Baixo | Baixa |
-| **EXITUS-SCHEMA-001** | `fonte_dados.rate_limit` — campo `Numeric` no schema Marshmallow conflita com valor string (`"2000/hour"`); campo deveria ser `String` — causa `decimal.ConversionSyntax` no endpoint `/api/fontes-dados` | Não implementado | Médio | Média |
+| **EXITUS-TESTENV-001** | 173 testes com `ERROR at setup` — `marshmallow_sqlalchemy` não instalado no ambiente local; testes só funcionam dentro do container | ✅ Won't Fix (04/03/2026) — ambiente canônico é o container; RUNBOOK atualizado com instrução explícita | Médio | Média |
+| **EXITUS-ENUMFIX-001** | Migration `_rename_enum_values` não preserva `NOT NULL` ao recriar colunas ENUM — requer `ALTER COLUMN ... SET NOT NULL` pós-migration; corrigir função helper na próxima migration que use ENUMs | ✅ Won't Fix (04/03/2026) — `create_test_db.sh` já usa `pg_dump --schema-only`; problema era operacional; RUNBOOK atualizado com obrigatoriedade pós `alembic upgrade` | Médio | Média |
+| **EXITUS-ENUMFIX-002** | Models Python sem `values_callable` causam `LookupError` ao ler ENUMs lowercase do banco — todos corrigidos em ENUM-001, mas padrão deve ser documentado em `CODING_STANDARDS.md` e enforçado em novos models | ✅ Concluído (04/03/2026) — `tests/test_model_standards.py` varre AST de todos os models via pytest | Baixo | Baixa |
+| **EXITUS-SCHEMA-001** | `fonte_dados.rate_limit` — campo `Numeric` no schema Marshmallow conflita com valor string (`"2000/hour"`); campo deveria ser `String` — causa `decimal.ConversionSyntax` no endpoint `/api/fontes-dados` | ✅ Concluído (04/03/2026) — `taxa_sucesso`/`taxa_erro`/`health_status` convertidos para `@property`; `tipo_fonte` usa `fields.Method` no schema | Médio | Média |
 
 ---
 

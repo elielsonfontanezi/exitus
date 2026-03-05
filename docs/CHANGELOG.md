@@ -9,6 +9,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-SCHEMA-001** — Correção serialização `FonteDados` (04/03/2026)
+  - `app/models/fonte_dados.py`: `taxa_sucesso`, `taxa_erro`, `health_status` convertidos de métodos para `@property` — compatibilidade com Marshmallow
+  - `app/schemas/fonte_dados_schema.py`: `tipo_fonte` usa `fields.Method` para extrair `.value` do enum; importação de `post_dump` adicionada
+  - Endpoint `GET /api/fontes-dados` retorna `tipo_fonte: "api"` (lowercase) em vez de `"TipoFonteDados.API"`
+
+- **EXITUS-ENUMFIX-002** — Linter automático de `values_callable` em models (04/03/2026)
+  - `tests/test_model_standards.py`: `TestModelStandards.test_enum_columns_tem_values_callable` — varre AST de todos os models e falha se `Column(Enum(PythonEnum))` não tiver `values_callable`
+  - Previne regressão futura do bug que motivou EXITUS-ENUM-001
+
+- **EXITUS-ENUMFIX-001 / EXITUS-TESTENV-001** — Won't Fix + documentação (04/03/2026)
+  - `docs/OPERATIONS_RUNBOOK.md`: `create_test_db.sh` marcado como **obrigatório após qualquer `alembic upgrade`**
+  - Testes rodam exclusivamente no container (`podman exec exitus-backend python -m pytest`) — ambiente local não é suportado
+  - `create_test_db.sh` já usava `pg_dump --schema-only` corretamente; problema foi operacional
+
 - **EXITUS-MULTIMOEDA-001** — Suporte multi-moeda com conversão automática para BRL (04/03/2026)
   - `alembic/versions/20260304_2100_add_taxa_cambio_table.py`: tabela `taxa_cambio` com índice único `par_moeda+data_referencia`
   - `app/models/taxa_cambio.py`: model `TaxaCambio` com `get_taxa_atual()`, `get_taxa_na_data()`, `TAXAS_FALLBACK` para 7 pares

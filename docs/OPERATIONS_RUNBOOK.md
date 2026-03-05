@@ -909,7 +909,7 @@ podman exec exitus-backend python -m pytest tests/ -x --no-cov
 
 ### Recriar o banco de teste do zero
 
-Quando o banco `exitusdb_test` precisar ser recriado (ex: após migrations, schema corrompido, ou primeiro setup em nova máquina):
+**Obrigatório após qualquer `alembic upgrade`** — e também após schema corrompido ou primeiro setup em nova máquina:
 
 ```bash
 # Recria exitusdb_test com schema idêntico ao exitusdb de produção

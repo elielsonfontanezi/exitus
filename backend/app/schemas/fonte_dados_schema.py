@@ -4,7 +4,7 @@ Exitus - Schema para FonteDados
 Marshmallow schemas para validação e serialização
 """
 
-from marshmallow import Schema, fields, validate, validates, ValidationError
+from marshmallow import Schema, fields, validate, validates, ValidationError, pre_load, post_dump
 from app.models.fonte_dados import FonteDados, TipoFonteDados
 
 
@@ -12,7 +12,14 @@ class FonteDadosResponseSchema(Schema):
     """Schema para resposta de FonteDados"""
     id = fields.UUID(dump_only=True)
     nome = fields.Str(required=True, validate=validate.Length(min=2, max=100))
-    tipo_fonte = fields.Str(required=True, validate=validate.OneOf([e.value for e in TipoFonteDados]))
+    tipo_fonte = fields.Method('get_tipo_fonte', deserialize='load_tipo_fonte')
+
+    def get_tipo_fonte(self, obj):
+        val = obj.tipo_fonte
+        return val.value if hasattr(val, 'value') else str(val)
+
+    def load_tipo_fonte(self, value):
+        return value
     url_base = fields.Str(allow_none=True, validate=validate.URL())
     requer_autenticacao = fields.Boolean(required=True)
     rate_limit = fields.Str(allow_none=True)
@@ -57,7 +64,11 @@ class FonteDadosListSchema(Schema):
     """Schema para listagem de FonteDados (com estatísticas incluídas)"""
     id = fields.UUID(dump_only=True)
     nome = fields.Str(dump_only=True)
-    tipo_fonte = fields.Str(dump_only=True)
+    tipo_fonte = fields.Method('get_tipo_fonte')
+
+    def get_tipo_fonte(self, obj):
+        val = obj.tipo_fonte
+        return val.value if hasattr(val, 'value') else str(val)
     url_base = fields.Str(allow_none=True, dump_only=True)
     ativa = fields.Boolean(dump_only=True)
     prioridade = fields.Integer(dump_only=True)

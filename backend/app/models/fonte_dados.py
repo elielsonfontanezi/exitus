@@ -200,6 +200,7 @@ class FonteDados(db.Model):
         self.total_erros += 1
         self.total_consultas += 1
 
+    @property
     def taxa_sucesso(self):
         """
         Calcula a taxa de sucesso das consultas
@@ -215,6 +216,7 @@ class FonteDados(db.Model):
             return (sucessos / total) * 100
         return 100.0  # Sem consultas = 100% por padrão
 
+    @property
     def taxa_erro(self):
         """
         Calcula a taxa de erro das consultas
@@ -229,6 +231,7 @@ class FonteDados(db.Model):
             return (erros / total) * 100
         return 0.0
 
+    @property
     def health_status(self):
         """
         Determina o status de saúde da fonte
@@ -241,7 +244,7 @@ class FonteDados(db.Model):
         if total == 0:
             return 'unknown'
         
-        taxa_sucesso = self.taxa_sucesso()
+        taxa_sucesso = self.taxa_sucesso
         
         if taxa_sucesso >= 95:
             return 'healthy'
@@ -270,9 +273,9 @@ class FonteDados(db.Model):
             'ultima_consulta': self.ultima_consulta.isoformat() if self.ultima_consulta else None,
             'total_consultas': self.total_consultas,
             'total_erros': self.total_erros,
-            'taxa_sucesso': round(self.taxa_sucesso(), 2),
-            'taxa_erro': round(self.taxa_erro(), 2),
-            'health_status': self.health_status(),
+            'taxa_sucesso': round(self.taxa_sucesso, 2),
+            'taxa_erro': round(self.taxa_erro, 2),
+            'health_status': self.health_status,
             'observacoes': self.observacoes,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
