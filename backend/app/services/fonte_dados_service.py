@@ -182,7 +182,7 @@ class FonteDadosService:
         }
         
         for fonte in fontes:
-            status = fonte.health_status()
+            status = fonte.health_status
             summary[status] += 1
             
             summary['detalhes'].append({
@@ -190,7 +190,7 @@ class FonteDadosService:
                 'nome': fonte.nome,
                 'tipo': fonte.tipo_fonte.value,
                 'status': status,
-                'taxa_sucesso': round(fonte.taxa_sucesso(), 2),
+                'taxa_sucesso': round(fonte.taxa_sucesso, 2),
                 'total_consultas': fonte.total_consultas,
                 'ultima_consulta': fonte.ultima_consulta.isoformat() if fonte.ultima_consulta else None
             })

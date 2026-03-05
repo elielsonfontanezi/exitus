@@ -9,6 +9,11 @@ e este projeto adere semanticamente à versão v0.8.0.
 ## [Unreleased]
 
 ### Added
+- **EXITUS-TESTFIX-003** — Correção fixtures `test_newapis_integration.py` (04/03/2026)
+  - `tests/test_newapis_integration.py`: fixture `auth_headers` corrigido (`nome_completo`, `set_password`, JWT direto sem login); fixtures `sample_parametro_macro` e `sample_fonte_dados` com nomes/pares únicos + cleanup por teste; asserts `==0` em banco não-vazio substituídos por asserts de estrutura
+  - `app/services/fonte_dados_service.py`: `health_status()` e `taxa_sucesso()` corrigidos para acesso como `@property` (sem parênteses)
+  - **Suite: 255 passed, 16 errors (TESTENV-001 Won't Fix)**
+
 - **EXITUS-SCHEMA-001** — Correção serialização `FonteDados` (04/03/2026)
   - `app/models/fonte_dados.py`: `taxa_sucesso`, `taxa_erro`, `health_status` convertidos de métodos para `@property` — compatibilidade com Marshmallow
   - `app/schemas/fonte_dados_schema.py`: `tipo_fonte` usa `fields.Method` para extrair `.value` do enum; importação de `post_dump` adicionada
