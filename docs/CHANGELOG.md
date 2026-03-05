@@ -8,8 +8,15 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
-### Changed — ROADMAP v3.0: Revisão Abrangente Pós-Fases 3-4 (05/03/2026)
+### Changed — ROADMAP v3.0 + SCRIPTS-002 + .windsurfrules v2.1 (05/03/2026)
 
+- **EXITUS-SCRIPTS-002** — GAP registrado no ROADMAP (Fase 6)
+  - Diagnóstico: 28 scripts auditados — 2 obsoletos, 1 bug (shebang), 3 duplicidades, 1 frágil
+  - Detalhamento completo no ROADMAP.md com escopo de 7 itens
+- **.windsurfrules v2.1** — Seção `SCRIPTS DISPONÍVEIS` adicionada
+  - 28 scripts categorizados (containers, banco, seeds, recovery, utilitários)
+  - Comandos frequentes documentados
+  - Métricas atualizadas: 255+ testes, 15 TipoAtivo
 - **EXITUS-DOCS-IRCONSOLIDAR-001** — Consolidação `EXITUS-IR-001.md` + `EXITUS-IR-009.md`
   - `docs/EXITUS-IR-001.md` v2.0: absorve Seção 9 (regras 2026, referências legais, tabela resumo)
   - `docs/EXITUS-IR-009.md`: mantido com redirecionamento para IR-001.md

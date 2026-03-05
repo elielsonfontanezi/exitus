@@ -111,6 +111,7 @@ O frontend atual (Flask + HTMX + Tailwind) é funcional mas **não consome** as 
 | **EXITUS-RECONCILIACAO-001** | Verificação posição calculada vs importada + saldo corretora vs soma movimentações | 📋 Planejado | Médio | Média |
 | **EXITUS-IOF-001** | IOF regressivo (96%→0% em 30 dias) para resgates de RF < 30 dias | 📋 Planejado | Médio | Média |
 | **EXITUS-CONSTRAINT-001** | Revisão de CHECK constraints no banco (quantidade>0, valor>=0, saldo>=0, etc.) | 📋 Planejado | Médio | Média |
+| **EXITUS-SCRIPTS-002** | Revisão/limpeza de `scripts/`: remover obsoletos, resolver duplicidades (.sh vs .py), corrigir `import_b3.py` (shebang bash), melhorar `backup_db.sh` | 📋 Planejado | Médio | Média |
 
 ### 6. Fase 7 — Produção e Escala (Média-Alta Prioridade)
 
@@ -550,6 +551,32 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 ### EXITUS-CONSTRAINT-001: Revisão de CHECK Constraints
 **Problema:** Verificar se todas as tabelas têm CHECK constraints adequados no banco (ex: `quantidade > 0`, `valor >= 0`). Fazer diff entre o que os models definem e o que o banco realmente tem.
 
+### EXITUS-SCRIPTS-002: Revisão e Limpeza de Scripts
+**Problema:** 28 scripts em `scripts/` com redundâncias, obsolescência e inconsistências acumuladas desde EXITUS-SCRIPTS-001.
+
+**Diagnóstico (05/03/2026):**
+
+| Categoria | Script | Problema |
+|-----------|--------|----------|
+| **Obsoleto** | `generate_api_docs.sh` | Gera para `docs/ARCHIVE/` — substituído por Swagger (SWAGGER-001) |
+| **One-time** | `migrate_legacy_seeds.py` | Migração de seeds legados já concluída |
+| **Bug** | `import_b3.py` | Shebang `#!/bin/bash` num arquivo `.py` — é bash disfarçado |
+| **Frágil** | `backup_db.sh` | 12 linhas, sem validação de container, sem compressão, sem rotação |
+| **Duplicidade** | `exitus.sh` (307 linhas) | Script unificado sobrepõe 5 scripts individuais (start/stop/restart/restart_backend/restart_frontend) |
+| **Duplicidade** | `import_b3.sh` + `import_b3.py` | Dois scripts para mesma função |
+| **Duplicidade** | `reset_and_seed.sh` + `reset_and_seed.py` | Dois scripts para mesma função |
+
+**Escopo:**
+1. Remover `generate_api_docs.sh` (substituído por Swagger)
+2. Remover ou mover `migrate_legacy_seeds.py` para `scripts/archive/`
+3. Corrigir `import_b3.py` — renomear para `.sh` ou reescrever como Python real
+4. Decidir: `exitus.sh` substitui scripts individuais ou coexistem?
+5. Decidir: versão `.sh` vs `.py` para import_b3 e reset_and_seed (manter apenas 1 de cada)
+6. Melhorar `backup_db.sh` — validação de container, compressão gzip, rotação de N backups
+7. Atualizar `OPERATIONS_RUNBOOK.md` e `.windsurfrules` após limpeza
+
+**Dependências:** Nenhuma. Quick win paralelo a qualquer fase.
+
 ### EXITUS-FUNDOS-001: Suporte a Fundos de Investimento (Proposta Futura)
 **Problema:** Fundos de investimento (FIAs, FIMs, FIRFs, multimercado) não são suportados. É uma classe de ativos relevante para investidores BR.
 
@@ -601,6 +628,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 5. **EXITUS-RECONCILIACAO-001** — Verificação de consistência
 6. **EXITUS-IOF-001** — IOF regressivo para RF
 7. **EXITUS-CONSTRAINT-001** — CHECK constraints no banco
+8. **EXITUS-SCRIPTS-002** — Revisão/limpeza de scripts (quick win paralelo)
 
 ### Fase 7 — Produção e Escala
 1. **EXITUS-MULTICLIENTE-001** — Multi-tenancy para assessoras
@@ -722,6 +750,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | EXITUS-RECONCILIACAO-001 | 6 | 📋 Planejado | Média | 2h |
 | EXITUS-IOF-001 | 6 | 📋 Planejado | Média | 1h |
 | EXITUS-CONSTRAINT-001 | 6 | 📋 Planejado | Média | 1h |
+| EXITUS-SCRIPTS-002 | 6 | 📋 Planejado | Média | 1-2h |
 | EXITUS-MULTICLIENTE-001 | 7 | 📋 Planejado | Média-Alta | — |
 | EXITUS-MONITOR-001 | 7 | 📋 Planejado | Média | — |
 | EXITUS-RATELIMIT-001 | 7 | 📋 Planejado | Média | — |
@@ -736,7 +765,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | EXITUS-AUDIT-001 | DT | 📋 Planejado | Baixa | — |
 | EXITUS-LGPD-001 | DT | 📋 Planejado | Baixa | — |
 
-**Resumo:** 30 concluídos + 22 planejados + 1 proposta = **53 GAPs rastreados**
+**Resumo:** 30 concluídos + 23 planejados + 1 proposta = **54 GAPs rastreados**
 
 ---
 

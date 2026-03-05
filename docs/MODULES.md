@@ -304,7 +304,7 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 | Ativos Seedados | — | 56 (15 ações BR, 10 FIIs, 6 US, 2 REITs, 8 ETFs, 5 RF, 10 EU) |
 | Cobertura ENUMs | — | 15/15 tipos implementados (inclui UNIT) |
 | GAPs Concluídos | — | 30 (Fases 2, 3, 4) |
-| GAPs Planejados | — | 22 + 1 proposta (Fases 5-8) |
+| GAPs Planejados | — | 23 + 1 proposta (Fases 5-8) |
 
 ---
 

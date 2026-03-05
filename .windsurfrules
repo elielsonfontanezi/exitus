@@ -1,6 +1,6 @@
 # .windsurfrules — Sistema Exitus
 ## Arquivo de regras para Cascade (Windsurf AI Assistant)
-### Versão: 2.0 — 04/03/2026 (migrado de .codeium.rules)
+### Versão: 2.1 — 05/03/2026 (adicionada seção scripts, métricas atualizadas)
 
 ---
 
@@ -18,7 +18,7 @@ PRIORIDADE 1 — Ler antes de qualquer ação:
 │
 PRIORIDADE 2 — Consultar conforme contexto:
 ├── docs/API_REFERENCE.md       # Contratos completos dos endpoints
-├── docs/ENUMS.md               # 14 TipoAtivo, mapeamentos DB/API/JSON
+├── docs/ENUMS.md               # 15 TipoAtivo (inclui UNIT), mapeamentos DB/API/JSON
 ├── docs/ARCHITECTURE.md        # Stack, containers, convenções
 ├── docs/MODULES.md             # Status M0-M7, endpoints por módulo
 ├── docs/EXITUS_DB_STRUCTURE.txt # Schema completo: tabelas, índices, constraints
@@ -36,7 +36,7 @@ Fluxo obrigatório em toda atividade:
 3. **Apresentar estratégia** com diagnóstico, arquivos, ordem de implementação (ver REGRA #6)
 4. **Aguardar "APROVADO"** explicitamente do usuário
 5. **Implementar** — código completo, funcional, sem omissões (`...`)
-6. **Testar** → suite deve passar (179+ testes)
+6. **Testar** → suite deve passar (255+ testes)
 7. **Documentar** → mesma sessão, mesmo commit
 8. **Apresentar commit** e aguardar aprovação antes de executar
 
@@ -147,7 +147,67 @@ Reload:  podman stop exitus-backend && podman start exitus-backend
 
 ---
 
-## 🔐 SEGURANÇA MULTI-TENANT
+## �️ SCRIPTS DISPONÍVEIS (`scripts/`)
+
+A IA tem acesso direto a todos os scripts via `run_command`. Usar conforme contexto:
+
+```
+Operações de container:
+├── scripts/start_exitus.sh          # Iniciar todos os containers
+├── scripts/stop_exitus.sh           # Parar todos os containers
+├── scripts/restart_exitus.sh        # Restart completo (3 containers)
+├── scripts/restart_backend.sh       # Restart só backend (após mudança de código)
+├── scripts/restart_frontend.sh      # Restart só frontend
+├── scripts/setup_containers.sh      # Setup inicial (criar containers + rede)
+├── scripts/repair_containers.sh     # Reparar containers com problemas
+├── scripts/cleanup_containers.sh    # Remover containers e volumes
+├── scripts/rebuild_restart_exitus-backend.sh   # Rebuild + restart backend
+├── scripts/rebuild_restart_exitus-frontend.sh  # Rebuild + restart frontend
+
+Banco de dados:
+├── scripts/backup_db.sh             # Backup completo do PostgreSQL
+├── scripts/restore_db.sh            # Restore de backup
+├── scripts/create_test_db.sh        # Recriar exitusdb_test (obrigatório após alembic)
+├── scripts/update_db_structure.sh   # Gerar docs/EXITUS_DB_STRUCTURE.txt (REGRA #9)
+
+Seeds e dados:
+├── scripts/populate_seeds.sh        # Executar todos os seeds (recomendado)
+├── scripts/reset_and_seed.sh        # Reset completo + seed (minimal/full/custom)
+├── scripts/reset_and_seed.py        # Versão Python do reset+seed
+├── scripts/import_b3.sh             # Importar arquivos B3 (Excel/CSV)
+├── scripts/import_b3.py             # Versão Python da importação B3
+
+Recovery:
+├── scripts/recovery_manager.sh      # Orquestrador de recovery enterprise-grade
+├── scripts/recovery_dashboard.sh    # Interface TUI para recovery
+├── scripts/validate_recovery.sh     # Validação pós-recovery
+├── scripts/rollback_recovery.sh     # Rollback automático
+
+Utilitários:
+├── scripts/get_backend_token.sh     # Obter JWT token para testes de API
+├── scripts/generate_api_docs.sh     # Gerar documentação de API
+├── scripts/setup_env.sh             # Configurar variáveis de ambiente
+└── scripts/migrate_legacy_seeds.py  # Migrar seeds legados (one-time)
+```
+
+**Comandos frequentes:**
+```bash
+# Testes (rodar SEMPRE no container)
+podman exec exitus-backend python -m pytest --no-cov -q
+
+# Token para testes de API
+export TOKEN=$(bash scripts/get_backend_token.sh)
+
+# Restart rápido após mudança de código Python
+bash scripts/restart_backend.sh
+
+# Schema docs após ALTER TABLE / migration
+bash scripts/update_db_structure.sh
+```
+
+---
+
+## �� SEGURANÇA MULTI-TENANT
 
 ```
 1. FILTER usuario_id em TODAS as queries — sem exceção
