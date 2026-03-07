@@ -968,9 +968,10 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 **Baseline Atual:**
 
-- Testes: 255+ passing
-- Cobertura: ?% (a medir)
+- Testes: 255 passed, 16 errors
+- Cobertura: ?% (coverage com erro de arquivo .coverage)
 - GAPs concluídos: 30/53
+- Backup: exitus_backup_20260307_113901.tar.gz (1.9MB)
 
 **Metas Finais:**
 
