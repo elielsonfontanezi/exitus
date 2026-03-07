@@ -115,6 +115,7 @@ O frontend atual (Flask + HTMX + Tailwind) é funcional mas **não consome** as 
 | **EXITUS-IOF-001** | IOF regressivo (96%→0% em 30 dias) para resgates de RF < 30 dias | 📋 Planejado | Médio | Média |
 | **EXITUS-CONSTRAINT-001** | Revisão de CHECK constraints no banco (quantidade>0, valor>=0, saldo>=0, etc.) | 📋 Planejado | Médio | Média |
 | **EXITUS-SCRIPTS-002** | Revisão/limpeza de `scripts/`: remover obsoletos, resolver duplicidades (.sh vs .py), corrigir `import_b3.py` (shebang bash), melhorar `backup_db.sh` | 📋 Planejado | Médio | Média |
+| **EXITUS-TESTFIX-CAMBIO-001** | Corrigir 16 errors em `test_cambio_integration.py` (setup de fixtures, configuração de ambiente) | 📋 Planejado | Baixo | Baixa |
 
 ### 6. Fase 7 — Produção e Escala (Média-Alta Prioridade)
 
@@ -919,7 +920,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 - **Decisão:** Itens do Prompt Mestre não priorizados (Redis, Hypothesis, Kubernetes, Monte Carlo, Markowitz, Backtesting, WebSocket) registrados para avaliação futura
 - **Consolidado:** EXITUS-IR-001.md + EXITUS-IR-009.md em documento único
 - **Reorganizado ROADMAP:** 8 fases + Dívida Técnica + Avaliação Futura
-- **Total GAPs:** 30 concluídos + 22 planejados + 1 proposta = **53 GAPs rastreados**
+- **Total GAPs:** 30 concluídos + 23 planejados + 1 proposta = **54 GAPs rastreados**
 
 ---
 
@@ -928,20 +929,20 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 > **Status:** Em Execução  
 > **Início:** 07/03/2026  
 > **Timeline Estimada:** 2 semanas  
-> **Modelo IA:** Claude Opus (1 GAP), Claude Sonnet (8 GAPs), SWE-1.5 (4 GAPs)
+> **Modelo IA:** Claude Opus (1 GAP), Claude Sonnet (8 GAPs), SWE-1.5 (5 GAPs)
 > **⚠️ NOTA:** Esta seção será **removida automaticamente** ao concluir todos GAPs das Fases 5 & 6
 
 ### 📋 Ordem de Execução Otimizada
 
 | Sprint | GAPs | Status | Modelo IA | Dias Estimados |
 |--------|------|--------|-----------|----------------|
-| **Setup** | Baseline + Backup | ⏳ Planejado | - | 0.5 dia |
+| **Setup** | Baseline + Backup | ✅ Concluído | - | 0.5 dia |
 | **Sprint 1** | VALIDATION-001 + CLEANUP-001 | ⏳ Planejado | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 2** | RENTABILIDADE-001 + SERVICE-REVIEW-001 | ⏳ Planejado | Opus + Sonnet | 2-3 dias |
 | **Sprint 3** | COVERAGE-001 + DOCS-SYNC-001 | ⏳ Planejado | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 4** | CONSTRAINT-001 + CIRCUITBREAKER-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
 | **Sprint 5** | AUDITLOG-001 + RECONCILIACAO-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
-| **Sprint 6** | DARF-ACUMULADO-001 + IOF-001 + SCRIPTS-002 | ⏳ Planejado | SWE-1.5 + SWE-1.5 | 1 dia |
+| Sprint 6 | DARF-ACUMULADO-001 + IOF-001 + SCRIPTS-002 + TESTFIX-CAMBIO-001 | ⏳ Planejado | SWE-1.5 + SWE-1.5 | 1 dia |
 
 ### 🔄 Status em Tempo Real
 
@@ -963,6 +964,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 - [ ] EXITUS-DARF-ACUMULADO-001 — DARF < R$10 acumulado
 - [ ] EXITUS-IOF-001 — IOF regressivo RF < 30 dias
 - [ ] EXITUS-SCRIPTS-002 — Limpeza scripts
+- [ ] EXITUS-TESTFIX-CAMBIO-001 — Corrigir 16 errors testes câmbio
 
 ### 📊 Métricas de Execução
 
@@ -970,14 +972,14 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 - Testes: 255 passed, 16 errors
 - Cobertura: ?% (coverage com erro de arquivo .coverage)
-- GAPs concluídos: 30/53
+- GAPs concluídos: 30/54
 - Backup: exitus_backup_20260307_113901.tar.gz (1.9MB)
 
 **Metas Finais:**
 
 - Testes: 300+ passing
 - Cobertura: 80%+
-- GAPs concluídos: 42/53
+- GAPs concluídos: 43/54
 
 ---
 
