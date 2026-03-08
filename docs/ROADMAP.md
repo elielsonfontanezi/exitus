@@ -929,7 +929,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | Sprint | GAPs | Status | Modelo IA | Dias Estimados |
 |--------|------|--------|-----------|----------------|
 | **Setup** | Baseline + Backup | ✅ Concluído | - | 0.5 dia |
-| **Sprint 1** | VALIDATION-001 + CLEANUP-001 | 🔄 Em Andamento | Sonnet + SWE-1.5 | 1-2 dias |
+| **Sprint 1** | VALIDATION-001 + CLEANUP-001 | ✅ Concluído | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 2** | RENTABILIDADE-001 + SERVICE-REVIEW-001 | ✅ Concluído | Opus + Sonnet | 2-3 dias |
 | **Sprint 3** | COVERAGE-001 + DOCS-SYNC-001 | ✅ Concluído | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 4** | CONSTRAINT-001 + CIRCUITBREAKER-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
