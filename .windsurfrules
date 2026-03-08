@@ -17,6 +17,7 @@ PRIORIDADE 1 — Ler antes de qualquer ação:
 ├── docs/CHANGELOG.md           # Histórico de mudanças, versão atual
 │
 PRIORIDADE 2 — Consultar conforme contexto:
+├── MCP PostgreSQL              # Schema real do banco via list_resources/read_resource
 ├── docs/API_REFERENCE.md       # Contratos completos dos endpoints
 ├── docs/ENUMS.md               # 15 TipoAtivo (inclui UNIT), mapeamentos DB/API/JSON
 ├── docs/ARCHITECTURE.md        # Stack, containers, convenções
@@ -246,3 +247,4 @@ Antes de qualquer ação, confirmar mentalmente:
 - [ ] PKs são UUID — nunca tentar resetar sequences
 - [ ] Usar `DELETE` para dados, nunca `DROP TABLE` para reset
 - [ ] Usar `db.session.get(Model, pk)` — não `Model.query.get(pk)` (depreciado)
+- [ ] Para inspecionar schema real, usar MCP PostgreSQL: `list_resources` → `read_resource` (mais rápido que psql)

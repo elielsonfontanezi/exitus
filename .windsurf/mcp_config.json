@@ -1,9 +1,8 @@
 {
   "mcpServers": {
     "postgres": {
-      "command": "wsl.exe",
+      "command": "/home/p016525/elielson/exitus/.windsurf/mcp_postgres.sh",
       "args": [
-        "/home/p016525/elielson/exitus/.windsurf/mcp_postgres.sh",
         "postgresql://exitus:exitus123@127.0.0.1:5433/exitusdb"
       ]
     }
