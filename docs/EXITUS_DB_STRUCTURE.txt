@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-04 21:57:15
+Gerado em: 2026-03-08 15:23:26
 ================================================================================
 
 ================================================================================
@@ -1528,9 +1528,9 @@ ________________________________________________________________________________
 TABELA: provento
 ################################################################################
 
-                                                                          Table "public.provento"
-      Column       |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                    Description                     
--------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+----------------------------------------------------
+                                                                              Table "public.provento"
+      Column       |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                        Description                         
+-------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+------------------------------------------------------------
  id                | uuid                     |           | not null |         | plain    |             |              | Identificador único do provento
  ativo_id          | uuid                     |           | not null |         | plain    |             |              | ID do ativo que pagou o provento
  valor_por_acao    | numeric(18,6)            |           | not null |         | main     |             |              | Valor unitário por ativo
@@ -1544,11 +1544,14 @@ TABELA: provento
  created_at        | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
  updated_at        | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
  tipo_provento     | tipoprovento             |           | not null |         | plain    |             |              | 
+ hash_importacao   | character varying(64)    |           |          |         | extended |             |              | Hash MD5 da linha original do arquivo B3 para deduplicação
+ arquivo_origem    | character varying(255)   |           |          |         | extended |             |              | Nome do arquivo B3 de origem da importação
 Indexes:
     "provento_pkey" PRIMARY KEY, btree (id)
     "ix_provento_ativo_id" btree (ativo_id)
     "ix_provento_data_com" btree (data_com)
     "ix_provento_data_pagamento" btree (data_pagamento)
+    "ix_provento_hash_importacao" btree (hash_importacao)
 Check constraints:
     "provento_data_pagamento_valida" CHECK (data_pagamento >= data_com)
     "provento_imposto_positivo" CHECK (imposto_retido >= 0::numeric)
@@ -1578,7 +1581,9 @@ Access method: heap
   12 | created_at        | timestamp with time zone |         | NO    | 
   13 | updated_at        | timestamp with time zone |         | NO    | 
   15 | tipo_provento     | USER-DEFINED             |         | NO    | 
-(13 rows)
+  16 | hash_importacao   | character varying        | (64)    | YES   | 
+  17 | arquivo_origem    | character varying        | (255)   | YES   | 
+(15 rows)
 
 
 Foreign Keys:
@@ -1602,13 +1607,14 @@ Unique Constraints:
 
 
 Índices:
-       Nome do Índice       |                                        Definição                                        
-----------------------------+-----------------------------------------------------------------------------------------
- provento_pkey              | CREATE UNIQUE INDEX provento_pkey ON public.provento USING btree (id)
- ix_provento_ativo_id       | CREATE INDEX ix_provento_ativo_id ON public.provento USING btree (ativo_id)
- ix_provento_data_com       | CREATE INDEX ix_provento_data_com ON public.provento USING btree (data_com)
- ix_provento_data_pagamento | CREATE INDEX ix_provento_data_pagamento ON public.provento USING btree (data_pagamento)
-(4 rows)
+       Nome do Índice        |                                         Definição                                         
+-----------------------------+-------------------------------------------------------------------------------------------
+ provento_pkey               | CREATE UNIQUE INDEX provento_pkey ON public.provento USING btree (id)
+ ix_provento_ativo_id        | CREATE INDEX ix_provento_ativo_id ON public.provento USING btree (ativo_id)
+ ix_provento_data_com        | CREATE INDEX ix_provento_data_com ON public.provento USING btree (data_com)
+ ix_provento_data_pagamento  | CREATE INDEX ix_provento_data_pagamento ON public.provento USING btree (data_pagamento)
+ ix_provento_hash_importacao | CREATE INDEX ix_provento_hash_importacao ON public.provento USING btree (hash_importacao)
+(5 rows)
 
 
 ________________________________________________________________________________
@@ -1921,9 +1927,9 @@ ________________________________________________________________________________
 TABELA: transacao
 ################################################################################
 
-                                                     Table "public.transacao"
-     Column      |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
------------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+                                                                             Table "public.transacao"
+     Column      |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target |                        Description                         
+-----------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+------------------------------------------------------------
  id              | uuid                     |           | not null |         | plain    |             |              | 
  usuario_id      | uuid                     |           | not null |         | plain    |             |              | 
  ativo_id        | uuid                     |           | not null |         | plain    |             |              | 
@@ -1943,8 +1949,11 @@ TABELA: transacao
  created_at      | timestamp with time zone |           | not null |         | plain    |             |              | 
  updated_at      | timestamp with time zone |           | not null |         | plain    |             |              | 
  tipo            | tipooperacao             |           | not null |         | plain    |             |              | 
+ hash_importacao | character varying(64)    |           |          |         | extended |             |              | Hash MD5 da linha original do arquivo B3 para deduplicação
+ arquivo_origem  | character varying(255)   |           |          |         | extended |             |              | Nome do arquivo B3 de origem da importação
 Indexes:
     "transacao_pkey" PRIMARY KEY, btree (id)
+    "ix_transacao_hash_importacao" btree (hash_importacao)
 Foreign-key constraints:
     "transacao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
     "transacao_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id)
@@ -1972,7 +1981,9 @@ Access method: heap
   18 | created_at      | timestamp with time zone |         | NO    | 
   19 | updated_at      | timestamp with time zone |         | NO    | 
   21 | tipo            | USER-DEFINED             |         | NO    | 
-(19 rows)
+  22 | hash_importacao | character varying        | (64)    | YES   | 
+  23 | arquivo_origem  | character varying        | (255)   | YES   | 
+(21 rows)
 
 
 Foreign Keys:
@@ -1998,10 +2009,11 @@ Unique Constraints:
 
 
 Índices:
- Nome do Índice |                                Definição                                
-----------------+-------------------------------------------------------------------------
- transacao_pkey | CREATE UNIQUE INDEX transacao_pkey ON public.transacao USING btree (id)
-(1 row)
+        Nome do Índice        |                                          Definição                                          
+------------------------------+---------------------------------------------------------------------------------------------
+ transacao_pkey               | CREATE UNIQUE INDEX transacao_pkey ON public.transacao USING btree (id)
+ ix_transacao_hash_importacao | CREATE INDEX ix_transacao_hash_importacao ON public.transacao USING btree (hash_importacao)
+(2 rows)
 
 
 ________________________________________________________________________________
@@ -2119,12 +2131,12 @@ Total de Colunas por Tabela:
  portfolio              |          10
  posicao                |          16
  projecoes_renda        |          11
- provento               |          13
+ provento               |          15
  regra_fiscal           |          13
  relatorios_performance |          11
  saldo_prejuizo         |           7
  taxa_cambio            |           8
- transacao              |          19
+ transacao              |          21
  usuario                |           9
 (24 rows)
 

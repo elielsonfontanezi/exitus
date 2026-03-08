@@ -5,6 +5,7 @@
 import enum
 from datetime import datetime
 from decimal import Decimal
+import sqlalchemy as sa
 from sqlalchemy import Column, String, Numeric, DateTime, Enum, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -65,7 +66,11 @@ class Transacao(db.Model):
     valor_liquido   = Column(Numeric(18, 2), nullable=False)  # valor_total ± custos
 
     # --- Metadados ---
-    observacoes = Column(Text, nullable=True)
+    observacoes      = Column(Text, nullable=True)
+    hash_importacao  = Column(sa.String(64), nullable=True, index=True,
+                              comment="Hash MD5 da linha original do arquivo B3 para deduplicação")
+    arquivo_origem   = Column(sa.String(255), nullable=True,
+                              comment="Nome do arquivo B3 de origem da importação")
     created_at  = Column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     updated_at  = Column(DateTime(timezone=True), nullable=False,
                          default=datetime.utcnow, onupdate=datetime.utcnow)

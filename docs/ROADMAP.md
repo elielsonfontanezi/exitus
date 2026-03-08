@@ -522,17 +522,17 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 
 **Dependências:** Tabelas `transacao`, `movimentacao_caixa`, `posicao`, `historico_preco`, `parametros_macro`
 
-### EXITUS-VALIDATION-001: Idempotência na Importação B3
+### EXITUS-VALIDATION-001: Idempotência na Importação B3 ✅ Concluído (08/03/2026)
 
-**Problema:** O `import_b3_service.py` (25KB) não verifica duplicatas — reimportar o mesmo arquivo insere dados repetidos. Também falta sanitização defensiva nos campos parseados do Excel/CSV.
+**Implementado:**
 
-**Escopo:**
-
-- **Deduplicação por chave natural:** antes de inserir, verificar `(usuario_id, ativo_id, data, tipo, valor)` para transações e proventos
-- **Modo dry-run:** retornar preview do que será inserido vs. já existente, sem persistir
-- **Relatório de duplicatas:** quantas linhas ignoradas e por quê
-- **Sanitização:** XSS, SQL injection, Unicode malicioso nos campos de texto
-- **Seeds idempotentes:** garantir que re-executar seed não duplique dados
+- **Hash MD5 por linha** (`hash_importacao` + `arquivo_origem`): reimportar o mesmo arquivo é bloqueado; arquivos diferentes com conteúdo igual são permitidos
+- **Modo dry_run=False**: preview sem persistir, retorna contagem de inserções e duplicatas
+- **Relatório de duplicatas**: `duplicatas_ignoradas` + `duplicatas_lista` com motivo
+- **Sanitização**: `_sanitizar_texto()` remove tags HTML, caracteres de controle Unicode, trunca em 500 chars
+- **Correção bug**: `TipoAtivo.FII`/`TipoAtivo.ACAO` enum em vez de strings hardcoded
+- **Migration**: `20260308_1500` — campos `hash_importacao` e `arquivo_origem` em `provento` e `transacao`
+- **Testes**: 18 passed em `test_import_b3_idempotencia.py`
 
 **Dependências:** `EXITUS-IMPORT-001` (concluído)
 
@@ -937,7 +937,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | Sprint | GAPs | Status | Modelo IA | Dias Estimados |
 |--------|------|--------|-----------|----------------|
 | **Setup** | Baseline + Backup | ✅ Concluído | - | 0.5 dia |
-| **Sprint 1** | VALIDATION-001 + CLEANUP-001 | ⏳ Planejado | Sonnet + SWE-1.5 | 1-2 dias |
+| **Sprint 1** | VALIDATION-001 + CLEANUP-001 | 🔄 Em Andamento | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 2** | RENTABILIDADE-001 + SERVICE-REVIEW-001 | ⏳ Planejado | Opus + Sonnet | 2-3 dias |
 | **Sprint 3** | COVERAGE-001 + DOCS-SYNC-001 | ⏳ Planejado | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 4** | CONSTRAINT-001 + CIRCUITBREAKER-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
@@ -948,7 +948,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 **Fase 5 — Robustez, Qualidade e Rentabilidade:**
 
-- [ ] EXITUS-VALIDATION-001 — Idempotência importação B3
+- [x] EXITUS-VALIDATION-001 — Idempotência importação B3 ✅ Concluído (08/03/2026)
 - [ ] EXITUS-CLEANUP-001 — Remoção arquivos órfãos
 - [ ] EXITUS-RENTABILIDADE-001 — TWR + MWR + benchmarks
 - [ ] EXITUS-SERVICE-REVIEW-001 — 4 services stub
@@ -970,9 +970,9 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 **Baseline Atual:**
 
-- Testes: 255 passed, 16 errors
+- Testes: 273 passed, 16 errors
 - Cobertura: ?% (coverage com erro de arquivo .coverage)
-- GAPs concluídos: 30/54
+- GAPs concluídos: 31/54
 - Backup: exitus_backup_20260307_113901.tar.gz (1.9MB)
 
 **Metas Finais:**

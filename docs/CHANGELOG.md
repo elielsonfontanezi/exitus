@@ -8,6 +8,24 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — EXITUS-VALIDATION-001 — Idempotência Importação B3 (08/03/2026)
+
+- **`backend/app/services/import_b3_service.py`** — Refatoração completa de idempotência:
+  - `_sanitizar_texto()`: remove tags HTML, caracteres de controle Unicode, trunca em 500 chars
+  - `_gerar_hash_linha()`: hash MD5 de todos os campos da linha + nome do arquivo origem
+  - `_importar_proventos()`: deduplicação por `hash_importacao`, relatório `duplicatas_ignoradas` + `duplicatas_lista`
+  - `importar_movimentacoes()`: parâmetro `dry_run=False` — não persiste, retorna preview
+  - `importar_negociacoes()`: mesma lógica de hash + dry_run para transações
+  - Correção bug: `TipoAtivo.FII` / `TipoAtivo.ACAO` em vez de strings hardcoded (enum lowercase)
+- **`backend/app/models/provento.py`** — Campos `hash_importacao` (String 64, indexed) + `arquivo_origem` (String 255)
+- **`backend/app/models/transacao.py`** — Campos `hash_importacao` + `arquivo_origem`
+- **`backend/alembic/versions/20260308_1500_add_hash_importacao_validation001.py`** — Migration idempotente com índices
+- **`backend/tests/test_import_b3_idempotencia.py`** — 18 testes novos (18 passed):
+  - `TestSanitizarTexto` (5 testes), `TestGerarHashLinha` (4 testes)
+  - `TestIdempotenciaProventos` (3 testes), `TestDryRunProventos` (2 testes)
+  - `TestIdempotenciaNegociacoes` (2 testes), `TestSanitizacaoNaImportacao` (2 testes)
+- **Suite: 273 passed, 16 errors (TESTFIX-CAMBIO-001 pré-existente)**
+
 ### Changed — ROADMAP v3.0 + SCRIPTS-002 + .windsurfrules v2.1 (05/03/2026)
 
 - **EXITUS-SCRIPTS-002** — GAP registrado no ROADMAP (Fase 6)

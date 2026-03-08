@@ -6,6 +6,8 @@ GAP: EXITUS-IMPORT-001
 Arquiteto: Perplexity AI (Persona 2)
 """
 
+import hashlib
+import os
 import pandas as pd
 import logging
 from datetime import datetime, timedelta
@@ -14,7 +16,7 @@ from decimal import Decimal
 import re
 
 from app.database import db
-from app.models.ativo import Ativo, ClasseAtivo
+from app.models.ativo import Ativo, ClasseAtivo, TipoAtivo
 from app.models.corretora import Corretora
 from app.models.provento import Provento, TipoProvento
 from app.models.transacao import Transacao, TipoTransacao
@@ -34,6 +36,7 @@ class ImportB3Service:
     def __init__(self):
         # TODO: Obter do contexto/auth
         self.usuario_id = None
+        self.arquivo_origem = None
         self.mapeamento_tipos_provento = {
             'Rendimento': TipoProvento.RENDIMENTO,
             'Juros Sobre Capital Próprio': TipoProvento.JCP,
@@ -176,13 +179,39 @@ class ImportB3Service:
             logger.error(f"Erro ao ler arquivo {file_path}: {e}")
             raise
 
-    def importar_movimentacoes(self, movimentacoes: List[Dict], sobrescrever: bool = True) -> Dict:
+    def _sanitizar_texto(self, texto: str) -> str:
+        """Remove caracteres perigosos de campos de texto (XSS, Unicode malicioso)"""
+        if not texto:
+            return ''
+        texto = str(texto).strip()
+        texto = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', texto)
+        texto = re.sub(r'<[^>]+>', '', texto)
+        return texto[:500]
+
+    def _gerar_hash_linha(self, row: Dict) -> str:
+        """Gera hash MD5 da linha original do arquivo B3 para deduplicação"""
+        conteudo = (
+            f"{row.get('data')}|"
+            f"{row.get('tipo_movimentacao', '')}|"
+            f"{row.get('produto', row.get('codigo_negociacao', ''))}|"
+            f"{row.get('instituicao', '')}|"
+            f"{row.get('quantidade', '')}|"
+            f"{row.get('preco_unitario', row.get('preco', ''))}|"
+            f"{row.get('valor_operacao', row.get('valor', ''))}"
+        )
+        arquivo = self.arquivo_origem or ''
+        chave = f"{arquivo}|{conteudo}"
+        return hashlib.md5(chave.encode('utf-8')).hexdigest()
+
+    def importar_movimentacoes(self, movimentacoes: List[Dict], sobrescrever: bool = True,
+                                dry_run: bool = False) -> Dict:
         """
-        Importar movimentações como proventos e eventos de custódia
+        Importar movimentações como proventos e eventos de custódia.
+        dry_run=True retorna preview sem persistir.
         """
         resultado = {
-            'proventos': {'sucesso': 0, 'erros': 0, 'erros_lista': []},
-            'eventos_custodia': {'sucesso': 0, 'erros': 0, 'erros_lista': []},
+            'proventos': {'sucesso': 0, 'erros': 0, 'erros_lista': [], 'duplicatas_ignoradas': 0, 'duplicatas_lista': []},
+            'eventos_custodia': {'sucesso': 0, 'erros': 0, 'erros_lista': [], 'duplicatas_ignoradas': 0},
             'ativos_criados': 0,
             'corretoras_criadas': 0
         }
@@ -200,45 +229,62 @@ class ImportB3Service:
             
             # Importar proventos
             if proventos:
-                resultado_proventos = self._importar_proventos(proventos, sobrescrever)
+                resultado_proventos = self._importar_proventos(proventos, sobrescrever, dry_run)
                 resultado['proventos'] = resultado_proventos
                 resultado['ativos_criados'] += resultado_proventos.get('ativos_criados', 0)
                 resultado['corretoras_criadas'] += resultado_proventos.get('corretoras_criadas', 0)
-            
+
             # Importar eventos de custódia
             if eventos_custodia:
-                resultado_eventos = self._processar_eventos_custodia(eventos_custodia)
+                resultado_eventos = self._processar_eventos_custodia(eventos_custodia, dry_run)
                 resultado['eventos_custodia'] = resultado_eventos
                 resultado['ativos_criados'] += resultado_eventos.get('ativos_criados', 0)
                 resultado['corretoras_criadas'] += resultado_eventos.get('corretoras_criadas', 0)
-            
+
             # Calcular totais
             resultado['sucesso'] = resultado['proventos']['sucesso'] + resultado['eventos_custodia']['sucesso']
             resultado['erros'] = resultado['proventos']['erros'] + resultado['eventos_custodia']['erros']
             resultado['erros_lista'] = resultado['proventos']['erros_lista'] + resultado['eventos_custodia']['erros_lista']
-            
-            db.session.commit()
-            logger.info(f"Importação concluída: {resultado['sucesso']} sucessos, {resultado['erros']} erros")
-            
+            resultado['duplicatas_ignoradas'] = (
+                resultado['proventos'].get('duplicatas_ignoradas', 0) +
+                resultado['eventos_custodia'].get('duplicatas_ignoradas', 0)
+            )
+            resultado['dry_run'] = dry_run
+
+            if dry_run:
+                db.session.rollback()
+                logger.info(f"Dry-run: {resultado['sucesso']} seriam inseridos, "
+                            f"{resultado['duplicatas_ignoradas']} duplicatas ignoradas")
+            else:
+                db.session.commit()
+                logger.info(f"Importação concluída: {resultado['sucesso']} sucessos, "
+                            f"{resultado['erros']} erros, "
+                            f"{resultado['duplicatas_ignoradas']} duplicatas ignoradas")
+
         except Exception as e:
             db.session.rollback()
             logger.error(f"Erro na importação: {e}")
             raise
-        
+
         return resultado
 
-    def importar_negociacoes(self, negociacoes: List[Dict], sobrescrever: bool = True) -> Dict:
+    def importar_negociacoes(self, negociacoes: List[Dict], sobrescrever: bool = True,
+                              dry_run: bool = False) -> Dict:
         """
-        Importar negociações como transações
+        Importar negociações como transações.
+        dry_run=True retorna preview sem persistir.
         """
         resultado = {
             'sucesso': 0,
             'erros': 0,
             'erros_lista': [],
+            'duplicatas_ignoradas': 0,
+            'duplicatas_lista': [],
             'ativos_criados': 0,
-            'corretoras_criadas': 0
+            'corretoras_criadas': 0,
+            'dry_run': dry_run
         }
-        
+
         try:
             for neg in negociacoes:
                 try:
@@ -248,27 +294,32 @@ class ImportB3Service:
                         resultado['erros'] += 1
                         resultado['erros_lista'].append(f"Tipo de transação não mapeado: {neg['tipo_movimentacao']}")
                         continue
-                    
+
+                    # Sanitizar campos de texto
+                    neg['codigo_negociacao'] = self._sanitizar_texto(neg.get('codigo_negociacao', ''))
+                    neg['instituicao'] = self._sanitizar_texto(neg.get('instituicao', ''))
+
+                    # Gerar hash da linha para deduplicação
+                    hash_linha = self._gerar_hash_linha(neg)
+
+                    # Verificar duplicata por hash
+                    existente = Transacao.query.filter_by(hash_importacao=hash_linha).first()
+                    if existente:
+                        ticker = self._extrair_ticker(neg['codigo_negociacao'])
+                        resultado['duplicatas_ignoradas'] += 1
+                        resultado['duplicatas_lista'].append(
+                            f"Duplicata ignorada: {ticker} em {neg['data']} (hash={hash_linha[:8]}...)"
+                        )
+                        logger.debug(f"Duplicata por hash ignorada: {ticker} {neg['data']}")
+                        continue
+
                     # Obter ou criar ativo
                     ticker = self._extrair_ticker(neg['codigo_negociacao'])
                     ativo = self._obter_ou_criar_ativo(ticker, resultado)
-                    
+
                     # Obter ou criar corretora
                     corretora = self._obter_ou_criar_corretora(neg['instituicao'], resultado)
-                    
-                    # Verificar duplicata
-                    if not sobrescrever:
-                        existente = Transacao.query.filter_by(
-                            ativo_id=ativo.id,
-                            data_transacao=neg['data'],
-                            tipo_transacao=tipo_transacao_enum
-                        ).first()
-                        
-                        if existente:
-                            resultado['erros'] += 1
-                            resultado['erros_lista'].append(f"Transação duplicada: {ticker} em {neg['data']}")
-                            continue
-                    
+
                     # Criar transação
                     transacao = Transacao(
                         usuario_id=self._get_usuario_id(),
@@ -286,25 +337,34 @@ class ImportB3Service:
                         outros_custos=0,
                         custos_totais=0,
                         valor_liquido=neg['valor'],
-                        observacoes=f"Importação B3 - {neg['codigo_negociacao']}"
+                        observacoes=self._sanitizar_texto(f"Importação B3 - {neg['codigo_negociacao']}"),
+                        hash_importacao=hash_linha,
+                        arquivo_origem=self.arquivo_origem
                     )
-                    
+
                     db.session.add(transacao)
                     resultado['sucesso'] += 1
-                    
+
                 except Exception as e:
                     resultado['erros'] += 1
                     resultado['erros_lista'].append(f"Erro ao importar negociação: {e}")
                     continue
-            
-            db.session.commit()
-            logger.info(f"Importação concluída: {resultado['sucesso']} sucessos, {resultado['erros']} erros")
-            
+
+            if dry_run:
+                db.session.rollback()
+                logger.info(f"Dry-run: {resultado['sucesso']} seriam inseridos, "
+                            f"{resultado['duplicatas_ignoradas']} duplicatas ignoradas")
+            else:
+                db.session.commit()
+                logger.info(f"Importação concluída: {resultado['sucesso']} sucessos, "
+                            f"{resultado['erros']} erros, "
+                            f"{resultado['duplicatas_ignoradas']} duplicatas ignoradas")
+
         except Exception as e:
             db.session.rollback()
             logger.error(f"Erro na importação: {e}")
             raise
-        
+
         return resultado
 
     def _parse_data(self, data_str: str) -> Optional[datetime]:
@@ -420,10 +480,10 @@ class ImportB3Service:
             # Criar novo ativo
             # Determinar tipo e classe baseado no ticker
             if ticker.endswith(('11', '12', '13', '31', '32', '33', '34', '35', '36')):
-                tipo_ativo = 'FII'
+                tipo_ativo = TipoAtivo.FII
                 classe_ativo = ClasseAtivo.RENDA_VARIAVEL
             else:
-                tipo_ativo = 'ACAO'
+                tipo_ativo = TipoAtivo.ACAO
                 classe_ativo = ClasseAtivo.RENDA_VARIAVEL
             
             ativo = Ativo(
@@ -467,16 +527,19 @@ class ImportB3Service:
         
         return corretora
 
-    def _importar_proventos(self, proventos: List[Dict], sobrescrever: bool = True) -> Dict:
+    def _importar_proventos(self, proventos: List[Dict], sobrescrever: bool = True,
+                             dry_run: bool = False) -> Dict:
         """Importa apenas proventos (método auxiliar)"""
         resultado = {
             'sucesso': 0,
             'erros': 0,
             'erros_lista': [],
+            'duplicatas_ignoradas': 0,
+            'duplicatas_lista': [],
             'ativos_criados': 0,
             'corretoras_criadas': 0
         }
-        
+
         try:
             for mov in proventos:
                 try:
@@ -486,55 +549,63 @@ class ImportB3Service:
                         resultado['erros'] += 1
                         resultado['erros_lista'].append(f"Tipo de provento não mapeado: {mov['tipo_movimentacao']}")
                         continue
-                    
+
+                    # Sanitizar campos de texto
+                    mov['produto'] = self._sanitizar_texto(mov.get('produto', ''))
+                    mov['instituicao'] = self._sanitizar_texto(mov.get('instituicao', ''))
+
+                    # Gerar hash da linha para deduplicação
+                    hash_linha = self._gerar_hash_linha(mov)
+
+                    # Verificar duplicata por hash
+                    existente = Provento.query.filter_by(hash_importacao=hash_linha).first()
+                    if existente:
+                        ticker = self._extrair_ticker(mov['produto'])
+                        resultado['duplicatas_ignoradas'] += 1
+                        resultado['duplicatas_lista'].append(
+                            f"Duplicata ignorada: {ticker} em {mov['data']} (hash={hash_linha[:8]}...)"
+                        )
+                        logger.debug(f"Duplicata por hash ignorada: {ticker} {mov['data']}")
+                        continue
+
                     # Obter ou criar ativo
                     ticker = self._extrair_ticker(mov['produto'])
                     ativo = self._obter_ou_criar_ativo(ticker, resultado)
-                    
+
                     # Obter ou criar corretora
                     corretora = self._obter_ou_criar_corretora(mov['instituicao'], resultado)
-                    
-                    # Verificar duplicata
-                    if not sobrescrever:
-                        existente = Provento.query.filter_by(
-                            ativo_id=ativo.id,
-                            data_pagamento=mov['data'],
-                            tipo_provento=tipo_provento_enum
-                        ).first()
-                        
-                        if existente:
-                            resultado['erros'] += 1
-                            resultado['erros_lista'].append(f"Provento duplicado: {ticker} em {mov['data']}")
-                            continue
-                    
+
                     # Criar provento
                     provento = Provento(
                         ativo_id=ativo.id,
                         data_pagamento=mov['data'],
-                        data_com=mov['data'] - timedelta(days=2),  # Estimativa
+                        data_com=mov['data'] - timedelta(days=2),
                         tipo_provento=tipo_provento_enum,
                         quantidade_ativos=mov['quantidade'],
                         valor_por_acao=mov['preco_unitario'],
                         valor_bruto=mov['valor_operacao'],
-                        valor_liquido=mov['valor_operacao']  # Sem IR explicito
+                        valor_liquido=mov['valor_operacao'],
+                        hash_importacao=hash_linha,
+                        arquivo_origem=self.arquivo_origem
                     )
-                    
+
                     db.session.add(provento)
                     resultado['sucesso'] += 1
-                    
+
                 except Exception as e:
                     resultado['erros'] += 1
                     resultado['erros_lista'].append(f"Erro ao importar provento {mov.get('produto', 'N/A')}: {e}")
                     logger.error(f"Erro detalhado: {e} - Dados: {mov}")
                     continue
-            
+
             return resultado
-            
+
         except Exception as e:
             logger.error(f"Erro na importação de proventos: {e}")
             raise
 
-    def _processar_eventos_custodia(self, movimentacoes: List[Dict]) -> Dict:
+    def _processar_eventos_custodia(self, movimentacoes: List[Dict],
+                                     dry_run: bool = False) -> Dict:
         """Processa Transferência - Liquidação como eventos de custódia"""
         resultado = {
             'sucesso': 0,

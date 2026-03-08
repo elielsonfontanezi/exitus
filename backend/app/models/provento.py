@@ -6,7 +6,7 @@ Entidade para registro de proventos (dividendos, JCP, rendimentos)
 
 from datetime import datetime
 from app.database import db
-from sqlalchemy import String, DateTime, Enum, Numeric, Text, Date, ForeignKey
+from sqlalchemy import String, DateTime, Enum, Numeric, Text, Date, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -125,6 +125,19 @@ class Provento(db.Model):
         Text,
         nullable=True,
         comment="Observações sobre o provento"
+    )
+
+    hash_importacao = db.Column(
+        String(64),
+        nullable=True,
+        index=True,
+        comment="Hash MD5 da linha original do arquivo B3 para deduplicação"
+    )
+
+    arquivo_origem = db.Column(
+        String(255),
+        nullable=True,
+        comment="Nome do arquivo B3 de origem da importação"
     )
     
     # Timestamps

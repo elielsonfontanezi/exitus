@@ -395,6 +395,26 @@ no banco. Isso garante que a apuração encontre exatamente os dados criados pel
 
 ---
 
+### L-DB-006 — Nunca usar strings hardcoded para ENUMs PostgreSQL em services
+**Origem:** EXITUS-VALIDATION-001 | **Data:** 08/03/2026
+
+```python
+# ❌ ERRADO — PostgreSQL espera lowercase 'fii', não 'FII'
+tipo_ativo = 'FII'
+ativo = Ativo(tipo=tipo_ativo, ...)  # psycopg2.errors.InvalidTextRepresentation
+
+# ✅ CORRETO — usar o enum Python, que tem values_callable para lowercase
+from app.models.ativo import TipoAtivo
+tipo_ativo = TipoAtivo.FII
+ativo = Ativo(tipo=tipo_ativo, ...)
+```
+
+**Regra:** Em services de importação ou qualquer código que instancie models com campos ENUM,
+sempre usar a classe Python do enum (ex: `TipoAtivo.FII`). Nunca strings literais como `'FII'` ou `'fii'`.
+O `values_callable` nos models garante a serialização correta para o PostgreSQL.
+
+---
+
 ## 📋 Referências
 
 | Documento | Papel |
