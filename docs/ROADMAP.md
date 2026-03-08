@@ -109,11 +109,11 @@ O frontend atual (Flask + HTMX + Tailwind) é funcional mas **não consome** as 
 |--------|---------------|--------|---------|------------|
 | **EXITUS-CLEANUP-001** | Remover ~15 arquivos backup/lixo, resolver blueprints duplicados, mover `schemas/ativo_service.py` | 📋 Planejado | Médio | Média |
 | **EXITUS-AUDITLOG-001** | Povoar `log_auditoria` em operações CRUD reais (CREATE/UPDATE/DELETE em entidades principais) | 📋 Planejado | Médio | Média |
-| **EXITUS-CIRCUITBREAKER-001** | Circuit breaker (pybreaker) + retry com backoff exponencial nos providers de cotação | 📋 Planejado | Médio | Média |
+| **EXITUS-CIRCUITBREAKER-001** | Circuit breaker (pybreaker) + retry com backoff exponencial nos providers de cotação | ✅ Concluído (08/03/2026) | Médio | Média |
 | **EXITUS-DARF-ACUMULADO-001** | Persistir DARF < R$10 para acumular entre meses (hoje só informa em alerta) | 📋 Planejado | Médio | Média |
 | **EXITUS-RECONCILIACAO-001** | Verificação posição calculada vs importada + saldo corretora vs soma movimentações | 📋 Planejado | Médio | Média |
 | **EXITUS-IOF-001** | IOF regressivo (96%→0% em 30 dias) para resgates de RF < 30 dias | 📋 Planejado | Médio | Média |
-| **EXITUS-CONSTRAINT-001** | Revisão de CHECK constraints no banco (quantidade>0, valor>=0, saldo>=0, etc.) | 📋 Planejado | Médio | Média |
+| **EXITUS-CONSTRAINT-001** | Revisão de CHECK constraints no banco (quantidade>0, valor>=0, saldo>=0, etc.) | ✅ Concluído (08/03/2026) | Médio | Média |
 | **EXITUS-SCRIPTS-002** | Revisão/limpeza de `scripts/`: remover obsoletos, resolver duplicidades (.sh vs .py), corrigir `import_b3.py` (shebang bash), melhorar `backup_db.sh` | 📋 Planejado | Médio | Média |
 | **EXITUS-TESTFIX-CAMBIO-001** | Corrigir 16 errors em `test_cambio_integration.py` (setup de fixtures, configuração de ambiente) | 📋 Planejado | Baixo | Baixa |
 
@@ -819,11 +819,11 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | EXITUS-COVERAGE-001 | 5 | 📋 Planejado | **Alta** | 2-3h |
 | EXITUS-CLEANUP-001 | 6 | 📋 Planejado | Média | 30min |
 | EXITUS-AUDITLOG-001 | 6 | 📋 Planejado | Média | 2h |
-| EXITUS-CIRCUITBREAKER-001 | 6 | 📋 Planejado | Média | 1-2h |
+| EXITUS-CIRCUITBREAKER-001 | 6 | ✅ Concluído | Média | 1-2h |
 | EXITUS-DARF-ACUMULADO-001 | 6 | 📋 Planejado | Média | 1h |
 | EXITUS-RECONCILIACAO-001 | 6 | 📋 Planejado | Média | 2h |
 | EXITUS-IOF-001 | 6 | 📋 Planejado | Média | 1h |
-| EXITUS-CONSTRAINT-001 | 6 | 📋 Planejado | Média | 1h |
+| EXITUS-CONSTRAINT-001 | 6 | ✅ Concluído | Média | 1h |
 | EXITUS-SCRIPTS-002 | 6 | 📋 Planejado | Média | 1-2h |
 | EXITUS-MULTICLIENTE-001 | 7 | 📋 Planejado | Média-Alta | — |
 | EXITUS-MONITOR-001 | 7 | 📋 Planejado | Média | — |
@@ -932,7 +932,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | **Sprint 1** | VALIDATION-001 + CLEANUP-001 | ✅ Concluído | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 2** | RENTABILIDADE-001 + SERVICE-REVIEW-001 | ✅ Concluído | Opus + Sonnet | 2-3 dias |
 | **Sprint 3** | COVERAGE-001 + DOCS-SYNC-001 | ✅ Concluído | Sonnet + SWE-1.5 | 1-2 dias |
-| **Sprint 4** | CONSTRAINT-001 + CIRCUITBREAKER-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
+| **Sprint 4** | CONSTRAINT-001 + CIRCUITBREAKER-001 | ✅ Concluído (08/03/2026) | Sonnet + Sonnet | 1-2 dias |
 | **Sprint 5** | AUDITLOG-001 + RECONCILIACAO-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
 | Sprint 6 | DARF-ACUMULADO-001 + IOF-001 + SCRIPTS-002 + TESTFIX-CAMBIO-001 | ⏳ Planejado | SWE-1.5 + SWE-1.5 | 1 dia |
 
@@ -949,8 +949,8 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 **Fase 6 — Integridade e Infraestrutura:**
 
-- [ ] EXITUS-CONSTRAINT-001 — CHECK constraints banco
-- [ ] EXITUS-CIRCUITBREAKER-001 — Resiliência APIs
+- [x] EXITUS-CONSTRAINT-001 — CHECK constraints banco — ✅ Concluído (08/03/2026)
+- [x] EXITUS-CIRCUITBREAKER-001 — Resiliência APIs — ✅ Concluído (08/03/2026)
 - [ ] EXITUS-AUDITLOG-001 — Log auditoria CRUD
 - [ ] EXITUS-RECONCILIACAO-001 — Verificação consistência
 - [ ] EXITUS-DARF-ACUMULADO-001 — DARF < R$10 acumulado

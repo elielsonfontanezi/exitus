@@ -8,6 +8,33 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — EXITUS-CIRCUITBREAKER-001 — Circuit Breaker para APIs Externas (08/03/2026)
+
+- **`backend/app/utils/circuit_breaker.py`** — novo utilitário:
+  - `CircuitBreaker`: estados CLOSED/OPEN/HALF_OPEN, `call_allowed()`, `record_success()`, `record_failure()`, `reset()`
+  - `get_circuit_breaker()`: registry global singleton por provider
+  - `with_retry()`: retry com backoff exponencial, integrado ao circuit breaker
+  - `reset_all()`: limpa estado de todos os breakers (usado em testes)
+- **`backend/app/services/cotacoes_service.py`** — todos os 8 providers integrados:
+  - BR: brapi.dev, hgfinance, yfinance.BR, twelvedata (threshold=3, recovery=60/120s)
+  - US: finnhub, alphavantage, twelvedata, yfinance.US
+  - Provider OPEN pula imediatamente para o próximo sem aguardar timeout HTTP
+- **`backend/tests/test_circuit_breaker.py`** — 23 testes (estados, HALF_OPEN, registry, retry, integração)
+- **Suite: 416 passed, 16 errors**
+
+### Added — EXITUS-CONSTRAINT-001 — CHECK Constraints de Negócio (08/03/2026)
+
+- **`backend/alembic/versions/20260308_1900_add_business_constraints.py`** — 13 constraints:
+  - `transacao`: `quantidade>0`, `preco_unitario>0`, `valor_total>0`
+  - `evento_custodia`: `quantidade>0`, `valor_operacao>0`
+  - `projecoes_renda`: `renda_dividendos_projetada>=0`, `renda_jcp_projetada>=0`, `renda_rendimentos_projetada>=0`, `renda_total_mes>=0`
+  - `parametros_macro`: `taxa_livre_risco>=0`, `inflacao_anual>=0`
+  - `taxa_cambio`: `taxa>0`
+  - `alertas`: `condicao_valor>0`
+- **`backend/tests/test_constraints.py`** — 17 testes via `engine.connect()` com rollback isolado
+- **`docs/EXITUS_DB_STRUCTURE.txt`** — schema atualizado
+- **Suite antes do CIRCUITBREAKER: 393 passed, 16 errors**
+
 ### Added — EXITUS-DOCS-SYNC-001 — Sincronização de Documentação (08/03/2026)
 
 - **`docs/MODULES.md`** — Métricas atualizadas (376 testes, 35/54 GAPs), Fase 5 marcada como concluída

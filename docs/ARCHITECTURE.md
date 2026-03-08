@@ -1006,6 +1006,39 @@ Cloud Provider
 
 ---
 
+### Circuit Breaker — Resiliência de APIs Externas (08/03/2026)
+
+Implementado em `backend/app/utils/circuit_breaker.py` — EXITUS-CIRCUITBREAKER-001.
+
+**Componentes:**
+
+| Classe/Função | Responsabilidade |
+|---|---|
+| `CircuitBreaker` | Estados CLOSED/OPEN/HALF_OPEN por provider |
+| `get_circuit_breaker(name)` | Registry global — singleton por provider no processo |
+| `with_retry(func, ...)` | Retry + backoff exponencial integrado ao breaker |
+| `reset_all()` | Limpa todos os breakers (uso em testes) |
+
+**Integração no `CotacoesService`:**
+
+```
+Providers BR:  brapi.dev → hgfinance → yfinance.BR → twelvedata
+Providers US:  finnhub → alphavantage → twelvedata → yfinance.US
+
+failure_threshold = 3  (3 falhas consecutivas → OPEN)
+recovery_timeout  = 60s (brapi, hgfinance, twelve, finnhub, alpha)
+recovery_timeout  = 120s (yfinance.BR, yfinance.US — cold start lento)
+
+Provider OPEN → pula imediatamente para o próximo (sem aguardar timeout HTTP)
+Provider volta a HALF_OPEN após recovery_timeout → tenta 1 request
+Sucesso em HALF_OPEN → fecha circuito (CLOSED)
+```
+
+**Estado:** em memória de processo (single-instance). Não persiste entre restarts.
+Para multi-instância futura, substituir pelo Redis (CIRCUITBREAKER-002 potencial).
+
+---
+
 ### Nota sobre Frontend (05/03/2026)
 
 O frontend atual (Flask + HTMX + Tailwind, container `exitus-frontend:8080`) é funcional mas **não consome** as APIs implementadas nas Fases 3-4 (IR, Export, Câmbio, Anomaly, RFCALC, Swagger). **Poderá ser refeito do zero** em framework moderno (React/Next.js ou similar) quando o backend estiver estabilizado. O foco atual de desenvolvimento é exclusivamente **backend + banco de dados**. Ver `ROADMAP.md` v3.0.

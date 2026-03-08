@@ -455,6 +455,55 @@ Testar com `pd.isna()` ou filtrar pelo valor string `'nan'` explicitamente.
 
 ---
 
+### L-TEST-002 — Testes de CHECK constraint devem usar engine.connect() com rollback explícito
+**Origem:** EXITUS-CONSTRAINT-001 | **Data:** 08/03/2026
+
+```python
+# ❌ ERRADO — begin_nested() em sessão ORM de escopo 'session' levanta PendingRollbackError
+db.session.begin_nested()
+db.session.add(obj_invalido)
+with pytest.raises(IntegrityError):
+    db.session.flush()
+db.session.rollback()  # sessão fica corrompida para o próximo teste
+
+# ✅ CORRETO — conexão independente da sessão ORM, transação própria sempre revertida
+conn = db.engine.connect()
+trans = conn.begin()
+raised = None
+try:
+    conn.execute(text(sql), params)
+except Exception as e:
+    raised = e
+finally:
+    trans.rollback()
+    conn.close()
+assert raised is not None and 'check' in str(raised).lower()
+```
+
+**Regra:** O conftest do Exitus usa `scope='session'` sem wrapping transacional por teste.
+`begin_nested()` na sessão ORM compartilhada corrompe o estado quando o flush falha.
+Para testar constraints do banco, usar `engine.connect()` com transação própria que **sempre** faz rollback no `finally`.
+
+---
+
+### L-CB-001 — Circuit breaker com recovery_timeout=0 nunca fica OPEN via property state
+**Origem:** EXITUS-CIRCUITBREAKER-001 | **Data:** 08/03/2026
+
+```python
+# Comportamento: recovery_timeout=0 faz state property re-transicionar para HALF_OPEN imediatamente
+cb = CircuitBreaker('test', failure_threshold=2, recovery_timeout=0)
+cb.record_failure(); cb.record_failure()
+assert cb._state == STATE_OPEN     # interno: OPEN
+assert cb.state == STATE_HALF_OPEN # property re-avalia: já expirou → HALF_OPEN imediatamente
+```
+
+**Regra:** A property `state` do `CircuitBreaker` avalia o timeout a cada acesso.
+Com `recovery_timeout=0`, o estado OPEN é instantaneamente convertido para HALF_OPEN.
+Para testes de bloqueio real, usar `recovery_timeout` alto (ex: 9999).
+Para verificar que `record_failure` abriu o circuito internamente, inspecionar `cb._state`.
+
+---
+
 ## 📋 Referências
 
 | Documento | Papel |
