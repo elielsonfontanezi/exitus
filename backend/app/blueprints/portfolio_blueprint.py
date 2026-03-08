@@ -55,6 +55,45 @@ def distribuicao_classes():
         return error_response(str(e), 500)
 
 
+@portfolio_bp.route('/rentabilidade', methods=['GET'])
+@jwt_required()
+def rentabilidade():
+    """
+    Calcula rentabilidade do portfólio (TWR, MWR, benchmark).
+    Query params:
+        - periodo: 1m, 3m, 6m, 12m, 24m, ytd, max (default: 12m)
+        - benchmark: CDI, IBOV, IFIX, IPCA6, SP500 (default: CDI)
+    """
+    try:
+        usuario_id = get_jwt_identity()
+        periodo = request.args.get('periodo', '12m')
+        benchmark = request.args.get('benchmark', 'CDI')
+
+        periodos_validos = {'1m', '3m', '6m', '12m', '24m', 'ytd', 'max'}
+        if periodo not in periodos_validos:
+            return error_response(
+                f"Período inválido. Use: {', '.join(sorted(periodos_validos))}", 400
+            )
+
+        benchmarks_validos = {'CDI', 'IBOV', 'IFIX', 'IPCA6', 'SP500'}
+        if benchmark.upper() not in benchmarks_validos:
+            return error_response(
+                f"Benchmark inválido. Use: {', '.join(sorted(benchmarks_validos))}", 400
+            )
+
+        from app.services.rentabilidade_service import RentabilidadeService
+        resultado = RentabilidadeService.calcular(usuario_id, periodo, benchmark)
+
+        return success_response(
+            data=resultado,
+            message="Rentabilidade calculada com sucesso"
+        )
+
+    except Exception as e:
+        logger.error(f"Erro ao calcular rentabilidade: {e}")
+        return error_response(str(e), 500)
+
+
 @portfolio_bp.route('/distribuicao/setores', methods=['GET'])
 @jwt_required()
 def distribuicao_setores():

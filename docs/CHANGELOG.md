@@ -8,6 +8,25 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — EXITUS-RENTABILIDADE-001 — Rentabilidade TWR + MWR + Benchmarks (08/03/2026)
+
+- **`backend/app/services/rentabilidade_service.py`** — Novo service completo:
+  - `calcular()`: orquestra TWR, MWR e benchmark num único resultado
+  - `_calcular_twr()`: Time-Weighted Return por sub-períodos entre fluxos de caixa
+  - `_calcular_mwr()` + `_xirr()`: Money-Weighted Return via scipy.optimize.brentq (XIRR com fallback Newton-Raphson)
+  - `_benchmark_cdi()`: CDI acumulado via `parametros_macro.taxa_livre_risco`
+  - `_benchmark_por_preco()`: IBOV/IFIX/SP500 via `historico_preco`
+  - `_benchmark_ipca_mais()`: IPCA + spread fixo
+  - `_obter_fluxos_caixa()`: agrega transações, proventos e movimentações de caixa
+  - `_obter_valores_portfolio()`: valor do portfólio em datas-chave via `historico_preco`
+- **`backend/app/blueprints/portfolio_blueprint.py`** — Endpoint `GET /api/portfolios/rentabilidade`:
+  - Query params: `periodo` (1m/3m/6m/12m/24m/ytd/max), `benchmark` (CDI/IBOV/IFIX/IPCA6/SP500)
+  - Validação de parâmetros com 400 para valores inválidos
+- **`backend/tests/test_rentabilidade.py`** — 21 testes novos (21 passed):
+  - `TestResolverPeriodo` (4), `TestXIRR` (3), `TestTWR` (4)
+  - `TestBenchmarkCDI` (2), `TestCalcularIntegracao` (4), `TestEndpointRentabilidade` (4)
+- **Suite: 294 passed, 16 errors (TESTFIX-CAMBIO-001 pré-existente)**
+
 ### Added — EXITUS-CLEANUP-001 — Higiene do Codebase (08/03/2026)
 
 - **Arquivos deletados (11):**

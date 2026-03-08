@@ -509,16 +509,16 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 - **Renda Fixa:** Duration (Macaulay, Modified), Yield to Maturity (YTM), curva de juros
 - **FIIs/REITs:** FFO (Funds From Operations), AFFO (Adjusted FFO), P/FFO
 
-### EXITUS-RENTABILIDADE-001: Rentabilidade TWR + MWR + Benchmarks
+### EXITUS-RENTABILIDADE-001: Rentabilidade TWR + MWR + Benchmarks ✅ Concluído (08/03/2026)
 
-**Problema:** O sistema calcula P&L e IR, mas **não calcula rentabilidade percentual ponderada**. Sem isso, o investidor não consegue responder "minha carteira rendeu mais que o CDI?" — pergunta #1 de qualquer investidor. Todo concorrente (Kinvo, Gorila, TradeMap) implementa isso.
+**Implementado:**
 
-**Escopo:**
-
-- **TWR (Time-Weighted Return):** Remove efeito de aportes/resgates. Padrão GIPS (CFA Institute).
-- **MWR (Money-Weighted Return / XIRR):** TIR considerando fluxo de caixa real do investidor.
-- **Comparação com benchmarks:** CDI, IBOV, IFIX, IPCA+6%, S&P500.
-- **Endpoints:** `GET /api/portfolio/rentabilidade?benchmark=CDI&periodo=12m`
+- **`rentabilidade_service.py`** — TWR (sub-períodos), MWR (XIRR via scipy.optimize.brentq + fallback Newton-Raphson)
+- **Benchmarks:** CDI (via `parametros_macro`), IBOV/IFIX/SP500 (via `historico_preco`), IPCA+6%
+- **Endpoint:** `GET /api/portfolios/rentabilidade?periodo=12m&benchmark=CDI`
+- **Períodos:** 1m, 3m, 6m, 12m, 24m, ytd, max
+- **Alpha:** diferença TWR - benchmark retornada automaticamente
+- **Testes:** 21 passed em `test_rentabilidade.py`
 
 **Dependências:** Tabelas `transacao`, `movimentacao_caixa`, `posicao`, `historico_preco`, `parametros_macro`
 
@@ -936,7 +936,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 |--------|------|--------|-----------|----------------|
 | **Setup** | Baseline + Backup | ✅ Concluído | - | 0.5 dia |
 | **Sprint 1** | VALIDATION-001 + CLEANUP-001 | 🔄 Em Andamento | Sonnet + SWE-1.5 | 1-2 dias |
-| **Sprint 2** | RENTABILIDADE-001 + SERVICE-REVIEW-001 | ⏳ Planejado | Opus + Sonnet | 2-3 dias |
+| **Sprint 2** | RENTABILIDADE-001 + SERVICE-REVIEW-001 | 🔄 Em Andamento | Opus + Sonnet | 2-3 dias |
 | **Sprint 3** | COVERAGE-001 + DOCS-SYNC-001 | ⏳ Planejado | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 4** | CONSTRAINT-001 + CIRCUITBREAKER-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
 | **Sprint 5** | AUDITLOG-001 + RECONCILIACAO-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
@@ -948,7 +948,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 - [x] EXITUS-VALIDATION-001 — Idempotência importação B3 ✅ Concluído (08/03/2026)
 - [x] EXITUS-CLEANUP-001 — Higiene do codebase ✅ Concluído (08/03/2026)
-- [ ] EXITUS-RENTABILIDADE-001 — TWR + MWR + benchmarks
+- [x] EXITUS-RENTABILIDADE-001 — TWR + MWR + benchmarks ✅ Concluído (08/03/2026)
 - [ ] EXITUS-SERVICE-REVIEW-001 — 4 services stub
 - [ ] EXITUS-COVERAGE-001 — Cobertura testes + import_b3
 - [ ] EXITUS-DOCS-SYNC-001 — Sincronização documentação
@@ -968,9 +968,9 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 **Baseline Atual:**
 
-- Testes: 273 passed, 16 errors
+- Testes: 294 passed, 16 errors
 - Cobertura: ?% (coverage com erro de arquivo .coverage)
-- GAPs concluídos: 32/54
+- GAPs concluídos: 33/54
 - Backup: exitus_backup_20260307_113901.tar.gz (1.9MB)
 
 **Metas Finais:**
