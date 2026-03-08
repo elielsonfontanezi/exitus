@@ -1,7 +1,7 @@
 """M7.1 - AuditoriaRelatorio Service Completo"""
 from app.models.auditoria_relatorio import AuditoriaRelatorio
+from app.database import db
 from sqlalchemy import desc
-from flask import current_app
 
 class AuditoriaRelatorioService:
     @staticmethod
@@ -23,7 +23,7 @@ class AuditoriaRelatorioService:
             filtros=data.get('filtros', {}),
             formato_export='visualizacao'
         )
-        current_app.db.session.add(relatorio)
-        current_app.db.session.commit()
-        current_app.db.session.refresh(relatorio)
+        db.session.add(relatorio)
+        db.session.commit()
+        db.session.refresh(relatorio)
         return relatorio.to_dict()

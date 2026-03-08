@@ -536,18 +536,19 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 
 **Dependências:** `EXITUS-IMPORT-001` (concluído)
 
-### EXITUS-SERVICE-REVIEW-001: Implementar Services Stub
+### EXITUS-SERVICE-REVIEW-001: Implementar Services Stub ✅ Concluído (08/03/2026)
 
-**Problema:** 4 services expostos via endpoints retornam dados mock/incompletos:
+**Implementado:**
 
-| Service | Estado | O que falta |
-|---------|--------|-------------|
-| `analise_service.py` | **Mock puro** — retorna alocação hardcoded 60/25/15 | Alocação real vs posições, correlação via `historico_preco` |
-| `projecao_renda_service.py` | CRUD básico sem cálculo | Projeção baseada em DY histórico dos ativos em carteira |
-| `relatorio_performance_service.py` | CRUD básico sem cálculo | Sharpe, drawdown, volatilidade reais |
-| `auditoria_relatorio_service.py` | CRUD + **bug** (`current_app.db.session` vs `db.session`) | Corrigir bug, integrar com `log_auditoria` real |
+| Service | Estado Anterior | Solução |
+|---------|----------------|--------|
+| `analise_service.py` | Mock 60/25/15 hardcoded | Alocação real por `Posicao`+`Ativo`, correlação Pearson via `historico_preco` |
+| `projecao_renda_service.py` | CRUD sem projeção | `qtd × preco × DY / 12` por tipo provento predominante |
+| `relatorio_performance_service.py` | CRUD sem cálculo | Sharpe, max drawdown, volatilidade via `historico_preco` |
+| `auditoria_relatorio_service.py` | Bug `current_app.db.session` | Corrigido para `db.session` |
 
-**Decisão:** Implementar lógica real. Endpoints que retornam mock como se fosse dado real são piores que não ter o endpoint.
+- **Testes:** 23 passed em `test_service_review.py`
+- **Suite:** 317 passed, 16 errors (baseline mantido)
 
 ### EXITUS-DOCS-SYNC-001: Sincronização de Documentação
 
@@ -936,7 +937,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 |--------|------|--------|-----------|----------------|
 | **Setup** | Baseline + Backup | ✅ Concluído | - | 0.5 dia |
 | **Sprint 1** | VALIDATION-001 + CLEANUP-001 | 🔄 Em Andamento | Sonnet + SWE-1.5 | 1-2 dias |
-| **Sprint 2** | RENTABILIDADE-001 + SERVICE-REVIEW-001 | 🔄 Em Andamento | Opus + Sonnet | 2-3 dias |
+| **Sprint 2** | RENTABILIDADE-001 + SERVICE-REVIEW-001 | ✅ Concluído | Opus + Sonnet | 2-3 dias |
 | **Sprint 3** | COVERAGE-001 + DOCS-SYNC-001 | ⏳ Planejado | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 4** | CONSTRAINT-001 + CIRCUITBREAKER-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
 | **Sprint 5** | AUDITLOG-001 + RECONCILIACAO-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
@@ -949,7 +950,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 - [x] EXITUS-VALIDATION-001 — Idempotência importação B3 ✅ Concluído (08/03/2026)
 - [x] EXITUS-CLEANUP-001 — Higiene do codebase ✅ Concluído (08/03/2026)
 - [x] EXITUS-RENTABILIDADE-001 — TWR + MWR + benchmarks ✅ Concluído (08/03/2026)
-- [ ] EXITUS-SERVICE-REVIEW-001 — 4 services stub
+- [x] EXITUS-SERVICE-REVIEW-001 — 4 services stub ✅ Concluído (08/03/2026)
 - [ ] EXITUS-COVERAGE-001 — Cobertura testes + import_b3
 - [ ] EXITUS-DOCS-SYNC-001 — Sincronização documentação
 
@@ -968,9 +969,9 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 **Baseline Atual:**
 
-- Testes: 294 passed, 16 errors
+- Testes: 317 passed, 16 errors
 - Cobertura: ?% (coverage com erro de arquivo .coverage)
-- GAPs concluídos: 33/54
+- GAPs concluídos: 34/54
 - Backup: exitus_backup_20260307_113901.tar.gz (1.9MB)
 
 **Metas Finais:**

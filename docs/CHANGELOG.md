@@ -8,6 +8,25 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — EXITUS-SERVICE-REVIEW-001 — Services Stub Implementados (08/03/2026)
+
+- **`backend/app/services/analise_service.py`** — Reescrito com dados reais:
+  - `analisar_performance_portfolio()`: alocação por classe com `Posicao`+`Ativo`, conversão cambial via `CambioService`
+  - `comparar_com_benchmark()`: delega para `RentabilidadeService.calcular()` (TWR, MWR, alpha reais)
+  - `calcular_correlacao_ativos()`: matriz de correlação de Pearson via `historico_preco` + helper `_correlacao()`
+- **`backend/app/services/projecao_renda_service.py`** — Projeção real:
+  - `calcular_projecao()`: `qtd × preco_atual × DY_anual / 12` por tipo de provento predominante
+  - `_tipo_provento_predominante()`: via histórico de `Provento` (GROUP BY tipo, ORDER BY COUNT)
+  - `create_or_update()`: upsert correto via constraint `usuario_id+portfolio_id+mes_ano`
+- **`backend/app/services/relatorio_performance_service.py`** — Métricas reais:
+  - `calcular()`: Sharpe ratio, max drawdown, volatilidade anualizada via `historico_preco`
+  - `generate()`: recalcula métricas antes de persistir (não salva mais dados mock)
+  - `_volatilidade_anualizada()`, `_sharpe()`, `_max_drawdown()`, `_serie_portfolio()`
+- **`backend/app/services/auditoria_relatorio_service.py`** — Fix bug:
+  - `current_app.db.session` → `db.session` (AttributeError em runtime)
+- **`backend/tests/test_service_review.py`** — 23 testes novos (23 passed)
+- **Suite: 317 passed, 16 errors (TESTFIX-CAMBIO-001 pré-existente)**
+
 ### Added — EXITUS-RENTABILIDADE-001 — Rentabilidade TWR + MWR + Benchmarks (08/03/2026)
 
 - **`backend/app/services/rentabilidade_service.py`** — Novo service completo:
