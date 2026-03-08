@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-08 15:23:26
+Gerado em: 2026-03-08 18:51:54
 ================================================================================
 
 ================================================================================
@@ -117,6 +117,8 @@ Indexes:
     "idx_alertas_nome" btree (nome)
     "idx_alertas_tipo" btree (tipo_alerta)
     "idx_alertas_usuario_id" btree (usuario_id)
+Check constraints:
+    "alertas_condicao_valor_positivo" CHECK (condicao_valor > 0::numeric)
 Foreign-key constraints:
     "alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 Access method: heap
@@ -697,6 +699,9 @@ Indexes:
     "ix_evento_custodia_ativo_id" btree (ativo_id)
     "ix_evento_custodia_data_evento" btree (data_evento)
     "ix_evento_custodia_usuario_id" btree (usuario_id)
+Check constraints:
+    "evento_custodia_quantidade_positiva" CHECK (quantidade > 0::numeric)
+    "evento_custodia_valor_operacao_positivo" CHECK (valor_operacao > 0::numeric)
 Foreign-key constraints:
     "evento_custodia_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
     "evento_custodia_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id)
@@ -1210,6 +1215,9 @@ Indexes:
     "ix_parametros_macro_mercado" btree (mercado)
     "ix_parametros_macro_pais" btree (pais)
     "ix_parametros_macro_pais_mercado" UNIQUE, btree (pais, mercado)
+Check constraints:
+    "parametros_inflacao_nao_negativa" CHECK (inflacao_anual >= 0::numeric)
+    "parametros_taxa_livre_risco_nao_negativa" CHECK (taxa_livre_risco >= 0::numeric)
 Access method: heap
 
  Pos |      Coluna       |           Tipo           | Tamanho | Null? |      Default      
@@ -1468,6 +1476,11 @@ Indexes:
     "ix_projecoes_renda_mes_ano" btree (mes_ano)
     "ix_projecoes_renda_usuario_id" btree (usuario_id)
     "projecoes_renda_usuario_id_portfolio_id_mes_ano_key" UNIQUE CONSTRAINT, btree (usuario_id, portfolio_id, mes_ano)
+Check constraints:
+    "projecao_renda_dividendos_nao_negativo" CHECK (renda_dividendos_projetada >= 0::numeric)
+    "projecao_renda_jcp_nao_negativo" CHECK (renda_jcp_projetada >= 0::numeric)
+    "projecao_renda_rendimentos_nao_negativo" CHECK (renda_rendimentos_projetada >= 0::numeric)
+    "projecao_renda_total_nao_negativo" CHECK (renda_total_mes >= 0::numeric)
 Foreign-key constraints:
     "projecoes_renda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 Access method: heap
@@ -1874,6 +1887,8 @@ Indexes:
     "ix_taxa_cambio_data_referencia" btree (data_referencia)
     "ix_taxa_cambio_par_data" btree (par_moeda, data_referencia)
     "uq_taxa_cambio_par_data" UNIQUE CONSTRAINT, btree (par_moeda, data_referencia)
+Check constraints:
+    "taxa_cambio_taxa_positiva" CHECK (taxa > 0::numeric)
 Access method: heap
 
  Pos |     Coluna      |           Tipo           | Tamanho | Null? |           Default           
@@ -1954,6 +1969,10 @@ TABELA: transacao
 Indexes:
     "transacao_pkey" PRIMARY KEY, btree (id)
     "ix_transacao_hash_importacao" btree (hash_importacao)
+Check constraints:
+    "transacao_preco_unitario_positivo" CHECK (preco_unitario > 0::numeric)
+    "transacao_quantidade_positiva" CHECK (quantidade > 0::numeric)
+    "transacao_valor_total_positivo" CHECK (valor_total > 0::numeric)
 Foreign-key constraints:
     "transacao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
     "transacao_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id)
