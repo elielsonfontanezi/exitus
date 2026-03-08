@@ -570,18 +570,16 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 - Criar testes pytest para `import_b3_service.py` (parsers, validação, edge cases)
 - Identificar services com 0% de cobertura e priorizar
 
-### EXITUS-CLEANUP-001: Higiene do Codebase
+### EXITUS-CLEANUP-001: Higiene do Codebase ✅ Concluído (08/03/2026)
 
-**Problema:** ~15 arquivos lixo/backup e blueprints duplicados.
+**Implementado:**
 
-**Arquivos a remover:**
-
-- `backend/app/__kk`, `services/alerta_service.py:`, `services/cotacao_service.py.DELETAR-20260102`
-- 3 backups em `services/cotacoes_service.py.backup*`, `buy_signals_service.py.backup`
-- `models/ativo.py.pre-14-enums`, 3 backups em `models/usuario.py.backup_*`, `configuracao_alerta.py.backup_*`
-- Mover `schemas/ativo_service.py` para local correto
-
-**Blueprints duplicados a resolver:** `feriados/` vs `feriadosblueprint.py`, `fontes/` vs `fontesblueprint.py`, `regras_fiscais/` vs `regras_fiscaisblueprint.py`
+- 11 arquivos lixo/backup deletados (ver CHANGELOG)
+- `schemas/ativo_service.py` deletado (cópia obsoleta — original em `services/`)
+- `blueprints/fontesblueprint.py` (mock) deletado — `fonte_dados_blueprint.py` (JWT + real) permanece
+- `__init__.py` M4.2 limpo — importação de `fontesblueprint` removida
+- Blueprints `feriadosblueprint.py` e `regras_fiscaisblueprint.py` mantidos — únicos ativos, sem duplicatas reais
+- Suite: 273 passed, 16 errors (baseline mantido)
 
 ### EXITUS-AUDITLOG-001: Povoar Log de Auditoria
 
@@ -949,7 +947,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 **Fase 5 — Robustez, Qualidade e Rentabilidade:**
 
 - [x] EXITUS-VALIDATION-001 — Idempotência importação B3 ✅ Concluído (08/03/2026)
-- [ ] EXITUS-CLEANUP-001 — Remoção arquivos órfãos
+- [x] EXITUS-CLEANUP-001 — Higiene do codebase ✅ Concluído (08/03/2026)
 - [ ] EXITUS-RENTABILIDADE-001 — TWR + MWR + benchmarks
 - [ ] EXITUS-SERVICE-REVIEW-001 — 4 services stub
 - [ ] EXITUS-COVERAGE-001 — Cobertura testes + import_b3
@@ -972,7 +970,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 - Testes: 273 passed, 16 errors
 - Cobertura: ?% (coverage com erro de arquivo .coverage)
-- GAPs concluídos: 31/54
+- GAPs concluídos: 32/54
 - Backup: exitus_backup_20260307_113901.tar.gz (1.9MB)
 
 **Metas Finais:**

@@ -151,13 +151,7 @@ def create_app(testing=False):
     except ImportError as e:
         print(f"⚠️  Feriados blueprint não encontrado: {e}")
 
-    # M4.2 - Fontes de Dados
-    try:
-        from .blueprints.fontesblueprint import fontesbp
-        app.register_blueprint(fontesbp)
-        print("✅ Fontes blueprint registrado: /api/fontes")
-    except ImportError as e:
-        print(f"⚠️  Fontes blueprint não encontrado: {e}")
+    # M4.2 - Fontes de Dados (removido fontesblueprint mock - CLEANUP-001)
 
     # M4.3 - Regras Fiscais
     try:

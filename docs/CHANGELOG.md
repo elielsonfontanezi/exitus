@@ -8,6 +8,21 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — EXITUS-CLEANUP-001 — Higiene do Codebase (08/03/2026)
+
+- **Arquivos deletados (11):**
+  - `backend/app/__kk`
+  - `backend/app/models/ativo.py.pre-14-enums`
+  - `backend/app/models/configuracao_alerta.py.backup_20251218_114233`
+  - `backend/app/models/usuario.py.backup_*` (3 arquivos)
+  - `backend/app/services/cotacoes_service.py.backup*` (2 arquivos)
+  - `backend/app/services/cotacao_service.py.DELETAR-20260102`
+  - `backend/app/services/buy_signals_service.py.backup`
+  - `backend/app/schemas/ativo_service.py` (cópia obsoleta — original em `services/`)
+- **Blueprint mock removido:** `backend/app/blueprints/fontesblueprint.py` — substituído por `fonte_dados_blueprint.py` (implementação real com JWT)
+- **`backend/app/__init__.py`** — removida importação de `fontesblueprint` (M4.2)
+- **Suite: 273 passed, 16 errors (baseline mantido)**
+
 ### Added — EXITUS-VALIDATION-001 — Idempotência Importação B3 (08/03/2026)
 
 - **`backend/app/services/import_b3_service.py`** — Refatoração completa de idempotência:
