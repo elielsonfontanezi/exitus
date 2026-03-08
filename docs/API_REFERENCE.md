@@ -752,8 +752,106 @@ Engine de apuração mensal de IR sobre renda variável.
 
 ---
 
-*Documento atualizado: 03 de Março de 2026*
+## 21. Rentabilidade (EXITUS-RENTABILIDADE-001)
+
+**Auth:** Bearer JWT obrigatório.  
+**Resposta:** envelope padrão `{"success": true, "data": {...}}`.
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/portfolios/rentabilidade` | Calcula TWR, MWR/XIRR e comparação com benchmark |
+
+**Query params:**
+
+| Parâmetro | Valores aceitos | Default |
+|-----------|----------------|---------|
+| `periodo` | `1m`, `3m`, `6m`, `12m`, `24m`, `ytd`, `max` | `12m` |
+| `benchmark` | `CDI`, `IBOV`, `IFIX`, `IPCA6`, `SP500` | `CDI` |
+
+**Exemplo:**
+```bash
+GET /api/portfolios/rentabilidade?periodo=6m&benchmark=CDI
+```
+
+**Resposta:**
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "6m",
+    "data_inicio": "2025-09-08",
+    "data_fim": "2026-03-08",
+    "dias": 181,
+    "twr": 0.1234,
+    "twr_percentual": 12.34,
+    "mwr": 0.1189,
+    "mwr_percentual": 11.89,
+    "benchmark": {
+      "nome": "CDI",
+      "retorno": 0.0672,
+      "retorno_percentual": 6.72
+    },
+    "alpha": 0.0562,
+    "alpha_percentual": 5.62,
+    "total_fluxos": 3
+  }
+}
+```
+
+**Observações:**
+- **TWR** (Time-Weighted Return): remove efeito de aportes/resgates. Padrão GIPS.
+- **MWR** (Money-Weighted Return / XIRR): TIR considerando fluxo de caixa real do investidor.
+- **CDI**: calculado via `parametros_macro.taxa_livre_risco` (dias úteis/252).
+- **IBOV/IFIX/SP500**: retorno via `historico_preco` dos ativos BOVA11/IFIX11/IVVB11.
+- **IPCA6**: IPCA (`parametros_macro.inflacao_anual`) + 6% a.a.
+
+---
+
+## 22. Importação B3 (EXITUS-VALIDATION-001)
+
+**Auth:** Bearer JWT obrigatório.  
+**Resposta:** envelope padrão.
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/api/import/movimentacoes` | Importa movimentações B3 (proventos, eventos de custódia) |
+| POST | `/api/import/negociacoes` | Importa negociações B3 (compras e vendas) |
+
+**Body (multipart/form-data):**
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `file` | File | Arquivo `.xlsx` ou `.csv` exportado do Portal B3 |
+| `dry_run` | bool | `true` = preview sem persistir (default: `false`) |
+
+**Resposta importação movimentações:**
+```json
+{
+  "success": true,
+  "data": {
+    "proventos": {
+      "sucesso": 12,
+      "erros": 0,
+      "duplicatas_ignoradas": 3,
+      "duplicatas_lista": ["Duplicata ignorada: PETR4 em 2025-03-15 (hash=a1b2c3d4...)"]
+    },
+    "ativos_criados": 2,
+    "corretoras_criadas": 0,
+    "dry_run": false
+  }
+}
+```
+
+**Comportamento de idempotência:**
+- Hash MD5 calculado por linha (`arquivo_origem + conteúdo`) — reimportar o mesmo arquivo é bloqueado.
+- Arquivos distintos com mesmo conteúdo geram hashes diferentes (arquivo faz parte da chave).
+- Campos de texto sanitizados: tags HTML removidas, caracteres de controle Unicode removidos.
+
+---
+
+*Documento atualizado: 08 de Março de 2026*
 *Versão da API: v0.8.0-dev*
 *GAPs fechados: EXITUS-POS-001→007, EXITUS-ATIVOS-ENUM-001, EXITUS-POS-PAGIN-001,*
 *EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001, EXITUS-COTACOES-RESP-001,*
-*EXITUS-SQLALCHEMY-001, EXITUS-CRUD-001, EXITUS-IR-001, EXITUS-EXPORT-001*
+*EXITUS-SQLALCHEMY-001, EXITUS-CRUD-001, EXITUS-IR-001, EXITUS-EXPORT-001,*
+*EXITUS-VALIDATION-001, EXITUS-RENTABILIDADE-001, EXITUS-SERVICE-REVIEW-001, EXITUS-COVERAGE-001, EXITUS-DOCS-SYNC-001*

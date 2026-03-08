@@ -265,11 +265,13 @@ Tabela `historico_preco`, script `popular_historico_inicial.py` e integração c
 
 ## Roadmap Futuro
 
-### Fase 5 — Robustez, Qualidade e Rentabilidade (Alta Prioridade)
-- **EXITUS-RENTABILIDADE-001** — TWR + MWR (XIRR) + benchmarks (CDI, IBOV, IFIX, S&P500)
-- **EXITUS-VALIDATION-001** — Idempotência na importação B3 (dedup, dry-run, sanitização)
-- **EXITUS-SERVICE-REVIEW-001** — Implementar 4 services stub com lógica real
-- **EXITUS-COVERAGE-001** — Medir cobertura + testes para import_b3_service.py
+### Fase 5 — Robustez, Qualidade e Rentabilidade (✅ Concluída 08/03/2026)
+- **EXITUS-VALIDATION-001** ✅ — Idempotência importação B3 (hash MD5, dry-run, sanitização)
+- **EXITUS-CLEANUP-001** ✅ — Higiene do codebase (13 arquivos deletados, blueprint mock removido)
+- **EXITUS-RENTABILIDADE-001** ✅ — TWR + MWR/XIRR + benchmarks (CDI, IBOV, IFIX, IPCA6, S&P500)
+- **EXITUS-SERVICE-REVIEW-001** ✅ — 4 services stub com lógica real (Sharpe, DY, correlação, fix bug)
+- **EXITUS-COVERAGE-001** ✅ — 59 testes para import_b3_service.py (parsers, edge cases, dry-run)
+- **EXITUS-DOCS-SYNC-001** ✅ — Sincronização de documentação (MODULES, API_REFERENCE, LESSONS_LEARNED)
 
 ### Fase 6 — Integridade e Infraestrutura (Média Prioridade)
 - CLEANUP-001, AUDITLOG-001, CIRCUITBREAKER-001, DARF-ACUMULADO-001, RECONCILIACAO-001, IOF-001, CONSTRAINT-001
@@ -303,8 +305,9 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 | Usuários Teste | Concorrentes | 20-40 |
 | Ativos Seedados | — | 56 (15 ações BR, 10 FIIs, 6 US, 2 REITs, 8 ETFs, 5 RF, 10 EU) |
 | Cobertura ENUMs | — | 15/15 tipos implementados (inclui UNIT) |
-| GAPs Concluídos | — | 30 (Fases 2, 3, 4) |
-| GAPs Planejados | — | 23 + 1 proposta (Fases 5-8) |
+| Testes | Suite pytest | **376 passed, 16 errors** |
+| GAPs Concluídos | — | 35 (Fases 2, 3, 4, 5) |
+| GAPs Planejados | — | 19 + 1 proposta (Fases 6-8) |
 
 ---
 
@@ -319,6 +322,6 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 
 ---
 
-*Documento atualizado: 05 de Março de 2026*
+*Documento atualizado: 08 de Março de 2026*
 *Versão: v0.8.0-dev*
-*56 ativos com dados fundamentalistas — 30 GAPs concluídos (Fases 2-4) — ver ROADMAP.md v3.0*
+*56 ativos com dados fundamentalistas — 35 GAPs concluídos (Fases 2-5) — ver ROADMAP.md v3.0*

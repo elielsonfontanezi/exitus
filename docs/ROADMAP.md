@@ -550,26 +550,19 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 - **Testes:** 23 passed em `test_service_review.py`
 - **Suite:** 317 passed, 16 errors (baseline mantido)
 
-### EXITUS-DOCS-SYNC-001: Sincronização de Documentação
+### EXITUS-DOCS-SYNC-001: Sincronização de Documentação ✅ Concluído (08/03/2026)
 
-**Problema:** Documentação com inconsistências acumuladas após Fases 3-4.
+**Implementado:**
+- `API_REFERENCE.md`: seções 21 (Rentabilidade) e 22 (Importação B3) adicionadas com exemplos completos
+- `MODULES.md`: métricas atualizadas (376 testes, 35 GAPs), Fase 5 marcada concluída
+- `LESSONS_LEARNED.md`: L-SVC-001 (`current_app.db`), L-TEST-001 (pandas NaN/CSV)
 
-**Escopo:**
+### EXITUS-COVERAGE-001: Cobertura de Testes ✅ Concluído (08/03/2026)
 
-- `API_REFERENCE.md`: parado em v0.7.10 — faltam ~20 endpoints (IR, Export, Câmbio, Anomaly, RFCALC, Swagger, NewAPIs)
-- `MODULES.md`: diz "77 testes" (real: 255+), não menciona GAPs das Fases 3/4
-- `LESSONS_LEARNED.md`: L-DB-004 referencia ENUM-001 como "Fix planejado" (já concluído)
-- `EXITUS-IR-001.md` + `EXITUS-IR-009.md`: consolidar em documento único
-
-### EXITUS-COVERAGE-001: Cobertura de Testes
-
-**Problema:** Testes rodam com `--no-cov`. O `import_b3_service.py` (25KB, maior service do sistema) não tem nenhum teste pytest dedicado.
-
-**Escopo:**
-
-- Ativar `--cov` e medir cobertura real por service
-- Criar testes pytest para `import_b3_service.py` (parsers, validação, edge cases)
-- Identificar services com 0% de cobertura e priorizar
+**Implementado:**
+- `tests/test_import_b3_parsers.py`: 59 testes novos (59 passed)
+- Cobre: `_parse_data`, `_parse_quantidade`, `_parse_monetario`, `_extrair_ticker`, `_gerar_hash_linha`, `_obter_ou_criar_ativo`, `parse_movimentacoes`, `parse_negociacoes`, `importar_movimentacoes`, `importar_negociacoes`
+- Suite: 376 passed, 16 errors (baseline mantido)
 
 ### EXITUS-CLEANUP-001: Higiene do Codebase ✅ Concluído (08/03/2026)
 
@@ -938,7 +931,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | **Setup** | Baseline + Backup | ✅ Concluído | - | 0.5 dia |
 | **Sprint 1** | VALIDATION-001 + CLEANUP-001 | 🔄 Em Andamento | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 2** | RENTABILIDADE-001 + SERVICE-REVIEW-001 | ✅ Concluído | Opus + Sonnet | 2-3 dias |
-| **Sprint 3** | COVERAGE-001 + DOCS-SYNC-001 | ⏳ Planejado | Sonnet + SWE-1.5 | 1-2 dias |
+| **Sprint 3** | COVERAGE-001 + DOCS-SYNC-001 | ✅ Concluído | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 4** | CONSTRAINT-001 + CIRCUITBREAKER-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
 | **Sprint 5** | AUDITLOG-001 + RECONCILIACAO-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
 | Sprint 6 | DARF-ACUMULADO-001 + IOF-001 + SCRIPTS-002 + TESTFIX-CAMBIO-001 | ⏳ Planejado | SWE-1.5 + SWE-1.5 | 1 dia |
@@ -951,8 +944,8 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 - [x] EXITUS-CLEANUP-001 — Higiene do codebase ✅ Concluído (08/03/2026)
 - [x] EXITUS-RENTABILIDADE-001 — TWR + MWR + benchmarks ✅ Concluído (08/03/2026)
 - [x] EXITUS-SERVICE-REVIEW-001 — 4 services stub ✅ Concluído (08/03/2026)
-- [ ] EXITUS-COVERAGE-001 — Cobertura testes + import_b3
-- [ ] EXITUS-DOCS-SYNC-001 — Sincronização documentação
+- [x] EXITUS-COVERAGE-001 — 59 testes import_b3_service ✅ Concluído (08/03/2026)
+- [x] EXITUS-DOCS-SYNC-001 — Sincronização documentação ✅ Concluído (08/03/2026)
 
 **Fase 6 — Integridade e Infraestrutura:**
 
@@ -969,9 +962,9 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 **Baseline Atual:**
 
-- Testes: 317 passed, 16 errors
+- Testes: 376 passed, 16 errors
 - Cobertura: ?% (coverage com erro de arquivo .coverage)
-- GAPs concluídos: 34/54
+- GAPs concluídos: 36/54
 - Backup: exitus_backup_20260307_113901.tar.gz (1.9MB)
 
 **Metas Finais:**

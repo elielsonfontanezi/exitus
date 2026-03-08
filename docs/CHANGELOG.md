@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — EXITUS-DOCS-SYNC-001 — Sincronização de Documentação (08/03/2026)
+
+- **`docs/MODULES.md`** — Métricas atualizadas (376 testes, 35/54 GAPs), Fase 5 marcada como concluída
+- **`docs/API_REFERENCE.md`** — Seções 21 e 22 adicionadas (Rentabilidade + Importação B3) com exemplos e contratos completos
+- **`docs/LESSONS_LEARNED.md`** — Lições L-SVC-001 (`current_app.db` bug) e L-TEST-001 (pandas NaN/CSV)
+
+### Added — EXITUS-COVERAGE-001 — Cobertura de Testes import_b3_service.py (08/03/2026)
+
+- **`backend/tests/test_import_b3_parsers.py`** — 59 testes novos (59 passed):
+  - `TestParseData`: 8 testes (formatos BR, ISO, vazio, inválido, espaços)
+  - `TestParseQuantidade`: 8 testes (int, float, string, traço, NaN, vazio)
+  - `TestParseMonetario`: 10 testes (float, BRL, R$, americano, traço, NaN)
+  - `TestExtrairTicker`: 9 testes (FII com descrição, ação, BDR, hífen, minúsculo)
+  - `TestObterOuCriarAtivo`: 3 testes (FII vs ACAO, sem duplicata)
+  - `TestGerarHashLinha`: 4 testes (determinístico, muda por arquivo, muda por conteúdo, 32 chars)
+  - `TestParseMovimentacoesCSV`: 6 testes (válido, sem data, valor zero, custódia, cessão, múltiplas linhas)
+  - `TestParseNegociacoesCSV`: 4 testes (compra, venda, sem tipo, sem data inválida)
+  - `TestImportarNegociacoesTipos`: 3 testes (tipo não mapeado, COMPRA, VENDA)
+  - `TestImportarMovimentacoesTipos`: 4 testes (tipo não mapeado, todos mapeados, dry_run mov, dry_run neg)
+- **Suite: 376 passed, 16 errors (TESTFIX-CAMBIO-001 pré-existente)**
+
 ### Added — EXITUS-SERVICE-REVIEW-001 — Services Stub Implementados (08/03/2026)
 
 - **`backend/app/services/analise_service.py`** — Reescrito com dados reais:

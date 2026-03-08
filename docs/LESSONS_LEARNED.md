@@ -415,6 +415,46 @@ O `values_callable` nos models garante a serialização correta para o PostgreSQ
 
 ---
 
+### L-SVC-001 — Nunca usar current_app.db — sempre importar db diretamente
+**Origem:** EXITUS-SERVICE-REVIEW-001 | **Data:** 08/03/2026
+
+```python
+# ❌ ERRADO — current_app não tem atributo 'db'; levanta AttributeError em runtime
+current_app.db.session.add(obj)
+current_app.db.session.commit()
+
+# ✅ CORRETO — importar db do módulo correto
+from app.database import db
+db.session.add(obj)
+db.session.commit()
+```
+
+**Regra:** `current_app` expõe configurações Flask (ex: `current_app.config`), não extensões.
+O SQLAlchemy `db` deve sempre ser importado de `app.database`. Erro silencioso: o service parece funcionar nos testes mas falha em runtime.
+
+---
+
+### L-TEST-001 — pandas converte célula CSV vazia para string 'nan', não string vazia
+**Origem:** EXITUS-COVERAGE-001 | **Data:** 08/03/2026
+
+```python
+# ❌ ERRADO — assumir que célula CSV vazia vira '' em pandas
+csv = "Código de Negociação\n\n"
+df = pd.read_csv(...)
+assert df.iloc[0]['Código de Negociação'] == ''  # Falha! É 'nan'
+
+# ✅ CORRETO — verificar com pd.isna() ou str() comparado a 'nan'
+valor = str(row.get('Código', '')).strip()
+if not valor or valor == 'nan':
+    continue
+```
+
+**Regra:** Ao escrever testes para parsers que usam pandas, nunca assumir que célula vazia
+produz string vazia. `pd.read_csv` retorna `float('nan')` que `str()` converte para `'nan'`.
+Testar com `pd.isna()` ou filtrar pelo valor string `'nan'` explicitamente.
+
+---
+
 ## 📋 Referências
 
 | Documento | Papel |
