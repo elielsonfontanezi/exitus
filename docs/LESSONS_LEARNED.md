@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 05/03/2026 — L-DB-004 corrigido (ENUM-001 concluído)  
+> **Atualizado:** 09/03/2026 — L-TEST-001 adicionado (fixtures com rollback)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -519,6 +519,50 @@ usuario = Usuario(username=username, email=email)
 ```
 
 **Regra:** Em suites com `scope='session'` no conftest, fixtures que criam entidades no banco devem usar identificadores únicos. O pytest não isola automaticamente dados entre testes quando a sessão é compartilhada. Use UUID suffix ou contadores para evitar conflitos de chave única.
+
+---
+
+## 🧪 Testes
+
+### L-TEST-001 — Fixtures devem fazer rollback antes de DELETE
+**Origem:** Auditoria de testes | **Data:** 09/03/2026
+
+```python
+# ❌ ERRADO — PendingRollbackError se teste anterior falhou
+@pytest.fixture(scope='function')
+def usuario_seed(app):
+    u = Usuario(...)
+    db.session.add(u)
+    db.session.commit()
+    yield u
+    Usuario.query.filter_by(username=username).delete()
+    db.session.commit()
+
+# ✅ CORRETO — rollback antes de DELETE + try/except em commit
+@pytest.fixture(scope='function')
+def usuario_seed(app):
+    u = Usuario(...)
+    db.session.add(u)
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+    yield u
+    
+    db.session.rollback()  # Limpa transação pendente
+    Usuario.query.filter_by(username=username).delete()
+    db.session.commit()
+```
+
+**Problema:** Quando um teste falha, a transação fica em estado `PendingRollback`. O teardown do fixture tenta fazer DELETE mas falha com `InFailedSqlTransaction`.
+
+**Solução:**
+1. Adicionar `db.session.rollback()` **antes** de DELETE no teardown
+2. Adicionar `try/except` com rollback em **commits** do setup
+3. Criar fixture `autouse` para limpar dados de teste (transações, posições)
+
+**Resultado:** 81 errors resolvidos (90 → 9), taxa de sucesso 96.2% (479/491 testes).
 
 ---
 
