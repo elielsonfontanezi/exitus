@@ -9,6 +9,7 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 from app.database import db
 from app.models import Posicao, Transacao, MovimentacaoCaixa, Corretora, Ativo, TipoTransacao
+from app.models.movimentacao_caixa import TipoMovimentacao
 from app.services.reconciliacao_service import ReconciliacaoService
 from app.services.posicao_service import PosicaoService
 
@@ -93,14 +94,14 @@ class TestReconciliacaoService:
             mov1 = MovimentacaoCaixa(
                 usuario_id=usuario_seed.id,
                 corretora_id=corretora_seed.id,
-                tipo_movimentacao='DEPOSITO',
+                tipo_movimentacao=TipoMovimentacao.DEPOSITO,
                 valor=1000.00,
                 data_movimentacao=datetime.utcnow().date()
             )
             mov2 = MovimentacaoCaixa(
                 usuario_id=usuario_seed.id,
                 corretora_id=corretora_seed.id,
-                tipo_movimentacao='SAQUE',
+                tipo_movimentacao=TipoMovimentacao.SAQUE,
                 valor=200.00,
                 data_movimentacao=datetime.utcnow().date()
             )
@@ -122,7 +123,7 @@ class TestReconciliacaoService:
             mov1 = MovimentacaoCaixa(
                 usuario_id=usuario_seed.id,
                 corretora_id=corretora_seed.id,
-                tipo_movimentacao='DEPOSITO',
+                tipo_movimentacao=TipoMovimentacao.DEPOSITO,
                 valor=1000.00,
                 data_movimentacao=datetime.utcnow().date()
             )

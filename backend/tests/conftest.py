@@ -149,15 +149,19 @@ def cleanup_test_data(app):
     from app.models.transacao import Transacao
     from app.models.posicao import Posicao
     from app.models.movimentacao_caixa import MovimentacaoCaixa
+    from app.models.log_auditoria import LogAuditoria
     
+    # Rollback para limpar transação pendente
     _db.session.rollback()
     
-    # Deletar na ordem correta (dependências primeiro)
-    Transacao.query.delete()
-    Posicao.query.delete()
-    MovimentacaoCaixa.query.delete()
-    
+    # Deletar dados criados durante o teste (não pelos fixtures)
+    # Isso previne violações de FK no teardown dos fixtures
     try:
+        # Deletar na ordem correta (dependências primeiro)
+        Posicao.query.delete()
+        Transacao.query.delete()
+        MovimentacaoCaixa.query.delete()
+        # Não deletar LogAuditoria pois é apenas leitura nos testes
         _db.session.commit()
     except Exception:
         _db.session.rollback()
@@ -189,3 +193,35 @@ def corretora_seed(app, usuario_seed):
     _db.session.rollback()
     Corretora.query.filter_by(nome=nome).delete()
     _db.session.commit()
+
+
+@pytest.fixture(scope='function')
+def transacao_seed(app, usuario_seed, ativo_seed, corretora_seed):
+    """Transação vinculada aos seeds. Limpeza feita por cleanup_test_data."""
+    from app.models.transacao import Transacao, TipoTransacao
+    from datetime import datetime
+    
+    t = Transacao(
+        usuario_id=usuario_seed.id,
+        ativo_id=ativo_seed.id,
+        corretora_id=corretora_seed.id,
+        tipo=TipoTransacao.COMPRA,
+        data_transacao=datetime(2024, 1, 15),
+        quantidade=100,
+        preco_unitario=25.50,
+        valor_total=2550.00,
+        taxa_corretagem=10.00,
+        custos_totais=10.00,
+        valor_liquido=2560.00
+    )
+    _db.session.add(t)
+    try:
+        _db.session.commit()
+    except Exception:
+        _db.session.rollback()
+        raise
+    _db.session.refresh(t)
+    
+    yield t
+    
+    # Não faz DELETE - cleanup_test_data já limpa todas as transações
