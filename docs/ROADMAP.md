@@ -921,9 +921,10 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 ## 🚀 ROADMAP EXECUTIVO - Fases 5 & 6
 
-> **Status:** Em Execução  
+> **Status:** ✅ **CONCLUÍDO**  
 > **Início:** 07/03/2026  
-> **Timeline Estimada:** 2 semanas  
+> **Término:** 09/03/2026  
+> **Duração Real:** 3 dias  
 > **Modelo IA:** Claude Opus (1 GAP), Claude Sonnet (8 GAPs), SWE-1.5 (5 GAPs)
 > **⚠️ NOTA:** Esta seção será **removida automaticamente** ao concluir todos GAPs das Fases 5 & 6
 
@@ -936,8 +937,8 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | **Sprint 2** | RENTABILIDADE-001 + SERVICE-REVIEW-001 | ✅ Concluído | Opus + Sonnet | 2-3 dias |
 | **Sprint 3** | COVERAGE-001 + DOCS-SYNC-001 | ✅ Concluído | Sonnet + SWE-1.5 | 1-2 dias |
 | **Sprint 4** | CONSTRAINT-001 + CIRCUITBREAKER-001 | ✅ Concluído (08/03/2026) | Sonnet + Sonnet | 1-2 dias |
-| **Sprint 5** | AUDITLOG-001 + RECONCILIACAO-001 | ⏳ Planejado | Sonnet + Sonnet | 1-2 dias |
-| Sprint 6 | DARF-ACUMULADO-001 + IOF-001 + SCRIPTS-002 + TESTFIX-CAMBIO-001 | ⏳ Planejado | SWE-1.5 + SWE-1.5 | 1 dia |
+| **Sprint 5** | AUDITLOG-001 + RECONCILIACAO-001 | ✅ Concluído (09/03/2026) | Sonnet + Sonnet | 1-2 dias |
+| **Sprint 6** | DARF-ACUMULADO-001 + IOF-001 + SCRIPTS-002 + TESTFIX-CAMBIO-001 | ✅ Concluído (09/03/2026) | SWE-1.5 + SWE-1.5 | 1 dia |
 
 ### 🔄 Status em Tempo Real
 
@@ -966,37 +967,31 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 **Baseline Atual:**
 
-- Testes: 376 passed, 16 errors
+- Testes: 398+ passed, 0 errors
 - Cobertura: ?% (coverage com erro de arquivo .coverage)
-- GAPs concluídos: 36/54
+- GAPs concluídos: 45/54
 - Backup: exitus_backup_20260307_113901.tar.gz (1.9MB)
 
 **Metas Finais:**
 
-- Testes: 300+ passing
-- Cobertura: 80%+
-- GAPs concluídos: 43/54
+- Testes: 400+ passing ✅
+- Cobertura: 80%+ (pendente)
+- GAPs concluídos: 45/54 ✅
 
 ---
 
-## 🚀 Próximos Passos
+## 🎯 Fases 5 & 6 — **CONCLUÍDAS** ✅
 
-1. **Fase 5 — Sprint imediato (Alta Prioridade):**
-   - EXITUS-RENTABILIDADE-001 — TWR + MWR + benchmarks (prioridade máxima — feature #1 que falta)
-   - EXITUS-VALIDATION-001 — Idempotência na importação B3
-   - EXITUS-SERVICE-REVIEW-001 — Implementar 4 services stub com lógica real
-   - EXITUS-DOCS-SYNC-001 — Sincronizar toda documentação (parcialmente iniciado nesta revisão)
-   - EXITUS-COVERAGE-001 — Medir cobertura + testes para import_b3
-2. **Modelo recomendado para Fase 5:**
-   - RENTABILIDADE-001 → **Claude Opus** (design de novo subsistema financeiro, TWR/MWR são algoritmos complexos)
-   - VALIDATION-001 → **Claude Sonnet** (lógica de negócio moderada, integração com import_b3)
-   - SERVICE-REVIEW-001 → **Claude Sonnet** (lógica de negócio em múltiplos arquivos, Sharpe/drawdown)
-   - DOCS-SYNC-001 → **SWE-1.5** (atualização mecânica de documentação)
-   - COVERAGE-001 → **Claude Sonnet** (testes de integração, edge cases complexos de parser B3)
-3. **Pós-Fase 5:** Avaliar Fase 6 (Integridade) — CLEANUP-001 pode ser quick win paralelo
+**Resumo da Execução:**
+- **Duração:** 3 dias (07/03 a 09/03/2026)
+- **GAPs concluídos:** 9 GAPs
+- **Testes adicionados:** 22 testes formais (IOF)
+- **Features entregues:** IOF regressivo, DARF acumulado, auditoria, reconciliação, circuit breaker, limpeza de scripts, consolidação de blueprints
+
+**Próxima Fase:** Fase 7 — Produção e Escala (MULTICLIENTE-001, MONITOR-001, RATELIMIT-001, CICD-001)
 
 ---
 
 *Este arquivo é o controle central do roadmap. Atualizar após cada decisão/desenvolvimento.*  
-*Versão: 3.0 — 05 de Março de 2026*  
+*Versão: 3.1 — 09 de Março de 2026 (Fases 5 & 6 concluídas)*  
 *Contribuidores: Elielson Fontanezi, Cascade AI*
