@@ -115,6 +115,7 @@ O frontend atual (Flask + HTMX + Tailwind) é funcional mas **não consome** as 
 | **EXITUS-IOF-001** | IOF regressivo (96%→0% em 30 dias) para resgates de RF < 30 dias | 📋 Planejado | Médio | Média |
 | **EXITUS-CONSTRAINT-001** | Revisão de CHECK constraints no banco (quantidade>0, valor>=0, saldo>=0, etc.) | ✅ Concluído (08/03/2026) | Médio | Média |
 | **EXITUS-SCRIPTS-002** | Revisão/limpeza de `scripts/`: remover obsoletos, resolver duplicidades (.sh vs .py), corrigir `import_b3.py` (shebang bash), melhorar `backup_db.sh` | 📋 Planejado | Médio | Média |
+| **EXITUS-MOVIMENTACAO-CONSOLIDATION-001** | Análise: movimentacao_blueprint.py vs movimentacao_caixa_blueprint.py (documentação, registro, testes, consolidação) | 📋 Planejado | Baixo | Baixa |
 | **EXITUS-TESTFIX-CAMBIO-001** | Corrigir 16 errors em `test_cambio_integration.py` (setup de fixtures, configuração de ambiente) | ✅ Concluído (09/03/2026) | Baixo | Baixa |
 
 ### 6. Fase 7 — Produção e Escala (Média-Alta Prioridade)
@@ -700,6 +701,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 6. **EXITUS-IOF-001** — IOF regressivo para RF
 7. **EXITUS-CONSTRAINT-001** — CHECK constraints no banco
 8. **EXITUS-SCRIPTS-002** — Revisão/limpeza de scripts (quick win paralelo)
+9. **EXITUS-MOVIMENTACAO-CONSOLIDATION-001** — Análise blueprints movimentação (baixa prioridade)
 
 ### Fase 7 — Produção e Escala
 
@@ -825,6 +827,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | EXITUS-IOF-001 | 6 | 📋 Planejado | Média | 1h |
 | EXITUS-CONSTRAINT-001 | 6 | ✅ Concluído | Média | 1h |
 | EXITUS-SCRIPTS-002 | 6 | 📋 Planejado | Média | 1-2h |
+| EXITUS-MOVIMENTACAO-CONSOLIDATION-001 | 6 | 📋 Planejado | Baixa | 30min |
 | EXITUS-MULTICLIENTE-001 | 7 | 📋 Planejado | Média-Alta | — |
 | EXITUS-MONITOR-001 | 7 | 📋 Planejado | Média | — |
 | EXITUS-RATELIMIT-001 | 7 | 📋 Planejado | Média | — |
@@ -956,6 +959,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 - [ ] EXITUS-DARF-ACUMULADO-001 — DARF < R$10 acumulado
 - [ ] EXITUS-IOF-001 — IOF regressivo RF < 30 dias
 - [ ] EXITUS-SCRIPTS-002 — Limpeza scripts
+- [ ] EXITUS-MOVIMENTACAO-CONSOLIDATION-001 — Análise blueprints movimentação
 - [x] EXITUS-TESTFIX-CAMBIO-001 — Corrigir 16 errors testes câmbio — ✅ Concluído (09/03/2026)
 
 ### 📊 Métricas de Execução

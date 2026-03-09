@@ -8,6 +8,17 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — EXITUS-CLEANUP-001 — Limpeza Parcial do Codebase (09/03/2026)
+
+- **Remoção de arquivos vazios/não utilizados:**
+  - `backend/app/blueprints/fontes/routes.py` — arquivo vazio removido
+  - `backend/app/blueprints/movimentacoes/` — pasta vazia removida
+- **Análise de blueprints duplicados:**
+  - Identificados `movimentacao_blueprint.py` (registrado, 83 bytes) e `movimentacao_caixa_blueprint.py` (não registrado, 202 bytes)
+  - Decisão: manter ambos, criar GAP específico para análise futura
+- **Novo GAP registrado:** `EXITUS-MOVIMENTACAO-CONSOLIDATION-001` — análise e consolidação de blueprints de movimentação
+- **Arquivos `__init__.py` vazios mantidos** — necessários para estrutura de pacotes Python
+
 ### Added — EXITUS-RECONCILIACAO-001 — Sistema de Reconciliação de Dados (09/03/2026)
 
 - **`backend/app/services/reconciliacao_service.py`** — serviço de verificação de consistência:
