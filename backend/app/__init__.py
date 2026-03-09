@@ -119,8 +119,8 @@ def create_app(testing=False):
     from .blueprints.provento_blueprint import provento_bp
     app.register_blueprint(provento_bp)
 
-    from .blueprints.movimentacao_blueprint import movimentacao_bp
-    app.register_blueprint(movimentacao_bp)
+    from .blueprints.movimentacao_caixa_blueprint import movimentacao_caixa_bp
+    app.register_blueprint(movimentacao_caixa_bp)
 
     from .blueprints.evento_corporativo_blueprint import evento_bp
     app.register_blueprint(evento_bp)

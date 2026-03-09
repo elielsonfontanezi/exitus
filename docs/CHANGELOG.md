@@ -94,7 +94,17 @@ e este projeto adere semanticamente à versão v0.8.0.
 - **`backend/tests/test_circuit_breaker.py`** — 23 testes (estados, HALF_OPEN, registry, retry, integração)
 - **Suite: 416 passed, 16 errors**
 
-### Fixed — EXITUS-TESTFIX-CAMBIO-001 — Correção de 16 erros em testes de câmbio (09/03/2026)
+### Fixed — EXITUS-MOVIMENTACAO-CONSOLIDATION-001 — Consolidação de Blueprints de Movimentação (09/03/2026)
+
+- **Removido** `backend/app/blueprints/movimentacao_blueprint.py` — blueprint básico (83 bytes, 3 endpoints)
+- **Registrado** `movimentacao_caixa_blueprint.py` em `__init__.py` — blueprint completo (7 endpoints)
+- **Corrigido** ImportError removendo `MovimentacaoCaixaUpdateSchema` inexistente
+- **Removido** endpoint PUT que usava schema não implementado
+- **Resultado:** API movimentações agora usa blueprint completo com CRUD + extrato
+- **URL final:** `/api/movimentacoes-caixa` (mais específico que `/api/movimentacoes`)
+- **Regra #10 adicionada:** Testes formais em `/backend/tests/` devem ser preservados permanentemente
+
+### Fixed — EXITUS-TESTFIX-CAMBIO-001 — Correção de Testes de Câmbio (09/03/2026)
 
 - **`backend/tests/test_cambio_integration.py`** — 33 testes passando (antes 16 errors):
   - `auth_headers`: email único com UUID suffix para evitar `UniqueViolation`
