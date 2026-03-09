@@ -94,6 +94,15 @@ e este projeto adere semanticamente à versão v0.8.0.
 - **`backend/tests/test_circuit_breaker.py`** — 23 testes (estados, HALF_OPEN, registry, retry, integração)
 - **Suite: 416 passed, 16 errors**
 
+### Fixed — EXITUS-SCRIPTS-002 — Limpeza e Revisão de Scripts (09/03/2026)
+
+- **Removido** `scripts/import_b3.py` — bash disfarçado com shebang Python (337 linhas)
+- **Removido** `scripts/generate_api_docs.sh` — obsoleto, substituído por Swagger
+- **Arquivado** `scripts/migrate_legacy_seeds.py` → `scripts/archive/` — migração one-time já concluída
+- **Mantido** `scripts/import_b3.sh` — wrapper funcional para containers (394 linhas)
+- **Mantido** `scripts/reset_and_seed.sh` + `reset_and_seed.py` — wrapper + script Python (ambos necessários)
+- **Resultado:** 3 arquivos removidos/arquivados, estrutura de scripts mais limpa
+
 ### Fixed — EXITUS-MOVIMENTACAO-CONSOLIDATION-001 — Consolidação de Blueprints de Movimentação (09/03/2026)
 
 - **Removido** `backend/app/blueprints/movimentacao_blueprint.py` — blueprint básico (83 bytes, 3 endpoints)
