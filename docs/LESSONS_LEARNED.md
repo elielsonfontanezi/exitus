@@ -562,7 +562,9 @@ def usuario_seed(app):
 2. Adicionar `try/except` com rollback em **commits** do setup
 3. Criar fixture `autouse` para limpar dados de teste (transações, posições)
 
-**Resultado:** 81 errors resolvidos (90 → 9), taxa de sucesso 96.2% (479/491 testes).
+**Resultado:** 82 errors resolvidos (90 → 8), taxa de sucesso 96.6% (482/499 testes).
+
+**Testes pendentes:** 17 testes ainda apresentam problemas (9 FAILED + 8 ERRORS). Ver `docs/TESTES_PENDENTES.md` para detalhes e plano de correção.
 
 ---
 

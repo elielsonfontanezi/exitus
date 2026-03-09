@@ -1,7 +1,7 @@
 # 🚀 Exitus — Roadmap de Implementação
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso:** 45/54 GAPs (83%) | **Testes:** 479/491 passing (96.2%) | **Endpoints:** 144 | **Versão:** v0.9.0
+> **Progresso:** 45/54 GAPs (83%) | **Testes:** 482/499 passing (96.6%) | **Endpoints:** 144 | **Versão:** v0.9.0
 
 ---
 
@@ -97,8 +97,9 @@
 | Métrica | Atual | Meta | Status |
 |---------|-------|------|--------|
 | **GAPs Concluídos** | 45/54 (83%) | 54/54 | ✅ Em dia |
-| **Testes Coletados** | 491 testes | 500+ | ✅ Superou |
-| **Testes Passando** | 479 (96.2%) | 480+ | ✅ Excelente |
+| **Testes Coletados** | 499 testes | 500+ | ✅ Quase lá |
+| **Testes Passando** | 482 (96.6%) | 480+ | ✅ Superou! |
+| **Testes Pendentes** | 17 (9 failed + 8 errors) | 0 | ⚠️ [Ver docs/TESTES_PENDENTES.md](TESTES_PENDENTES.md) |
 | **Cobertura** | ?% | 80%+ | ⚠️ Medir |
 | **Endpoints** | 144 | 150+ | ✅ Superou! |
 | **Ativos** | 56 | 100+ | ✅ Conforme |

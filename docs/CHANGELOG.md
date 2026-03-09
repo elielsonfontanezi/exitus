@@ -8,6 +8,31 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — Auditoria e Correção de Testes (09/03/2026)
+
+- **Auditoria completa da suite de testes:**
+  - Verificados 499 testes coletados (23 arquivos formais)
+  - 482 testes passando (96.6% de sucesso)
+  - 17 testes pendentes documentados em `docs/TESTES_PENDENTES.md`
+- **Correções em `backend/tests/conftest.py`:**
+  - Adicionado `db.session.rollback()` antes de DELETE em fixtures (auth_client, usuario_seed, ativo_seed, corretora_seed)
+  - Adicionado try/except com rollback em commits dos fixtures
+  - Criado fixture `cleanup_test_data` (autouse) para limpar transações/posições/movimentações
+  - Criado fixture `transacao_seed` para testes de auditlog
+- **Correções em `backend/tests/test_reconciliacao.py`:**
+  - Importado enum `TipoMovimentacao`
+  - Substituído strings `'DEPOSITO'`/`'SAQUE'` por `TipoMovimentacao.DEPOSITO`/`SAQUE`
+  - Corrigido erro `InvalidTextRepresentation` em 8 testes
+- **Resultados:**
+  - +91 testes passando (de 391 → 482)
+  - -82 errors resolvidos (de 90 → 8)
+  - -3 failed resolvidos (de 12 → 9)
+  - Taxa de sucesso: +18% (de 78.6% → 96.6%)
+- **Documentação:**
+  - `docs/TESTES_PENDENTES.md` criado com análise dos 17 testes pendentes
+  - `docs/LESSONS_LEARNED.md` atualizado com L-TEST-001 (fixtures com rollback)
+  - `docs/ROADMAP.md` atualizado com métricas reais (482/499 testes, 144 endpoints)
+
 ### Fixed — EXITUS-CLEANUP-001 — Limpeza Parcial do Codebase (09/03/2026)
 
 - **Remoção de arquivos vazios/não utilizados:**
