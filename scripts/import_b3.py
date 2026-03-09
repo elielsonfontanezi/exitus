@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Importação B3 Portal Investidor - Script Híbrido
 # GAP: EXITUS-IMPORT-001

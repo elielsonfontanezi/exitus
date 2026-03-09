@@ -254,15 +254,6 @@ scripts/
 - ✅ Gera documentação
 - ✅ Formato estruturado
 
-### `cleanup_duplicates.sh`
-**Remove duplicatas do DB**
-```bash
-./scripts/cleanup_duplicates.sh
-```
-- ⚠️ **Cuidado:** Operação destrutiva
-- ✅ Remove registros duplicados
-- ✅ Mantém mais recente
-
 ---
 
 ## 📊 Scripts de Manutenção
@@ -275,15 +266,6 @@ scripts/
 - ✅ Remove containers parados
 - ✅ Limpa imagens órfãs
 - ✅ Libera espaço
-
-### `validate_docs.sh`
-**Valida documentação**
-```bash
-./scripts/validate_docs.sh
-```
-- ✅ Verifica links
-- ✅ Valida estrutura
-- ✅ Reporta erros
 
 ---
 
