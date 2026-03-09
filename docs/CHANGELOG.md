@@ -8,6 +8,29 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — EXITUS-RECONCILIACAO-001 — Sistema de Reconciliação de Dados (09/03/2026)
+
+- **`backend/app/services/reconciliacao_service.py`** — serviço de verificação de consistência:
+  - `verificar_tudo()`: executa todas as verificações e retorna status geral (OK/WARNING/ERROR)
+  - `verificar_posicoes()`: compara quantidade em `Posicao` vs soma de transações (compra - venda)
+  - `verificar_saldos_corretoras()`: valida `Corretora.saldo_atual` vs `SUM(MovimentacaoCaixa)`
+  - `verificar_integridade_transacoes()`: detecta transações sem ativo, quantidade zero, duplicadas
+  - `verificar_ativo_especifico()`: reconciliação detalhada de um ativo por corretora
+  - Tolerância de `0.01` para arredondamento, `1.00` para custos/saldos
+- **`backend/app/blueprints/reconciliacao_blueprint.py`** — 5 endpoints REST:
+  - `GET /api/reconciliacao/verificar`: verificação completa
+  - `GET /api/reconciliacao/posicoes`: apenas posições
+  - `GET /api/reconciliacao/saldos`: apenas saldos de corretoras
+  - `GET /api/reconciliacao/integridade`: apenas integridade de transações
+  - `GET /api/reconciliacao/ativo/<id>`: ativo específico (query param `corretora_id` opcional)
+- **`backend/app/__init__.py`** — blueprint registrado em `/api/reconciliacao/*`
+- **`backend/tests/test_reconciliacao.py`** — 14 testes (9 unitários + 5 integração):
+  - Testes de divergências de quantidade, custo, saldo
+  - Detecção de transações sem ativo, duplicadas
+  - Tolerância de arredondamento
+  - Endpoints REST funcionais
+- **Suite: 371 passed, 82 errors** (erros não relacionados à reconciliação)
+
 ### Added — EXITUS-AUDITLOG-001 — Sistema de Auditoria Completo (09/03/2026)
 
 - **`backend/app/services/auditoria_service.py`** — serviço centralizado de auditoria:

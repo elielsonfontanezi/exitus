@@ -262,6 +262,16 @@ def create_app(testing=False):
         print(f"⚠️  Câmbio blueprint não encontrado: {e}")
 
     # ============================================
+    # M6 - Reconciliação (EXITUS-RECONCILIACAO-001)
+    # ============================================
+    try:
+        from .blueprints.reconciliacao_blueprint import reconciliacaobp
+        app.register_blueprint(reconciliacaobp)
+        print("✅ Reconciliação blueprint registrado: /api/reconciliacao/*")
+    except ImportError as e:
+        print(f"⚠️  Reconciliação blueprint não encontrado: {e}")
+
+    # ============================================
     # SWAGGER / OpenAPI (EXITUS-SWAGGER-001)
     # ============================================
     if not testing:

@@ -111,7 +111,7 @@ O frontend atual (Flask + HTMX + Tailwind) é funcional mas **não consome** as 
 | **EXITUS-AUDITLOG-001** | Povoar `log_auditoria` em operações CRUD reais (CREATE/UPDATE/DELETE em entidades principais) | ✅ Concluído (09/03/2026) | Médio | Média |
 | **EXITUS-CIRCUITBREAKER-001** | Circuit breaker (pybreaker) + retry com backoff exponencial nos providers de cotação | ✅ Concluído (08/03/2026) | Médio | Média |
 | **EXITUS-DARF-ACUMULADO-001** | Persistir DARF < R$10 para acumular entre meses (hoje só informa em alerta) | 📋 Planejado | Médio | Média |
-| **EXITUS-RECONCILIACAO-001** | Verificação posição calculada vs importada + saldo corretora vs soma movimentações | 📋 Planejado | Médio | Média |
+| **EXITUS-RECONCILIACAO-001** | Verificação posição calculada vs importada + saldo corretora vs soma movimentações | ✅ Concluído (09/03/2026) | Médio | Média |
 | **EXITUS-IOF-001** | IOF regressivo (96%→0% em 30 dias) para resgates de RF < 30 dias | 📋 Planejado | Médio | Média |
 | **EXITUS-CONSTRAINT-001** | Revisão de CHECK constraints no banco (quantidade>0, valor>=0, saldo>=0, etc.) | ✅ Concluído (08/03/2026) | Médio | Média |
 | **EXITUS-SCRIPTS-002** | Revisão/limpeza de `scripts/`: remover obsoletos, resolver duplicidades (.sh vs .py), corrigir `import_b3.py` (shebang bash), melhorar `backup_db.sh` | 📋 Planejado | Médio | Média |
@@ -696,7 +696,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 2. **EXITUS-AUDITLOG-001** — Povoar log de auditoria — ✅ Concluído (09/03/2026)
 3. **EXITUS-CIRCUITBREAKER-001** — Circuit breaker + retry
 4. **EXITUS-DARF-ACUMULADO-001** — Persistir acúmulo DARF < R$10
-5. **EXITUS-RECONCILIACAO-001** — Verificação de consistência
+5. **EXITUS-RECONCILIACAO-001** — Verificação de consistência — ✅ Concluído (09/03/2026)
 6. **EXITUS-IOF-001** — IOF regressivo para RF
 7. **EXITUS-CONSTRAINT-001** — CHECK constraints no banco
 8. **EXITUS-SCRIPTS-002** — Revisão/limpeza de scripts (quick win paralelo)
@@ -821,7 +821,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | EXITUS-AUDITLOG-001 | 6 | ✅ Concluído (09/03/2026) | Média | 2h |
 | EXITUS-CIRCUITBREAKER-001 | 6 | ✅ Concluído | Média | 1-2h |
 | EXITUS-DARF-ACUMULADO-001 | 6 | 📋 Planejado | Média | 1h |
-| EXITUS-RECONCILIACAO-001 | 6 | 📋 Planejado | Média | 2h |
+| EXITUS-RECONCILIACAO-001 | 6 | ✅ Concluído (09/03/2026) | Média | 2h |
 | EXITUS-IOF-001 | 6 | 📋 Planejado | Média | 1h |
 | EXITUS-CONSTRAINT-001 | 6 | ✅ Concluído | Média | 1h |
 | EXITUS-SCRIPTS-002 | 6 | 📋 Planejado | Média | 1-2h |
@@ -952,7 +952,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 - [x] EXITUS-CONSTRAINT-001 — CHECK constraints banco — ✅ Concluído (08/03/2026)
 - [x] EXITUS-CIRCUITBREAKER-001 — Resiliência APIs — ✅ Concluído (08/03/2026)
 - [x] EXITUS-AUDITLOG-001 — Log auditoria CRUD — ✅ Concluído (09/03/2026)
-- [ ] EXITUS-RECONCILIACAO-001 — Verificação consistência
+- [x] EXITUS-RECONCILIACAO-001 — Verificação consistência — ✅ Concluído (09/03/2026)
 - [ ] EXITUS-DARF-ACUMULADO-001 — DARF < R$10 acumulado
 - [ ] EXITUS-IOF-001 — IOF regressivo RF < 30 dias
 - [ ] EXITUS-SCRIPTS-002 — Limpeza scripts
