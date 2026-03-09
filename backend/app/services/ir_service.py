@@ -79,6 +79,41 @@ TABELA_REGRESSIVA_RF = [
 ]  # >720 dias → 15%
 ALIQUOTA_RF_MINIMA = Decimal('0.150')
 
+# Tabela regressiva IOF sobre rendimentos de RF (art. 7º do Decreto 6.306/2007)
+# Índice = dias corridos desde a aplicação (1 a 29); dia 0 e >=30 → 0%
+TABELA_IOF_REGRESSIVA = [
+    Decimal('0'),    # dia 0  → 0% (não se aplica)
+    Decimal('0.96'), # dia 1  → 96%
+    Decimal('0.93'), # dia 2  → 93%
+    Decimal('0.90'), # dia 3  → 90%
+    Decimal('0.86'), # dia 4  → 86%
+    Decimal('0.83'), # dia 5  → 83%
+    Decimal('0.80'), # dia 6  → 80%
+    Decimal('0.76'), # dia 7  → 76%
+    Decimal('0.73'), # dia 8  → 73%
+    Decimal('0.70'), # dia 9  → 70%
+    Decimal('0.66'), # dia 10 → 66%
+    Decimal('0.63'), # dia 11 → 63%
+    Decimal('0.60'), # dia 12 → 60%
+    Decimal('0.56'), # dia 13 → 56%
+    Decimal('0.53'), # dia 14 → 53%
+    Decimal('0.50'), # dia 15 → 50%
+    Decimal('0.46'), # dia 16 → 46%
+    Decimal('0.43'), # dia 17 → 43%
+    Decimal('0.40'), # dia 18 → 40%
+    Decimal('0.36'), # dia 19 → 36%
+    Decimal('0.33'), # dia 20 → 33%
+    Decimal('0.30'), # dia 21 → 30%
+    Decimal('0.26'), # dia 22 → 26%
+    Decimal('0.23'), # dia 23 → 23%
+    Decimal('0.20'), # dia 24 → 20%
+    Decimal('0.16'), # dia 25 → 16%
+    Decimal('0.13'), # dia 26 → 13%
+    Decimal('0.10'), # dia 27 → 10%
+    Decimal('0.06'), # dia 28 →  6%
+    Decimal('0.03'), # dia 29 →  3%
+]  # dia 30+ → 0%
+
 
 # ---------------------------------------------------------------------------
 # Helpers internos
@@ -199,6 +234,24 @@ def _aliquota_rf(prazo_dias: int) -> Decimal:
         if prazo_dias <= limite:
             return aliquota
     return ALIQUOTA_RF_MINIMA
+
+
+def _calcular_iof(prazo_dias: int, rendimento: Decimal) -> Decimal:
+    """
+    Calcula IOF sobre rendimento de RF conforme tabela regressiva
+    (art. 7º do Decreto 6.306/2007).
+
+    Args:
+        prazo_dias: número de dias corridos entre aplicação e resgate
+        rendimento: rendimento bruto da operação (base de cálculo)
+
+    Returns:
+        Decimal com o valor de IOF devido (zero se prazo >= 30 dias ou rendimento <= 0)
+    """
+    if prazo_dias >= 30 or rendimento <= 0:
+        return Decimal('0')
+    aliquota = TABELA_IOF_REGRESSIVA[prazo_dias] if prazo_dias < len(TABELA_IOF_REGRESSIVA) else Decimal('0')
+    return (rendimento * aliquota).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
 
 def _custo_medio(compras: list) -> Decimal:
@@ -763,6 +816,7 @@ class IRService:
                 'rendimento_bruto': 0.0,
                 'ir_devido':        Decimal('0'),
                 'ir_retido':        0.0,
+                'iof_devido':       0.0,
                 'aliquota_media':   0.0,
                 'operacoes':        0,
                 'isento':           True,
@@ -774,6 +828,7 @@ class IRService:
         total_rendimento = Decimal('0')
         total_ir_devido  = Decimal('0')
         total_ir_retido  = Decimal('0')
+        total_iof        = Decimal('0')
         alertas_pm       = []
         detalhes         = []
 
@@ -790,6 +845,7 @@ class IRService:
                     'aliquota':  0.0,
                     'ir_devido': 0.0,
                     'ir_retido': float(ir_retido_op),
+                    'iof_devido': 0.0,
                     'prazo_dias': None,
                     'isento':    True,
                     'motivo_isencao': 'LCI/LCA — isento PF (Lei 12.431)',
@@ -821,10 +877,14 @@ class IRService:
             if rendimento > 0:
                 ir_op = (rendimento * aliquota).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
+            # IOF regressivo (art. 7º Decreto 6.306/2007) — só para prazo < 30 dias
+            iof_op = _calcular_iof(prazo_dias, rendimento) if rendimento > 0 else Decimal('0')
+
             total_resgatado  += valor_resgate
             total_rendimento += rendimento
             total_ir_devido  += ir_op
             total_ir_retido  += ir_retido_op
+            total_iof        += iof_op
 
             detalhes.append({
                 'ticker':    ticker,
@@ -833,6 +893,7 @@ class IRService:
                 'aliquota':  float(aliquota * 100),
                 'ir_devido': float(ir_op),
                 'ir_retido': float(ir_retido_op),
+                'iof_devido': float(iof_op),
                 'prazo_dias': prazo_dias,
                 'isento':    False,
                 'motivo_isencao': None,
@@ -848,6 +909,7 @@ class IRService:
             'rendimento_bruto': float(total_rendimento.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
             'ir_devido':        total_ir_devido,
             'ir_retido':        float(total_ir_retido.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+            'iof_devido':       float(total_iof.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
             'aliquota_media':   aliquota_media,
             'operacoes':        len(resgates),
             'isento':           total_ir_devido == Decimal('0'),

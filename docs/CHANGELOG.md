@@ -94,6 +94,22 @@ e este projeto adere semanticamente à versão v0.8.0.
 - **`backend/tests/test_circuit_breaker.py`** — 23 testes (estados, HALF_OPEN, registry, retry, integração)
 - **Suite: 416 passed, 16 errors**
 
+### Added — EXITUS-IOF-001 — IOF Regressivo sobre Rendimentos de RF (09/03/2026)
+
+- **`backend/app/services/ir_service.py`** — implementação completa:
+  - `TABELA_IOF_REGRESSIVA`: lista de 30 entradas (dia 0→0%, dia 1→96%, ..., dia 29→3%)
+  - `_calcular_iof(prazo_dias, rendimento)`: calcula IOF com arredondamento 2 casas
+  - `_apurar_renda_fixa()`: integração com IOF por operação
+    - Campo `iof_devido` adicionado em cada `detalhe` (incluindo LCI/LCA com 0.0)
+    - Campo `iof_devido` adicionado no retorno consolidado
+    - LCI/LCA: IOF = 0 (isentos)
+    - Prazo >= 30 dias: IOF = 0
+- **`backend/tests/test_iof.py`** — 22 testes formais:
+  - `TestTabelaIOFRegressiva` (7 testes): estrutura, valores, monotonicidade
+  - `TestCalcularIOF` (11 testes): limites de prazo, valores, arredondamento
+  - `TestApurarRendaFixaComIOF` (4 testes): integração, LCI/LCA, prazo curto/longo
+- **Suite: 22 passed, 0 failed**
+
 ### Fixed — EXITUS-SCRIPTS-002 — Limpeza e Revisão de Scripts (09/03/2026)
 
 - **Removido** `scripts/import_b3.py` — bash disfarçado com shebang Python (337 linhas)

@@ -112,7 +112,7 @@ O frontend atual (Flask + HTMX + Tailwind) é funcional mas **não consome** as 
 | **EXITUS-CIRCUITBREAKER-001** | Circuit breaker (pybreaker) + retry com backoff exponencial nos providers de cotação | ✅ Concluído (08/03/2026) | Médio | Média |
 | **EXITUS-DARF-ACUMULADO-001** | Persistir DARF < R$10 para acumular entre meses (hoje só informa em alerta) | ✅ Concluído (09/03/2026) | Médio | Média |
 | **EXITUS-RECONCILIACAO-001** | Verificação posição calculada vs importada + saldo corretora vs soma movimentações | ✅ Concluído (09/03/2026) | Médio | Média |
-| **EXITUS-IOF-001** | IOF regressivo (96%→0% em 30 dias) para resgates de RF < 30 dias | 📋 Planejado | Médio | Média |
+| **EXITUS-IOF-001** | IOF regressivo (96%→0% em 30 dias) para resgates de RF < 30 dias | ✅ Concluído (09/03/2026) | Médio | Média |
 | **EXITUS-CONSTRAINT-001** | Revisão de CHECK constraints no banco (quantidade>0, valor>=0, saldo>=0, etc.) | ✅ Concluído (08/03/2026) | Médio | Média |
 | **EXITUS-SCRIPTS-002** | Revisão/limpeza de `scripts/`: remover obsoletos, resolver duplicidades (.sh vs .py), corrigir `import_b3.py` (shebang bash), melhorar `backup_db.sh` | ✅ Concluído (09/03/2026) | Médio | Média |
 | **EXITUS-MOVIMENTACAO-CONSOLIDATION-001** | Análise: movimentacao_blueprint.py vs movimentacao_caixa_blueprint.py (documentação, registro, testes, consolidação) | ✅ Concluído (09/03/2026) | Baixo | Baixa |
@@ -698,7 +698,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 3. **EXITUS-CIRCUITBREAKER-001** — Circuit breaker + retry
 4. **EXITUS-DARF-ACUMULADO-001** — Persistir acúmulo DARF < R$10 — ✅ Concluído (09/03/2026)
 5. **EXITUS-RECONCILIACAO-001** — Verificação de consistência — ✅ Concluído (09/03/2026)
-6. **EXITUS-IOF-001** — IOF regressivo para RF
+6. **EXITUS-IOF-001** — IOF regressivo para RF — ✅ Concluído (09/03/2026)
 7. **EXITUS-CONSTRAINT-001** — CHECK constraints no banco
 8. **EXITUS-SCRIPTS-002** — Revisão/limpeza de scripts — ✅ Concluído (09/03/2026)
 9. **EXITUS-MOVIMENTACAO-CONSOLIDATION-001** — Análise blueprints movimentação — ✅ Concluído (09/03/2026)
@@ -824,7 +824,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | EXITUS-CIRCUITBREAKER-001 | 6 | ✅ Concluído | Média | 1-2h |
 | EXITUS-DARF-ACUMULADO-001 | 6 | ✅ Concluído (09/03/2026) | Média | 1h |
 | EXITUS-RECONCILIACAO-001 | 6 | ✅ Concluído (09/03/2026) | Média | 2h |
-| EXITUS-IOF-001 | 6 | 📋 Planejado | Média | 1h |
+| EXITUS-IOF-001 | 6 | ✅ Concluído (09/03/2026) | Média | 1h |
 | EXITUS-CONSTRAINT-001 | 6 | ✅ Concluído | Média | 1h |
 | EXITUS-SCRIPTS-002 | 6 | ✅ Concluído (09/03/2026) | Média | 1-2h |
 | EXITUS-MOVIMENTACAO-CONSOLIDATION-001 | 6 | ✅ Concluído (09/03/2026) | Baixa | 30min |
@@ -957,7 +957,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 - [x] EXITUS-AUDITLOG-001 — Log auditoria CRUD — ✅ Concluído (09/03/2026)
 - [x] EXITUS-RECONCILIACAO-001 — Verificação consistência — ✅ Concluído (09/03/2026)
 - [x] EXITUS-DARF-ACUMULADO-001 — DARF < R$10 acumulado — ✅ Concluído (09/03/2026)
-- [ ] EXITUS-IOF-001 — IOF regressivo RF < 30 dias
+- [x] EXITUS-IOF-001 — IOF regressivo RF < 30 dias — ✅ Concluído (09/03/2026)
 - [x] EXITUS-SCRIPTS-002 — Limpeza scripts — ✅ Concluído (09/03/2026)
 - [x] EXITUS-MOVIMENTACAO-CONSOLIDATION-001 — Análise blueprints movimentação — ✅ Concluído (09/03/2026)
 - [x] EXITUS-TESTFIX-CAMBIO-001 — Corrigir 16 errors testes câmbio — ✅ Concluído (09/03/2026)
