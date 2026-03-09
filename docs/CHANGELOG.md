@@ -19,6 +19,24 @@ e este projeto adere semanticamente à versão v0.8.0.
 - **Novo GAP registrado:** `EXITUS-MOVIMENTACAO-CONSOLIDATION-001` — análise e consolidação de blueprints de movimentação
 - **Arquivos `__init__.py` vazios mantidos** — necessários para estrutura de pacotes Python
 
+### Added — EXITUS-DARF-ACUMULADO-001 — Sistema de Acúmulo de DARF (09/03/2026)
+
+- **`backend/app/models/saldo_darf_acumulado.py`** — modelo para persistir saldos:
+  - Campos: usuario_id, categoria, codigo_receita, ano_mes, saldo
+  - Constraints: únicidade por usuário/categoria/código/mês
+  - Validações: categoria válida, código DARF válido, saldo >= 0
+- **`backend/app/services/ir_service.py`** — lógica de acúmulo implementada:
+  - `_calcular_darf()` modificado para acumular valores < R$10,00
+  - `_processar_acumulo_darf()` — gerencia acúmulo entre meses
+  - Remove alerta de DARF < R$10 (agora tratado automaticamente)
+  - Compatibilidade mantida com API existente
+- **Migration `5f0da25a1ee2`** — cria tabela `saldo_darf_acumulado`
+- **`backend/tests/test_darf_acumulado.py`** — 8 testes unitários + 2 integração:
+  - Acúmulo abaixo do mínimo, pagamento ao atingir, separação por categoria
+  - IR renda fixa não acumula, IR zero não gera registro
+  - Todos os testes passam (8/8)
+- **Funcionalidade:** DARF < R$10,00 acumulado automaticamente, pago quando soma >= R$10,00
+
 ### Added — EXITUS-RECONCILIACAO-001 — Sistema de Reconciliação de Dados (09/03/2026)
 
 - **`backend/app/services/reconciliacao_service.py`** — serviço de verificação de consistência:

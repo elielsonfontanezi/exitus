@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-08 18:51:54
+Gerado em: 2026-03-09 11:14:49
 ================================================================================
 
 ================================================================================
@@ -31,11 +31,12 @@ TABELAS DO BANCO EXITUS
  public | provento               | exitus
  public | regra_fiscal           | exitus
  public | relatorios_performance | exitus
+ public | saldo_darf_acumulado   | exitus
  public | saldo_prejuizo         | exitus
  public | taxa_cambio            | exitus
  public | transacao              | exitus
  public | usuario                | exitus
-(24 rows)
+(25 rows)
 
 
 ================================================================================
@@ -1796,6 +1797,82 @@ ________________________________________________________________________________
 
 
 ################################################################################
+TABELA: saldo_darf_acumulado
+################################################################################
+
+                                                 Table "public.saldo_darf_acumulado"
+     Column     |            Type             | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+----------------+-----------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id             | uuid                        |           | not null |         | plain    |             |              | 
+ usuario_id     | uuid                        |           | not null |         | plain    |             |              | 
+ categoria      | character varying(20)       |           | not null |         | extended |             |              | 
+ codigo_receita | character varying(10)       |           | not null |         | extended |             |              | 
+ ano_mes        | character varying(7)        |           | not null |         | extended |             |              | 
+ saldo          | numeric(15,2)               |           | not null |         | main     |             |              | 
+ created_at     | timestamp without time zone |           | not null |         | plain    |             |              | 
+ updated_at     | timestamp without time zone |           | not null |         | plain    |             |              | 
+Indexes:
+    "saldo_darf_acumulado_pkey" PRIMARY KEY, btree (id)
+    "ix_saldo_darf_acumulado_usuario_id" btree (usuario_id)
+    "unique_saldo_darf_usuario_categoria_codigo_mes" UNIQUE CONSTRAINT, btree (usuario_id, categoria, codigo_receita, ano_mes)
+Check constraints:
+    "saldo_darf_categoria_valida" CHECK (categoria::text = ANY (ARRAY['swing_acoes'::character varying, 'day_trade'::character varying, 'fiis'::character varying, 'exterior'::character varying, 'rf'::character varying]::text[]))
+    "saldo_darf_codigo_receita_valido" CHECK (codigo_receita::text = ANY (ARRAY['6015'::character varying, '0561'::character varying, '9453'::character varying]::text[]))
+    "saldo_darf_nao_negativo" CHECK (saldo >= 0::numeric)
+Foreign-key constraints:
+    "saldo_darf_acumulado_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |     Coluna     |            Tipo             | Tamanho | Null? | Default 
+-----+----------------+-----------------------------+---------+-------+---------
+   1 | id             | uuid                        |         | NO    | 
+   2 | usuario_id     | uuid                        |         | NO    | 
+   3 | categoria      | character varying           | (20)    | NO    | 
+   4 | codigo_receita | character varying           | (10)    | NO    | 
+   5 | ano_mes        | character varying           | (7)     | NO    | 
+   6 | saldo          | numeric                     |         | NO    | 
+   7 | created_at     | timestamp without time zone |         | NO    | 
+   8 | updated_at     | timestamp without time zone |         | NO    | 
+(8 rows)
+
+
+Foreign Keys:
+               Nome FK                |   Coluna   | Tabela Referenciada | Coluna Referenciada 
+--------------------------------------+------------+---------------------+---------------------
+ saldo_darf_acumulado_usuario_id_fkey | usuario_id | usuario             | id
+(1 row)
+
+
+Primary Keys:
+          Nome PK          | Coluna 
+---------------------------+--------
+ saldo_darf_acumulado_pkey | id
+(1 row)
+
+
+Unique Constraints:
+                Nome Constraint                 |     Coluna     
+------------------------------------------------+----------------
+ unique_saldo_darf_usuario_categoria_codigo_mes | usuario_id
+ unique_saldo_darf_usuario_categoria_codigo_mes | categoria
+ unique_saldo_darf_usuario_categoria_codigo_mes | codigo_receita
+ unique_saldo_darf_usuario_categoria_codigo_mes | ano_mes
+(4 rows)
+
+
+Índices:
+                 Nome do Índice                 |                                                                           Definição                                                                            
+------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ saldo_darf_acumulado_pkey                      | CREATE UNIQUE INDEX saldo_darf_acumulado_pkey ON public.saldo_darf_acumulado USING btree (id)
+ unique_saldo_darf_usuario_categoria_codigo_mes | CREATE UNIQUE INDEX unique_saldo_darf_usuario_categoria_codigo_mes ON public.saldo_darf_acumulado USING btree (usuario_id, categoria, codigo_receita, ano_mes)
+ ix_saldo_darf_acumulado_usuario_id             | CREATE INDEX ix_saldo_darf_acumulado_usuario_id ON public.saldo_darf_acumulado USING btree (usuario_id)
+(3 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
 TABELA: saldo_prejuizo
 ################################################################################
 
@@ -2070,6 +2147,7 @@ Referenced by:
     TABLE "posicao" CONSTRAINT "posicao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "projecoes_renda" CONSTRAINT "projecoes_renda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
     TABLE "relatorios_performance" CONSTRAINT "relatorios_performance_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+    TABLE "saldo_darf_acumulado" CONSTRAINT "saldo_darf_acumulado_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "saldo_prejuizo" CONSTRAINT "saldo_prejuizo_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "transacao" CONSTRAINT "transacao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 Access method: heap
@@ -2126,7 +2204,7 @@ RESUMO GERAL
 Total de Tabelas:
  Total 
 -------
-    24
+    25
 (1 row)
 
 
@@ -2153,11 +2231,12 @@ Total de Colunas por Tabela:
  provento               |          15
  regra_fiscal           |          13
  relatorios_performance |          11
+ saldo_darf_acumulado   |           8
  saldo_prejuizo         |           7
  taxa_cambio            |           8
  transacao              |          21
  usuario                |           9
-(24 rows)
+(25 rows)
 
 
 Total de Foreign Keys por Tabela:
@@ -2177,9 +2256,10 @@ Total de Foreign Keys por Tabela:
  projecoes_renda        |       1
  provento               |       1
  relatorios_performance |       1
+ saldo_darf_acumulado   |       1
  saldo_prejuizo         |       1
  transacao              |       3
-(16 rows)
+(17 rows)
 
 
 ================================================================================

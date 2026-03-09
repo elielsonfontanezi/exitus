@@ -31,6 +31,7 @@ from app.models.ativo import Ativo, TipoAtivo
 from app.models.corretora import Corretora
 from app.models.posicao import Posicao
 from app.models.saldo_prejuizo import SaldoPrejuizo
+from app.models.saldo_darf_acumulado import SaldoDarfAcumulado
 from app.models.regra_fiscal import RegraFiscal
 from app.utils.exceptions import BusinessRuleError
 
@@ -433,7 +434,7 @@ class IRService:
         ir_total    = ir_swing + ir_dt + ir_fii + ir_exterior + ir_rf
 
         # DARF
-        darf = IRService._calcular_darf(ir_swing + ir_dt + ir_fii, ir_exterior, ir_rf)
+        darf = IRService._calcular_darf(usuario_id, mes_str, ir_swing + ir_dt + ir_fii, ir_exterior, ir_rf, persist)
 
         # Alertas
         alertas = []
@@ -447,8 +448,7 @@ class IRService:
             alertas.extend(res.pop('_alertas_pm', []))
         if res_swing.get('isento'):
             alertas.append(f"Vendas de ações em {mes_str} abaixo de R$20.000 — isento de IR (swing trade).")
-        if ir_total < DARF_MINIMO and ir_total > 0:
-            alertas.append(f"IR total R${ir_total:.2f} abaixo do mínimo de DARF (R$10,00) — acumular para mês seguinte.")
+        # Alerta de DARF < R$10 removido - agora é tratado por acúmulo automático
 
         # Serializar por_corretora
         corretoras_lista = [
@@ -860,38 +860,140 @@ class IRService:
     # -----------------------------------------------------------------------
 
     @staticmethod
-    def _calcular_darf(ir_br: Decimal, ir_exterior: Decimal, ir_rf: Decimal = Decimal('0')) -> dict:
-        """Monta resumo de DARF a pagar."""
+    def _calcular_darf(usuario_id: str, mes_str: str, ir_br: Decimal, ir_exterior: Decimal, ir_rf: Decimal = Decimal('0'), persist: bool = True) -> dict:
+        """
+        Monta resumo de DARF a pagar com acúmulo de valores < R$10,00.
+        
+        Args:
+            usuario_id: ID do usuário
+            mes_str: Mês no formato YYYY-MM
+            ir_br: IR de renda variável BR
+            ir_exterior: IR de renda variável exterior
+            ir_rf: IR de renda fixa (retido na fonte)
+            persist: Se True, persiste saldos acumulados
+            
+        Returns:
+            dict com lista de DARFs
+        """
         darfs = []
-
+        mes_ant = _mes_anterior(*_parse_mes(mes_str))
+        
+        # Processar IR BR (swing + day trade + FIIs)
         if ir_br > 0:
-            darfs.append({
-                'codigo_receita': DARF_SWING_ACAO,
-                'descricao':      'Ganho de capital — renda variável BR (ações, FIIs, day-trade)',
-                'valor':          float(ir_br.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
-                'pagar':          ir_br >= DARF_MINIMO,
-                'obs':            None if ir_br >= DARF_MINIMO else f'Abaixo do mínimo (R$10,00) — acumular',
-            })
-
+            saldo_acumulado = IRService._processar_acumulo_darf(
+                usuario_id, mes_str, mes_ant, 'swing_acoes', DARF_SWING_ACAO, ir_br, persist
+            )
+            if saldo_acumulado['valor_pagar'] > 0:
+                darfs.append({
+                    'codigo_receita': DARF_SWING_ACAO,
+                    'descricao': 'Ganho de capital — renda variável BR (ações, FIIs, day-trade)',
+                    'valor': float(saldo_acumulado['valor_pagar'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                    'pagar': True,
+                    'obs': saldo_acumulado.get('obs'),
+                })
+        
+        # Processar IR Exterior
         if ir_exterior > 0:
-            darfs.append({
-                'codigo_receita': DARF_RENDA_FIXA,
-                'descricao':      'Ganho de capital — renda variável exterior',
-                'valor':          float(ir_exterior.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
-                'pagar':          ir_exterior >= DARF_MINIMO,
-                'obs':            None if ir_exterior >= DARF_MINIMO else f'Abaixo do mínimo (R$10,00) — acumular',
-            })
-
+            saldo_acumulado = IRService._processar_acumulo_darf(
+                usuario_id, mes_str, mes_ant, 'exterior', DARF_RENDA_FIXA, ir_exterior, persist
+            )
+            if saldo_acumulado['valor_pagar'] > 0:
+                darfs.append({
+                    'codigo_receita': DARF_RENDA_FIXA,
+                    'descricao': 'Ganho de capital — renda variável exterior',
+                    'valor': float(saldo_acumulado['valor_pagar'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                    'pagar': True,
+                    'obs': saldo_acumulado.get('obs'),
+                })
+        
+        # IR RF é sempre informativo (retido na fonte)
         if ir_rf > 0:
             darfs.append({
                 'codigo_receita': DARF_RENDA_FIXA,
-                'descricao':      'IR renda fixa — tabela regressiva (retido na fonte)',
-                'valor':          float(ir_rf.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
-                'pagar':          False,
-                'obs':            'Retido na fonte pela instituição financeira — informativo',
+                'descricao': 'IR renda fixa — tabela regressiva (retido na fonte)',
+                'valor': float(ir_rf.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'pagar': False,
+                'obs': 'Retido na fonte pela instituição financeira — informativo',
             })
-
-        return darfs
+        
+        return {'darfs': darfs}
+    
+    @staticmethod
+    def _processar_acumulo_darf(usuario_id: str, mes_atual: str, mes_anterior: str, categoria: str, codigo_receita: str, ir_mes: Decimal, persist: bool) -> dict:
+        """
+        Processa acúmulo de DARF para valores < R$10,00.
+        
+        Returns:
+            dict com:
+            - valor_pagar: Valor a pagar neste mês (0 se < R$10)
+            - obs: Observação sobre acúmulo
+        """
+        # Buscar saldo acumulado do mês anterior
+        saldo_anterior = SaldoDarfAcumulado.query.filter_by(
+            usuario_id=usuario_id,
+            categoria=categoria,
+            codigo_receita=codigo_receita,
+            ano_mes=mes_anterior
+        ).first()
+        
+        valor_anterior = saldo_anterior.saldo if saldo_anterior else Decimal('0')
+        valor_total = valor_anterior + ir_mes
+        
+        if valor_total < DARF_MINIMO:
+            # Ainda abaixo do mínimo - acumular
+            valor_pagar = Decimal('0')
+            obs = f'Abaixo do mínimo (R$10,00) — acumulado: R${valor_total:.2f}'
+            
+            # Persistir acumulado do mês atual
+            if persist:
+                saldo_atual = SaldoDarfAcumulado.query.filter_by(
+                    usuario_id=usuario_id,
+                    categoria=categoria,
+                    codigo_receita=codigo_receita,
+                    ano_mes=mes_atual
+                ).first()
+                
+                if saldo_atual:
+                    saldo_atual.saldo = valor_total
+                else:
+                    saldo_atual = SaldoDarfAcumulado(
+                        usuario_id=usuario_id,
+                        categoria=categoria,
+                        codigo_receita=codigo_receita,
+                        ano_mes=mes_atual,
+                        saldo=valor_total
+                    )
+                    db.session.add(saldo_atual)
+        else:
+            # Alcançou ou ultrapassou o mínimo - pagar tudo
+            valor_pagar = valor_total
+            obs = None if valor_anterior == 0 else f'Inclui acumulado de meses anteriores: R${valor_anterior:.2f}'
+            
+            # Zerar saldo acumulado (já pago)
+            if persist:
+                saldo_atual = SaldoDarfAcumulado.query.filter_by(
+                    usuario_id=usuario_id,
+                    categoria=categoria,
+                    codigo_receita=codigo_receita,
+                    ano_mes=mes_atual
+                ).first()
+                
+                if saldo_atual:
+                    saldo_atual.saldo = Decimal('0')
+                else:
+                    saldo_atual = SaldoDarfAcumulado(
+                        usuario_id=usuario_id,
+                        categoria=categoria,
+                        codigo_receita=codigo_receita,
+                        ano_mes=mes_atual,
+                        saldo=Decimal('0')
+                    )
+                    db.session.add(saldo_atual)
+        
+        return {
+            'valor_pagar': valor_pagar,
+            'obs': obs
+        }
 
     # -----------------------------------------------------------------------
     # Histórico
