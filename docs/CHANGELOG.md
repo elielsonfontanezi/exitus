@@ -22,6 +22,13 @@ e este projeto adere semanticamente à versão v0.8.0.
 - **`backend/tests/test_circuit_breaker.py`** — 23 testes (estados, HALF_OPEN, registry, retry, integração)
 - **Suite: 416 passed, 16 errors**
 
+### Fixed — EXITUS-TESTFIX-CAMBIO-001 — Correção de 16 erros em testes de câmbio (09/03/2026)
+
+- **`backend/tests/test_cambio_integration.py`** — 33 testes passando (antes 16 errors):
+  - `auth_headers`: email único com UUID suffix para evitar `UniqueViolation`
+  - Testes fallback: `TaxaCambio.query.delete()` para garantir banco vazio
+  - Suite geral: 432 passed, 0 errors (antes: 416 passed, 16 errors)
+
 ### Added — EXITUS-CONSTRAINT-001 — CHECK Constraints de Negócio (08/03/2026)
 
 - **`backend/alembic/versions/20260308_1900_add_business_constraints.py`** — 13 constraints:

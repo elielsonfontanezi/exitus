@@ -504,6 +504,24 @@ Para verificar que `record_failure` abriu o circuito internamente, inspecionar `
 
 ---
 
+### L-TEST-003 — Fixtures de teste devem usar identificadores únicos (UUID suffix)
+**Origem:** EXITUS-TESTFIX-CAMBIO-001 | **Data:** 09/03/2026
+
+```python
+# ❌ ERRADO — email fixo causa UniqueViolation quando o fixture é reutilizado
+usuario = Usuario(username='test_cambio', email='test_cambio@exitus.com')
+
+# ✅ CORRETO — sufixo UUID garante unicidade entre execuções e testes
+suffix = str(uuid.uuid4())[:8]
+username = f'test_cambio_{suffix}'
+email = f'{username}@test.exitus'
+usuario = Usuario(username=username, email=email)
+```
+
+**Regra:** Em suites com `scope='session'` no conftest, fixtures que criam entidades no banco devem usar identificadores únicos. O pytest não isola automaticamente dados entre testes quando a sessão é compartilhada. Use UUID suffix ou contadores para evitar conflitos de chave única.
+
+---
+
 ## 📋 Referências
 
 | Documento | Papel |

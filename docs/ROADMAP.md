@@ -115,7 +115,7 @@ O frontend atual (Flask + HTMX + Tailwind) é funcional mas **não consome** as 
 | **EXITUS-IOF-001** | IOF regressivo (96%→0% em 30 dias) para resgates de RF < 30 dias | 📋 Planejado | Médio | Média |
 | **EXITUS-CONSTRAINT-001** | Revisão de CHECK constraints no banco (quantidade>0, valor>=0, saldo>=0, etc.) | ✅ Concluído (08/03/2026) | Médio | Média |
 | **EXITUS-SCRIPTS-002** | Revisão/limpeza de `scripts/`: remover obsoletos, resolver duplicidades (.sh vs .py), corrigir `import_b3.py` (shebang bash), melhorar `backup_db.sh` | 📋 Planejado | Médio | Média |
-| **EXITUS-TESTFIX-CAMBIO-001** | Corrigir 16 errors em `test_cambio_integration.py` (setup de fixtures, configuração de ambiente) | 📋 Planejado | Baixo | Baixa |
+| **EXITUS-TESTFIX-CAMBIO-001** | Corrigir 16 errors em `test_cambio_integration.py` (setup de fixtures, configuração de ambiente) | ✅ Concluído (09/03/2026) | Baixo | Baixa |
 
 ### 6. Fase 7 — Produção e Escala (Média-Alta Prioridade)
 
@@ -956,7 +956,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 - [ ] EXITUS-DARF-ACUMULADO-001 — DARF < R$10 acumulado
 - [ ] EXITUS-IOF-001 — IOF regressivo RF < 30 dias
 - [ ] EXITUS-SCRIPTS-002 — Limpeza scripts
-- [ ] EXITUS-TESTFIX-CAMBIO-001 — Corrigir 16 errors testes câmbio
+- [x] EXITUS-TESTFIX-CAMBIO-001 — Corrigir 16 errors testes câmbio — ✅ Concluído (09/03/2026)
 
 ### 📊 Métricas de Execução
 
