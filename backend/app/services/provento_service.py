@@ -14,6 +14,7 @@ from app.database import db
 from app.models import Provento, Ativo, Posicao
 from app.utils.exceptions import NotFoundError
 from app.services.posicao_service import PosicaoService
+from app.services.auditoria_service import AuditoriaService
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +113,16 @@ class ProventoService:
             db.session.commit()
             db.session.refresh(provento)
             
+            # Auditoria (usuario_id via ativo)
+            AuditoriaService.registrar_create(
+                usuario_id=None,  # Provento não tem usuario_id direto
+                entidade='Provento',
+                entidade_id=provento.id,
+                dados_depois=provento.to_dict()
+            )
+            
+            logger.info(f"Provento criado com sucesso: {provento.id}")
+            
             # ✅ EAGER LOAD ativo para retornar completo
             provento = Provento.query.options(
                 joinedload(Provento.ativo)
@@ -123,6 +134,7 @@ class ProventoService:
             raise ValueError(f"Tipo de provento inválido: {data.get('tipo_provento')}")
         except Exception as e:
             db.session.rollback()
+            logger.error(f"Erro ao criar provento: {e}")
             raise
    
     
@@ -134,6 +146,9 @@ class ProventoService:
             if not provento:
                 raise NotFoundError("Provento não encontrado")
             
+            # Capturar estado antes das modificações
+            dados_antes = provento.to_dict()
+            
             campos_permitidos = [
                 'tipo_provento', 'valor_por_acao', 'quantidade_ativos',
                 'valor_bruto', 'imposto_retido', 'valor_liquido',
@@ -144,10 +159,30 @@ class ProventoService:
                 if campo in data:
                     setattr(provento, campo, data[campo])
             
+            if 'observacoes' in data:
+                provento.observacoes = data['observacoes']
+            
+            # Capturar estado depois das modificações
+            dados_depois = provento.to_dict()
+            
             db.session.commit()
+            db.session.refresh(provento)
+            
+            # Auditoria
+            AuditoriaService.registrar_update(
+                usuario_id=None,
+                entidade='Provento',
+                entidade_id=provento.id,
+                dados_antes=dados_antes,
+                dados_depois=dados_depois
+            )
+            
+            logger.info(f"Provento atualizado com sucesso: {provento.id}")
+            
             return provento
         except Exception as e:
             db.session.rollback()
+            logger.error(f"Erro ao atualizar provento: {e}")
             raise
     
     
@@ -159,8 +194,21 @@ class ProventoService:
             if not provento:
                 raise NotFoundError("Provento não encontrado")
             
+            # Capturar estado antes de deletar
+            dados_antes = provento.to_dict()
+            provento_id = provento.id
+            
             db.session.delete(provento)
             db.session.commit()
+            
+            # Auditoria
+            AuditoriaService.registrar_delete(
+                usuario_id=None,
+                entidade='Provento',
+                entidade_id=provento_id,
+                dados_antes=dados_antes
+            )
+            
             return True
         except Exception as e:
             db.session.rollback()

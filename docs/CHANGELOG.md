@@ -8,6 +8,26 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — EXITUS-AUDITLOG-001 — Sistema de Auditoria Completo (09/03/2026)
+
+- **`backend/app/services/auditoria_service.py`** — serviço centralizado de auditoria:
+  - `registrar()`: função principal que nunca levanta exceção
+  - Atalhos: `registrar_create()`, `registrar_update()`, `registrar_delete()`, `registrar_login()`, `registrar_logout()`, `registrar_export()`
+  - Captura automática de `ip_address` e `user_agent` via `flask.request`
+  - Suporta `dados_antes`/`dados_depois` para rastreamento de alterações
+- **Integração em 5 services principais:**
+  - `transacao_service.py`: CREATE, UPDATE, DELETE
+  - `provento_service.py`: CREATE, UPDATE, DELETE
+  - `ativo_service.py`: CREATE, UPDATE, DELETE
+  - `movimentacao_caixa_service.py`: CREATE
+  - `auth_service.py`: LOGIN (sucesso e falha com mensagens específicas)
+- **`backend/tests/test_auditlog.py`** — 15 testes (6 unitários + 9 integração):
+  - Testes de `AuditoriaService`: create, update, delete, login sucesso/falha
+  - Integração com TransacaoService, AtivoService, AuthService
+  - Validação de `get_alteracoes()` e `to_dict()` do model
+- **Tabela `log_auditoria` agora é populada** em todas operações CRUD e autenticação
+- **Suite: 399 passed, 45 errors** (erros não relacionados à auditoria)
+
 ### Added — EXITUS-CIRCUITBREAKER-001 — Circuit Breaker para APIs Externas (08/03/2026)
 
 - **`backend/app/utils/circuit_breaker.py`** — novo utilitário:

@@ -108,7 +108,7 @@ O frontend atual (Flask + HTMX + Tailwind) é funcional mas **não consome** as 
 | GAP ID | Funcionalidade | Status | Impacto | Prioridade |
 |--------|---------------|--------|---------|------------|
 | **EXITUS-CLEANUP-001** | Remover ~15 arquivos backup/lixo, resolver blueprints duplicados, mover `schemas/ativo_service.py` | 📋 Planejado | Médio | Média |
-| **EXITUS-AUDITLOG-001** | Povoar `log_auditoria` em operações CRUD reais (CREATE/UPDATE/DELETE em entidades principais) | 📋 Planejado | Médio | Média |
+| **EXITUS-AUDITLOG-001** | Povoar `log_auditoria` em operações CRUD reais (CREATE/UPDATE/DELETE em entidades principais) | ✅ Concluído (09/03/2026) | Médio | Média |
 | **EXITUS-CIRCUITBREAKER-001** | Circuit breaker (pybreaker) + retry com backoff exponencial nos providers de cotação | ✅ Concluído (08/03/2026) | Médio | Média |
 | **EXITUS-DARF-ACUMULADO-001** | Persistir DARF < R$10 para acumular entre meses (hoje só informa em alerta) | 📋 Planejado | Médio | Média |
 | **EXITUS-RECONCILIACAO-001** | Verificação posição calculada vs importada + saldo corretora vs soma movimentações | 📋 Planejado | Médio | Média |
@@ -693,7 +693,7 @@ Executar via job periódico ou on-demand ao atualizar cotações.
 ### Fase 6 — Integridade e Infraestrutura 🟡
 
 1. **EXITUS-CLEANUP-001** — Higiene do codebase (quick win)
-2. **EXITUS-AUDITLOG-001** — Povoar log de auditoria
+2. **EXITUS-AUDITLOG-001** — Povoar log de auditoria — ✅ Concluído (09/03/2026)
 3. **EXITUS-CIRCUITBREAKER-001** — Circuit breaker + retry
 4. **EXITUS-DARF-ACUMULADO-001** — Persistir acúmulo DARF < R$10
 5. **EXITUS-RECONCILIACAO-001** — Verificação de consistência
@@ -818,7 +818,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | EXITUS-DOCS-SYNC-001 | 5 | 📋 Planejado | **Alta** | 2h |
 | EXITUS-COVERAGE-001 | 5 | 📋 Planejado | **Alta** | 2-3h |
 | EXITUS-CLEANUP-001 | 6 | 📋 Planejado | Média | 30min |
-| EXITUS-AUDITLOG-001 | 6 | 📋 Planejado | Média | 2h |
+| EXITUS-AUDITLOG-001 | 6 | ✅ Concluído (09/03/2026) | Média | 2h |
 | EXITUS-CIRCUITBREAKER-001 | 6 | ✅ Concluído | Média | 1-2h |
 | EXITUS-DARF-ACUMULADO-001 | 6 | 📋 Planejado | Média | 1h |
 | EXITUS-RECONCILIACAO-001 | 6 | 📋 Planejado | Média | 2h |
@@ -951,7 +951,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 - [x] EXITUS-CONSTRAINT-001 — CHECK constraints banco — ✅ Concluído (08/03/2026)
 - [x] EXITUS-CIRCUITBREAKER-001 — Resiliência APIs — ✅ Concluído (08/03/2026)
-- [ ] EXITUS-AUDITLOG-001 — Log auditoria CRUD
+- [x] EXITUS-AUDITLOG-001 — Log auditoria CRUD — ✅ Concluído (09/03/2026)
 - [ ] EXITUS-RECONCILIACAO-001 — Verificação consistência
 - [ ] EXITUS-DARF-ACUMULADO-001 — DARF < R$10 acumulado
 - [ ] EXITUS-IOF-001 — IOF regressivo RF < 30 dias

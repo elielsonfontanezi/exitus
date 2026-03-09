@@ -8,6 +8,7 @@ from app.database import db
 from app.models import Ativo, TipoAtivo, ClasseAtivo
 from app.utils.db_utils import safe_commit, safe_delete_commit
 from app.utils.exceptions import NotFoundError, ConflictError
+from app.services.auditoria_service import AuditoriaService
 
 class AtivoService:
     """Serviço para operações de ativos"""
@@ -90,7 +91,6 @@ class AtivoService:
         if existing:
             raise ConflictError(f"Ativo {data['ticker']} já existe no mercado {data['mercado']}")
         
-        # ⚠️ CORREÇÃO: Usar p_l, p_vp (nomes das colunas no DB)
         ativo = Ativo(
             ticker=data['ticker'].upper(),
             nome=data['nome'],
@@ -100,15 +100,25 @@ class AtivoService:
             moeda=data['moeda'].upper(),
             preco_atual=Decimal(str(data['preco_atual'])) if data.get('preco_atual') else None,
             dividend_yield=Decimal(str(data['dividend_yield'])) if data.get('dividend_yield') else None,
-            p_l=Decimal(str(data['pl'])) if data.get('pl') else None,  # ⬅️ CORRIGIDO
-            p_vp=Decimal(str(data['pvp'])) if data.get('pvp') else None,  # ⬅️ CORRIGIDO
+            p_l=Decimal(str(data['pl'])) if data.get('pl') else None,
+            p_vp=Decimal(str(data['pvp'])) if data.get('pvp') else None,
             roe=Decimal(str(data['roe'])) if data.get('roe') else None,
             ativo=data.get('ativo', True),
             deslistado=data.get('deslistado', False)
         )
         
         db.session.add(ativo)
-        safe_commit()
+        db.session.commit()
+        db.session.refresh(ativo)
+        
+        # Auditoria
+        AuditoriaService.registrar_create(
+            usuario_id=None,  # Ativo é global, não tem usuario_id
+            entidade='Ativo',
+            entidade_id=ativo.id,
+            dados_depois=ativo.to_dict()
+        )
+        
         return ativo
     
     @staticmethod
@@ -123,6 +133,9 @@ class AtivoService:
         ativo = db.session.get(Ativo, ativo_id)
         if not ativo:
             raise NotFoundError("Ativo não encontrado")
+        
+        # Capturar estado antes das modificações
+        dados_antes = ativo.to_dict()
         
         # Atualizar campos permitidos
         if 'nome' in data:
@@ -165,6 +178,16 @@ class AtivoService:
                 ativo.data_deslistagem = data['data_deslistagem']
         
         safe_commit()
+        
+        # Auditoria
+        AuditoriaService.registrar_update(
+            usuario_id=None,
+            entidade='Ativo',
+            entidade_id=ativo.id,
+            dados_antes=dados_antes,
+            dados_depois=ativo.to_dict()
+        )
+        
         return ativo
     
     @staticmethod
@@ -184,7 +207,20 @@ class AtivoService:
                 "Desative o ativo (ativo=False) em vez de deletar."
             )
         
+        # Capturar estado antes de deletar
+        dados_antes = ativo.to_dict()
+        ativo_id_saved = ativo.id
+        
         safe_delete_commit(ativo)
+        
+        # Auditoria
+        AuditoriaService.registrar_delete(
+            usuario_id=None,
+            entidade='Ativo',
+            entidade_id=ativo_id_saved,
+            dados_antes=dados_antes
+        )
+        
         return True
     
     @staticmethod
