@@ -59,7 +59,11 @@ def auth_client(app):
     u = Usuario(username=username, email=f'{username}@test.exitus', role=UserRole.ADMIN)
     u.set_password('senha_teste_123')
     _db.session.add(u)
-    _db.session.commit()
+    try:
+        _db.session.commit()
+    except Exception:
+        _db.session.rollback()
+        raise
 
     with app.test_client() as c:
         response = c.post('/api/auth/login', json={
@@ -73,6 +77,7 @@ def auth_client(app):
         c._auth_headers = {'Authorization': f'Bearer {token}'}
         yield c
 
+    _db.session.rollback()
     Usuario.query.filter_by(username=username).delete()
     _db.session.commit()
 
@@ -90,11 +95,16 @@ def usuario_seed(app):
     u = Usuario(username=username, email=f'{username}@test.exitus', role=UserRole.ADMIN)
     u.set_password('senha_teste_123')
     _db.session.add(u)
-    _db.session.commit()
+    try:
+        _db.session.commit()
+    except Exception:
+        _db.session.rollback()
+        raise
     _db.session.refresh(u)
 
     yield u
 
+    _db.session.rollback()
     Usuario.query.filter_by(username=username).delete()
     _db.session.commit()
 
@@ -117,13 +127,40 @@ def ativo_seed(app):
         p_vp=Decimal('1.1'),
     )
     _db.session.add(a)
-    _db.session.commit()
+    try:
+        _db.session.commit()
+    except Exception:
+        _db.session.rollback()
+        raise
     _db.session.refresh(a)
 
     yield a
 
+    _db.session.rollback()
     Ativo.query.filter_by(ticker=ticker).delete()
     _db.session.commit()
+
+
+@pytest.fixture(scope='function', autouse=True)
+def cleanup_test_data(app):
+    """Limpa dados de teste após cada teste para evitar violações de FK."""
+    yield
+    
+    from app.models.transacao import Transacao
+    from app.models.posicao import Posicao
+    from app.models.movimentacao_caixa import MovimentacaoCaixa
+    
+    _db.session.rollback()
+    
+    # Deletar na ordem correta (dependências primeiro)
+    Transacao.query.delete()
+    Posicao.query.delete()
+    MovimentacaoCaixa.query.delete()
+    
+    try:
+        _db.session.commit()
+    except Exception:
+        _db.session.rollback()
 
 
 @pytest.fixture(scope='function')
@@ -140,10 +177,15 @@ def corretora_seed(app, usuario_seed):
         usuario_id=usuario_seed.id,
     )
     _db.session.add(c)
-    _db.session.commit()
+    try:
+        _db.session.commit()
+    except Exception:
+        _db.session.rollback()
+        raise
     _db.session.refresh(c)
 
     yield c
 
+    _db.session.rollback()
     Corretora.query.filter_by(nome=nome).delete()
     _db.session.commit()
