@@ -38,15 +38,15 @@ entregando funcionalidades completas e testadas.
 | M9 | Deploy & Monitoramento | PLAN | Q1 2026 | — |
 | TESTS | Testes Automatizados | PROD | 03 Mar 2026 | — |
 
-**Total de Endpoints: 67+ rotas RESTful validadas.**  
-**Suite de testes: 255+ passed, 0 failed** (`pytest` contra `exitusdb_test` no container).
+**Total de Endpoints: 72+ rotas RESTful validadas.**  
+**Suite de testes: 371 passed, 82 errors** (`pytest` contra `exitusdb_test` no container).
 
 > v0.7.10: Validação completa de APIs — 16 GAPs corrigidos, envelope {success,data}
 > padronizado, strict_slashes aplicado, documentação atualizada. Ver CHANGELOG.md.
 >
-> v0.8.0-dev: **30 GAPs concluídos** (Fases 2, 3, 4 completas). Engine de IR completo,
-> multi-moeda, exportação, Swagger, detecção de anomalias, cálculos RF/FII.
-> Suite de testes verde: 255+ passed, 0 failed. Ver CHANGELOG.md e ROADMAP.md v3.0.
+> v0.8.0-dev: **32 GAPs concluídos** (Fases 2-5 completas + 2 da Fase 6). Engine de IR completo,
+> multi-moeda, exportação, Swagger, detecção de anomalias, cálculos RF/FII, auditoria CRUD,
+> reconciliação de dados. Suite: 371 passed, 82 errors. Ver CHANGELOG.md e ROADMAP.md v3.0.
 
 ---
 
@@ -322,6 +322,6 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 
 ---
 
-*Documento atualizado: 08 de Março de 2026*
+*Documento atualizado: 09 de Março de 2026*
 *Versão: v0.8.0-dev*
-*56 ativos com dados fundamentalistas — 35 GAPs concluídos (Fases 2-5) — ver ROADMAP.md v3.0*
+*56 ativos com dados fundamentalistas — 37 GAPs concluídos (Fases 2-5 + 2 da Fase 6) — ver ROADMAP.md v3.0*

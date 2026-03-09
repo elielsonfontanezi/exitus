@@ -22,6 +22,7 @@
 - 18. Cotações
 - 19. Projeções
 - 20. Performance
+- 21. Reconciliação
 - Health Checks
 
 ---
@@ -807,6 +808,155 @@ GET /api/portfolios/rentabilidade?periodo=6m&benchmark=CDI
 
 ---
 
+## 21. Reconciliação (EXITUS-RECONCILIACAO-001)
+
+**Auth:** Bearer JWT obrigatório.  
+**Resposta:** envelope padrão.
+
+Endpoints para verificação de consistência entre dados calculados e importados.
+
+### GET /api/reconciliacao/verificar
+
+Executa verificação completa de reconciliação (posições, saldos, integridade).
+
+**Resposta:**
+```json
+{
+  "status": "OK",
+  "divergencias": [],
+  "resumo": {
+    "total_divergencias": 0,
+    "erros": 0,
+    "avisos": 0
+  }
+}
+```
+
+**Status possíveis:**
+- `OK`: Nenhuma divergência encontrada
+- `WARNING`: Divergências menores (custos, saldos com tolerância)
+- `ERROR`: Divergências críticas (quantidade de posições)
+
+**Exemplo com divergências:**
+```json
+{
+  "status": "ERROR",
+  "divergencias": [
+    {
+      "tipo": "POSICAO_QUANTIDADE",
+      "severidade": "ERROR",
+      "ativo_ticker": "PETR4",
+      "corretora_nome": "Clear",
+      "quantidade_posicao": 100.0,
+      "quantidade_calculada": 150.0,
+      "diferenca": 50.0,
+      "mensagem": "Divergência de quantidade: PETR4 na Clear"
+    }
+  ],
+  "resumo": {
+    "total_divergencias": 1,
+    "erros": 1,
+    "avisos": 0
+  }
+}
+```
+
+### GET /api/reconciliacao/posicoes
+
+Verifica apenas reconciliação de posições (quantidade e custo).
+
+**Resposta:**
+```json
+{
+  "divergencias": [
+    {
+      "tipo": "POSICAO_CUSTO",
+      "severidade": "WARNING",
+      "ativo_ticker": "VALE3",
+      "corretora_nome": "XP",
+      "custo_posicao": 5000.0,
+      "custo_calculado": 5050.0,
+      "diferenca": 50.0,
+      "mensagem": "Divergência de custo: VALE3"
+    }
+  ],
+  "total": 1
+}
+```
+
+### GET /api/reconciliacao/saldos
+
+Verifica saldos de corretoras vs soma de movimentações de caixa.
+
+**Resposta:**
+```json
+{
+  "divergencias": [
+    {
+      "tipo": "SALDO_CORRETORA",
+      "severidade": "WARNING",
+      "corretora_nome": "Clear",
+      "saldo_registrado": 10000.0,
+      "saldo_calculado": 9950.0,
+      "diferenca": 50.0,
+      "mensagem": "Divergência de saldo na corretora Clear"
+    }
+  ],
+  "total": 1
+}
+```
+
+### GET /api/reconciliacao/integridade
+
+Verifica integridade geral de transações (sem ativo, duplicadas, quantidade zero).
+
+**Resposta:**
+```json
+{
+  "divergencias": [
+    {
+      "tipo": "TRANSACAO_DUPLICADA",
+      "severidade": "WARNING",
+      "hash_importacao": "a1b2c3d4e5f6...",
+      "quantidade": 2,
+      "mensagem": "2 transações com mesmo hash de importação"
+    }
+  ],
+  "total": 1
+}
+```
+
+### GET /api/reconciliacao/ativo/{ativo_id}
+
+Verifica reconciliação de um ativo específico.
+
+**Query params:**
+- `corretora_id` (opcional): Filtrar por corretora específica
+
+**Resposta:**
+```json
+{
+  "ativo_id": "uuid-do-ativo",
+  "corretoras": [
+    {
+      "corretora_id": "uuid-corretora",
+      "corretora_nome": "Clear",
+      "quantidade_posicao": 100.0,
+      "quantidade_calculada": 100.0,
+      "diferenca": 0.0,
+      "status": "OK"
+    }
+  ],
+  "divergencias": []
+}
+```
+
+**Tolerâncias:**
+- Quantidade: 0.01 (arredondamento)
+- Custos/Saldos: R$ 1,00
+
+---
+
 ## 22. Importação B3 (EXITUS-VALIDATION-001)
 
 **Auth:** Bearer JWT obrigatório.  
@@ -849,9 +999,10 @@ GET /api/portfolios/rentabilidade?periodo=6m&benchmark=CDI
 
 ---
 
-*Documento atualizado: 08 de Março de 2026*
+*Documento atualizado: 09 de Março de 2026*
 *Versão da API: v0.8.0-dev*
 *GAPs fechados: EXITUS-POS-001→007, EXITUS-ATIVOS-ENUM-001, EXITUS-POS-PAGIN-001,*
 *EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001, EXITUS-COTACOES-RESP-001,*
 *EXITUS-SQLALCHEMY-001, EXITUS-CRUD-001, EXITUS-IR-001, EXITUS-EXPORT-001,*
-*EXITUS-VALIDATION-001, EXITUS-RENTABILIDADE-001, EXITUS-SERVICE-REVIEW-001, EXITUS-COVERAGE-001, EXITUS-DOCS-SYNC-001*
+*EXITUS-VALIDATION-001, EXITUS-RENTABILIDADE-001, EXITUS-SERVICE-REVIEW-001, EXITUS-COVERAGE-001,*
+*EXITUS-DOCS-SYNC-001, EXITUS-AUDITLOG-001, EXITUS-RECONCILIACAO-001*

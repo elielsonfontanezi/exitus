@@ -128,11 +128,12 @@ Healthcheck: /health (30s interval)
 ```
 
 **Características**:
-- 16 blueprints registrados
-- 67 rotas RESTful
+- 17 blueprints registrados (incluindo reconciliação)
+- 72+ rotas RESTful
 - Autenticação JWT (1h expiry)
 - Rate limiting configurável
 - Logs estruturados (INFO/WARNING/ERROR)
+- Auditoria automática de operações CRUD
 
 ### Container 3: Flask Frontend
 
@@ -1045,5 +1046,5 @@ O frontend atual (Flask + HTMX + Tailwind, container `exitus-frontend:8080`) é 
 
 ---
 
-**Documento atualizado**: 05 de Março de 2026  
-**Versão arquitetural**: v0.8.0-dev (Fases 2-4 concluídas — 30 GAPs implementados, 255+ testes, ver ROADMAP.md v3.0)
+**Documento atualizado**: 09 de Março de 2026  
+**Versão arquitetural**: v0.8.0-dev (Fases 2-5 concluídas + 2 da Fase 6 — 37 GAPs implementados, 371 testes passed, ver ROADMAP.md v3.0)
