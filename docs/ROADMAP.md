@@ -773,7 +773,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 ---
 
-## 📊 Status Atual (atualizado 05/03/2026)
+## 📊 Status Atual (atualizado 09/03/2026)
 
 ### Fases Concluídas
 
@@ -814,18 +814,18 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 
 | GAP ID | Fase | Status | Prioridade | Estimativa |
 |--------|------|--------|------------|------------|
-| EXITUS-RENTABILIDADE-001 | 5 | 📋 Planejado | **Alta** | 3-4h |
-| EXITUS-VALIDATION-001 | 5 | 📋 Planejado | **Alta** | 2-3h |
-| EXITUS-SERVICE-REVIEW-001 | 5 | 📋 Planejado | **Alta** | 3-4h |
-| EXITUS-DOCS-SYNC-001 | 5 | 📋 Planejado | **Alta** | 2h |
-| EXITUS-COVERAGE-001 | 5 | 📋 Planejado | **Alta** | 2-3h |
+| EXITUS-RENTABILIDADE-001 | 5 | ✅ Concluído (08/03/2026) | **Alta** | 3-4h |
+| EXITUS-VALIDATION-001 | 5 | ✅ Concluído (08/03/2026) | **Alta** | 2-3h |
+| EXITUS-SERVICE-REVIEW-001 | 5 | ✅ Concluído (08/03/2026) | **Alta** | 3-4h |
+| EXITUS-DOCS-SYNC-001 | 5 | ✅ Concluído (08/03/2026) | **Alta** | 2h |
+| EXITUS-COVERAGE-001 | 5 | ✅ Concluído (08/03/2026) | **Alta** | 2-3h |
 | EXITUS-CLEANUP-001 | 6 | 📋 Planejado | Média | 30min |
 | EXITUS-AUDITLOG-001 | 6 | ✅ Concluído (09/03/2026) | Média | 2h |
 | EXITUS-CIRCUITBREAKER-001 | 6 | ✅ Concluído | Média | 1-2h |
 | EXITUS-DARF-ACUMULADO-001 | 6 | ✅ Concluído (09/03/2026) | Média | 1h |
 | EXITUS-RECONCILIACAO-001 | 6 | ✅ Concluído (09/03/2026) | Média | 2h |
 | EXITUS-IOF-001 | 6 | ✅ Concluído (09/03/2026) | Média | 1h |
-| EXITUS-CONSTRAINT-001 | 6 | ✅ Concluído | Média | 1h |
+| EXITUS-CONSTRAINT-001 | 6 | ✅ Concluído (08/03/2026) | Média | 1h |
 | EXITUS-SCRIPTS-002 | 6 | ✅ Concluído (09/03/2026) | Média | 1-2h |
 | EXITUS-MOVIMENTACAO-CONSOLIDATION-001 | 6 | ✅ Concluído (09/03/2026) | Baixa | 30min |
 | EXITUS-MULTICLIENTE-001 | 7 | 📋 Planejado | Média-Alta | — |
@@ -842,7 +842,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/parametros-macr
 | EXITUS-AUDIT-001 | DT | 📋 Planejado | Baixa | — |
 | EXITUS-LGPD-001 | DT | 📋 Planejado | Baixa | — |
 
-**Resumo:** 30 concluídos + 23 planejados + 1 proposta = **54 GAPs rastreados**
+**Resumo:** 45 concluídos + 8 planejados + 1 proposta = **54 GAPs rastreados**
 
 ---
 
