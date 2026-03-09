@@ -24,7 +24,12 @@ class TestCambioServiceIdentidade:
     # app_context necessário para acesso ao banco
     def test_brl_usd_usa_fallback_com_banco_vazio(self, app):
         from app.services.cambio_service import CambioService, TAXAS_FALLBACK
+        from app.database import db
+        from app.models.taxa_cambio import TaxaCambio
         with app.app_context():
+            # Limpar taxas existentes para garantir fallback
+            TaxaCambio.query.delete()
+            db.session.commit()
             resultado = CambioService.get_taxa('BRL', 'USD')
             assert resultado['taxa'] == float(TAXAS_FALLBACK['BRL/USD'])
 
@@ -32,27 +37,48 @@ class TestCambioServiceIdentidade:
 class TestCambioServiceFallback:
     def test_brl_usd_fallback(self, app):
         from app.services.cambio_service import CambioService, TAXAS_FALLBACK
+        from app.database import db
+        from app.models.taxa_cambio import TaxaCambio
         with app.app_context():
+            # Limpar taxas para testar fallback
+            TaxaCambio.query.delete()
+            db.session.commit()
             resultado = CambioService.get_taxa('BRL', 'USD')
             assert resultado['taxa'] is not None
             assert resultado['taxa'] == float(TAXAS_FALLBACK.get('BRL/USD', 0))
 
     def test_usd_brl_fallback(self, app):
         from app.services.cambio_service import CambioService, TAXAS_FALLBACK
+        from app.database import db
+        from app.models.taxa_cambio import TaxaCambio
         with app.app_context():
+            # Limpar taxas para testar fallback
+            TaxaCambio.query.delete()
+            db.session.commit()
             resultado = CambioService.get_taxa('USD', 'BRL')
             assert resultado['taxa'] is not None
             assert resultado['taxa'] == float(TAXAS_FALLBACK.get('USD/BRL', 0))
 
     def test_brl_eur_fallback(self, app):
         from app.services.cambio_service import CambioService, TAXAS_FALLBACK
+        from app.database import db
+        from app.models.taxa_cambio import TaxaCambio
         with app.app_context():
+            # Limpar taxas para testar fallback
+            TaxaCambio.query.delete()
+            db.session.commit()
             resultado = CambioService.get_taxa('BRL', 'EUR')
+            assert resultado['taxa'] is not None
             assert resultado['taxa'] == float(TAXAS_FALLBACK.get('BRL/EUR', 0))
 
     def test_par_inexistente_retorna_erro(self, app):
         from app.services.cambio_service import CambioService
+        from app.database import db
+        from app.models.taxa_cambio import TaxaCambio
         with app.app_context():
+            # Limpar taxas para testar fallback
+            TaxaCambio.query.delete()
+            db.session.commit()
             resultado = CambioService.get_taxa('BRL', 'XYZ')
             assert resultado.get('erro') is not None
             assert resultado['taxa'] is None
@@ -129,9 +155,14 @@ def auth_headers(app):
         from app.database import db
         from app.models.usuario import Usuario, UserRole
         from flask_jwt_extended import create_access_token
+        import uuid
+        # Email único para evitar conflitos entre testes
+        suffix = str(uuid.uuid4())[:8]
+        username = f'test_cambio_{suffix}'
+        email = f'{username}@test.exitus'
         usuario = Usuario(
-            username='test_cambio',
-            email='test_cambio@exitus.com',
+            username=username,
+            email=email,
             nome_completo='Teste Cambio',
             role=UserRole.ADMIN,
         )
