@@ -329,3 +329,23 @@ Antes de qualquer ação, confirmar mentalmente:
 - `/api/calendario-dividendos/resumo` - Estatísticas
 
 ---
+
+## 🤖 MODELOS DE IA DISPONÍVEIS PARA CASCADE
+
+### Modelos Internos (padrão):
+- **Claude Sonnet** - Padrão para maioria das tarefas
+- **Claude Opus** - Para tarefas complexas (design, arquitetura)
+- **SWE-1.5** - Para CRUD simples, refatorações pontuais
+
+### Modelos Externos (configurados):
+- **OpenRouteService** - Modelo adicional disponível via API
+  - Configurado em `.windsurf/windsurf.config.json`
+  - Chave: `OPENROUTESERVICE_API_KEY`
+  - Uso: Apenas pelo Cascade como opção de modelo
+  - **NÃO usar no código do projeto**
+
+### Quando usar cada modelo:
+- **SWE-1.5**: CRUD, ajustes simples, scripts
+- **Claude Sonnet**: Lógica de negócio, integrações, testes
+- **Claude Opus**: Design de sistemas, decisões arquitetônicas
+- **OpenRouteService**: Quando modelos internos não disponíveis ou como alternativa
