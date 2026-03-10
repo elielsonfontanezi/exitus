@@ -24,14 +24,14 @@
 | **SEEDS.md** | 11KB | ✅ Essencial | Dados de teste e credenciais |
 | **MODULES.md** | 12KB | ✅ Útil | Status dos módulos M0-M7 |
 
-### ⚠️ Arquivos Redundantes (Consolidar)
+### ⚠️ Arquivos Redundantes (Consolidados) - REMOVIDOS ✅
 
-| Arquivo | Tamanho | Status | Ação recomendada |
-|---------|---------|--------|------------------|
-| **EXITUS-IR-009.md** | 9.6KB | ⚠️ Consolidado | **Remover** - conteúdo em EXITUS-IR-001.md (Seção 9) |
-| **IMPLEMENTACAO-IMPORT-001.md** | 6.1KB | ⚠️ Resumo | **Remover** - é apenas resumo de EXITUS-IMPORT-001.md |
-| **SEED_CONTROL_DESIGN.md** | 10KB | ⚠️ Duplicado | **Remover** - similar a SEEDS.md |
-| **IMPORT_B3_DESIGN.md** | 13KB | ⚠️ Duplicado | **Remover** - similar a EXITUS-IMPORT-001.md |
+| Arquivo | Tamanho | Status | Ação realizada |
+|---------|---------|--------|----------------|
+| **EXITUS-IR-009.md** | 9.6KB | ✅ Removido | Conteúdo consolidado em EXITUS-IR-001.md (Seção 9) |
+| **IMPLEMENTACAO-IMPORT-001.md** | 6.1KB | ✅ Removido | Era apenas resumo de EXITUS-IMPORT-001.md |
+| **SEED_CONTROL_DESIGN.md** | 10KB | ✅ Removido | Similar a SEEDS.md |
+| **IMPORT_B3_DESIGN.md** | 13KB | ✅ Removido | Similar a EXITUS-IMPORT-001.md |
 
 ### 📁 Arquivos Específicos de GAP (Manter)
 
@@ -84,13 +84,13 @@
 
 ## 🎯 Recomendações
 
-### Para Remover (4 arquivos)
+### Para Remover (4 arquivos) - ✅ CONCLUÍDO
 ```bash
-# Arquivos redundantes ou consolidados
-rm docs/EXITUS-IR-009.md
-rm docs/IMPLEMENTACAO-IMPORT-001.md
-rm docs/SEED_CONTROL_DESIGN.md
-rm docs/IMPORT_B3_DESIGN.md
+# Arquivos redundantes ou consolidados - REMOVIDOS EM 10/03/2026
+✓ rm docs/EXITUS-IR-009.md
+✓ rm docs/IMPLEMENTACAO-IMPORT-001.md
+✓ rm docs/SEED_CONTROL_DESIGN.md
+✓ rm docs/IMPORT_B3_DESIGN.md
 ```
 
 ### Para Manter (26 arquivos)
@@ -99,22 +99,23 @@ rm docs/IMPORT_B3_DESIGN.md
 - Guias e manuais
 
 ### Para Melhorar
-1. **Criar diagrama ER** (próxima tarefa)
+1. **Criar diagrama ER** ✅ CONCLUÍDO - Ver `EXITUS_ER_DIAGRAM.md`
 2. **Atualizar docs/README.md** com referência a TESTES_PENDENTES.md
 3. **Adicionar seção "Documentação Obsoleta"** em ROADMAP.md
 
 ---
 
-## 📈 Métricas Finais
+## 📈 Métricas Finais (Atualizadas)
 
 | Categoria | Quantidade |
 |-----------|------------|
-| **Arquivos totais** | 30 |
+| **Arquivos totais** | 26 (eram 30) |
 | **Essenciais** | 11 |
 | **GAPs ativos** | 7 |
 | **Suporte** | 4 |
 | **Banco** | 2 |
-| **Redundantes** | 4 |
-| **Redução possível** | 13% (4/30) |
+| **Redundantes** | 0 (eram 4) |
+| **Redução realizada** | 13% (4/30) |
+| **Novos documentos** | 3 (ER_DIAGRAM, FRONTEND_PROPOSAL, TESTES_PENDENTES) |
 
-**Recomendação:** Remover os 4 arquivos redundantes para simplificar a documentação.
+**Conclusão:** ✅ Documentação simplificada com remoção de 4 arquivos redundantes e criação de 3 novos documentos essenciais.
