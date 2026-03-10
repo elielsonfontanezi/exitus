@@ -46,6 +46,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 - **Status:** GAP mantido como cancelado no ROADMAP.md
 - **Motivo:** Segurança do codebase > limpeza otimização
 
+### Fixed — BLUEPRINT-CONSOLIDATION-001 Consolidação de Blueprints (10/03/2026)
+
+- **Limpeza segura de pastas vazias:**
+  - Removida pasta `blueprints/feriados/` (routes.py vazio)
+  - Removida pasta `blueprints/regras_fiscais/` (routes.py vazio)
+- **Documentação de padrões:**
+  - Padrão A: Pasta + routes.py (moderno, recomendado para novos blueprints)
+  - Padrão B: Arquivo único (legacy funcional, mantido para compatibilidade)
+- **Decisão arquitetônica:** Manter coexistência de padrões em vez de forçar migração
+- **Resultados:** -2 pastas vazias, 0 funcionalidades perdidas, 491/491 testes passando
+- **Segurança:** Abordagem conservadora, sem risco de quebrar funcionalidades existentes
+
 ### Fixed — Auditoria e Correção de Testes (09/03/2026)
 
 - **Auditoria completa da suite de testes:**
