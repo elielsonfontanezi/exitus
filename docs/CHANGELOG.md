@@ -37,7 +37,14 @@ e este projeto adere semanticamente à versão v0.8.0.
   - +9 testes corrigidos (de 482 → 491)
   - -8 errors resolvidos (teardown FK violations)
   - -1 failed resolvido (saldo divergência)
-  - Taxa de sucesso: 100% (de 96.6% → 100%)
+  - **Taxa de sucesso:** 100% (de 96.6% → 100%)
+
+### Cancelled — ORPHAN-001 Limpeza de Código Órfão (10/03/2026)
+
+- **Análise realizada:** Identificados 3 blueprints legacy e arquivos duplicados
+- **Decisão:** Cancelado por considerar muito arriscado sem análise profunda
+- **Status:** GAP mantido como cancelado no ROADMAP.md
+- **Motivo:** Segurança do codebase > limpeza otimização
 
 ### Fixed — Auditoria e Correção de Testes (09/03/2026)
 

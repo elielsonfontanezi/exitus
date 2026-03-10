@@ -63,7 +63,7 @@
 | DIVCALENDAR-001 | Calendário de dividendos | 📋 Planejado |
 | CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
 | BLUEPRINT-CONSOLIDATION-001 | Consolidação de blueprints | 📋 Planejado |
-| ORPHAN-001 | Limpeza de código órfão | 📋 Planejado |
+| ORPHAN-001 | Limpeza de código órfão | ❌ Cancelado (arriscado) |
 
 ---
 

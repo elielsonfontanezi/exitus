@@ -1,9 +1,10 @@
 # Auditoria de Documentação - Sistema Exitus
 
 > **Data:** 10/03/2026  
-> **Status:** ✅ Completo - Todos os testes corrigidos  
+> **Status:** ✅ Completo - Testes corrigidos + GAPs considerados  
 > **Arquivos analisados:** 30 arquivos em docs/ + README.md raiz  
-> **Testes:** 491/491 passando (100%) ✅
+> **Testes:** 491/491 passando (100%) ✅  
+> **GAPs:** 1 considerado e cancelado (ORPHAN-001)
 
 ---
 
@@ -79,10 +80,25 @@
 3. **conftest.py** (8 ERRORS): Cleanup centralizado para evitar FK violations
 
 **Documentação atualizada:**
-- ✅ `CHANGELOG.md`: Entrada completa com todas as correções
-- ✅ `ROADMAP.md`: 491/491 testes (100%) ✅
+- ✅ `CHANGELOG.md`: Entrada completa com todas as correções + ORPHAN-001 cancelado
+- ✅ `ROADMAP.md`: 491/491 testes (100%) ✅ + ORPHAN-001 marcado como cancelado
 - ✅ `LESSONS_LEARNED.md`: L-TEST-002 a L-TEST-005 adicionados
 - ✅ `TESTES_PENDENTES.md`: Renomeado para "Testes Corrigidos"
+
+---
+
+### 🚫 GAPs Cancelados/Considerados
+
+#### ORPHAN-001 — Limpeza de Código Órfão
+**Data:** 10/03/2026  
+**Status:** ❌ Cancelado (arriscado)  
+**Motivo:** Análise identificou 3 blueprints legacy e arquivos duplicados, mas decisão foi cancelar por segurança do codebase  
+**Ação:** Documentado em ROADMAP.md como cancelado, CHANGELOG.md registrado decisão
+
+**Lições aprendidas:**
+- Limpeza de código sem análise profunda é arriscada
+- Segurança do codebase > otimização prematura
+- Sempre criar documento GAP antes de qualquer modificação estrutural
 
 ---
 
