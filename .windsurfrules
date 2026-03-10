@@ -178,6 +178,10 @@ Operações de container:
 ├── scripts/rebuild_restart_exitus-backend.sh   # Rebuild + restart backend
 ├── scripts/rebuild_restart_exitus-frontend.sh  # Rebuild + restart frontend
 
+Scripts especiais:
+├── scripts/exitus.sh                 # Script principal de orquestração
+├── scripts/import_b3.sh              # Importação B3 (Excel/CSV) - TIPOS TRATADOS
+
 Banco de dados:
 ├── scripts/backup_db.sh             # Backup completo do PostgreSQL
 ├── scripts/restore_db.sh            # Restore de backup
@@ -292,17 +296,14 @@ Antes de qualquer ação, confirmar mentalmente:
 
 ---
 
-## � CHAVES DE API E SECRETS
+## 🔐 CHAVES DE API E SEGREDO
 
-- **OpenRouteService:** Sempre usar variável de ambiente `OPENROUTESERVICE_API_KEY`. Nunca escrever a chave diretamente no código. Usar `python-dotenv` ou `os.environ`.
-- Exemplo:
-  ```python
-  import os
-  from dotenv import load_dotenv
-  
-  load_dotenv()
-  api_key = os.environ.get('OPENROUTESERVICE_API_KEY')
-  ```
+- **OpenRouteService:** 
+  - Propósito: Disponibilizar modelo de IA adicional para o Cascade
+  - Configuração: Já definida em `.windsurf/windsurf.config.json`
+  - Uso: Apenas pelo Cascade/Windsurf, NÃO para código Python
+  - Importante: Manter chave válida para acesso a modelos externos
+  - Nunca usar esta chave no código do projeto
 
 ---
 
