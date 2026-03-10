@@ -182,14 +182,15 @@ class ReconciliacaoService:
                 saldo_calculado = Decimal('0')
                 
                 for mov in movimentacoes:
-                    tipo = str(mov.tipo_movimentacao).upper()
+                    # Obter valor do enum (ex: TipoMovimentacao.DEPOSITO.value = "deposito")
+                    tipo = mov.tipo_movimentacao.value if hasattr(mov.tipo_movimentacao, 'value') else str(mov.tipo_movimentacao)
                     valor = Decimal(str(mov.valor))
                     
                     # Entradas (+)
-                    if tipo in ['DEPOSITO', 'DIVIDENDO', 'JCP', 'VENDA', 'BONIFICACAO']:
+                    if tipo in ['deposito', 'credito_prov', 'transf_rec']:
                         saldo_calculado += valor
                     # Saídas (-)
-                    elif tipo in ['SAQUE', 'COMPRA', 'TAXA']:
+                    elif tipo in ['saque', 'pagto_taxa', 'pagto_imposto', 'transf_env']:
                         saldo_calculado -= valor
                 
                 # Comparar com saldo registrado na corretora

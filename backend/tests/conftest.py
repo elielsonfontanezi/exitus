@@ -104,9 +104,7 @@ def usuario_seed(app):
 
     yield u
 
-    _db.session.rollback()
-    Usuario.query.filter_by(username=username).delete()
-    _db.session.commit()
+    # Limpeza feita por cleanup_test_data - não deletar aqui para evitar FK violation
 
 
 @pytest.fixture(scope='function')
@@ -136,35 +134,57 @@ def ativo_seed(app):
 
     yield a
 
-    _db.session.rollback()
-    Ativo.query.filter_by(ticker=ticker).delete()
-    _db.session.commit()
+    # Limpeza feita por cleanup_test_data - não deletar aqui para evitar FK violation
 
 
 @pytest.fixture(scope='function', autouse=True)
 def cleanup_test_data(app):
-    """Limpa dados de teste após cada teste para evitar violações de FK."""
+    """
+    Limpa dados de teste após cada teste para evitar violações de FK.
+    
+    Este fixture roda ANTES do teardown dos outros fixtures (usuario_seed, ativo_seed, etc.)
+    e deleta todas as transações, posições e movimentações criadas durante o teste.
+    Isso garante que os fixtures possam deletar suas entidades sem violação de FK.
+    """
     yield
     
     from app.models.transacao import Transacao
     from app.models.posicao import Posicao
     from app.models.movimentacao_caixa import MovimentacaoCaixa
-    from app.models.log_auditoria import LogAuditoria
     
     # Rollback para limpar transação pendente
     _db.session.rollback()
     
-    # Deletar dados criados durante o teste (não pelos fixtures)
-    # Isso previne violações de FK no teardown dos fixtures
+    # Deletar TODOS os dados criados durante o teste
+    # Usar synchronize_session=False para forçar delete direto no banco
+    # Ordem é crítica: dependências primeiro, depois entidades base
     try:
-        # Deletar na ordem correta (dependências primeiro)
-        Posicao.query.delete()
-        Transacao.query.delete()
-        MovimentacaoCaixa.query.delete()
-        # Não deletar LogAuditoria pois é apenas leitura nos testes
+        from app.models.ativo import Ativo
+        from app.models.corretora import Corretora
+        from app.models.usuario import Usuario
+        
+        # 1. Deletar posições (dependem de ativo + corretora + usuario)
+        Posicao.query.delete(synchronize_session=False)
+        
+        # 2. Deletar transações (dependem de ativo + corretora + usuario)
+        Transacao.query.delete(synchronize_session=False)
+        
+        # 3. Deletar movimentações (dependem de corretora + usuario)
+        MovimentacaoCaixa.query.delete(synchronize_session=False)
+        
+        # 4. Deletar corretoras (dependem de usuario)
+        Corretora.query.delete(synchronize_session=False)
+        
+        # 5. Deletar ativos (independentes)
+        Ativo.query.delete(synchronize_session=False)
+        
+        # 6. Deletar usuarios (base)
+        Usuario.query.delete(synchronize_session=False)
+        
         _db.session.commit()
-    except Exception:
+    except Exception as e:
         _db.session.rollback()
+        # Não propagar erro
 
 
 @pytest.fixture(scope='function')
@@ -190,9 +210,7 @@ def corretora_seed(app, usuario_seed):
 
     yield c
 
-    _db.session.rollback()
-    Corretora.query.filter_by(nome=nome).delete()
-    _db.session.commit()
+    # Limpeza feita por cleanup_test_data - não deletar aqui para evitar FK violation
 
 
 @pytest.fixture(scope='function')

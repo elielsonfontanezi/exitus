@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 09/03/2026 — L-TEST-001 adicionado (fixtures com rollback)  
+> **Atualizado:** 10/03/2026 — L-TEST-002 a L-TEST-005 adicionados (correção completa de testes)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -79,6 +79,98 @@ podman exec exitus-db pg_dump -U exitus -d exitusdb --schema-only --no-owner --n
 ```
 
 **Fix planejado:** Script automatizado EXITUS-TESTDB-001.
+
+---
+
+## 🧪 Testes
+
+### L-TEST-002 — Fixture cleanup_test_data deve deletar TUDO, fixtures não devem deletar
+**Origem:** Correção de 8 ERRORS de teardown | **Data:** 10/03/2026
+
+**Problema:** Fixtures que deletam suas próprias entidades no teardown causam FK violations quando há dados dependentes criados durante os testes.
+
+```python
+# ❌ ERRADO — fixture deleta no teardown
+@pytest.fixture
+def usuario_seed(app):
+    u = Usuario(...)
+    db.session.add(u)
+    db.session.commit()
+    yield u
+    Usuario.query.filter_by(id=u.id).delete()  # ❌ FK violation se houver transações
+    db.session.commit()
+
+# ✅ CORRETO — fixture não deleta, cleanup_test_data faz tudo
+@pytest.fixture
+def usuario_seed(app):
+    u = Usuario(...)
+    db.session.add(u)
+    db.session.commit()
+    yield u
+    # Limpeza feita por cleanup_test_data
+```
+
+**Solução:** Fixture `cleanup_test_data` (autouse) deleta **todas** as entidades na ordem correta:
+1. Posições → 2. Transações → 3. Movimentações → 4. Corretoras → 5. Ativos → 6. Usuários
+
+**Usar `synchronize_session=False`** para forçar delete direto no banco.
+
+---
+
+### L-TEST-003 — auth_client não aplica headers automaticamente
+**Origem:** 5 testes com 401 Unauthorized | **Data:** 10/03/2026
+
+**Problema:** O fixture `auth_client` armazena headers em `c._auth_headers`, mas o Flask test_client **não os aplica automaticamente**.
+
+```python
+# ❌ ERRADO — 401 Unauthorized
+response = auth_client.get('/api/reconciliacao/verificar')
+
+# ✅ CORRETO — passar headers explicitamente
+response = auth_client.get('/api/reconciliacao/verificar', headers=auth_client._auth_headers)
+```
+
+**Regra:** Sempre passar `headers=auth_client._auth_headers` em **todas** as requisições HTTP nos testes.
+
+---
+
+### L-TEST-004 — Problemas de sessão SQLAlchemy em testes
+**Origem:** Teste de saldo falhando | **Data:** 10/03/2026
+
+**Problema:** Modificar objeto de fixture e depois fazer query pode retornar estado desatualizado.
+
+```python
+# ❌ ERRADO — modificar fixture diretamente
+corretora_seed.saldo_atual = 800.00
+db.session.commit()
+# Query do serviço pode ver estado antigo
+
+# ✅ CORRETO — buscar novamente antes de modificar
+corr = Corretora.query.get(corretora_seed.id)
+corr.saldo_atual = 800.00
+db.session.commit()
+```
+
+**Regra:** Quando modificar entidades em testes, sempre fazer nova query antes de modificar para garantir estado atualizado.
+
+---
+
+### L-TEST-005 — Enum values devem ser comparados com .value
+**Origem:** ReconciliacaoService calculando saldo errado | **Data:** 10/03/2026
+
+**Problema:** Comparar `str(enum)` retorna representação diferente do valor real.
+
+```python
+# ❌ ERRADO — str(TipoMovimentacao.DEPOSITO) = 'TipoMovimentacao.DEPOSITO'
+tipo = str(mov.tipo_movimentacao).upper()
+if tipo in ['DEPOSITO', 'SAQUE']:  # Nunca vai bater
+
+# ✅ CORRETO — usar .value
+tipo = mov.tipo_movimentacao.value  # 'deposito'
+if tipo in ['deposito', 'saque']:  # ✅ Funciona
+```
+
+**Regra:** Sempre usar `.value` para obter o valor real de enums Python.
 
 ---
 
