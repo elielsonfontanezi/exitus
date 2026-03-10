@@ -261,3 +261,17 @@ Antes de qualquer ação, confirmar mentalmente:
 - [ ] Usar `DELETE` para dados, nunca `DROP TABLE` para reset
 - [ ] Usar `db.session.get(Model, pk)` — não `Model.query.get(pk)` (depreciado)
 - [ ] Para inspecionar schema real, usar MCP PostgreSQL: `list_resources` → `read_resource` (mais rápido que psql)
+
+---
+
+## 🔐 CHAVES DE API E SECRETS
+
+- **OpenRouteService:** Sempre usar variável de ambiente `OPENROUTESERVICE_API_KEY`. Nunca escrever a chave diretamente no código. Usar `python-dotenv` ou `os.environ`.
+- Exemplo:
+  ```python
+  import os
+  from dotenv import load_dotenv
+  
+  load_dotenv()
+  api_key = os.environ.get('OPENROUTESERVICE_API_KEY')
+  ```
