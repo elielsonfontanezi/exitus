@@ -97,9 +97,9 @@
 | Métrica | Atual | Meta | Status |
 |---------|-------|------|--------|
 | **GAPs Concluídos** | 45/54 (83%) | 54/54 | ✅ Em dia |
-| **Testes Coletados** | 499 testes | 500+ | ✅ Quase lá |
-| **Testes Passando** | 482 (96.6%) | 480+ | ✅ Superou! |
-| **Testes Pendentes** | 17 (9 failed + 8 errors) | 0 | ⚠️ [Ver docs/TESTES_PENDENTES.md](TESTES_PENDENTES.md) |
+| **Testes Coletados** | 491 testes | 500+ | ✅ Quase lá |
+| **Testes Passando** | 491 (100%) | 480+ | ✅ Superou! |
+| **Testes Pendentes** | 0 (0 failed + 0 errors) | 0 | ✅ [Ver docs/TESTES_PENDENTES.md](TESTES_PENDENTES.md) |
 | **Cobertura** | ?% | 80%+ | ⚠️ Medir |
 | **Endpoints** | 144 | 150+ | ✅ Superou! |
 | **Ativos** | 56 | 100+ | ✅ Conforme |
