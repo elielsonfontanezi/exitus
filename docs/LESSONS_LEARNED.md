@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 10/03/2026 — L-TEST-002 a L-TEST-005 adicionados (correção completa de testes)  
+> **Atualizado:** 10/03/2026 — L-TEST-002 a L-TEST-005 e L-MIG-001 adicionados (correção completa de testes + migrations)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -660,7 +660,42 @@ def usuario_seed(app):
 
 ---
 
-## 📋 Referências
+## � Migrations e Testes
+
+### L-MIG-001 — Aplicar migrations em ambos os bancos (dev e teste)
+**Origem:** DIVCALENDAR-001 | **Data:** 10/03/2026
+
+**Problema:** Nova migration criada no banco de desenvolvimento, mas testes falham com `UndefinedTable` porque tabela não existe no banco de testes (`exitusdb_test`).
+
+**Solução:**
+1. Aplicar migration no banco principal:
+   ```bash
+   alembic upgrade head
+   ```
+
+2. Aplicar migration no banco de testes:
+   ```python
+   # Criar app com testing=True
+   app = create_app(testing=True)
+   with app.app_context():
+       alembic_cfg = Config('alembic.ini')
+       alembic_cfg.set_main_option('sqlalchemy.url', app.config['SQLALCHEMY_DATABASE_URI'])
+       command.upgrade(alembic_cfg, 'head')
+   ```
+
+3. Ou aplicar manualmente via SQL se necessário:
+   ```sql
+   -- Criar tabela
+   CREATE TABLE calendario_dividendo (...);
+   -- Atualizar versão
+   UPDATE alembic_version SET version_num = '20260310_1700';
+   ```
+
+**Resultado:** Testes passam de 1 failed para 490 passed.
+
+---
+
+## �� Referências
 
 | Documento | Papel |
 |---|---|

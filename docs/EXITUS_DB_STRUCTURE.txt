@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-09 11:14:49
+Gerado em: 2026-03-10 18:38:14
 ================================================================================
 
 ================================================================================
@@ -15,6 +15,7 @@ TABELAS DO BANCO EXITUS
  public | alertas                | exitus
  public | ativo                  | exitus
  public | auditoria_relatorios   | exitus
+ public | calendario_dividendo   | exitus
  public | configuracoes_alertas  | exitus
  public | corretora              | exitus
  public | evento_corporativo     | exitus
@@ -36,7 +37,7 @@ TABELAS DO BANCO EXITUS
  public | taxa_cambio            | exitus
  public | transacao              | exitus
  public | usuario                | exitus
-(25 rows)
+(26 rows)
 
 
 ================================================================================
@@ -226,6 +227,7 @@ Check constraints:
     "ativo_preco_positivo" CHECK (preco_atual IS NULL OR preco_atual >= 0::numeric)
     "ativo_ticker_min_length" CHECK (length(ticker::text) >= 1)
 Referenced by:
+    TABLE "calendario_dividendo" CONSTRAINT "calendario_dividendo_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
     TABLE "configuracoes_alertas" CONSTRAINT "configuracoes_alertas_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE CASCADE
     TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_ativo_novo_id_fkey" FOREIGN KEY (ativo_novo_id) REFERENCES ativo(id) ON DELETE SET NULL
@@ -392,6 +394,94 @@ Unique Constraints:
  ix_auditoria_relatorios_tipo_relatorio      | CREATE INDEX ix_auditoria_relatorios_tipo_relatorio ON public.auditoria_relatorios USING btree (tipo_relatorio)
  ix_auditoria_relatorios_usuario_id          | CREATE INDEX ix_auditoria_relatorios_usuario_id ON public.auditoria_relatorios USING btree (usuario_id)
 (9 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: calendario_dividendo
+################################################################################
+
+                                                        Table "public.calendario_dividendo"
+     Column     |            Type             | Collation | Nullable | Default | Storage  | Compression | Stats target |        Description        
+----------------+-----------------------------+-----------+----------+---------+----------+-------------+--------------+---------------------------
+ id             | uuid                        |           | not null |         | plain    |             |              | 
+ ativo_id       | uuid                        |           | not null |         | plain    |             |              | 
+ usuario_id     | uuid                        |           | not null |         | plain    |             |              | 
+ data_esperada  | date                        |           | not null |         | plain    |             |              | Data prevista do provento
+ tipo_provento  | character varying(20)       |           | not null |         | extended |             |              | Tipo do provento
+ yield_estimado | numeric(8,4)                |           |          |         | main     |             |              | Yield percentual estimado
+ valor_estimado | numeric(18,2)               |           |          |         | main     |             |              | Valor em R$ estimado
+ quantidade     | integer                     |           | not null |         | plain    |             |              | Quantidade de ativos
+ status         | character varying(20)       |           | not null |         | extended |             |              | Status do calendário
+ observacoes    | text                        |           |          |         | extended |             |              | Observações adicionais
+ data_pagamento | date                        |           |          |         | plain    |             |              | Data real do pagamento
+ valor_real     | numeric(18,2)               |           |          |         | main     |             |              | Valor real pago
+ created_at     | timestamp without time zone |           | not null |         | plain    |             |              | 
+ updated_at     | timestamp without time zone |           | not null |         | plain    |             |              | 
+Indexes:
+    "calendario_dividendo_pkey" PRIMARY KEY, btree (id)
+    "idx_calendario_ativo_data" btree (ativo_id, data_esperada)
+    "idx_calendario_status" btree (status)
+    "idx_calendario_usuario_ativo" btree (usuario_id, ativo_id)
+    "idx_calendario_usuario_data" btree (usuario_id, data_esperada)
+Check constraints:
+    "ck_calendario_quantidade_positiva" CHECK (quantidade >= 0)
+Foreign-key constraints:
+    "calendario_dividendo_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
+    "calendario_dividendo_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+Access method: heap
+
+ Pos |     Coluna     |            Tipo             | Tamanho | Null? | Default 
+-----+----------------+-----------------------------+---------+-------+---------
+   1 | id             | uuid                        |         | NO    | 
+   2 | ativo_id       | uuid                        |         | NO    | 
+   3 | usuario_id     | uuid                        |         | NO    | 
+   4 | data_esperada  | date                        |         | NO    | 
+   5 | tipo_provento  | character varying           | (20)    | NO    | 
+   6 | yield_estimado | numeric                     |         | YES   | 
+   7 | valor_estimado | numeric                     |         | YES   | 
+   8 | quantidade     | integer                     |         | NO    | 
+   9 | status         | character varying           | (20)    | NO    | 
+  10 | observacoes    | text                        |         | YES   | 
+  11 | data_pagamento | date                        |         | YES   | 
+  12 | valor_real     | numeric                     |         | YES   | 
+  13 | created_at     | timestamp without time zone |         | NO    | 
+  14 | updated_at     | timestamp without time zone |         | NO    | 
+(14 rows)
+
+
+Foreign Keys:
+               Nome FK                |   Coluna   | Tabela Referenciada | Coluna Referenciada 
+--------------------------------------+------------+---------------------+---------------------
+ calendario_dividendo_ativo_id_fkey   | ativo_id   | ativo               | id
+ calendario_dividendo_usuario_id_fkey | usuario_id | usuario             | id
+(2 rows)
+
+
+Primary Keys:
+          Nome PK          | Coluna 
+---------------------------+--------
+ calendario_dividendo_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+        Nome do Índice        |                                                    Definição                                                    
+------------------------------+-----------------------------------------------------------------------------------------------------------------
+ calendario_dividendo_pkey    | CREATE UNIQUE INDEX calendario_dividendo_pkey ON public.calendario_dividendo USING btree (id)
+ idx_calendario_usuario_data  | CREATE INDEX idx_calendario_usuario_data ON public.calendario_dividendo USING btree (usuario_id, data_esperada)
+ idx_calendario_ativo_data    | CREATE INDEX idx_calendario_ativo_data ON public.calendario_dividendo USING btree (ativo_id, data_esperada)
+ idx_calendario_status        | CREATE INDEX idx_calendario_status ON public.calendario_dividendo USING btree (status)
+ idx_calendario_usuario_ativo | CREATE INDEX idx_calendario_usuario_ativo ON public.calendario_dividendo USING btree (usuario_id, ativo_id)
+(5 rows)
 
 
 ________________________________________________________________________________
@@ -2138,6 +2228,7 @@ Indexes:
 Referenced by:
     TABLE "alertas" CONSTRAINT "alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "auditoria_relatorios" CONSTRAINT "auditoria_relatorios_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    TABLE "calendario_dividendo" CONSTRAINT "calendario_dividendo_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
     TABLE "configuracoes_alertas" CONSTRAINT "configuracoes_alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "corretora" CONSTRAINT "corretora_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "evento_custodia" CONSTRAINT "evento_custodia_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
@@ -2204,7 +2295,7 @@ RESUMO GERAL
 Total de Tabelas:
  Total 
 -------
-    25
+    26
 (1 row)
 
 
@@ -2215,6 +2306,7 @@ Total de Colunas por Tabela:
  alertas                |          15
  ativo                  |          27
  auditoria_relatorios   |          13
+ calendario_dividendo   |          14
  configuracoes_alertas  |          16
  corretora              |          11
  evento_corporativo     |          12
@@ -2236,7 +2328,7 @@ Total de Colunas por Tabela:
  taxa_cambio            |           8
  transacao              |          21
  usuario                |           9
-(25 rows)
+(26 rows)
 
 
 Total de Foreign Keys por Tabela:
@@ -2244,6 +2336,7 @@ Total de Foreign Keys por Tabela:
 ------------------------+---------
  alertas                |       1
  auditoria_relatorios   |       1
+ calendario_dividendo   |       2
  configuracoes_alertas  |       3
  corretora              |       1
  evento_corporativo     |       2
@@ -2259,7 +2352,7 @@ Total de Foreign Keys por Tabela:
  saldo_darf_acumulado   |       1
  saldo_prejuizo         |       1
  transacao              |       3
-(17 rows)
+(18 rows)
 
 
 ================================================================================

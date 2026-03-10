@@ -97,7 +97,7 @@ Configurações:
 - Persistência via volume mapeado
 - Backup automático configurável
 - Migrations gerenciadas por Alembic
-- 22 tabelas + 86+ índices otimizados
+- 23 tabelas + 86+ índices otimizados
 
 ### Container 2: Flask Backend API
 
@@ -357,7 +357,7 @@ ativo = db.session.get(Ativo, id)
 
 ## Modelo de Dados
 
-### Entidades Principais (22 Tabelas)
+### Entidades Principais (23 Tabelas)
 
 #### Core Tables
 
@@ -598,7 +598,21 @@ ativo = db.session.get(Ativo, id)
 
 21. **projecaorenda** / **relatoriosperformance** — tabelas auxiliares de analytics (detalhadas em `MODULES.md`).[file:10]
 
-22. **outros metadados** (ex.: tabelas auxiliares futuras para monitoramento/parametrização).
+22. **calendario_dividendo** — calendário de proventos futuros para planejamento (DIVCALENDAR-001):
+    - `usuario_id` (FK)
+    - `ativo_id` (FK)
+    - `data_esperada` (Date)
+    - `tipo_provento` (String)
+    - `yield_estimado` (Numeric)
+    - `valor_estimado` (Numeric)
+    - `quantidade` (Integer)
+    - `status` (String: previsto/confirmado/atrasado/pago)
+    - `data_pagamento` (Date, opcional)
+    - `valor_real` (Numeric, opcional)
+    - `observacoes` (Text)
+    - `created_at`, `updated_at`
+
+23. **outros metadados** (ex.: tabelas auxiliares futuras para monitoramento/parametrização).
 
 ### Relacionamentos Chave
 
@@ -609,12 +623,14 @@ usuario (1) ─────> (N) saldo_prejuizo
 usuario (1) ─────> (N) transacao
 usuario (1) ─────> (N) alerta
 usuario (1) ─────> (N) portfolio
+usuario (1) ─────> (N) calendario_dividendo
 
 ativo (1) ─────> (N) posicao
 ativo (1) ─────> (N) transacao
 ativo (1) ─────> (N) provento
 ativo (1) ─────> (N) evento_corporativo
 ativo (1) ─────> (N) historico_preco
+ativo (1) ─────> (N) calendario_dividendo
 
 corretora (1) ─────> (N) posicao
 corretora (1) ─────> (N) transacao

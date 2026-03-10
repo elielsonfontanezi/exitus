@@ -47,3 +47,6 @@ exitus-db/
 Thumbs.db
 exitus_fontes.txt
 docs/exitus_fontes.txt
+
+# Windsuf
+.windsurf/

@@ -272,6 +272,16 @@ def create_app(testing=False):
         print(f"⚠️  Reconciliação blueprint não encontrado: {e}")
 
     # ============================================
+    # DIVCALENDAR-001 - Calendário de Dividendos
+    # ============================================
+    try:
+        from .blueprints.calendario_dividendo_blueprint import calendario_dividendo_bp
+        app.register_blueprint(calendario_dividendo_bp)
+        print("✅ Calendário de Dividendos blueprint registrado: /api/calendario-dividendos/*")
+    except ImportError as e:
+        print(f"⚠️  Calendário de Dividendos blueprint não encontrado: {e}")
+
+    # ============================================
     # SWAGGER / OpenAPI (EXITUS-SWAGGER-001)
     # ============================================
     if not testing:

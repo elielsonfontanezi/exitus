@@ -58,6 +58,28 @@ e este projeto adere semanticamente à versão v0.8.0.
 - **Resultados:** -2 pastas vazias, 0 funcionalidades perdidas, 491/491 testes passando
 - **Segurança:** Abordagem conservadora, sem risco de quebrar funcionalidades existentes
 
+### Fixed — DIVCALENDAR-001 Calendário de Dividendos (10/03/2026)
+
+- **Backend completo (100%):**
+  - Model `CalendarioDividendo` com relacionamentos e validações
+  - Migration `20260310_1700_add_calendario_dividendo_table.py` aplicada
+  - Service `CalendarioDividendoService` com geração automática baseada em histórico
+  - Schemas Marshmallow para validação completa
+  - Blueprint `calendario_dividendo_blueprint.py` com 7 endpoints REST
+- **Endpoints implementados:**
+  - GET/POST/PUT/DELETE `/api/calendario-dividendos/` - CRUD completo
+  - POST `/api/calendario-dividendos/gerar` - Geração automática
+  - GET `/api/calendario-dividendos/resumo` - Estatísticas
+  - POST `/api/calendario-dividendos/{id}/confirmar-pagamento` - Confirmação
+- **Features:**
+  - Geração automática baseada em padrões históricos de pagamento
+  - Cálculo de yield estimado com média móvel
+  - Status tracking (previsto/confirmado/atrasado/pago)
+  - Filtros por data, ativo e status
+- **Testes:** 3/3 endpoints testados com sucesso (100%)
+- **Integração:** Blueprint registrado em `app/__init__.py`
+- **Status:** Backend 100% funcional, pronto para frontend
+
 ### Fixed — Auditoria e Correção de Testes (09/03/2026)
 
 - **Auditoria completa da suite de testes:**

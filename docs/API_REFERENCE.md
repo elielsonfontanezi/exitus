@@ -23,6 +23,7 @@
 - 19. Projeções
 - 20. Performance
 - 21. Reconciliação
+- 22. Calendário de Dividendos
 - Health Checks
 
 ---
@@ -999,10 +1000,163 @@ Verifica reconciliação de um ativo específico.
 
 ---
 
-*Documento atualizado: 09 de Março de 2026*
+## 22. Calendário de Dividendos
+
+Gerenciamento de calendário de proventos futuros para planejamento de fluxo de caixa.
+
+### 22.1 Listar Calendário
+
+**GET** `/calendario-dividendos/`
+
+Lista itens do calendário com filtros opcionais.
+
+**Parâmetros Query:**
+- `data_inicio` (string, opcional): Data inicial no formato YYYY-MM-DD
+- `data_fim` (string, opcional): Data final no formato YYYY-MM-DD
+- `ativo_id` (UUID, opcional): ID do ativo específico
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "calendario": [
+      {
+        "id": "uuid",
+        "ativo_id": "uuid",
+        "usuario_id": "uuid",
+        "data_esperada": "2026-04-15",
+        "tipo_provento": "dividendo",
+        "yield_estimado": 0.05,
+        "valor_estimado": 150.00,
+        "quantidade": 100,
+        "status": "previsto",
+        "observacoes": null,
+        "data_pagamento": null,
+        "valor_real": null,
+        "created_at": "2026-03-10T17:00:00",
+        "updated_at": "2026-03-10T17:00:00",
+        "ativo": {
+          "ticker": "PETR4",
+          "nome": "Petrobras"
+        }
+      }
+    ],
+    "total": 1
+  },
+  "message": "1 itens encontrados"
+}
+```
+
+### 22.2 Criar Item
+
+**POST** `/calendario-dividendos/`
+
+Cria novo item no calendário.
+
+**Request Body:**
+```json
+{
+  "ativo_id": "uuid",
+  "usuario_id": "uuid",
+  "data_esperada": "2026-04-15",
+  "tipo_provento": "dividendo",
+  "yield_estimado": 0.05,
+  "valor_estimado": 150.00,
+  "quantidade": 100,
+  "status": "previsto",
+  "observacoes": "Provento Q2-2026"
+}
+```
+
+### 22.3 Gerar Calendário Automático
+
+**POST** `/calendario-dividendos/gerar`
+
+Gera calendário automático baseado em posições e histórico.
+
+**Request Body:**
+```json
+{
+  "usuario_id": "uuid",
+  "meses_futuros": 12,
+  "ativo_id": "uuid"  // opcional
+}
+```
+
+### 22.4 Resumo do Calendário
+
+**GET** `/calendario-dividendos/resumo`
+
+Retorna estatísticas agregadas do calendário.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "total_itens": 10,
+    "valor_total_estimado": 1500.00,
+    "valor_total_real": 800.00,
+    "resumo_mensal": {
+      "2026-04": {
+        "valor_estimado": 500.00,
+        "valor_real": 300.00,
+        "quantidade": 3
+      }
+    },
+    "resumo_ativos": {
+      "PETR4": {
+        "valor_estimado": 800.00,
+        "valor_real": 500.00,
+        "quantidade": 5
+      }
+    }
+  }
+}
+```
+
+### 22.5 Confirmar Pagamento
+
+**POST** `/calendario-dividendos/{id}/confirmar-pagamento`
+
+Confirma pagamento real de um provento.
+
+**Request Body:**
+```json
+{
+  "data_pagamento": "2026-04-15",
+  "valor_real": 155.50
+}
+```
+
+### 22.6 Outros Endpoints
+
+- **GET** `/calendario-dividendos/{id}` - Buscar item específico
+- **PUT** `/calendario-dividendos/{id}` - Atualizar item
+- **DELETE** `/calendario-dividendos/{id}` - Excluir item
+
+**Status Possíveis:**
+- `previsto` - Provento estimado
+- `confirmado` - Empresa confirmou data/valor
+- `atrasado` - Data passou, não pago ainda
+- `pago` - Pagamento realizado
+
+**Tipos de Provento:**
+- `dividendo` - Dividendos
+- `jcp` - Juros sobre Capital Próprio
+- `rendimento` - Rendimentos (FIIs)
+- `cupom` - Cupoms (Renda Fixa)
+- `bonificacao` - Bonificações em ações
+- `direito_sub` - Direito de subscrição
+- `outro` - Outros tipos
+
+---
+
+*Documento atualizado: 10 de Março de 2026*
 *Versão da API: v0.8.0-dev*
 *GAPs fechados: EXITUS-POS-001→007, EXITUS-ATIVOS-ENUM-001, EXITUS-POS-PAGIN-001,*
 *EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001, EXITUS-COTACOES-RESP-001,*
 *EXITUS-SQLALCHEMY-001, EXITUS-CRUD-001, EXITUS-IR-001, EXITUS-EXPORT-001,*
 *EXITUS-VALIDATION-001, EXITUS-RENTABILIDADE-001, EXITUS-SERVICE-REVIEW-001, EXITUS-COVERAGE-001,*
-*EXITUS-DOCS-SYNC-001, EXITUS-AUDITLOG-001, EXITUS-RECONCILIACAO-001*
+*EXITUS-DOCS-SYNC-001, EXITUS-AUDITLOG-001, EXITUS-RECONCILIACAO-001, EXITUS-DIVCALENDAR-001*

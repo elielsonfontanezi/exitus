@@ -294,9 +294,9 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 | Categoria | Métrica | Valor |
 |---|---|---|
 | Endpoints | Rotas totais | **67+** |
-| Tabelas | Database | 21 |
+| Tabelas | Database | 23 |
 | Índices | PostgreSQL | 86+ |
-| Blueprints | Flask | 16 |
+| Blueprints | Flask | 17 |
 | Templates | Frontend | 7 |
 | Gráficos | Chart.js | 5 |
 | Providers | Cotações | 5 |
