@@ -48,7 +48,17 @@ O Exitus tem um **backend robusto** com:
 - **Dividendos:** Calendário visual, timeline, projeções
 - **IR:** Dashboard fiscal, DARFs pendentes, relatórios
 - **Buy Signals:** Cards interativos com detalhes
+- **Planos de Compra:** Novo conceito (ver detalhes abaixo)
 - **Rentabilidade:** Gráficos avançados (Chart.js)
+
+### 5. **Planos de Compra (NOVO CONCEITO)**
+- **Ideia:** Dashboard para visualizar melhores oportunidades de compra
+- **Contexto:** Lista de ativos de interesse (já na carteira ou não)
+- **Funcionalidade:** Análise comparativa de preço teto vs preço atual
+- **Diferencial vs Buy Signals:** 
+  - Buy Signals: Score individual (0-100) por ativo
+  - Planos de Compra: Visão consolidada multi-ativos com priorização
+- **Implementação:** Nova rota `/api/planos-compra` e dashboard dedicado
 
 ---
 
@@ -81,18 +91,36 @@ Antes de qualquer proposta, ler e processar:
 - Identificar componentes repetitivos
 - Mapear dependências (HTMX, Alpine.js, Tailwind)
 - Verificar integração com APIs do backend
+- **DECISÃO CRÍTICA:** Manter estrutura atual vs iniciar do zero?
 
-### **2. Análise de Performance**
+### **2. Avaliação de Reinício (Opção Zero)**
+- **Prós:** Arquitetura limpa, padrão moderno, sem débito técnico
+- **Contras:** Reimplementar tudo, tempo extra, risco de regressão
+- **Critérios:** 
+  - Se >50% dos templates precisam refatoração → Considerar reinício
+  - Se performance <80% do esperado → Considerar reinício
+  - Se UX atual inadequada para multi-mercado → Considerar reinício
+
+### **3. Análise de Performance**
 - Tempo de carregamento do dashboard
 - Uso de memória no browser
 - Requisições paralelas vs sequenciais
 - Cache implementado
 
-### **3. Avaliação de UX**
+### **4. Avaliação de UX**
 - Fluxo de navegação atual
 - Responsividade mobile
 - Acessibilidade (WCAG)
 - Feedback visual ao usuário
+
+### **5. Análise de Buy Signals vs Planos de Compra**
+- **Buy Signals existentes:** `/api/buy-signals/watchlist-top`
+- **Funcionalidade atual:** Score individual (0-100), margem de segurança
+- **Gap identificado:** Não há visão consolidada multi-ativos
+- **Oportunidade:** Planos de Compra como evolução natural
+  - Dashboard comparativo (Ações BR, FIIs BR, etc.)
+  - Priorização baseada em múltiplos critérios
+  - Integração com carteira existente
 
 ---
 
@@ -127,9 +155,9 @@ Layout proposto:
 ├─────────────────────────────────┤
 │ KPIs: Patrimônio, Rentabilidade │
 ├─────────────────────────────────┤
-│ Gráfico: Alocação Geográfica     │
+│ Gráfico: Alocação Geográfica    │
 ├─────────────────────────────────┤
-│ Cards: Top 5 Ativos por Mercado  │
+│ Cards: Top 5 Ativos por Mercado │
 └─────────────────────────────────┘
 ```
 
@@ -168,7 +196,9 @@ Layout proposto:
 
 1. **Confirme leitura** dos 10 documentos listados
 2. **Apresente diagnóstico** do frontend atual
-3. **Proponha decisão** sobre stack (manter vs migrar)
-4. **Esboce layout** do Dashboard Global
+3. **Proponha decisão** sobre stack (manter vs migrar vs reinício)
+4. **Esboçe layout** do Dashboard Global
+5. **Analise Planos de Compra** vs Buy Signals existentes
+6. **Recomende implementação** do novo conceito
 
-**Aguardando sua análise inicial antes de prosseguir...**
+**Aguardando sua análise completa antes de prosseguir...**
