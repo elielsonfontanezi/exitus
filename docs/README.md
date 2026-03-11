@@ -1,36 +1,74 @@
 # Documentação do Sistema Exitus
 
-## 📁 Estrutura de Documentos
+> **Total:** 26 arquivos organizados por contexto  
+> **Última atualização:** 11/03/2026  
+> **Versão:** v0.9.0
 
-### 🎯 Visão e Estratégia
-- **[VISION.md](VISION.md)** — Visão de negócio, proposta de valor, roadmap funcional
-- **[PERSONAS.md](PERSONAS.md)** — **Manual de Operação da IA** — define como a assistente deve se comportar, fontes de verdade, fluxo de trabalho
+---
 
-### 🏗️ Arquitetura e Design
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** — Arquitetura técnica, containers, stack, princípios de design
-- **[MODULES.md](MODULES.md)** — Status dos módulos M0-M7, endpoints por módulo, roadmap de implementação
-- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** — Padrões de codificação e SQLAlchemy (v2.0)
+## 📁 Estrutura de Documentos por Contexto
 
-### 📋 GAPs e Implementações
-- **[ROADMAP.md](ROADMAP.md)** — Roadmap completo com GAPs identificados e status
-- **[EXITUS-SQLALCHEMY-001.md](EXITUS-SQLALCHEMY-001.md)** — Padrões SQLAlchemy (problemas recorrentes)
-- **[EXITUS-IMPORT-001.md](EXITUS-IMPORT-001.md)** — Importação B3 Portal Investidor (completo)
-- **[EXITUS-CASHFLOW-001.md](EXITUS-CASHFLOW-001.md)** — Eventos de Custódia B3 (completo)
-- **[EXITUS-ASSETS-001.md](EXITUS-ASSETS-001.md)** — Massa de dados de teste (design)
+### 🔴 **Core Operacional (8 arquivos)**
+Documentação crítica para operação e desenvolvimento do sistema.
 
-### 🔌 APIs e Contratos
-- **[API_REFERENCE.md](API_REFERENCE.md)** — **Referência completa** de todas as APIs com exemplos cURL
-- **[ENUMS.md](ENUMS.md)** — Enums do sistema (TipoAtivo, TipoOperacao, etc.) com mapeamentos
+| Arquivo | Descrição | Prioridade |
+|---------|-----------|------------|
+| **[ROADMAP.md](ROADMAP.md)** | Visão estratégica, métricas atuais (491 testes), próximos GAPs | 🔴 Crítico |
+| **[CHANGELOG.md](CHANGELOG.md)** | Histórico completo, auditoria, rastreabilidade | 🔴 Crítico |
+| **[API_REFERENCE.md](API_REFERENCE.md)** | Contratos da API, essencial para desenvolvimento | 🔴 Crítico |
+| **[ARCHITECTURE.md](ARCHITECTURE.md)** | Decisões arquiteturais, stack, containers | 🔴 Crítico |
+| **[CODING_STANDARDS.md](CODING_STANDARDS.md)** | Padrões obrigatórios (snake_case, SQLAlchemy) | 🔴 Crítico |
+| **[OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md)** | Scripts, troubleshooting, procedimentos | 🔴 Crítico |
+| **[PERSONAS.md](PERSONAS.md)** | Manual da IA, comportamento esperado | 🔴 Crítico |
+| **[LESSONS_LEARNED.md](LESSONS_LEARNED.md)** | Erros reais, lições valiosas (L-TEST-002 a L-TEST-005) | 🔴 Crítico |
 
-### 🗄️ Database e Dados
-- **[EXITUS_DB_STRUCTURE.txt](EXITUS_DB_STRUCTURE.txt)** — Schema completo do PostgreSQL (21 tabelas, 86+ índices)
-- **[SEEDS.md](SEEDS.md)** — Dados iniciais, credenciais de desenvolvimento, usuários teste
+### 🟡 **Referência Técnica (5 arquivos)**
+Documentação de referência para desenvolvimento e troubleshooting.
 
-### 📋 Operações e Manuais
-- **[OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md)** — **Manual de Operações** — deploy, troubleshooting, scripts úteis
-- **[USER_GUIDE.md](USER_GUIDE.md)** — **Guia do Usuário Final** — como usar o sistema (dashboards, operações)
-- **[CHANGELOG.md](CHANGELOG.md)** — Histórico de versões, GAPs registrados, roadmap futuro
-- **[ROADMAP.md](ROADMAP.md)** — Roadmap de implementação — GAPs identificados e plano de desenvolvimento
+| Arquivo | Descrição | Uso |
+|---------|-----------|-----|
+| **[ENUMS.md](ENUMS.md)** | 15 TipoAtivo, mapeamentos DB/API/JSON | 🟡 Alto |
+| **[SEEDS.md](SEEDS.md)** | Credenciais dev, dados de teste | 🟡 Alto |
+| **[MODULES.md](MODULES.md)** | Status M0-M7, 17 blueprints, 23 tabelas | � Alto |
+| **[EXITUS_DB_STRUCTURE.txt](EXITUS_DB_STRUCTURE.txt)** | Schema completo gerado automaticamente | 🟡 Alto |
+| **[EXITUS_ER_DIAGRAM.md](EXITUS_ER_DIAGRAM.md)** | Visualização do schema, diagramas ER | 🟢 Médio |
+
+### 📋 **GAPs Ativos (7 arquivos)**
+Documentação de features implementadas e padrões estabelecidos.
+
+| Arquivo | Descrição | Status |
+|---------|-----------|--------|
+| **[EXITUS-IR-001.md](EXITUS-IR-001.md)** | Motor IR consolidado (v2.0), fonte de verdade | ✅ Concluído |
+| **[EXITUS-IMPORT-001.md](EXITUS-IMPORT-001.md)** | Design B3, parsers, validações | ✅ Concluído |
+| **[EXITUS-EXPORT-001.md](EXITUS-EXPORT-001.md)** | Exportação genérica (CSV, Excel, JSON, PDF) | ✅ Concluído |
+| **[EXITUS-CASHFLOW-001.md](EXITUS-CASHFLOW-001.md)** | Eventos de custódia, transferências | ✅ Concluído |
+| **[EXITUS-ASSETS-001.md](EXITUS-ASSETS-001.md)** | Massa de dados, 56 ativos seed | ✅ Concluído |
+| **[EXITUS-CRUD-002.md](EXITUS-CRUD-002.md)** | Padrões Service/Route | ✅ Concluído |
+| **[EXITUS-SQLALCHEMY-001.md](EXITUS-SQLALCHEMY-001.md)** | Boas práticas SQLAlchemy | ✅ Concluído |
+
+### 🆕 **GAPs Recentes (2 arquivos)**
+Implementações mais recentes com histórico de decisões.
+
+| Arquivo | Descrição | Data |
+|---------|-----------|------|
+| **[EXITUS-DIVCALENDAR-001.md](EXITUS-DIVCALENDAR-001.md)** | Calendário de dividendos | 10/03/2026 |
+| **[EXITUS-BLUEPRINT-CONSOLIDATION-001.md](EXITUS-BLUEPRINT-CONSOLIDATION-001.md)** | Padrões de blueprints | 10/03/2026 |
+
+### � **Guias e Visão (3 arquivos)**
+Documentação para usuários e visão de negócio.
+
+| Arquivo | Descrição | Público |
+|---------|-----------|---------|
+| **[USER_GUIDE.md](USER_GUIDE.md)** | Guia do usuário final | Usuários |
+| **[VISION.md](VISION.md)** | Visão de negócio, proposta de valor | Stakeholders |
+| **[README.md](README.md)** | Este arquivo - índice da documentação | Todos |
+
+### 📚 **Histórico (1 arquivo)**
+Documentação de correções e lições aprendidas.
+
+| Arquivo | Descrição | Valor |
+|---------|-----------|-------|
+| **[TESTES_HISTORICO.md](TESTES_HISTORICO.md)** | Histórico de correções de testes (491/491 ✅) | Referência |
 
 ---
 
@@ -103,5 +141,5 @@
 
 ---
 
-*Atualizado: 04 de Março de 2026*  
-*Versão: 3.0 — Migrado de Perplexity/Spaces para Cascade/Windsurf*
+*Atualizado: 11 de Março de 2026*  
+*Versão: 4.0 — Documentação reorganizada por contexto (26 arquivos)*
