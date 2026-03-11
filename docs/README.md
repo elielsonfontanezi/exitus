@@ -70,6 +70,23 @@ Documentação de correções e lições aprendidas.
 |---------|-----------|-------|
 | **[TESTES_HISTORICO.md](TESTES_HISTORICO.md)** | Histórico de correções de testes (491/491 ✅) | Referência |
 
+### 🧪 **Testes e Validação (2 pastas)**
+Testes formais e scripts de validação do sistema.
+
+| Pasta | Arquivos | Descrição | Status |
+|-------|----------|-----------|--------|
+| **[tests/](../tests/)** | 6 scripts (.sh) | Validação por fase (Módulo 0-5) | ✅ Ativos |
+| **[backend/tests/](../backend/tests/)** | 33 arquivos | Testes formais Python (491 casos) | ✅ 100% passando |
+
+**Scripts de Validação (`tests/`):**
+- `mod0_validacao_final.sh` - Health checks do sistema
+- `mod1_validacao_final_fase[1-5].sh` - Validação estrutural por fase
+
+**Testes Formais (`backend/tests/`):**
+- **Unitários:** `test_darf_acumulado.py` (8), `test_rentabilidade.py` (21)
+- **Integração:** `test_ir_integration.py` (47KB), `test_import_b3_parsers.py` (59)
+- **Scripts:** `test_complete_M0_M7.4.sh` - Validação completa
+
 ---
 
 ## 🔄 Como Usar Esta Documentação
