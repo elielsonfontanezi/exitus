@@ -61,6 +61,7 @@
 4. **API_REFERENCE.md** — Contratos para validação
 5. **ENUMS.md** — Valores válidos para campos
 6. **ROADMAP.md** — Status dos GAPs para planejamento
+7. **TESTES_HISTORICO.md** — Histórico de correções de testes
 
 **Regras operacionais da IA:** `.windsurfrules` na raiz do projeto (lido automaticamente pelo Cascade)
 
