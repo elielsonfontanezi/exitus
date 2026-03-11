@@ -298,11 +298,11 @@ Antes de qualquer ação, confirmar mentalmente:
 
 ## 🔐 CHAVES DE API E SEGREDO
 
-- **OpenRouteService:** 
-  - Propósito: Disponibilizar modelo de IA adicional para o Cascade
+- **OpenRouter:** 
+  - Propósito: Disponibilizar modelos de IA adicionais via openrouter.ai
   - Configuração: Já definida em `.windsurf/windsurf.config.json`
   - Uso: Apenas pelo Cascade/Windsurf, NÃO para código Python
-  - Importante: Manter chave válida para acesso a modelos externos
+  - Importante: Manter chave válida para acesso a GPT-4, Llama, etc.
   - Nunca usar esta chave no código do projeto
 
 ---
@@ -338,14 +338,15 @@ Antes de qualquer ação, confirmar mentalmente:
 - **SWE-1.5** - Para CRUD simples, refatorações pontuais
 
 ### Modelos Externos (configurados):
-- **OpenRouteService** - Modelo adicional disponível via API
+- **OpenRouter** - Agregador de modelos de IA via API
   - Configurado em `.windsurf/windsurf.config.json`
-  - Chave: `OPENROUTESERVICE_API_KEY`
+  - Chave: `OPENROUTER_API_KEY`
   - Uso: Apenas pelo Cascade como opção de modelo
   - **NÃO usar no código do projeto**
+  - Acesso a: GPT-4, Claude, Llama, Mistral e outros
 
 ### Quando usar cada modelo:
 - **SWE-1.5**: CRUD, ajustes simples, scripts
 - **Claude Sonnet**: Lógica de negócio, integrações, testes
 - **Claude Opus**: Design de sistemas, decisões arquitetônicas
-- **OpenRouteService**: Quando modelos internos não disponíveis ou como alternativa
+- **OpenRouter**: Quando modelos internos não disponíveis ou para acessar outros modelos (GPT-4, Llama, etc.)
