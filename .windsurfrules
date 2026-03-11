@@ -359,14 +359,16 @@ Antes de qualquer ação, confirmar mentalmente:
 - **postgres** - Acesso ao banco PostgreSQL
   - Script: `.windsurf/mcp_postgres.sh`
   - Uso: `@postgres <consulta em linguagem natural>`
-  
-- **openrouter** - Acesso a modelos de IA via OpenRouter
+  - Exemplo: `@postgres list tables`
+
+### Experimentos (em desenvolvimento):
+- **openrouter** - Tentativa de MCP para OpenRouter
   - Script: `.windsurf/mcp_openrouter_simple.sh`
-  - Tools: `openrouter_chat`, `openrouter_list_models`
-  - Uso: Apenas pelo Cascade, não diretamente
+  - Status: Em desenvolvimento (parsing JSON complexo)
+  - Alternativa: Usar OpenRouter via variável de ambiente diretamente
 
 ### Como usar:
 - PostgreSQL: `@postgres list tables`
-- OpenRouter: Acesso interno via Cascade
+- OpenRouter: Configurado via `OPENROUTER_API_KEY` para uso interno do Cascade
 
 ---

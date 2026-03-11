@@ -5,9 +5,6 @@
       "args": [
         "postgresql://exitus:exitus123@127.0.0.1:5433/exitusdb"
       ]
-    },
-    "openrouter": {
-      "command": "/home/p016525/elielson/exitus/.windsurf/mcp_openrouter_simple.sh"
     }
   }
 }
