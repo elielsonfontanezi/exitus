@@ -190,6 +190,19 @@ Layout proposto:
 - ✅ Usar snake_case em IDs/classes
 - ✅ Documentar cada componente
 
+### **Colaboração com Mantenedor (CRÍTICO)**
+- **Discussão Obrigatória:** Antes de implementar qualquer interface
+- **Validação de UX:** Apresentar mockups/wireframes para aprovação
+- **Priorização:** Alinhar features com necessidades reais do usuário
+- **Feedback Iterativo:** Refinar com base no conhecimento do mantenedor
+- **Foco no Valor:** Garantir que cada tela resolva um problema real
+
+**Por quê?**
+- Mantenedor tem conhecimento profundo do domínio e fluxos reais
+- IA pode propor soluções tecnicamente corretas mas inadequadas
+- Colaboração garante interfaces que realmente agregam valor
+- Evita retrabalho e features desnecessárias
+
 ---
 
 ## 🎯 AÇÃO IMEDIATA
@@ -200,5 +213,12 @@ Layout proposto:
 4. **Esboçe layout** do Dashboard Global
 5. **Analise Planos de Compra** vs Buy Signals existentes
 6. **Recomende implementação** do novo conceito
+7. **Sugira pontos de discussão** com o mantenedor para cada interface
+
+**IMPORTANTE:** Prepare uma lista de perguntas para o mantenedor sobre:
+- Fluxos reais de uso
+- Prioridades de negócio
+- Critérios de decisão (ex: Planos de Compra)
+- Necessidades não atendidas
 
 **Aguardando sua análise completa antes de prosseguir...**
