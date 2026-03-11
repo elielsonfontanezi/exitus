@@ -362,9 +362,11 @@ Antes de qualquer ação, confirmar mentalmente:
   - Exemplo: `@postgres list tables`
 
 ### Experimentos (em desenvolvimento):
-- **openrouter** - Tentativa de MCP para OpenRouter
-  - Script: `.windsurf/mcp_openrouter_simple.sh`
-  - Status: Em desenvolvimento (parsing JSON complexo)
+- **openrouter** - MCP para OpenRouter com acesso a arquivos locais
+  - Scripts criados: `mcp_openrouter.sh`, `mcp_openrouter_simple.sh`
+  - Status: Em desenvolvimento (parsing JSON e escape de strings)
+  - Objetivo: Permitir `@openrouter read_file backend/app/models/calendario_dividendo.py`
+  - Desafios: Escape de conteúdo de arquivos, parsing JSON complexo
   - Alternativa: Usar OpenRouter via variável de ambiente diretamente
 
 ### Como usar:
