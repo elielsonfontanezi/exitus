@@ -350,3 +350,23 @@ Antes de qualquer ação, confirmar mentalmente:
 - **Claude Sonnet**: Lógica de negócio, integrações, testes
 - **Claude Opus**: Design de sistemas, decisões arquitetônicas
 - **OpenRouter**: Quando modelos internos não disponíveis ou para acessar outros modelos (GPT-4, Llama, etc.)
+
+---
+
+## 🔌 MCP SERVERS CONFIGURADOS
+
+### Servidores Ativos:
+- **postgres** - Acesso ao banco PostgreSQL
+  - Script: `.windsurf/mcp_postgres.sh`
+  - Uso: `@postgres <consulta em linguagem natural>`
+  
+- **openrouter** - Acesso a modelos de IA via OpenRouter
+  - Script: `.windsurf/mcp_openrouter_simple.sh`
+  - Tools: `openrouter_chat`, `openrouter_list_models`
+  - Uso: Apenas pelo Cascade, não diretamente
+
+### Como usar:
+- PostgreSQL: `@postgres list tables`
+- OpenRouter: Acesso interno via Cascade
+
+---
