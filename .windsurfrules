@@ -34,8 +34,8 @@ PRIORIDADE 2 — Consultar conforme contexto:
 
 Fluxo obrigatório em toda atividade:
 1. **Analisar** → ler fontes de verdade relevantes
-2. **Indicar modelo de IA recomendado** (ver REGRA #5)
-3. **Apresentar estratégia** com diagnóstico, arquivos, ordem de implementação (ver REGRA #6)
+2. **Indicar modelo de IA recomendado** (ver REGRA #3)
+3. **Apresentar estratégia** com diagnóstico, arquivos, ordem de implementação (ver REGRA #4)
 4. **Aguardar "APROVADO"** explicitamente do usuário
 5. **Implementar** — código completo, funcional, sem omissões (`...`)
 6. **Testar** → suite deve passar (491 testes)
@@ -46,7 +46,7 @@ Fluxo obrigatório em toda atividade:
 
 ---
 
-## 🤖 REGRA #5 — INDICAR MODELO DE IA POR ATIVIDADE
+## 🤖 REGRA #3 — INDICAR MODELO DE IA POR ATIVIDADE
 
 Ao iniciar qualquer GAP, indicar obrigatoriamente:
 
@@ -61,7 +61,7 @@ Critérios:
 
 ---
 
-## 🗺️ REGRA #6 — APRESENTAR ESTRATÉGIA ANTES DE CODIFICAR
+## 🗺️ REGRA #4 — APRESENTAR ESTRATÉGIA ANTES DE CODIFICAR
 
 Formato obrigatório antes de qualquer implementação:
 
@@ -73,7 +73,7 @@ Formato obrigatório antes de qualquer implementação:
 
 ---
 
-## 📦 REGRA #7 — COMMIT AO FIM DE CADA FASE VALIDADA
+## 📦 REGRA #5 — COMMIT AO FIM DE CADA FASE VALIDADA
 
 - **Uma atividade por commit** — nunca agrupar GAPs distintos
 - Apresentar o comando **antes** de executar, aguardar aprovação
@@ -94,7 +94,7 @@ Tipos de commit: `feat` / `fix` / `docs` / `refactor` / `test`
 
 ---
 
-## 📝 REGRA #8 — DOCUMENTAÇÃO NO MESMO COMMIT
+## 📝 REGRA #6 — DOCUMENTAÇÃO NO MESMO COMMIT
 
 Ao fechar qualquer GAP, os seguintes docs DEVEM ser atualizados **no mesmo commit**:
 
@@ -111,7 +111,7 @@ O usuário **nunca** deve precisar perguntar "e a documentação?" — ela já v
 
 ---
 
-## 🗄️ REGRA #9 — ATUALIZAR SCHEMA APÓS MUDANÇA NO BANCO
+## 🗄️ REGRA #7 — ATUALIZAR SCHEMA APÓS MUDANÇA NO BANCO
 
 Sempre que uma atividade alterar o banco (nova tabela, migration, ALTER TABLE, novo índice):
 
@@ -123,7 +123,7 @@ Isso sobrescreve `docs/EXITUS_DB_STRUCTURE.txt`. Executar antes do commit final.
 
 ---
 
-## 🧪 REGRA #10 — PRESERVAR TESTES FORMAIS
+## 🧪 REGRA #8 — PRESERVAR TESTES FORMAIS
 
 Arquivos em `/backend/tests/` são testes formais e **NUNCA devem ser removidos**:
 - `test_darf_acumulado.py` (8 testes)
@@ -252,13 +252,13 @@ bash scripts/update_db_structure.sh
 
 Antes de qualquer ação, confirmar mentalmente:
 - [ ] Li `docs/LESSONS_LEARNED.md`? (erros reais)
-- [ ] Indiquei o modelo de IA recomendado? (REGRA #5)
-- [ ] Apresentei estratégia e aguardei "APROVADO"? (REGRA #6)
-- [ ] Sei quais docs precisarão ser atualizados? (REGRA #8)
+- [ ] Indiquei o modelo de IA recomendado? (REGRA #3)
+- [ ] Apresentei estratégia e aguardei "APROVADO"? (REGRA #4)
+- [ ] Sei quais docs precisarão ser atualizados? (REGRA #6)
 - [ ] A atividade altera o banco? Se sim:
   - [ ] Aplicar migration no banco dev: `alembic upgrade head`
   - [ ] Aplicar migration no banco teste (L-MIG-001)
-  - [ ] Rodar `./scripts/update_db_structure.sh` (REGRA #9)
+  - [ ] Rodar `./scripts/update_db_structure.sh` (REGRA #7)
 - [ ] É um novo blueprint? Se sim:
   - [ ] Seguir padrão A (pasta + routes.py) ou B (arquivo único)
   - [ ] Registrar com try/except em `app/__init__.py`
