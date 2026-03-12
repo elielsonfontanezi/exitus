@@ -1,6 +1,6 @@
 # .windsurfrules — Sistema Exitus
 ## Arquivo de regras para Cascade (Windsurf AI Assistant)
-### Versão: 2.2 — 10/03/2026 (revisão pós-DIVCALENDAR-001 + BLUEPRINT-CONSOLIDATION-001)
+### Versão: 2.3 — 11/03/2026 (revisão pós-otimização documentação + testes)
 
 ---
 
@@ -11,6 +11,7 @@ Consultar ANTES de gerar qualquer código ou proposta:
 ```
 PRIORIDADE 1 — Ler antes de qualquer ação:
 ├── docs/LESSONS_LEARNED.md     # Erros reais — ler PRIMEIRO, sempre
+├── docs/TESTES_HISTORICO.md    # Histórico de correções (491/491 ✅)
 ├── docs/PERSONAS.md            # Manual de operação da IA (comportamento, fluxo)
 ├── docs/CODING_STANDARDS.md    # snake_case obrigatório, padrões SQLAlchemy
 ├── docs/ROADMAP.md             # GAPs registrados, status, plano de implementação
@@ -37,7 +38,7 @@ Fluxo obrigatório em toda atividade:
 3. **Apresentar estratégia** com diagnóstico, arquivos, ordem de implementação (ver REGRA #6)
 4. **Aguardar "APROVADO"** explicitamente do usuário
 5. **Implementar** — código completo, funcional, sem omissões (`...`)
-6. **Testar** → suite deve passar (490+ testes)
+6. **Testar** → suite deve passar (491 testes)
 7. **Documentar** → mesma sessão, mesmo commit
 8. **Apresentar commit** e aguardar aprovação antes de executar
 
@@ -304,6 +305,26 @@ Antes de qualquer ação, confirmar mentalmente:
 
 ---
 
+## 🧪 ESTRUTURA DE TESTES
+
+### Scripts de Validação (`tests/`):
+- **6 scripts** bash para validação por fase (Módulo 0-5)
+- `mod0_validacao_final.sh` - Health checks do sistema
+- `mod1_validacao_final_fase[1-5].sh` - Validação estrutural
+
+### Testes Formais (`backend/tests/`):
+- **33 arquivos** Python
+- **491 testes** (100% passando)
+- **Preservar permanentemente** - NUNCA remover (regra crítica)
+- **Principais:** `test_darf_acumulado.py` (8), `test_rentabilidade.py` (21), `test_ir_integration.py` (47KB)
+
+### Regras:
+- **Testes formais** devem ficar em `/backend/tests/`
+- **Scripts temporários** podem ficar na raiz, mas devem ser removidos após validação
+- **Nunca remover** testes formais (patrimônio do código)
+
+---
+
 ## 📊 MÓDULOS E ENDPOINTS ATUAIS
 
 ### Módulos Implementados (v0.8.0-dev):
@@ -317,7 +338,7 @@ Antes de qualquer ação, confirmar mentalmente:
 ### Total:
 - **17 blueprints** registrados
 - **23 tabelas** no banco
-- **490+ testes** passando
+- **491 testes** passando
 - **67+ endpoints** REST
 
 ### Novos Endpoints (DIVCALENDAR-001):
