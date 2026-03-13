@@ -69,7 +69,8 @@ Antes de qualquer proposta, ler e processar:
 ### **Documentação Essencial:**
 1. **[API_REFERENCE.md](docs/API_REFERENCE.md)** - Contratos completos
 2. **[ENUMS.md](docs/ENUMS.md)** - 15 TipoAtivo, mapeamentos
-3. **[ROADMAP.md](docs/ROADMAP.md)** - Status atual (83% GAPs)
+3. **[ROADMAP_BACKEND.md](docs/ROADMAP_BACKEND.md)** - Status backend (83% GAPs)
+3b. **[ROADMAP_FRONTEND.md](docs/ROADMAP_FRONTEND.md)** - Plano de reengenharia frontend
 4. **[VISION.md](docs/VISION.md)** - Proposta de valor
 5. **[CODING_STANDARDS.md](docs/CODING_STANDARDS.md)** - snake_case
 

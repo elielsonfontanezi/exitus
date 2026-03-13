@@ -8,6 +8,40 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Planejamento Completo Frontend Reengenharia (13/03/2026)
+
+- **Documentação técnica criada:**
+  - `docs/ROADMAP_FRONTEND.md` v1.1 — Planejamento completo 4 fases (8 semanas)
+  - `docs/PROTOTIPOS_FRONTEND_RESUMO.md` — 12 wireframes ASCII completos
+  - 28 componentes reutilizáveis planejados
+- **Estratégia definida:**
+  - Manter stack HTMX + Alpine.js + TailwindCSS
+  - Componentização sistemática primeiro
+  - 3 telas separadas: Assets, Buy Signals, Planos de Compra
+- **Wireframes ASCII (12 telas):**
+  - Dashboard Multi-Mercado (prioridade #1)
+  - Buy Signals (análise individual)
+  - Planos de Compra (novo módulo)
+  - Assets, Portfolios, Transactions, Dividends, Analytics
+  - Movimentações, Alerts, Reports, Report Detail
+- **Arquitetura de componentes:**
+  - badges/ (5 componentes)
+  - cards/ (5 componentes)
+  - tables/ (5 componentes)
+  - charts/ (4 componentes)
+  - forms/ (4 componentes)
+  - layout/ (3 componentes)
+  - utils/ (3 componentes)
+- **Roadmap de implementação:**
+  - Fase 1: Componentização (2 semanas)
+  - Fase 2: Gráficos e Visualizações (2 semanas)
+  - Fase 3: Planos de Compra (2 semanas)
+  - Fase 4: Melhorias UX (2 semanas)
+- **Documentação reorganizada:**
+  - `docs/ROADMAP.md` → `docs/ROADMAP_BACKEND.md`
+  - Referências atualizadas em 4 arquivos
+  - Status: Planejamento Concluído, pronto para implementação
+
 ### Fixed — Correção Completa dos Testes Pendentes (10/03/2026)
 
 - **Suite de testes 100% funcional:**

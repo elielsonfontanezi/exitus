@@ -14,7 +14,7 @@ PRIORIDADE 1 — Ler antes de qualquer ação:
 ├── docs/TESTES_HISTORICO.md    # Histórico de correções (491/491 ✅)
 ├── docs/PERSONAS.md            # Manual de operação da IA (comportamento, fluxo)
 ├── docs/CODING_STANDARDS.md    # snake_case obrigatório, padrões SQLAlchemy
-├── docs/ROADMAP.md             # GAPs registrados, status, plano de implementação
+├── docs/ROADMAP_BACKEND.md     # GAPs backend, status, plano de implementação
 ├── docs/CHANGELOG.md           # Histórico de mudanças, versão atual
 │
 PRIORIDADE 2 — Consultar conforme contexto:

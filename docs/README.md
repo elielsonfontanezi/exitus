@@ -13,7 +13,8 @@ Documentação crítica para operação e desenvolvimento do sistema.
 
 | Arquivo | Descrição | Prioridade |
 |---------|-----------|------------|
-| **[ROADMAP.md](ROADMAP.md)** | Visão estratégica, métricas atuais (491 testes), próximos GAPs | 🔴 Crítico |
+| **[ROADMAP_BACKEND.md](ROADMAP_BACKEND.md)** | Status de GAPs backend, próximas fases | 🔴 Crítico |
+| **[ROADMAP_FRONTEND.md](ROADMAP_FRONTEND.md)** | Plano de reengenharia frontend, melhorias UX | 🔴 Crítico |
 | **[CHANGELOG.md](CHANGELOG.md)** | Histórico completo, auditoria, rastreabilidade | 🔴 Crítico |
 | **[API_REFERENCE.md](API_REFERENCE.md)** | Contratos da API, essencial para desenvolvimento | 🔴 Crítico |
 | **[ARCHITECTURE.md](ARCHITECTURE.md)** | Decisões arquiteturais, stack, containers | 🔴 Crítico |
