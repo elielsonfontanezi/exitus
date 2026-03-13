@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 10/03/2026 — L-TEST-002 a L-TEST-005 e L-MIG-001 adicionados (correção completa de testes + migrations)  
+> **Atualizado:** 13/03/2026 — L-DOCS-001 adicionado (documentação no mesmo commit)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -692,6 +692,35 @@ def usuario_seed(app):
    ```
 
 **Resultado:** Testes passam de 1 failed para 490 passed.
+
+---
+
+## 📝 Documentação
+
+### L-DOCS-001 — Documentação no mesmo commit (REGRA #6)
+**Origem:** Planejamento Frontend | **Data:** 13/03/2026
+
+**Problema:** Criar commits de código/documentação separados, violando REGRA #6 do `.windsurfrules`. Usuário precisa perguntar "e a documentação?".
+
+**Solução:**
+1. **Sempre** atualizar documentação no mesmo commit:
+   - `CHANGELOG.md` - entrada com artefatos criados/modificados
+   - `ROADMAP.md` - status atualizado para "Concluído (DD/MM/AAAA)"
+   - `CODING_STANDARDS.md` - se introduz novo padrão de código
+   - `ARCHITECTURE.md` - se adiciona componentes/endpoints
+   - `OPERATIONS_RUNBOOK.md` - se adiciona scripts/procedimentos
+   - `LESSONS_LEARNED.md` - se gera lição nova
+
+2. **Fazer squash** se commits já foram criados separados:
+   ```bash
+   git reset --soft HEAD~N  # N = número de commits para juntar
+   git add docs/CHANGELOG.md  # Adicionar documentação faltante
+   git commit -m "feat: descrição completa com documentação"
+   ```
+
+3. **Antes de qualquer commit**, verificar: "Preciso atualizar algum doc?"
+
+**Resultado:** Usuário nunca precisa perguntar sobre documentação - ela já vem junto.
 
 ---
 
