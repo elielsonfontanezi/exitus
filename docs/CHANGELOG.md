@@ -8,6 +8,31 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Fase 2 Sprint 2.1: Integração Chart.js (14/03/2026)
+
+- **Chart.js integrado:**
+  - `frontend/app/templates/base.html` - Chart.js 4.4.0 adicionado
+  - Biblioteca carregada via CDN para gráficos interativos
+- **Gráficos implementados:**
+  - Gráfico de pizza para alocação geográfica (BR/US/INTL)
+  - Gráfico de linha para evolução patrimonial (12 meses simulados)
+  - Gráfico de barras para performance por ativo (por mercado)
+- **Novo componente:**
+  - `performance_by_asset_chart.html` - gráfico de barras com cores dinâmicas
+  - Verde para rentabilidade positiva, vermelho para negativa
+  - Tooltips customizados com formatação percentual
+- **Dashboard atualizado:**
+  - `frontend/app/templates/dashboard/index.html` - scripts Chart.js
+  - Dados passados via `{{ dados | tojson }}`
+  - Gráficos responsivos e interativos
+  - Seção "Performance por Ativo" adicionada
+- **Funcionalidades:**
+  - Gráficos responsivos (mobile/desktop)
+  - Tooltips informativos
+  - Cores consistentes com design system
+  - Animações suaves de transição
+- **Status:** Sprint 2.1 concluída - Gráficos Chart.js funcionais
+
 ### Added — Fase 1 Sprint 1.2: Dashboard Multi-Mercado MVP (14/03/2026)
 
 - **Backend modificado:**

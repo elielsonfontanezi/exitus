@@ -274,59 +274,50 @@ Response:
 
 ### **FASE 2: Gráficos e Visualizações (2 semanas)**
 
-#### **Sprint 2.1: Integração Chart.js (Semana 3)**
+#### **✅ Sprint 2.1: Integração Chart.js (Semana 3) - CONCLUÍDA (14/03/2026)**
 
-**Adicionar dependência:**
+**Dependência adicionada:**
 ```html
-<!-- Chart.js 4.x via CDN -->
+<!-- Chart.js 4.4.0 via CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 ```
 
-**Criar componentes:**
+**Componentes criados:**
 ```
 components/charts/
-├── allocation_pie_chart.html (alocação geográfica)
-├── evolution_line_chart.html (evolução patrimonial)
-└── chart_wrapper.html (wrapper genérico)
+├── allocation_pie_chart.html (alocação geográfica) ✅
+├── evolution_line_chart.html (evolução patrimonial) ✅
+├── performance_by_asset_chart.html (performance por ativo) ✅
+└── chart_wrapper.html (wrapper genérico) ✅
 ```
 
-**Implementar no Dashboard:**
-1. Gráfico Pizza: Alocação 🇧🇷 60% | 🇺🇸 30% | 🌍 10%
-2. Gráfico Linha: Evolução últimos 12 meses
+**Implementado no Dashboard:**
+1. ✅ Gráfico Pizza: Alocação 🇧🇷 BR | 🇺🇸 US | 🌍 INTL
+2. ✅ Gráfico Linha: Evolução últimos 12 meses (simulado)
+3. ✅ Gráfico Barras: Performance por ativo (por mercado)
 
-**Backend necessário:**
+**Backend utilizado:**
 ```python
-# Novo endpoint
-GET /api/analytics/alocacao-geografica
+# Endpoint existente modificado
+GET /api/portfolios/dashboard
 
 Response:
 {
-  "data": [
-    {"mercado": "BR", "percentual": 60, "valor_brl": 50000},
-    {"mercado": "US", "percentual": 30, "valor_brl": 20450},
-    {"mercado": "INTL", "percentual": 10, "valor_brl": 6800}
-  ]
-}
-
-# Novo endpoint
-GET /api/analytics/evolucao-patrimonial?meses=12
-
-Response:
-{
-  "data": [
-    {"mes": "2025-01", "br": 45000, "us": 8000, "intl": 1500, "total": 54500},
-    {"mes": "2025-02", "br": 47000, "us": 8500, "intl": 1800, "total": 57300},
-    ...
-  ]
+  "resumo": {...},
+  "por_mercado": {...},
+  "alocacao_geografica": {"BR": 73.08, "US": 21.92, "INTL": 5.04},
+  "evolucao": []  # Futuro: histórico real
 }
 ```
 
 **Testes:**
-- [ ] Gráfico Pizza renderiza corretamente
-- [ ] Gráfico Linha mostra evolução temporal
-- [ ] Responsivo (adapta em mobile)
+- [x] Gráfico Pizza renderiza corretamente
+- [x] Gráfico Linha mostra evolução temporal
+- [x] Gráfico Barras mostra performance por ativo
+- [x] Responsivo (adapta em mobile)
+- [x] Tooltips funcionais
 
-**Entregável:** 2 gráficos funcionais no Dashboard
+**Entregável:** 3 gráficos funcionais no Dashboard + novo componente
 
 ---
 

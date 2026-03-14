@@ -4,18 +4,19 @@
   Props:
     - data: dict - dados de alocação {BR: 60, US: 30, INTL: 10}
     - chart_id: string - ID único do canvas
+    - title: string - Título do gráfico
   Uso:
-    {% include 'components/charts/allocation_pie_chart.html' with data={...} chart_id='allocation-chart' %}
+    {% include 'components/charts/allocation_pie_chart.html' with data={...} chart_id='allocation-chart' title='Alocação Geográfica' %}
 #}
 
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-  <h3 class="text-lg font-semibold text-gray-900 mb-4">Alocação Geográfica</h3>
-  <div class="relative h-64">
-    <canvas id="{{ chart_id|default('allocation-chart') }}"></canvas>
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ title or 'Alocação Geográfica' }}</h3>
+  <div class="h-64">
+    <canvas id="{{ chart_id or 'allocation-chart' }}"></canvas>
   </div>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const ctx = document.getElementById('{{ chart_id|default('allocation-chart') }}').getContext('2d');
+      const ctx = document.getElementById('{{ chart_id or 'allocation-chart' }}').getContext('2d');
       new Chart(ctx, {
         type: 'pie',
         data: {
