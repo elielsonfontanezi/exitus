@@ -1,42 +1,63 @@
 {# 
   Componente: Asset Card
-  Descrição: Card para exibir informações de um ativo individual
+  Descrição: Card para exibir informações de um ativo individual (Top 5)
   Props:
     - ticker: string - código do ativo
     - nome: string - nome do ativo
     - tipo: string - tipo do ativo
     - mercado: string - mercado (BR, US, INTL)
-    - preco: string - preço atual
-    - variacao: number - variação percentual
+    - valor: number - valor da posição (opcional)
+    - preco: string - preço atual (opcional)
+    - quantidade: number - quantidade (opcional)
+    - rentabilidade: number - rentabilidade percentual
     - score: number - score 0-100 (opcional)
+    - compact: boolean - modo compacto para listas (opcional)
   Uso:
-    {% include 'components/cards/asset_card.html' with ticker='PETR4' nome='Petrobras PN' tipo='ACAO' mercado='BR' preco='R$ 38.50' variacao=2.5 score=85 %}
+    {% include 'components/cards/asset_card.html' with ticker='PETR4' nome='Petrobras PN' tipo='ACAO' mercado='BR' valor=12500 rentabilidade=18.5 %}
 #}
 
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+<div class="{% if compact %}bg-gray-50{% else %}bg-white{% endif %} rounded-lg {% if compact %}border border-gray-200{% else %}shadow-sm border border-gray-200{% endif%} p-4 {% if not compact %}hover:shadow-md{% endif %} transition-shadow">
   <div class="flex items-start justify-between mb-3">
-    <div class="flex-1">
+    <div class="flex-1 min-w-0">
       <div class="flex items-center gap-2 mb-1">
-        <h3 class="text-lg font-bold text-gray-900">{{ ticker }}</h3>
+        <h3 class="text-lg font-bold text-gray-900 truncate">{{ ticker }}</h3>
         {% include 'components/badges/market_badge.html' with mercado=mercado size='sm' %}
-        {% include 'components/badges/asset_type_badge.html' with tipo=tipo size='sm' %}
       </div>
-      <p class="text-sm text-gray-600">{{ nome }}</p>
+      <p class="text-sm text-gray-600 truncate">{{ nome }}</p>
     </div>
     {% if score is defined %}
       {% include 'components/badges/score_badge.html' with score=score size='sm' show_label=false %}
     {% endif %}
   </div>
   
-  <div class="flex items-end justify-between">
-    <div>
-      <p class="text-2xl font-bold text-gray-900">{{ preco }}</p>
-    </div>
-    <div class="text-right">
-      {% if variacao >= 0 %}
-        <p class="text-sm font-semibold text-green-600">+{{ variacao }}%</p>
+  <div class="space-y-2">
+    {% if valor is defined %}
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-gray-500">Posição</span>
+        <span class="text-sm font-semibold text-gray-900">R$ {{ "%.2f"|format(valor) }}</span>
+      </div>
+    {% endif %}
+    
+    {% if quantidade is defined %}
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-gray-500">Quantidade</span>
+        <span class="text-sm font-semibold text-gray-900">{{ quantidade }}</span>
+      </div>
+    {% endif %}
+    
+    {% if preco is defined %}
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-gray-500">Preço</span>
+        <span class="text-sm font-semibold text-gray-900">{{ preco }}</span>
+      </div>
+    {% endif %}
+    
+    <div class="flex justify-between items-center pt-2 border-t border-gray-200">
+      <span class="text-sm text-gray-500">Rentabilidade</span>
+      {% if rentabilidade >= 0 %}
+        <span class="text-sm font-semibold text-green-600">+{{ "%.2f"|format(rentabilidade) }}%</span>
       {% else %}
-        <p class="text-sm font-semibold text-red-600">{{ variacao }}%</p>
+        <span class="text-sm font-semibold text-red-600">{{ "%.2f"|format(rentabilidade) }}%</span>
       {% endif %}
     </div>
   </div>

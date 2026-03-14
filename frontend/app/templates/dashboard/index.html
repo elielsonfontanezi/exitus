@@ -82,41 +82,42 @@
 
   {% include 'components/layout/section_divider.html' with title='Top 5 Ativos por Mercado' %}
 
+  <!-- Filtros e Ordenação -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="text-sm font-medium text-gray-700">Ordenar por:</span>
+        <div class="flex gap-2" x-data="{ sortBy: 'valor' }">
+          <button @click="sortBy = 'valor'" 
+                  :class="sortBy === 'valor' ? 'bg-blue-100 text-blue-700 border-blue-300' : 'bg-white text-gray-700 border-gray-300'"
+                  class="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 transition-colors">
+            Valor
+          </button>
+          <button @click="sortBy = 'rentabilidade'" 
+                  :class="sortBy === 'rentabilidade' ? 'bg-blue-100 text-blue-700 border-blue-300' : 'bg-white text-gray-700 border-gray-300'"
+                  class="px-3 py-1 text-sm border rounded-md hover:bg-gray-50 transition-colors">
+            Rentabilidade
+          </button>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-gray-500">Total de ativos:</span>
+        <span class="text-sm font-semibold text-gray-900">
+          {{ dados.por_mercado.BR.top_ativos|length + dados.por_mercado.US.top_ativos|length + dados.por_mercado.INTL.top_ativos|length }}
+        </span>
+      </div>
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
     {% for mercado_key in ['BR', 'US', 'INTL'] %}
       {% set mercado_data = dados.por_mercado[mercado_key] %}
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div class="flex items-center gap-2 mb-4">
-          {% include 'components/badges/market_badge.html' with mercado=mercado_key size='md' %}
-          <h3 class="text-lg font-semibold text-gray-900">Top 5</h3>
-        </div>
-        {% if mercado_data.top_ativos %}
-          <div class="space-y-3">
-            {% for ativo in mercado_data.top_ativos %}
-              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div class="flex-1">
-                  <p class="text-sm font-bold text-gray-900">{{ ativo.ticker }}</p>
-                  <p class="text-xs text-gray-500">{{ ativo.nome[:30] }}...</p>
-                </div>
-                <div class="text-right">
-                  <p class="text-sm font-semibold text-gray-900">R$ {{ "%.2f"|format(ativo.valor) }}</p>
-                  {% if ativo.rentabilidade >= 0 %}
-                    <p class="text-xs font-medium text-green-600">+{{ "%.2f"|format(ativo.rentabilidade) }}%</p>
-                  {% else %}
-                    <p class="text-xs font-medium text-red-600">{{ "%.2f"|format(ativo.rentabilidade) }}%</p>
-                  {% endif %}
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          {% include 'components/layout/empty_state.html' with 
-            title='Nenhum ativo'
-            message='Sem posições neste mercado'
-            icon='📊'
-          %}
-        {% endif %}
-      </div>
+      {% include 'components/cards/top_assets_list.html' with 
+        mercado=mercado_key
+        ativos=mercado_data.top_ativos
+        title='Top 5 - ' + mercado_key
+        max_items=5
+      %}
     {% endfor %}
   </div>
 
@@ -132,6 +133,30 @@
           title='Performance - ' + mercado_key
         %}
       {% endif %}
+    {% endfor %}
+  </div>
+
+  {% include 'components/layout/section_divider.html' with title='Melhores Ativos' %}
+
+  <!-- Cards detalhados dos Top 3 ativos -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    {% set todos_ativos = [] %}
+    {% for mercado_key in ['BR', 'US', 'INTL'] %}
+      {% for ativo in dados.por_mercado[mercado_key].top_ativos %}
+        {% set _ = todos_ativos.append(ativo) %}
+      {% endfor %}
+    {% endfor %}
+    
+    {% for ativo in todos_ativos[:3] %}
+      {% include 'components/cards/asset_card.html' with 
+        ticker=ativo.ticker
+        nome=ativo.nome
+        tipo=ativo.tipo
+        mercado=ativo.mercado
+        valor=ativo.valor
+        rentabilidade=ativo.rentabilidade
+        compact=false
+      %}
     {% endfor %}
   </div>
 

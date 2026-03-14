@@ -321,45 +321,52 @@ Response:
 
 ---
 
-#### **Sprint 2.2: Top 5 Ativos por Mercado (Semana 4)**
+#### **✅ Sprint 2.2: Top 5 Ativos por Mercado (Semana 4) - CONCLUÍDA (14/03/2026)**
 
-**Criar componente:**
+**Componentes criados/atualizados:**
 ```
-components/cards/asset_card.html
+components/cards/
+├── asset_card.html (refatorado) ✅
+└── top_assets_list.html (NOVO) ✅
 ```
 
-**Implementar seção no Dashboard:**
-- Top 5 Brasil (cards horizontais)
-- Top 5 EUA (cards horizontais)
-- Responsivo (stack vertical em mobile)
+**Implementado no Dashboard:**
+- ✅ Top 5 Brasil (cards com ranking)
+- ✅ Top 5 EUA (cards com ranking)
+- ✅ Top 5 Internacional (cards com ranking)
+- ✅ Filtros e ordenação (Valor/Rentabilidade)
+- ✅ Seção "Melhores Ativos" com 3 cards detalhados
+- ✅ Responsivo (mobile/desktop)
 
-**Backend necessário:**
+**Backend utilizado:**
 ```python
-# Novo endpoint
-GET /api/portfolios/top-ativos?mercado=BR&limit=5
-
-Response:
+# Dados já existentes em /api/portfolios/dashboard
 {
-  "data": [
-    {
-      "ticker": "VALE3",
-      "nome": "Vale ON",
-      "preco_atual": 72.00,
-      "variacao_dia": 2.5,
-      "quantidade": 150,
-      "valor_posicao": 10800
-    },
-    ...
-  ]
+  "por_mercado": {
+    "BR": {"top_ativos": [...]},
+    "US": {"top_ativos": [...]},
+    "INTL": {"top_ativos": [...]}
+  }
 }
 ```
 
-**Testes:**
-- [ ] Cards exibem top 5 por mercado
-- [ ] Variação positiva/negativa com cores
-- [ ] Responsivo (2 colunas → 1 coluna)
+**Funcionalidades implementadas:**
+- Cards com ranking numérico (1-5)
+- Ordenação por valor/rentabilidade
+- Contador total de ativos
+- Hover states e transições
+- Truncamento de textos
+- Cores dinâmicas para rentabilidade
+- Modo compacto para listas
 
-**Entregável:** Seção "Top 5 Ativos" funcional
+**Testes:**
+- [x] Cards exibem top 5 por mercado
+- [x] Variação positiva/negativa com cores
+- [x] Responsivo (2 colunas → 1 coluna)
+- [x] Filtros funcionais
+- [x] Cards detalhados com informações completas
+
+**Entregável:** Seção "Top 5 Ativos" refinada + novo componente top_assets_list
 
 ---
 

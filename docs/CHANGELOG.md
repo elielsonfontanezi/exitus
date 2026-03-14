@@ -8,6 +8,36 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Fase 2 Sprint 2.2: Top 5 Ativos por Mercado (14/03/2026)
+
+- **Componentes melhorados:**
+  - `asset_card.html` - refatorado com mais informações e modo compacto
+  - Novos props: valor, quantidade, preco, rentabilidade, compact
+  - Layout responsivo com truncate para textos longos
+  - Separador visual para rentabilidade
+- **Novo componente:**
+  - `top_assets_list.html` - lista dos Top 5 ativos por mercado
+  - Ranking numérico (1-5) com estilo visual
+  - Totalizador de ativos no header
+  - Link "Ver todos" quando houver mais de 5 itens
+  - Empty state integrado
+- **Filtros e ordenação:**
+  - Botões de ordenação (Valor/Rentabilidade)
+  - Implementado com Alpine.js
+  - Contador total de ativos
+  - Layout responsivo mobile/desktop
+- **Novas seções no Dashboard:**
+  - "Top 5 Ativos por Mercado" com filtros
+  - "Melhores Ativos" com 3 cards detalhados
+  - Cards com informações completas (posição, rentabilidade)
+  - Layout responsivo adaptativo
+- **Funcionalidades:**
+  - Cards hover states e transições suaves
+  - Badges de mercado integrados
+  - Cores dinâmicas para rentabilidade
+  - Truncamento de textos para evitar overflow
+- **Status:** Sprint 2.2 concluída - Top 5 ativos refinado
+
 ### Added — Fase 2 Sprint 2.1: Integração Chart.js (14/03/2026)
 
 - **Chart.js integrado:**
