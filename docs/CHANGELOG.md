@@ -8,6 +8,39 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Fase 4 Sprint 4.1: Otimização de Performance (14/03/2026)
+
+- **Análise de Performance:**
+  - Script `analyze_performance.py` para identificar gargalos
+  - Análise de queries SQL e endpoints críticos
+  - Identificação de índices faltantes
+- **Índices de Banco de Dados:**
+  - Migration `add_performance_indexes.py` com 12 novos índices
+  - Índices compostos para queries frequentes
+  - Otimização das tabelas: posicao, transacao, plano_compra, ativo, provento
+- **Cache Redis:**
+  - Serviço `CacheService` com fallback graceful
+  - Cache para dashboard (5 minutos TTL)
+  - Decorators para cache automático
+  - Suporte a padrões de limpeza
+- **Middleware de Performance:**
+  - Logging automático de requisições lentas
+  - Medição de tempo de resposta
+  - Headers de debug para performance
+  - Decorator para medir funções específicas
+- **Otimizações Implementadas:**
+  - Cache no PortfolioService.get_dashboard()
+  - Logs de slow queries (>1s)
+  - Monitoramento em tempo real
+  - Métricas de performance
+- **Melhorias de Query:**
+  - Índice idx_posicao_usuario_id
+  - Índice idx_transacao_usuario_data
+  - Índice idx_transacao_usuario_ativo
+  - Índice idx_plano_usuario_status
+  - Índice idx_ativo_ticker
+- **Status:** Sprint 4.1 concluída - Performance otimizada
+
 ### Added — Fase 3 Sprint 3.2: Frontend Planos de Compra (14/03/2026)
 
 - **Componentes Criados:**

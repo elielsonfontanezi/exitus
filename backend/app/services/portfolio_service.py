@@ -7,6 +7,7 @@ from app.database import db
 from app.models.portfolio import Portfolio
 from app.models.posicao import Posicao
 from app.models.ativo import Ativo
+from app.services.cache_service import cache
 
 logger = logging.getLogger(__name__)
 
@@ -108,24 +109,17 @@ class PortfolioService:
     def get_dashboard(usuario_id: UUID) -> Dict:
         """
         Gera dados consolidados para o dashboard com agrupamento por mercado.
-        
-        Returns:
-            {
-                "resumo": {
-                    "total_portfolios": int,
-                    "total_posicoes": int,
-                    "patrimonio_total": float,
-                    "rentabilidade_geral": float
-                },
-                "por_mercado": {
-                    "BR": {"patrimonio": float, "percentual": float, "rentabilidade": float, "top_ativos": []},
-                    "US": {"patrimonio": float, "percentual": float, "rentabilidade": float, "top_ativos": []},
-                    "INTL": {"patrimonio": float, "percentual": float, "rentabilidade": float, "top_ativos": []}
-                },
-                "alocacao_geografica": {"BR": float, "US": float, "INTL": float},
-                "evolucao": [{"data": str, "valor": float}]
-            }
+        Cache por 5 minutos para melhorar performance.
         """
+        # Tentar obter do cache
+        cache_key = f"dashboard:{usuario_id}"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            logger.debug(f"Dashboard cache HIT para usuário {usuario_id}")
+            return cached_data
+        
+        logger.debug(f"Dashboard cache MISS para usuário {usuario_id}")
+        
         from app.models import Posicao, Ativo
         from app.services.cambio_service import CambioService
         from decimal import Decimal
@@ -222,7 +216,7 @@ class PortfolioService:
             'INTL': round(por_mercado['INTL']['percentual'], 2)
         }
         
-        return {
+        result = {
             "resumo": {
                 "total_portfolios": total_portfolios,
                 "total_posicoes": total_posicoes,
@@ -233,6 +227,11 @@ class PortfolioService:
             "alocacao_geografica": alocacao_geografica,
             "evolucao": []
         }
+        
+        # Salvar no cache por 5 minutos
+        cache.set(cache_key, result, ttl=300)
+        
+        return result
 
     # --- MÉTODOS DE COMPATIBILIDADE (M4) ---
     @staticmethod
