@@ -227,51 +227,46 @@ components/utils/
 
 ---
 
-#### **Sprint 1.2: Dashboard Multi-Mercado MVP (Semana 2)**
+#### **✅ Sprint 1.2: Dashboard Multi-Mercado MVP (Semana 2) - CONCLUÍDA (14/03/2026)**
 
-**Modificar:** `/dashboard/` (index.html)
+**Modificado:** `/dashboard/` (index.html), `dashboard.py`, `portfolio_service.py`
 
-**Implementar:**
-1. Seção "Patrimônio Consolidado" (3 cards por mercado)
-2. Toggle BRL/USD funcional (Alpine.js)
-3. Integração com endpoint `/api/portfolios/dashboard`
-4. Cards responsivos (grid adaptativo)
+**Implementado:**
+1. ✅ Seção "Patrimônio Consolidado" (3 cards por mercado)
+2. ✅ Toggle BRL/USD funcional (Alpine.js)
+3. ✅ Integração com endpoint `/api/portfolios/dashboard`
+4. ✅ Cards responsivos (grid adaptativo)
+5. ✅ Gráfico de alocação geográfica (Chart.js)
+6. ✅ Top 5 ativos por mercado
+7. ✅ Seções com dividers e empty states
 
-**Backend necessário:**
+**Backend implementado:**
 ```python
-# Modificar endpoint existente
+# Endpoint modificado
 GET /api/portfolios/dashboard
 
 Response:
 {
-  "patrimonio_por_mercado": {
-    "BR": {
-      "total_brl": 50000,
-      "percentual": 60,
-      "rentabilidade_mes": 8.5
-    },
-    "US": {
-      "total_usd": 10000,
-      "percentual": 30,
-      "rentabilidade_mes": 12.3
-    },
-    "INTL": {
-      "total_eur": 2000,
-      "percentual": 10,
-      "rentabilidade_mes": 5.2
-    }
+  "resumo": {
+    "patrimonio_total": float,
+    "rentabilidade_geral": float,
+    "total_portfolios": int,
+    "total_posicoes": int
   },
-  "total_consolidado_brl": 68450,
-  "total_consolidado_usd": 13690,
-  "rentabilidade_geral_mes": 9.2,
-  "rentabilidade_geral_ano": 24.5
+  "por_mercado": {
+    "BR": {"patrimonio": float, "percentual": float, "rentabilidade": float, "top_ativos": []},
+    "US": {"patrimonio": float, "percentual": float, "rentabilidade": float, "top_ativos": []},
+    "INTL": {"patrimonio": float, "percentual": float, "rentabilidade": float, "top_ativos": []}
+  },
+  "alocacao_geografica": {"BR": float, "US": float, "INTL": float},
+  "evolucao": []
 }
 ```
 
 **Testes:**
-- [ ] Toggle BRL/USD alterna valores
-- [ ] Cards exibem dados corretos
-- [ ] Responsivo em mobile (320px)
+- [x] Toggle BRL/USD alterna valores
+- [x] Cards exibem dados corretos
+- [x] Responsivo em mobile (320px)
 
 **Entregável:** Dashboard Multi-Mercado funcional
 

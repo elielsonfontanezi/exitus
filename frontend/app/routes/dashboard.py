@@ -24,35 +24,35 @@ def login_required(f):
 @bp.route('/', methods=['GET'])
 @login_required
 def index():
-    """Dashboard Principal (Home) - Integrado M7"""
+    """Dashboard Multi-Mercado - Fase 1 Sprint 1.2"""
     token = session.get('access_token')
 
     # Estrutura padrão (zerada) para evitar erros no template
     dados = {
-        "patrimonio_total": 0.0,
-        "rentabilidade_geral": 0.0,
-        "total_portfolios": 0,
-        "total_ativos": 0,
-        "alocacao": {},
-        "evolucao": [],
-        "ultimas_transacoes": []
+        "resumo": {
+            "patrimonio_total": 0.0,
+            "rentabilidade_geral": 0.0,
+            "total_portfolios": 0,
+            "total_posicoes": 0
+        },
+        "por_mercado": {
+            "BR": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
+            "US": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
+            "INTL": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []}
+        },
+        "alocacao_geografica": {"BR": 0.0, "US": 0.0, "INTL": 0.0},
+        "evolucao": []
     }
 
     if token:
         try:
             headers = {'Authorization': f'Bearer {token}'}
 
-            # Chamada A: Resumo Portfolio
+            # Chamada: Dashboard com dados por mercado
             resp_dash = requests.get(f'{Config.BACKEND_API_URL}/api/portfolios/dashboard', headers=headers, timeout=5)
             if resp_dash.status_code == 200:
                 data = resp_dash.json().get('data', {})
-                resumo = data.get('resumo', {})
-                dados.update({
-                    "patrimonio_total": resumo.get('patrimonio_total', 0.0),
-                    "rentabilidade_geral": resumo.get('rentabilidade_geral', 0.0),
-                    "total_portfolios": resumo.get('total_portfolios', 0),
-                    "total_ativos": resumo.get('total_posicoes', 0)
-                })
+                dados = data
 
         except Exception as e:
             print(f"Erro no dashboard home: {e}")

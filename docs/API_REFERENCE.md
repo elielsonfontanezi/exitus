@@ -208,11 +208,75 @@ Para referência completa dos enums, consulte `ENUMS.md`.
 
 ## 5. Portfólios
 APIs de dashboard, alocação, performance e carteiras customizadas:
-- `GET /api/portfolio/dashboard`
+- `GET /api/portfolios/dashboard` - Dashboard consolidado com dados por mercado
 - `GET /api/portfolio/alocacao`
 - `GET /api/portfolio/performance`
 - `GET /api/portfolio/evolucao`
 - CRUD de `/api/portfolios`
+
+### GET /api/portfolios/dashboard
+Retorna dashboard consolidado do portfólio com agrupamento por mercado (BR, US, INTL).
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "resumo": {
+      "patrimonio_total": 68450.00,
+      "rentabilidade_geral": 12.5,
+      "total_portfolios": 3,
+      "total_posicoes": 25
+    },
+    "por_mercado": {
+      "BR": {
+        "patrimonio": 50000.00,
+        "percentual": 73.08,
+        "rentabilidade": 15.2,
+        "top_ativos": [
+          {
+            "ticker": "PETR4",
+            "nome": "Petrobras PN",
+            "tipo": "acao",
+            "valor": 12500.00,
+            "rentabilidade": 18.5
+          }
+        ]
+      },
+      "US": {
+        "patrimonio": 15000.00,
+        "percentual": 21.92,
+        "rentabilidade": 8.3,
+        "top_ativos": []
+      },
+      "INTL": {
+        "patrimonio": 3450.00,
+        "percentual": 5.04,
+        "rentabilidade": 5.1,
+        "top_ativos": []
+      }
+    },
+    "alocacao_geografica": {
+      "BR": 73.08,
+      "US": 21.92,
+      "INTL": 5.04
+    },
+    "evolucao": []
+  },
+  "message": "Dashboard gerado com sucesso"
+}
+```
+
+**Notas:**
+- Todos os valores em BRL (conversão automática via CambioService)
+- `top_ativos`: até 5 maiores posições por mercado
+- `evolucao`: histórico patrimonial (futuro)
+- Mercados: BR (Brasil), US (Estados Unidos), INTL (Europa/Ásia/Global)
 
 ---
 

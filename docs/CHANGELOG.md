@@ -8,7 +8,37 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
-### Added — Fase 1: Biblioteca de Componentes Frontend (13/03/2026)
+### Added — Fase 1 Sprint 1.2: Dashboard Multi-Mercado MVP (14/03/2026)
+
+- **Backend modificado:**
+  - `backend/app/services/portfolio_service.py` - método `get_dashboard()` refatorado
+  - Agrupamento por mercado (BR, US, INTL)
+  - Cálculo de patrimônio, rentabilidade e top 5 ativos por mercado
+  - Conversão automática para BRL via CambioService
+  - Alocação geográfica percentual
+- **Frontend refatorado:**
+  - `frontend/app/templates/dashboard/index.html` - refatoração completa
+  - `frontend/app/routes/dashboard.py` - ajuste na rota index()
+  - Integração de 15+ componentes criados na Sprint 1.1
+  - Toggle BRL/USD com Alpine.js (preparado)
+  - 3 market_stat_card por mercado
+  - Gráfico de alocação geográfica (Chart.js)
+  - Top 5 ativos por mercado
+  - Seções com dividers e empty states
+- **Componentes utilizados:**
+  - page_header, section_divider, empty_state
+  - stat_card (4x), market_stat_card (3x)
+  - market_badge, currency_badge
+  - allocation_pie_chart
+  - currency_toggle
+- **Estrutura de dados:**
+  - `resumo`: patrimônio total, rentabilidade geral, totais
+  - `por_mercado`: dados agrupados BR/US/INTL
+  - `alocacao_geografica`: percentuais por mercado
+  - `top_ativos`: 5 maiores posições por mercado
+- **Status:** Sprint 1.2 concluída - Dashboard Multi-Mercado funcional
+
+### Added — Fase 1 Sprint 1.1: Biblioteca de Componentes Frontend (13/03/2026)
 
 - **28 componentes reutilizáveis criados:**
   - **Badges (5):** market_badge, currency_badge, score_badge, signal_badge, asset_type_badge

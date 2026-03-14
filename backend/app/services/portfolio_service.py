@@ -106,18 +106,132 @@ class PortfolioService:
     
     @staticmethod
     def get_dashboard(usuario_id: UUID) -> Dict:
-        """Gera dados consolidados para o dashboard."""
-        # Implementação simplificada para validar a rota
+        """
+        Gera dados consolidados para o dashboard com agrupamento por mercado.
+        
+        Returns:
+            {
+                "resumo": {
+                    "total_portfolios": int,
+                    "total_posicoes": int,
+                    "patrimonio_total": float,
+                    "rentabilidade_geral": float
+                },
+                "por_mercado": {
+                    "BR": {"patrimonio": float, "percentual": float, "rentabilidade": float, "top_ativos": []},
+                    "US": {"patrimonio": float, "percentual": float, "rentabilidade": float, "top_ativos": []},
+                    "INTL": {"patrimonio": float, "percentual": float, "rentabilidade": float, "top_ativos": []}
+                },
+                "alocacao_geografica": {"BR": float, "US": float, "INTL": float},
+                "evolucao": [{"data": str, "valor": float}]
+            }
+        """
+        from app.models import Posicao, Ativo
+        from app.services.cambio_service import CambioService
+        from decimal import Decimal
+        from collections import defaultdict
+        
         total_portfolios = Portfolio.query.filter_by(usuario_id=usuario_id, ativo=True).count()
-        total_posicoes = Posicao.query.filter_by(usuario_id=usuario_id).count()
+        posicoes = Posicao.query.filter_by(usuario_id=usuario_id).all()
+        total_posicoes = len(posicoes)
+        
+        if not posicoes:
+            return {
+                "resumo": {
+                    "total_portfolios": total_portfolios,
+                    "total_posicoes": 0,
+                    "patrimonio_total": 0.0,
+                    "rentabilidade_geral": 0.0
+                },
+                "por_mercado": {
+                    "BR": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
+                    "US": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
+                    "INTL": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []}
+                },
+                "alocacao_geografica": {"BR": 0.0, "US": 0.0, "INTL": 0.0},
+                "evolucao": []
+            }
+        
+        patrimonio_por_mercado = defaultdict(float)
+        custo_por_mercado = defaultdict(float)
+        ativos_por_mercado = defaultdict(list)
+        patrimonio_total = 0.0
+        custo_total = 0.0
+        
+        for posicao in posicoes:
+            ativo = posicao.ativo
+            if not ativo:
+                continue
+            
+            preco = Decimal(str(ativo.preco_atual)) if ativo.preco_atual else Decimal(str(posicao.preco_medio))
+            valor_posicao_moeda = Decimal(str(posicao.quantidade)) * preco
+            custo_posicao_moeda = Decimal(str(posicao.custo_total)) if posicao.custo_total else Decimal('0')
+            
+            moeda = getattr(ativo, 'moeda', 'BRL') or 'BRL'
+            if moeda.upper() != 'BRL':
+                valor_brl = CambioService.converter_para_brl(valor_posicao_moeda, moeda)
+                custo_brl = CambioService.converter_para_brl(custo_posicao_moeda, moeda)
+                valor_posicao = float(valor_brl) if valor_brl is not None else float(valor_posicao_moeda)
+                custo_posicao = float(custo_brl) if custo_brl is not None else float(custo_posicao_moeda)
+            else:
+                valor_posicao = float(valor_posicao_moeda)
+                custo_posicao = float(custo_posicao_moeda)
+            
+            mercado = ativo.mercado.upper()
+            if mercado not in ['BR', 'US']:
+                mercado = 'INTL'
+            
+            patrimonio_por_mercado[mercado] += valor_posicao
+            custo_por_mercado[mercado] += custo_posicao
+            patrimonio_total += valor_posicao
+            custo_total += custo_posicao
+            
+            ativos_por_mercado[mercado].append({
+                'ticker': ativo.ticker,
+                'nome': ativo.nome,
+                'tipo': ativo.tipo.value if ativo.tipo else None,
+                'valor': valor_posicao,
+                'rentabilidade': ((valor_posicao - custo_posicao) / custo_posicao * 100) if custo_posicao > 0 else 0.0
+            })
+        
+        rentabilidade_geral = ((patrimonio_total - custo_total) / custo_total * 100) if custo_total > 0 else 0.0
+        
+        por_mercado = {}
+        for mercado in ['BR', 'US', 'INTL']:
+            patrimonio = patrimonio_por_mercado.get(mercado, 0.0)
+            custo = custo_por_mercado.get(mercado, 0.0)
+            percentual = (patrimonio / patrimonio_total * 100) if patrimonio_total > 0 else 0.0
+            rentabilidade = ((patrimonio - custo) / custo * 100) if custo > 0 else 0.0
+            
+            top_ativos = sorted(
+                ativos_por_mercado.get(mercado, []),
+                key=lambda x: x['valor'],
+                reverse=True
+            )[:5]
+            
+            por_mercado[mercado] = {
+                'patrimonio': round(patrimonio, 2),
+                'percentual': round(percentual, 2),
+                'rentabilidade': round(rentabilidade, 2),
+                'top_ativos': top_ativos
+            }
+        
+        alocacao_geografica = {
+            'BR': round(por_mercado['BR']['percentual'], 2),
+            'US': round(por_mercado['US']['percentual'], 2),
+            'INTL': round(por_mercado['INTL']['percentual'], 2)
+        }
         
         return {
             "resumo": {
                 "total_portfolios": total_portfolios,
                 "total_posicoes": total_posicoes,
-                "patrimonio_total": 0.0,  # TODO: Calcular soma das posições
-                "rentabilidade_geral": 0.0
-            }
+                "patrimonio_total": round(patrimonio_total, 2),
+                "rentabilidade_geral": round(rentabilidade_geral, 2)
+            },
+            "por_mercado": por_mercado,
+            "alocacao_geografica": alocacao_geografica,
+            "evolucao": []
         }
 
     # --- MÉTODOS DE COMPATIBILIDADE (M4) ---
