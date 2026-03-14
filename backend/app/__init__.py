@@ -177,6 +177,14 @@ def create_app(testing=False):
     except ImportError as e:
         print(f"⚠️  Buy Signals blueprint não encontrado: {e}")
 
+    # Fase 3 - Planos de Compra
+    try:
+        from .blueprints.plano_compra_blueprint import bp as plano_compra_bp
+        app.register_blueprint(plano_compra_bp)
+        print("✅ Planos de Compra blueprint registrado: /api/plano-compra/*")
+    except ImportError as e:
+        print(f"⚠️  Planos de Compra blueprint não encontrado: {e}")
+
     # M4.6 - IR (Imposto de Renda — EXITUS-IR-001)
     try:
         from .blueprints.ir_blueprint import ir_bp

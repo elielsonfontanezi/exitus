@@ -38,6 +38,7 @@ class Usuario(db.Model):
     # Relacionamentos
     # 'Portfolio' como string para evitar Import Circular
     portfolios = relationship('Portfolio', back_populates='usuario', lazy='dynamic', cascade='all, delete-orphan')
+    planos_compra = relationship('PlanoCompra', back_populates='usuario', lazy='dynamic', cascade='all, delete-orphan')
 
     def set_password(self, password):
         """Define a senha do usuário (gera hash bcrypt)"""

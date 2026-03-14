@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-10 18:38:14
+Gerado em: 2026-03-14 11:16:25
 ================================================================================
 
 ================================================================================
@@ -26,6 +26,7 @@ TABELAS DO BANCO EXITUS
  public | log_auditoria          | exitus
  public | movimentacao_caixa     | exitus
  public | parametros_macro       | exitus
+ public | plano_compra           | exitus
  public | portfolio              | exitus
  public | posicao                | exitus
  public | projecoes_renda        | exitus
@@ -37,7 +38,7 @@ TABELAS DO BANCO EXITUS
  public | taxa_cambio            | exitus
  public | transacao              | exitus
  public | usuario                | exitus
-(26 rows)
+(27 rows)
 
 
 ================================================================================
@@ -232,6 +233,7 @@ Referenced by:
     TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_ativo_novo_id_fkey" FOREIGN KEY (ativo_novo_id) REFERENCES ativo(id) ON DELETE SET NULL
     TABLE "evento_custodia" CONSTRAINT "evento_custodia_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
+    TABLE "plano_compra" CONSTRAINT "fk_plano_compra_ativo" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE CASCADE
     TABLE "historico_preco" CONSTRAINT "historico_preco_ativoid_fkey" FOREIGN KEY (ativoid) REFERENCES ativo(id) ON DELETE CASCADE
     TABLE "posicao" CONSTRAINT "posicao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     TABLE "provento" CONSTRAINT "provento_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
@@ -1362,6 +1364,92 @@ ________________________________________________________________________________
 
 
 ################################################################################
+TABELA: plano_compra
+################################################################################
+
+                                                                 Table "public.plano_compra"
+        Column        |            Type             | Collation | Nullable |          Default           | Storage  | Compression | Stats target | Description 
+----------------------+-----------------------------+-----------+----------+----------------------------+----------+-------------+--------------+-------------
+ id                   | uuid                        |           | not null |                            | plain    |             |              | 
+ usuario_id           | uuid                        |           | not null |                            | plain    |             |              | 
+ ativo_id             | uuid                        |           | not null |                            | plain    |             |              | 
+ nome                 | character varying(200)      |           | not null |                            | extended |             |              | 
+ descricao            | character varying(500)      |           |          |                            | extended |             |              | 
+ quantidade_alvo      | numeric(15,4)               |           | not null |                            | main     |             |              | 
+ quantidade_acumulada | numeric(15,4)               |           | not null | '0'::numeric               | main     |             |              | 
+ valor_aporte_mensal  | numeric(15,2)               |           | not null |                            | main     |             |              | 
+ data_inicio          | timestamp without time zone |           | not null |                            | plain    |             |              | 
+ data_fim_prevista    | timestamp without time zone |           |          |                            | plain    |             |              | 
+ data_conclusao       | timestamp without time zone |           |          |                            | plain    |             |              | 
+ status               | statusplanocompra           |           | not null | 'ativo'::statusplanocompra | plain    |             |              | 
+ proximo_aporte       | timestamp without time zone |           |          |                            | plain    |             |              | 
+ created_at           | timestamp without time zone |           | not null |                            | plain    |             |              | 
+ updated_at           | timestamp without time zone |           | not null |                            | plain    |             |              | 
+Indexes:
+    "plano_compra_pkey" PRIMARY KEY, btree (id)
+    "ix_plano_compra_ativo_id" btree (ativo_id)
+    "ix_plano_compra_status" btree (status)
+    "ix_plano_compra_usuario_id" btree (usuario_id)
+Foreign-key constraints:
+    "fk_plano_compra_ativo" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE CASCADE
+    "fk_plano_compra_usuario" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |        Coluna        |            Tipo             | Tamanho | Null? |          Default           
+-----+----------------------+-----------------------------+---------+-------+----------------------------
+   1 | id                   | uuid                        |         | NO    | 
+   2 | usuario_id           | uuid                        |         | NO    | 
+   3 | ativo_id             | uuid                        |         | NO    | 
+   4 | nome                 | character varying           | (200)   | NO    | 
+   5 | descricao            | character varying           | (500)   | YES   | 
+   6 | quantidade_alvo      | numeric                     |         | NO    | 
+   7 | quantidade_acumulada | numeric                     |         | NO    | '0'::numeric
+   8 | valor_aporte_mensal  | numeric                     |         | NO    | 
+   9 | data_inicio          | timestamp without time zone |         | NO    | 
+  10 | data_fim_prevista    | timestamp without time zone |         | YES   | 
+  11 | data_conclusao       | timestamp without time zone |         | YES   | 
+  12 | status               | USER-DEFINED                |         | NO    | 'ativo'::statusplanocompra
+  13 | proximo_aporte       | timestamp without time zone |         | YES   | 
+  14 | created_at           | timestamp without time zone |         | NO    | 
+  15 | updated_at           | timestamp without time zone |         | NO    | 
+(15 rows)
+
+
+Foreign Keys:
+         Nome FK         |   Coluna   | Tabela Referenciada | Coluna Referenciada 
+-------------------------+------------+---------------------+---------------------
+ fk_plano_compra_usuario | usuario_id | usuario             | id
+ fk_plano_compra_ativo   | ativo_id   | ativo               | id
+(2 rows)
+
+
+Primary Keys:
+      Nome PK      | Coluna 
+-------------------+--------
+ plano_compra_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+       Nome do Índice       |                                        Definição                                        
+----------------------------+-----------------------------------------------------------------------------------------
+ plano_compra_pkey          | CREATE UNIQUE INDEX plano_compra_pkey ON public.plano_compra USING btree (id)
+ ix_plano_compra_usuario_id | CREATE INDEX ix_plano_compra_usuario_id ON public.plano_compra USING btree (usuario_id)
+ ix_plano_compra_ativo_id   | CREATE INDEX ix_plano_compra_ativo_id ON public.plano_compra USING btree (ativo_id)
+ ix_plano_compra_status     | CREATE INDEX ix_plano_compra_status ON public.plano_compra USING btree (status)
+(4 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
 TABELA: portfolio
 ################################################################################
 
@@ -2232,6 +2320,7 @@ Referenced by:
     TABLE "configuracoes_alertas" CONSTRAINT "configuracoes_alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "corretora" CONSTRAINT "corretora_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "evento_custodia" CONSTRAINT "evento_custodia_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+    TABLE "plano_compra" CONSTRAINT "fk_plano_compra_usuario" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "log_auditoria" CONSTRAINT "log_auditoria_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL
     TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "portfolio" CONSTRAINT "portfolio_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
@@ -2295,7 +2384,7 @@ RESUMO GERAL
 Total de Tabelas:
  Total 
 -------
-    26
+    27
 (1 row)
 
 
@@ -2317,6 +2406,7 @@ Total de Colunas por Tabela:
  log_auditoria          |          12
  movimentacao_caixa     |          13
  parametros_macro       |          12
+ plano_compra           |          15
  portfolio              |          10
  posicao                |          16
  projecoes_renda        |          11
@@ -2328,7 +2418,7 @@ Total de Colunas por Tabela:
  taxa_cambio            |           8
  transacao              |          21
  usuario                |           9
-(26 rows)
+(27 rows)
 
 
 Total de Foreign Keys por Tabela:
@@ -2344,6 +2434,7 @@ Total de Foreign Keys por Tabela:
  historico_preco        |       1
  log_auditoria          |       1
  movimentacao_caixa     |       4
+ plano_compra           |       2
  portfolio              |       1
  posicao                |       3
  projecoes_renda        |       1
@@ -2352,7 +2443,7 @@ Total de Foreign Keys por Tabela:
  saldo_darf_acumulado   |       1
  saldo_prejuizo         |       1
  transacao              |       3
-(18 rows)
+(19 rows)
 
 
 ================================================================================
@@ -2366,6 +2457,7 @@ ENUMS DO BANCO
  frequencianotificacao | imediata, diaria, semanal, mensal
  incidenciaimposto     | lucro, receita, provento, operacao
  operadorcondicao      | >, <, ==, >=, <=, ENTRE
+ statusplanocompra     | ativo, pausado, concluido, cancelado
  tipo_evento_custodia  | liquidacao_d2, transferencia_entrada, transferencia_saida, ajuste_posicao, desdobramento, agrupamento, amortizacao, outro
  tipoalerta            | queda_preco, alta_preco, dividendo_previsto, meta_rentabilidade, volatilidade_alta, desvio_alocacao, noticias_ativo
  tipoativo             | acao, fii, reit, bond, etf, cripto, outro, cdb, lci_lca, tesouro_direto, debenture, stock, stock_intl, etf_intl, unit
@@ -2379,7 +2471,7 @@ ENUMS DO BANCO
  tiporelatorio         | portfolio, performance, renda_passiva, investimento, customizado
  tipotransacao         | compra, venda, dividendo, jcp, aluguel, bonificacao, split, grupamento, subscricao, amortizacao
  userrole              | admin, user, readonly
-(18 rows)
+(19 rows)
 
 
 ================================================================================

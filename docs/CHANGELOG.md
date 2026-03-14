@@ -8,6 +8,42 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Fase 3 Sprint 3.1: Backend Planos de Compra (14/03/2026)
+
+- **Novo Model:**
+  - `PlanoCompra` - planos de compra programada de ativos
+  - Campos: nome, descricao, quantidade_alvo, quantidade_acumulada, valor_aporte_mensal
+  - Status: ativo, pausado, concluido, cancelado
+  - Relacionamentos: FK para Usuario e Ativo
+  - Métodos: calcular_progresso(), esta_concluido(), pode_receber_aporte()
+- **Novo Service:**
+  - `PlanoCompraService` - lógica de negócio completa
+  - CRUD: create, get_by_id, list, update, delete
+  - Operações: registrar_aporte, pausar, reativar, cancelar
+  - Validações: dados obrigatórios, status, valores positivos
+  - Cálculos automáticos: progresso, próximo aporte, data fim prevista
+- **Novo Blueprint:**
+  - `/api/plano-compra/*` - endpoints REST completos
+  - POST / - criar plano
+  - GET / - listar planos (com filtro por status)
+  - GET /{id} - buscar plano por ID
+  - PUT /{id} - atualizar plano
+  - POST /{id}/aporte - registrar aporte
+  - POST /{id}/pausar - pausar plano
+  - POST /{id}/reativar - reativar plano
+  - POST /{id}/cancelar - cancelar plano
+  - DELETE /{id} - remover plano
+  - GET /dashboard - dashboard com resumo e próximos aportes
+- **Banco de Dados:**
+  - Migration `a3b8454c1468_add_plano_compra_table.py`
+  - Tabela `plano_compra` com índices e FKs
+  - Enum `statusplanocompra` para status
+- **Integrações:**
+  - Relacionamento com model Usuario adicionado
+  - Blueprint registrado em app/__init__.py
+  - Exceções BusinessRuleError para validações
+- **Status:** Sprint 3.1 concluída - Backend Planos de Compra funcional
+
 ### Added — Fase 2 Sprint 2.2: Top 5 Ativos por Mercado (14/03/2026)
 
 - **Componentes melhorados:**

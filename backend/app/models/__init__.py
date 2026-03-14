@@ -42,6 +42,9 @@ from .portfolio import Portfolio
 
 from app.models.historico_preco import HistoricoPreco
 
+# Fase 3 - Planos de Compra
+from .plano_compra import PlanoCompra, StatusPlanoCompra
+
 __all__ = [
     # Core
     "Usuario",
@@ -86,4 +89,8 @@ __all__ = [
     "ProjecaoRenda",
     "RelatorioPerformance",
     "Portfolio",
+    
+    # Fase 3 - Planos de Compra
+    "PlanoCompra",
+    "StatusPlanoCompra",
 ]
