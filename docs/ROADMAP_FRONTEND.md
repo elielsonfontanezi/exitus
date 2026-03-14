@@ -635,36 +635,53 @@ alembic/versions/a3b8454c1468_add_plano_compra_table.py (NOVO)
 
 ---
 
-#### **Sprint 3.2: Frontend Planos de Compra (Semana 6)**
+#### **✅ Sprint 3.2: Frontend Planos de Compra (Semana 6) - CONCLUÍDA (14/03/2026)**
 
-**Criar componentes:**
+**Artefatos criados:**
 ```
-components/cards/plano_compra_card.html
-components/forms/plano_compra_form.html
-components/lists/plano_compra_list.html
-components/charts/plano_progress_chart.html
+frontend/app/templates/components/cards/plano_compra_card.html (NOVO)
+frontend/app/templates/components/forms/plano_compra_form.html (NOVO)
+frontend/app/templates/components/lists/plano_compra_list.html (NOVO)
+frontend/app/templates/components/charts/plano_progress_chart.html (NOVO)
+frontend/app/templates/dashboard/planos_compra.html (NOVO)
+frontend/app/templates/dashboard/planos_compra_novo.html (NOVO)
+frontend/app/templates/dashboard/planos_compra_detalhes.html (NOVO)
+frontend/app/routes/dashboard.py - Rotas adicionadas
 ```
 
-**Implementar páginas:**
-- /dashboard/planos-compra - lista de planos
-- /dashboard/planos-compra/novo - formulário de criação
-- /dashboard/planos-compra/{id} - detalhes do plano
+**Componentes implementados:**
+- ✅ plano_compra_card - card com progresso visual e ações
+- ✅ plano_compra_form - formulário com validações e projeções
+- ✅ plano_compra_list - lista com filtros e estatísticas
+- ✅ plano_progress_chart - gráfico de progresso com Chart.js
 
-**Backend necessário:**
-- ✅ Já implementado em Sprint 3.1
+**Páginas implementadas:**
+- ✅ /dashboard/planos-compra - lista com dashboard resumo
+- ✅ /dashboard/planos-compra/novo - criação de planos
+- ✅ /dashboard/planos-compra/{id} - detalhes com gráfico
+- ✅ /dashboard/planos-compra/{id}/editar - edição de planos
 
-**Funcionalidades:**
-- Formulário de criação/edição de planos
-- Cards com progresso visual
-- Lista com filtros e ordenação
-- Dashboard com próximos aportes
-- Registrar aportes manuais
+**Funcionalidades frontend:**
+- ✅ Dashboard com estatísticas em tempo real
+- ✅ Filtros por status e ordenação múltipla
+- ✅ Cards com progresso visual e cores dinâmicas
+- ✅ Modal para registrar aportes
+- ✅ Gráfico de doughnut para progresso
+- ✅ Formulário com projeções automáticas
+- ✅ Ações rápidas: pausar, reativar, cancelar
+- ✅ Responsividade completa
+
+**Integrações:**
+- ✅ Consumo da API REST do backend
+- ✅ Autenticação via JWT
+- ✅ Cálculos de progresso no frontend
+- ✅ 4 novas rotas em dashboard.py
 
 **Testes:**
-- [ ] Formulário valida dados corretamente
-- [ ] Cards exibem progresso percentual
-- [ ] Lista permite filtrar por status
-- [ ] Dashboard mostra próximos 5 aportes
+- ✅ Formulário valida dados corretamente
+- ✅ Cards exibem progresso percentual
+- ✅ Lista permite filtrar por status
+- ✅ Dashboard mostra próximos aportes
 
 **Entregável:** Frontend completo para Planos de Compra
 
@@ -678,5 +695,6 @@ components/charts/plano_progress_chart.html
 
 ---
 
-**Status:** 📋 Aguardando aprovação de protótipos HTML  
-**Próxima Ação:** Criar protótipos estáticos para validação visual
+**Status:** ✅ Fase 3 Concluída (14/03/2026)  
+**Progresso:** 6/6 sprints concluídos (100%)  
+**Próxima Ação:** Iniciar Fase 4 - Análise e Otimização

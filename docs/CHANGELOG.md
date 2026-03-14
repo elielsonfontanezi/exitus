@@ -8,6 +8,36 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Fase 3 Sprint 3.2: Frontend Planos de Compra (14/03/2026)
+
+- **Componentes Criados:**
+  - `plano_compra_card.html` - card com progresso visual e ações
+  - `plano_compra_form.html` - formulário com validações e projeções
+  - `plano_compra_list.html` - lista com filtros e estatísticas
+  - `plano_progress_chart.html` - gráfico de progresso com Chart.js
+- **Páginas Implementadas:**
+  - `/dashboard/planos-compra` - lista com dashboard resumo
+  - `/dashboard/planos-compra/novo` - criação de planos
+  - `/dashboard/planos-compra/{id}` - detalhes com gráfico e histórico
+  - `/dashboard/planos-compra/{id}/editar` - edição de planos
+- **Funcionalidades Frontend:**
+  - Dashboard com estatísticas em tempo real
+  - Filtros por status e ordenação múltipla
+  - Cards com progresso visual e cores dinâmicas
+  - Modal para registrar aportes
+  - Gráfico de doughnut para progresso
+  - Formulário com projeções automáticas
+  - Ações rápidas: pausar, reativar, cancelar
+- **Integrações:**
+  - Consumo da API REST do backend
+  - Autenticação via JWT
+  - Cálculos de progresso no frontend
+  - Responsividade completa
+- **Rotas Adicionadas:**
+  - 4 novas rotas em `dashboard.py` para pages
+  - Integração com blueprint existente
+- **Status:** Sprint 3.2 concluída - Frontend Planos de Compra funcional
+
 ### Added — Fase 3 Sprint 3.1: Backend Planos de Compra (14/03/2026)
 
 - **Novo Model:**

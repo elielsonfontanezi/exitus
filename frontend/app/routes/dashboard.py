@@ -868,6 +868,132 @@ def alerts_delete(alert_id):
     requests.delete(f'{Config.BACKEND_API_URL}/api/alertas/{alert_id}', headers=headers)
     return redirect(url_for('dashboard.alerts'))
 
+# --- Rotas de Planos de Compra (Fase 3 Sprint 3.2) ---
+@bp.route('/planos-compra')
+@login_required
+def planos_compra():
+    """Lista de Planos de Compra"""
+    token = session.get('access_token')
+    planos = []
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/plano-compra/', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                planos = data.get('data', [])
+                # Calcular progresso percentual para cada plano
+                for plano in planos:
+                    quantidade_alvo = float(plano.get('quantidade_alvo', 0))
+                    quantidade_acumulada = float(plano.get('quantidade_acumulada', 0))
+                    if quantidade_alvo > 0:
+                        plano['progresso_percentual'] = (quantidade_acumulada / quantidade_alvo) * 100
+                    else:
+                        plano['progresso_percentual'] = 0
+        except Exception as e:
+            print(f"Erro ao buscar planos de compra: {e}")
+    
+    return render_template('dashboard/planos_compra.html', planos=planos)
+
+
+@bp.route('/planos-compra/novo')
+@login_required
+def planos_compra_novo():
+    """Formulário de Novo Plano de Compra"""
+    token = session.get('access_token')
+    ativos = []
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/ativos', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                ativos = data.get('data', {}).get('ativos', [])
+        except Exception as e:
+            print(f"Erro ao buscar ativos: {e}")
+    
+    return render_template('dashboard/planos_compra_novo.html', ativos=ativos)
+
+
+@bp.route('/planos-compra/<plano_id>')
+@login_required
+def planos_compra_detalhes(plano_id):
+    """Detalhes do Plano de Compra"""
+    token = session.get('access_token')
+    plano = None
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/plano-compra/{plano_id}', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                plano = data.get('data')
+                # Calcular progresso
+                if plano:
+                    quantidade_alvo = float(plano.get('quantidade_alvo', 0))
+                    quantidade_acumulada = float(plano.get('quantidade_acumulada', 0))
+                    if quantidade_alvo > 0:
+                        plano['progresso_percentual'] = (quantidade_acumulada / quantidade_alvo) * 100
+                    else:
+                        plano['progresso_percentual'] = 0
+        except Exception as e:
+            print(f"Erro ao buscar plano: {e}")
+            flash('Plano não encontrado.', 'error')
+            return redirect(url_for('dashboard.planos_compra'))
+    
+    if not plano:
+        flash('Plano não encontrado.', 'error')
+        return redirect(url_for('dashboard.planos_compra'))
+    
+    return render_template('dashboard/planos_compra_detalhes.html', plano=plano)
+
+
+@bp.route('/planos-compra/<plano_id>/editar')
+@login_required
+def planos_compra_editar(plano_id):
+    """Editar Plano de Compra"""
+    token = session.get('access_token')
+    plano = None
+    ativos = []
+    
+    if token:
+        # Buscar plano
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/plano-compra/{plano_id}', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                plano = data.get('data')
+        except Exception as e:
+            print(f"Erro ao buscar plano: {e}")
+            flash('Plano não encontrado.', 'error')
+            return redirect(url_for('dashboard.planos_compra'))
+        
+        # Buscar ativos
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/ativos', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                ativos = data.get('data', {}).get('ativos', [])
+        except Exception as e:
+            print(f"Erro ao buscar ativos: {e}")
+    
+    if not plano:
+        flash('Plano não encontrado.', 'error')
+        return redirect(url_for('dashboard.planos_compra'))
+    
+    return render_template('dashboard/planos_compra_novo.html', plano=plano, ativos=ativos)
+
+
 # ✅ ADICIONAR NO FINAL (usando bp Blueprint)
 @bp.route('/movimentacoes')
 @login_required
