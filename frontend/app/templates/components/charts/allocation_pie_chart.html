@@ -1,0 +1,57 @@
+{# 
+  Componente: Allocation Pie Chart
+  Descrição: Gráfico de pizza para alocação geográfica
+  Props:
+    - data: dict - dados de alocação {BR: 60, US: 30, INTL: 10}
+    - chart_id: string - ID único do canvas
+  Uso:
+    {% include 'components/charts/allocation_pie_chart.html' with data={...} chart_id='allocation-chart' %}
+#}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">Alocação Geográfica</h3>
+  <div class="relative h-64">
+    <canvas id="{{ chart_id|default('allocation-chart') }}"></canvas>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('{{ chart_id|default('allocation-chart') }}').getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['🇧🇷 Brasil', '🇺🇸 Estados Unidos', '🌍 Internacional'],
+          datasets: [{
+            data: [{{ data.BR|default(0) }}, {{ data.US|default(0) }}, {{ data.INTL|default(0) }}],
+            backgroundColor: [
+              'rgba(34, 197, 94, 0.8)',
+              'rgba(59, 130, 246, 0.8)',
+              'rgba(168, 85, 247, 0.8)'
+            ],
+            borderColor: [
+              'rgba(34, 197, 94, 1)',
+              'rgba(59, 130, 246, 1)',
+              'rgba(168, 85, 247, 1)'
+            ],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.label + ': ' + context.parsed + '%';
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</div>

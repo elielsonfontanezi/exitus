@@ -8,6 +8,37 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Fase 1: Biblioteca de Componentes Frontend (13/03/2026)
+
+- **28 componentes reutilizáveis criados:**
+  - **Badges (5):** market_badge, currency_badge, score_badge, signal_badge, asset_type_badge
+  - **Cards (5):** stat_card, market_stat_card, asset_card, opportunity_card, portfolio_summary_card
+  - **Tables (5):** data_table, asset_table, transaction_table, dividend_table, opportunity_table
+  - **Charts (4):** allocation_pie_chart, evolution_line_chart, performance_bar_chart, chart_wrapper
+  - **Forms (4):** filter_form, search_bar, currency_toggle, modal_form
+  - **Layout (3):** page_header, section_divider, empty_state
+  - **Utils (3):** loading_spinner, toast_notification, pagination
+- **Estrutura de diretórios:**
+  - `frontend/app/templates/components/badges/`
+  - `frontend/app/templates/components/cards/`
+  - `frontend/app/templates/components/tables/`
+  - `frontend/app/templates/components/charts/`
+  - `frontend/app/templates/components/forms/`
+  - `frontend/app/templates/components/layout/`
+  - `frontend/app/templates/components/utils/`
+- **Padrões estabelecidos:**
+  - Jinja2 includes para reuso
+  - Alpine.js para estado local (toggle, modal)
+  - TailwindCSS para estilos responsivos
+  - Chart.js para gráficos interativos
+  - Props documentados em cada componente
+- **Integração:**
+  - Componentes auto-contidos e reutilizáveis
+  - Responsivos (mobile/desktop)
+  - Acessíveis via include
+  - Prontos para uso nas 12 telas planejadas
+- **Status:** Fase 1 Sprint 1.1 concluída (Semana 1)
+
 ### Added — Planejamento Completo Frontend Reengenharia (13/03/2026)
 
 - **Documentação técnica criada:**

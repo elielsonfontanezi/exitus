@@ -1,0 +1,42 @@
+{# 
+  Componente: Score Badge
+  Descrição: Badge visual para score de ativo (0-100)
+  Props:
+    - score: number (0-100)
+    - size: string (sm, md, lg) - opcional, padrão 'md'
+    - show_label: boolean - opcional, padrão true
+  Uso:
+    {% include 'components/badges/score_badge.html' with score=85 size='md' show_label=true %}
+#}
+
+{% set badge_classes = {
+  'sm': 'px-2 py-0.5 text-xs',
+  'md': 'px-2.5 py-1 text-sm',
+  'lg': 'px-3 py-1.5 text-base'
+} %}
+
+{% set score_value = score|default(0)|int %}
+{% set size_class = badge_classes.get(size, badge_classes['md']) %}
+{% set show_label = show_label if show_label is defined else true %}
+
+{% if score_value >= 70 %}
+  {% set emoji = '🟢' %}
+  {% set color = 'bg-green-100 text-green-800 border-green-300' %}
+  {% set label = 'Excelente' %}
+{% elif score_value >= 50 %}
+  {% set emoji = '🟡' %}
+  {% set color = 'bg-yellow-100 text-yellow-800 border-yellow-300' %}
+  {% set label = 'Moderado' %}
+{% else %}
+  {% set emoji = '🔴' %}
+  {% set color = 'bg-red-100 text-red-800 border-red-300' %}
+  {% set label = 'Baixo' %}
+{% endif %}
+
+<span class="inline-flex items-center gap-1.5 font-medium rounded-md border {{ size_class }} {{ color }}">
+  <span>{{ emoji }}</span>
+  <span class="font-semibold">{{ score_value }}</span>
+  {% if show_label %}
+    <span class="text-xs opacity-75">{{ label }}</span>
+  {% endif %}
+</span>

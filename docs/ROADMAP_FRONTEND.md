@@ -168,9 +168,9 @@ components/
 
 ### **FASE 1: Fundação e Componentização (2 semanas)**
 
-#### **Sprint 1.1: Biblioteca de Componentes Base (Semana 1)**
+#### **✅ Sprint 1.1: Biblioteca de Componentes Base (Semana 1) - CONCLUÍDA (13/03/2026)**
 
-**Artefatos a criar:**
+**Artefatos criados:**
 ```
 components/badges/
 ├── market_badge.html (🇧🇷 🇺🇸 🌍)
@@ -216,14 +216,14 @@ components/utils/
 ```
 
 **Testes:**
-- [ ] Renderização de badges em diferentes contextos
-- [ ] Toggle de moeda funcional
-- [ ] Cards responsivos (mobile/desktop)
-- [ ] Tables com sorting/filtering
-- [ ] Gráficos Chart.js funcionais
-- [ ] Forms com validação
+- [x] Renderização de badges em diferentes contextos
+- [x] Toggle de moeda funcional
+- [x] Cards responsivos (mobile/desktop)
+- [x] Tables com sorting/filtering
+- [x] Gráficos Chart.js funcionais
+- [x] Forms com validação
 
-**Entregável:** 28 componentes base funcionais
+**Entregável:** ✅ 28 componentes base funcionais criados
 
 ---
 

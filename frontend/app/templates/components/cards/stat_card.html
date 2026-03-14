@@ -1,0 +1,51 @@
+{# 
+  Componente: Stat Card
+  Descrição: Card genérico para exibir estatísticas/KPIs
+  Props:
+    - title: string - título do card
+    - value: string/number - valor principal
+    - subtitle: string - subtítulo opcional
+    - trend: string (up, down, neutral) - opcional
+    - trend_value: string - valor da tendência opcional
+    - icon: string - emoji/ícone opcional
+  Uso:
+    {% include 'components/cards/stat_card.html' with title='Patrimônio Total' value='R$ 68.450,00' trend='up' trend_value='+8.5%' icon='💰' %}
+#}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+  <div class="flex items-start justify-between">
+    <div class="flex-1">
+      <p class="text-sm font-medium text-gray-600">{{ title }}</p>
+      <div class="mt-2 flex items-baseline gap-2">
+        <p class="text-2xl font-semibold text-gray-900">{{ value }}</p>
+        {% if trend %}
+          {% if trend == 'up' %}
+            <span class="inline-flex items-center gap-1 text-sm font-medium text-green-600">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
+              </svg>
+              {{ trend_value }}
+            </span>
+          {% elif trend == 'down' %}
+            <span class="inline-flex items-center gap-1 text-sm font-medium text-red-600">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586 3.707 5.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd"/>
+              </svg>
+              {{ trend_value }}
+            </span>
+          {% else %}
+            <span class="text-sm font-medium text-gray-600">{{ trend_value }}</span>
+          {% endif %}
+        {% endif %}
+      </div>
+      {% if subtitle %}
+        <p class="mt-1 text-sm text-gray-500">{{ subtitle }}</p>
+      {% endif %}
+    </div>
+    {% if icon %}
+      <div class="flex-shrink-0">
+        <span class="text-3xl">{{ icon }}</span>
+      </div>
+    {% endif %}
+  </div>
+</div>

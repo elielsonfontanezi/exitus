@@ -1,0 +1,25 @@
+{# 
+  Componente: Currency Toggle
+  Descrição: Toggle para alternar entre moedas (BRL ⇄ USD)
+  Props:
+    - current: string - moeda atual (BRL, USD)
+  Uso:
+    {% include 'components/forms/currency_toggle.html' with current='BRL' %}
+#}
+
+<div x-data="{ currency: '{{ current|default('BRL') }}' }" class="inline-flex rounded-md shadow-sm">
+  <button 
+    @click="currency = 'BRL'"
+    :class="currency === 'BRL' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+    class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-l-md focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+  >
+    R$ BRL
+  </button>
+  <button 
+    @click="currency = 'USD'"
+    :class="currency === 'USD' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+    class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 rounded-r-md focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+  >
+    $ USD
+  </button>
+</div>

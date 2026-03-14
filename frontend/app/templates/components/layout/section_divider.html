@@ -1,0 +1,19 @@
+{# 
+  Componente: Section Divider
+  Descrição: Divisor de seção com título opcional
+  Props:
+    - title: string - título da seção (opcional)
+  Uso:
+    {% include 'components/layout/section_divider.html' with title='Resumo Financeiro' %}
+#}
+
+<div class="relative py-4">
+  <div class="absolute inset-0 flex items-center" aria-hidden="true">
+    <div class="w-full border-t border-gray-300"></div>
+  </div>
+  {% if title %}
+    <div class="relative flex justify-center">
+      <span class="bg-white px-3 text-sm font-medium text-gray-900">{{ title }}</span>
+    </div>
+  {% endif %}
+</div>

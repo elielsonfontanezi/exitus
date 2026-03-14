@@ -1,0 +1,43 @@
+{# 
+  Componente: Asset Card
+  Descrição: Card para exibir informações de um ativo individual
+  Props:
+    - ticker: string - código do ativo
+    - nome: string - nome do ativo
+    - tipo: string - tipo do ativo
+    - mercado: string - mercado (BR, US, INTL)
+    - preco: string - preço atual
+    - variacao: number - variação percentual
+    - score: number - score 0-100 (opcional)
+  Uso:
+    {% include 'components/cards/asset_card.html' with ticker='PETR4' nome='Petrobras PN' tipo='ACAO' mercado='BR' preco='R$ 38.50' variacao=2.5 score=85 %}
+#}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+  <div class="flex items-start justify-between mb-3">
+    <div class="flex-1">
+      <div class="flex items-center gap-2 mb-1">
+        <h3 class="text-lg font-bold text-gray-900">{{ ticker }}</h3>
+        {% include 'components/badges/market_badge.html' with mercado=mercado size='sm' %}
+        {% include 'components/badges/asset_type_badge.html' with tipo=tipo size='sm' %}
+      </div>
+      <p class="text-sm text-gray-600">{{ nome }}</p>
+    </div>
+    {% if score is defined %}
+      {% include 'components/badges/score_badge.html' with score=score size='sm' show_label=false %}
+    {% endif %}
+  </div>
+  
+  <div class="flex items-end justify-between">
+    <div>
+      <p class="text-2xl font-bold text-gray-900">{{ preco }}</p>
+    </div>
+    <div class="text-right">
+      {% if variacao >= 0 %}
+        <p class="text-sm font-semibold text-green-600">+{{ variacao }}%</p>
+      {% else %}
+        <p class="text-sm font-semibold text-red-600">{{ variacao }}%</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
