@@ -8,6 +8,28 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Fase 7: Multi-Tenancy (Parte 1) (16/03/2026)
+
+- **MULTICLIENTE-001 - Base Multi-Tenant:**
+  - Model Assessora: Entidade principal para multi-tenancy
+  - 23 campos: identificação, contato, endereço, certificações, limites
+  - Relacionamentos: usuarios, portfolios, transacoes, posicoes, planos
+  - Properties: total_usuarios, total_portfolios, validações de limites
+- **Migrations:**
+  - create_assessora_table: Tabela assessora com 4 índices
+  - add_assessora_id_to_tables: assessora_id em 20 tabelas
+  - 20 foreign keys com CASCADE
+  - 24 índices (20 simples + 4 compostos)
+- **Models Atualizados (4):**
+  - Usuario: assessora_id + relacionamento
+  - Portfolio: assessora_id + relacionamento
+  - PlanoVenda: assessora_id + relacionamento
+  - PlanoCompra: assessora_id + relacionamento
+- **Scripts:**
+  - add_assessora_to_models.py: Script para atualizar models restantes
+- **Status:** Parte 1 concluída - Base implementada
+- **Próximos Passos:** Atualizar 16 models restantes, aplicar migrations, JWT, middleware
+
 ### Fixed — Infraestrutura e Processos (16/03/2026)
 
 - **Correção de Permissões WSL/Containers:**

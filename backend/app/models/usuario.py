@@ -3,7 +3,7 @@
 
 import enum
 from datetime import datetime
-from sqlalchemy import String, Boolean, DateTime, Enum
+from sqlalchemy import String, Boolean, DateTime, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -26,6 +26,9 @@ class Usuario(db.Model):
     email = db.Column(String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(String(255), nullable=False)
     nome_completo = db.Column(String(200), nullable=True)
+    
+    # Multi-tenancy
+    assessora_id = db.Column(UUID(as_uuid=True), ForeignKey('assessora.id', ondelete='CASCADE'), nullable=True, index=True)
 
     # Controle
     ativo = db.Column(Boolean, default=True, nullable=False)
@@ -37,6 +40,7 @@ class Usuario(db.Model):
 
     # Relacionamentos
     # 'Portfolio' como string para evitar Import Circular
+    assessora = relationship('Assessora', back_populates='usuarios')
     portfolios = relationship('Portfolio', back_populates='usuario', lazy='dynamic', cascade='all, delete-orphan')
     planos_compra = relationship('PlanoCompra', back_populates='usuario', lazy='dynamic', cascade='all, delete-orphan')
     planos_venda = relationship('PlanoVenda', back_populates='usuario', lazy='dynamic', cascade='all, delete-orphan')
@@ -66,6 +70,8 @@ class Usuario(db.Model):
             "nome_completo": self.nome_completo,
             "ativo": self.ativo,
             "role": self.role.value if self.role else UserRole.USER.value,
+            "assessora_id": str(self.assessora_id) if self.assessora_id else None,
+            "assessora_nome": self.assessora.nome if self.assessora else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }

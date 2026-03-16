@@ -48,6 +48,7 @@ class PlanoVenda(db.Model):
     # Relacionamentos
     usuario_id = Column(UUID(as_uuid=True), ForeignKey("usuario.id"), nullable=False)
     ativo_id = Column(UUID(as_uuid=True), ForeignKey("ativo.id"), nullable=False)
+    assessora_id = Column(UUID(as_uuid=True), ForeignKey("assessora.id", ondelete="CASCADE"), nullable=True, index=True)
     
     # Configurações da venda
     quantidade_total = Column(Numeric(18, 8), nullable=False)  # Quantidade total para vender
@@ -75,6 +76,7 @@ class PlanoVenda(db.Model):
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relacionamentos
+    assessora = relationship("Assessora", back_populates="planos_venda")
     usuario = relationship("Usuario", back_populates="planos_venda")
     ativo = relationship("Ativo")
     

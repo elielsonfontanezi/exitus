@@ -5,6 +5,7 @@ Exportação centralizada de todos os models
 """
 
 # Módulo 1 e 2 - Core
+from .assessora import Assessora
 from .usuario import Usuario, UserRole
 from .corretora import Corretora, TipoCorretora
 from .ativo import Ativo, TipoAtivo, ClasseAtivo
@@ -50,6 +51,7 @@ from .plano_venda import PlanoVenda, StatusPlanoVenda, TipoGatilho
 
 __all__ = [
     # Core
+    "Assessora",
     "Usuario",
     "UserRole",
     "Corretora",

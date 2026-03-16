@@ -29,6 +29,7 @@ class PlanoCompra(db.Model):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuario.id', ondelete='CASCADE'), nullable=False, index=True)
     ativo_id = Column(UUID(as_uuid=True), ForeignKey('ativo.id', ondelete='CASCADE'), nullable=False, index=True)
+    assessora_id = Column(UUID(as_uuid=True), ForeignKey('assessora.id', ondelete='CASCADE'), nullable=True, index=True)
     
     # Dados do plano
     nome = Column(String(200), nullable=False)
@@ -51,6 +52,7 @@ class PlanoCompra(db.Model):
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relacionamentos
+    assessora = relationship('Assessora', back_populates='planos_compra')
     usuario = relationship('Usuario', back_populates='planos_compra')
     ativo = relationship('Ativo', backref='planos_compra')
 
