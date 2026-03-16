@@ -47,6 +47,7 @@ class Transacao(db.Model):
     # --- Relacionamentos ---
     ativo_id    = Column(UUID(as_uuid=True), ForeignKey('ativo.id'), nullable=False)
     corretora_id = Column(UUID(as_uuid=True), ForeignKey('corretora.id'), nullable=False)
+    assessora_id = Column(UUID(as_uuid=True), ForeignKey('assessora.id', ondelete='CASCADE'), nullable=True, index=True)
 
     # --- Dados da transação ---
     data_transacao  = Column(DateTime(timezone=True), nullable=False)
@@ -76,6 +77,7 @@ class Transacao(db.Model):
                          default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # --- ORM relationships ---
+    assessora = relationship('Assessora', back_populates='transacoes')
     usuario  = relationship('Usuario', backref='transacoes', lazy=True)
     ativo    = relationship('Ativo', backref='transacoes',
                             primaryjoin='Transacao.ativo_id == Ativo.id', lazy=True)

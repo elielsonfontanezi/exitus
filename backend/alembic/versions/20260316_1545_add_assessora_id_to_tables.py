@@ -10,8 +10,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '20260316_1545_add_assessora_id_to_tables'
-down_revision = '20260316_1540_create_assessora_table'
+revision = '20260316_1545_assessora_id'
+down_revision = '20260316_1540_assessora'
 branch_labels = None
 depends_on = None
 
@@ -72,7 +72,7 @@ def upgrade():
     
     # Índices compostos para queries frequentes
     op.create_index('ix_usuario_assessora_ativo', 'usuario', ['assessora_id', 'ativo'], unique=False)
-    op.create_index('ix_transacao_assessora_data', 'transacao', ['assessora_id', 'data'], unique=False)
+    op.create_index('ix_transacao_assessora_data', 'transacao', ['assessora_id', 'data_transacao'], unique=False)
     op.create_index('ix_posicao_assessora_ativo', 'posicao', ['assessora_id', 'ativo_id'], unique=False)
     op.create_index('ix_portfolio_assessora_usuario', 'portfolio', ['assessora_id', 'usuario_id'], unique=False)
 

@@ -75,6 +75,14 @@ class Posicao(db.Model):
         comment="ID do ativo"
     )
     
+    assessora_id = db.Column(
+        UUID(as_uuid=True),
+        ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID da assessora (multi-tenancy)"
+    )
+    
     # Dados da posição
     quantidade = db.Column(
         Numeric(precision=18, scale=8),
@@ -163,6 +171,7 @@ class Posicao(db.Model):
     )
     
     # Relacionamentos
+    assessora = relationship('Assessora', back_populates='posicoes')
     usuario = relationship('Usuario', backref='posicoes', lazy='joined')
     corretora = relationship('Corretora', backref='posicoes', lazy='joined')
     ativo = relationship('Ativo', backref='posicoes', lazy='joined')

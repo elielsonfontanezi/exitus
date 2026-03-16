@@ -8,6 +8,28 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Fase 7: Multi-Tenancy (Parte 2A) (16/03/2026)
+
+- **MULTICLIENTE-001 - Migrations Aplicadas e Models Atualizados:**
+  - Migrations aplicadas com sucesso no banco
+  - Tabela assessora criada (23 campos)
+  - assessora_id adicionado em 20 tabelas
+  - 24 índices criados (20 simples + 4 compostos)
+  - 20 foreign keys com CASCADE
+- **Models Atualizados (11/20):**
+  - Parte 1: Usuario, Portfolio, PlanoVenda, PlanoCompra (manual)
+  - Parte 2A: Posicao, Transacao (manual)
+  - Script: Alerta, RelatorioPerformance, ProjecaoRenda, CalendarioDividendo, Transacao (automático)
+- **Assessora Padrão:**
+  - ID: 23c54cb4-cb0a-438f-b985-def21d70904e
+  - Nome: Assessora Padrão
+  - 5 usuários migrados
+- **Correções:**
+  - Revision ID reduzido para 32 chars
+  - Coluna data_transacao corrigida na migration
+- **Status:** Parte 2A concluída - Migrations aplicadas, 11/20 models atualizados (55%)
+- **Próximos Passos (Parte 2B):** Atualizar 9 models restantes, implementar filtros, JWT, middleware
+
 ### Added — Fase 7: Multi-Tenancy (Parte 1) (16/03/2026)
 
 - **MULTICLIENTE-001 - Base Multi-Tenant:**
@@ -15,20 +37,14 @@ e este projeto adere semanticamente à versão v0.8.0.
   - 23 campos: identificação, contato, endereço, certificações, limites
   - Relacionamentos: usuarios, portfolios, transacoes, posicoes, planos
   - Properties: total_usuarios, total_portfolios, validações de limites
-- **Migrations:**
-  - create_assessora_table: Tabela assessora com 4 índices
-  - add_assessora_id_to_tables: assessora_id em 20 tabelas
-  - 20 foreign keys com CASCADE
-  - 24 índices (20 simples + 4 compostos)
+- **Migrations Criadas:**
+  - 20260316_1540_assessora: Tabela assessora
+  - 20260316_1545_assessora_id: assessora_id em 20 tabelas
 - **Models Atualizados (4):**
-  - Usuario: assessora_id + relacionamento
-  - Portfolio: assessora_id + relacionamento
-  - PlanoVenda: assessora_id + relacionamento
-  - PlanoCompra: assessora_id + relacionamento
+  - Usuario, Portfolio, PlanoVenda, PlanoCompra
 - **Scripts:**
   - add_assessora_to_models.py: Script para atualizar models restantes
 - **Status:** Parte 1 concluída - Base implementada
-- **Próximos Passos:** Atualizar 16 models restantes, aplicar migrations, JWT, middleware
 
 ### Fixed — Infraestrutura e Processos (16/03/2026)
 
