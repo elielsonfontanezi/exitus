@@ -228,6 +228,10 @@ sleep 10
 #### 5. Iniciar Backend
 
 ```bash
+# Obter UID/GID do usuário (importante para permissões)
+USER_UID=$(id -u)
+USER_GID=$(id -g)
+
 podman run -d \
   --name exitus-backend \
   --network exitus-net \
@@ -235,6 +239,8 @@ podman run -d \
   -v ./backend:/app:Z \
   -v exitus-backend-logs:/app/logs:Z \
   -p 5000:5000 \
+  -e USER_UID=$USER_UID \
+  -e USER_GID=$USER_GID \
   exitus-backend:latest
 ```
 
@@ -248,6 +254,8 @@ podman run -d \
   -v ./frontend:/app:Z \
   -v exitus-frontend-logs:/app/logs:Z \
   -p 8080:8080 \
+  -e USER_UID=$USER_UID \
+  -e USER_GID=$USER_GID \
   exitus-frontend:latest
 ```
 
@@ -1782,6 +1790,73 @@ GROUP BY tipo
 ORDER BY total DESC;
 "
 ```
+
+---
+
+## 🔧 Correção de Permissões (Windows WSL)
+
+### Problema Comum
+
+Ao editar arquivos no Windsurf (Windows) através do WSL, os arquivos são criados com UID/GID diferentes do usuário dentro dos containers Podman.
+
+### Sintomas
+- Erros: "Permission denied", "Operation not permitted"
+- Containers não conseguem ler/escrever arquivos montados
+- Arquivos com owner `100999` (Windows) vs `exitus` (container)
+
+### Solução Automática
+
+#### Método 1: Script Fix (Recomendado)
+```bash
+# Corrige instalação existente
+./scripts/fix_permissions.sh
+```
+
+#### Método 2: Setup com UID/GID
+```bash
+# Para nova instalação
+./scripts/setup_containers.sh
+```
+
+### Verificação
+```bash
+# Verificar UID/GID no host
+id -u && id -g
+
+# Verificar UID/GID no container
+podman exec exitus-backend id -u exitus
+podman exec exitus-backend id -g exitus
+
+# Deve ser igual!
+```
+
+### Manual (se necessário)
+```bash
+# Parar containers
+podman stop exitus-backend exitus-frontend
+
+# Reconstruir imagem com UID/GID
+cd backend
+podman build -t exitus-backend:latest .
+cd ../frontend
+podman build -t exitus-frontend:latest .
+cd ..
+
+# Criar com UID/GID correto
+USER_UID=$(id -u)
+USER_GID=$(id -g)
+
+podman run -d --name exitus-backend \
+  --network exitus-net \
+  -p 5000:5000 \
+  -v ./backend:/app:Z \
+  --env-file ./backend/.env \
+  -e USER_UID=$USER_UID \
+  -e USER_GID=$USER_GID \
+  exitus-backend:latest
+```
+
+**Documentação completa**: [PERMISSIONS_FIX.md](PERMISSIONS_FIX.md)
 
 ---
 

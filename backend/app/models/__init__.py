@@ -45,6 +45,9 @@ from app.models.historico_preco import HistoricoPreco
 # Fase 3 - Planos de Compra
 from .plano_compra import PlanoCompra, StatusPlanoCompra
 
+# Fase 4 - Planos de Venda
+from .plano_venda import PlanoVenda, StatusPlanoVenda, TipoGatilho
+
 __all__ = [
     # Core
     "Usuario",
@@ -93,4 +96,9 @@ __all__ = [
     # Fase 3 - Planos de Compra
     "PlanoCompra",
     "StatusPlanoCompra",
+    
+    # Fase 4 - Planos de Venda
+    "PlanoVenda",
+    "StatusPlanoVenda",
+    "TipoGatilho",
 ]

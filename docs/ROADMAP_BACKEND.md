@@ -1,7 +1,7 @@
 # 🚀 Exitus — Roadmap de Implementação
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso:** 45/54 GAPs (83%) | **Testes:** 491/491 passing (100%) ✅ | **Endpoints:** 144 | **Versão:** v0.9.0
+> **Progresso:** 46/54 GAPs (85%) | **Testes:** 491/491 passing (100%) ✅ | **Endpoints:** 155 | **Versão:** v0.9.1
 
 ---
 
@@ -21,8 +21,8 @@
 
 | Componente | Status | Detalhes |
 |------------|--------|----------|
-| **Backend** | ✅ | 67+ endpoints REST, Flask + SQLAlchemy |
-| **Banco** | ✅ | PostgreSQL, 22 tabelas, constraints robustas |
+| **Backend** | ✅ | 155 endpoints REST, Flask + SQLAlchemy |
+| **Banco** | ✅ | PostgreSQL, 23 tabelas, constraints robustas |
 | **Autenticação** | ✅ | JWT, 3 roles (ADMIN/USER/READONLY) |
 | **Motor Fiscal** | ✅ | IR completo, IOF, DARF, compensação |
 | **Importação** | ✅ | B3 Excel/CSV, 56 ativos seed |
@@ -42,7 +42,7 @@
 | **1** | Setup | ✅ | Fev/2026 | Infraestrutura base |
 | **2** | 9 GAPs | ✅ | Fev/2026 | Scripts, CRUD, Importação |
 | **3** | 13 GAPs | ✅ | Mar/2026 | Motor IR completo |
-| **4** | 8 GAPs | ✅ | Mar/2026 | APIs, Multi-moeda |
+| **4** | 9 GAPs | ✅ | Mar/2026 | APIs, Multi-moeda, Planos de Venda |
 | **5** | 6 GAPs | ✅ | 08/03/2026 | Rentabilidade, Qualidade |
 | **6** | 9 GAPs | ✅ | 09/03/2026 | IOF, Auditoria, Scripts |
 
@@ -60,6 +60,7 @@
 | GAP ID | Funcionalidade | Status |
 |--------|---------------|--------|
 | REBALANCE-001 | Rebalanceamento automático | 📋 Planejado |
+| **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
 | DIVCALENDAR-001 | Calendário de dividendos | ✅ Concluído (10/03/2026) |
 | CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
 | BLUEPRINT-CONSOLIDATION-001 | Consolidação de blueprints | ✅ Concluído (10/03/2026) |
@@ -74,7 +75,7 @@
 │   Frontend      │    │    Backend      │    │   Banco dados   │
 │   (HTMX)        │◄──►│   (Flask)       │◄──►│  (PostgreSQL)   │
 │                 │    │                 │    │                 │
-│ - Tailwind CSS  │    │ - 67 endpoints  │    │ - 22 tabelas    │
+│ - Tailwind CSS  │    │ - 155 endpoints  │    │ - 23 tabelas    │
 │ - JWT Auth      │    │ - SQLAlchemy    │    │ - Constraints   │
 │ - Swagger UI    │    │ - Redis cache   │    │ - Índices       │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
@@ -96,12 +97,12 @@
 
 | Métrica | Atual | Meta | Status |
 |---------|-------|------|--------|
-| **GAPs Concluídos** | 45/54 (83%) | 54/54 | ✅ Em dia |
+| **GAPs Concluídos** | 46/54 (85%) | 54/54 | ✅ Em dia |
 | **Testes Coletados** | 491 testes | 500+ | ✅ Quase lá |
 | **Testes Passando** | 491 (100%) | 480+ | ✅ Superou! |
-| **Testes Pendentes** | 0 (0 failed + 0 errors) | 0 | ✅ [Ver docs/TESTES_PENDENTES.md](TESTES_PENDENTES.md) |
+| **Testes Pendentes** | 0 (0 failed + 0 errors) | 0 | ✅ [Ver docs/TESTES_HISTORICO.md](TESTES_HISTORICO.md) |
 | **Cobertura** | ?% | 80%+ | ⚠️ Medir |
-| **Endpoints** | 144 | 150+ | ✅ Superou! |
+| **Endpoints** | 155 | 150+ | ✅ Superou! |
 | **Ativos** | 56 | 100+ | ✅ Conforme |
 
 ---
@@ -199,6 +200,6 @@ Maio 2026:
 
 ---
 
-*Última atualização: 11/03/2026*  
+*Última atualização: 16/03/2026*  
 *Próxima revisão: Após Fase 7*  
 *Responsável: Elielson Fontanezi + Cascade AI*

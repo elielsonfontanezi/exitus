@@ -8,6 +8,55 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — Infraestrutura e Processos (16/03/2026)
+
+- **Correção de Permissões WSL/Containers:**
+  - Problema: UID/GID mismatch entre Windows WSL e containers Podman
+  - Solução: Implementado UID/GID dinâmico em runtime
+  - docker-entrypoint.sh: Script ajusta usuário do container automaticamente
+  - setup_containers.sh: Passa UID/GID do host como environment variables
+  - fix_permissions.sh: Script único para corrigir instalações existentes
+- **Arquivos Modificados:**
+  - backend/Dockerfile: Suporte a USER_UID/USER_GID
+  - backend/docker-entrypoint.sh: Entrypoint dinâmico
+  - scripts/setup_containers.sh: Passa UID/GID para containers
+  - scripts/fix_permissions.sh: Script de correção
+  - docs/PERMISSIONS_FIX.md: Documentação completa
+- **Benefícios:**
+  - Fim dos erros de permissão ao editar no Windsurf
+  - Volumes funcionam corretamente
+  - Processo de desenvolvimento fluido Windows ↔ WSL ↔ Containers
+
+### Added — Fase 4 Sprint 4.2: Planos de Venda (16/03/2026)
+
+- **Model PlanoVenda:**
+  - Sistema completo para planos de venda disciplinada
+  - Status: ATIVO, PAUSADO, CONCLUIDO, CANCELADO
+  - Gatilhos: PRECO_ALVO, PERCENTUAL_LUCRO, PARCELAS_SEMANAIS/MENSAIS, DATA_LIMITE, GATILHO_MISTO
+  - Campos: quantidade_total/vendida, preços, parcelamento, controle
+- **Service PlanoVendaService:**
+  - CRUD completo com validações de posição suficiente
+  - Cache Redis para performance (5min TTL)
+  - Verificação automática de gatilhos
+  - Dashboard com estatísticas e próximos disparos
+- **Blueprint plano_venda_blueprint.py:**
+  - 11 endpoints REST completos
+  - Validações de input e tratamento de erros
+  - Paginação e filtros por status
+  - Autenticação JWT em todos os endpoints
+- **Banco de Dados:**
+  - Migration `create_plano_venda_table` aplicada
+  - Tabela `plano_venda` com 4 índices otimizados
+  - Relacionamento com Usuario e Ativo
+- **Utils:**
+  - Arquivo `validators.py` criado com `validate_uuid`
+  - Validações para UUID, email, CNPJ, ticker B3
+- **Integrações:**
+  - Relacionamento `planos_venda` adicionado ao model Usuario
+  - Blueprint registrado em `/api/plano-venda/*`
+  - Exportação no `models/__init__.py`
+- **Status:** Sprint 4.2 concluída - Planos de Venda 100% funcional
+
 ### Added — Fase 4 Sprint 4.1: Otimização de Performance (14/03/2026)
 
 - **Análise de Performance:**

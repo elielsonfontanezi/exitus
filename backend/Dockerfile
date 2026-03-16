@@ -11,6 +11,10 @@ ARG APP_USER=exitus
 ARG APP_UID=1000
 ARG APP_GID=1000
 
+# Variáveis de ambiente para UID/GID dinâmicos
+ENV USER_UID=${APP_UID}
+ENV USER_GID=${APP_GID}
+
 WORKDIR /app
 
 # 1️⃣ Instalar dependências sistema + ferramentas essenciais
@@ -22,10 +26,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     procps \
     && rm -rf /var/lib/apt/lists/*
 
-# 2️⃣ Criar usuário não-root dedicado
+# 2️⃣ Criar usuário não-root dedicado (com UID/GID dinâmicos)
 RUN groupadd -g ${APP_GID} ${APP_USER} && \
     useradd -u ${APP_UID} -g ${APP_GID} -m -s /bin/bash ${APP_USER} && \
     chown -R ${APP_USER}:${APP_USER} /app
+
+# Script para ajustar UID/GID em runtime
+COPY --chown=${APP_USER}:${APP_USER} docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 # 3️⃣ Copiar requirements e instalar dependências Python (como root)
 COPY --chown=${APP_USER}:${APP_USER} requirements.txt .
