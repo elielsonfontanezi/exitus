@@ -93,7 +93,7 @@ tests/e2e/
 - ✅ Lista de DARFs
 - ✅ Calculadora
 
-## 📊 Cobertura Planejada
+## 📊 Cobertura Completa
 
 | Tela | Testes | Status |
 |------|--------|--------|
@@ -103,13 +103,19 @@ tests/e2e/
 | Portfolios | 7 | ✅ |
 | Transações | 7 | ✅ |
 | Relatórios | 6 | ✅ |
-| Análise Ativos | 0 | ⏳ |
-| Performance | 0 | ⏳ |
-| Proventos | 0 | ⏳ |
-| Alocação | 0 | ⏳ |
-| ... | ... | ⏳ |
+| Análise Ativos | 6 | ✅ |
+| Performance | 6 | ✅ |
+| Proventos | 6 | ✅ |
+| Alocação | 5 | ✅ |
+| Fluxo Caixa | 5 | ✅ |
+| Alertas | 5 | ✅ |
+| Comparador | 5 | ✅ |
+| Planos Venda | 5 | ✅ |
+| Educação | 5 | ✅ |
+| Configurações | 5 | ✅ |
+| Buy Signals | 8 | ✅ |
 
-**Total:** 52/170 testes (31%)
+**Total:** 108 testes de fumaça (100% das telas cobertas!)
 
 ## 🐛 Relatório de Bugs
 
