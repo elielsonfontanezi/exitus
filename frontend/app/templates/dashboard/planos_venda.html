@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Planos de Compra Disciplinada{% endblock %}
+{% block title %}Planos de Venda Disciplinada{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="/static/css/design-system.css">
@@ -7,7 +7,7 @@
 
 {% block content %}
 <div class="min-h-screen bg-gray-50" 
-     x-data="planosCompraData()" 
+     x-data="planosVendaData()" 
      @currency-changed.window="handleCurrencyChange($event.detail)">
   
   <!-- Header -->
@@ -15,8 +15,8 @@
     <div class="container mx-auto px-6 py-12">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="display-3 mb-4">Planos de Compra Disciplinada</h1>
-          <p class="text-xl opacity-90">Automatize suas compras com inteligência artificial</p>
+          <h1 class="display-3 mb-4">Planos de Venda Disciplinada</h1>
+          <p class="text-xl opacity-90">Proteja seus lucros com stop gain e stop loss inteligentes</p>
         </div>
         <div class="flex gap-4">
           <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white hover:text-primary-600">
@@ -48,7 +48,7 @@
               </div>
               <div>
                 <h3 class="font-semibold text-white">Planos Ativos</h3>
-                <p class="text-sm text-white opacity-90">Em execução</p>
+                <p class="text-sm text-white opacity-90">Monitorando</p>
               </div>
             </div>
             <span class="badge badge-white text-success-600" x-text="resumo.planos_ativos"></span>
@@ -56,14 +56,14 @@
           <div class="space-y-2">
             <p class="text-2xl font-bold text-white" x-text="resumo.planos_ativos"></p>
             <div class="flex items-center gap-2 text-sm">
-              <span class="text-white">Este mês:</span>
-              <span class="text-white font-medium" x-text="resumo.compras_mes + ' execuções'"></span>
+              <span class="text-white">Posições:</span>
+              <span class="text-white font-medium" x-text="resumo.posicoes_monitoradas"></span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Total Investido -->
+      <!-- Lucro Protegido -->
       <div class="card card-gradient animate-fade-in" style="animation-delay: 100ms">
         <div class="p-6">
           <div class="flex items-center justify-between mb-4">
@@ -74,71 +74,73 @@
                 </svg>
               </div>
               <div>
-                <h3 class="font-semibold text-gray-900">Total Investido</h3>
-                <p class="text-sm text-gray-600">Via planos</p>
+                <h3 class="font-semibold text-gray-900">Lucro Protegido</h3>
+                <p class="text-sm text-gray-600">Stop gains</p>
               </div>
             </div>
-            <span class="badge badge-primary" x-text="resumo.total_planos"></span>
+            <span class="badge badge-primary" x-text="resumo.stop_gains"></span>
           </div>
           <div class="space-y-2">
-            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.total_investido, currentCurrency)"></p>
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.lucro_protegido, currentCurrency)"></p>
             <div class="flex items-center gap-2 text-sm">
               <span class="text-primary-600">Média:</span>
-              <span class="text-gray-900 font-medium" x-text="formatCurrency(resumo.media_investimento, currentCurrency)"></span>
+              <span class="text-gray-900 font-medium" x-text="resumo.media_gains.toFixed(1) + '%'"></span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Economia IA -->
+      <!-- Prejuízo Limitado -->
       <div class="card card-gradient-warning animate-fade-in" style="animation-delay: 200ms">
         <div class="p-6">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 bg-warning-100 rounded-full flex items-center justify-center">
                 <svg class="w-6 h-6 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div>
-                <h3 class="font-semibold text-gray-900">Economia IA</h3>
-                <p class="text-sm text-gray-600">Otimização</p>
+                <h3 class="font-semibold text-gray-900">Prejuízo Limitado</h3>
+                <p class="text-sm text-gray-600">Stop losses</p>
               </div>
             </div>
-            <span class="badge badge-warning" x-text="resumo.economia_percentual.toFixed(1) + '%'"></span>
+            <span class="badge badge-warning" x-text="resumo.stop_losses"></span>
           </div>
           <div class="space-y-2">
-            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.economia_total, currentCurrency)"></p>
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.prejuizo_limitado, currentCurrency)"></p>
             <div class="flex items-center gap-2 text-sm">
-              <span class="text-warning-600">vs manual:</span>
-              <span class="text-gray-900 font-medium">R$ 0.50/ação</span>
+              <span class="text-warning-600">Máximo:</span>
+              <span class="text-gray-900 font-medium" x-text="resumo.media_losses.toFixed(1) + '%'"></span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Próxima Execução -->
+      <!-- Execuções Hoje -->
       <div class="card card-gradient-info animate-fade-in" style="animation-delay: 300ms">
         <div class="p-6">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 bg-info-100 rounded-full flex items-center justify-center">
                 <svg class="w-6 h-6 text-info-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
               </div>
               <div>
-                <h3 class="font-semibold text-white">Próxima Execução</h3>
-                <p class="text-sm text-white opacity-90">Automática</p>
+                <h3 class="font-semibold text-white">Execuções Hoje</h3>
+                <p class="text-sm text-white opacity-90">Disparados</p>
               </div>
             </div>
-            <span class="badge badge-white text-info-600" x-text="resumo.proximas_execucoes"></span>
+            <span class="badge badge-white text-info-600" x-text="resumo.execucoes_hoje"></span>
           </div>
           <div class="space-y-2">
-            <p class="text-2xl font-bold text-white" x-text="resumo.proxima_data"></p>
+            <p class="text-2xl font-bold text-white" x-text="resumo.execucoes_hoje"></p>
             <div class="flex items-center gap-2 text-sm">
-              <span class="text-white opacity-75">Em:</span>
-              <span class="text-white font-medium" x-text="resumo.proximo_horario"></span>
+              <span class="text-white opacity-75">Gains:</span>
+              <span class="text-white font-medium" x-text="resumo.gains_hoje"></span>
+              <span class="text-white opacity-75">Losses:</span>
+              <span class="text-white font-medium" x-text="resumo.losses_hoje"></span>
             </div>
           </div>
         </div>
@@ -163,19 +165,19 @@
             </svg>
             Novo Plano
           </button>
+          <button @click="abaAtiva = 'posicoes'" :class="abaAtiva === 'posicoes' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            Posições
+          </button>
           <button @click="abaAtiva = 'historico'" :class="abaAtiva === 'historico' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
                   class="py-4 px-6 border-b-2 font-medium text-sm">
             <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             Histórico
-          </button>
-          <button @click="abaAtiva = 'ai-insights'" :class="abaAtiva === 'ai-insights' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
-                  class="py-4 px-6 border-b-2 font-medium text-sm">
-            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-            </svg>
-            AI Insights
           </button>
         </nav>
       </div>
@@ -185,7 +187,7 @@
         <!-- Meus Planos -->
         <div x-show="abaAtiva === 'planos'" x-transition>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="h3">Planos Ativos</h3>
+            <h3 class="h3">Planos de Venda Ativos</h3>
             <button @click="abaAtiva = 'novo'" class="btn btn-primary">
               <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -204,24 +206,30 @@
                             x-text="plano.status"></span>
                       <span class="badge badge-primary" x-text="plano.tipo"></span>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                       <div>
                         <p class="text-sm text-gray-600">Ativo</p>
                         <p class="font-medium" x-text="plano.ativo"></p>
                       </div>
                       <div>
-                        <p class="text-sm text-gray-600">Frequência</p>
-                        <p class="font-medium" x-text="plano.frequencia"></p>
+                        <p class="text-sm text-gray-600">Stop Gain</p>
+                        <p class="font-medium text-success-600" x-text="'+' + plano.stop_gain + '%'"></p>
                       </div>
                       <div>
-                        <p class="text-sm text-gray-600">Valor</p>
-                        <p class="font-medium" x-text="formatCurrency(plano.valor, currentCurrency)"></p>
+                        <p class="text-sm text-gray-600">Stop Loss</p>
+                        <p class="font-medium text-danger-600" x-text="'-' + plano.stop_loss + '%'"></p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-600">Quantidade</p>
+                        <p class="font-medium" x-text="plano.quantidade"></p>
                       </div>
                     </div>
                     <div class="flex items-center gap-6 text-sm text-gray-600">
-                      <span>Início: <span class="font-medium" x-text="formatDate(plano.data_inicio)"></span></span>
-                      <span>Próxima execução: <span class="font-medium" x-text="formatDate(plano.proxima_execucao)"></span></span>
-                      <span>Total investido: <span class="font-medium text-primary-600" x-text="formatCurrency(plano.total_investido, currentCurrency)"></span></span>
+                      <span>Preço entrada: <span class="font-medium" x-text="formatCurrency(plano.preco_entrada, currentCurrency)"></span></span>
+                      <span>Preço atual: <span class="font-medium" :class="plano.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                            x-text="formatCurrency(plano.preco_atual, currentCurrency)"></span></span>
+                      <span>Variação: <span class="font-medium" :class="plano.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                            x-text="(plano.variacao >= 0 ? '+' : '') + plano.variacao.toFixed(2) + '%'"></span></span>
                     </div>
                   </div>
                   <div class="flex items-center gap-2 ml-4">
@@ -256,7 +264,7 @@
 
         <!-- Novo Plano -->
         <div x-show="abaAtiva === 'novo'" x-transition>
-          <h3 class="h3 mb-6">Criar Novo Plano de Compra</h3>
+          <h3 class="h3 mb-6">Criar Novo Plano de Venda</h3>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Formulário -->
             <div>
@@ -265,47 +273,57 @@
                   <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Plano</label>
                   <input type="text" x-model="novoPlano.nome" required
                          class="w-full px-3 py-2 border border-gray-300 rounded-md" 
-                         placeholder="Ex: Compra mensal PETR4">
+                         placeholder="Ex: Venda PETR4 Stop Gain">
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Ativo</label>
-                  <select x-model="novoPlano.ativo" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                  <select x-model="novoPlano.ativo" required @change="carregarPosicao()" class="w-full px-3 py-2 border border-gray-300 rounded-md">
                     <option value="">Selecione um ativo</option>
-                    <template x-for="ativo in ativosDisponiveis" :key="ativo.ticker">
-                      <option :value="ativo.ticker" x-text="ativo.ticker + ' - ' + ativo.nome"></option>
+                    <template x-for="posicao in posicoesDisponiveis" :key="posicao.ativo.ticker">
+                      <option :value="posicao.ativo.ticker" x-text="posicao.ativo.ticker + ' - ' + posicao.ativo.nome + ' (' + posicao.quantidade + ' unidades)'"></option>
                     </template>
                   </select>
                 </div>
+                <div x-show="posicaoSelecionada">
+                  <div class="bg-gray-50 p-3 rounded-lg mb-4">
+                    <p class="text-sm text-gray-600">Posição atual:</p>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                      <span class="text-sm">Quantidade: <strong x-text="posicaoSelecionada.quantidade"></strong></span>
+                      <span class="text-sm">Preço médio: <strong x-text="formatCurrency(posicaoSelecionada.preco_medio, currentCurrency)"></strong></span>
+                      <span class="text-sm">Total: <strong x-text="formatCurrency(posicaoSelecionada.quantidade * posicaoSelecionada.preco_medio, currentCurrency)"></strong></span>
+                      <span class="text-sm">Variação: <strong :class="posicaoSelecionada.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" x-text="(posicaoSelecionada.variacao >= 0 ? '+' : '') + posicaoSelecionada.variacao.toFixed(2) + '%'"></strong></span>
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Plano</label>
-                  <select x-model="novoPlano.tipo" @change="atualizarCamposTipo()" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                    <option value="valor_fixo">Valor Fixo</option>
-                    <option value="quantidade_fixa">Quantidade Fixa</option>
-                    <option value="smart">Smart (AI)</option>
+                  <select x-model="novoPlano.tipo" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <option value="stop_gain">Stop Gain</option>
+                    <option value="stop_loss">Stop Loss</option>
+                    <option value="ambos">Stop Gain + Loss</option>
                   </select>
                 </div>
-                <div x-show="novoPlano.tipo === 'valor_fixo' || novoPlano.tipo === 'smart'">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Valor por Compra</label>
-                  <input type="number" x-model="novoPlano.valor" step="0.01" min="10"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="100.00">
+                <div x-show="novoPlano.tipo === 'stop_gain' || novoPlano.tipo === 'ambos'">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Stop Gain (%)</label>
+                  <input type="number" x-model="novoPlano.stop_gain" step="0.1" min="0.1" max="100"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="20.0">
                 </div>
-                <div x-show="novoPlano.tipo === 'quantidade_fixa'">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Quantidade por Compra</label>
-                  <input type="number" x-model="novoPlano.quantidade" min="1"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="10">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Frequência</label>
-                  <select x-model="novoPlano.frequencia" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                    <option value="diario">Diário</option>
-                    <option value="semanal">Semanal</option>
-                    <option value="quinzenal">Quinzenal</option>
-                    <option value="mensal">Mensal</option>
-                  </select>
+                <div x-show="novoPlano.tipo === 'stop_loss' || novoPlano.tipo === 'ambos'">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Stop Loss (%)</label>
+                  <input type="number" x-model="novoPlano.stop_loss" step="0.1" min="0.1" max="100"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="10.0">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Data de Início</label>
-                  <input type="date" x-model="novoPlano.data_inicio" required
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Quantidade para Vender</label>
+                  <input type="number" x-model="novoPlano.quantidade" min="1" :max="posicaoSelecionada?.quantidade || 999999"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="100">
+                  <p class="text-xs text-gray-500 mt-1" x-show="posicaoSelecionada">
+                    Máximo disponível: <span x-text="posicaoSelecionada.quantidade"></span> unidades
+                  </p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Vencimento (opcional)</label>
+                  <input type="date" x-model="novoPlano.data_vencimento"
                          class="w-full px-3 py-2 border border-gray-300 rounded-md">
                 </div>
                 <div class="flex gap-2">
@@ -325,42 +343,102 @@
               </form>
             </div>
 
-            <!-- Preview e AI Insights -->
+            <!-- Preview e Alertas -->
             <div>
               <div class="bg-gray-50 rounded-lg p-6 mb-4">
                 <h4 class="font-semibold text-gray-900 mb-4">Preview do Plano</h4>
                 <div class="space-y-3">
                   <div class="flex justify-between">
-                    <span class="text-gray-600">Investimento mensal:</span>
-                    <span class="font-medium" x-text="formatCurrency(getInvestimentoMensal())"></span>
+                    <span class="text-gray-600">Valor da posição:</span>
+                    <span class="font-medium" x-text="formatCurrency(getValorPosicao())"></span>
                   </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">Estimativa 12 meses:</span>
-                    <span class="font-medium" x-text="formatCurrency(getInvestimentoAnual())"></span>
+                  <div x-show="novoPlano.stop_gain">
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Preço Stop Gain:</span>
+                      <span class="font-medium text-success-600" x-text="formatCurrency(getPrecoStopGain())"></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Lucro estimado:</span>
+                      <span class="font-medium text-success-600" x-text="formatCurrency(getLucroEstimado())"></span>
+                    </div>
                   </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">Taxa de sucesso:</span>
-                    <span class="font-medium text-success-600" x-text="getTaxaSucesso() + '%'"></span>
+                  <div x-show="novoPlano.stop_loss">
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Preço Stop Loss:</span>
+                      <span class="font-medium text-danger-600" x-text="formatCurrency(getPrecoStopLoss())"></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Prejuízo máximo:</span>
+                      <span class="font-medium text-danger-600" x-text="formatCurrency(getPrejuizoMaximo())"></span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- AI Insights -->
-              <div class="bg-gradient-to-r from-primary-50 to-info-50 rounded-lg p-6">
+              <!-- Alertas Inteligentes -->
+              <div class="bg-gradient-to-r from-warning-50 to-danger-50 rounded-lg p-6">
                 <h4 class="font-semibold text-gray-900 mb-4">
-                  <svg class="w-4 h-4 inline mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                  <svg class="w-4 h-4 inline mr-2 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                   </svg>
-                  AI Insights
+                  Alertas Inteligentes
                 </h4>
                 <div class="space-y-2 text-sm">
-                  <p class="text-gray-700">• <span class="font-medium">Otimização de timing:</span> Nossa IA sugere executar compras entre 10h-11h para melhor preço</p>
-                  <p class="text-gray-700">• <span class="font-medium">Análise de volatilidade:</span> PETR4 apresenta baixa volatilidade, ideal para DCA</p>
-                  <p class="text-gray-700">• <span class="font-medium">Sazonalidade:</span> Histórico mostra melhores preços em maio/junho</p>
-                  <p class="text-gray-700">• <span class="font-medium">Recomendação:</span> Considere aumentar 20% no valor para aproveitar correções</p>
+                  <p class="text-gray-700">• <span class="font-medium">Volatilidade alta detectada:</span> Considere stop loss mais apertado</p>
+                  <p class="text-gray-700">• <span class="font-medium">Proximidade de suporte:</span> Preço atual próximo a R$ 28,50</p>
+                  <p class="text-gray-700">• <span class="font-medium">Volume anômalo:</span> Aumento de 300% nas últimas 2 horas</p>
+                  <p class="text-gray-700">• <span class="font-medium">Recomendação:</span> Stop gain em +25% para capturar tendência</p>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Posições -->
+        <div x-show="abaAtiva === 'posicoes'" x-transition>
+          <h3 class="h3 mb-6">Posições Disponíveis</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-3 px-4">Ativo</th>
+                  <th class="text-right py-3 px-4">Quantidade</th>
+                  <th class="text-right py-3 px-4">Preço Médio</th>
+                  <th class="text-right py-3 px-4">Preço Atual</th>
+                  <th class="text-right py-3 px-4">Variação</th>
+                  <th class="text-right py-3 px-4">Total</th>
+                  <th class="text-center py-3 px-4">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="posicao in posicoesDisponiveis" :key="posicao.ativo.ticker">
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                      <div>
+                        <p class="font-medium" x-text="posicao.ativo.ticker"></p>
+                        <p class="text-sm text-gray-600" x-text="posicao.ativo.nome"></p>
+                      </div>
+                    </td>
+                    <td class="text-right py-3 px-4" x-text="posicao.quantidade"></td>
+                    <td class="text-right py-3 px-4" x-text="formatCurrency(posicao.preco_medio, currentCurrency)"></td>
+                    <td class="text-right py-3 px-4" x-text="formatCurrency(posicao.preco_atual, currentCurrency)"></td>
+                    <td class="text-right py-3 px-4">
+                      <span :class="posicao.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                            x-text="(posicao.variacao >= 0 ? '+' : '') + posicao.variacao.toFixed(2) + '%'"></span>
+                    </td>
+                    <td class="text-right py-3 px-4 font-semibold" x-text="formatCurrency(posicao.quantidade * posicao.preco_atual, currentCurrency)"></td>
+                    <td class="text-center py-3 px-4">
+                      <button @click="criarPlanoParaPosicao(posicao)" class="btn btn-primary btn-sm">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Criar Plano
+                      </button>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -377,11 +455,12 @@
                   <th class="text-right py-3 px-4">Quantidade</th>
                   <th class="text-right py-3 px-4">Preço</th>
                   <th class="text-right py-3 px-4">Total</th>
+                  <th class="text-center py-3 px-4">Tipo</th>
                   <th class="text-center py-3 px-4">Status</th>
                 </tr>
               </thead>
               <tbody>
-                <template x-for="execucao in historico" :key="execucao.id">
+                <template xfor="execucao in historico" :key="execucao.id">
                   <tr class="border-b hover:bg-gray-50">
                     <td class="py-3 px-4" x-text="formatDateTime(execucao.data)"></td>
                     <td class="py-3 px-4" x-text="execucao.plano"></td>
@@ -389,6 +468,10 @@
                     <td class="text-right py-3 px-4" x-text="execucao.quantidade"></td>
                     <td class="text-right py-3 px-4" x-text="formatCurrency(execucao.preco, currentCurrency)"></td>
                     <td class="text-right py-3 px-4 font-semibold" x-text="formatCurrency(execucao.total, currentCurrency)"></td>
+                    <td class="text-center py-3 px-4">
+                      <span class="badge" :class="execucao.tipo === 'gain' ? 'badge-success' : 'badge-danger'" 
+                            x-text="execucao.tipo"></span>
+                    </td>
                     <td class="text-center py-3 px-4">
                       <span class="badge" :class="execucao.status === 'executado' ? 'badge-success' : 'badge-warning'" 
                             x-text="execucao.status"></span>
@@ -399,66 +482,11 @@
             </table>
           </div>
         </div>
-
-        <!-- AI Insights -->
-        <div x-show="abaAtiva === 'ai-insights'" x-transition>
-          <h3 class="h3 mb-6">Insights da Inteligência Artificial</h3>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Otimizações Sugeridas -->
-            <div class="bg-gradient-to-r from-success-50 to-primary-50 rounded-lg p-6">
-              <h4 class="font-semibold text-gray-900 mb-4">Otimizações Sugeridas</h4>
-              <div class="space-y-3">
-                <div class="p-3 bg-white rounded border-l-4 border-success-500">
-                  <p class="font-medium text-gray-900">Reduzir frequência do plano PETR4</p>
-                  <p class="text-sm text-gray-600">De diário para semanal pode economizar R$ 45/mês em taxas</p>
-                </div>
-                <div class="p-3 bg-white rounded border-l-4 border-primary-500">
-                  <p class="font-medium text-gray-900">Aumentar valor do plano VALE3</p>
-                  <p class="text-sm text-gray-600">Oportunidade de compra com 15% de desconto preço médio</p>
-                </div>
-                <div class="p-3 bg-white rounded border-l-4 border-warning-500">
-                  <p class="font-medium text-gray-900">Criar plano para ITUB4</p>
-                  <p class="text-sm text-gray-600">Setor bancário com forte potencial de recuperação</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Análise de Performance -->
-            <div class="bg-gradient-to-r from-info-50 to-warning-50 rounded-lg p-6">
-              <h4 class="font-semibold text-gray-900 mb-4">Análise de Performance</h4>
-              <div class="h-64">
-                <canvas id="performance-chart"></canvas>
-              </div>
-            </div>
-          </div>
-
-          <!-- Previsões e Tendências -->
-          <div class="mt-6 bg-gray-50 rounded-lg p-6">
-            <h4 class="font-semibold text-gray-900 mb-4">Previsões e Tendências</h4>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div class="text-center">
-                <p class="text-sm text-gray-600 mb-2">Retorno Estimado 12M</p>
-                <p class="text-2xl font-bold text-success-600">+18.5%</p>
-                <p class="text-xs text-gray-500">vs IBOV +12.3%</p>
-              </div>
-              <div class="text-center">
-                <p class="text-sm text-gray-600 mb-2">Risco Calculado</p>
-                <p class="text-2xl font-bold text-warning-600">Médio</p>
-                <p class="text-xs text-gray-500">Volatilidade 14.2%</p>
-              </div>
-              <div class="text-center">
-                <p class="text-sm text-gray-600 mb-2">Score de Confiança</p>
-                <p class="text-2xl font-bold text-primary-600">87%</p>
-                <p class="text-xs text-gray-500">Baseado em 2 anos</p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
   </div>
 </div>
 
-<script src="/static/js/planos_compra.js"></script>
+<script src="/static/js/planos_venda.js"></script>
 {% endblock %}

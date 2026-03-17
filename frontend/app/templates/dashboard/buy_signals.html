@@ -1,319 +1,272 @@
 {% extends "base.html" %}
 {% block title %}Buy Signals - Exitus{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
 {% block content %}
-<div class="container mx-auto p-6 space-y-6" x-data="buySignalsData()">
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900">
-        <i class="fas fa-chart-line text-blue-600 mr-3"></i>Buy Signals
-      </h1>
-      <p class="text-gray-600 mt-1">Ativos com melhores oportunidades de compra</p>
+<div class="min-h-screen bg-gray-50" 
+     x-data="buySignalsData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Header -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Buy Signals</h1>
+          <p class="text-xl opacity-90">Descubra as melhores oportunidades de compra com IA</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white hover:text-primary-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Busca Individual de Ativo -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">🔍 Analisar Ativo Específico</h3>
-    <div class="flex gap-3">
-      <div class="flex-1">
-        <input 
-          type="text" 
-          x-model="searchTicker"
-          @keyup.enter="searchAsset()"
-          placeholder="Digite o ticker (ex: PETR4, AAPL, MSFT)"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-      </div>
-      <button 
-        @click="searchAsset()"
-        :disabled="!searchTicker || searching"
-        class="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-      >
-        <span x-show="!searching">🔍 Analisar</span>
-        <span x-show="searching">
-          <svg class="animate-spin h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Buscando...
-        </span>
-      </button>
-    </div>
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
     
-    <!-- Resultado da Busca Individual -->
-    <div x-show="selectedAsset" class="mt-6 p-4 bg-gray-50 rounded-lg">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Informações Básicas -->
-        <div>
-          <h4 class="font-bold text-lg mb-3" x-text="selectedAsset?.ticker"></h4>
-          <p class="text-sm text-gray-600 mb-4" x-text="selectedAsset?.nome"></p>
-          
-          <div class="space-y-2">
-            <div class="flex justify-between">
-              <span class="text-sm text-gray-600">Buy Score:</span>
-              <span class="font-bold" :class="{
-                'text-green-600': selectedAsset?.buyscore >= 80,
-                'text-yellow-600': selectedAsset?.buyscore >= 60 && selectedAsset?.buyscore < 80,
-                'text-red-600': selectedAsset?.buyscore < 60
-              }" x-text="selectedAsset?.buyscore"></span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-sm text-gray-600">Margem de Segurança:</span>
-              <span class="font-bold text-green-600" x-text="'+' + selectedAsset?.margem + '%'"></span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-sm text-gray-600">Preço Atual:</span>
-              <span class="font-medium" x-text="'R$ ' + selectedAsset?.preco_atual"></span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-sm text-gray-600">Preço Teto:</span>
-              <span class="font-medium" x-text="'R$ ' + selectedAsset?.preco_teto"></span>
-            </div>
+    <!-- Busca Principal -->
+    <div class="card card-elevated mb-8">
+      <div class="p-6">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="h3">Analisar Ativo Específico</h3>
+            <p class="text-gray-600">Digite o ticker para análise completa com IA</p>
           </div>
         </div>
         
-        <!-- Gráfico Radial (será implementado) -->
-        <div>
-          <canvas :id="'radar-chart-' + selectedAsset?.ticker" class="w-full h-64"></canvas>
+        <div class="flex gap-3">
+          <div class="flex-1">
+            <input 
+              type="text" 
+              x-model="searchTicker"
+              @keyup.enter="searchAsset()"
+              placeholder="Digite o ticker (ex: PETR4, VALE3, ITUB4)"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-lg"
+            >
+          </div>
+          <button 
+            @click="searchAsset()"
+            :disabled="!searchTicker || searching"
+            class="btn btn-primary px-8"
+          >
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <span x-show="!searching">Analisar</span>
+            <span x-show="searching" class="flex items-center">
+              <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Analisando...
+            </span>
+          </button>
         </div>
       </div>
-      
-      <div class="mt-4 flex gap-3">
-        <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-          💰 Adicionar ao Plano de Compra
-        </button>
-        <button @click="selectedAsset = null" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-          Fechar
-        </button>
-      </div>
     </div>
-    
-    <!-- Mensagem de Erro -->
-    <div x-show="searchError" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-      <p class="text-red-700" x-text="searchError"></p>
-    </div>
-  </div>
 
-  <!-- Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="card p-6 text-center hover:shadow-xl">
-      <div class="text-3xl font-bold text-blue-600 mb-2">{{ signals|length }}</div>
-      <div class="text-sm text-gray-600 uppercase">Total Sinais</div>
-    </div>
-    <div class="card p-6 text-center hover:shadow-xl">
-      <div class="text-3xl font-bold text-green-600 mb-2">
-        {{ signals|selectattr('buyscore', 'ge', 80)|list|length }}
-      </div>
-      <div class="text-sm text-gray-600 uppercase">Sinais Fortes</div>
-    </div>
-    <div class="card p-6 text-center hover:shadow-xl">
-      <div class="text-3xl font-bold text-orange-600 mb-2">
-        {{ (signals|map(attribute='margem')|sum / signals|length)|round(2) if signals else 0 }}%
-      </div>
-      <div class="text-sm text-gray-600 uppercase">Margem Média</div>
-    </div>
-  </div>
+    <!-- Resultado da Análise -->
+    <div x-show="selectedAsset" x-transition class="mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Card Principal -->
+        <div class="lg:col-span-2">
+          <div class="card card-elevated">
+            <div class="p-6">
+              <div class="flex items-start justify-between mb-6">
+                <div>
+                  <div class="flex items-center gap-3 mb-2">
+                    <h2 class="text-2xl font-bold text-gray-900" x-text="selectedAsset?.ticker"></h2>
+                    <span class="badge" :class="getSignalClass(selectedAsset?.signal)" x-text="selectedAsset?.signal"></span>
+                  </div>
+                  <p class="text-gray-600" x-text="selectedAsset?.nome"></p>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm text-gray-600">Preço Atual</p>
+                  <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(selectedAsset?.preco_atual, currentCurrency)"></p>
+                  <p class="text-sm" :class="selectedAsset?.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                     x-text="(selectedAsset?.variacao >= 0 ? '+' : '') + selectedAsset?.variacao?.toFixed(2) + '%'"></p>
+                </div>
+              </div>
 
-  <!-- Tabela Sinais -->
-  <div class="card">
-    <div class="p-6 border-b">
-      <h2 class="text-xl font-bold">Melhores Oportunidades</h2>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="w-full">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-4 text-left font-bold">Ativo</th>
-            <th class="px-6 py-4 text-left font-bold">Mercado</th>
-            <th class="px-6 py-4 text-center font-bold">Buy Score</th>
-            <th class="px-6 py-4 text-right font-bold">Margem</th>
-            <th class="px-6 py-4 text-center font-bold">Ação</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-          {% for signal in signals %}
-          <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4">
-              <div class="font-bold text-lg">{{ signal.ticker }}</div>
-              <div class="text-sm text-gray-600">{{ signal.nome }}</div>
-            </td>
-            <td class="px-6 py-4">
-              <span class="text-2xl">
-                {% if signal.mercado == 'BR' %}🇧🇷
-                {% elif signal.mercado == 'US' %}🇺🇸
-                {% else %}🇪🇺{% endif %}
-              </span>
-              <span class="text-sm text-gray-600 ml-2">{{ signal.mercado }}</span>
-            </td>
-            <td class="px-6 py-4 text-center">
-              {% if signal.buyscore >= 80 %}
-              <span class="badge bg-green-500 text-white px-4 py-2 text-lg font-bold">{{ signal.buyscore }}</span>
-              {% elif signal.buyscore >= 60 %}
-              <span class="badge bg-yellow-500 text-white px-4 py-2 text-lg font-bold">{{ signal.buyscore }}</span>
-              {% else %}
-              <span class="badge bg-red-500 text-white px-4 py-2 text-lg font-bold">{{ signal.buyscore }}</span>
-              {% endif %}
-            </td>
-            <td class="px-6 py-4 text-right">
-              <span class="text-lg font-bold text-green-600">+{{ "%.2f"|format(signal.margem) }}%</span>
-            </td>
-            <td class="px-6 py-4 text-center">
-              <a href="/dashboard/assets/{{ signal.ticker }}" class="btn btn-primary btn-sm">
-                <i class="fas fa-shopping-cart mr-1"></i>Comprar
-              </a>
-            </td>
-          </tr>
-          {% else %}
-          <tr>
-            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-              <i class="fas fa-chart-line text-4xl mb-4"></i>
-              <div>Nenhum sinal disponível</div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
+              <!-- Gráfico Radial -->
+              <div class="mb-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Análise Multi-Fator</h3>
+                <div class="h-80">
+                  <canvas id="radar-chart"></canvas>
+                </div>
+              </div>
 
-  <!-- Gráfico Distribuição Mercados -->
-  <div class="card">
-    <div class="p-6 border-b">
-      <h2 class="text-xl font-bold"><i class="fas fa-globe text-blue-600 mr-2"></i>Distribuição por Mercado</h2>
-    </div>
-    <div class="p-6 bg-gray-50">
-      <div style="max-width:500px;margin:0 auto;height:300px;">
-        <canvas id="chartMercados"></canvas>
+              <!-- Indicadores Chave -->
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                  <p class="text-sm text-gray-600">P/L</p>
+                  <p class="text-lg font-semibold" x-text="selectedAsset?.pl || '-'"></p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                  <p class="text-sm text-gray-600">P/VP</p>
+                  <p class="text-lg font-semibold" x-text="selectedAsset?.pvp || '-'"></p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                  <p class="text-sm text-gray-600">DY</p>
+                  <p class="text-lg font-semibold" x-text="(selectedAsset?.dy || 0) + '%'"></p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                  <p class="text-sm text-gray-600">ROE</p>
+                  <p class="text-lg font-semibold" x-text="(selectedAsset?.roe || 0) + '%'"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar com Insights -->
+        <div class="space-y-6">
+          <!-- Score de Compra -->
+          <div class="card card-gradient-primary text-white">
+            <div class="p-6">
+              <h3 class="font-semibold mb-4">Score de Compra</h3>
+              <div class="text-center">
+                <div class="text-5xl font-bold mb-2" x-text="selectedAsset?.score || 0"></div>
+                <div class="w-full bg-white bg-opacity-30 rounded-full h-3 mb-2">
+                  <div class="bg-white h-3 rounded-full" :style="`width: ${selectedAsset?.score || 0}%`"></div>
+                </div>
+                <p class="text-sm opacity-90">Baseado em 15 indicadores</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Insights da IA -->
+          <div class="card card-elevated">
+            <div class="p-6">
+              <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 text-primary-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                Insights da IA
+              </h3>
+              <div class="space-y-3">
+                <div class="p-3 bg-success-50 rounded-lg border-l-4 border-success-500">
+                  <p class="text-sm font-medium text-success-900">Ponto Forte</p>
+                  <p class="text-sm text-success-700" x-text="selectedAsset?.insights?.forte || 'Excelente indicador de valorização'"></p>
+                </div>
+                <div class="p-3 bg-warning-50 rounded-lg border-l-4 border-warning-500">
+                  <p class="text-sm font-medium text-warning-900">Atenção</p>
+                  <p class="text-sm text-warning-700" x-text="selectedAsset?.insights?.atencao || 'Volatilidade acima da média'"></p>
+                </div>
+                <div class="p-3 bg-info-50 rounded-lg border-l-4 border-info-500">
+                  <p class="text-sm font-medium text-info-900">Oportunidade</p>
+                  <p class="text-sm text-info-700" x-text="selectedAsset?.insights?.oportunidade || 'Projeção de dividendos em alta'"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preço Alvo -->
+          <div class="card card-elevated">
+            <div class="p-6">
+              <h3 class="font-semibold text-gray-900 mb-4">Preço Alvo</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Conservador</span>
+                  <span class="font-semibold" x-text="formatCurrency(selectedAsset?.preco_alvo?.conservador, currentCurrency)"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Moderado</span>
+                  <span class="font-semibold text-primary-600" x-text="formatCurrency(selectedAsset?.preco_alvo?.moderado, currentCurrency)"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Otimista</span>
+                  <span class="font-semibold text-success-600" x-text="formatCurrency(selectedAsset?.preco_alvo?.otimista, currentCurrency)"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Sinais Globais -->
+    <div class="card card-elevated">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="h3">Sinais de Compra - Mercado</h3>
+          <div class="flex gap-2">
+            <button @click="filtroSinal = 'todos'" 
+                    :class="filtroSinal === 'todos' ? 'btn-primary' : 'btn-outline'"
+                    class="btn btn-sm">Todos</button>
+            <button @click="filtroSinal = 'compra'" 
+                    :class="filtroSinal === 'compra' ? 'btn-success' : 'btn-outline'"
+                    class="btn btn-sm">Compra</button>
+            <button @click="filtroSinal = 'aguardar'" 
+                    :class="filtroSinal === 'aguardar' ? 'btn-warning' : 'btn-outline'"
+                    class="btn btn-sm">Aguardar</button>
+            <button @click="filtroSinal = 'venda'" 
+                    :class="filtroSinal === 'venda' ? 'btn-danger' : 'btn-outline'"
+                    class="btn btn-sm">Venda</button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div x-show="loading" class="text-center py-12">
+          <svg class="animate-spin h-8 w-8 text-primary-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p class="text-gray-600 mt-2">Carregando sinais...</p>
+        </div>
+
+        <!-- Grid de Sinais -->
+        <div x-show="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <template x-for="signal in sinaisFiltrados" :key="signal.ticker">
+            <div class="border rounded-lg p-4 hover:shadow-md transition-all cursor-pointer" 
+                 @click="selectSignal(signal)">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h4 class="font-semibold text-gray-900" x-text="signal.ticker"></h4>
+                  <p class="text-sm text-gray-600" x-text="signal.nome"></p>
+                </div>
+                <span class="badge" :class="getSignalClass(signal.signal)" x-text="signal.signal"></span>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-2 mb-3">
+                <div>
+                  <p class="text-xs text-gray-600">Preço</p>
+                  <p class="font-semibold" x-text="formatCurrency(signal.preco_atual, currentCurrency, false)"></p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-600">Score</p>
+                  <p class="font-semibold" x-text="signal.score + '/100'"></p>
+                </div>
+              </div>
+              
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="h-2 rounded-full" 
+                     :class="getSignalColor(signal.signal)"
+                     :style="`width: ${signal.score}%`"></div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-// Função Alpine.js para Buy Signals
-function buySignalsData() {
-  return {
-    searchTicker: '',
-    searching: false,
-    selectedAsset: null,
-    searchError: null,
-    
-    async searchAsset() {
-      if (!this.searchTicker) return;
-      
-      this.searching = true;
-      this.searchError = null;
-      this.selectedAsset = null;
-      
-      try {
-        const ticker = this.searchTicker.toUpperCase().trim();
-        const response = await fetch(`/dashboard/buy-signals/analisar/${ticker}`);
-        
-        if (!response.ok) {
-          throw new Error('Ativo não encontrado ou sem dados suficientes');
-        }
-        
-        const data = await response.json();
-        this.selectedAsset = data.data;
-        
-        // Renderizar gráfico radial após um pequeno delay
-        this.$nextTick(() => {
-          this.renderRadarChart();
-        });
-        
-      } catch (error) {
-        this.searchError = error.message || 'Erro ao buscar ativo. Tente novamente.';
-      } finally {
-        this.searching = false;
-      }
-    },
-    
-    renderRadarChart() {
-      if (!this.selectedAsset) return;
-      
-      const canvasId = `radar-chart-${this.selectedAsset.ticker}`;
-      const canvas = document.getElementById(canvasId);
-      
-      if (!canvas) return;
-      
-      new Chart(canvas, {
-        type: 'radar',
-        data: {
-          labels: ['Score', 'Margem', 'DY', 'P/L', 'P/VP', 'ROE'],
-          datasets: [{
-            label: this.selectedAsset.ticker,
-            data: [
-              this.selectedAsset.buyscore || 0,
-              (this.selectedAsset.margem || 0) * 2, // Normalizar para escala 0-100
-              (this.selectedAsset.dy || 0) * 10, // Normalizar para escala 0-100
-              Math.min((this.selectedAsset.pl || 0) * 5, 100), // Normalizar
-              Math.min((this.selectedAsset.pvp || 0) * 50, 100), // Normalizar
-              this.selectedAsset.roe || 0
-            ],
-            backgroundColor: 'rgba(59, 130, 246, 0.2)',
-            borderColor: 'rgb(59, 130, 246)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgb(59, 130, 246)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgb(59, 130, 246)'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            r: {
-              beginAtZero: true,
-              max: 100,
-              ticks: {
-                stepSize: 20
-              }
-            }
-          },
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
-        }
-      });
-    }
-  }
-}
-
-document.addEventListener('DOMContentLoaded', function(){
-  const ctx = document.getElementById('chartMercados');
-  if(ctx){
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Brasil 🇧🇷', 'EUA 🇺🇸', 'Europa 🇪🇺'],
-        datasets: [{
-          label: 'Sinais por Mercado',
-          data: [2, 1, 0],
-          backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              font: {size: 14},
-              padding: 15
-            }
-          }
-        }
-      }
-    });
-  }
-});
-</script>
+<script src="/static/js/buy_signals.js"></script>
 {% endblock %}

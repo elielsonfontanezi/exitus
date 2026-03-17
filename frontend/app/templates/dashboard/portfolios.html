@@ -1,157 +1,351 @@
 {% extends "base.html" %}
-{% block title %}Portfolios - Exitus{% endblock %}
+{% block title %}Carteiras - Exitus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6 space-y-6">
-  <!-- Header e Botão Novo -->
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900">
-        <i class="fas fa-briefcase text-blue-600 mr-3"></i>Carteiras
-      </h1>
-      <p class="text-gray-600 mt-1">Gerencie suas contas de investimento</p>
-    </div>
-    <button onclick="openModal()" class="btn btn-primary">
-      <i class="fas fa-plus mr-2"></i>Nova Carteira
-    </button>
-  </div>
-
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-    <div class="card p-6 text-center hover:shadow-xl transition-shadow duration-300">
-      <div class="text-3xl font-bold text-blue-600 mb-2">{{ stats.total }}</div>
-      <div class="text-sm text-gray-600 uppercase font-semibold">Total Carteiras</div>
-    </div>
-    <div class="card p-6 text-center hover:shadow-xl transition-shadow duration-300">
-      <div class="text-3xl font-bold text-green-600 mb-2">{{ stats.ativas }}</div>
-      <div class="text-sm text-gray-600 uppercase font-semibold">Ativas</div>
-    </div>
-    <div class="card p-6 text-center hover:shadow-xl transition-shadow duration-300">
-      <div class="text-3xl font-bold text-emerald-600 mb-2">R$ {{ "%.2f"|format(stats.saldo_br) }}</div>
-      <div class="text-sm text-gray-600 uppercase font-semibold">Saldo Brasil</div>
-    </div>
-    <div class="card p-6 text-center hover:shadow-xl transition-shadow duration-300">
-      <div class="text-3xl font-bold text-blue-600 mb-2">$ {{ "%.2f"|format(stats.saldo_us) }}</div>
-      <div class="text-sm text-gray-600 uppercase font-semibold">Saldo EUA</div>
+<div class="min-h-screen bg-gray-50" 
+     x-data="portfoliosData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Header -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Carteiras</h1>
+          <p class="text-xl opacity-90">Gerencie suas contas de investimento em múltiplos mercados</p>
+        </div>
+        <div class="flex gap-4">
+          <button @click="showModal = true" class="btn btn-white text-primary-600 hover:bg-primary-50">
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Nova Carteira
+          </button>
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white hover:text-primary-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Tabela Carteiras (Integrada com API M7) -->
-  <div class="card bg-white rounded-lg shadow-sm border border-gray-200">
-    <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-      <div>
-        <h2 class="text-xl font-bold text-gray-800">Minhas Carteiras ({{ corretoras|length }})</h2>
-        {% if backend_status == 'ok' %}
-          <div class="flex items-center text-xs text-green-600 mt-1">
-            <i class="fas fa-check-circle mr-1"></i> Conectado ao Backend
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Cards de Resumo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Total Carteiras -->
+      <div class="card card-gradient animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Total Carteiras</h3>
+                <p class="text-sm text-white opacity-90">Ativas e inativas</p>
+              </div>
+            </div>
           </div>
-        {% else %}
-          <div class="flex items-center text-xs text-yellow-600 mt-1">
-            <i class="fas fa-exclamation-triangle mr-1"></i> Modo Offline (Mock)
+          <div class="space-y-2">
+            <p class="text-3xl font-bold text-white" x-text="resumo.total_carteiras"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75">Ativas:</span>
+              <span class="text-white font-medium" x-text="resumo.carteiras_ativas"></span>
+            </div>
           </div>
-        {% endif %}
+        </div>
       </div>
-      
-      <!-- Filtros Rápidos (Visual Only por enquanto) -->
-      <div class="flex space-x-2">
-        <select class="select select-sm select-bordered w-32">
-          <option>Todos</option>
-          <option>Ativos</option>
-          <option>Inativos</option>
-        </select>
+
+      <!-- Saldo Brasil -->
+      <div class="card card-gradient-success animate-fade-in" style="animation-delay: 100ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Saldo Brasil</h3>
+                <p class="text-sm text-white opacity-90">Mercado B3</p>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <p class="text-3xl font-bold text-white" x-text="formatCurrency(resumo.saldo_brl, 'BRL')"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75">Variação:</span>
+              <span class="text-white font-medium" x-text="(resumo.variacao_brl >= 0 ? '+' : '') + resumo.variacao_brl.toFixed(2) + '%'"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saldo EUA -->
+      <div class="card card-gradient-info animate-fade-in" style="animation-delay: 200ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Saldo EUA</h3>
+                <p class="text-sm text-white opacity-90">Mercado NYSE/NASDAQ</p>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <p class="text-3xl font-bold text-white" x-text="formatCurrency(resumo.saldo_usd, 'USD')"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75">Variação:</span>
+              <span class="text-white font-medium" x-text="(resumo.variacao_usd >= 0 ? '+' : '') + resumo.variacao_usd.toFixed(2) + '%'"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Patrimônio Total -->
+      <div class="card card-gradient-warning animate-fade-in" style="animation-delay: 300ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Patrimônio Total</h3>
+                <p class="text-sm text-white opacity-90">Consolidado</p>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <p class="text-3xl font-bold text-white" x-text="formatCurrency(resumo.patrimonio_total, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75">Total investido:</span>
+              <span class="text-white font-medium" x-text="formatCurrency(resumo.total_investido, currentCurrency)"></span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="w-full">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nome / Descrição</th>
-            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Objetivo</th>
-            <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Criado em</th>
-            <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Ações</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 bg-white">
-          {% for portfolio in corretoras %}
-          <tr class="hover:bg-gray-50 transition-colors duration-150">
-            <td class="px-6 py-4">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                  <i class="fas fa-wallet"></i>
-                </div>
-                <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">{{ portfolio.nome }}</div>
-                  <div class="text-sm text-gray-500">{{ portfolio.descricao[:50] }}</div>
+    <!-- Lista de Carteiras -->
+    <div class="card card-elevated">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="h3">Minhas Carteiras</h3>
+          <div class="flex gap-2">
+            <button @click="vista = 'grid'" 
+                    :class="vista === 'grid' ? 'btn-primary' : 'btn-outline'"
+                    class="btn btn-icon btn-icon-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+              </svg>
+            </button>
+            <button @click="vista = 'lista'" 
+                    :class="vista === 'lista' ? 'btn-primary' : 'btn-outline'"
+                    class="btn btn-icon btn-icon-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div x-show="loading" class="text-center py-12">
+          <svg class="animate-spin h-8 w-8 text-primary-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p class="text-gray-600 mt-2">Carregando carteiras...</p>
+        </div>
+
+        <!-- Vista Grid -->
+        <div x-show="!loading && vista === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <template x-for="carteira in carteiras" :key="carteira.id">
+            <div class="border rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer" 
+                 @click="verDetalhes(carteira)">
+              <!-- Header do Card -->
+              <div class="bg-gradient-to-r from-primary-500 to-primary-600 p-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h4 class="font-semibold text-white" x-text="carteira.nome"></h4>
+                    <p class="text-sm text-white opacity-90" x-text="carteira.corretora"></p>
+                  </div>
+                  <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                {{ portfolio.objetivo }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-              {% if portfolio.ativo %}
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                  ATIVA
-                </span>
-              {% else %}
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                  INATIVA
-                </span>
-              {% endif %}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-              {{ portfolio.created_at[:10] }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <button class="text-blue-600 hover:text-blue-900 mr-3" onclick="alert('Editar: {{ portfolio.id }}')">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="text-red-600 hover:text-red-900" onclick="alert('Deletar: {{ portfolio.id }}')">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-          {% else %}
-          <tr>
-            <td colspan="5" class="px-6 py-10 text-center text-gray-500">
-              <i class="fas fa-folder-open text-4xl mb-3 text-gray-300"></i>
-              <p>Nenhuma carteira encontrada.</p>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+              
+              <!-- Conteúdo -->
+              <div class="p-4">
+                <div class="space-y-3">
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Saldo</span>
+                    <span class="font-semibold" x-text="formatCurrency(carteira.saldo, carteira.moeda)"></span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Variação</span>
+                    <span class="font-semibold" :class="carteira.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                          x-text="(carteira.variacao >= 0 ? '+' : '') + carteira.variacao.toFixed(2) + '%'"></span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Ativos</span>
+                    <span class="font-semibold" x-text="carteira.quantidade_ativos"></span>
+                  </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="mt-4">
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="h-2 rounded-full" 
+                         :class="carteira.variacao >= 0 ? 'bg-success-500' : 'bg-danger-500'"
+                         :style="`width: ${Math.min(100, Math.abs(carteira.variacao) * 5)}%`"></div>
+                  </div>
+                </div>
+                
+                <!-- Status Badge -->
+                <div class="mt-3 flex justify-between items-center">
+                  <span class="badge" :class="carteira.status === 'ativa' ? 'badge-success' : 'badge-warning'" 
+                        x-text="carteira.status"></span>
+                  <button class="text-primary-600 hover:text-primary-800 text-sm font-medium">
+                    Ver detalhes →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Vista Lista -->
+        <div x-show="!loading && vista === 'lista'" class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b">
+                <th class="text-left py-3 px-4">Carteira</th>
+                <th class="text-left py-3 px-4">Corretora</th>
+                <th class="text-right py-3 px-4">Saldo</th>
+                <th class="text-right py-3 px-4">Variação</th>
+                <th class="text-center py-3 px-4">Ativos</th>
+                <th class="text-center py-3 px-4">Status</th>
+                <th class="text-center py-3 px-4">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="carteira in carteiras" :key="carteira.id">
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4">
+                    <div class="font-semibold" x-text="carteira.nome"></div>
+                    <div class="text-sm text-gray-600" x-text="carteira.tipo_conta"></div>
+                  </td>
+                  <td class="py-3 px-4" x-text="carteira.corretora"></td>
+                  <td class="text-right py-3 px-4 font-semibold" x-text="formatCurrency(carteira.saldo, carteira.moeda)"></td>
+                  <td class="text-right py-3 px-4">
+                    <span class="font-semibold" :class="carteira.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                          x-text="(carteira.variacao >= 0 ? '+' : '') + carteira.variacao.toFixed(2) + '%'"></span>
+                  </td>
+                  <td class="text-center py-3 px-4" x-text="carteira.quantidade_ativos"></td>
+                  <td class="text-center py-3 px-4">
+                    <span class="badge" :class="carteira.status === 'ativa' ? 'badge-success' : 'badge-warning'" 
+                          x-text="carteira.status"></span>
+                  </td>
+                  <td class="text-center py-3 px-4">
+                    <div class="flex gap-2 justify-center">
+                      <button @click="editarCarteira(carteira)" class="btn btn-outline btn-icon btn-icon-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                      </button>
+                      <button @click="excluirCarteira(carteira)" class="btn btn-outline btn-icon btn-icon-sm text-danger-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal Nova Carteira -->
+  <div x-show="showModal" x-transition class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md" @click.away="showModal = false">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Nova Carteira</h3>
+      <form @submit.prevent="criarCarteira()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nome da Carteira</label>
+          <input type="text" x-model="novaCarteira.nome" required
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                 placeholder="Ex: Minha Carteira Principal">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Corretora</label>
+          <select x-model="novaCarteira.corretora" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md">
+            <option value="">Selecione</option>
+            <option value="XP Investimentos">XP Investimentos</option>
+            <option value="NuInvest">NuInvest</option>
+            <option value="Inter Investimentos">Inter Investimentos</option>
+            <option value="Rico Investimentos">Rico Investimentos</option>
+            <option value="BTG Pactual">BTG Pactual</option>
+            <option value="Clear">Clear</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Conta</label>
+          <select x-model="novaCarteira.tipo" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md">
+            <option value="">Selecione</option>
+            <option value="normal">Normal</option>
+            <option value="day_trade">Day Trade</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Mercado</label>
+          <select x-model="novaCarteira.mercado" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md">
+            <option value="">Selecione</option>
+            <option value="brasil">Brasil (BRL)</option>
+            <option value="usa">EUA (USD)</option>
+          </select>
+        </div>
+        <div class="flex gap-2">
+          <button type="submit" class="btn btn-primary flex-1">Criar</button>
+          <button type="button" @click="showModal = false" class="btn btn-outline">Cancelar</button>
+        </div>
+      </form>
     </div>
   </div>
+
 </div>
 
-<!-- Modal Nova Carteira (Placeholder Visual) -->
-<div id="newPortfolioModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3 text-center">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Nova Carteira</h3>
-            <div class="mt-2 px-7 py-3">
-                <p class="text-sm text-gray-500">Funcionalidade de criação será implementada na próxima etapa.</p>
-            </div>
-            <div class="items-center px-4 py-3">
-                <button id="closeModal" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                    Fechar
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    function openModal() {
-        document.getElementById('newPortfolioModal').classList.remove('hidden');
-    }
-    document.getElementById('closeModal').addEventListener('click', function() {
-        document.getElementById('newPortfolioModal').classList.add('hidden');
-    });
-</script>
+<script src="/static/js/portfolios.js"></script>
 {% endblock %}

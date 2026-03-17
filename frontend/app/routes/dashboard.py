@@ -1152,3 +1152,53 @@ def alertas():
     token = session.get('access_token')
     
     return render_template('dashboard/alertas.html')
+
+
+# --- Comparador de Ativos (NOVO) ---
+@bp.route('/comparador')
+@login_required
+def comparador():
+    """Comparador de Ativos - Fase 3 Sprint 3.1"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/comparador.html')
+
+
+# --- Planos de Compra Disciplinada (NOVO) ---
+@bp.route('/planos-compra')
+@login_required
+def planos_compra():
+    """Planos de Compra Disciplinada - Fase 3 Sprint 3.2"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/planos_compra.html')
+
+
+# --- Planos de Venda Disciplinada (NOVO) ---
+@bp.route('/planos-venda')
+@login_required
+def planos_venda():
+    """Planos de Venda Disciplinada - Fase 3 Sprint 3.3"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/planos_venda.html')
+
+
+# --- Educação e Insights (NOVO) ---
+@bp.route('/educacao')
+@login_required
+def educacao():
+    """Educação e Insights - Fase 3 Sprint 3.4"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/educacao.html')
+
+
+# --- Configurações (NOVO) ---
+@bp.route('/configuracoes')
+@login_required
+def configuracoes():
+    """Configurações - Fase 3 Sprint 3.5"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/configuracoes.html')

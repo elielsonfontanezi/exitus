@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+{% block title %}Comparador de Ativos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" 
+     x-data="comparadorData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Header -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Comparador de Ativos</h1>
+          <p class="text-xl opacity-90">Compare múltiplos ativos lado a lado</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white hover:text-primary-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Seleção de Ativos -->
+    <div class="card card-elevated mb-8">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="h3">Selecionar Ativos para Comparar</h3>
+          <span class="badge badge-primary" x-text="ativosSelecionados.length + ' selecionados'"></span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <template x-for="(ativo, index) in ativosComparacao" :key="ativo.ticker">
+            <div class="relative">
+              <div class="p-4 border rounded-lg cursor-pointer transition-all"
+                   :class="ativosSelecionados.includes(ativo.ticker) ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-gray-400'"
+                   @click="toggleAtivo(ativo.ticker)">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-semibold text-gray-900" x-text="ativo.ticker"></span>
+                  <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center"
+                       :class="ativosSelecionados.includes(ativo.ticker) ? 'border-primary-500 bg-primary-500' : 'border-gray-300'">
+                    <svg x-show="ativosSelecionados.includes(ativo.ticker)" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </div>
+                </div>
+                <p class="text-sm text-gray-600" x-text="ativo.nome"></p>
+                <p class="text-xs text-gray-500" x-text="ativo.setor"></p>
+              </div>
+            </div>
+          </template>
+        </div>
+        <div class="mt-6 flex justify-center">
+          <button @click="compararAtivos()" 
+                  :disabled="ativosSelecionados.length < 2"
+                  :class="ativosSelecionados.length < 2 ? 'btn-disabled' : 'btn-primary'"
+                  class="btn">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            Comparar Selecionados
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resultados da Comparação -->
+    <div x-show="mostrarComparacao" x-transition>
+      <!-- Cards Principais -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <template x-for="ativo in dadosComparacao" :key="ativo.ticker">
+          <div class="card card-gradient animate-fade-in" :style="`animation-delay: ${ativosSelecionados.indexOf(ativo.ticker) * 100}ms`">
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-semibold text-white" x-text="ativo.ticker"></h3>
+                  <p class="text-sm text-white opacity-90" x-text="ativo.nome"></p>
+                </div>
+                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                  <span class="text-white font-bold text-xs" x-text="ativo.ticker.substring(0, 3)"></span>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <p class="text-2xl font-bold text-white" x-text="formatCurrency(ativo.preco_atual, currentCurrency)"></p>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm text-white opacity-75">Variação:</span>
+                  <span class="text-sm font-medium" :class="ativo.variacao >= 0 ? 'text-white' : 'text-white opacity-90'" 
+                        x-text="(ativo.variacao >= 0 ? '+' : '') + ativo.variacao.toFixed(2) + '%'"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Tabela Comparativa -->
+      <div class="card card-elevated mb-8">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">Análise Comparativa</h3>
+            <div class="flex gap-2">
+              <button @click="exportarComparacao()" class="btn btn-outline">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Exportar
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-3 px-4">Métrica</th>
+                  <template x-for="ativo in dadosComparacao" :key="ativo.ticker">
+                    <th class="text-center py-3 px-4" x-text="ativo.ticker"></th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Preço -->
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4 font-medium text-gray-900">Preço Atual</td>
+                  <template x-for="ativo in dadosComparacao" :key="'preco-' + ativo.ticker">
+                    <td class="text-center py-3 px-4" x-text="formatCurrency(ativo.preco_atual, currentCurrency)"></td>
+                  </template>
+                </tr>
+                <!-- Variação -->
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4 font-medium text-gray-900">Variação Dia</td>
+                  <template x-for="ativo in dadosComparacao" :key="'variacao-' + ativo.ticker">
+                    <td class="text-center py-3 px-4">
+                      <span :class="ativo.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                            x-text="(ativo.variacao >= 0 ? '+' : '') + ativo.variacao.toFixed(2) + '%'"></span>
+                    </td>
+                  </template>
+                </tr>
+                <!-- P/L -->
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4 font-medium text-gray-900">P/L</td>
+                  <template x-for="ativo in dadosComparacao" :key="'pl-' + ativo.ticker">
+                    <td class="text-center py-3 px-4" x-text="ativo.indicadores.pl.toFixed(2)"></td>
+                  </template>
+                </tr>
+                <!-- P/VP -->
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4 font-medium text-gray-900">P/VP</td>
+                  <template x-for="ativo in dadosComparacao" :key="'pvp-' + ativo.ticker">
+                    <td class="text-center py-3 px-4" x-text="ativo.indicadores.pvp.toFixed(2)"></td>
+                  </template>
+                </tr>
+                <!-- ROE -->
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4 font-medium text-gray-900">ROE</td>
+                  <template x-for="ativo in dadosComparacao" :key="'roe-' + ativo.ticker">
+                    <td class="text-center py-3 px-4" x-text="ativo.indicadores.roe.toFixed(1) + '%'"></td>
+                  </template>
+                </tr>
+                <!-- DY -->
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4 font-medium text-gray-900">Dividend Yield</td>
+                  <template x-for="ativo in dadosComparacao" :key="'dy-' + ativo.ticker">
+                    <td class="text-center py-3 px-4" x-text="ativo.indicadores.dy.toFixed(2) + '%'"></td>
+                  </template>
+                </tr>
+                <!-- Liquidez -->
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4 font-medium text-gray-900">Liquidez (R$MM)</td>
+                  <template x-for="ativo in dadosComparacao" :key="'liquidez-' + ativo.ticker">
+                    <td class="text-center py-3 px-4" x-text="(ativo.indicadores.liquidez / 1000000).toFixed(0)"></td>
+                  </template>
+                </tr>
+                <!-- Buy Score -->
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4 font-medium text-gray-900">Buy Score</td>
+                  <template x-for="ativo in dadosComparacao" :key="'buyscore-' + ativo.ticker">
+                    <td class="text-center py-3 px-4">
+                      <div class="flex items-center justify-center gap-2">
+                        <div class="w-16 bg-gray-200 rounded-full h-2">
+                          <div class="h-2 rounded-full" 
+                               :class="getBuyScoreClass(ativo.buy_score)"
+                               :style="`width: ${ativo.buy_score}%`"></div>
+                        </div>
+                        <span class="text-sm font-medium" x-text="ativo.buy_score.toFixed(0)"></span>
+                      </div>
+                    </td>
+                  </template>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráficos Comparativos -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Gráfico de Preços -->
+        <div class="card card-elevated">
+          <div class="p-6">
+            <h3 class="h3 mb-6">Evolução de Preços</h3>
+            <div class="h-80">
+              <canvas id="precos-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico Radar -->
+        <div class="card card-elevated">
+          <div class="p-6">
+            <h3 class="h3 mb-6">Análise Radar</h3>
+            <div class="h-80">
+              <canvas id="radar-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Análise Setorial -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <h3 class="h3 mb-6">Distribuição Setorial</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Gráfico de Pizza -->
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-4">Por Ativo</h4>
+              <div class="h-64">
+                <canvas id="setor-chart"></canvas>
+              </div>
+            </div>
+            
+            <!-- Tabela Detalhada -->
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-4">Resumo por Setor</h4>
+              <div class="space-y-2">
+                <template xfor="setor in analiseSetorial" :key="setor.nome">
+                  <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-2">
+                      <div class="w-3 h-3 rounded-full" :style="`background-color: ${setor.cor}`"></div>
+                      <span class="font-medium text-gray-900" x-text="setor.nome"></span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                      <span class="text-sm text-gray-600" x-text="setor.ativos + ' ativos'"></span>
+                      <span class="font-semibold text-gray-900" x-text="setor.percentual.toFixed(1) + '%'"></span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recomendações -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <h3 class="h3 mb-6">Recomendações Baseadas na Análise</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Melhor Custo-Benefício -->
+            <div class="p-4 bg-success-50 border border-success-200 rounded-lg">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-semibold text-success-800">Melhor Custo-Benefício</p>
+                  <p class="text-sm text-success-700" x-text="recomendacoes.melhor_custo_beneficio.ticker"></p>
+                  <p class="text-xs text-success-600" x-text="'P/L: ' + recomendacoes.melhor_custo_beneficio.pl + ' | DY: ' + recomendacoes.melhor_custo_beneficio.dy + '%'"></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Maior Potencial -->
+            <div class="p-4 bg-primary-50 border border-primary-200 rounded-lg">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-semibold text-primary-800">Maior Potencial</p>
+                  <p class="text-sm text-primary-700" x-text="recomendacoes.maior_potencial.ticker"></p>
+                  <p class="text-xs text-primary-600" x-text="'ROE: ' + recomendacoes.maior_potencial.roe + '% | Buy Score: ' + recomendacoes.maior_potencial.buy_score"></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mais Seguro -->
+            <div class="p-4 bg-warning-50 border border-warning-200 rounded-lg">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 bg-warning-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-semibold text-warning-800">Mais Seguro</p>
+                  <p class="text-sm text-warning-700" x-text="recomendacoes.mais_seguro.ticker"></p>
+                  <p class="text-xs text-warning-600" x-text="'Liquidez: R$' + (recomendacoes.mais_seguro.liquidez/1000000).toFixed(0) + 'M | P/VP: ' + recomendacoes.mais_seguro.pvp"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/comparador.js"></script>
+{% endblock %}

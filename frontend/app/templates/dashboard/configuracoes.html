@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+{% block title %}Configurações{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" 
+     x-data="configuracoesData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Header -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Configurações</h1>
+          <p class="text-xl opacity-90">Personalize sua experiência e gerencie sua conta</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white hover:text-primary-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Abas -->
+    <div class="card card-elevated mb-8">
+      <div class="border-b border-gray-200">
+        <nav class="flex -mb-px">
+          <button @click="abaAtiva = 'perfil'" :class="abaAtiva === 'perfil' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            Perfil
+          </button>
+          <button @click="abaAtiva = 'notificacoes'" :class="abaAtiva === 'notificacoes' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            Notificações
+          </button>
+          <button @click="abaAtiva = 'seguranca'" :class="abaAtiva === 'seguranca' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            Segurança
+          </button>
+          <button @click="abaAtiva = 'preferencias'" :class="abaAtiva === 'preferencias' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Preferências
+          </button>
+        </nav>
+      </div>
+
+      <!-- Conteúdo das Abas -->
+      <div class="p-6">
+        <!-- Perfil -->
+        <div x-show="abaAtiva === 'perfil'" x-transition>
+          <h3 class="h3 mb-6">Informações do Perfil</h3>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Foto do Perfil -->
+            <div class="lg:col-span-1">
+              <div class="text-center">
+                <div class="w-32 h-32 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="text-3xl font-bold text-white" x-text="perfil.nome.charAt(0).toUpperCase()"></span>
+                </div>
+                <button class="btn btn-outline btn-sm">Alterar Foto</button>
+              </div>
+            </div>
+            
+            <!-- Formulário do Perfil -->
+            <div class="lg:col-span-2">
+              <form @submit.prevent="salvarPerfil()" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                    <input type="text" x-model="perfil.nome" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                    <input type="email" x-model="perfil.email" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                    <input type="tel" x-model="perfil.telefone"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Data de Nascimento</label>
+                    <input type="date" x-model="perfil.data_nascimento"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                  <textarea x-model="perfil.bio" rows="3"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            placeholder="Fale um pouco sobre você..."></textarea>
+                </div>
+                
+                <div class="flex gap-2">
+                  <button type="submit" class="btn btn-primary">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Salvar Alterações
+                  </button>
+                  <button type="button" @click="cancelarEdicao()" class="btn btn-outline">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notificações -->
+        <div x-show="abaAtiva === 'notificacoes'" x-transition>
+          <h3 class="h3 mb-6">Preferências de Notificação</h3>
+          
+          <div class="space-y-6">
+            <!-- Notificações por E-mail -->
+            <div class="border rounded-lg p-6">
+              <h4 class="font-semibold text-gray-900 mb-4">Notificações por E-mail</h4>
+              <div class="space-y-3">
+                <label class="flex items-center justify-between">
+                  <div>
+                    <p class="font-medium text-gray-900">Resumo Diário</p>
+                    <p class="text-sm text-gray-600">Resumo diário do seu portfolio</p>
+                  </div>
+                  <input type="checkbox" x-model="notificacoes.email.resumo_diario" 
+                         class="w-4 h-4 text-primary-600 rounded">
+                </label>
+                
+                <label class="flex items-center justify-between">
+                  <div>
+                    <p class="font-medium text-gray-900">Alertas de Preço</p>
+                    <p class="text-sm text-gray-600">Quando ativos atingirem metas definidas</p>
+                  </div>
+                  <input type="checkbox" x-model="notificacoes.email.alertas_preco" 
+                         class="w-4 h-4 text-primary-600 rounded">
+                </label>
+                
+                <label class="flex items-center justify-between">
+                  <div>
+                    <p class="font-medium text-gray-900">Notícias Relevantes</p>
+                    <p class="text-sm text-gray-600">Notícias sobre ativos do seu portfolio</p>
+                  </div>
+                  <input type="checkbox" x-model="notificacoes.email.noticias" 
+                         class="w-4 h-4 text-primary-600 rounded">
+                </label>
+                
+                <label class="flex items-center justify-between">
+                  <div>
+                    <p class="font-medium text-gray-900">Dicas Educacionais</p>
+                    <p class="text-sm text-gray-600">Conteúdo educacional personalizado</p>
+                  </div>
+                  <input type="checkbox" x-model="notificacoes.email.educacional" 
+                         class="w-4 h-4 text-primary-600 rounded">
+                </label>
+              </div>
+            </div>
+            
+            <!-- Notificações Push -->
+            <div class="border rounded-lg p-6">
+              <h4 class="font-semibold text-gray-900 mb-4">Notificações Push</h4>
+              <div class="space-y-3">
+                <label class="flex items-center justify-between">
+                  <div>
+                    <p class="font-medium text-gray-900">Ordens Executadas</p>
+                    <p class="text-sm text-gray-600">Confirmação de ordens de compra/venda</p>
+                  </div>
+                  <input type="checkbox" x-model="notificacoes.push.ordens" 
+                         class="w-4 h-4 text-primary-600 rounded">
+                </label>
+                
+                <label class="flex items-center justify-between">
+                  <div>
+                    <p class="font-medium text-gray-900">Alertas Críticos</p>
+                    <p class="text-sm text-gray-600">Stop loss e alertas urgentes</p>
+                  </div>
+                  <input type="checkbox" x-model="notificacoes.push.criticos" 
+                         class="w-4 h-4 text-primary-600 rounded">
+                </label>
+                
+                <label class="flex items-center justify-between">
+                  <div>
+                    <p class="font-medium text-gray-900">Oportunidades</p>
+                    <p class="text-sm text-gray-600">Oportunidades de mercado detectadas</p>
+                  </div>
+                  <input type="checkbox" x-model="notificacoes.push.oportunidades" 
+                         class="w-4 h-4 text-primary-600 rounded">
+                </label>
+              </div>
+            </div>
+            
+            <button @click="salvarNotificacoes()" class="btn btn-primary">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Salvar Preferências
+            </button>
+          </div>
+        </div>
+
+        <!-- Segurança -->
+        <div x-show="abaAtiva === 'seguranca'" x-transition>
+          <h3 class="h3 mb-6">Segurança da Conta</h3>
+          
+          <div class="space-y-6">
+            <!-- Alterar Senha -->
+            <div class="border rounded-lg p-6">
+              <h4 class="font-semibold text-gray-900 mb-4">Alterar Senha</h4>
+              <form @submit.prevent="alterarSenha()" class="space-y-4 max-w-md">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Senha Atual</label>
+                  <input type="password" x-model="senha.senha_atual" required
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Nova Senha</label>
+                  <input type="password" x-model="senha.nova_senha" required
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Confirmar Nova Senha</label>
+                  <input type="password" x-model="senha.confirmar_senha" required
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <button type="submit" class="btn btn-primary">Alterar Senha</button>
+              </form>
+            </div>
+            
+            <!-- Autenticação em Dois Fatores -->
+            <div class="border rounded-lg p-6">
+              <h4 class="font-semibold text-gray-900 mb-4">Autenticação em Dois Fatores</h4>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium text-gray-900">2FA via App</p>
+                  <p class="text-sm text-gray-600">Adicione uma camada extra de segurança</p>
+                </div>
+                <button @click="configurar2FA()" 
+                        :class="seguranca.two_factor_enabled ? 'btn-danger' : 'btn-primary'"
+                        x-text="seguranca.two_factor_enabled ? 'Desativar' : 'Configurar'">
+                </button>
+              </div>
+            </div>
+            
+            <!-- Sessões Ativas -->
+            <div class="border rounded-lg p-6">
+              <h4 class="font-semibold text-gray-900 mb-4">Sessões Ativas</h4>
+              <div class="space-y-3">
+                <template x-for="sessao in sessoesAtivas" :key="sessao.id">
+                  <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-3">
+                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                      </svg>
+                      <div>
+                        <p class="font-medium text-gray-900" x-text="sessao.dispositivo"></p>
+                        <p class="text-sm text-gray-600" x-text="sessao.localizacao + ' • ' + sessao.data_acesso"></p>
+                      </div>
+                    </div>
+                    <button @click="encerrarSessao(sessao)" 
+                            :class="sessao.atual ? 'btn-outline btn-sm' : 'btn-danger btn-sm'"
+                            :disabled="sessao.atual"
+                            x-text="sessao.atual ? 'Atual' : 'Encerrar'">
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preferências -->
+        <div x-show="abaAtiva === 'preferencias'" x-transition>
+          <h3 class="h3 mb-6">Preferências do Sistema</h3>
+          
+          <div class="space-y-6">
+            <!-- Interface -->
+            <div class="border rounded-lg p-6">
+              <h4 class="font-semibold text-gray-900 mb-4">Interface</h4>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Idioma</label>
+                  <select x-model="preferencias.idioma" class="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-md">
+                    <option value="pt-BR">Português (Brasil)</option>
+                    <option value="en-US">English (US)</option>
+                    <option value="es-ES">Español</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Tema</label>
+                  <select x-model="preferencias.tema" class="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-md">
+                    <option value="light">Claro</option>
+                    <option value="dark">Escuro</option>
+                    <option value="auto">Automático</option>
+                  </select>
+                </div>
+                
+                <label class="flex items-center">
+                  <input type="checkbox" x-model="preferencias.animacoes" 
+                         class="w-4 h-4 text-primary-600 rounded mr-2">
+                  <span class="text-gray-700">Habilitar animações</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Mercado -->
+            <div class="border rounded-lg p-6">
+              <h4 class="font-semibold text-gray-900 mb-4">Mercado</h4>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Moeda Padrão</label>
+                  <select x-model="preferencias.moeda_padrao" @change="atualizarMoedaPadrao()" 
+                          class="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-md">
+                    <option value="BRL">Real (R$)</option>
+                    <option value="USD">Dolar ($)</option>
+                  </select>
+                </div>
+                
+                <label class="flex items-center">
+                  <input type="checkbox" x-model="preferencias.dados_tempo_real" 
+                         class="w-4 h-4 text-primary-600 rounded mr-2">
+                  <span class="text-gray-700">Dados em tempo real</span>
+                </label>
+                
+                <label class="flex items-center">
+                  <input type="checkbox" x-model="preferencias.ocultar_saldo" 
+                         class="w-4 h-4 text-primary-600 rounded mr-2">
+                  <span class="text-gray-700">Ocultar saldo (modo privado)</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Privacidade -->
+            <div class="border rounded-lg p-6">
+              <h4 class="font-semibold text-gray-900 mb-4">Privacidade</h4>
+              <div class="space-y-4">
+                <label class="flex items-center">
+                  <input type="checkbox" x-model="preferencias.analise_comportamento" 
+                         class="w-4 h-4 text-primary-600 rounded mr-2">
+                  <span class="text-gray-700">Compartilhar dados para análise de comportamento</span>
+                </label>
+                
+                <label class="flex items-center">
+                  <input type="checkbox" x-model="preferencias.personalizacao_conteudo" 
+                         class="w-4 h-4 text-primary-600 rounded mr-2">
+                  <span class="text-gray-700">Personalizar conteúdo baseado no uso</span>
+                </label>
+                
+                <label class="flex items-center">
+                  <input type="checkbox" x-model="preferencias.newsletter" 
+                         class="w-4 h-4 text-primary-600 rounded mr-2">
+                  <span class="text-gray-700">Receber newsletter com novidades</span>
+                </label>
+              </div>
+            </div>
+            
+            <button @click="salvarPreferencias()" class="btn btn-primary">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Salvar Preferências
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/configuracoes.js"></script>
+{% endblock %}
