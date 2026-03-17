@@ -14,6 +14,7 @@ from app.models import Transacao, Ativo, Corretora
 from app.utils.business_rules import validar_transacao
 from app.utils.exceptions import NotFoundError
 from app.services.auditoria_service import AuditoriaService
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,10 @@ class TransacaoService:
                          joinedload(Transacao.ativo),
                          joinedload(Transacao.corretora),
                      ))
+            
+            # Filtro por assessora (multi-tenancy)
+            query = filter_by_assessora(query, Transacao)
+            
             if tipo:
                 query = query.filter(Transacao.tipo.in_(tipo.upper()))
             if ativo_id:

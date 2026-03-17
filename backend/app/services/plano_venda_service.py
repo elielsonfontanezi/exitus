@@ -18,6 +18,7 @@ from app.models.plano_venda import PlanoVenda, StatusPlanoVenda, TipoGatilho
 from app.models.ativo import Ativo
 from app.models.posicao import Posicao
 from app.services.cache_service import cache
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,9 @@ class PlanoVendaService:
             if not posicao or posicao.quantidade < Decimal(str(data.get('quantidade_total', 0))):
                 raise ValueError("Quantidade insuficiente na posição para criar plano de venda")
             
+            # Obter assessora_id do JWT ou dos dados
+            assessora_id = data.get('assessora_id') or get_current_assessora_id()
+            
             # Criar plano
             plano = PlanoVenda(
                 usuario_id=usuario_id,
@@ -56,7 +60,8 @@ class PlanoVendaService:
                 parcelas_executadas=0,
                 valor_parcela_fixo=Decimal(str(data['valor_parcela_fixo'])) if data.get('valor_parcela_fixo') else None,
                 status=StatusPlanoVenda.ATIVO,
-                data_inicio=date.today()
+                data_inicio=date.today(),
+                assessora_id=assessora_id
             )
             
             db.session.add(plano)
