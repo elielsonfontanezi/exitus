@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% block title %}Alocação e Rebalanceamento{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" 
+     x-data="alocacaoData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Header -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Alocação e Rebalanceamento</h1>
+          <p class="text-xl opacity-90">Visualize e otimize a distribuição do seu patrimônio</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white hover:text-primary-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Cards de Resumo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Patrimônio Total -->
+      <div class="card card-gradient-success animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Patrimônio Total</h3>
+                <p class="text-sm text-white opacity-90">Todos os ativos</p>
+              </div>
+            </div>
+            <span class="badge badge-white text-success-600">100%</span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="formatCurrency(resumo.patrimonio_total, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white">Diversificado:</span>
+              <span class="text-white font-medium" x-text="resumo.numero_ativos + ' ativos'"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Maior Alocação -->
+      <div class="card card-gradient animate-fade-in" style="animation-delay: 100ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Maior Alocação</h3>
+                <p class="text-sm text-gray-600" x-text="resumo.maior_alocacao.ticker"></p>
+              </div>
+            </div>
+            <span class="badge badge-primary" x-text="resumo.maior_alocacao.percentual.toFixed(1) + '%'"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.maior_alocacao.valor, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-gray-600">Concentração:</span>
+              <span class="text-warning-600 font-medium" x-text="resumo.maior_alocacao.percentual > 20 ? 'Alta' : 'Normal'"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ativos em Destaque -->
+      <div class="card card-gradient animate-fade-in" style="animation-delay: 200ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-warning-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Top 5 Ativos</h3>
+                <p class="text-sm text-gray-600">Em valor</p>
+              </div>
+            </div>
+            <span class="badge badge-warning" x-text="resumo.top5_percentual.toFixed(1) + '%'"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.top5_valor, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-gray-600">do total</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diversificação -->
+      <div class="card card-gradient-info animate-fade-in" style="animation-delay: 300ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-info-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-info-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Diversificação</h3>
+                <h3 class="text-sm text-white opacity-90">Índice HHI</h3>
+              </div>
+            </div>
+            <span class="badge badge-white text-info-600" x-text="resumo.hhi_score"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="resumo.diversificacao_nivel"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75">0-1000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visualizações de Alocação -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Gráfico de Pizza -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">Alocação por Ativo</h3>
+            <div class="flex gap-2">
+              <button @click="changeView('pizza')" :class="view === 'pizza' ? 'btn-primary' : 'btn-outline'" class="btn btn-icon btn-icon-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+                </svg>
+              </button>
+              <button @click="changeView('treemap')" :class="view === 'treemap' ? 'btn-primary' : 'btn-outline'" class="btn btn-icon btn-icon-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="h-80">
+            <canvas id="alocacao-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alocação por Categoria -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">Alocação por Categoria</h3>
+            <button class="btn btn-outline btn-icon btn-icon-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="h-80">
+            <canvas id="categoria-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela Detalhada -->
+    <div class="card card-elevated mb-8">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="h3">Posições Detalhadas</h3>
+          <div class="flex gap-2">
+            <input type="text" x-model="searchAtivo" placeholder="Buscar ativo..." 
+                   class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <select x-model="sortBy" @change="sortAtivos()" class="btn btn-outline">
+              <option value="valor">Valor</option>
+              <option value="percentual">Percentual</option>
+              <option value="ticker">Ticker</option>
+            </select>
+            <button @click="openRebalanceamento()" class="btn btn-primary">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              Rebalancear
+            </button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b">
+                <th class="text-left py-3 px-4">Ativo</th>
+                <th class="text-right py-3 px-4">Quantidade</th>
+                <th class="text-right py-3 px-4">Preço Médio</th>
+                <th class="text-right py-3 px-4">Valor Atual</th>
+                <th class="text-right py-3 px-4">Total</th>
+                <th class="text-right py-3 px-4">%</th>
+                <th class="text-center py-3 px-4">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="ativo in filteredAtivos" :key="ativo.ticker">
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                        <span class="text-primary-600 font-semibold text-xs" x-text="ativo.ticker.substring(0, 3)"></span>
+                      </div>
+                      <div>
+                        <p class="font-semibold text-gray-900" x-text="ativo.ticker"></p>
+                        <p class="text-xs text-gray-500" x-text="ativo.nome"></p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right py-3 px-4" x-text="ativo.quantidade"></td>
+                  <td class="text-right py-3 px-4" x-text="formatCurrency(ativo.preco_medio, currentCurrency)"></td>
+                  <td class="text-right py-3 px-4" x-text="formatCurrency(ativo.preco_atual, currentCurrency)"></td>
+                  <td class="text-right py-3 px-4 font-semibold" x-text="formatCurrency(ativo.valor_total, currentCurrency)"></td>
+                  <td class="text-right py-3 px-4">
+                    <div class="flex items-center gap-2">
+                      <div class="w-16 bg-gray-200 rounded-full h-2">
+                        <div class="bg-primary-500 h-2 rounded-full" :style="`width: ${ativo.percentual}%`"></div>
+                      </div>
+                      <span class="text-sm font-medium" x-text="ativo.percentual.toFixed(1) + '%'"></span>
+                    </div>
+                  </td>
+                  <td class="text-center py-3 px-4">
+                    <div class="flex items-center justify-center gap-2">
+                      <button @click="verDetalhes(ativo.ticker)" class="btn btn-outline btn-icon btn-icon-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                      </button>
+                      <button @click="editarPosicao(ativo)" class="btn btn-outline btn-icon btn-icon-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Análise de Concentração -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Top 10 -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <h3 class="h3 mb-4">Top 10 Concentração</h3>
+          <div class="space-y-3">
+            <template x-for="(ativo, index) in topAtivos.slice(0, 10)" :key="ativo.ticker">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-medium text-gray-600" x-text="index + 1"></span>
+                  <span class="font-medium text-gray-900" x-text="ativo.ticker"></span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="w-12 bg-gray-200 rounded-full h-2">
+                    <div class="bg-primary-500 h-2 rounded-full" :style="`width: ${ativo.percentual}%`"></div>
+                  </div>
+                  <span class="text-sm font-medium" x-text="ativo.percentual.toFixed(1) + '%'"></span>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Análise Setorial -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <h3 class="h3 mb-4">Análise Setorial</h3>
+          <div class="space-y-3">
+            <template x-for="setor in analiseSetorial" :key="setor.nome">
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center gap-2">
+                  <div class="w-3 h-3 rounded-full" :style="`background-color: ${setor.cor}`"></div>
+                  <span class="font-medium text-gray-900" x-text="setor.nome"></span>
+                </div>
+                <div class="text-right">
+                  <p class="font-semibold text-gray-900" x-text="formatCurrency(setor.valor, currentCurrency)"></p>
+                  <p class="text-xs text-gray-500" x-text="setor.percentual.toFixed(1) + '%'"></p>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recomendações -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <h3 class="h3 mb-4">Recomendações</h3>
+          <div class="space-y-3">
+            <div class="p-3 bg-warning-50 border border-warning-200 rounded-lg">
+              <div class="flex items-start gap-2">
+                <svg class="w-5 h-5 text-warning-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-warning-800">Alta Concentração</p>
+                  <p class="text-xs text-warning-700">PETR4 representa 28% do portfolio</p>
+                </div>
+              </div>
+            </div>
+            <div class="p-3 bg-success-50 border border-success-200 rounded-lg">
+              <div class="flex items-start gap-2">
+                <svg class="w-5 h-5 text-success-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-success-800">Boa Diversificação</p>
+                  <p class="text-xs text-success-700">8 setores diferentes representados</p>
+                </div>
+              </div>
+            </div>
+            <div class="p-3 bg-info-50 border border-info-200 rounded-lg">
+              <div class="flex items-start gap-2">
+                <svg class="w-5 h-5 text-info-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-info-800">Oportunidade</p>
+                  <p class="text-xs text-info-700">Considere aumentar exposição em FIIs</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/alocacao.js"></script>
+{% endblock %}

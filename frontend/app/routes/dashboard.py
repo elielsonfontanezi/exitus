@@ -1112,3 +1112,43 @@ def proventos_calendario():
     token = session.get('access_token')
     
     return render_template('dashboard/proventos_calendario.html')
+
+
+# --- Alocação e Rebalanceamento (NOVO) ---
+@bp.route('/alocacao')
+@login_required
+def alocacao():
+    """Alocação e Rebalanceamento - Fase 2 Sprint 2.1"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/alocacao.html')
+
+
+# --- Fluxo de Caixa (NOVO) ---
+@bp.route('/fluxo-caixa')
+@login_required
+def fluxo_caixa():
+    """Fluxo de Caixa - Fase 2 Sprint 2.2"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/fluxo_caixa.html')
+
+
+# --- Imposto de Renda (NOVO) ---
+@bp.route('/imposto-renda')
+@login_required
+def imposto_renda():
+    """Imposto de Renda - Fase 2 Sprint 2.3"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/imposto_renda.html')
+
+
+# --- Central de Alertas (NOVO) ---
+@bp.route('/alertas')
+@login_required
+def alertas():
+    """Central de Alertas - Fase 2 Sprint 2.4"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/alertas.html')

@@ -8,6 +8,45 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — ROADMAP_FRONTEND_V2.0 - Fase 2 Completa (17/03/2026)
+
+- **Alocação e Rebalanceamento:**
+  - `frontend/app/templates/dashboard/alocacao.html` - Visualização completa com cards de resumo
+  - Cards: Patrimônio total, maior alocação, top 5 ativos, índice HHI de diversificação
+  - Gráficos: Pizza/treemap de alocação por ativo, barras por categoria/setor
+  - Tabela detalhada com ordenação, busca e ações
+  - Análise de concentração: top 10, setorial e recomendações
+  - `frontend/app/static/js/alocacao.js` - Dados dinâmicos e mock
+- **Fluxo de Caixa:**
+  - `frontend/app/templates/dashboard/fluxo_caixa.html` - Timeline completa de movimentações
+  - Cards: Saldo atual, entradas/saídas do mês, saldo líquido
+  - Gráfico de evolução (linha/barra) com entradas, saídas e saldo acumulado
+  - Timeline visual com ícones e cores diferenciadas
+  - Filtros por período, tipo e categoria
+  - `frontend/app/static/js/fluxo_caixa.js` - Agrupamento por dia e mock
+- **Imposto de Renda:**
+  - `frontend/app/templates/dashboard/imposto_renda.html` - Sistema completo com 4 abas
+  - Cards: IR acumulado, prejuízos compensáveis, IR pago no ano, alíquota efetiva
+  - Calculadora de IR com simulação de compensação de prejuízos
+  - Lista de DARFs com status e ações (visualizar/baixar)
+  - Prejuízos acumulados com gráfico e disponibilidade
+  - Relatório anual com exportação
+  - `frontend/app/static/js/imposto_renda.js` - Cálculos automáticos e mock
+- **Central de Alertas:**
+  - `frontend/app/templates/dashboard/alertas.html` - Sistema completo de monitoramento
+  - Cards: Alertas ativos, preço alvo, notícias, eventos corporativos
+  - Lista de alertas com status, condições e ações
+  - Filtros por tipo, status e ativo
+  - Modal para criação de novos alertas
+  - Tipos: preço alvo, notícias, eventos, variação percentual
+  - `frontend/app/static/js/alertas.js` - CRUD completo e mock
+- **Rotas Frontend:**
+  - `/dashboard/alocacao` - Alocação e Rebalanceamento
+  - `/dashboard/fluxo-caixa` - Fluxo de Caixa
+  - `/dashboard/imposto-renda` - Imposto de Renda
+  - `/dashboard/alertas` - Central de Alertas
+- **Status:** ✅ Fase 2 100% concluída (4/4 telas)
+
 ### Added — ROADMAP_FRONTEND_V2.0 - Fase 1 Completa (17/03/2026)
 
 - **Design System Moderno:**
