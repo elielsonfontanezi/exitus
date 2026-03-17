@@ -46,10 +46,14 @@ class AuthService:
             )
             raise ValueError("Credenciais inválidas")  # Mensagem genérica por segurança
         
-        # Gerar tokens
+        # Gerar tokens com assessora_id
+        additional_claims = {'role': user.role.value}
+        if user.assessora_id:
+            additional_claims['assessora_id'] = str(user.assessora_id)
+        
         access_token = create_access_token(
             identity=str(user.id),
-            additional_claims={'role': user.role.value}
+            additional_claims=additional_claims
         )
         refresh_token = create_refresh_token(identity=str(user.id))
         

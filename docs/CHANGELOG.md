@@ -8,6 +8,16 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Fase 7: Multi-Tenancy (Parte 3) (16/03/2026)
+
+- **MULTICLIENTE-001 - Implementação Funcional Iniciada:**
+  - Dados migrados: 13 registros para assessora padrão (5 usuários + 1 evento + 7 logs)
+  - Helper de tenant criado: 4 funções utilitárias (get_current_assessora_id, require_assessora, require_same_assessora, filter_by_assessora)
+  - JWT atualizado: Inclui assessora_id no payload do token
+  - Auth service modificado para adicionar assessora_id aos claims
+- **Status:** Parte 3 iniciada - Helper e JWT implementados (60%)
+- **Próximos Passos:** Atualizar services com filtros, criar testes, rodar suite completa
+
 ### Added — Fase 7: Multi-Tenancy (Parte 2B) (16/03/2026)
 
 - **MULTICLIENTE-001 - Todos os Models Atualizados (100%):**
@@ -16,7 +26,6 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Backend testado e funcionando com todos os 20 models
   - Imports corrigidos: relationship adicionado em SaldoDarfAcumulado e HistoricoPreco
 - **Status:** Parte 2B concluída - 20/20 models atualizados (100%)
-- **Próximos Passos (Parte 3):** Implementar filtros nos services, atualizar JWT, criar middleware de tenant isolation, migrar dados completos, atualizar testes
 
 ### Added — Fase 7: Multi-Tenancy (Parte 2A) (16/03/2026)
 
