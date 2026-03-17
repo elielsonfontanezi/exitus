@@ -8,6 +8,44 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — ROADMAP_FRONTEND_V2.0 - Fase 4 Completa (17/03/2026)
+
+- **Buy Signals (Redesign):**
+  - `frontend/app/templates/dashboard/buy_signals.html` - Análise completa com design moderno
+  - Cards gradient: Score de compra, insights da IA, preço alvo
+  - Gráfico radar multi-fator com 8 indicadores
+  - Busca individual de ativos com análise completa
+  - Grid de sinais globais com filtros (compra/aguardar/venda)
+  - `frontend/app/static/js/buy_signals.js` - Alpine.js reativo e mock data
+- **Portfolios (Redesign):**
+  - `frontend/app/templates/dashboard/portfolios.html` - Gestão premium de carteiras
+  - Cards gradient animados: Total, Saldo BR, Saldo EUA, Patrimônio
+  - Vista dupla: Grid cards e tabela lista
+  - Modal para criação de novas carteiras
+  - Suporte multi-moeda (BRL/USD) com conversão automática
+  - `frontend/app/static/js/portfolios.js` - CRUD completo e resumo consolidado
+- **Transações (Redesign):**
+  - `frontend/app/templates/dashboard/transactions.html` - Histórico avançado
+  - Cards gradient: Total transações, compras, vendas, volume
+  - Filtros avançados: período, tipo, ativo, corretora, status
+  - Tabela responsiva com paginação e ordenação
+  - Exportação CSV/Excel com download direto
+  - `frontend/app/static/js/transactions.js` - Paginação e filtros em tempo real
+- **Relatórios (Redesign):**
+  - `frontend/app/templates/dashboard/reports.html` - Sistema completo de relatórios
+  - Cards gradient: Total, Portfolio, Performance, Downloads
+  - 6 tipos de relatórios: Portfolio, Performance, IR, Dividendos, Alocação, Custos
+  - Modal avançado com preview e opções customizáveis
+  - Formatos: PDF, Excel, CSV com download direto
+  - `frontend/app/static/js/reports.js` - Geração assíncrona e status tracking
+- **Rotas Frontend:**
+  - `/dashboard/buy-signals` - Buy Signals (redesign)
+  - `/dashboard/portfolios` - Portfolios (redesign)
+  - `/dashboard/transactions` - Transações (redesign)
+  - `/dashboard/reports` - Relatórios (redesign)
+- **Status:** ✅ Fase 4 100% concluída (4/4 telas)
+- **Total ROADMAP:** ✅ 17/17 telas premium implementadas
+
 ### Added — ROADMAP_FRONTEND_V2.0 - Fase 2 Completa (17/03/2026)
 
 - **Alocação e Rebalanceamento:**
