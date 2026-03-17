@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+{% block title %}Performance e Rentabilidade{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" 
+     x-data="performanceData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Header -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Performance e Rentabilidade</h1>
+          <p class="text-xl opacity-90">Análise completa do desempenho do seu patrimônio</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white hover:text-primary-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Cards de Métricas Principais -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Rentabilidade Total -->
+      <div class="card card-gradient-success animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Rentabilidade Total</h3>
+                <p class="text-sm text-white opacity-90">12 meses</p>
+              </div>
+            </div>
+            <span class="badge badge-white text-success-600">+18.5%</span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="formatCurrency(performance.rentabilidade_total.valor, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white">CDI: +12.3%</span>
+              <span class="text-white opacity-75">vs</span>
+              <span class="text-white">IBOV: +15.2%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mês Atual -->
+      <div class="card card-gradient animate-fade-in" style="animation-delay: 100ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Mês Atual</h3>
+                <p class="text-sm text-gray-600">Março 2024</p>
+              </div>
+            </div>
+            <span class="badge badge-success">+2.8%</span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(performance.mes_atual.valor, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-success">Melhor dia: +R$ 3.450</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Maior Ganhador -->
+      <div class="card card-gradient animate-fade-in" style="animation-delay: 200ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Maior Ganhador</h3>
+                <p class="text-sm text-gray-600" x-text="performance.maior_ganhador.ticker"></p>
+              </div>
+            </div>
+            <span class="badge badge-success" x-text="'+' + performance.maior_ganhador.percentual + '%'"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(performance.maior_ganhador.valor, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-gray-600">Quantidade:</span>
+              <span class="text-gray-900 font-medium" x-text="performance.maior_ganhador.quantidade"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Maior Perdedor -->
+      <div class="card card-gradient-danger animate-fade-in" style="animation-delay: 300ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-danger-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-danger-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Maior Perdedor</h3>
+                <p class="text-sm text-white opacity-90" x-text="performance.maior_perdedor.ticker"></p>
+              </div>
+            </div>
+            <span class="badge badge-white text-danger-600" x-text="performance.maior_perdedor.percentual + '%'"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="formatCurrency(performance.maior_perdedor.valor, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75">Quantidade:</span>
+              <span class="text-white font-medium" x-text="performance.maior_perdedor.quantidade"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráficos de Performance -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Performance Acumulada -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">Performance Acumulada</h3>
+            <div class="flex gap-2">
+              <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('1M')" :class="period === '1M' ? 'btn-primary' : ''">1M</button>
+              <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('6M')" :class="period === '6M' ? 'btn-primary' : ''">6M</button>
+              <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('1A')" :class="period === '1A' ? 'btn-primary' : ''">1A</button>
+              <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('5A')" :class="period === '5A' ? 'btn-primary' : ''">5A</button>
+            </div>
+          </div>
+          <div class="h-80">
+            <canvas id="performance-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparação com Benchmarks -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">vs Benchmarks</h3>
+            <div class="flex gap-2">
+              <label class="flex items-center gap-2">
+                <input type="checkbox" x-model="showCDI" @change="updateBenchmarkChart()" class="rounded">
+                <span class="text-sm">CDI</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input type="checkbox" x-model="showIBOV" @change="updateBenchmarkChart()" class="rounded">
+                <span class="text-sm">IBOV</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input type="checkbox" x-model="showIFIX" @change="updateBenchmarkChart()" class="rounded">
+                <span class="text-sm">IFIX</span>
+              </label>
+            </div>
+          </div>
+          <div class="h-80">
+            <canvas id="benchmark-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Heatmap de Performance -->
+    <div class="card card-elevated mb-8">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="h3">Heatmap de Performance Mensal</h3>
+          <select x-model="heatmapYear" @change="updateHeatmap()" class="btn btn-outline">
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+          </select>
+        </div>
+        <div class="overflow-x-auto">
+          <div id="heatmap-container" class="min-w-[600px]">
+            <!-- Heatmap será gerado via JavaScript -->
+          </div>
+        </div>
+        <div class="flex items-center justify-center gap-4 mt-4 text-sm">
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 bg-danger-500 rounded"></div>
+            <span class="text-gray-600">Pior</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 bg-warning-500 rounded"></div>
+            <span class="text-gray-600">Neutro</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 bg-success-500 rounded"></div>
+            <span class="text-gray-600">Melhor</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance por Ativo -->
+    <div class="card card-elevated mb-8">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="h3">Performance por Ativo</h3>
+          <div class="flex gap-2">
+            <input type="text" x-model="searchAtivo" placeholder="Buscar ativo..." 
+                   class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <select x-model="sortBy" @change="sortAtivos()" class="btn btn-outline">
+              <option value="valor">Valor</option>
+              <option value="percentual">Percentual</option>
+              <option value="ticker">Ticker</option>
+            </select>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b">
+                <th class="text-left py-3 px-4">Ativo</th>
+                <th class="text-right py-3 px-4">Quantidade</th>
+                <th class="text-right py-3 px-4">Custo Médio</th>
+                <th class="text-right py-3 px-4">Valor Atual</th>
+                <th class="text-right py-3 px-4">Resultado</th>
+                <th class="text-right py-3 px-4">%</th>
+                <th class="text-center py-3 px-4">Gráfico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="ativo in filteredAtivos" :key="ativo.ticker">
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-3 px-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                        <span class="text-primary-600 font-semibold text-xs" x-text="ativo.ticker.substring(0, 3)"></span>
+                      </div>
+                      <div>
+                        <p class="font-semibold text-gray-900" x-text="ativo.ticker"></p>
+                        <p class="text-xs text-gray-500" x-text="ativo.nome"></p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right py-3 px-4" x-text="ativo.quantidade"></td>
+                  <td class="text-right py-3 px-4" x-text="formatCurrency(ativo.custo_medio, currentCurrency)"></td>
+                  <td class="text-right py-3 px-4" x-text="formatCurrency(ativo.valor_atual, currentCurrency)"></td>
+                  <td class="text-right py-3 px-4" :class="ativo.resultado >= 0 ? 'text-success' : 'text-danger'" 
+                      x-text="formatCurrency(ativo.resultado, currentCurrency)"></td>
+                  <td class="text-right py-3 px-4">
+                    <span class="badge" :class="ativo.percentual >= 0 ? 'badge-success' : 'badge-danger'" 
+                          x-text="(ativo.percentual >= 0 ? '+' : '') + ativo.percentual.toFixed(2) + '%'"></span>
+                  </td>
+                  <td class="text-center py-3 px-4">
+                    <div class="w-20 h-8">
+                      <canvas :id="'sparkline-' + ativo.ticker"></canvas>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Análise de Risco -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Volatilidade -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <h3 class="h3 mb-4">Volatilidade</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-600">Portfolio</span>
+                <span class="font-medium">18.5%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-warning-500 h-2 rounded-full" style="width: 65%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-600">IBOV</span>
+                <span class="font-medium">22.3%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-danger-500 h-2 rounded-full" style="width: 80%"></div>
+              </div>
+            </div>
+            <div class="text-sm text-gray-600 mt-3">
+              Portfolio menos volátil que IBOVESPA
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drawdown Máximo -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <h3 class="h3 mb-4">Drawdown Máximo</h3>
+          <div class="text-center">
+            <p class="text-3xl font-bold text-danger-600 mb-2">-12.4%</p>
+            <p class="text-sm text-gray-600">Maior queda do pico</p>
+            <p class="text-xs text-gray-500 mt-2">Out/2023 - Fev/2024</p>
+          </div>
+          <div class="mt-4 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Recuperação:</span>
+              <span class="font-medium text-success-600">3.2 meses</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sharpe Ratio -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <h3 class="h3 mb-4">Sharpe Ratio</h3>
+          <div class="text-center">
+            <p class="text-3xl font-bold text-success-600 mb-2">1.42</p>
+            <p class="text-sm text-gray-600">Ajustado ao risco</p>
+          </div>
+          <div class="mt-4 space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">CDI:</span>
+              <span class="font-medium">1.00</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">IBOV:</span>
+              <span class="font-medium">0.85</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/performance.js"></script>
+{% endblock %}

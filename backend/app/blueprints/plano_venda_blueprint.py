@@ -411,3 +411,94 @@ def get_tipos_gatilho():
         data={'tipos_gatilho': tipos},
         message="Tipos de gatilho listados com sucesso"
     )
+
+
+@plano_venda_bp.route('/simular-venda', methods=['POST'])
+@jwt_required()
+def simular_venda():
+    """Simula IR e resultados de uma venda"""
+    try:
+        usuario_id = get_jwt_identity()
+        data = request.get_json()
+        
+        if not data:
+            return error_response("Dados não fornecidos", 400)
+        
+        # Validações
+        required_fields = ['posicao_id', 'quantidade', 'preco_venda']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return error_response(f"Campo '{field}' é obrigatório", 400)
+        
+        # Validar UUID
+        if not validate_uuid(data['posicao_id']):
+            return error_response("posicao_id inválido", 400)
+        
+        # Validar quantidade
+        quantidade = int(data['quantidade'])
+        if quantidade <= 0:
+            return error_response("Quantidade deve ser maior que zero", 400)
+        
+        # Validar preço
+        try:
+            preco_venda = float(data['preco_venda'])
+            if preco_venda <= 0:
+                return error_response("Preço de venda deve ser maior que zero", 400)
+        except (ValueError, TypeError):
+            return error_response("Preço de venda inválido", 400)
+        
+        # Obter posição
+        from app.models.posicao import Posicao
+        from app.models.ativo import Ativo
+        from decimal import Decimal
+        from datetime import datetime
+        
+        posicao = Posicao.query.filter_by(
+            id=data['posicao_id'],
+            usuario_id=usuario_id
+        ).first()
+        
+        if not posicao:
+            return error_response("Posição não encontrada", 404)
+        
+        if quantidade > posicao.quantidade:
+            return error_response("Quantidade maior que posição disponível", 400)
+        
+        # Calcular resultados
+        preco_medio = posicao.preco_medio
+        custo_total = preco_medio * quantidade
+        valor_venda = preco_venda * quantidade
+        lucro_bruto = valor_venda - custo_total
+        
+        # Calcular IR (simplificado - 15% para swing trade)
+        ir_aliquota = Decimal('0.15')
+        ir_devido = lucro_bruto * ir_aliquota if lucro_bruto > 0 else Decimal('0')
+        lucro_liquido = lucro_bruto - ir_devido
+        
+        simulacao = {
+            'posicao': {
+                'ticker': posicao.ativo.ticker,
+                'nome': posicao.ativo.nome,
+                'tipo': posicao.ativo.tipo.value
+            },
+            'quantidade': quantidade,
+            'preco_medio': float(preco_medio),
+            'preco_venda': preco_venda,
+            'custo_total': float(custo_total),
+            'valor_venda': valor_venda,
+            'lucro_bruto': float(lucro_bruto),
+            'ir_aliquota': float(ir_aliquota),
+            'ir_devido': float(ir_devido),
+            'lucro_liquido': float(lucro_liquido),
+            'rentabilidade_percentual': float((lucro_bruto / custo_total) * 100) if custo_total > 0 else 0,
+            'simulado_em': datetime.now().isoformat()
+        }
+        
+        return success_response(
+            data=simulacao,
+            message="Simulação realizada com sucesso"
+        )
+        
+    except Exception as e:
+        logger.error(f"Erro ao simular venda: {e}")
+        return error_response(str(e), 500)

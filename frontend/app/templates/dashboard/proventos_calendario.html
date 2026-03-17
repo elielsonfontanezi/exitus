@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block title %}Gestão de Proventos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" 
+     x-data="proventosData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Header -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Gestão de Proventos</h1>
+          <p class="text-xl opacity-90">Acompanhe dividendos, JCP e eventos corporativos</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white hover:text-primary-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Cards de Resumo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Total Recebido -->
+      <div class="card card-gradient-success animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Total Recebido</h3>
+                <p class="text-sm text-white opacity-90">12 meses</p>
+              </div>
+            </div>
+            <span class="badge badge-white text-success-600">+15%</span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="formatCurrency(resumo.total_recebido, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white">Média mensal:</span>
+              <span class="text-white font-medium" x-text="formatCurrency(resumo.media_mensal, currentCurrency)"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- A Receber -->
+      <div class="card card-gradient animate-fade-in" style="animation-delay: 100ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-warning-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">A Receber</h3>
+                <p class="text-sm text-gray-600">Próximos 90 dias</p>
+              </div>
+            </div>
+            <span class="badge badge-warning" x-text="resumo.proventos_a_receber + ' eventos'"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.valor_a_receber, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-warning">Próximo:</span>
+              <span class="text-gray-900 font-medium" x-text="resumo.proximo_provento.data"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Yield on Cost -->
+      <div class="card card-gradient animate-fade-in" style="animation-delay: 200ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Yield on Cost</h3>
+                <p class="text-sm text-gray-600">Sobre custo</p>
+              </div>
+            </div>
+            <span class="badge badge-primary">Excelente</span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="resumo.yield_on_cost.toFixed(2) + '%'"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-gray-600">DY Atual:</span>
+              <span class="text-primary-600 font-medium" x-text="resumo.dy_atual.toFixed(2) + '%'"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projeção Anual -->
+      <div class="card card-gradient-info animate-fade-in" style="animation-delay: 300ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-info-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-info-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Projeção 2024</h3>
+                <p class="text-sm text-white opacity-90">Baseado no YTD</p>
+              </div>
+            </div>
+            <span class="badge badge-white text-info-600">+12%</span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="formatCurrency(resumo.projecao_anual, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75">Mensal est.</span>
+              <span class="text-white font-medium" x-text="formatCurrency(resumo.projecao_anual / 12, currentCurrency)"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros e Visualizações -->
+    <div class="card card-elevated mb-8">
+      <div class="p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div class="flex flex-wrap gap-4">
+            <select x-model="anoSelecionado" @change="carregarDados()" class="btn btn-outline">
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+            </select>
+            <select x-model="tipoProvento" @change="filtrarProventos()" class="btn btn-outline">
+              <option value="todos">Todos os tipos</option>
+              <option value="dividendo">Dividendos</option>
+              <option value="jcp">JCP</option>
+              <option value="rendimento">Rendimento</option>
+            </select>
+            <select x-model="vista" @change="mudarVista()" class="btn btn-outline">
+              <option value="calendario">Calendário</option>
+              <option value="lista">Lista</option>
+              <option value="analise">Análise</option>
+            </select>
+          </div>
+          <div class="flex gap-2">
+            <button @click="exportarDados()" class="btn btn-primary">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              Exportar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista: Calendário -->
+    <div x-show="vista === 'calendario'" x-transition>
+      <div class="card card-elevated mb-8">
+        <div class="p-6">
+          <h3 class="h3 mb-6">Calendário de Proventos <span x-text="anoSelecionado"></span></h3>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <template x-for="trimestre in [1, 2, 3, 4]" :key="trimestre">
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-4" x-text="getTrimestreNome(trimestre)"></h4>
+                <div class="space-y-2">
+                  <template x-for="mes in getMesesTrimestre(trimestre)" :key="mes.numero">
+                    <div class="border rounded-lg p-3" :class="mes.proventos.length > 0 ? 'border-success-300 bg-success-50' : 'border-gray-200'">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="font-medium text-gray-900" x-text="mes.nome"></span>
+                        <span class="badge" :class="mes.total > 0 ? 'badge-success' : 'badge-gray'" 
+                              x-text="formatCurrency(mes.total, currentCurrency)"></span>
+                      </div>
+                      <div class="space-y-1">
+                        <template x-for="provento in mes.proventos.slice(0, 3)" :key="provento.id">
+                          <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-700" x-text="provento.ativo.ticker"></span>
+                            <span class="text-gray-600" x-text="formatCurrency(provento.valor, currentCurrency)"></span>
+                          </div>
+                        </template>
+                        <div x-show="mes.proventos.length > 3" class="text-xs text-gray-500">
+                          +<span x-text="mes.proventos.length - 3"></span> outros
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista: Lista -->
+    <div x-show="vista === 'lista'" x-transition>
+      <div class="card card-elevated mb-8">
+        <div class="p-6">
+          <h3 class="h3 mb-6">Lista de Proventos</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-3 px-4">Data Com</th>
+                  <th class="text-left py-3 px-4">Ativo</th>
+                  <th class="text-left py-3 px-4">Tipo</th>
+                  <th class="text-right py-3 px-4">Valor/Ação</th>
+                  <th class="text-right py-3 px-4">Quantidade</th>
+                  <th class="text-right py-3 px-4">Total</th>
+                  <th class="text-center py-3 px-4">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="provento in filteredProventos" :key="provento.id">
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4" x-text="formatDate(provento.data_com)"></td>
+                    <td class="py-3 px-4">
+                      <div class="flex items-center gap-2">
+                        <span class="font-semibold" x-text="provento.ativo.ticker"></span>
+                        <span class="text-xs text-gray-500" x-text="provento.ativo.nome"></span>
+                      </div>
+                    </td>
+                    <td class="py-3 px-4">
+                      <span class="badge" :class="getTipoProventoClass(provento.tipo)" x-text="provento.tipo"></span>
+                    </td>
+                    <td class="text-right py-3 px-4" x-text="formatCurrency(provento.valor_por_acao, currentCurrency)"></td>
+                    <td class="text-right py-3 px-4" x-text="provento.quantidade"></td>
+                    <td class="text-right py-3 px-4 font-semibold" x-text="formatCurrency(provento.valor, currentCurrency)"></td>
+                    <td class="text-center py-3 px-4">
+                      <span class="badge" :class="provento.status === 'RECEBIDO' ? 'badge-success' : 'badge-warning'" 
+                            x-text="provento.status"></span>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista: Análise -->
+    <div x-show="vista === 'analise'" x-transition>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Top Proventos -->
+        <div class="card card-elevated">
+          <div class="p-6">
+            <h3 class="h3 mb-6">Maiores Pagadores</h3>
+            <div class="space-y-3">
+              <template x-for="(ativo, index) in topProventos" :key="ativo.ticker">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center">
+                      <span class="text-success-600 font-semibold text-xs" x-text="index + 1"></span>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-gray-900" x-text="ativo.ticker"></p>
+                      <p class="text-xs text-gray-500" x-text="ativo.nome"></p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-semibold text-gray-900" x-text="formatCurrency(ativo.total, currentCurrency)"></p>
+                    <p class="text-xs text-gray-500" x-text="ativo.eventos + ' eventos'"></p>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico de Evolução -->
+        <div class="card card-elevated">
+          <div class="p-6">
+            <h3 class="h3 mb-6">Evolução Mensal</h3>
+            <div class="h-80">
+              <canvas id="proventos-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Análise por Setor -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <h3 class="h3 mb-6">Análise por Setor</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Gráfico de Pizza -->
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-4">Distribuição por Setor</h4>
+              <div class="h-64">
+                <canvas id="sector-chart"></canvas>
+              </div>
+            </div>
+            
+            <!-- Tabela Detalhada -->
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-4">Detalhes por Setor</h4>
+              <div class="space-y-2">
+                <template x-for="setor in analiseSetorial" :key="setor.nome">
+                  <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-3">
+                      <div class="w-4 h-4 rounded-full" :style="`background-color: ${setor.cor}`"></div>
+                      <span class="font-medium text-gray-900" x-text="setor.nome"></span>
+                    </div>
+                    <div class="text-right">
+                      <p class="font-semibold text-gray-900" x-text="formatCurrency(setor.total, currentCurrency)"></p>
+                      <p class="text-xs text-gray-500" x-text="setor.percentual.toFixed(1) + '% do total'"></p>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/proventos.js"></script>
+{% endblock %}

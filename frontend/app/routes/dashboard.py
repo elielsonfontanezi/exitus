@@ -1061,3 +1061,54 @@ def dashboard_movimentacoes():
         total_movimentacoes=total,
         page_title="Movimentações - Exitus"
     )
+
+
+# --- Análise de Ativos (NOVO) ---
+@bp.route('/ativo/<ticker>')
+@login_required
+def ativo_detalhes(ticker):
+    """Análise detalhada de ativo - Fase 1 Sprint 1.3"""
+    token = session.get('access_token')
+    ativo = None
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/ativos/ticker/{ticker}', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                ativo = data.get('data')
+            else:
+                flash('Ativo não encontrado.', 'error')
+                return redirect(url_for('dashboard.index'))
+        except Exception as e:
+            print(f'Erro ao buscar ativo: {e}')
+            flash('Erro ao carregar dados do ativo.', 'error')
+            return redirect(url_for('dashboard.index'))
+    
+    if not ativo:
+        flash('Ativo não encontrado.', 'error')
+        return redirect(url_for('dashboard.index'))
+    
+    return render_template('dashboard/ativo_detalhes.html', ativo=ativo)
+
+
+# --- Performance e Rentabilidade (NOVO) ---
+@bp.route('/performance')
+@login_required
+def performance():
+    """Performance e Rentabilidade - Fase 1 Sprint 1.4"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/performance.html')
+
+
+# --- Gestão de Proventos (NOVO) ---
+@bp.route('/proventos-calendario')
+@login_required
+def proventos_calendario():
+    """Gestão de Proventos - Fase 1 Sprint 1.5"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/proventos_calendario.html')

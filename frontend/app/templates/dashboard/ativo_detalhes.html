@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% block title %}Análise de Ativo - {{ ativo.ticker if ativo else '' }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" 
+     x-data="ativoData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Header do Ativo -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-4">
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white hover:text-primary-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar
+          </a>
+          <div>
+            <h1 class="display-2" x-text="ativo.ticker || 'CARREGANDO...'"></h1>
+            <p class="text-xl opacity-90" x-text="ativo.nome || ''"></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="text-right">
+            <p class="text-3xl font-bold" x-text="formatCurrency(ativo.preco_atual, currentCurrency)"></p>
+            <div class="flex items-center gap-2">
+              <span class="text-lg" :class="ativo.variacao_dia >= 0 ? 'text-green-300' : 'text-red-300'" 
+                    x-text="ativo.variacao_dia >= 0 ? '+' + ativo.variacao_dia.toFixed(2) + '%' : ativo.variacao_dia.toFixed(2) + '%'"></span>
+              <span class="text-sm opacity-75">hoje</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Gráfico de Preço -->
+    <div class="card card-elevated mb-8">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="h3">Evolução do Preço</h3>
+          <div class="flex gap-2">
+            <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('1M')" :class="period === '1M' ? 'btn-primary' : ''">1M</button>
+            <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('3M')" :class="period === '3M' ? 'btn-primary' : ''">3M</button>
+            <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('6M')" :class="period === '6M' ? 'btn-primary' : ''">6M</button>
+            <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('1A')" :class="period === '1A' ? 'btn-primary' : ''">1A</button>
+            <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('5A')" :class="period === '5A' ? 'btn-primary' : ''">5A</button>
+          </div>
+        </div>
+        <div class="h-96">
+          <canvas id="price-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicadores Fundamentalistas -->
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+      <template x-for="indicador in indicadores" :key="indicador.nome">
+        <div class="card animate-fade-in">
+          <div class="p-4 text-center">
+            <p class="text-sm text-gray-600 mb-1" x-text="indicador.nome"></p>
+            <p class="text-xl font-bold" :class="indicador.cor" x-text="indicador.valor"></p>
+            <p class="text-xs text-gray-500" x-text="indicador.descricao"></p>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Buy Score e Radar -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Buy Score -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">Buy Score</h3>
+            <span class="badge" :class="getBuyScoreClass(ativo.buy_score)" x-text="ativo.buy_score + '/100'"></span>
+          </div>
+          <div class="space-y-4">
+            <!-- Barra de Progresso -->
+            <div class="relative">
+              <div class="w-full bg-gray-200 rounded-full h-8">
+                <div class="h-8 rounded-full flex items-center justify-center text-white font-semibold transition-all duration-500"
+                     :class="getBuyScoreGradient(ativo.buy_score)"
+                     :style="`width: ${ativo.buy_score}%`">
+                  <span x-text="ativo.buy_score + '%'"></span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Breakdown -->
+            <div class="space-y-2">
+              <template x-for="componente in buy_score_breakdown" :key="componente.nome">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600" x-text="componente.nome"></span>
+                  <div class="flex items-center gap-2">
+                    <div class="w-24 bg-gray-200 rounded-full h-2">
+                      <div class="h-2 rounded-full" 
+                           :class="componente.cor"
+                           :style="`width: ${componente.pontos}%`"></div>
+                    </div>
+                    <span class="text-sm font-medium" x-text="componente.pontos"></span>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico Radar -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <h3 class="h3 mb-6">Análise Radar</h3>
+          <div class="h-80">
+            <canvas id="radar-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Proventos e Eventos -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Proventos -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">Histórico de Proventos</h3>
+            <a href="/dashboard/proventos-calendario" class="btn btn-outline btn-sm">Ver calendário</a>
+          </div>
+          <div class="space-y-3">
+            <template x-for="provento in proventos.slice(0, 5)" :key="provento.id">
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center">
+                    <svg class="w-4 h-4 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900" x-text="provento.tipo"></p>
+                    <p class="text-xs text-gray-500" x-text="formatDate(provento.data_com)"></p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-semibold text-gray-900" x-text="formatCurrency(provento.valor, currentCurrency)"></p>
+                  <p class="text-xs text-gray-500" x-text="'R$ ' + provento.valor_por_acao.toFixed(4) + '/ação'"></p>
+                </div>
+              </div>
+            </template>
+            <div x-show="proventos.length === 0" class="text-center py-8 text-gray-500">
+              Nenhum provento registrado
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Eventos Corporativos -->
+      <div class="card card-elevated">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">Eventos Corporativos</h3>
+            <span class="badge badge-primary" x-text="eventos.length + ' eventos'"></span>
+          </div>
+          <div class="space-y-3">
+            <template x-for="evento in eventos.slice(0, 5)" :key="evento.id">
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-info-100 rounded-full flex items-center justify-center">
+                    <svg class="w-4 h-4 text-info-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900" x-text="evento.tipo"></p>
+                    <p class="text-xs text-gray-500" x-text="formatDate(evento.data)"></p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm text-gray-900" x-text="evento.descricao"></p>
+                </div>
+              </div>
+            </template>
+            <div x-show="eventos.length === 0" class="text-center py-8 text-gray-500">
+              Nenhum evento corporativo recente
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Análise Setorial -->
+    <div class="card card-elevated">
+      <div class="p-6">
+        <h3 class="h3 mb-6">Comparação Setorial</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Tabela Comparativa -->
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-4">Principais Competidores</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b">
+                    <th class="text-left py-2">Ativo</th>
+                    <th class="text-right py-2">P/L</th>
+                    <th class="text-right py-2">P/VP</th>
+                    <th class="text-right py-2">DY%</th>
+                    <th class="text-right py-2">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="competidor in comparacao_setorial" :key="competidor.ticker">
+                    <tr class="border-b hover:bg-gray-50">
+                      <td class="py-2 font-medium" x-text="competidor.ticker"></td>
+                      <td class="text-right" x-text="competidor.pl"></td>
+                      <td class="text-right" x-text="competidor.pvp"></td>
+                      <td class="text-right" x-text="competidor.dy + '%'"></td>
+                      <td class="text-right">
+                        <span class="badge" :class="getBuyScoreClass(competidor.score)" x-text="competidor.score"></span>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Gráfico Comparativo -->
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-4">Ranking no Setor</h4>
+            <div class="h-64">
+              <canvas id="sector-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/ativo_detalhes.js"></script>
+{% endblock %}
