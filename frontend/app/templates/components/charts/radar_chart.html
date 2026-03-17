@@ -1,0 +1,120 @@
+{# 
+  Componente: Radar Chart
+  Descrição: Gráfico radial (radar) para visualização de múltiplas métricas
+  Props:
+    - chart_id: string - ID único do canvas
+    - title: string - título do gráfico (opcional)
+    - labels: list - lista de labels para os eixos
+    - data: list - lista de valores (0-100)
+    - label: string - label do dataset (opcional)
+  Uso:
+    {% include 'components/charts/radar_chart.html' with 
+      chart_id='radar-petr4'
+      title='Análise Fundamentalista'
+      labels=['Score', 'Margem', 'DY', 'P/L', 'P/VP', 'ROE']
+      data=[85, 60, 75, 80, 70, 90]
+      label='PETR4'
+    %}
+#}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+  {% if title %}
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ title }}</h3>
+  {% endif %}
+  
+  <div class="relative" style="height: 300px;">
+    <canvas id="{{ chart_id }}"></canvas>
+  </div>
+</div>
+
+<script>
+(function() {
+  const chartId = '{{ chart_id }}';
+  const labels = {{ labels | tojson | safe }};
+  const data = {{ data | tojson | safe }};
+  const datasetLabel = '{{ label|default("Métricas") }}';
+  
+  // Aguardar DOM estar pronto
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderChart);
+  } else {
+    renderChart();
+  }
+  
+  function renderChart() {
+    const canvas = document.getElementById(chartId);
+    if (!canvas) {
+      console.warn('Canvas não encontrado:', chartId);
+      return;
+    }
+    
+    // Verificar se Chart.js está disponível
+    if (typeof Chart === 'undefined') {
+      console.error('Chart.js não está carregado');
+      return;
+    }
+    
+    new Chart(canvas, {
+      type: 'radar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: datasetLabel,
+          data: data,
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+          borderColor: 'rgb(59, 130, 246)',
+          borderWidth: 2,
+          pointBackgroundColor: 'rgb(59, 130, 246)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgb(59, 130, 246)',
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            min: 0,
+            ticks: {
+              stepSize: 20,
+              callback: function(value) {
+                return value;
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            },
+            angleLines: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            },
+            pointLabels: {
+              font: {
+                size: 12,
+                weight: 'bold'
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.label + ': ' + context.parsed.r.toFixed(1);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+})();
+</script>

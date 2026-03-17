@@ -2,13 +2,96 @@
 {% block title %}Buy Signals - Exitus{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6 space-y-6">
+<div class="container mx-auto p-6 space-y-6" x-data="buySignalsData()">
   <div class="flex justify-between items-center mb-6">
     <div>
       <h1 class="text-3xl font-bold text-gray-900">
         <i class="fas fa-chart-line text-blue-600 mr-3"></i>Buy Signals
       </h1>
       <p class="text-gray-600 mt-1">Ativos com melhores oportunidades de compra</p>
+    </div>
+  </div>
+
+  <!-- Busca Individual de Ativo -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">🔍 Analisar Ativo Específico</h3>
+    <div class="flex gap-3">
+      <div class="flex-1">
+        <input 
+          type="text" 
+          x-model="searchTicker"
+          @keyup.enter="searchAsset()"
+          placeholder="Digite o ticker (ex: PETR4, AAPL, MSFT)"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+      </div>
+      <button 
+        @click="searchAsset()"
+        :disabled="!searchTicker || searching"
+        class="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+      >
+        <span x-show="!searching">🔍 Analisar</span>
+        <span x-show="searching">
+          <svg class="animate-spin h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Buscando...
+        </span>
+      </button>
+    </div>
+    
+    <!-- Resultado da Busca Individual -->
+    <div x-show="selectedAsset" class="mt-6 p-4 bg-gray-50 rounded-lg">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Informações Básicas -->
+        <div>
+          <h4 class="font-bold text-lg mb-3" x-text="selectedAsset?.ticker"></h4>
+          <p class="text-sm text-gray-600 mb-4" x-text="selectedAsset?.nome"></p>
+          
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600">Buy Score:</span>
+              <span class="font-bold" :class="{
+                'text-green-600': selectedAsset?.buyscore >= 80,
+                'text-yellow-600': selectedAsset?.buyscore >= 60 && selectedAsset?.buyscore < 80,
+                'text-red-600': selectedAsset?.buyscore < 60
+              }" x-text="selectedAsset?.buyscore"></span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600">Margem de Segurança:</span>
+              <span class="font-bold text-green-600" x-text="'+' + selectedAsset?.margem + '%'"></span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600">Preço Atual:</span>
+              <span class="font-medium" x-text="'R$ ' + selectedAsset?.preco_atual"></span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600">Preço Teto:</span>
+              <span class="font-medium" x-text="'R$ ' + selectedAsset?.preco_teto"></span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Gráfico Radial (será implementado) -->
+        <div>
+          <canvas :id="'radar-chart-' + selectedAsset?.ticker" class="w-full h-64"></canvas>
+        </div>
+      </div>
+      
+      <div class="mt-4 flex gap-3">
+        <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+          💰 Adicionar ao Plano de Compra
+        </button>
+        <button @click="selectedAsset = null" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+          Fechar
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mensagem de Erro -->
+    <div x-show="searchError" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <p class="text-red-700" x-text="searchError"></p>
     </div>
   </div>
 
@@ -109,6 +192,98 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+// Função Alpine.js para Buy Signals
+function buySignalsData() {
+  return {
+    searchTicker: '',
+    searching: false,
+    selectedAsset: null,
+    searchError: null,
+    
+    async searchAsset() {
+      if (!this.searchTicker) return;
+      
+      this.searching = true;
+      this.searchError = null;
+      this.selectedAsset = null;
+      
+      try {
+        const ticker = this.searchTicker.toUpperCase().trim();
+        const response = await fetch(`/api/buy-signals/analisar/${ticker}`);
+        
+        if (!response.ok) {
+          throw new Error('Ativo não encontrado ou sem dados suficientes');
+        }
+        
+        const data = await response.json();
+        this.selectedAsset = data.data;
+        
+        // Renderizar gráfico radial após um pequeno delay
+        this.$nextTick(() => {
+          this.renderRadarChart();
+        });
+        
+      } catch (error) {
+        this.searchError = error.message || 'Erro ao buscar ativo. Tente novamente.';
+      } finally {
+        this.searching = false;
+      }
+    },
+    
+    renderRadarChart() {
+      if (!this.selectedAsset) return;
+      
+      const canvasId = `radar-chart-${this.selectedAsset.ticker}`;
+      const canvas = document.getElementById(canvasId);
+      
+      if (!canvas) return;
+      
+      new Chart(canvas, {
+        type: 'radar',
+        data: {
+          labels: ['Score', 'Margem', 'DY', 'P/L', 'P/VP', 'ROE'],
+          datasets: [{
+            label: this.selectedAsset.ticker,
+            data: [
+              this.selectedAsset.buyscore || 0,
+              (this.selectedAsset.margem || 0) * 2, // Normalizar para escala 0-100
+              (this.selectedAsset.dy || 0) * 10, // Normalizar para escala 0-100
+              Math.min((this.selectedAsset.pl || 0) * 5, 100), // Normalizar
+              Math.min((this.selectedAsset.pvp || 0) * 50, 100), // Normalizar
+              this.selectedAsset.roe || 0
+            ],
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: 'rgb(59, 130, 246)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgb(59, 130, 246)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgb(59, 130, 246)'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                stepSize: 20
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function(){
   const ctx = document.getElementById('chartMercados');
   if(ctx){

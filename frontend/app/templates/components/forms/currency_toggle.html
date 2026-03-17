@@ -1,25 +1,83 @@
 {# 
   Componente: Currency Toggle
-  Descrição: Toggle para alternar entre moedas (BRL ⇄ USD)
+  Descrição: Toggle para alternar entre moedas (BRL ⇄ USD) com conversão dinâmica
   Props:
     - current: string - moeda atual (BRL, USD)
   Uso:
     {% include 'components/forms/currency_toggle.html' with current='BRL' %}
+  
+  Eventos:
+    - Emite evento 'currency-changed' quando moeda é alterada
+    - Armazena preferência no localStorage
 #}
 
-<div x-data="{ currency: '{{ current|default('BRL') }}' }" class="inline-flex rounded-md shadow-sm">
-  <button 
-    @click="currency = 'BRL'"
-    :class="currency === 'BRL' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
-    class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-l-md focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-  >
-    R$ BRL
-  </button>
-  <button 
-    @click="currency = 'USD'"
-    :class="currency === 'USD' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
-    class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 rounded-r-md focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-  >
-    $ USD
-  </button>
+<div x-data="currencyToggle('{{ current|default('BRL') }}')" class="inline-flex items-center gap-3">
+  <span class="text-sm font-medium text-gray-700">Moeda:</span>
+  <div class="inline-flex rounded-md shadow-sm">
+    <button 
+      @click="changeCurrency('BRL')"
+      :class="currency === 'BRL' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+      class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-l-md focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+    >
+      R$ BRL
+    </button>
+    <button 
+      @click="changeCurrency('USD')"
+      :class="currency === 'USD' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+      class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 rounded-r-md focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+    >
+      $ USD
+    </button>
+  </div>
+  <span class="text-xs text-gray-500" x-show="currency === 'USD'">
+    Taxa: R$ <span x-text="exchangeRate.toFixed(2)"></span>
+  </span>
 </div>
+
+<script>
+function currencyToggle(initialCurrency) {
+  return {
+    currency: localStorage.getItem('preferredCurrency') || initialCurrency,
+    exchangeRate: 5.00, // Taxa padrão, será atualizada via API
+    
+    init() {
+      // Carregar taxa de câmbio
+      this.loadExchangeRate();
+      
+      // Emitir evento inicial
+      this.$nextTick(() => {
+        this.$dispatch('currency-changed', { 
+          currency: this.currency, 
+          rate: this.exchangeRate 
+        });
+      });
+    },
+    
+    changeCurrency(newCurrency) {
+      if (this.currency !== newCurrency) {
+        this.currency = newCurrency;
+        localStorage.setItem('preferredCurrency', newCurrency);
+        
+        // Emitir evento de mudança
+        this.$dispatch('currency-changed', { 
+          currency: newCurrency, 
+          rate: this.exchangeRate 
+        });
+      }
+    },
+    
+    async loadExchangeRate() {
+      try {
+        // Tentar buscar taxa do backend
+        const response = await fetch('/api/cambio/taxa-atual?de=USD&para=BRL');
+        if (response.ok) {
+          const data = await response.json();
+          this.exchangeRate = data.data.taxa || 5.00;
+        }
+      } catch (error) {
+        console.warn('Usando taxa de câmbio padrão:', this.exchangeRate);
+      }
+    }
+  }
+}
+</script>
