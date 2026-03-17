@@ -99,14 +99,17 @@ tests/e2e/
 |------|--------|--------|
 | Dashboard | 17 | ✅ |
 | Imposto Renda | 7 | ✅ |
-| Planos Compra | 0 | ⏳ |
-| Planos Venda | 0 | ⏳ |
-| Portfolios | 0 | ⏳ |
-| Transações | 0 | ⏳ |
-| Relatórios | 0 | ⏳ |
+| Planos Compra | 8 | ✅ |
+| Portfolios | 7 | ✅ |
+| Transações | 7 | ✅ |
+| Relatórios | 6 | ✅ |
+| Análise Ativos | 0 | ⏳ |
+| Performance | 0 | ⏳ |
+| Proventos | 0 | ⏳ |
+| Alocação | 0 | ⏳ |
 | ... | ... | ⏳ |
 
-**Total:** 24/170 testes (14%)
+**Total:** 52/170 testes (31%)
 
 ## 🐛 Relatório de Bugs
 
