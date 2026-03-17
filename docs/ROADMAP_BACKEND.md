@@ -48,12 +48,12 @@
 
 ### 🎯 Fase 7 — Produção e Escala (Próxima)
 
-| GAP ID | Funcionalidade | Prioridade | Complexidade | Modelo IA |
-|--------|---------------|------------|--------------|-----------|
-| **MULTICLIENTE-001** | Multi-tenancy para assessoras | 🔴 Alta | Alta | Claude Sonnet |
-| **MONITOR-001** | Monitoramento e alertas | 🟡 Média | Média | Claude Sonnet |
-| **RATELIMIT-001** | Rate limiting | 🟡 Média | Baixa | SWE-1.5 |
-| **CICD-001** | CI/CD + deploy | 🟡 Média | Média | Claude Sonnet |
+| GAP ID | Funcionalidade | Prioridade | Status | Data |
+|--------|---------------|------------|--------|------|
+| **MULTICLIENTE-001** | Multi-tenancy para assessoras | 🔴 Alta | 🟡 85% (16/03/2026) | Parte 3 em andamento |
+| **MONITOR-001** | Monitoramento e alertas | 🟡 Média | 📋 Planejado | - |
+| **RATELIMIT-001** | Rate limiting | 🟡 Média | 📋 Planejado | - |
+| **CICD-001** | CI/CD + deploy | 🟡 Média | 📋 Planejado | - |
 
 ### 🔮 Fase 8 — Futuro
 

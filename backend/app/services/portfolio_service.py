@@ -8,6 +8,7 @@ from app.models.portfolio import Portfolio
 from app.models.posicao import Posicao
 from app.models.ativo import Ativo
 from app.services.cache_service import cache
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,9 @@ class PortfolioService:
         """
         query = Portfolio.query.filter_by(usuario_id=usuario_id)
         
+        # Filtro por assessora (multi-tenancy)
+        query = filter_by_assessora(query, Portfolio)
+        
         # Filtrar por status se especificado
         if ativo is not None:
             query = query.filter_by(ativo=ativo)
@@ -50,6 +54,9 @@ class PortfolioService:
     def create(data: Dict, usuario_id: UUID) -> Portfolio:
         """Cria um novo portfolio."""
         try:
+            # Obter assessora_id do JWT ou dos dados
+            assessora_id = data.get('assessora_id') or get_current_assessora_id()
+            
             novo_portfolio = Portfolio(
                 usuario_id=usuario_id,
                 nome=data['nome'],
@@ -57,7 +64,8 @@ class PortfolioService:
                 objetivo=data.get('objetivo'),
                 ativo=data.get('ativo', True),
                 valor_inicial=data.get('valor_inicial'),
-                percentual_alocacao_target=data.get('percentual_alocacao_target')
+                percentual_alocacao_target=data.get('percentual_alocacao_target'),
+                assessora_id=assessora_id
             )
             db.session.add(novo_portfolio)
             db.session.commit()
