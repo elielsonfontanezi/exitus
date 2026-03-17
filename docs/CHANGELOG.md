@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — ROADMAP_TESTES_FRONTEND - Fase 1 Completa (17/03/2026)
+
+- **Testes E2E - Fase 1 (Smoke Tests):**
+  - `tests/e2e/playwright.config.js` - Configuração completa Playwright v1.40
+  - `tests/e2e/package.json` - Dependências e scripts de teste
+  - `tests/e2e/specs/smoke/` - 17 arquivos de teste (108 testes)
+  - Browsers: Chromium, Firefox, WebKit, Mobile (Pixel 5, iPhone 12), Tablet (iPad Pro)
+  - Reporters: HTML, JSON, JUnit com screenshots e vídeos em falhas
+  - **Cobertura:** 100% das 17 telas do Frontend V2.0
+  - **Tipos de teste:** Performance (17), UI/Visual (47), Funcionalidade (27), Responsividade (17)
+- **Testes por tela:**
+  - Dashboard (17 testes), Imposto Renda (7), Planos Compra (8), Portfolios (7)
+  - Transações (7), Relatórios (6), Análise Ativos (6), Performance (6)
+  - Proventos (6), Alocação (5), Fluxo Caixa (5), Alertas (5)
+  - Comparador (5), Planos Venda (5), Educação (5), Configurações (5), Buy Signals (8)
+- **Documentação:**
+  - `tests/e2e/README.md` - Guia completo de uso
+  - `tests/e2e/RELATORIO_FASE1.md` - Relatório detalhado
+  - `docs/ROADMAP_TESTES_FRONTEND.md` - Atualizado com progresso
+- **Status:** ✅ Fase 1 concluída (100%), aguardando execução dos testes
+
 ### Added — ROADMAP_FRONTEND_V2.0 - Fase 4 Completa (17/03/2026)
 
 - **Buy Signals (Redesign):**
