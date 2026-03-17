@@ -8,6 +8,54 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — ROADMAP_FRONTEND_V2.0 - Fase 1 Completa (17/03/2026)
+
+- **Design System Moderno:**
+  - `frontend/app/static/css/design-system.css` - 1000+ linhas de CSS profissional
+  - Paleta de cores fintech com gradientes premium
+  - Tipografia Inter (Google Fonts) e escala modular
+  - Componentes modernos (cards, botões, badges, skeleton loaders)
+  - Animações sutis (fadeIn, slideIn, shimmer) e micro-interações
+  - Responsividade mobile-first e dark mode support
+- **Dashboard Multi-Mercado:**
+  - `frontend/app/templates/dashboard/index.html` - Hero section com gradiente
+  - Cards por mercado (BR, US, INTL) com animações escalonadas
+  - Gráficos Chart.js (alocação geográfica, evolução patrimonial)
+  - Top 5 ativos, alertas recentes e últimas transações
+  - `frontend/app/static/js/dashboard.js` - APIs reais e conversão BRL/USD
+- **Análise de Ativos:**
+  - `frontend/app/templates/dashboard/ativo_detalhes.html` - Análise completa
+  - Header com preço em tempo real e variação
+  - Gráfico de preço 12 meses com múltiplos períodos
+  - Indicadores fundamentalistas em cards coloridos
+  - Buy Score visual com breakdown e gráfico radar
+  - Comparação setorial com ranking e gráfico de barras
+  - `frontend/app/static/js/ativo_detalhes.js` - Dados dinâmicos e mock
+- **Performance e Rentabilidade:**
+  - `frontend/app/templates/dashboard/performance.html` - Métricas avançadas
+  - Cards de rentabilidade, maior ganhador/perdedor
+  - Gráfico de performance acumulada vs benchmarks (CDI, IBOV, IFIX)
+  - Heatmap de performance mensal interativo
+  - Tabela por ativo com sparklines e ordenação
+  - Análise de risco (volatilidade, drawdown máximo, Sharpe ratio)
+  - `frontend/app/static/js/performance.js` - Filtros e visualizações
+- **Gestão de Proventos:**
+  - `frontend/app/templates/dashboard/proventos_calendario.html` - 3 vistas
+  - Cards de resumo (total recebido, yield on cost, projeção anual)
+  - Vista Calendário: trimestral com detalhes mensais
+  - Vista Lista: tabela completa com filtros
+  - Vista Análise: top pagadores, evolução e análise setorial
+  - `frontend/app/static/js/proventos.js` - Calendário interativo
+- **Rotas Frontend:**
+  - `/dashboard/` - Dashboard Multi-Mercado
+  - `/dashboard/ativo/<ticker>` - Análise de Ativos
+  - `/dashboard/performance` - Performance e Rentabilidade
+  - `/dashboard/proventos-calendario` - Gestão de Proventos
+- **Backend - Plano Venda:**
+  - `backend/app/blueprints/plano_venda_blueprint.py` - Endpoint `/simular-venda`
+  - Simulador de IR para vendas com cálculo de lucro/prejuízo
+- **Status:** ✅ Fase 1 100% concluída (4/4 telas)
+
 ### Added — Integração Frontend-Backend (17/03/2026)
 
 - **Endpoints Backend para Frontend:**
