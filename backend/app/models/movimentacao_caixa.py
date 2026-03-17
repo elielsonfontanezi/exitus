@@ -96,6 +96,14 @@ class MovimentacaoCaixa(db.Model):
         comment="ID do provento (apenas para crédito de provento)"
     )
     
+    assessora_id = db.Column(
+        UUID(as_uuid=True),
+        ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID da assessora (multi-tenancy)"
+    )
+    
     # Dados da movimentação
     tipo_movimentacao = db.Column(
         Enum(TipoMovimentacao, values_callable=lambda x: [e.value for e in x]),
@@ -155,6 +163,7 @@ class MovimentacaoCaixa(db.Model):
     )
     
     # Relacionamentos
+    assessora = relationship('Assessora', back_populates='movimentacoes_caixa')
     usuario = relationship('Usuario', backref='movimentacoes_caixa', lazy='joined')
     corretora = relationship(
         'Corretora',

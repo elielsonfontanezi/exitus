@@ -8,6 +8,16 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Fase 7: Multi-Tenancy (Parte 2B) (16/03/2026)
+
+- **MULTICLIENTE-001 - Todos os Models Atualizados (100%):**
+  - 9 models finais atualizados: MovimentacaoCaixa, Provento, SaldoPrejuizo, SaldoDarfAcumulado, HistoricoPreco, EventoCorporativo, ConfiguracaoAlerta, AuditoriaRelatorio, LogAuditoria
+  - Assessora model: 15 relacionamentos bidirecionais completos
+  - Backend testado e funcionando com todos os 20 models
+  - Imports corrigidos: relationship adicionado em SaldoDarfAcumulado e HistoricoPreco
+- **Status:** Parte 2B concluída - 20/20 models atualizados (100%)
+- **Próximos Passos (Parte 3):** Implementar filtros nos services, atualizar JWT, criar middleware de tenant isolation, migrar dados completos, atualizar testes
+
 ### Added — Fase 7: Multi-Tenancy (Parte 2A) (16/03/2026)
 
 - **MULTICLIENTE-001 - Migrations Aplicadas e Models Atualizados:**
@@ -28,7 +38,6 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Revision ID reduzido para 32 chars
   - Coluna data_transacao corrigida na migration
 - **Status:** Parte 2A concluída - Migrations aplicadas, 11/20 models atualizados (55%)
-- **Próximos Passos (Parte 2B):** Atualizar 9 models restantes, implementar filtros, JWT, middleware
 
 ### Added — Fase 7: Multi-Tenancy (Parte 1) (16/03/2026)
 

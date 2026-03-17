@@ -68,6 +68,15 @@ class Assessora(db.Model):
     posicoes = relationship("Posicao", back_populates="assessora", lazy="dynamic")
     planos_compra = relationship("PlanoCompra", back_populates="assessora", lazy="dynamic")
     planos_venda = relationship("PlanoVenda", back_populates="assessora", lazy="dynamic")
+    movimentacoes_caixa = relationship("MovimentacaoCaixa", back_populates="assessora", lazy="dynamic")
+    proventos = relationship("Provento", back_populates="assessora", lazy="dynamic")
+    saldos_prejuizo = relationship("SaldoPrejuizo", back_populates="assessora", lazy="dynamic")
+    saldos_darf_acumulados = relationship("SaldoDarfAcumulado", back_populates="assessora", lazy="dynamic")
+    historicos_precos = relationship("HistoricoPreco", back_populates="assessora", lazy="dynamic")
+    eventos_corporativos = relationship("EventoCorporativo", back_populates="assessora", lazy="dynamic")
+    configuracoes_alertas = relationship("ConfiguracaoAlerta", back_populates="assessora", lazy="dynamic")
+    auditorias_relatorios = relationship("AuditoriaRelatorio", back_populates="assessora", lazy="dynamic")
+    logs_auditoria = relationship("LogAuditoria", back_populates="assessora", lazy="dynamic")
     
     def __repr__(self):
         return f"<Assessora {self.nome}>"

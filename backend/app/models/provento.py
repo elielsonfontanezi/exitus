@@ -56,13 +56,21 @@ class Provento(db.Model):
         comment="Identificador único do provento"
     )
     
-    # Foreign key
+    # Foreign keys
     ativo_id = db.Column(
         UUID(as_uuid=True),
         ForeignKey('ativo.id', ondelete='RESTRICT'),
         nullable=False,
         index=True,
         comment="ID do ativo que pagou o provento"
+    )
+    
+    assessora_id = db.Column(
+        UUID(as_uuid=True),
+        ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID da assessora (multi-tenancy)"
     )
     
     # Tipo de provento
@@ -157,6 +165,7 @@ class Provento(db.Model):
     )
     
     # Relacionamentos
+    assessora = relationship('Assessora', back_populates='proventos')
     ativo = relationship('Ativo', backref='proventos', lazy='joined')
     
     # Constraints de tabela

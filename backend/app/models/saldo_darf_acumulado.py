@@ -10,6 +10,7 @@ from decimal import Decimal
 import uuid
 
 from app.database import db
+from sqlalchemy.orm import relationship
 
 
 class SaldoDarfAcumulado(db.Model):
@@ -44,6 +45,13 @@ class SaldoDarfAcumulado(db.Model):
         db.ForeignKey('usuario.id', ondelete='CASCADE'),
         nullable=False,
         comment='ID do usuário proprietário do saldo'
+    )
+    
+    assessora_id = db.Column(
+        db.UUID(as_uuid=True),
+        db.ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        comment='ID da assessora (multi-tenancy)'
     )
 
     categoria = db.Column(
@@ -85,6 +93,9 @@ class SaldoDarfAcumulado(db.Model):
         onupdate=datetime.utcnow,
         comment='Data da última atualização'
     )
+
+    # Relacionamentos
+    assessora = relationship('Assessora', back_populates='saldos_darf_acumulados')
 
     __table_args__ = (
         db.UniqueConstraint(

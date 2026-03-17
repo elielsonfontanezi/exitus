@@ -7,6 +7,7 @@ Issue: #1 - Gap P0 da Revisão M1-4
 from app.database import db
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Index
+from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime
 
@@ -28,6 +29,7 @@ class HistoricoPreco(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     ativoid = db.Column(UUID(as_uuid=True), db.ForeignKey('ativo.id', ondelete='CASCADE'), nullable=False)
     data = db.Column(db.Date, nullable=False)
+    assessora_id = db.Column(UUID(as_uuid=True), db.ForeignKey('assessora.id', ondelete='CASCADE'), nullable=True)
     preco_abertura = db.Column(db.Numeric(18, 6), nullable=True)
     preco_fechamento = db.Column(db.Numeric(18, 6), nullable=False)
     preco_minimo = db.Column(db.Numeric(18, 6), nullable=True)
@@ -36,7 +38,8 @@ class HistoricoPreco(db.Model):
     createdat = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updatedat = db.Column(db.DateTime, onupdate=datetime.utcnow, nullable=True)
     
-    # Relacionamento com Ativo
+    # Relacionamentos
+    assessora = relationship('Assessora', back_populates='historicos_precos')
     ativo = db.relationship('Ativo', backref=db.backref('historico_precos', lazy='dynamic', cascade='all, delete-orphan'))
     
     # Constraints
