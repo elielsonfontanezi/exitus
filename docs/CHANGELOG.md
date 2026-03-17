@@ -8,6 +8,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Integração Frontend-Backend (17/03/2026)
+
+- **Endpoints Backend para Frontend:**
+  - `/api/buy-signals/analisar/{ticker}` - Análise completa de ativo (buy_score, margem, métricas fundamentalistas)
+  - `/api/cambio/taxa-atual?de=USD&para=BRL` - Taxa de câmbio atual (endpoint público)
+  - Testes criados: test_buy_signals_endpoints.py (8 testes) e test_cambio_endpoints.py (9 testes)
+- **Artefatos modificados:**
+  - backend/app/blueprints/buy_signals_blueprint.py - Endpoint /analisar/{ticker}
+  - backend/app/blueprints/cambio_blueprint.py - Endpoint /taxa-atual
+- **Status:** ✅ Backend pronto para integração com frontend
+- **Resultado:** Frontend pode consumir análises de ativos e conversão de moedas
+
 ### Added — Fase 7: Multi-Tenancy (Parte 3) (16/03/2026)
 
 - **MULTICLIENTE-001 - Implementação Funcional COMPLETA:**
