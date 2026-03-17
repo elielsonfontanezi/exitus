@@ -6,11 +6,11 @@
      x-data="dashboardData()" 
      @currency-changed.window="handleCurrencyChange($event.detail)">
   
-  {% include 'components/layout/page_header.html' with title='Dashboard Multi-Mercado' subtitle='Visão consolidada dos seus investimentos' icon='📊' %}
+  {% include 'components/layout/page_header.html' %}
   
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-4">
-      {% include 'components/forms/currency_toggle.html' with current='BRL' %}
+      {% include 'components/forms/currency_toggle.html' %}
     </div>
     <div class="flex gap-3">
       <a href="/dashboard/buy-signals" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
@@ -23,56 +23,21 @@
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    {% include 'components/cards/stat_card.html' with 
-      title='Patrimônio Total' 
-      value='R$ ' + "%.2f"|format(dados.resumo.patrimonio_total) 
-      trend='up' if dados.resumo.rentabilidade_geral >= 0 else 'down'
-      trend_value=("%+.2f"|format(dados.resumo.rentabilidade_geral)) + '%'
-      icon='💰' 
-    %}
-    
-    {% include 'components/cards/stat_card.html' with 
-      title='Rentabilidade Geral' 
-      value=("%+.2f"|format(dados.resumo.rentabilidade_geral)) + '%'
-      subtitle='Período: 12 meses'
-      icon='📈' if dados.resumo.rentabilidade_geral >= 0 else '📉'
-    %}
-    
-    {% include 'components/cards/stat_card.html' with 
-      title='Carteiras Ativas' 
-      value=dados.resumo.total_portfolios
-      icon='💼'
-    %}
-    
-    {% include 'components/cards/stat_card.html' with 
-      title='Posições em Aberto' 
-      value=dados.resumo.total_posicoes
-      icon='📊'
-    %}
+    {% include 'components/cards/stat_card.html' %}
+    {% include 'components/cards/stat_card.html' %}
+    {% include 'components/cards/stat_card.html' %}
+    {% include 'components/cards/stat_card.html' %}
   </div>
 
-  {% include 'components/layout/section_divider.html' with title='Patrimônio por Mercado' %}
+  {% include 'components/layout/section_divider.html' %}
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    {% for mercado_key in ['BR', 'US', 'INTL'] %}
-      {% set mercado_data = dados.por_mercado[mercado_key] %}
-      {% include 'components/cards/market_stat_card.html' with 
-        mercado=mercado_key
-        valor='R$ ' + "%.2f"|format(mercado_data.patrimonio)
-        percentual=mercado_data.percentual
-        rentabilidade=mercado_data.rentabilidade
-        moeda='BRL'
-      %}
-    {% endfor %}
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">Alocação Geográfica</h3>
+  <div class="h-64">
+    <canvas id="allocation-chart"></canvas>
   </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    {% if dados.alocacao_geografica %}
-      {% include 'components/charts/allocation_pie_chart.html' with 
-        data=dados.alocacao_geografica
-        chart_id='allocation-chart'
-      %}
-    {% endif %}
+</div>
     
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 class="text-lg font-semibold text-gray-900 mb-4">Evolução Patrimonial</h3>
@@ -82,9 +47,8 @@
     </div>
   </div>
 
-  {% include 'components/layout/section_divider.html' with title='Top 5 Ativos por Mercado' %}
+  {% include 'components/layout/section_divider.html' %}
 
-  <!-- Filtros e Ordenação -->
   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
       <div class="flex flex-wrap items-center gap-3">
@@ -102,67 +66,55 @@
           </button>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <span class="text-sm text-gray-500">Total de ativos:</span>
-        <span class="text-sm font-semibold text-gray-900">
-          {{ dados.por_mercado.BR.top_ativos|length + dados.por_mercado.US.top_ativos|length + dados.por_mercado.INTL.top_ativos|length }}
-        </span>
-      </div>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-    {% for mercado_key in ['BR', 'US', 'INTL'] %}
-      {% set mercado_data = dados.por_mercado[mercado_key] %}
-      {% include 'components/cards/top_assets_list.html' with 
-        mercado=mercado_key
-        ativos=mercado_data.top_ativos
-        title='Top 5 - ' + mercado_key
-        max_items=5
-      %}
-    {% endfor %}
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Ativos BR</h3>
+      <p class="text-gray-600">Em desenvolvimento...</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Ativos US</h3>
+      <p class="text-gray-600">Em desenvolvimento...</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Ativos INTL</h3>
+      <p class="text-gray-600">Em desenvolvimento...</p>
+    </div>
   </div>
 
-  {% include 'components/layout/section_divider.html' with title='Performance por Ativo' %}
+  {% include 'components/layout/section_divider.html' %}
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    {% for mercado_key in ['BR', 'US', 'INTL'] %}
-      {% set mercado_data = dados.por_mercado[mercado_key] %}
-      {% if mercado_data.top_ativos %}
-        {% include 'components/charts/performance_by_asset_chart.html' with 
-          data=mercado_data.top_ativos
-          chart_id='performance-chart-' + mercado_key
-          title='Performance - ' + mercado_key
-        %}
-      {% endif %}
-    {% endfor %}
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Performance BR</h3>
+      <p class="text-gray-600">Gráfico em desenvolvimento...</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Performance US</h3>
+      <p class="text-gray-600">Gráfico em desenvolvimento...</p>
+    </div>
   </div>
 
-  {% include 'components/layout/section_divider.html' with title='Melhores Ativos' %}
+  {% include 'components/layout/section_divider.html' %}
 
-  <!-- Cards detalhados dos Top 3 ativos -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-    {% set todos_ativos = [] %}
-    {% for mercado_key in ['BR', 'US', 'INTL'] %}
-      {% for ativo in dados.por_mercado[mercado_key].top_ativos %}
-        {% set _ = todos_ativos.append(ativo) %}
-      {% endfor %}
-    {% endfor %}
-    
-    {% for ativo in todos_ativos[:3] %}
-      {% include 'components/cards/asset_card.html' with 
-        ticker=ativo.ticker
-        nome=ativo.nome
-        tipo=ativo.tipo
-        mercado=ativo.mercado
-        valor=ativo.valor
-        rentabilidade=ativo.rentabilidade
-        compact=false
-      %}
-    {% endfor %}
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Top Ativo 1</h3>
+      <p class="text-gray-600">Em desenvolvimento...</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Top Ativo 2</h3>
+      <p class="text-gray-600">Em desenvolvimento...</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Top Ativo 3</h3>
+      <p class="text-gray-600">Em desenvolvimento...</p>
+    </div>
   </div>
 
-  {% include 'components/layout/section_divider.html' with title='Ações Rápidas' %}
+  {% include 'components/layout/section_divider.html' %}
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
@@ -173,150 +125,27 @@
         + Compra/Venda
       </a>
     </div>
+    
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <h3 class="font-bold text-lg mb-4 flex items-center text-gray-800">
-        <span class="text-2xl mr-2">💼</span> Carteiras
+        <span class="text-2xl mr-2">📊</span> Relatórios
       </h3>
-      <a href="/dashboard/portfolios" class="block w-full px-4 py-2 bg-blue-600 text-white text-center font-medium rounded-md hover:bg-blue-700 transition-colors">
-        Gerenciar Carteiras
+      <a href="/dashboard/reports" class="block w-full px-4 py-2 bg-purple-600 text-white text-center font-medium rounded-md hover:bg-purple-700 transition-colors">
+        📈 Ver Relatórios
       </a>
     </div>
+    
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <h3 class="font-bold text-lg mb-4 flex items-center text-gray-800">
-        <span class="text-2xl mr-2">🔔</span> Alertas
+        <span class="text-2xl mr-2">⚙️</span> Configurações
       </h3>
-      <a href="/dashboard/alerts" class="block w-full px-4 py-2 bg-yellow-600 text-white text-center font-medium rounded-md hover:bg-yellow-700 transition-colors">
-        Configurar Alertas
+      <a href="/dashboard/settings" class="block w-full px-4 py-2 bg-gray-600 text-white text-center font-medium rounded-md hover:bg-gray-700 transition-colors">
+        🔧 Configurar
       </a>
     </div>
   </div>
 </div>
-{% endblock %}
 
-{% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Dados do dashboard
-    const dados = {{ dados | tojson }};
-    
-    // Gráfico de Alocação Geográfica
-    if (dados.alocacao_geografica) {
-        const allocationCtx = document.getElementById('allocation-chart');
-        if (allocationCtx) {
-            new Chart(allocationCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Brasil (BR)', 'Estados Unidos (US)', 'Internacional (INTL)'],
-                    datasets: [{
-                        data: [
-                            dados.alocacao_geografica.BR,
-                            dados.alocacao_geografica.US,
-                            dados.alocacao_geografica.INTL
-                        ],
-                        backgroundColor: [
-                            '#10b981', // green-500
-                            '#3b82f6', // blue-500
-                            '#f59e0b'  // amber-500
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 15,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed.toFixed(2) + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    }
-    
-    // Gráfico de Evolução Patrimonial (simulado)
-    const evolutionCtx = document.getElementById('evolution-chart');
-    if (evolutionCtx) {
-        // Dados simulados para evolução (últimos 12 meses)
-        const labels = [];
-        const data = [];
-        const hoje = new Date();
-        let valorSimulado = dados.resumo.patrimonio_total * 0.7; // Começa com 70% do valor atual
-        
-        for (let i = 11; i >= 0; i--) {
-            const dataMes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
-            labels.push(dataMes.toLocaleDateString('pt-BR', { month: 'short' }));
-            
-            // Simula crescimento gradual
-            valorSimulado *= (1 + (Math.random() * 0.05 - 0.01)); // -1% a +4% por mês
-            data.push(valorSimulado);
-        }
-        
-        // Garante que o último mês seja o valor atual
-        data[data.length - 1] = dados.resumo.patrimonio_total;
-        
-        new Chart(evolutionCtx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Patrimônio (R$)',
-                    data: data,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3,
-                    pointHoverRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return 'R$ ' + context.parsed.y.toLocaleString('pt-BR', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                });
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        ticks: {
-                            callback: function(value) {
-                                return 'R$ ' + (value / 1000).toFixed(0) + 'k';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-});
-</script>
+<script src="/static/js/dashboard.js"></script>
+
 {% endblock %}

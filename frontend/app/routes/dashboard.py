@@ -93,6 +93,33 @@ def buy_signals():
     return render_template('dashboard/buy_signals.html', signals=signals)
 
 
+@bp.route('/buy-signals/analisar/<ticker>')
+@login_required
+def analisar_ativo(ticker):
+    """API para análise individual de ativo - proxy para backend"""
+    token = session.get('access_token')
+    
+    if not token:
+        return {'success': False, 'message': 'Não autenticado'}, 401
+    
+    try:
+        headers = {'Authorization': f'Bearer {token}'}
+        response = requests.get(
+            f'{Config.BACKEND_API_URL}/api/buy-signals/analisar/{ticker}',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {'success': False, 'message': 'Ativo não encontrado ou sem dados suficientes'}, 404
+            
+    except Exception as e:
+        print(f"Erro ao analisar ativo {ticker}: {e}")
+        return {'success': False, 'message': 'Erro ao comunicar com backend'}, 500
+
+
 @bp.route('/portfolios')
 @login_required
 def portfolios():

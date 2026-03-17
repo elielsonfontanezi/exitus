@@ -92,10 +92,10 @@ def analisar_ativo(ticker):
             "preco_atual": float(ativo.preco_atual) if ativo.preco_atual else 0.0,
             "preco_teto": float(preco_teto),
             "dy": float(ativo.dividend_yield) if ativo.dividend_yield else 0.0,
-            "pl": float(ativo.pl) if ativo.pl else 0.0,
-            "pvp": float(ativo.pvp) if ativo.pvp else 0.0,
+            "pl": float(ativo.p_l) if ativo.p_l else 0.0,
+            "pvp": float(ativo.p_vp) if ativo.p_vp else 0.0,
             "roe": float(ativo.roe) if ativo.roe else 0.0,
-            "tipo": ativo.tipo_ativo.value if ativo.tipo_ativo else "ACAO"
+            "tipo": ativo.tipo.value if ativo.tipo else "ACAO"
         }
         
         return jsonify({"success": True, "data": resultado}), 200

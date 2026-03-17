@@ -22,11 +22,14 @@ Elevar o frontend ao nível de profissionalismo do backend, mantendo a stack atu
 - ✅ Gráficos avançados (Chart.js)
 - ✅ Responsividade mobile-first
 
-### **Progresso Atual (13/03/2026)**
+### **Progresso Atual (17/03/2026)**
 - ✅ **Documentação técnica completa:** ROADMAP_FRONTEND.md criado
 - ✅ **Wireframes ASCII:** 12 telas completas (3 prioritárias + 9 restantes)
 - ✅ **Estratégia definida:** Componentização primeiro, telas depois
 - ✅ **Protótipos validados:** Opção B (wireframes antes de implementar)
+- ✅ **Integração Frontend-Backend:** Login, Dashboard, Toggle BRL/USD, Buy Signals funcionando
+- ✅ **Templates Corrigidos:** Jinja2 sem erros, includes funcionais
+- ✅ **API Proxy:** Rota `/dashboard/buy-signals/analisar/<ticker>` implementada
 
 ---
 

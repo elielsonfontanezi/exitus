@@ -18,6 +18,29 @@ db.drop_all()
 db.create_all()
 
 # ✅ CORRETO — limpa dados, preserva estrutura
+```
+
+---
+
+## 🎨 Frontend Templates
+
+### L-FE-001 — Sintaxe Jinja2: include não usa 'with' para passar variáveis
+**Origem:** Frontend Template Error | **Data:** 17/03/2026
+
+```jinja2
+# ❌ ERRADO — 'with' não é sintaxe válida em Jinja2 includes
+{% include 'components/cards/stat_card.html' with title='Dashboard' value='R$ 1000' %}
+
+# ✅ CORRETO — include simples, variáveis via contexto
+{% include 'components/cards/stat_card.html' %}
+
+# ✅ ALTERNATIVA — passar contexto completo
+{% include 'components/cards/stat_card.html' with context %}
+```
+
+**Problema:** `jinja2.exceptions.TemplateSyntaxError: expected token 'end of statement block', got 'with'`
+
+**Solução:** Remover `with` dos includes ou usar `with context` para herdar contexto atual. Componentes devem receber dados via contexto do template pai, não via parâmetros no include.
 db.session.execute(text("DELETE FROM tabela"))
 ```
 **Regra:** "O que preciso resetar?" → Dados = DELETE. Schema = DROP (raramente).  

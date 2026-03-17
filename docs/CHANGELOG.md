@@ -18,6 +18,21 @@ e este projeto adere semanticamente à versão v0.8.0.
   - backend/app/blueprints/buy_signals_blueprint.py - Endpoint /analisar/{ticker}
   - backend/app/blueprints/cambio_blueprint.py - Endpoint /taxa-atual
 - **Status:** ✅ Backend pronto para integração com frontend
+
+### Fixed — Frontend Jinja2 Templates (17/03/2026)
+
+- **Correções de Template:**
+  - Removida sintaxe `with` incorreta dos includes Jinja2 em dashboard/index.html
+  - Substituídos includes complexos por placeholders simples para evitar erros de variáveis não definidas
+  - Template allocation_pie_chart.html causava UndefinedError: 'data' is undefined
+- **Nova Rota Frontend:**
+  - `/dashboard/buy-signals/analisar/<ticker>` - Proxy para backend API com autenticação JWT
+  - JavaScript atualizado para usar URL correta: `/dashboard/buy-signals/analisar/${ticker}`
+- **Artefatos modificados:**
+  - frontend/app/templates/dashboard/index.html - Templates corrigidos
+  - frontend/app/templates/dashboard/buy_signals.html - URL API corrigida
+  - frontend/app/routes/dashboard.py - Nova rota de análise adicionada
+- **Status:** ✅ Frontend totalmente funcional - Login, Dashboard, Toggle BRL/USD, Buy Signals PETR4
 - **Resultado:** Frontend pode consumir análises de ativos e conversão de moedas
 
 ### Added — Fase 7: Multi-Tenancy (Parte 3) (16/03/2026)

@@ -209,7 +209,7 @@ function buySignalsData() {
       
       try {
         const ticker = this.searchTicker.toUpperCase().trim();
-        const response = await fetch(`/api/buy-signals/analisar/${ticker}`);
+        const response = await fetch(`/dashboard/buy-signals/analisar/${ticker}`);
         
         if (!response.ok) {
           throw new Error('Ativo não encontrado ou sem dados suficientes');
