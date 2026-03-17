@@ -1,6 +1,12 @@
 # 🎨 Exitus — Roadmap Frontend Reengenharia
 
-> **Status:** 📋 Planejamento Concluído  
+> ⚠️ **ATENÇÃO:** Este documento foi **SUBSTITUÍDO** por `ROADMAP_FRONTEND_V2.md` (17/03/2026)  
+> 📄 **Versão Atual:** V2.0 - 17 telas premium com design moderno  
+> 📋 **Este arquivo mantido apenas para referência histórica**
+
+---
+
+> **Status:** ⚠️ OBSOLETO (substituído por V2.0)  
 > **Versão:** 1.1  
 > **Data:** 13/03/2026 (atualizado)  
 > **Modelo IA Recomendado:** Claude Sonnet (complexidade moderada-alta)
