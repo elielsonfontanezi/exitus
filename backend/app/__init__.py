@@ -185,6 +185,14 @@ def create_app(testing=False):
     except ImportError as e:
         print(f"⚠️  Planos de Compra blueprint não encontrado: {e}")
 
+    # Planos de Venda
+    try:
+        from .blueprints.plano_venda_blueprint import plano_venda_bp
+        app.register_blueprint(plano_venda_bp)
+        print("✅ Planos de Venda blueprint registrado: /api/plano-venda/*")
+    except ImportError as e:
+        print(f"⚠️  Planos de Venda blueprint não encontrado: {e}")
+
     # M4.6 - IR (Imposto de Renda — EXITUS-IR-001)
     try:
         from .blueprints.ir_blueprint import ir_bp

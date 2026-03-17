@@ -9,7 +9,8 @@ class Alerta(db.Model):
     __tablename__ = 'alertas'
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuario.id'), nullable=False, index=True)  # ✅ CORRIGIDO
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuario.id'), nullable=False, index=True)
+    assessora_id = Column(UUID(as_uuid=True), ForeignKey('assessora.id', ondelete='CASCADE'), nullable=True, index=True)  # ✅ CORRIGIDO
     
     # Configuração do Alerta
     nome = Column(String(100), nullable=False, index=True)

@@ -43,6 +43,7 @@ class CalendarioDividendo(db.Model):
     
     # Foreign Keys
     ativo_id = Column(UUID(as_uuid=True), ForeignKey('ativo.id'), nullable=False)
+    assessora_id = Column(UUID(as_uuid=True), ForeignKey('assessora.id', ondelete='CASCADE'), nullable=True, index=True)
     usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuario.id'), nullable=False)
     
     # Dados do Calendário
