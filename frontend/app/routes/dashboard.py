@@ -1164,14 +1164,6 @@ def comparador():
     return render_template('dashboard/comparador.html')
 
 
-# --- Planos de Compra Disciplinada (NOVO) ---
-@bp.route('/planos-compra')
-@login_required
-def planos_compra():
-    """Planos de Compra Disciplinada - Fase 3 Sprint 3.2"""
-    token = session.get('access_token')
-    
-    return render_template('dashboard/planos_compra.html')
 
 
 # --- Planos de Venda Disciplinada (NOVO) ---

@@ -93,7 +93,7 @@ module.exports = defineConfig({
 
   /* Servidor de desenvolvimento */
   webServer: {
-    command: 'cd ../../frontend && python app.py',
+    command: 'cd ../../frontend && python run.py',
     url: 'http://localhost:8080',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
