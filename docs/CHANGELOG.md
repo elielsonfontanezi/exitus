@@ -8,6 +8,22 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — Consolidação de Documentação: 42 → 18 arquivos (18/03/2026)
+
+- **Consolidação:**
+  - 42 arquivos .md reduzidos para 18 ativos + 28 arquivados
+  - `ROADMAP.md` criado (unifica 5 roadmaps: backend, frontend, frontend_v2, testes, fase4)
+  - `MULTICLIENTE.md` criado (unifica 4 partes: PARTE1, PARTE2A, PARTE2B, PARTE3)
+  - `PROJECT_STATUS.md` reescrito (absorve FRONTEND_V2_STATUS, TESTES_HISTORICO, TESTES_E2E_PLAN)
+  - `README.md` reescrito (absorve VISION.md, novo índice de 18 arquivos)
+- **Preservação:**
+  - 8 pendências ativas mapeadas e preservadas
+  - 28 arquivos históricos movidos para `docs/archive/`
+  - Zero perda de informação
+- **Governança:**
+  - `.windsurfrules` v2.4: referências atualizadas (ROADMAP_BACKEND→ROADMAP, TESTES_HISTORICO→PROJECT_STATUS)
+  - EXITUS-CRUD-002.md mantido como GAP pendente
+
 ### Fixed — Testes E2E Login e Performance (18/03/2026)
 
 - **Correções Login:**

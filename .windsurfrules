@@ -1,6 +1,6 @@
 # .windsurfrules — Sistema Exitus
 ## Arquivo de regras para Cascade (Windsurf AI Assistant)
-### Versão: 2.3 — 11/03/2026 (revisão pós-otimização documentação + testes)
+### Versão: 2.4 — 18/03/2026 (consolidação documentação: 42 → 18 arquivos)
 
 ---
 
@@ -11,10 +11,10 @@ Consultar ANTES de gerar qualquer código ou proposta:
 ```
 PRIORIDADE 1 — Ler antes de qualquer ação:
 ├── docs/LESSONS_LEARNED.md     # Erros reais — ler PRIMEIRO, sempre
-├── docs/TESTES_HISTORICO.md    # Histórico de correções (491/491 ✅)
+├── docs/PROJECT_STATUS.md     # Status consolidado do projeto (métricas, testes)
 ├── docs/PERSONAS.md            # Manual de operação da IA (comportamento, fluxo)
 ├── docs/CODING_STANDARDS.md    # snake_case obrigatório, padrões SQLAlchemy
-├── docs/ROADMAP_BACKEND.md     # GAPs backend, status, plano de implementação
+├── docs/ROADMAP.md             # Roadmap consolidado (backend, frontend, testes)
 ├── docs/CHANGELOG.md           # Histórico de mudanças, versão atual
 │
 PRIORIDADE 2 — Consultar conforme contexto:
