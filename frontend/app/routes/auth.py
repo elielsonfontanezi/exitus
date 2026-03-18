@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 import requests
 from app.config import Config
 from functools import wraps
@@ -45,6 +45,19 @@ def login():
                     session['role'] = payload.get('role', 'user')
                     session['access_token'] = access_token
                     session.permanent = True
+                    
+                    # Se for requisição AJAX (JavaScript), retornar JSON
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return jsonify({
+                            'success': True,
+                            'token': access_token,
+                            'user': {
+                                'id': payload.get('sub'),
+                                'username': username,
+                                'role': payload.get('role', 'user')
+                            },
+                            'redirect': url_for('dashboard.index')
+                        })
                     
                     flash('Login OK!', 'success')
                     return redirect(url_for('dashboard.index'))

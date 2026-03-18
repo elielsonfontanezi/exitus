@@ -40,29 +40,41 @@ function dashboardData() {
             
             try {
                 // Carregar dados do portfolio
-                const portfolioResponse = await fetch('/api/portfolios/dashboard');
-                if (portfolioResponse.ok) {
-                    const portfolioData = await portfolioResponse.json();
-                    this.updateMarketData(portfolioData.data);
+                const response = await window.auth.fetch('/api/portfolios/dashboard');
+                if (response && response.ok) {
+                    const data = await response.json();
+                    this.updateMarketData(data.data);
                 }
                 
-                // Carregar top ativos
-                const positionsResponse = await fetch('/api/posicoes');
-                if (positionsResponse.ok) {
+                // Carregar taxa de câmbio
+                const cambioResponse = await window.auth.fetch('/api/cambio/taxa-atual?de=USD&para=BRL');
+                if (cambioResponse && cambioResponse.ok) {
+                    const cambioData = await cambioResponse.json();
+                    this.exchangeRate = cambioData.data.taxa || 5.00;
+                }
+                
+                // Carregar posições
+                const positionsResponse = await window.auth.fetch('/api/posicoes');
+                if (positionsResponse && positionsResponse.ok) {
                     const positionsData = await positionsResponse.json();
                     this.updateTopAssets(positionsData.data);
                 }
                 
-                // Carregar alertas
-                const alertsResponse = await fetch('/api/alerts?limit=5');
-                if (alertsResponse.ok) {
-                    const alertsData = await alertsResponse.json();
-                    this.recentAlerts = alertsData.data || [];
+                // Carregar alertas (endpoint pode não existir)
+                try {
+                    const alertsResponse = await window.auth.fetch('/api/alerts?limit=5');
+                    if (alertsResponse && alertsResponse.ok) {
+                        const alertsData = await alertsResponse.json();
+                        this.recentAlerts = alertsData.data || [];
+                    }
+                } catch (alertError) {
+                    console.log('Endpoint de alertas não disponível (OK)');
+                    this.recentAlerts = [];
                 }
                 
                 // Carregar transações
-                const transactionsResponse = await fetch('/api/transacoes?limit=5');
-                if (transactionsResponse.ok) {
+                const transactionsResponse = await window.auth.fetch('/api/transacoes?limit=5');
+                if (transactionsResponse && transactionsResponse.ok) {
                     const transactionsData = await transactionsResponse.json();
                     this.recentTransactions = transactionsData.data || [];
                 }
