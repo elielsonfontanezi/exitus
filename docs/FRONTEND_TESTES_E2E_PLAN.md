@@ -2,8 +2,17 @@
 
 > **Data:** 17/03/2026  
 > **Versão:** 1.0  
-> **Status:** 📋 Planejamento  
-> **Escopo:** 17 telas premium do ROADMAP_FRONTEND_V2.0
+> **Status:** ⚠️ **SUPERADO - Ver ROADMAP_TESTES_FRONTEND.md**
+
+---
+
+## 📋 **Status Atual**
+
+**⚠️ IMPORTANTE:** Este documento foi **superado** pelo roadmap principal.
+
+**Documentação atual:** [`ROADMAP_TESTES_FRONTEND.md`](./ROADMAP_TESTES_FRONTEND.md)
+
+**Progresso:** Fase 1 concluída (108 testes implementados)
 
 ---
 
