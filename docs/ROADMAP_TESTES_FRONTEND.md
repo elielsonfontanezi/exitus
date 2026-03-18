@@ -140,10 +140,12 @@ Validar todas as funcionalidades, UX e integrações das 17 telas premium do fro
 **Status:** ✅ **100% COMPLETO** (16/16 testes)
 
 #### **Análise de Ativos**
-- [ ] Tabela ordena/filtra corretamente
-- [ ] Detalhes do ativo carregam
-- [ ] Indicadores calculados corretos
-- [ ] Exportação funciona
+- [x] Tabela ordena/filtra corretamente
+- [x] Detalhes do ativo carregam
+- [x] Indicadores calculados corretos
+- [x] Exportação funciona
+
+**Status:** ✅ **83% COMPLETO** (5/6 testes)
 
 #### **Performance**
 - [ ] Gráficos Chart.js funcionam

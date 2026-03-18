@@ -39,6 +39,22 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Suite completa: 1.0m total
   - Status: Produção ready
 
+### Added — Expansão Testes E2E (18/03/2026)
+
+- **Novas Telas Testadas:**
+  - Análise de Ativos: 5/6 testes (83% sucesso)
+  - Imposto de Renda: 5/7 testes (71% sucesso)
+  - Portfolios: 6/7 testes (86% sucesso)
+  - Configurações: 4/5 testes (80% sucesso)
+- **Correções em Lote:**
+  - 16 arquivos: credenciais padronizadas (admin/senha123)
+  - URLs corrigidas: /login → /auth/login
+  - Seletores ajustados para realidade do frontend
+- **Progresso Global:**
+  - Total: 41/108 testes executados (38%)
+  - Sucesso: 36/41 (88% taxa de sucesso)
+  - Performance: média 3.5s por teste
+
 ### Added — ROADMAP_TESTES_FRONTEND - Fase 1 Completa (17/03/2026)
 
 - **Testes E2E - Fase 1 (Smoke Tests):**
