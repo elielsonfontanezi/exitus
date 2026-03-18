@@ -10,13 +10,13 @@ test.describe('Dashboard - Smoke Tests @smoke @critical', () => {
   
   test.beforeEach(async ({ page }) => {
     // Login antes de cada teste
-    await page.goto('/auth/login');
+    await page.goto('/auth/auth/login');
     
     // Debug: verificar URL atual
     console.log('URL atual:', page.url());
     
     // Esperar o formulário carregar
-    await page.waitForSelector('form[action="/auth/login"]', { timeout: 10000 });
+    await page.waitForSelector('form[action="/auth/auth/login"]', { timeout: 10000 });
     
     // Preencher campos
     await page.locator('input[name="username"]').fill('admin');

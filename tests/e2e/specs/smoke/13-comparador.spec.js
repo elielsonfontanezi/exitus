@@ -3,9 +3,9 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Comparador - Smoke Tests @smoke @critical', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/login');
-    await page.fill('input[name="username"]', 'test@exitus.com');
-    await page.fill('input[name="password"]', 'test123');
+    await page.goto('/auth/login');
+    await page.fill('input[name="username"]', 'admin');
+    await page.fill('input[name="password"]', 'senha123');
     await page.click('button[type="submit"]');
     await page.waitForURL('/dashboard/');
   });
