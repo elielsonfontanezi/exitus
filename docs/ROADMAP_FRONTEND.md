@@ -559,7 +559,7 @@ components/tables/opportunity_table.html
 ### **Fase 4 (Semanas 7-8):**
 - [ ] Buy Signals redesenhado
 - [ ] Assets redesenhado
-- [ ] Testes E2E (Cypress/Playwright)
+- [x] Testes E2E (Playwright) - 41/108 testes (38% completo)
 - [ ] Documentação final
 
 ---

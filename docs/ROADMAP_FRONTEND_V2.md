@@ -773,7 +773,7 @@ Aplicar em **TODAS as 17 telas:**
 3. ✅ Fase 1: Dashboard + Análise + Performance + Proventos
 4. ✅ Fase 2: Alocação + Fluxo Caixa + IR + Alertas
 5. ✅ Fase 3: Comparador + Planos Compra/Venda + Educação + Redesigns
-6. ✅ Testes E2E completos
+6. 🧪 Testes E2E em andamento (41/108 testes, 38% completo)
 7. ✅ Documentação final
 
 ---
