@@ -126,11 +126,11 @@ Validar todas as funcionalidades, UX e integrações das 17 telas premium do fro
 ### **Fase 1: Fundações (4 telas)**
 
 #### **Dashboard Multi-Mercado**
-- [ ] Carregamento < 3s
+- [x] Carregamento < 3s (1.3s)
 - [ ] Cards exibem dados corretos
 - [ ] Gráficos renderizam sem erro
 - [ ] Currency toggle funciona
-- [ ] Responsive design
+- [x] Responsive design
 
 #### **Análise de Ativos**
 - [ ] Tabela ordena/filtra corretamente

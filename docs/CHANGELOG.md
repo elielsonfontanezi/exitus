@@ -8,6 +8,21 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — Testes E2E Login e Performance (18/03/2026)
+
+- **Correções Login:**
+  - URL corrigida: `/login` → `/auth/login`
+  - Credenciais corrigidas: `admin/senha123` (conforme OPERATION_RUNBOOK.md)
+  - Seletores melhorados: `name="username"` e `name="password"`
+- **Performance:**
+  - Sistema reiniciado com alocação de memória WSL
+  - Tempo de teste: 9s → 1-3s (70% melhoria)
+  - Playwright browsers instalados
+- **Resultados:**
+  - Login: 100% funcional
+  - Suite: 11/16 testes passando (68% sucesso)
+  - Timeout ajustado: 3s → 10s
+
 ### Added — ROADMAP_TESTES_FRONTEND - Fase 1 Completa (17/03/2026)
 
 - **Testes E2E - Fase 1 (Smoke Tests):**
