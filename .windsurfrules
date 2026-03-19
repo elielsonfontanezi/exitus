@@ -438,7 +438,9 @@ Antes de qualquer ação, confirmar mentalmente:
 **Guia Rápido:**
 1. **SEMPRE**: CHANGELOG.md, ROADMAP.md, PROJECT_STATUS.md
 2. **SE APLICÁVEL**: CODING_STANDARDS.md, ARCHITECTURE.md, OPERATIONS_RUNBOOK.md, LESSONS_LEARNED.md, README.md
-3. **MCPs**: @postgres (banco), @mcp0_browser_* (navegador)
+3. **MANUAIS**: MANUAL_USUARIO.md (usuário final), TECHNICAL_GUIDE.md (desenvolvedores)
+4. **AUDITORIA**: AUDITORIA_VISUAL.md (análise frontend)
+5. **MCPs**: @postgres (banco), @mcp0_browser_* (navegador)
 
 **Regra de ouro:** Documentação vai junto, sempre!
 
