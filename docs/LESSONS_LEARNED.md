@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 13/03/2026 — L-DOCS-001 adicionado (documentação no mesmo commit)  
+> **Atualizado:** 19/03/2026 — L-TEST-001 adicionado (banco de testes multi-tenant)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -744,6 +744,49 @@ def usuario_seed(app):
 3. **Antes de qualquer commit**, verificar: "Preciso atualizar algum doc?"
 
 **Resultado:** Usuário nunca precisa perguntar sobre documentação - ela já vem junto.
+
+---
+
+## 🧪 Testes
+
+### L-TEST-001 — Banco de testes precisa de schema sincronizado (MULTICLIENTE-001)
+**Origem:** MULTI-CLIENTE-001 | **Data:** 19/03/2026
+
+**Problema:** Banco de testes (`exitusdb_test`) com schema desatualizado, causando erro:
+```
+psycopg2.errors.UndefinedColumn: column "assessora_id" of relation "usuario" does not exist
+```
+
+**Causa:** Script `create_test_db.sh` usa `pg_dump --schema-only` do banco de produção, mas banco de testes não foi recriado após mudanças de schema.
+
+**Solução:**
+1. **Recriar banco de testes** após mudanças de schema:
+   ```bash
+   ./scripts/create_test_db.sh
+   ```
+
+2. **Verificar schema sincronizado**:
+   ```bash
+   # Produção
+   podman exec exitus-db psql -U exitus -d exitusdb -c "\d usuario"
+   
+   # Testes (deve ser idêntico)
+   podman exec exitus-db psql -U exitus -d exitusdb_test -c "\d usuario"
+   ```
+
+3. **Atualizar fixtures** para incluir assessora:
+   ```python
+   @pytest.fixture(scope='function')
+   def assessora_seed(app):
+       # Criar assessora padrão para testes
+   
+   @pytest.fixture(scope='function')
+   def usuario_seed(app, assessora_seed):
+       # Usuário com assessora_id
+       u = Usuario(..., assessora_id=assessora_seed.id)
+   ```
+
+**Resultado:** 436/497 testes passando (87.7%) — +5 testes recuperados.
 
 ---
 

@@ -1,8 +1,8 @@
 # Documentação do Sistema Exitus
 
 > **Total:** 18 arquivos ativos + archive  
-> **Última atualização:** 18/03/2026  
-> **Versão:** v0.9.1
+> **Última atualização:** 19/03/2026  
+> **Versão:** v0.9.2
 
 ---
 
