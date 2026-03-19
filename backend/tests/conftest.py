@@ -46,7 +46,7 @@ def client(app):
 # auth_client — cliente HTTP autenticado com JWT de admin
 # ---------------------------------------------------------------------------
 @pytest.fixture(scope='function')
-def auth_client(app):
+def auth_client(app, assessora_seed):
     """
     Cliente HTTP com JWT de admin válido.
     Cria usuário com nome único por teste e faz DELETE no teardown.
@@ -56,7 +56,12 @@ def auth_client(app):
     suffix = str(uuid_lib.uuid4())[:8]
     username = f'ta{suffix}'
 
-    u = Usuario(username=username, email=f'{username}@test.exitus', role=UserRole.ADMIN)
+    u = Usuario(
+        username=username,
+        email=f'{username}@test.exitus',
+        role=UserRole.ADMIN,
+        assessora_id=assessora_seed.id
+    )
     u.set_password('senha_teste_123')
     _db.session.add(u)
     try:
@@ -86,13 +91,44 @@ def auth_client(app):
 # Fixtures de entidades pré-criadas
 # ---------------------------------------------------------------------------
 @pytest.fixture(scope='function')
-def usuario_seed(app):
+def assessora_seed(app):
+    """Assessora padrão para testes. DELETE no teardown."""
+    from app.models.assessora import Assessora
+
+    suffix = str(uuid_lib.uuid4())[:8]
+    a = Assessora(
+        nome=f'Assessora Teste {suffix}',
+        razao_social=f'Assessora Teste LTDA {suffix}',
+        cnpj=f'{uuid_lib.uuid4().int % 100000000000000:014d}',
+        email=f'assessora{suffix}@test.exitus',
+        ativo=True
+    )
+    _db.session.add(a)
+    try:
+        _db.session.commit()
+    except Exception:
+        _db.session.rollback()
+        raise
+    _db.session.refresh(a)
+
+    yield a
+
+    # Limpeza feita por cleanup_test_data - não deletar aqui para evitar FK violation
+
+
+@pytest.fixture(scope='function')
+def usuario_seed(app, assessora_seed):
     """Usuário admin com nome único. DELETE no teardown."""
     from app.models.usuario import Usuario, UserRole
 
     suffix = str(uuid_lib.uuid4())[:8]
     username = f'us{suffix}'
-    u = Usuario(username=username, email=f'{username}@test.exitus', role=UserRole.ADMIN)
+    u = Usuario(
+        username=username,
+        email=f'{username}@test.exitus',
+        role=UserRole.ADMIN,
+        assessora_id=assessora_seed.id
+    )
     u.set_password('senha_teste_123')
     _db.session.add(u)
     try:
@@ -162,6 +198,7 @@ def cleanup_test_data(app):
         from app.models.ativo import Ativo
         from app.models.corretora import Corretora
         from app.models.usuario import Usuario
+        from app.models.assessora import Assessora
         
         # 1. Deletar posições (dependem de ativo + corretora + usuario)
         Posicao.query.delete(synchronize_session=False)
@@ -178,8 +215,11 @@ def cleanup_test_data(app):
         # 5. Deletar ativos (independentes)
         Ativo.query.delete(synchronize_session=False)
         
-        # 6. Deletar usuarios (base)
+        # 6. Deletar usuarios (dependem de assessora)
         Usuario.query.delete(synchronize_session=False)
+        
+        # 7. Deletar assessoras (base)
+        Assessora.query.delete(synchronize_session=False)
         
         _db.session.commit()
     except Exception as e:

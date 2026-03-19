@@ -10,6 +10,7 @@ from app.database import db
 from app.models.plano_compra import PlanoCompra, StatusPlanoCompra
 from app.models.ativo import Ativo
 from app.utils.exceptions import NotFoundError, BusinessRuleError, ConflictError
+from app.utils.tenant import filter_by_assessora
 
 
 class PlanoCompraService:
@@ -95,7 +96,9 @@ class PlanoCompraService:
         Raises:
             NotFoundError: Se plano não existe ou não pertence ao usuário
         """
-        plano = PlanoCompra.query.filter_by(id=plano_id, usuario_id=usuario_id).first()
+        query = PlanoCompra.query.filter_by(id=plano_id, usuario_id=usuario_id)
+        query = filter_by_assessora(query, PlanoCompra)
+        plano = query.first()
         if not plano:
             raise NotFoundError(f"Plano {plano_id} não encontrado")
         return plano
@@ -113,6 +116,7 @@ class PlanoCompraService:
             Lista de PlanoCompra
         """
         query = PlanoCompra.query.filter_by(usuario_id=usuario_id)
+        query = filter_by_assessora(query, PlanoCompra)
         
         if status:
             try:

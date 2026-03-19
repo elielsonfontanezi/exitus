@@ -17,14 +17,11 @@ from app.services.auth_service import AuthService
 class TestAuditoriaService:
     """Testes unitários do AuditoriaService"""
     
-    def test_registrar_create(self, app):
+    def test_registrar_create(self, app, usuario_seed):
         with app.app_context():
-            # Criar usuário de teste
-            usuario = Usuario.query.first()
-            
             # Registrar auditoria
             log = AuditoriaService.registrar_create(
-                usuario_id=usuario.id,
+                usuario_id=usuario_seed.id,
                 entidade='Teste',
                 entidade_id='123e4567-e89b-12d3-a456-426614174000',
                 dados_depois={'campo': 'valor'}
@@ -37,12 +34,10 @@ class TestAuditoriaService:
             assert log.dados_depois == {'campo': 'valor'}
             assert log.dados_antes is None
     
-    def test_registrar_update(self, app):
+    def test_registrar_update(self, app, usuario_seed):
         with app.app_context():
-            usuario = Usuario.query.first()
-            
             log = AuditoriaService.registrar_update(
-                usuario_id=usuario.id,
+                usuario_id=usuario_seed.id,
                 entidade='Teste',
                 entidade_id='123e4567-e89b-12d3-a456-426614174000',
                 dados_antes={'campo': 'valor_antigo'},
@@ -54,12 +49,10 @@ class TestAuditoriaService:
             assert log.dados_antes == {'campo': 'valor_antigo'}
             assert log.dados_depois == {'campo': 'valor_novo'}
     
-    def test_registrar_delete(self, app):
+    def test_registrar_delete(self, app, usuario_seed):
         with app.app_context():
-            usuario = Usuario.query.first()
-            
             log = AuditoriaService.registrar_delete(
-                usuario_id=usuario.id,
+                usuario_id=usuario_seed.id,
                 entidade='Teste',
                 entidade_id='123e4567-e89b-12d3-a456-426614174000',
                 dados_antes={'campo': 'valor'}
@@ -70,12 +63,10 @@ class TestAuditoriaService:
             assert log.dados_antes == {'campo': 'valor'}
             assert log.dados_depois is None
     
-    def test_registrar_login_sucesso(self, app):
+    def test_registrar_login_sucesso(self, app, usuario_seed):
         with app.app_context():
-            usuario = Usuario.query.first()
-            
             log = AuditoriaService.registrar_login(
-                usuario_id=usuario.id,
+                usuario_id=usuario_seed.id,
                 sucesso=True
             )
             
@@ -84,12 +75,10 @@ class TestAuditoriaService:
             assert log.sucesso is True
             assert log.mensagem is None
     
-    def test_registrar_login_falha(self, app):
+    def test_registrar_login_falha(self, app, usuario_seed):
         with app.app_context():
-            usuario = Usuario.query.first()
-            
             log = AuditoriaService.registrar_login(
-                usuario_id=usuario.id,
+                usuario_id=usuario_seed.id,
                 sucesso=False,
                 mensagem='Senha incorreta'
             )

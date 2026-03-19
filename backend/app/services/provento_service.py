@@ -15,6 +15,7 @@ from app.models import Provento, Ativo, Posicao
 from app.utils.exceptions import NotFoundError
 from app.services.posicao_service import PosicaoService
 from app.services.auditoria_service import AuditoriaService
+from app.utils.tenant import filter_by_assessora
 
 logger = logging.getLogger(__name__)
 
@@ -219,10 +220,12 @@ class ProventoService:
     def get_por_ativo(usuario_id, ativo_id):
         """Consolida posições de um ativo em todas as corretoras"""
         try:
-            posicoes = Posicao.query.filter_by(
+            query = Posicao.query.filter_by(
                 usuario_id=usuario_id,
                 ativo_id=ativo_id
-            ).options(
+            )
+            query = filter_by_assessora(query, Posicao)
+            posicoes = query.options(
                 joinedload(Posicao.ativo),
                 joinedload(Posicao.corretora)
             ).all()
@@ -258,7 +261,9 @@ class ProventoService:
     @staticmethod
     def get_recebidos_usuario(usuario_id, data_inicio=None, data_fim=None):
         """Retorna proventos recebidos do usuário"""
-        posicoes = Posicao.query.filter_by(usuario_id=usuario_id).options(joinedload(Posicao.ativo)).all()
+        query = Posicao.query.filter_by(usuario_id=usuario_id).options(joinedload(Posicao.ativo))
+        query = filter_by_assessora(query, Posicao)
+        posicoes = query.all()
         
         if not posicoes:
             return []

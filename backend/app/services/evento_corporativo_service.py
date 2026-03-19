@@ -7,6 +7,7 @@ from app.models import EventoCorporativo, Posicao, Ativo
 from app.models.evento_corporativo import TipoEventoCorporativo
 from app.utils.db_utils import safe_commit, safe_delete_commit
 from app.utils.exceptions import NotFoundError
+from app.utils.tenant import filter_by_assessora
 from decimal import Decimal
 import logging
 
@@ -100,10 +101,12 @@ class EventoCorporativoService:
             if not evento:
                 raise NotFoundError("Evento não encontrado")
 
-            posicao = Posicao.query.filter_by(
+            query = Posicao.query.filter_by(
                 usuario_id=usuario_id, 
                 ativo_id=evento.ativo_id
-            ).first()
+            )
+            query = filter_by_assessora(query, Posicao)
+            posicao = query.first()
 
             if not posicao:
                 return {"status": "ignored", "message": "Usuário não possui posição neste ativo"}

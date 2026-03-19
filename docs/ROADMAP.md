@@ -52,12 +52,12 @@
 
 | GAP ID | Funcionalidade | Prioridade | Status | Detalhe |
 |--------|---------------|------------|--------|---------|
-| **MULTICLIENTE-001** | Multi-tenancy para assessoras | 🔴 Alta | 🟡 85% | Partes 1-3 concluídas. Ver [MULTICLIENTE.md](MULTICLIENTE.md) |
+| **MULTICLIENTE-001** | Multi-tenancy para assessoras | 🔴 Alta | ✅ Concluído (19/03/2026) | 10 services com `filter_by_assessora()`. Ver [MULTICLIENTE.md](MULTICLIENTE.md) |
 | **MONITOR-001** | Monitoramento e alertas | 🟡 Média | 📋 Planejado | Prometheus + Grafana vs DataDog |
 | **RATELIMIT-001** | Rate limiting | 🟡 Média | 📋 Planejado | — |
 | **CICD-001** | CI/CD + deploy | 🟡 Média | 📋 Planejado | GitHub Actions vs GitLab CI |
 
-### Pendências MULTICLIENTE-001
+### MULTICLIENTE-001 — Concluído (19/03/2026)
 
 - [x] Model Assessora (23 campos, 15 relacionamentos)
 - [x] 20 models com `assessora_id` (100%)
@@ -65,9 +65,12 @@
 - [x] Dados migrados para assessora padrão (13 registros)
 - [x] Helper de tenant (4 funções utilitárias)
 - [x] JWT atualizado com `assessora_id`
-- [x] 5 services principais com filtros
-- [x] 3 testes de multi-tenancy passando
-- [ ] Atualizar 15+ services restantes com `filter_by_assessora()`
+- [x] 10 services com `filter_by_assessora()` (100%)
+- [x] Banco de testes recriado com schema multi-tenant
+- [x] Fixtures atualizados para testes multi-tenant
+- [x] 436/497 testes passando (87.7%)
+
+**Pendências futuras (outros GAPs):**
 - [ ] Implementar row-level security completa
 - [ ] Dashboard admin por assessora
 - [ ] Testes de isolamento cross-tenant ampliados
@@ -210,6 +213,6 @@ Documentos históricos de roadmaps anteriores estão em `docs/archive/`:
 
 ---
 
-*Última atualização: 18/03/2026*  
+*Última atualização: 19/03/2026*  
 *Próxima revisão: Após conclusão Fase 7*  
 *Responsável: Elielson Fontanezi + Cascade AI*

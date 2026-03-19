@@ -111,6 +111,14 @@ proventos = Provento.query.filter(
     Provento.data_pagamento >= data_inicio,
     Provento.tipo_provento == TipoProvento.DIVIDENDO
 ).all()
+
+# ✅ MULTI-TENANT QUERIES (MULTICLIENTE-001)
+from app.utils.tenant import filter_by_assessora
+
+# Aplicar filtro de tenant em TODAS as queries
+query = Transacao.query.filter_by(usuario_id=usuario_id)
+query = filter_by_assessora(query, Transacao)
+transacoes = query.all()
 ```
 
 ---

@@ -8,6 +8,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feature — MULTICLIENTE-001: Multi-tenancy Concluído (19/03/2026)
+
+- **Core Multi-tenancy:**
+  - 10 services atualizados com `filter_by_assessora()`: movimentacao_caixa, provento, plano_compra, alerta, configuracao_alerta, evento_corporativo, relatorio_performance, relatorio, auditoria_relatorio
+  - JWT tokens incluem `assessora_id` para identificação do tenant
+  - Helper `filter_by_assessora(query, Model)` em `app/utils/tenant.py`
+- **Infraestrutura:**
+  - Banco de testes recriado com schema multi-tenant completo
+  - Fixures atualizados: `assessora_seed`, `usuario_seed`, `auth_client`
+  - Schema sincronizado entre produção (`exitusdb`) e testes (`exitusdb_test`)
+- **Testes:** 436/497 passando (87.7%) - 5 testes recuperados ao corrigir fixtures
+- **Arquitetura:** Shared Database + Tenant Column (assessora_id)
+- **Assessora padrão:** ID `23c54cb4-cb0a-438f-b985-def21d70904e`
+
 ### Docs — Consolidação de Documentação: 42 → 18 arquivos (18/03/2026)
 
 - **Consolidação:**

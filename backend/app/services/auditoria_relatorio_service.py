@@ -1,14 +1,16 @@
 """M7.1 - AuditoriaRelatorio Service Completo"""
 from app.models.auditoria_relatorio import AuditoriaRelatorio
 from app.database import db
+from app.utils.tenant import filter_by_assessora
 from sqlalchemy import desc
 
 class AuditoriaRelatorioService:
     @staticmethod
     def list_by_usuario(usuario_id, page=1, per_page=10):
         """Lista relatórios paginados por usuário"""
-        query = AuditoriaRelatorio.query.filter_by(usuario_id=usuario_id)\
-            .order_by(desc(AuditoriaRelatorio.timestamp_criacao))
+        query = AuditoriaRelatorio.query.filter_by(usuario_id=usuario_id)
+        query = filter_by_assessora(query, AuditoriaRelatorio)
+        query = query.order_by(desc(AuditoriaRelatorio.timestamp_criacao))
         relatorios = query.paginate(page=page, per_page=per_page, error_out=False)
         return [r.to_dict() for r in relatorios.items]
 

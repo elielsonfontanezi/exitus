@@ -10,6 +10,9 @@ from uuid import UUID
 from sqlalchemy import desc
 
 from app.database import db
+from app.models import Posicao, Transacao, Provento, MovimentacaoCaixa
+from app.utils.exceptions import NotFoundError
+from app.utils.tenant import filter_by_assessora
 from app.models.ativo import Ativo
 from app.models.historico_preco import HistoricoPreco
 from app.models.parametros_macro import ParametrosMacro
@@ -53,7 +56,9 @@ class RelatorioPerformanceService:
         Returns:
             Dict com métricas calculadas.
         """
-        posicoes = Posicao.query.filter_by(usuario_id=usuario_id).all()
+        query = Posicao.query.filter_by(usuario_id=usuario_id)
+        query = filter_by_assessora(query, Posicao)
+        posicoes = query.all()
 
         if not posicoes:
             return RelatorioPerformanceService._resultado_vazio(periodo_inicio, periodo_fim)
