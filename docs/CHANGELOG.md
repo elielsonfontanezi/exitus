@@ -28,6 +28,27 @@ e este projeto adere semanticamente à versão v0.8.0.
   - 42 arquivos .md reduzidos para 18 ativos + 28 arquivados
   - `ROADMAP.md` criado (unifica 5 roadmaps: backend, frontend, frontend_v2, testes, fase4)
   - `MULTICLIENTE.md` criado (unifica 4 partes: PARTE1, PARTE2A, PARTE2B, PARTE3)
+
+### Feature — UX Evolution Roadmap Completo (20/03/2026)
+
+- **Roadmap UX:**
+  - `UX_ROADMAP.md` criado com planejamento completo de 8 semanas
+  - Transformação: sistema técnico → plataforma intuitiva para não-técnicos
+  - Menu simplificado: 22 itens → 8 itens intuitivos
+  - Design emocional: cores vivas, tipografia acessível, cards visuais
+- **Fases de Implementação:**
+  - Weeks 1-2: Fundação UX (pesquisa, benchmarking, design system)
+  - Weeks 3-4: Navegação simplificada (mobile-first, contexto)
+  - Weeks 5-6: Componentes visuais (cards, dashboard)
+  - Weeks 7-8: Testes e refinamento (A/B, polimento)
+- **Métricas de Sucesso:**
+  - Tempo primeira ação: < 30 segundos
+  - Taxa de conclusão: > 85%
+  - Satisfação (NPS): > 70
+  - Engajamento: +40% tempo na plataforma
+- **Documentação Atualizada:**
+  - `ROADMAP.md`: Adicionada seção de UX Evolution
+  - `PROJECT_STATUS.md`: Status do roadmap UX incluído
   - `PROJECT_STATUS.md` reescrito (absorve FRONTEND_V2_STATUS, TESTES_HISTORICO, TESTES_E2E_PLAN)
   - `README.md` reescrito (absorve VISION.md, novo índice de 18 arquivos)
 - **Preservação:**

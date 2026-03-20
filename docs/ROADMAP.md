@@ -14,6 +14,7 @@
  Backend Fase 7: Produção 🎯 (próxima)
  Backend Fase 8: Futuro 📋
  Frontend V2.0: 17/17 telas ✅
+ Frontend UX Evolution: 8 semanas 🎨 (novo)
  Testes E2E Fase 1: Setup + Smoke ✅
  Testes E2E Fase 2: Funcionais + UX ⏳
  Testes E2E Fase 3: Go-Live ⏳
@@ -172,6 +173,47 @@ Maio 2026:
 
 **Origem:** Descoberto durante EXITUS-TESTS-001.  
 **Detalhes completos:** [archive/EXITUS-CRUD-002.md](archive/EXITUS-CRUD-002.md)
+
+---
+
+## 🎨 Frontend — UX Evolution (8 Semanas)
+
+> **Status:** 📋 **Planejamento Completo** | **Início:** 20/03/2026 | **Modelo IA:** Sonnet  
+> **Objetivo:** Transformar sistema técnico → plataforma intuitiva para não-técnicos  
+> **Roadmap completo:** [UX_ROADMAP.md](UX_ROADMAP.md)
+
+### Fases de Implementação
+
+| Semana | Fase | Status | Deliverables |
+|--------|------|--------|--------------|
+| **1-2** | Fundação UX | 📋 Planejado | Pesquisa, benchmarking, design system |
+| **3-4** | Navegação Simplificada | 📋 Planejado | Menu 22→8 itens, mobile-first |
+| **5-6** | Componentes Visuais | 📋 Planejado | Cards, dashboard simplificado |
+| **7-8** | Testes e Refinamento | 📋 Planejado | Testes A/B, polimento final |
+
+### Transformação Principal
+
+**ANTES (Técnico):**
+```
+Dashboard | Buy Signals | Alertas | Carteiras | Ativos | 
+Transações | Movimentações | Proventos | Relatórios | Análises |
+[... 22 itens totais]
+```
+
+**DEPOIS (Intuitivo):**
+```
+📊 RESUMO: Visão Geral | Meus Investimentos
+💰 OPERAÇÕES: Comprar | Vender | Depositar/Sacar  
+📈 ANÁLISES: Desempenho | Oportunidades | Alertas
+⚙️ CONFIG: Relatórios | Perfil
+```
+
+### Métricas de Sucesso UX
+
+- **Tempo de primeira ação:** < 30 segundos
+- **Taxa de conclusão:** > 85%
+- **Satisfação (NPS):** > 70
+- **Engajamento:** +40% tempo na plataforma
 
 ---
 

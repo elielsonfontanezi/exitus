@@ -12,6 +12,7 @@
 |------------|-----------|---------|
 | **Backend** | ✅ 87% | 47/54 GAPs, 436/497 testes (87.7%), 155 endpoints |
 | **Frontend V2.0** | ✅ 100% | 17/17 telas premium, design classe mundial |
+| **Frontend UX Evolution** | 📋 0% | 8 semanas planejadas, roadmap completo |
 | **Testes Backend** | 🟡 87.7% | 436/497 passando (61 failed, 35 errors) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services com filtros |
@@ -42,6 +43,37 @@
 - **Diferenciais:** Planos de Compra/Venda Disciplinada, Compensação Visual IR
 - **Auditoria Visual:** ✅ Concluída (P0 corrigido, P1/P2 OK)
 - **Documentação:** ✅ Manual do Usuário completo (16 módulos, 800+ linhas)
+
+---
+
+## 🎨 Frontend — UX Evolution (Planejado)
+
+> **Status:** 📋 **Roadmap Completo** | **Início:** 20/03/2026  
+> **Objetivo:** Transformar sistema técnico → plataforma intuitiva para não-técnicos  
+> **Documentação:** [UX_ROADMAP.md](UX_ROADMAP.md)
+
+### Planejamento Estratégico
+
+| Fase | Duração | Status | Deliverables |
+|------|---------|--------|--------------|
+| **Fundação UX** | 2 semanas | 📋 Planejado | Pesquisa, benchmarking, design system |
+| **Navegação** | 2 semanas | 📋 Planejado | Menu 22→8 itens, mobile-first |
+| **Componentes** | 2 semanas | 📋 Planejado | Cards visuais, dashboard simplificado |
+| **Testes** | 2 semanas | 📋 Planejado | Testes A/B, polimento final |
+
+### Transformação Principal
+
+- **Menu:** 22 itens → 8 itens intuitivos
+- **Design:** Técnico → emocional (cores vivas, tipografia acessível)
+- **Interface:** Tabelas densas → cards clicáveis
+- **Navegação:** Hierárquica → por contexto
+
+### Métricas Alvo
+
+- **Tempo primeira ação:** < 30 segundos
+- **Taxa conclusão:** > 85%
+- **Satisfação (NPS):** > 70
+- **Engajamento:** +40% tempo na plataforma
 
 ---
 
