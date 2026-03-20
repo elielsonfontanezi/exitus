@@ -19,6 +19,11 @@ function dashboardData() {
             total: 0
         },
         
+        // Variáveis para Hero Section
+        totalPatrimonio: 0,
+        variacaoMes: 0,
+        rentabilidadeGeral: 0,
+        
         // Top 5 ativos
         topAssets: [],
         
@@ -109,6 +114,11 @@ function dashboardData() {
                 },
                 total: total
             };
+            
+            // Atualizar variáveis da Hero Section
+            this.totalPatrimonio = total;
+            this.variacaoMes = 12450 + 2340 + 890; // Soma das variações
+            this.rentabilidadeGeral = data.rentabilidade_geral || 1.9;
         },
         
         // Atualizar top ativos
