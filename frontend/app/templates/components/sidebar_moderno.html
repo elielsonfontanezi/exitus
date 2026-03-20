@@ -94,14 +94,43 @@
                         </a>
 
                         <!-- Carteiras -->
-                        <a href="/dashboard/portfolios" 
-                           class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all hover:bg-gray-800 group">
-                            <span class="text-lg">📁</span>
-                            <span>Carteiras</span>
-                            <span class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="fas fa-chevron-right text-xs"></i>
-                            </span>
-                        </a>
+                        <div x-data="{ submenuOpen: false }" class="relative">
+                            <button @click="submenuOpen = !submenuOpen" 
+                                    class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all hover:bg-gray-800 group">
+                                <span class="text-lg">📁</span>
+                                <span>Carteiras</span>
+                                <span class="ml-auto transition-transform duration-200" 
+                                      :class="submenuOpen ? 'rotate-180' : ''">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </span>
+                            </button>
+                            
+                            <!-- Sub-menu Carteiras -->
+                            <div x-show="submenuOpen" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                                 class="mt-1 ml-4 space-y-1">
+                                <a href="/dashboard/portfolios" 
+                                   class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm">
+                                    <span class="text-base">📋</span>
+                                    <span>Minhas Carteiras</span>
+                                </a>
+                                <a href="/dashboard/portfolios?action=create" 
+                                   class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm">
+                                    <span class="text-base">➕</span>
+                                    <span>Nova Carteira</span>
+                                </a>
+                                <a href="/dashboard/portfolios?action=import" 
+                                   class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm">
+                                    <span class="text-base">📥</span>
+                                    <span>Importar</span>
+                                </a>
+                            </div>
+                        </div>
 
                         <!-- Ativos -->
                         <a href="/dashboard/assets" 
