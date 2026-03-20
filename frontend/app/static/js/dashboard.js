@@ -132,6 +132,12 @@ function dashboardData() {
             const ctx = document.getElementById('allocation-chart');
             if (!ctx) return;
             
+            // Destruir chart existente se houver
+            const existingChart = Chart.getChart(ctx);
+            if (existingChart) {
+                existingChart.destroy();
+            }
+            
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -185,6 +191,12 @@ function dashboardData() {
         initEvolutionChart() {
             const ctx = document.getElementById('evolution-chart');
             if (!ctx) return;
+            
+            // Destruir chart existente se houver
+            const existingChart = Chart.getChart(ctx);
+            if (existingChart) {
+                existingChart.destroy();
+            }
             
             // Gerar dados mock para evolução
             const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];

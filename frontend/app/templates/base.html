@@ -121,6 +121,17 @@
     <!-- Sistema de Autenticação Global -->
     <script src="/static/js/auth.js"></script>
     
+    <!-- Variáveis Globais para Alpine.js -->
+    <script>
+        // Definir variáveis globais para compatibilidade com templates
+        window.currentCurrency = localStorage.getItem('preferredCurrency') || 'BRL';
+        
+        // Event listener para atualizar currentCurrency quando mudar
+        window.addEventListener('currency-changed', (event) => {
+            window.currentCurrency = event.detail.currency;
+        });
+    </script>
+    
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
