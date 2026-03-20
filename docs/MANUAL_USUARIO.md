@@ -41,15 +41,15 @@
 
 ---
 
-## 🔐 Acesso ao Sistema
+## Acesso ao Sistema
 
 ### 1. Login
 
 **URL:** `http://localhost:8080/auth/login`
 
-**Credenciais padrão:**
+**Para ambiente de desenvolvimento, use:**
 - **Usuário:** `admin`
-- **Senha:** `admin123`
+- **Senha:** `senha123`
 
 **Funcionalidades:**
 - Login com usuário/senha

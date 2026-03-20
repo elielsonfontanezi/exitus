@@ -37,7 +37,7 @@ O sistema abrirá na página de login.[file:14]
 ### 2. Login e Registro
 **Para ambiente de desenvolvimento, use:**
 - **Usuário**: `admin`
-- **Senha**: `admin123`
+- **Senha**: `senha123`
 
 **Tela de Login:**
 - Campo: Nome de Usuário
