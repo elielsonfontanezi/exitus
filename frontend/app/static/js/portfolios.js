@@ -36,6 +36,14 @@ function portfoliosData() {
         
         // Inicialização
         init() {
+            // Verificar se deve abrir modal automaticamente
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('action') === 'create') {
+                this.showModal = true;
+                // Limpar URL para não abrir novamente em refresh
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
             this.carregarDados();
         },
         
