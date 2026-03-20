@@ -66,9 +66,10 @@
     <!-- Main Container -->
     <div class="min-h-screen flex">
         
-        <!-- Sidebar Moderno -->
+        <!-- Sidebar Desktop (lg:hidden) -->
         {% if session.get('user_id') %}
             {% include 'components/sidebar_moderno.html' %}
+            {% include 'components/sidebar_mobile.html' %}
         {% endif %}
         
         <!-- Main Content -->
