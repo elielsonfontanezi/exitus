@@ -444,9 +444,118 @@ tipo = Column(Enum(TipoAtivo), nullable=False)
 
 ---
 
+## � **Frontend — Padrões de Design Moderno (UX Evolution)**
+
+### **Hero Section Padrão**
+```html
+<!-- ✅ PADRÃO OBRIGATÓRIO para todas as páginas -->
+<section class="bg-gradient-hero rounded-3xl mx-6 mt-6 p-8 text-white shadow-large animate-fade-in relative overflow-hidden">
+  <!-- Elementos Decorativos -->
+  <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+  <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
+  
+  <div class="relative z-10">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse-slow">
+            <span class="text-3xl">[EMOJI]</span>
+          </div>
+          <div>
+            <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+              [TÍTULO]
+            </h1>
+            <p class="text-xl text-white/80">[DESCRIÇÃO]</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-8 lg:mt-0 lg:ml-8">
+        <div class="flex flex-wrap gap-3">
+          <!-- BOTÕES AQUI -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+```
+
+### **Cards Modernos Padrão**
+```html
+<!-- ✅ PADRÃO OBRIGATÓRIO para cards de estatísticas -->
+<div class="card-moderno p-6 animate-scale-in hover-lift group cursor-pointer">
+  <div class="flex items-center justify-between mb-4">
+    <div class="w-12 h-12 bg-[COR]-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+      <span class="text-2xl">[EMOJI]</span>
+    </div>
+    <div class="w-8 h-8 bg-[COR]-100 rounded-full flex items-center justify-center">
+      <span class="text-[COR]-600 font-bold text-sm">[VALOR]</span>
+    </div>
+  </div>
+  <div class="space-y-2">
+    <p class="text-3xl font-bold text-gray-900">[VALOR PRINCIPAL]</p>
+    <p class="text-sm text-gray-600">[DESCRIÇÃO]</p>
+  </div>
+</div>
+```
+
+### **Botões Padrão**
+```html
+<!-- ✅ BOTÃO PRIMÁRIO -->
+<button class="btn-primario">
+  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    [ÍCONE SVG]
+  </svg>
+  [TEXTO]
+</button>
+
+<!-- ✅ BOTÃO SECUNDÁRIO -->
+<a href="[URL]" class="btn-secundario">
+  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    [ÍCONE SVG]
+  </svg>
+  [TEXTO]
+</a>
+```
+
+### **Emojis por Página (Obrigatório)**
+| Página | Emoji | Cor |
+|--------|-------|-----|
+| Dashboard | 📊 | primary |
+| Carteiras | 📁 | primary |
+| Ativos | �🎯 | primary |
+| Performance | 📈 | success |
+| Movimentações | 💳 | primary |
+| Alertas | 🔔 | warning |
+| Relatórios | 📄 | primary |
+| Imposto de Renda | 🧾 | danger |
+| Educação | 🎓 | primary |
+| Configurações | ⚙️ | gray |
+
+### **Cores Semânticas**
+- **primary:** azul principal
+- **success:** verde para positivos
+- **warning:** laranja para alertas
+- **danger:** vermelho para negativos
+- **purple:** roxo para especiais
+
+### **Animações Padrão**
+- **animate-fade-in:** para hero sections
+- **animate-scale-in:** para cards
+- **animate-delay-100/200/300:** delays progressivos
+- **animate-pulse-slow:** para emojis principais
+- **hover-lift:** elevação no hover
+- **group-hover:scale-110:** escala nos ícones
+
+---
+
 ## 🎯 **Regras de Ouro**
 
 1. **🔍 SEMPRE validar** enums antes de usar
+2. **🎨 USAR SEMPRE** hero section padrão em novas páginas
+3. **📊 MANTER** consistência de emojis e cores
+4. **⚡ APLICAR** animações com delays progressivos
+5. **🔧 USAR** btn-primario/btn-secundario para ações principais
 2. **✅ SEMPRE validar** constraints antes de inserir  
 3. **🔄 SEMPRE fazer** rollback após erros
 4. **📝 SEMPRE documentar** problemas recorrentes
