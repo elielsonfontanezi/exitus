@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}UX Test - Design System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 p-8">
+  <!-- Hero Section com Gradiente -->
+  <section class="bg-gradient-hero rounded-2xl p-8 text-white shadow-medium mb-8 animate-fade-in">
+    <h1 class="text-4xl font-bold mb-2">🎨 Design System Moderno</h1>
+    <p class="text-xl">Week 1 - Cores Emocionais, Componentes e Animações</p>
+  </section>
+
+  <!-- Teste de Cores -->
+  <section class="mb-8 animate-slide-up">
+    <h2 class="text-3xl font-bold mb-4">🌈 Cores Emocionais</h2>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div class="bg-primary-500 text-white p-4 rounded-xl text-center">
+        <p class="font-bold">Primário</p>
+        <p class="text-sm">#3B82F6</p>
+      </div>
+      <div class="bg-secondary-500 text-white p-4 rounded-xl text-center">
+        <p class="font-bold">Secundário</p>
+        <p class="text-sm">#8b5cf6</p>
+      </div>
+      <div class="bg-success-500 text-white p-4 rounded-xl text-center">
+        <p class="font-bold">Sucesso</p>
+        <p class="text-sm">#10B981</p>
+      </div>
+      <div class="bg-attention-500 text-white p-4 rounded-xl text-center">
+        <p class="font-bold">Atenção</p>
+        <p class="text-sm">#f59e0b</p>
+      </div>
+      <div class="bg-danger-500 text-white p-4 rounded-xl text-center">
+        <p class="font-bold">Perigo</p>
+        <p class="text-sm">#EF4444</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teste de Cards -->
+  <section class="mb-8 animate-slide-up animate-delay-100">
+    <h2 class="text-3xl font-bold mb-4">🃏 Cards Modernos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Card de Ativo 1 -->
+      <div class="card-ativo animate-scale-in">
+        <div class="header">
+          <span class="ticker">PETR4</span>
+          <span class="categoria">Ação</span>
+        </div>
+        <h4 class="text-lg font-semibold mb-2">Petrobras</h4>
+        <div class="preco">R$ 45,67</div>
+        <div class="variacao positiva">+2.3% ↗</div>
+      </div>
+
+      <!-- Card de Ativo 2 -->
+      <div class="card-ativo animate-scale-in animate-delay-100">
+        <div class="header">
+          <span class="ticker">VALE3</span>
+          <span class="categoria">Ação</span>
+        </div>
+        <h4 class="text-lg font-semibold mb-2">Vale</h4>
+        <div class="preco">R$ 78,90</div>
+        <div class="variacao negativa">-0.8% ↘</div>
+      </div>
+
+      <!-- Card de Ativo 3 -->
+      <div class="card-ativo animate-scale-in animate-delay-200">
+        <div class="header">
+          <span class="ticker">TRXF11</span>
+          <span class="categoria">FII</span>
+        </div>
+        <h4 class="text-lg font-semibold mb-2">TRX Real Estate</h4>
+        <div class="preco">R$ 120,00</div>
+        <div class="variacao positiva">+1.2% ↗</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teste de Métricas -->
+  <section class="mb-8 animate-slide-up animate-delay-200">
+    <h2 class="text-3xl font-bold mb-4">📊 Cards de Métrica</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="card-metrica positiva">
+        <span class="valor">+R$ 2.890</span>
+        <span class="descricao">Este mês</span>
+      </div>
+      <div class="card-metrica">
+        <span class="valor">12</span>
+        <span class="descricao">Ativos</span>
+      </div>
+      <div class="card-metrica">
+        <span class="valor">R$ 450</span>
+        <span class="descricao">Proventos</span>
+      </div>
+      <div class="card-metrica">
+        <span class="valor">+18.5%</span>
+        <span class="descricao">Rentabilidade</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teste de Botões -->
+  <section class="mb-8 animate-slide-up animate-delay-300">
+    <h2 class="text-3xl font-bold mb-4">🔘 Botões Modernos</h2>
+    <div class="space-y-4">
+      <div class="flex flex-wrap gap-4">
+        <button class="btn-primario">Primário</button>
+        <button class="btn-secundario">Secundário</button>
+        <button class="btn-sucesso">Sucesso</button>
+        <button class="btn-atencao">Atenção</button>
+        <button class="btn-perigo">Perigo</button>
+      </div>
+      
+      <div class="flex flex-wrap gap-4">
+        <button class="btn-primario btn-pequeno">Pequeno</button>
+        <button class="btn-primario">Médio</button>
+        <button class="btn-primario btn-grande">Grande</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teste de Botões de Ação -->
+  <section class="mb-8 animate-slide-up animate-delay-400">
+    <h2 class="text-3xl font-bold mb-4">⚡ Botões de Ação Rápida</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <button class="btn-acao comprar">
+        <span class="text-3xl">💰</span>
+        <span class="text-lg font-semibold">Comprar Ativos</span>
+      </button>
+      <button class="btn-acao vender">
+        <span class="text-3xl">💸</span>
+        <span class="text-lg font-semibold">Vender Ativos</span>
+      </button>
+      <button class="btn-acao depositar">
+        <span class="text-3xl">🏦</span>
+        <span class="text-lg font-semibold">Depositar</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Teste de Animações -->
+  <section class="mb-8 animate-slide-up animate-delay-500">
+    <h2 class="text-3xl font-bold mb-4">✨ Animações e Hover States</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="card-moderno p-6 hover-lift">
+        <h3 class="text-xl font-bold mb-2">Hover Lift</h3>
+        <p class="text-gray-600">Passa o mouse para levantar</p>
+      </div>
+      <div class="card-moderno p-6 hover-scale">
+        <h3 class="text-xl font-bold mb-2">Hover Scale</h3>
+        <p class="text-gray-600">Passa o mouse para crescer</p>
+      </div>
+      <div class="card-moderno p-6 hover-glow">
+        <h3 class="text-xl font-bold mb-2">Hover Glow</h3>
+        <p class="text-gray-600">Passa o mouse para brilhar</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teste de Loading Skeletons -->
+  <section class="mb-8 animate-slide-up">
+    <h2 class="text-3xl font-bold mb-4">⏳ Loading Skeletons</h2>
+    <div class="card-moderno p-6 space-y-4">
+      <div class="loading-skeleton title"></div>
+      <div class="loading-skeleton text"></div>
+      <div class="loading-skeleton text" style="width: 60%;"></div>
+      <div class="loading-skeleton card"></div>
+    </div>
+  </section>
+
+  <!-- Teste de Sombras -->
+  <section class="mb-8">
+    <h2 class="text-3xl font-bold mb-4">🌑 Sombras Modernas</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-2xl shadow-soft">
+        <h3 class="text-xl font-bold mb-2">Shadow Soft</h3>
+        <p class="text-gray-600">Sombra suave e sutil</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-medium">
+        <h3 class="text-xl font-bold mb-2">Shadow Medium</h3>
+        <p class="text-gray-600">Sombra média e equilibrada</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-strong">
+        <h3 class="text-xl font-bold mb-2">Shadow Strong</h3>
+        <p class="text-gray-600">Sombra forte e profunda</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Voltar ao Dashboard -->
+  <div class="text-center mt-8">
+    <a href="/dashboard" class="btn-primario btn-grande">
+      ← Voltar ao Dashboard
+    </a>
+  </div>
+</div>
+{% endblock %}
