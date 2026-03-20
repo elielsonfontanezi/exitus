@@ -10,137 +10,183 @@
      x-data="portfoliosData()" 
      @currency-changed.window="handleCurrencyChange($event.detail)">
   
-  <!-- Header -->
-  <div class="bg-gradient-primary text-white">
-    <div class="container mx-auto px-6 py-12">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="display-3 mb-4">Carteiras</h1>
-          <p class="text-xl opacity-90">Gerencie suas contas de investimento em múltiplos mercados</p>
+  <!-- Hero Section Ultra-Moderna -->
+  <section class="bg-gradient-hero rounded-3xl mx-6 mt-6 p-8 text-white shadow-large animate-fade-in relative overflow-hidden">
+    <!-- Elementos Decorativos -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
+    
+    <div class="relative z-10">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse-slow">
+              <span class="text-3xl">📁</span>
+            </div>
+            <div>
+              <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                Carteiras
+              </h1>
+              <p class="text-xl text-white/80">Gerencie suas contas de investimento em múltiplos mercados</p>
+            </div>
+          </div>
         </div>
-        <div class="flex gap-4">
-          <button @click="showModal = true" class="btn btn-white text-primary-600 hover:bg-primary-50">
-            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Nova Carteira
-          </button>
-          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10 hover:border-white/50">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Voltar
-          </a>
-          {% include 'components/forms/currency_toggle.html' %}
+        
+        <div class="mt-8 lg:mt-0 lg:ml-8">
+          <div class="flex flex-wrap gap-3">
+            <button @click="showModal = true" class="btn-primario">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Nova Carteira
+            </button>
+            <a href="/dashboard/" class="btn-secundario">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Voltar
+            </a>
+            {% include 'components/forms/currency_toggle.html' %}
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- Main Content -->
   <div class="container mx-auto px-6 py-8">
     
-    <!-- Cards de Resumo -->
+    <!-- Cards de Resumo Ultra-Modernos -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <!-- Total Carteiras -->
-      <div class="card card-gradient animate-fade-in">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="font-semibold text-white">Total Carteiras</h3>
-                <p class="text-sm text-white opacity-90">Ativas e inativas</p>
-              </div>
+      <div class="card-moderno p-6 animate-scale-in hover-lift group cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span class="text-2xl">📁</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-gray-900 group-hover:text-primary-600 transition-colors">Total Carteiras</h3>
+              <p class="text-sm text-gray-600">Ativas e inativas</p>
             </div>
           </div>
-          <div class="space-y-2">
-            <p class="text-3xl font-bold text-white" x-text="resumo.total_carteiras"></p>
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-white opacity-75">Ativas:</span>
-              <span class="text-white font-medium" x-text="resumo.carteiras_ativas"></span>
+          <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+            <span class="text-primary-600 font-bold text-sm" x-text="totalCarteiras">0</span>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <p class="text-3xl font-bold text-gray-900" x-text="totalCarteiras">0</p>
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2">
+              <span class="text-gray-500">Ativas:</span>
+              <span class="font-semibold text-gray-700" x-text="carteirasAtivas">0</span>
+            </div>
+            <div class="w-16 h-8">
+              <canvas id="sparkline-carteiras"></canvas>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Saldo Brasil -->
-      <div class="card card-gradient-success animate-fade-in" style="animation-delay: 100ms">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="font-semibold text-white">Saldo Brasil</h3>
-                <p class="text-sm text-white opacity-90">Mercado B3</p>
-              </div>
+      <div class="card-moderno p-6 animate-scale-in animate-delay-100 hover-lift group cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-success-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span class="text-2xl">🇧🇷</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-gray-900 group-hover:text-success-600 transition-colors">Saldo Brasil</h3>
+              <p class="text-sm text-gray-600">Mercado B3</p>
             </div>
           </div>
-          <div class="space-y-2">
-            <p class="text-3xl font-bold text-white" x-text="formatCurrency(resumo.saldo_brl, 'BRL')"></p>
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-white opacity-75">Variação:</span>
-              <span class="text-white font-medium" x-text="(resumo.variacao_brl >= 0 ? '+' : '') + resumo.variacao_brl.toFixed(2) + '%'"></span>
+          <div class="flex items-center gap-1">
+            <svg class="w-4 h-4 text-success-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+            <span class="text-success-600 font-bold text-sm" x-text="(resumo.variacao_brl >= 0 ? '+' : '') + resumo.variacao_brl.toFixed(2) + '%'">+0.00%</span>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <p class="text-3xl font-bold text-gray-900" x-text="formatCurrency(resumo.saldo_brl, 'BRL')">R$ 0</p>
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2">
+              <span class="text-gray-500">Variação:</span>
+              <span class="font-semibold text-success-600" x-text="(resumo.variacao_brl >= 0 ? '+' : '') + resumo.variacao_brl.toFixed(2) + '%'">+0.00%</span>
+            </div>
+            <div class="w-16 h-8">
+              <canvas id="sparkline-brasil"></canvas>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Saldo EUA -->
-      <div class="card card-gradient-info animate-fade-in" style="animation-delay: 200ms">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="font-semibold text-white">Saldo EUA</h3>
-                <p class="text-sm text-white opacity-90">Mercado NYSE/NASDAQ</p>
-              </div>
+      <div class="card-moderno p-6 animate-scale-in animate-delay-200 hover-lift group cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span class="text-2xl">🇺🇸</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-gray-900 group-hover:text-primary-600 transition-colors">Saldo EUA</h3>
+              <p class="text-sm text-gray-600">Mercado NYSE/NASDAQ</p>
             </div>
           </div>
-          <div class="space-y-2">
-            <p class="text-3xl font-bold text-white" x-text="formatCurrency(resumo.saldo_usd, 'USD')"></p>
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-white opacity-75">Variação:</span>
-              <span class="text-white font-medium" x-text="(resumo.variacao_usd >= 0 ? '+' : '') + resumo.variacao_usd.toFixed(2) + '%'"></span>
+          <div class="flex items-center gap-1">
+            <svg class="w-4 h-4 text-success-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+            <span class="text-success-600 font-bold text-sm" x-text="(resumo.variacao_usd >= 0 ? '+' : '') + resumo.variacao_usd.toFixed(2) + '%'">+0.00%</span>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <p class="text-3xl font-bold text-gray-900" x-text="formatCurrency(resumo.saldo_usd, 'USD')">$ 0</p>
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2">
+              <span class="text-gray-500">Variação:</span>
+              <span class="font-semibold text-success-600" x-text="(resumo.variacao_usd >= 0 ? '+' : '') + resumo.variacao_usd.toFixed(2) + '%'">+0.00%</span>
+            </div>
+            <div class="w-16 h-8">
+              <canvas id="sparkline-eua"></canvas>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Patrimônio Total -->
-      <div class="card card-gradient-warning animate-fade-in" style="animation-delay: 300ms">
-        <div class="p-6">
+      <div class="card-moderno p-6 bg-gradient-success text-white animate-scale-in animate-delay-300 hover-lift group cursor-pointer relative overflow-hidden">
+        <!-- Efeito de brilho -->
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform"></div>
+        
+        <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                </svg>
+              <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span class="text-2xl">💰</span>
               </div>
               <div>
-                <h3 class="font-semibold text-white">Patrimônio Total</h3>
-                <p class="text-sm text-white opacity-90">Consolidado</p>
+                <h3 class="font-bold text-white">Patrimônio Total</h3>
+                <p class="text-sm text-white/80">Consolidado</p>
               </div>
             </div>
+            <div class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg font-bold text-sm flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+              +1.9%
+            </div>
           </div>
-          <div class="space-y-2">
-            <p class="text-3xl font-bold text-white" x-text="formatCurrency(resumo.patrimonio_total, currentCurrency)"></p>
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-white opacity-75">Total investido:</span>
-              <span class="text-white font-medium" x-text="formatCurrency(resumo.total_investido, currentCurrency)"></span>
+          <div class="space-y-3">
+            <p class="text-3xl font-bold text-white" x-text="formatCurrency(resumo.patrimonio_total, currentCurrency)">R$ 0</p>
+            <div class="flex items-center justify-between text-sm">
+              <div class="flex items-center gap-2">
+                <span class="text-white/75">Total investido:</span>
+                <span class="text-white font-semibold" x-text="formatCurrency(resumo.total_investido, currentCurrency)">R$ 0</span>
+              </div>
+              <div class="w-16 h-8">
+                <canvas id="sparkline-patrimonio"></canvas>
+              </div>
             </div>
           </div>
         </div>
