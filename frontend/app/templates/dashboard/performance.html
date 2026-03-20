@@ -10,107 +10,118 @@
      x-data="performanceData()" 
      @currency-changed.window="handleCurrencyChange($event.detail)">
   
-  <!-- Header -->
-  <div class="bg-gradient-primary text-white">
-    <div class="container mx-auto px-6 py-12">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="display-3 mb-4">Performance e Rentabilidade</h1>
-          <p class="text-xl opacity-90">Análise completa do desempenho do seu patrimônio</p>
+  <!-- Hero Section Ultra-Moderna -->
+  <section class="bg-gradient-hero rounded-3xl mx-6 mt-6 p-8 text-white shadow-large animate-fade-in relative overflow-hidden">
+    <!-- Elementos Decorativos -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
+    
+    <div class="relative z-10">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse-slow">
+              <span class="text-3xl">📈</span>
+            </div>
+            <div>
+              <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                Performance
+              </h1>
+              <p class="text-xl text-white/80">Análise completa do desempenho do seu patrimônio</p>
+            </div>
+          </div>
         </div>
-        <div class="flex gap-4">
-          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10 hover:border-white/50">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Voltar
-          </a>
-          {% include 'components/forms/currency_toggle.html' %}
+        
+        <div class="mt-8 lg:mt-0 lg:ml-8">
+          <div class="flex flex-wrap gap-3">
+            <a href="/dashboard/" class="btn-secundario">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Voltar
+            </a>
+            {% include 'components/forms/currency_toggle.html' %}
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- Main Content -->
   <div class="container mx-auto px-6 py-8">
     
-    <!-- Cards de Métricas Principais -->
+    <!-- Cards de Métricas Ultra-Modernos -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <!-- Rentabilidade Total -->
-      <div class="card card-gradient-success animate-fade-in">
-        <div class="p-6">
+      <div class="card-moderno p-6 bg-gradient-success text-white animate-scale-in hover-lift group cursor-pointer relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform"></div>
+        <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                </svg>
+              <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span class="text-2xl">📊</span>
               </div>
               <div>
-                <h3 class="font-semibold text-white">Rentabilidade Total</h3>
-                <p class="text-sm text-white opacity-90">12 meses</p>
+                <h3 class="font-bold text-white">Rentabilidade Total</h3>
+                <p class="text-sm text-white/80">12 meses</p>
               </div>
             </div>
-            <span class="badge badge-white text-success-600">+18.5%</span>
+            <div class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg font-bold text-sm">+18.5%</div>
           </div>
-          <div class="space-y-2">
-            <p class="text-2xl font-bold text-white" x-text="formatCurrency(performance.rentabilidade_total.valor, currentCurrency)"></p>
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-white">CDI: +12.3%</span>
-              <span class="text-white opacity-75">vs</span>
-              <span class="text-white">IBOV: +15.2%</span>
+          <div class="space-y-3">
+            <p class="text-3xl font-bold text-white" x-text="formatCurrency(performance.rentabilidade_total.valor, currentCurrency)">R$ 0</p>
+            <div class="flex items-center gap-2 text-sm text-white/75">
+              <span>CDI: +12.3%</span>
+              <span>vs</span>
+              <span>IBOV: +15.2%</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Mês Atual -->
-      <div class="card card-gradient animate-fade-in" style="animation-delay: 100ms">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="font-semibold text-gray-900">Mês Atual</h3>
-                <p class="text-sm text-gray-600">Março 2024</p>
-              </div>
+      <div class="card-moderno p-6 animate-scale-in animate-delay-100 hover-lift group cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span class="text-2xl">📅</span>
             </div>
-            <span class="badge badge-success">+2.8%</span>
+            <div>
+              <h3 class="font-bold text-gray-900 group-hover:text-primary-600 transition-colors">Mês Atual</h3>
+              <p class="text-sm text-gray-600">Março 2024</p>
+            </div>
           </div>
-          <div class="space-y-2">
-            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(performance.mes_atual.valor, currentCurrency)"></p>
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-success">Melhor dia: +R$ 3.450</span>
-            </div>
+          <div class="bg-success-100 text-success-600 px-3 py-1 rounded-lg font-bold text-sm">+2.8%</div>
+        </div>
+        <div class="space-y-3">
+          <p class="text-3xl font-bold text-gray-900" x-text="formatCurrency(performance.mes_atual.valor, currentCurrency)">R$ 0</p>
+          <div class="flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4 text-success-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+            <span class="text-success-600 font-semibold">Melhor dia: +R$ 3.450</span>
           </div>
         </div>
       </div>
 
       <!-- Maior Ganhador -->
-      <div class="card card-gradient animate-fade-in" style="animation-delay: 200ms">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="font-semibold text-gray-900">Maior Ganhador</h3>
-                <p class="text-sm text-gray-600" x-text="performance.maior_ganhador.ticker"></p>
-              </div>
+      <div class="card-moderno p-6 animate-scale-in animate-delay-200 hover-lift group cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-success-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span class="text-2xl">🏆</span>
             </div>
-            <span class="badge badge-success" x-text="'+' + performance.maior_ganhador.percentual + '%'"></span>
+            <div>
+              <h3 class="font-bold text-gray-900 group-hover:text-success-600 transition-colors">Maior Ganhador</h3>
+              <p class="text-sm text-gray-600" x-text="performance.maior_ganhador.ticker">TICKER</p>
+            </div>
           </div>
-          <div class="space-y-2">
-            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(performance.maior_ganhador.valor, currentCurrency)"></p>
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-gray-600">Quantidade:</span>
+          <div class="bg-success-100 text-success-600 px-3 py-1 rounded-lg font-bold text-sm" x-text="'+' + performance.maior_ganhador.percentual + '%'">+0%</div>
+        </div>
+        <div class="space-y-3">
+          <p class="text-3xl font-bold text-gray-900" x-text="formatCurrency(performance.maior_ganhador.valor, currentCurrency)">R$ 0</p>
+          <div class="flex items-center gap-2 text-sm">
+            <span class="text-gray-500">Quantidade:</span>
               <span class="text-gray-900 font-medium" x-text="performance.maior_ganhador.quantidade"></span>
             </div>
           </div>
@@ -118,27 +129,26 @@
       </div>
 
       <!-- Maior Perdedor -->
-      <div class="card card-gradient-danger animate-fade-in" style="animation-delay: 300ms">
-        <div class="p-6">
+      <div class="card-moderno p-6 bg-gradient-to-br from-danger-500 to-danger-600 text-white animate-scale-in animate-delay-300 hover-lift group cursor-pointer relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform"></div>
+        <div class="relative z-10">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-danger-100 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-danger-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
-                </svg>
+              <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span class="text-2xl">📉</span>
               </div>
               <div>
-                <h3 class="font-semibold text-white">Maior Perdedor</h3>
-                <p class="text-sm text-white opacity-90" x-text="performance.maior_perdedor.ticker"></p>
+                <h3 class="font-bold text-white">Maior Perdedor</h3>
+                <p class="text-sm text-white/80" x-text="performance.maior_perdedor.ticker">TICKER</p>
               </div>
             </div>
-            <span class="badge badge-white text-danger-600" x-text="performance.maior_perdedor.percentual + '%'"></span>
+            <div class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg font-bold text-sm" x-text="performance.maior_perdedor.percentual + '%'">-0%</div>
           </div>
-          <div class="space-y-2">
-            <p class="text-2xl font-bold text-white" x-text="formatCurrency(performance.maior_perdedor.valor, currentCurrency)"></p>
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-white opacity-75">Quantidade:</span>
-              <span class="text-white font-medium" x-text="performance.maior_perdedor.quantidade"></span>
+          <div class="space-y-3">
+            <p class="text-3xl font-bold text-white" x-text="formatCurrency(performance.maior_perdedor.valor, currentCurrency)">R$ 0</p>
+            <div class="flex items-center gap-2 text-sm text-white/75">
+              <span>Quantidade:</span>
+              <span class="font-semibold text-white" x-text="performance.maior_perdedor.quantidade">0</span>
             </div>
           </div>
         </div>
