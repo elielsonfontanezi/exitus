@@ -93,9 +93,9 @@ module.exports = defineConfig({
 
   /* Servidor de desenvolvimento */
   webServer: {
-    command: 'cd ../../frontend && python run.py',
+    command: 'echo "Usando servidor existente em http://localhost:8080"',
     url: 'http://localhost:8080',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    reuseExistingServer: true,
+    timeout: 5 * 1000,
   },
 });

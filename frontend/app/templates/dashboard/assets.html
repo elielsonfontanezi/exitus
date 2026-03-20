@@ -1,124 +1,211 @@
 {% extends "base.html" %}
 {% block title %}Ativos - Exitus{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
 {% block content %}
-<div class="container mx-auto p-6 space-y-6">
+<div class="min-h-screen bg-gray-50" 
+     x-data="assetsData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
   
   <!-- Header -->
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900">
-        <i class="fas fa-layer-group text-blue-600 mr-3"></i>Ativos Monitorados
-      </h1>
-      <p class="text-gray-600 mt-1">Gerencie os ativos disponíveis para suas carteiras</p>
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Ativos Monitorados</h1>
+          <p class="text-xl opacity-90">Gerencie os ativos disponíveis para suas carteiras</p>
+        </div>
+        <div class="flex gap-4">
+          <button class="btn btn-white text-primary-600 hover:bg-primary-50 opacity-50 cursor-not-allowed" title="Em breve">
+            <i class="fas fa-plus mr-2"></i>Novo Ativo
+          </button>
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10 hover:border-white/50">
+            <i class="fas fa-arrow-left mr-2"></i>Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
     </div>
-    <!-- Botão Stub - Futuro: Abrir modal de cadastro -->
-    <button class="btn btn-primary opacity-50 cursor-not-allowed" title="Em breve">
-      <i class="fas fa-plus mr-2"></i>Novo Ativo
-    </button>
   </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
 
   <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-    <div class="card p-4 text-center hover:shadow-md transition bg-white border-l-4 border-blue-500">
-      <div class="text-2xl font-bold text-gray-800">{{ stats.total }}</div>
-      <div class="text-xs text-gray-500 uppercase font-bold mt-1">Total</div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+    <!-- Total -->
+    <div class="card card-elevated animate-fade-in">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-layer-group text-blue-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+        <h3 class="h3 mb-2">{{ stats.total }}</h3>
+        <p class="text-gray-600">Total de Ativos</p>
+      </div>
     </div>
-    <div class="card p-4 text-center hover:shadow-md transition bg-white">
-      <div class="text-2xl font-bold text-green-600">{{ stats.acoes }}</div>
-      <div class="text-xs text-gray-500 uppercase font-bold mt-1">Ações</div>
+
+    <!-- Ações -->
+    <div class="card card-elevated animate-fade-in">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-chart-line text-green-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+        <h3 class="h3 mb-2">{{ stats.acoes }}</h3>
+        <p class="text-gray-600">Ações</p>
+      </div>
     </div>
-    <div class="card p-4 text-center hover:shadow-md transition bg-white">
-      <div class="text-2xl font-bold text-yellow-600">{{ stats.fiis }}</div>
-      <div class="text-xs text-gray-500 uppercase font-bold mt-1">FIIs</div>
+
+    <!-- FIIs -->
+    <div class="card card-elevated animate-fade-in">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-building text-yellow-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+        <h3 class="h3 mb-2">{{ stats.fiis }}</h3>
+        <p class="text-gray-600">FIIs</p>
+      </div>
     </div>
-    <div class="card p-4 text-center hover:shadow-md transition bg-white">
-      <div class="text-2xl font-bold text-purple-600">{{ stats.etfs }}</div>
-      <div class="text-xs text-gray-500 uppercase font-bold mt-1">ETFs</div>
+
+    <!-- ETFs -->
+    <div class="card card-elevated animate-fade-in">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-coins text-purple-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+        <h3 class="h3 mb-2">{{ stats.etfs }}</h3>
+        <p class="text-gray-600">ETFs</p>
+      </div>
     </div>
-    <div class="card p-4 text-center hover:shadow-md transition bg-white">
-      <div class="text-2xl font-bold text-gray-600">{{ stats.bdrs }}</div>
-      <div class="text-xs text-gray-500 uppercase font-bold mt-1">BDRs</div>
+
+    <!-- BDRs -->
+    <div class="card card-elevated animate-fade-in">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-globe text-gray-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+        <h3 class="h3 mb-2">{{ stats.bdrs }}</h3>
+        <p class="text-gray-600">BDRs</p>
+      </div>
     </div>
   </div>
 
-  <!-- Filtros Visuais (apenas UI por enquanto) -->
-  <div class="card bg-white p-4 mb-6 flex flex-wrap gap-4 items-center">
-    <div class="flex items-center space-x-2">
-      <i class="fas fa-filter text-gray-400"></i>
-      <span class="text-sm font-semibold text-gray-600">Filtros:</span>
+  <!-- Filtros -->
+  <div class="card card-elevated mb-8">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="h3">Filtros</h3>
+        <button class="btn btn-ghost btn-sm">Limpar</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+          <select class="select select-bordered w-full" onchange="window.location.href='?tipo='+this.value">
+              <option value="todos" {% if filtros.tipo == 'todos' %}selected{% endif %}>Todos os Tipos</option>
+              <option value="ACAO" {% if filtros.tipo == 'ACAO' %}selected{% endif %}>Ações</option>
+              <option value="FII" {% if filtros.tipo == 'FII' %}selected{% endif %}>FIIs</option>
+              <option value="ETF" {% if filtros.tipo == 'ETF' %}selected{% endif %}>ETFs</option>
+          </select>
+        </div>
+      </div>
     </div>
-    <select class="select select-sm select-bordered w-40" onchange="window.location.href='?tipo='+this.value">
-        <option value="todos" {% if filtros.tipo == 'todos' %}selected{% endif %}>Todos os Tipos</option>
-        <option value="ACAO" {% if filtros.tipo == 'ACAO' %}selected{% endif %}>Ações</option>
-        <option value="FII" {% if filtros.tipo == 'FII' %}selected{% endif %}>FIIs</option>
-        <option value="ETF" {% if filtros.tipo == 'ETF' %}selected{% endif %}>ETFs</option>
-    </select>
   </div>
 
   <!-- Tabela de Ativos -->
-  <div class="card bg-white rounded-lg shadow-sm border border-gray-200">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Ticker</th>
-            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Nome</th>
-            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">Tipo</th>
-            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">Setor</th>
-            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">Cotação (R$)</th>
-            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">Ações</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          {% for ativo in ativos %}
-          <tr class="hover:bg-blue-50 transition-colors duration-150">
-            <td class="px-6 py-4">
-                <span class="font-bold text-gray-800 bg-gray-100 px-2 py-1 rounded text-sm">{{ ativo.ticker }}</span>
-            </td>
-            <td class="px-6 py-4 text-sm text-gray-600">
-                {{ ativo.nome }}
-            </td>
-            <td class="px-6 py-4 text-center">
-                <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                    {% if ativo.tipo == 'ACAO' %}bg-green-100 text-green-800
-                    {% elif ativo.tipo == 'FII' %}bg-yellow-100 text-yellow-800
-                    {% elif ativo.tipo == 'ETF' %}bg-purple-100 text-purple-800
-                    {% else %}bg-gray-100 text-gray-600{% endif %}">
-                    {{ ativo.tipo }}
-                </span>
-            </td>
-            <td class="px-6 py-4 text-center text-sm text-gray-500">
-                {{ ativo.setor }}
-            </td>
-            <td class="px-6 py-4 text-right font-mono text-sm">
-                {{ "%.2f"|format(ativo.cotacao) }}
-            </td>
-            <td class="px-6 py-4 text-right">
-                <button class="text-blue-500 hover:text-blue-700" title="Ver Detalhes">
-                    <i class="fas fa-chart-line"></i>
-                </button>
-            </td>
-          </tr>
-          {% else %}
-          <tr>
-            <td colspan="6" class="px-6 py-12 text-center text-gray-400">
-                <i class="fas fa-search text-3xl mb-3 block opacity-50"></i>
-                Nenhum ativo encontrado no banco de dados.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    
-    <!-- Footer / Paginação Simples -->
-    <div class="p-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center text-sm text-gray-500">
-        <span>Mostrando até 50 registros</span>
-        <div class="space-x-2">
-            <button class="btn btn-xs btn-outline disabled:opacity-50">Anterior</button>
-            <button class="btn btn-xs btn-outline">Próxima</button>
+  <div class="card card-elevated">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="h3">Lista de Ativos</h3>
+        <div class="flex gap-2">
+          <button class="btn btn-ghost btn-sm">
+            <i class="fas fa-download mr-2"></i>Exportar CSV
+          </button>
+          <button class="btn btn-ghost btn-sm">
+            <i class="fas fa-file-excel mr-2"></i>Exportar Excel
+          </button>
         </div>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Ticker</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-700">Nome</th>
+              <th class="text-center py-3 px-4 font-semibold text-gray-700">Tipo</th>
+              <th class="text-center py-3 px-4 font-semibold text-gray-700">Setor</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">Cotação (R$)</th>
+              <th class="text-center py-3 px-4 font-semibold text-gray-700">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ativo in ativos %}
+            <tr class="border-b border-gray-100 hover:bg-gray-50">
+              <td class="py-3 px-4">
+                <span class="badge badge-primary">{{ ativo.ticker }}</span>
+              </td>
+              <td class="py-3 px-4 text-gray-600">{{ ativo.nome }}</td>
+              <td class="py-3 px-4 text-center">
+                <span class="badge 
+                  {% if ativo.tipo == 'ACAO' %}badge-success
+                  {% elif ativo.tipo == 'FII' %}badge-warning
+                  {% elif ativo.tipo == 'ETF' %}badge-purple
+                  {% else %}badge-gray{% endif %}">
+                  {{ ativo.tipo }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-center text-gray-500">{{ ativo.setor }}</td>
+              <td class="py-3 px-4 text-right font-mono">{{ "%.2f"|format(ativo.cotacao) }}</td>
+              <td class="py-3 px-4 text-center">
+                <button class="btn btn-ghost btn-sm" title="Ver Detalhes">
+                  <i class="fas fa-chart-line"></i>
+                </button>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="py-12 text-center text-gray-400">
+                <i class="fas fa-search text-4xl mb-4 block opacity-50"></i>
+                <p class="text-lg">Nenhum ativo encontrado no banco de dados.</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Paginação -->
+      <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+        <div class="text-sm text-gray-500">
+          Mostrando até 50 registros
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-outline btn-sm" disabled>Anterior</button>
+          <button class="btn btn-outline btn-sm">Próxima</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
