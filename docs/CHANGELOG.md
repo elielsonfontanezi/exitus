@@ -29,6 +29,38 @@ e este projeto adere semanticamente à versão v0.8.0.
   - `ROADMAP.md` criado (unifica 5 roadmaps: backend, frontend, frontend_v2, testes, fase4)
   - `MULTICLIENTE.md` criado (unifica 4 partes: PARTE1, PARTE2A, PARTE2B, PARTE3)
 
+### Feature — Week 2 Navegação Simplificada (20/03/2026)
+
+- **Sidebar Moderno Implementado:**
+  - `sidebar_moderno.html`: Nova estrutura com 22→8 itens
+  - Agrupamento lógico: 4 áreas (Resumo, Operações, Análises, Config)
+  - Emojis grandes vs ícones pequenos (📊, 💰, 📈, ⚙️)
+  - Headers em caixa alta com tracking-wider
+  - Hover effects com chevron animado
+- **Busca Inteligente:**
+  - Barra de busca contextual com 6 atalhos (dash, cart, ati, comp, rel, conf)
+  - Resultados em tempo real com Alpine.js reativo
+  - Animações scale/opacity para resultados
+  - Placeholder "🔍 Buscar rápido..."
+- **Sub-Menus Contextuais:**
+  - Comprar/Vender → Oportunidades, Transações
+  - Proventos → Dividendos, Calendário
+  - Planos → Planos de Compra, Planos de Venda
+  - Análises → Análises Gerais, Alocação, Fluxo de Caixa, Comparador
+  - Chevron animado com rotate 180°
+- **Mobile-First:**
+  - `sidebar_mobile.html`: Versão otimizada para telas pequenas
+  - Menu hambúrguer com overlay e slide-in
+  - 85vw max-width, padding aumentado para touch
+  - Tipografia base (16px) para legibilidade
+  - Animações suaves de enter/leave
+- **Testes e Validação:**
+  - Screenshots: `sidebar-simplificado-week2.png`, `sidebar-contextual-busca-week2.png`, `mobile-menu-aberto-week2.png`
+  - Validação desktop/mobile: Todos os testes PASS
+  - Funcionalidades: Busca, sub-menus, responsividade
+- **Modelo IA:** SWE-1.5 (economia, simplicidade, responsividade)
+- **Próximo:** Week 3 - Dashboard Moderno
+
 ### Feature — Week 1 Design System Moderno (20/03/2026)
 
 - **Design System Implementado:**
@@ -52,7 +84,7 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Screenshots: `ux-design-system-week1.png`, `dashboard-modernizado-week1.png`
   - Todos os componentes funcionando sem erros
 - **Modelo IA:** Claude Sonnet (complexidade moderada CSS + componentes)
-- **Próximo:** Week 2 - Navegação simplificada (22→8 itens)
+- **Próximo:** Week 2 - Navegação Simplificada (22→8 itens)
 
 ### Feature — UX Evolution Roadmap Completo (20/03/2026)
 
