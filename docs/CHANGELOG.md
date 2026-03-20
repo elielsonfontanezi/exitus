@@ -29,6 +29,31 @@ e este projeto adere semanticamente à versão v0.8.0.
   - `ROADMAP.md` criado (unifica 5 roadmaps: backend, frontend, frontend_v2, testes, fase4)
   - `MULTICLIENTE.md` criado (unifica 4 partes: PARTE1, PARTE2A, PARTE2B, PARTE3)
 
+### Feature — Week 1 Design System Moderno (20/03/2026)
+
+- **Design System Implementado:**
+  - `design-system.css`: +454 linhas de CSS moderno
+  - Cores emocionais: Roxo (#8b5cf6), Laranja (#f59e0b) inspiradas em Nubank/PicPay
+  - Gradientes modernos: Hero, card, success com backdrop-blur
+  - Sombras profundas: soft, medium, strong para profundidade visual
+  - Bordas arredondadas: sm, md, lg, xl, 2xl (8px a 32px)
+- **Componentes Modernos:**
+  - Cards: `.card-moderno`, `.card-ativo`, `.card-metrica` com hover effects
+  - Botões: `.btn-primario`, `.btn-sucesso`, `.btn-acao` com scale/shadow
+  - Animações: fadeIn, slideUp, scaleIn, pulseSoft + delays progressivos
+  - Loading skeletons: Estados de carregamento elegantes
+- **Dashboard Modernizado:**
+  - Hero section: "Olá! 👋" com gradiente roxo vibrante
+  - Cards de mercado: 4 cards (BR 🇧🇷, US 🇺🇸, INTL 🌍, Total 💰)
+  - Emojis grandes e cores vibrantes
+  - Alpine.js corrigido: variáveis totalPatrimonio, variacaoMes, rentabilidadeGeral
+- **Testes e Validação:**
+  - Página de teste: `/dashboard/ux-test` com 8 seções de validação
+  - Screenshots: `ux-design-system-week1.png`, `dashboard-modernizado-week1.png`
+  - Todos os componentes funcionando sem erros
+- **Modelo IA:** Claude Sonnet (complexidade moderada CSS + componentes)
+- **Próximo:** Week 2 - Navegação simplificada (22→8 itens)
+
 ### Feature — UX Evolution Roadmap Completo (20/03/2026)
 
 - **Roadmap UX:**
@@ -43,7 +68,7 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Weeks 7-8: Testes e refinamento (A/B, polimento)
 - **Métricas de Sucesso:**
   - Tempo primeira ação: < 30 segundos
-  - Taxa de conclusão: > 85%
+  - Taxa conclusão: > 85%
   - Satisfação (NPS): > 70
   - Engajamento: +40% tempo na plataforma
 - **Documentação Atualizada:**
