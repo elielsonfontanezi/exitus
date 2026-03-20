@@ -3,47 +3,116 @@
 {% block title %}Alertas - Exitus{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6 space-y-6">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">
-                <i class="fas fa-bell text-yellow-500 mr-3"></i>Alertas e Notificações
-            </h1>
-            <p class="text-gray-600 mt-1">Monitore seus ativos e portfólios com alertas personalizados</p>
+<div class="min-h-screen bg-gray-50">
+  
+  <!-- Hero Section Ultra-Moderna -->
+  <section class="bg-gradient-hero rounded-3xl mx-6 mt-6 p-8 text-white shadow-large animate-fade-in relative overflow-hidden">
+    <!-- Elementos Decorativos -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
+    
+    <div class="relative z-10">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse-slow">
+              <span class="text-3xl">🔔</span>
+            </div>
+            <div>
+              <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                Alertas
+              </h1>
+              <p class="text-xl text-white/80">Monitore seus ativos e portfólios com alertas personalizados</p>
+            </div>
+          </div>
         </div>
-        <!-- ✅ BOTÃO VERMELHO - JS PURO -->
-        <button id="btn-novo-alerta" 
-                class="btn btn-primary flex items-center space-x-2 !border-4 !border-red-500 shadow-lg"
-                onclick="abrirModal()">
-            <i class="fas fa-plus"></i><span>Novo Alerta</span>
-        </button>
+        
+        <div class="mt-8 lg:mt-0 lg:ml-8">
+          <div class="flex flex-wrap gap-3">
+            <button id="btn-novo-alerta" onclick="abrirModal()" class="btn-primario">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Novo Alerta
+            </button>
+            <a href="/dashboard/" class="btn-secundario">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Voltar
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <!-- Stats Cards (Dinâmicos) -->
+  <div class="container mx-auto px-6 py-8">
+
+    <!-- Stats Cards Ultra-Modernos -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <!-- Total -->
-        <div class="card bg-white p-6 rounded-lg shadow-sm text-center border-l-4 border-blue-500">
-            <div class="text-3xl font-bold text-gray-800">{{ stats.total }}</div>
-            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1">Total Alertas</div>
+        <div class="card-moderno p-6 animate-scale-in hover-lift group cursor-pointer">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">🔔</span>
+                </div>
+                <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                    <span class="text-primary-600 font-bold text-sm">{{ stats.total }}</span>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-3xl font-bold text-gray-900">{{ stats.total }}</p>
+                <p class="text-sm text-gray-600">Total Alertas</p>
+            </div>
         </div>
 
         <!-- Ativos -->
-        <div class="card bg-white p-6 rounded-lg shadow-sm text-center border-l-4 border-green-500">
-            <div class="text-3xl font-bold text-green-600">{{ stats.ativos }}</div>
-            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1">Ativos</div>
+        <div class="card-moderno p-6 animate-scale-in animate-delay-100 hover-lift group cursor-pointer">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-success-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">✅</span>
+                </div>
+                <div class="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center">
+                    <span class="text-success-600 font-bold text-sm">{{ stats.ativos }}</span>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-3xl font-bold text-gray-900">{{ stats.ativos }}</p>
+                <p class="text-sm text-gray-600">Ativos</p>
+            </div>
         </div>
 
         <!-- Alta Preço -->
-        <div class="card bg-white p-6 rounded-lg shadow-sm text-center border-l-4 border-orange-500">
-            <div class="text-3xl font-bold text-orange-600">{{ stats.alta_preco }}</div>
-            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1">Alta Preço</div>
+        <div class="card-moderno p-6 animate-scale-in animate-delay-200 hover-lift group cursor-pointer">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-warning-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">📈</span>
+                </div>
+                <div class="w-8 h-8 bg-warning-100 rounded-full flex items-center justify-center">
+                    <span class="text-warning-600 font-bold text-sm">{{ stats.alta_preco }}</span>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-3xl font-bold text-gray-900">{{ stats.alta_preco }}</p>
+                <p class="text-sm text-gray-600">Alta Preço</p>
+            </div>
         </div>
 
         <!-- Acionados -->
-        <div class="card bg-white p-6 rounded-lg shadow-sm text-center border-l-4 border-purple-500">
-            <div class="text-3xl font-bold text-purple-600">{{ stats.acionados }}</div>
-            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1">Acionados</div>
+        <div class="card-moderno p-6 animate-scale-in animate-delay-300 hover-lift group cursor-pointer">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">⚡</span>
+                </div>
+                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <span class="text-purple-600 font-bold text-sm">{{ stats.acionados }}</span>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-3xl font-bold text-gray-900">{{ stats.acionados }}</p>
+                <p class="text-sm text-gray-600">Acionados</p>
+            </div>
         </div>
     </div>
 
