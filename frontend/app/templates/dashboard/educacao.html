@@ -10,26 +10,42 @@
      x-data="educacaoData()" 
      @currency-changed.window="handleCurrencyChange($event.detail)">
   
-  <!-- Header -->
-  <div class="bg-gradient-primary text-white">
-    <div class="container mx-auto px-6 py-12">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="display-3 mb-4">Educação e Insights</h1>
-          <p class="text-xl opacity-90">Aprenda e tome decisões mais inteligentes</p>
+  <!-- Hero Section Ultra-Moderna -->
+  <section class="bg-gradient-hero rounded-3xl mx-6 mt-6 p-8 text-white shadow-large animate-fade-in relative overflow-hidden">
+    <!-- Elementos Decorativos -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
+    
+    <div class="relative z-10">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse-slow">
+              <span class="text-3xl">🎓</span>
+            </div>
+            <div>
+              <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                Educação
+              </h1>
+              <p class="text-xl text-white/80">Aprenda e tome decisões mais inteligentes</p>
+            </div>
+          </div>
         </div>
-        <div class="flex gap-4">
-          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10 hover:border-white/50">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Voltar
-          </a>
-          {% include 'components/forms/currency_toggle.html' %}
+        
+        <div class="mt-8 lg:mt-0 lg:ml-8">
+          <div class="flex flex-wrap gap-3">
+            <a href="/dashboard/" class="btn-secundario">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Voltar
+            </a>
+            {% include 'components/forms/currency_toggle.html' %}
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- Main Content -->
   <div class="container mx-auto px-6 py-8">
