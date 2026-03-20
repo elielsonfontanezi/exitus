@@ -14,7 +14,7 @@
  Backend Fase 7: Produção 🎯 (próxima)
  Backend Fase 8: Futuro 📋
  Frontend V2.0: 17/17 telas ✅
- Frontend UX Evolution: 8 semanas 🎨 (novo)
+ Frontend UX Evolution: 4 semanas 🎨 (incremental)
  Testes E2E Fase 1: Setup + Smoke ✅
  Testes E2E Fase 2: Funcionais + UX ⏳
  Testes E2E Fase 3: Go-Live ⏳
@@ -176,20 +176,20 @@ Maio 2026:
 
 ---
 
-## 🎨 Frontend — UX Evolution (8 Semanas)
+## 🎨 Frontend — UX Evolution (4 Semanas)
 
 > **Status:** 📋 **Planejamento Completo** | **Início:** 20/03/2026 | **Modelo IA:** Sonnet  
-> **Objetivo:** Transformar sistema técnico → plataforma intuitiva para não-técnicos  
-> **Roadmap completo:** [UX_ROADMAP.md](UX_ROADMAP.md)
+> **Objetivo:** Modernizar interface tecnicista → design moderno para público geral  
+> **Roadmap completo:** [UX_ROADMAP.md](UX_ROADMAP.md) | **Implementação:** [UX_IMPLEMENTACAO_WEEK1.md](UX_IMPLEMENTACAO_WEEK1.md)
 
-### Fases de Implementação
+### Fases de Implementação - 4 Semanas
 
 | Semana | Fase | Status | Deliverables |
 |--------|------|--------|--------------|
-| **1-2** | Fundação UX | 📋 Planejado | Pesquisa, benchmarking, design system |
-| **3-4** | Navegação Simplificada | 📋 Planejado | Menu 22→8 itens, mobile-first |
-| **5-6** | Componentes Visuais | 📋 Planejado | Cards, dashboard simplificado |
-| **7-8** | Testes e Refinamento | 📋 Planejado | Testes A/B, polimento final |
+| **1** | Design System Moderno | 📋 Planejado | Cores emocionais, tipografia, componentes |
+| **2** | Navegação Simplificada | 📋 Planejado | Menu 22→8 itens, abas contextuais |
+| **3** | Dashboard Moderno | 📋 Planejado | Hero section, cards, ações rápidas |
+| **4** | Polimento e Testes | 📋 Planejado | Animações, A/B testes, performance |
 
 ### Transformação Principal
 

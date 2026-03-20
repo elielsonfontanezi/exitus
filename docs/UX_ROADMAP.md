@@ -2,107 +2,125 @@
 
 ## 📋 Visão Geral
 
-**Objetivo:** Transformar o Exitus de um sistema técnico para uma plataforma intuitiva para investidores não-técnicos.
+**Objetivo:** Modernizar a interface do Exitus de um design tecnicista para um visual moderno e amigável para público geral.
 
-**Público-Alvo:** Investidores iniciantes, pessoas físicas, usuários que buscam simplicidade.
+**Público-Alvo:** Qualquer pessoa (público geral) que deseja uma interface clara e intuitiva, sem necessidade de conhecimento especializado em negócios ou finanças.
 
-**Timeline:** 8 semanas (2 meses)
+**Timeline:** 4 semanas (1 mês) - Abordagem Incremental
 
 ---
 
-## 🎯 Fases de Implementação
+## 🎯 Fases de Implementação - 4 Semanas Incrementais
 
-### **📅 SEMANA 1-2: Fundação UX**
+### **📅 SEMANA 1: Design System Moderno**
 
-#### **Sprint 1: Análise e Planejamento**
-- [ ] **Pesquisa de Usuário**
-  - Entrevistas com 5-10 investidores não-técnicos
-  - Mapeamento de journey map atual
-  - Identificação de pain points principais
-
-- [ ] **Benchmarking**
-  - Análise de Nubank, Inter, PicPay, Mercado Bitcoin
-  - Documentação de best practices de UX financeiro
-  - Criação de mood board visual
-
-- [ ] **Arquitetura de Informação**
-  - Redefinição do sitemap (22 → 8 itens principais)
-  - Agrupamento lógico de funcionalidades
-  - Hierarquia de navegação simplificada
-
-#### **Sprint 2: Design System Base**
+#### **Dia 1-2: Fundação Visual**
 - [ ] **Cores Emocionais**
-  ```css
-  :root {
-    --sucesso: #10b981;    /* verde para lucros */
-    --atencao: #f59e0b;    /* laranja para alertas */
-    --perigo: #ef4444;     /* vermelho para perdas */
-    --calma: #3b82f6;      /* azul para informações */
-    --gradiente-primario: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  }
-  ```
+  - Implementar palette inspirada em apps populares
+  - Adicionar gradientes suaves e modernos
+  - Definir cores semânticas (sucesso, perigo, atenção)
 
 - [ ] **Tipografia Acessível**
-  - Títulos: 24-32px (vs 16-20px atual)
-  - Textos: 16-18px (vs 14px atual)
-  - Contrast ratio 4.5:1 mínimo
+  - Aumentar escala tipográfica (16px → 24px títulos)
+  - Garantir contrast ratio 4.5:1 mínimo
+  - Criar hierarquia clara de informações
 
-- [ ] **Componentes Base**
-  - Cards grandes e clicáveis
-  - Botões com estados claros
-  - Ícones de 24px mínimos
+#### **Dia 3-4: Componentes Base**
+- [ ] **Cards Modernos**
+  - Criar componentes de card grandes e clicáveis
+  - Implementar sombras suaves e bordas arredondadas
+  - Adicionar hover states e microinterações
 
----
+- [ ] **Botões e Ícones**
+  - Redesenhar botões com estados claros
+  - Implementar ícones de 24px mínimos
+  - Adicionar cores de contexto (primário, secundário)
 
-### **📅 SEMANA 3-4: Navegação Simplificada**
+#### **Dia 5: Animações e Transições**
+- [ ] **Microinterações**
+  - Implementar animações suaves (fade-in, slide-up)
+  - Adicionar hover states em todos elementos interativos
+  - Criar loading skeletons
 
-#### **Sprint 3: Menu Reestruturado**
-- [ ] **Nova Estrutura de Menu**
-  ```
-  📊 VISÃO RÁPIDA
-  • Resumo (Dashboard)
-  • Meus Investimentos
-  
-  💰 OPERAÇÕES
-  • Comprar Ativos
-  • Vender Ativos
-  • Depositar/Sacar
-  
-  📈 ANÁLISES
-  • Desempenho
-  • Oportunidades
-  • Alertas
-  
-  ⚙️ CONFIGURAÇÕES
-  • Relatórios
-  • Perfil
-  ```
+### **📅 SEMANA 2: Navegação Simplificada**
+
+#### **Dia 1-2: Menu Inteligente**
+- [ ] **Redução 22→8 itens**
+  - Agrupar funcionalidades logicamente
+  - Criar 4 áreas principais (Resumo, Operações, Análises, Config)
+  - Implementar navegação por contexto
 
 - [ ] **Navegação por Abas**
-  - Abas horizontais principais
-  - Indicador de seção ativa
-  - Breadcrumbs para contexto
+  - Implementar abas horizontais principais
+  - Adicionar indicador de seção ativa
+  - Criar breadcrumbs para contexto
 
-- [ ] **Busca Inteligente**
-  - Barra de pesquisa proeminente
-  - Sugestões autocomplete
-  - Filtros rápidos (Ações, FIIs, etc.)
+#### **Dia 3-4: Sub-menu Contextual**
+- [ ] **Menu Dinâmico**
+  - Implementar sub-menu que aparece suavemente
+  - Adicionar busca inteligente
+  - Criar filtros rápidos por categoria
 
-#### **Sprint 4: Interface Mobile-First**
+#### **Dia 5: Mobile-First**
 - [ ] **Layout Responsivo**
-  - Cards em grid (vs tabela atual)
-  - Menu hambúrguer para mobile
-  - Botões flutuantes de ação
+  - Adaptar navegação para mobile
+  - Implementar menu hambúrguer
+  - Otimizar toques e gestos
 
-- [ ] **Gestos e Interações**
-  - Swipe entre cards
-  - Pull-to-refresh
-  - Tap-and-hold para menus
+### **📅 SEMANA 3: Dashboard Moderno**
 
-- [ ] **Performance Mobile**
-  - Lazy loading de conteúdo
-  - Imagens otimizadas
-  - Cache inteligente
+#### **Dia 1-2: Hero Section**
+- [ ] **Saudação Personalizada**
+  - Implementar "Olá, João! 👋" com dados reais
+  - Adicionar cards de métricas principais
+  - Criar gradiente hero section
+
+#### **Dia 3-4: Cards de Ativos**
+- [ ] **Tabela→Cards**
+  - Converter tabela de ativos para cards visuais
+  - Implementar grid responsivo
+  - Adicionar informações contextuais
+
+#### **Dia 5: Ações Rápidas**
+- [ ] **Botões Flutuantes**
+  - Implementar botões de ação rápida (Comprar, Vender, Depositar)
+  - Adicionar oportunidades em destaque
+  - Criar fluxo simplificado
+
+### **📅 SEMANA 4: Polimento e Testes**
+
+#### **Dia 1-2: Componentes Avançados**
+- [ ] **Gráficos Modernos**
+  - Atualizar gráficos com cores emocionais
+  - Implementar tooltips e interações
+  - Adicionar legendas claras
+
+- [ ] **Alertas e Notificações**
+  - Redesenhar sistema de alertas
+  - Implementar notificações contextuais
+  - Adicionar badges e indicadores
+
+#### **Dia 3-4: Testes e Validação**
+- [ ] **Testes A/B**
+  - Testar cores (emocionais vs corporativas)
+  - Testar layout (cards vs tabela)
+  - Testar navegação (menu vs abas)
+
+- [ ] **Performance e Acessibilidade**
+  - Otimizar tempo de carregamento
+  - Validar WCAG 2.1 AA
+  - Testar navegação por teclado
+
+#### **Dia 5: Documentação e Deploy**
+- [ ] **Documentação Atualizada**
+  - Atualizar ROADMAP.md com progresso
+  - Documentar novos componentes
+  - Criar guia de estilo
+
+- [ ] **Deploy Gradual**
+  - Implementar feature flags
+  - Rollout para 10% usuários
+  - Monitorar métricas
 
 ---
 
@@ -158,18 +176,18 @@
 
 ---
 
-### **📅 SEMANA 7-8: Refinamento e Testes**
+### **📅 SEMANA 7-8: Refinamento e Implementação**
 
-#### **Sprint 7: Testes com Usuários**
+#### **Sprint 7: Testes Visuais**
 - [ ] **Testes A/B**
   - Layout dashboard (cards vs tabela)
   - Cores (emocionais vs corporativas)
   - Navegação (menu vs abas)
 
-- [ ] **Usabilidade**
-  - Testes com 10 usuários não-técnicos
-  - Gravação de sessões
-  - Análise de heatmaps
+- [ ] **Validação Interna**
+  - Testes de usabilidade com equipe
+  - Revisão de acessibilidade
+  - Validação de responsividade
 
 - [ ] **Acessibilidade**
   - Leitor de tela (VoiceOver/TalkBack)
