@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Dashboard - Exitus{% endblock %}
 
+{% block extra_css %}
+<style>
+    body {
+        background: #f5f5f5 !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mx-auto max-w-7xl py-6" x-data="dashboardV2()" x-init="init()">
     
@@ -30,8 +38,8 @@
             <div class="label">Saldo em Caixa</div>
             <div class="valor" x-text="moedaAtual === 'BRL' ? formatMoney(saldoCaixa.saldo_total_brl) : '$' + saldoCaixa.saldo_usd.toFixed(2)">R$ 0,00</div>
             <div class="variacao">
-                <button @click="toggleMoeda()" class="text-sm hover:underline" style="color: #a38c65;">
-                    <span x-text="moedaAtual">BRL</span> ⇄
+                <button @click="toggleMoeda()" class="px-3 py-1 rounded" style="background: #a38c65; color: white; font-weight: 600;">
+                    <span x-text="moedaAtual">BRL</span> ⇄ <span x-text="moedaAtual === 'BRL' ? 'USD' : 'BRL'">USD</span>
                 </button>
             </div>
         </div>
@@ -191,14 +199,18 @@ function dashboardV2() {
         
         async carregarDados() {
             const token = localStorage.getItem('access_token');
-            if (!token) return;
+            if (!token) {
+                console.warn('Token não encontrado');
+                return;
+            }
             
             try {
+                const baseUrl = 'http://localhost:5000';
                 const [resDash, resCaixa, resAlertas, resTrx] = await Promise.all([
-                    fetch('/api/portfolios/dashboard', { headers: { 'Authorization': `Bearer ${token}` }}),
-                    fetch('/api/carteira/saldo-caixa', { headers: { 'Authorization': `Bearer ${token}` }}),
-                    fetch('/api/alertas/recentes?limit=3', { headers: { 'Authorization': `Bearer ${token}` }}),
-                    fetch('/api/transacoes/recentes?limit=5', { headers: { 'Authorization': `Bearer ${token}` }})
+                    fetch(`${baseUrl}/api/portfolios/dashboard`, { headers: { 'Authorization': `Bearer ${token}` }}),
+                    fetch(`${baseUrl}/api/carteira/saldo-caixa`, { headers: { 'Authorization': `Bearer ${token}` }}),
+                    fetch(`${baseUrl}/api/alertas/recentes?limit=3`, { headers: { 'Authorization': `Bearer ${token}` }}),
+                    fetch(`${baseUrl}/api/transacoes/recentes?limit=5`, { headers: { 'Authorization': `Bearer ${token}` }})
                 ]);
                 
                 const [dataDash, dataCaixa, dataAlertas, dataTrx] = await Promise.all([
