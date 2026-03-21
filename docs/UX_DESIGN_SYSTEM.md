@@ -2,13 +2,16 @@
 
 > **Consolidado de:** UX_MODERNIZACAO.md + UX_IMPLEMENTACAO_WEEK1.md + UX_BENCHMARKING.md  
 > **Data:** 21/03/2026  
-> **Status:** ✅ Implementado (100%)
+> **Status:** 🔄 **Atualizado com Inspiração Investidor10**  
+> **Implementação:** Pendente
+> 
+> **📌 IMPORTANTE:** Verifique **UX_PLANO_EXECUCAO.md** para a metodologia de implementação interativa!
 
 ---
 
 ## 📋 Visão Geral
 
-Transformar interface tecnicista → design moderno para público geral, inspirado nos melhores apps financeiros (Nubank, Inter, PicPay, Mercado Bitcoin).
+Transformar interface tecnicista → design moderno para público geral, inspirado no **Investidor10** (referência principal) e apps financeiros (Nubank, Inter, PicPay).
 
 **Público-alvo:** Qualquer pessoa (sem necessidade de conhecimento especializado)
 
@@ -44,7 +47,313 @@ Transformar interface tecnicista → design moderno para público geral, inspira
 
 ---
 
-## 🌈 Design System Implementado
+## � **Inspiração Principal - Investidor10**
+
+### ✅ **Por que Investidor10?**
+- **Denso mas organizado** - Muita informação visível sem sobrecarga
+- **Tipografia limpa** - Nunito, legível e profissional
+- **Cores sóbrias** - Dourado/marrom (#A38C65) como primária
+- **Design plano** - Sem gradientes excessivos
+- **Layout eficiente** - Informação densa mas escaneável
+
+### 🎨 **Características Visuais Identificadas**
+
+**1. Paleta de Cores:**
+```css
+:root {
+  /* Cores Principais - Inspiração Investidor10 */
+  --color-primary-50: #f8f6f3;
+  --color-primary-500: #a38c65;  /* Dourado/marrom */
+  --color-primary-600: #8b7454;
+  --color-primary-700: #735c43;
+  
+  /* Cores de Fundo */
+  --color-background: #ffffff;
+  --color-surface: #f8f9fa;
+  --color-border: #e9ecef;
+  
+  /* Cores Semânticas */
+  --color-success: #28a745;  /* Verde padrão */
+  --color-danger: #dc3545;   /* Vermelho padrão */
+  --color-text: #212529;     /* Texto principal */
+  --color-text-muted: #6c757d; /* Texto secundário */
+}
+```
+
+**2. Tipografia:**
+```css
+/* Fonte Principal - Nunito (como Investidor10) */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+:root {
+  --font-family: 'Nunito', sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+}
+```
+
+**3. Padrões de Layout:**
+
+### Opção A: Cards Originais Investidor10 (Preservados)
+```css
+/* Cards Compactos (estilo Investidor10 original) */
+.card-ativo-original {
+  background: white;
+  border: none;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 66px;
+  width: 100%;
+  font-size: 16px;
+}
+
+.card-ativo-original:hover {
+  background: #f8f9fa;
+}
+
+/* Layout ultra-denso: ticker + preço + variação + 15+ campos */
+.card-ativo-original span {
+  padding: 0 8px;
+  border-right: 1px solid #f1f3f4;
+}
+```
+
+### Padrão: Cards Modulares (Implementação)
+```css
+/* Cards Compactos (estilo Investidor10 melhorado) - PADRÃO */
+.card-ativo {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.card-ativo:hover {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 2px 8px rgba(163, 140, 101, 0.1);
+}
+
+/* Links e Elementos Interativos */
+.link-primary {
+  color: var(--color-primary-500);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link-primary:hover {
+  color: var(--color-primary-600);
+  text-decoration: underline;
+}
+```
+
+**4. Componentes Específicos (Observados no Site):**
+
+```css
+/* Quadros de Seção (Ex: "Tudo sobre Fundos Imobiliários") */
+.section-box {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 24px;
+  margin: 16px 0;
+}
+
+.section-box h2 {
+  color: var(--color-primary-500);
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--color-primary-500);
+  padding-bottom: 8px;
+}
+
+/* Tabelas de Dados (Estilo Investidor10) */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  font-size: 14px;
+}
+
+.data-table tr {
+  background: white;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.data-table td {
+  padding: 8px 15px;
+  text-align: left;
+  border: none;
+}
+
+.data-table tr:hover {
+  background: #f8f9fa;
+}
+
+/* Gráficos e Charts */
+.chart-container {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.chart-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 12px;
+}
+
+/* Menu de Navegação (Header) */
+.nav-menu {
+  background: #212529;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nav-menu a {
+  color: white;
+  text-decoration: none;
+  padding: 12px 16px;
+  font-weight: 400;
+  transition: background 0.2s;
+}
+
+.nav-menu a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Dropdown Menu (Estilo Investidor10) */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  color: white;
+  text-decoration: none;
+  padding: 12px 16px;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-toggle::after {
+  content: '▼';
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.dropdown.active .dropdown-toggle::after {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.dropdown.active .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-section {
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.dropdown-section:last-child {
+  border-bottom: none;
+}
+
+.dropdown-section h3 {
+  color: var(--color-primary-500);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 4px 16px;
+  margin: 0;
+}
+
+.dropdown-item {
+  display: block;
+  color: var(--color-text);
+  text-decoration: none;
+  padding: 8px 16px 8px 24px;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+  color: var(--color-primary-500);
+}
+
+.dropdown-item i {
+  margin-right: 8px;
+  width: 12px;
+  text-align: center;
+}
+
+/* Cards de Notificação/Alerta */
+.notification-card {
+  background: white;
+  border-left: 4px solid var(--color-primary-500);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin: 8px 0;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.notification-time {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+```
+
+---
+
+## �� Design System Implementado
 
 ### Paleta Emocional (Inspirada em Apps Populares)
 

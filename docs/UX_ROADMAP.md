@@ -2,11 +2,43 @@
 
 ## 📋 Visão Geral
 
-**Objetivo:** Modernizar a interface do Exitus de um design tecnicista para um visual moderno e amigável para público geral.
+**Objetivo:** Modernizar a interface do Exitus de um design tecnicista para um visual moderno e amigável para público geral, **inspirado no Investidor10**.
 
 **Público-Alvo:** Qualquer pessoa (público geral) que deseja uma interface clara e intuitiva, sem necessidade de conhecimento especializado em negócios ou finanças.
 
+**Referência Principal:** Investidor10.com.br - Design denso mas organizado, tipografia Nunito, cores sóbrias (dourado/marrom).
+
 **Timeline:** 4 semanas (1 mês) - Abordagem Incremental
+
+---
+
+## 📚 **Documentos de Referência**
+
+### **Controle e Execução:**
+- **UX_ROADMAP.md** ← *Este documento* (controle geral, fases, entregas)
+- **UX_ESTRUTURA_PROPOSTA.md** ← *Estrutura detalhada, layouts, componentes*
+
+### **Design System:**
+- **UX_DESIGN_SYSTEM.md** ← *Padrões visuais, cores, tipografia, CSS*
+
+### **Análise Histórica:**
+- **UX_ANALISE_COMPLETA_OPUS.md** ← *Análise completa, decisões, raciocínio*
+
+---
+
+## 🔄 **Fluxo de Trabalho**
+
+```
+UX_ROADMAP.md (Controle)
+    ↓
+UX_ESTRUTURA_PROPOSTA.md (Estrutura)
+    ↓
+UX_DESIGN_SYSTEM.md (Implementação)
+    ↓
+Código Frontend
+```
+
+> **📌 IMPORTANTE:** Verifique **UX_PLANO_EXECUCAO.md** para a metodologia interativa completa de implementação tela a tela!
 
 ---
 
@@ -15,26 +47,26 @@
 ### **📅 SEMANA 1: Design System Moderno**
 
 #### **Dia 1-2: Fundação Visual**
-- [ ] **Cores Emocionais**
-  - Implementar palette inspirada em apps populares
-  - Adicionar gradientes suaves e modernos
-  - Definir cores semânticas (sucesso, perigo, atenção)
+- [ ] **Cores Investidor10**
+  - Implementar palette dourado/marrom (#A38C65) como primária
+  - Cores sóbrias e profissionais (sem gradientes excessivos)
+  - Definir cores semânticas (sucesso verde, perigo vermelho)
 
-- [ ] **Tipografia Acessível**
-  - Aumentar escala tipográfica (16px → 24px títulos)
-  - Garantir contrast ratio 4.5:1 mínimo
-  - Criar hierarquia clara de informações
+- [ ] **Tipografia Nunito**
+  - Implementar fonte Nunito (como Investidor10)
+  - Escala: 16px base, 24px títulos
+  - Pesos: 400 (normal), 600 (semibold), 700 (bold)
 
 #### **Dia 3-4: Componentes Base**
-- [ ] **Cards Modernos**
-  - Criar componentes de card grandes e clicáveis
-  - Implementar sombras suaves e bordas arredondadas
-  - Adicionar hover states e microinterações
+- [ ] **Cards Compactos (Estilo Investidor10)**
+  - Cards densos mas organizados (ticker + preço + variação)
+  - Borda simples (1px) com hover sutil
+  - Layout horizontal para máxima eficiência
 
-- [ ] **Botões e Ícones**
-  - Redesenhar botões com estados claros
-  - Implementar ícones de 24px mínimos
-  - Adicionar cores de contexto (primário, secundário)
+- [ ] **Links e Botões**
+  - Links dourado/marrom com hover underline
+  - Botões sóbrios sem gradientes
+  - Focus states claros e acessíveis
 
 #### **Dia 5: Animações e Transições**
 - [ ] **Microinterações**
@@ -44,10 +76,24 @@
 
 ### **📅 SEMANA 2: Navegação Simplificada**
 
-#### **Dia 1-2: Menu Inteligente**
-- [ ] **Redução 22→8 itens**
-  - Agrupar funcionalidades logicamente
-  - Criar 4 áreas principais (Resumo, Operações, Análises, Config)
+#### **Dia 1-2: Menu Horizontal com Dropdowns (Estilo Investidor10)**
+- [ ] **Header Escuro com Dropdowns**
+  - Background #212529 (preto suave)
+  - Links brancos com hover rgba(255,255,255,0.1)
+  - Logo à esquerda, menu centralizado
+  - Dropdowns com setas ▼ animadas
+
+- [ ] **Estrutura de Dropdowns**
+  - Visão Geral | Operações | Ativos | Análises | Relatórios | Ferramentas
+  - Subcategorias organizadas por seção
+  - Ícones discretos para itens (Font Awesome)
+  - Busca proeminente no header
+
+- [ ] **Comportamento dos Dropdowns**
+  - Aparecem com fade + slide suave
+  - Background branco com borda #e9ecef
+  - Sombra 0 4px 12px rgba(0,0,0,0.15)
+  - Seções com títulos em dourado/marrom
   - Implementar navegação por contexto
 
 - [ ] **Navegação por Abas**
@@ -67,13 +113,41 @@
   - Implementar menu hambúrguer
   - Otimizar toques e gestos
 
-### **📅 SEMANA 3: Dashboard Moderno**
+### **📅 SEMANA 3: Layout Denso e Gráficos**
 
-#### **Dia 1-2: Hero Section**
-- [ ] **Saudação Personalizada**
-  - Implementar "Olá, João! 👋" com dados reais
-  - Adicionar cards de métricas principais
-  - Criar gradiente hero section
+#### **Dia 1-2: Tabelas de Dados (Estilo Investidor10)**
+- [ ] **Tabelas Limpas**
+  - Fundo branco, sem bordas externas
+  - Linhas separadas por border-bottom #f1f3f4
+  - Padding: 8px 15px nas células
+  - Hover: background #f8f9fa
+
+- [ ] **Gráficos e Charts**
+  - Container branco com border 1px #e9ecef
+  - Título 16px, weight 600
+  - Sem animações excessivas
+  - Cores sóbrias e profissionais
+
+#### **Dia 3-4: Quadros de Conteúdo**
+- [ ] **Section Boxes**
+  - Background #f8f9fa
+  - Border 1px #e9ecef, border-radius 8px
+  - Título com border-bottom 2px primária
+  - Padding 24px interno
+
+#### **Dia 5: Cards de Notificação**
+- [ ] **Alertas e Updates**
+  - Border-left 4px cor primária
+  - Box-shadow sutil 0 2px 4px rgba(0,0,0,0.1)
+  - Título + timestamp (12px, muted)
+
+### **📅 SEMANA 4: Mobile-First**
+
+#### **Dia 1-2: Layout Adaptativo**
+- [ ] **Mobile-First Approach**
+  - Desenhar para mobile primeiro (320px+)
+  - Adaptar para desktop (1024px+)
+  - Testar em tablets intermediários section
 
 #### **Dia 3-4: Cards de Ativos**
 - [ ] **Tabela→Cards**
@@ -307,17 +381,39 @@
 
 ## 🎯 Deliverables por Sprint
 
-| Sprint | Deliverable | Status |
-|--------|-------------|--------|
-| 1 | Pesquisa de usuários | 🔲 Planejado |
-| 1 | Benchmarking UX | 🔲 Planejado |
-| 2 | Design System v1 | 🔲 Planejado |
-| 3 | Menu simplificado | 🔲 Planejado |
-| 4 | Layout mobile-first | 🔲 Planejado |
-| 5 | Cards de ativos | 🔲 Planejado |
-| 6 | Dashboard simplificado | 🔲 Planejado |
-| 7 | Testes A/B | 🔲 Planejado |
-| 8 | Documentação completa | 🔲 Planejado |
+| Sprint | Deliverable | Documento | Status |
+|--------|-------------|-----------|--------|
+| 1 | Pesquisa de usuários | UX_ROADMAP.md | 🔲 Planejado |
+| 1 | Benchmarking UX (Investidor10) | UX_ANALISE_COMPLETA_OPUS.md | 🟡 **Concluído** |
+| 2 | Design System v1 (Inspiração I10) | UX_DESIGN_SYSTEM.md | 🟡 **Atualizado** |
+| 3 | Estrutura de navegação | UX_ESTRUTURA_PROPOSTA.md | � **Atualizado** |
+| 4 | Menu horizontal dropdowns | UX_ESTRUTURA_PROPOSTA.md | � **Proposto** |
+| 5 | Cards modulares (padrão) | UX_DESIGN_SYSTEM.md | � **Definido** |
+| 6 | Layout responsivo | UX_ESTRUTURA_PROPOSTA.md | 🟡 **Proposto** |
+| 7 | Implementação CSS | UX_DESIGN_SYSTEM.md | 🔲 Pendente |
+| 8 | Testes e validação | UX_ROADMAP.md | 🔲 Pendente |
+
+---
+
+## 📊 **Painel de Controle**
+
+### ✅ **Concluído:**
+- [x] Análise completa Investidor10
+- [x] Design system cores + tipografia
+- [x] Estrutura de navegação proposta
+- [x] Menu horizontal com dropdowns
+- [x] Padrão de cards definidos
+
+### 🔄 **Em Andamento:**
+- [ ] Implementação CSS no código
+- [ ] Aplicação nos templates
+- [ ] Testes visuais
+
+### ⏳ **Próximos Passos:**
+1. Implementar CSS (UX_DESIGN_SYSTEM.md)
+2. Aplicar estrutura (UX_ESTRUTURA_PROPOSTA.md)
+3. Validar com usuários
+4. Iterar conforme feedback
 
 ---
 
