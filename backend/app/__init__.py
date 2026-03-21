@@ -125,6 +125,14 @@ def create_app(testing=False):
     from .blueprints.evento_corporativo_blueprint import evento_bp
     app.register_blueprint(evento_bp)
 
+    # 🆕 Carteira (Dashboard v2 - UX)
+    try:
+        from .blueprints.carteira_blueprint import carteira_bp
+        app.register_blueprint(carteira_bp)
+        print("✅ Carteira blueprint registrado: /api/carteira/*")
+    except ImportError as e:
+        print(f"⚠️  Carteira blueprint não encontrado: {e}")
+
     # 🆕 Portfolio consolidado (M7)
     # 🆕 Portfolio consolidado (M7)
     try:

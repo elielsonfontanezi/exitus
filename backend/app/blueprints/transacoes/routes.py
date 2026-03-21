@@ -177,3 +177,47 @@ def get_resumo_ativo(ativo_id):
         return error(str(e), e.http_status)
     except Exception as e:
         return error(f'Erro ao buscar resumo: {str(e)}', 500)
+
+
+# -----------------------------------------------------------------------
+# GET /api/transacoes/recentes
+# Dashboard v2: Últimas operações
+# -----------------------------------------------------------------------
+@bp.route('/recentes', methods=['GET'])
+@jwt_required()
+def get_transacoes_recentes():
+    """
+    Retorna últimas transações do usuário.
+    
+    Query params:
+        - limit: Número máximo de transações (default: 5)
+    
+    Returns:
+        Lista das últimas transações ordenadas por data
+    """
+    usuario_id = get_jwt_identity()
+    limit = request.args.get('limit', 5, type=int)
+    
+    try:
+        # Buscar últimas transações
+        pagination = TransacaoService.get_all(
+            usuario_id=usuario_id,
+            page=1,
+            per_page=limit,
+            tipo=None,
+            ativo_id=None,
+            corretora_id=None,
+            data_inicio=None,
+            data_fim=None
+        )
+        
+        # Formatar resposta
+        schema = TransacaoListSchema()
+        result = schema.dump(pagination)
+        
+        return success(result, f'{len(result.get("items", []))} transação(ões) recente(s)')
+        
+    except ExitusError as e:
+        return error(str(e), e.http_status)
+    except Exception as e:
+        return error(f'Erro ao buscar transações recentes: {str(e)}', 500)

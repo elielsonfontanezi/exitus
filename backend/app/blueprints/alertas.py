@@ -47,6 +47,48 @@ def criar_alerta():
         print(f"Erro criar alerta: {e}")
         return jsonify({"success": False, "message": str(e)}), 500
 
+@bp.route('/recentes', methods=['GET'])
+@jwt_required()
+def listar_alertas_recentes():
+    """
+    Retorna alertas disparados recentemente.
+    
+    Query params:
+        - limit: Número máximo de alertas (default: 5)
+    
+    Returns:
+        Lista de alertas disparados ordenados por data
+    """
+    try:
+        usuario_id = UUID(get_jwt_identity())
+        limit = request.args.get('limit', 5, type=int)
+        
+        # Buscar alertas ativos disparados recentemente
+        alertas = ConfiguracaoAlerta.query.filter_by(
+            usuario_id=usuario_id,
+            ativo=True
+        ).order_by(
+            ConfiguracaoAlerta.timestamp_criacao.desc()
+        ).limit(limit).all()
+        
+        result = [{
+            'id': str(a.id),
+            'nome': a.nome,
+            'tipo': a.tipo_alerta,
+            'mensagem': a.mensagem or f"Alerta {a.tipo_alerta}",
+            'data': a.timestamp_criacao.isoformat() if a.timestamp_criacao else None
+        } for a in alertas]
+        
+        return jsonify({
+            "success": True,
+            "data": result,
+            "message": f"{len(result)} alerta(s) recente(s)"
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
 @bp.route('/<alerta_id>/toggle', methods=['PATCH'])
 @jwt_required()
 def toggle_alerta(alerta_id):
