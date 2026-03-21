@@ -8,6 +8,19 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — CORREÇÕES CRÍTICAS UX E CONSOLIDAÇÃO (21/03/2026)
+
+- **Bug Fixes:**
+  - Corrigido bug `xfor` → `x-for` em imposto_renda.html (linha 349)
+  - Migrado modal de Alertas de JavaScript puro para Alpine.js
+  - Unificado padrão de cards (removido `border-2` inconsistente)
+  - Unificado padrão de botões (padronizado gradientes e hover)
+  - Corrigida versão no footer (v1.0.0 → v0.9.3)
+- **Documentação:**
+  - Criado `docs/UX_ANALISE_COMPLETA_OPUS.md` com análise completa de 27 arquivos
+  - Avaliados arquivos em `docs/archive/`: 23 preservar, 3 remover, 4 decisão usuário
+  - Proposta de consolidação: 51 → ~35 arquivos (-31%)
+
 ### Feature — MODERNIZAÇÃO UX COMPLETA: 10 Páginas Ultra-Modernas (20/03/2026)
 
 - **Hero Sections Ultra-Modernas:**
