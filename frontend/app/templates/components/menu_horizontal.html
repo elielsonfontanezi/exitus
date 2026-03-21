@@ -20,6 +20,18 @@
                 </div>
             </div>
             
+            <!-- Operações -->
+            <div class="dropdown">
+                <button class="dropdown-toggle">Operações</button>
+                <div class="dropdown-menu">
+                    <a href="/operacoes/comprar" class="dropdown-item"><i class="fas fa-plus-circle"></i> Comprar Ativos</a>
+                    <a href="/operacoes/vender" class="dropdown-item"><i class="fas fa-minus-circle"></i> Vender Ativos</a>
+                    <a href="/operacoes/transferencias" class="dropdown-item"><i class="fas fa-exchange-alt"></i> Transferências</a>
+                    <a href="/operacoes/rebalanceamento" class="dropdown-item"><i class="fas fa-balance-scale"></i> Rebalanceamento</a>
+                    <a href="/operacoes/historico" class="dropdown-item"><i class="fas fa-history"></i> Histórico</a>
+                </div>
+            </div>
+            
             <!-- Ativos -->
             <div class="dropdown">
                 <button class="dropdown-toggle">
@@ -27,30 +39,112 @@
                 </button>
                 <div class="dropdown-menu">
                     <div class="dropdown-section">
-                        <h3>Nacional</h3>
-                        <a href="/ativos/acoes" class="dropdown-item"><i class="fas fa-chart-bar"></i> Ações</a>
-                        <a href="/ativos/fiis" class="dropdown-item"><i class="fas fa-building"></i> FIIs</a>
+                        <h3>Ações</h3>
+                        <a href="/ativos/acoes" class="dropdown-item">Minhas Ações</a>
+                        <a href="/ativos/acoes/buscar" class="dropdown-item">Buscar Ações</a>
+                        <a href="/ativos/acoes/setores" class="dropdown-item">Setores</a>
+                    </div>
+                    <div class="dropdown-section">
+                        <h3>FIIs</h3>
+                        <a href="/ativos/fiis" class="dropdown-item">Meus FIIs</a>
+                        <a href="/ativos/fiis/buscar" class="dropdown-item">Buscar FIIs</a>
+                        <a href="/ativos/fiis/tipos" class="dropdown-item">Tipos de Imóveis</a>
+                    </div>
+                    <div class="dropdown-section">
+                        <a href="/ativos/etfs" class="dropdown-item">ETFs</a>
+                        <a href="/ativos/renda-fixa" class="dropdown-item">Renda Fixa</a>
+                        <a href="/ativos/cripto" class="dropdown-item">Criptoativos</a>
                     </div>
                 </div>
             </div>
             
             <!-- Análises -->
             <div class="dropdown">
-                <button class="dropdown-toggle">
-                    Análises
-                </button>
+                <button class="dropdown-toggle">Análises</button>
                 <div class="dropdown-menu">
-                    <a href="/proventos" class="dropdown-item"><i class="fas fa-hand-holding-usd"></i> Proventos</a>
-                    <a href="/imposto-renda" class="dropdown-item"><i class="fas fa-file-invoice-dollar"></i> IR</a>
+                    <div class="dropdown-section">
+                        <h3>Proventos</h3>
+                        <a href="/proventos/recebidos" class="dropdown-item">Recebidos</a>
+                        <a href="/proventos/projetados" class="dropdown-item">Projetados</a>
+                        <a href="/proventos/calendario" class="dropdown-item">Calendário</a>
+                    </div>
+                    <div class="dropdown-section">
+                        <h3>Rentabilidade</h3>
+                        <a href="/rentabilidade/periodo" class="dropdown-item">Por Período</a>
+                        <a href="/rentabilidade/ativo" class="dropdown-item">Por Ativo</a>
+                        <a href="/rentabilidade/comparativo" class="dropdown-item">Comparativo</a>
+                    </div>
+                    <div class="dropdown-section">
+                        <h3>Imposto de Renda</h3>
+                        <a href="/imposto-renda/mensal" class="dropdown-item">Cálculo Mensal</a>
+                        <a href="/imposto-renda/darfs" class="dropdown-item">DARFs Pendentes</a>
+                        <a href="/imposto-renda/declaracao" class="dropdown-item">Declaração Anual</a>
+                    </div>
+                    <div class="dropdown-section">
+                        <a href="/alocacao" class="dropdown-item">Alocação de Ativos</a>
+                        <a href="/riscos" class="dropdown-item">Análise de Riscos</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Relatórios -->
+            <div class="dropdown">
+                <button class="dropdown-toggle">Relatórios</button>
+                <div class="dropdown-menu">
+                    <a href="/relatorios/mensal" class="dropdown-item">Relatórios Mensais</a>
+                    <a href="/relatorios/anual" class="dropdown-item">Relatórios Anuais</a>
+                    <a href="/relatorios/ir" class="dropdown-item">IR Completo</a>
+                    <div class="dropdown-section">
+                        <h3>Exportar Dados</h3>
+                        <a href="/relatorios/exportar/excel" class="dropdown-item">Excel</a>
+                        <a href="/relatorios/exportar/pdf" class="dropdown-item">PDF</a>
+                        <a href="/relatorios/exportar/csv" class="dropdown-item">CSV</a>
+                    </div>
+                    <a href="/relatorios/compartilhar" class="dropdown-item">Compartilhar</a>
+                </div>
+            </div>
+            
+            <!-- Ferramentas -->
+            <div class="dropdown">
+                <button class="dropdown-toggle">Ferramentas</button>
+                <div class="dropdown-menu">
+                    <a href="/comparador" class="dropdown-item">Comparador de Ativos</a>
+                    <a href="/calculadora-ir" class="dropdown-item">Calculadora IR</a>
+                    <a href="/simulador" class="dropdown-item">Simulador de Investimentos</a>
+                    <a href="/metas" class="dropdown-item">Projetor de Metas</a>
+                    <a href="/screeners" class="dropdown-item">Screeners</a>
+                </div>
+            </div>
+            
+            <!-- Alertas -->
+            <div class="dropdown">
+                <button class="dropdown-toggle">Alertas</button>
+                <div class="dropdown-menu">
+                    <a href="/alertas/preco" class="dropdown-item">Alertas de Preço</a>
+                    <a href="/alertas/dividendos" class="dropdown-item">Alertas de Dividendos</a>
+                    <a href="/alertas/noticias" class="dropdown-item">Alertas de Notícias</a>
+                    <a href="/alertas/personalizados" class="dropdown-item">Alertas Personalizados</a>
                 </div>
             </div>
         </div>
         
-        <!-- User Menu -->
-        <div class="flex items-center gap-4">
-            <a href="/logout" class="text-white hover:bg-white/10 px-3 py-2 rounded">
-                <i class="fas fa-sign-out-alt"></i>
-            </a>
+        <!-- Busca, Notificações e Usuário -->
+        <div class="flex items-center gap-3">
+            <button class="text-white hover:bg-white/10 px-3 py-2 rounded" title="Buscar">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="text-white hover:bg-white/10 px-3 py-2 rounded relative" title="Notificações">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="dropdown">
+                <button class="dropdown-toggle"><i class="fas fa-user-circle"></i></button>
+                <div class="dropdown-menu" style="right: 0; left: auto;">
+                    <a href="/perfil" class="dropdown-item">Meu Perfil</a>
+                    <a href="/configuracoes" class="dropdown-item">Configurações</a>
+                    <a href="/logout" class="dropdown-item">Sair</a>
+                </div>
+            </div>
         </div>
     </div>
 </nav>
