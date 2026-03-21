@@ -401,6 +401,33 @@ Response 200:
 Filtros e payload mantidos — `tipo` usa Enum TipoTransacao
 (ex.: `COMPRA`, `VENDA`, `DIVIDENDO`, `JCP`, etc.).
 
+### GET /api/transacoes/recentes
+**Dashboard v2** - Retorna últimas transações do usuário.
+
+Query params:
+- `limit` (int, default: 5) - Número máximo de transações
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "ativo_ticker": "PETR4",
+        "tipo": "COMPRA",
+        "quantidade": 100,
+        "preco_unitario": 38.50,
+        "valor_total": 3850.00,
+        "data_operacao": "2026-03-20"
+      }
+    ]
+  },
+  "message": "5 transação(ões) recente(s)"
+}
+```
+
 ---
 
 ## 8. Proventos
@@ -1217,10 +1244,69 @@ Confirma pagamento real de um provento.
 
 ---
 
-*Documento atualizado: 10 de Março de 2026*
+## 23. Carteira (Dashboard v2)
+
+**Base URL**: `/api/carteira`  
+**Auth**: Bearer JWT obrigatório
+
+### GET /api/carteira/saldo-caixa
+Retorna saldo disponível em caixa do usuário com suporte a múltiplas moedas.
+
+Query params:
+- `moeda` (string, default: BRL) - Moeda para exibição (BRL ou USD)
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "saldo_brl": 12450.00,
+    "saldo_usd": 2280.50,
+    "saldo_total_brl": 24896.73,
+    "moeda_exibicao": "BRL",
+    "taxa_cambio": 5.46
+  },
+  "message": "Saldo em caixa obtido com sucesso"
+}
+```
+
+---
+
+## 24. Alertas (Dashboard v2)
+
+**Base URL**: `/api/alertas`  
+**Auth**: Bearer JWT obrigatório
+
+### GET /api/alertas/recentes
+Retorna alertas disparados recentemente.
+
+Query params:
+- `limit` (int, default: 5) - Número máximo de alertas
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "nome": "Dividendo PETR4",
+      "tipo": "dividendo",
+      "mensagem": "R$ 0,85 por ação",
+      "data": "2026-03-18T10:30:00"
+    }
+  ],
+  "message": "3 alerta(s) recente(s)"
+}
+```
+
+---
+
+*Documento atualizado: 21 de Março de 2026*
 *Versão da API: v0.8.0-dev*
 *GAPs fechados: EXITUS-POS-001→007, EXITUS-ATIVOS-ENUM-001, EXITUS-POS-PAGIN-001,*
 *EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001, EXITUS-COTACOES-RESP-001,*
 *EXITUS-SQLALCHEMY-001, EXITUS-CRUD-001, EXITUS-IR-001, EXITUS-EXPORT-001,*
 *EXITUS-VALIDATION-001, EXITUS-RENTABILIDADE-001, EXITUS-SERVICE-REVIEW-001, EXITUS-COVERAGE-001,*
 *EXITUS-DOCS-SYNC-001, EXITUS-AUDITLOG-001, EXITUS-RECONCILIACAO-001, EXITUS-DIVCALENDAR-001*
+*Dashboard v2: CARTEIRA-001, ALERTAS-RECENTES-001, TRANSACOES-RECENTES-001*

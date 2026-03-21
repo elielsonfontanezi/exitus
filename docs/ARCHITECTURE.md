@@ -1014,10 +1014,33 @@ Cloud Provider
 
 ---
 
+## Novos Componentes (Dashboard v2 - 21/03/2026)
+
+### Backend - Blueprints Adicionados:
+- **carteira_blueprint.py** - `/api/carteira/*`
+  - GET `/saldo-caixa` - Saldo disponível em BRL/USD com toggle
+
+### Backend - Services Adicionados:
+- **carteira_service.py** - Lógica de negócio para saldo em caixa
+  - `get_saldo_caixa(usuario_id, moeda_exibicao)` - Calcula saldo por moeda
+
+### Backend - Endpoints Modificados:
+- **alertas.py** - Adicionado GET `/recentes?limit=N`
+- **transacoes/routes.py** - Adicionado GET `/recentes?limit=N`
+
+### Frontend - Templates Modificados:
+- **dashboard/index.html** - Reescrito completo para Dashboard v2
+  - Integração com 4 APIs via Alpine.js
+  - 2 gráficos Chart.js (evolução + alocação)
+  - Toggle BRL/USD dinâmico
+  - Visão multi-mercado (BR/US/INTL)
+
+---
+
 ## Referências
 
 - [MODULES.md](MODULES.md) - Detalhes de cada módulo M0-M7
-- [API_REFERENCE.md](API_REFERENCE.md) - Endpoints completos
+- [API_REFERENCE.md](API_REFERENCE.md) - Endpoints completos (23 seções)
 - [OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md) - Deploy e troubleshooting
 - [ENUMS.md](ENUMS.md) - Documentação completa de ENUMs
 

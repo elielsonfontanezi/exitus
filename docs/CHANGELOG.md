@@ -8,6 +8,36 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feature — DASHBOARD V2 + NOVAS APIs (21/03/2026)
+
+**Backend - Novas APIs:**
+- `GET /api/carteira/saldo-caixa` - Saldo disponível em BRL/USD com toggle
+- `GET /api/alertas/recentes?limit=N` - Últimos alertas disparados
+- `GET /api/transacoes/recentes?limit=N` - Últimas transações
+- Criado `backend/app/blueprints/carteira_blueprint.py`
+- Criado `backend/app/services/carteira_service.py`
+- Registrado blueprint carteira em `backend/app/__init__.py`
+
+**Frontend - Dashboard v2:**
+- Resumo Patrimônio + Saldo Caixa (4 cards dinâmicos)
+- Visão Multi-Mercado (BR/US/INTL) com 3 cards
+- Gráfico Evolução Patrimônio (Chart.js linha)
+- Top 5 Ativos - Brasil (tabela dinâmica)
+- Últimas Transações (5 mais recentes)
+- Gráfico Alocação por Mercado (Chart.js doughnut)
+- Alertas Recentes (3 mais recentes)
+- Toggle BRL/USD no saldo em caixa
+- Integração completa com 4 APIs via Alpine.js
+- Arquivo: `frontend/app/templates/dashboard/index.html` (reescrito)
+
+**Documentação:**
+- `docs/API_REFERENCE.md` - Adicionadas seções 23 (Carteira) e 24 (Alertas)
+- `docs/API_REFERENCE.md` - Adicionado endpoint GET /api/transacoes/recentes
+- `docs/UX_ROADMAP.md` - Dashboard v2 marcado como concluído
+- `docs/UX_HANDOFF_SONNET.md` - Contexto Dashboard v1/v2 adicionado
+
+**Status:** Dashboard v2 completo e funcional (21/03/2026)
+
 ### Fix — CORREÇÕES CRÍTICAS UX E CONSOLIDAÇÃO (21/03/2026)
 
 - **Bug Fixes:**

@@ -464,35 +464,35 @@ Código Frontend
 - **21/03/2026:** Início da implementação (Sonnet)
 - **21/03/2026:** Dashboard v1 validado e em produção
 
-#### **Melhorias v2 Planejadas:**
+#### **Melhorias v2 - CONCLUÍDAS (21/03/2026):**
 
 **Feedback do usuário:** "Vale uma reavaliação do que ainda pode ser apresentado na tela principal."
 
-**Componentes a adicionar:**
+**Componentes implementados:**
 
-1. **Visão Multi-Mercado** ⭐ ALTA PRIORIDADE
+1. ✅ **Visão Multi-Mercado** (ALTA PRIORIDADE)
    - Cards BR/US/INTL com patrimônio, percentual e rentabilidade
-   - API: `/api/v1/dashboard/multi-mercado`
+   - API: `/api/portfolios/dashboard`
 
-2. **Saldo em Caixa + Toggle BRL/USD** ⭐ ALTA PRIORIDADE
+2. ✅ **Saldo em Caixa + Toggle BRL/USD** (ALTA PRIORIDADE)
    - Card com saldo disponível
-   - Toggle para alternar moeda
-   - API: `/api/v1/carteira/saldo-caixa`
+   - Toggle para alternar moeda (⇄)
+   - API: `/api/carteira/saldo-caixa`
 
-3. **Alocação Gráfica** 📊 MÉDIA PRIORIDADE
-   - Gráfico pizza/donut (Chart.js)
-   - Visualizações: Por tipo, setor, mercado
-   - API: `/api/v1/dashboard/alocacao`
+3. ✅ **Alocação Gráfica** (MÉDIA PRIORIDADE)
+   - Gráfico doughnut (Chart.js)
+   - Visualização por mercado (BR/US/INTL)
+   - Dados: `alocacao_geografica`
 
-4. **Alertas Recentes** 🔔 MÉDIA PRIORIDADE
+4. ✅ **Alertas Recentes** (MÉDIA PRIORIDADE)
    - Lista de alertas disparados
-   - API: `/api/v1/alertas/recentes?limit=5`
+   - API: `/api/alertas/recentes?limit=3`
 
-5. **Últimas Transações** 💸 MÉDIA PRIORIDADE
+5. ✅ **Últimas Transações** (MÉDIA PRIORIDADE)
    - 5 últimas operações
-   - API: `/api/v1/operacoes/recentes?limit=5`
+   - API: `/api/transacoes/recentes?limit=5`
 
-**Status:** Planejado para próxima sprint
+**Status:** ✅ Implementado e em produção (21/03/2026)
 
 ---
 
