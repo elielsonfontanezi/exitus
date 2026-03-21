@@ -20,6 +20,13 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# --- Rota de Teste - Novo Dashboard UX ---
+@bp.route('/novo', methods=['GET'])
+@login_required
+def dashboard_novo():
+    """Dashboard Novo - Estilo Investidor10"""
+    return render_template('dashboard/dashboard_novo.html')
+
 # --- Rota Principal (Home) ---
 @bp.route('/', methods=['GET'])
 @login_required
