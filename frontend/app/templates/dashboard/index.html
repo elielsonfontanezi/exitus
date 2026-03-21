@@ -1,442 +1,192 @@
 {% extends "base.html" %}
-{% block title %}Dashboard Multi-Mercado{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="/static/css/design-system.css">
-{% endblock %}
+{% block title %}Dashboard - Exitus{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50" 
-     x-data="dashboardData()" 
-     @currency-changed.window="handleCurrencyChange($event.detail)">
-  
-  <!-- Hero Section Ultra-Moderna -->
-  <section class="bg-gradient-hero rounded-3xl mx-6 mt-6 p-8 text-white shadow-large animate-fade-in relative overflow-hidden">
-    <!-- Elementos Decorativos -->
-    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
-    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
+<div class="container mx-auto max-w-7xl py-6">
     
-    <div class="relative z-10">
-      <!-- Saudação Personalizada -->
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div class="flex-1">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse-slow">
-              <span class="text-3xl">👋</span>
-            </div>
-            <div>
-              <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                Olá! 
-              </h1>
-              <p class="text-xl text-white/80">
-                <span x-text="new Date().toLocaleDateString('pt-BR', { weekday: 'long', hour: 'numeric', minute: 'numeric' })"></span>
-              </p>
-            </div>
-          </div>
-          
-          <!-- Patrimônio Principal -->
-          <div class="mb-6">
-            <p class="text-lg text-white/70 mb-2">Seu patrimônio total:</p>
-            <div class="flex items-baseline gap-3">
-              <p class="text-6xl font-bold" x-text="formatCurrency(totalPatrimonio, currentCurrency)">R$ 0,00</p>
-              <div class="bg-success-500/20 backdrop-blur-sm px-3 py-1 rounded-full">
-                <span class="text-success-200 text-sm font-semibold">+1.9%</span>
-              </div>
-            </div>
-            <p class="text-white/60 mt-2">
-              <span class="text-success-200 font-semibold">+$ 15.680</span> hoje
-            </p>
-          </div>
+    <!-- 1. RESUMO DO PATRIMÔNIO -->
+    <div class="resumo-patrimonio mb-6">
+        <div class="resumo-item">
+            <div class="label">Patrimônio Total</div>
+            <div class="valor">R$ 125.430</div>
+            <div class="variacao positiva">▲ +5.2% no mês</div>
         </div>
         
-        <!-- Métricas Rápidas -->
-        <div class="mt-8 lg:mt-0 lg:ml-8">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 hover:bg-white/15 transition-all hover-scale">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 bg-success-500/20 rounded-xl flex items-center justify-center">
-                  <span class="text-2xl">📈</span>
-                </div>
-                <span class="text-white/70 text-sm">Este mês</span>
-              </div>
-              <p class="text-2xl font-bold text-white" x-text="formatCurrency(variacaoMes, currentCurrency)">+R$ 0</p>
-              <div class="flex items-center gap-1 mt-2">
-                <svg class="w-4 h-4 text-success-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                </svg>
-                <span class="text-success-300 text-sm font-semibold">+12.4%</span>
-              </div>
-            </div>
-            
-            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 hover:bg-white/15 transition-all hover-scale">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 bg-primary-500/20 rounded-xl flex items-center justify-center">
-                  <span class="text-2xl">🎯</span>
-                </div>
-                <span class="text-white/70 text-sm">Rentabilidade</span>
-              </div>
-              <p class="text-2xl font-bold text-white" x-text="rentabilidadeGeral + '%'">+0%</p>
-              <div class="flex items-center gap-1 mt-2">
-                <svg class="w-4 h-4 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-                <span class="text-primary-300 text-sm font-semibold">vs IBOV</span>
-              </div>
-            </div>
-            
-            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 hover:bg-white/15 transition-all hover-scale">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 bg-secondary-500/20 rounded-xl flex items-center justify-center">
-                  <span class="text-2xl">💎</span>
-                </div>
-                <span class="text-white/70 text-sm">Ativos</span>
-              </div>
-              <p class="text-2xl font-bold text-white">56</p>
-              <div class="flex items-center gap-1 mt-2">
-                <svg class="w-4 h-4 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span class="text-secondary-300 text-sm font-semibold">4 carteiras</span>
-              </div>
-            </div>
-            
-            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 hover:bg-white/15 transition-all hover-scale">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 bg-attention-500/20 rounded-xl flex items-center justify-center">
-                  <span class="text-2xl">🔔</span>
-                </div>
-                <span class="text-white/70 text-sm">Alertas</span>
-              </div>
-              <p class="text-2xl font-bold text-white">3</p>
-              <div class="flex items-center gap-1 mt-2">
-                <svg class="w-4 h-4 text-attention-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                </svg>
-                <span class="text-attention-300 text-sm font-semibold">ativos</span>
-              </div>
-            </div>
-          </div>
+        <div class="resumo-item">
+            <div class="label">Rentabilidade</div>
+            <div class="valor">+12.4%</div>
+            <div class="variacao positiva">▲ vs IBOV +8.1%</div>
         </div>
-      </div>
-    
-    <!-- Ações Rápidas -->
-    <div class="mt-6 flex flex-wrap gap-3">
-      {% include 'components/forms/currency_toggle.html' %}
-      <a href="/dashboard/buy-signals" class="btn-primario">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-        </svg>
-        Oportunidades
-      </a>
-      <a href="/dashboard/portfolios" class="btn-secundario">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-        </svg>
-        Carteiras
-      </a>
-    </div>
-  </section>
-
-  <!-- Main Content -->
-  <div class="px-6 py-8">
-    
-    <!-- Cards por Mercado Ultra-Modernos -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <!-- Mercado BR -->
-      <div class="card-moderno p-6 animate-scale-in hover-lift group cursor-pointer" onclick="window.location.href='/dashboard/portfolios?market=br'">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-success-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-              <span class="text-2xl">🇧🇷</span>
-            </div>
-            <div>
-              <h3 class="font-bold text-gray-900 group-hover:text-success-600 transition-colors">Brasil</h3>
-              <p class="text-sm text-gray-600">Ações & FIIs</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-1">
-            <svg class="w-4 h-4 text-success-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-            </svg>
-            <span class="text-success-600 font-bold text-sm">+2.4%</span>
-          </div>
-        </div>
-        <div class="space-y-3">
-          <p class="text-3xl font-bold text-gray-900" x-text="formatCurrency(marketData.br.total, currentCurrency)">R$ 0</p>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-success-600 font-semibold">+R$ 12.450</span>
-              <span class="text-gray-500">hoje</span>
-            </div>
-            <div class="w-16 h-8">
-              <canvas id="sparkline-br"></canvas>
-            </div>
-          </div>
-        </div>
-        <!-- Mini Gráfico -->
-        <div class="mt-4 pt-4 border-t border-gray-100">
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-gray-500">Top ativo:</span>
-            <span class="font-semibold text-gray-700">VALE3</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mercado US -->
-      <div class="card-moderno p-6 animate-scale-in animate-delay-100 hover-lift group cursor-pointer" onclick="window.location.href='/dashboard/portfolios?market=us'">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-              <span class="text-2xl">🇺🇸</span>
-            </div>
-            <div>
-              <h3 class="font-bold text-gray-900 group-hover:text-primary-600 transition-colors">EUA</h3>
-              <p class="text-sm text-gray-600">Stocks & ETFs</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-1">
-            <svg class="w-4 h-4 text-success-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-            </svg>
-            <span class="text-success-600 font-bold text-sm">+1.8%</span>
-          </div>
-        </div>
-        <div class="space-y-3">
-          <p class="text-3xl font-bold text-gray-900" x-text="formatCurrency(marketData.us.total, currentCurrency)">$ 0</p>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-success-600 font-semibold">+$ 2.340</span>
-              <span class="text-gray-500">hoje</span>
-            </div>
-            <div class="w-16 h-8">
-              <canvas id="sparkline-us"></canvas>
-            </div>
-          </div>
-        </div>
-        <!-- Mini Gráfico -->
-        <div class="mt-4 pt-4 border-t border-gray-100">
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-gray-500">Top ativo:</span>
-            <span class="font-semibold text-gray-700">AAPL</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mercado INTL -->
-      <div class="card-moderno p-6 animate-scale-in animate-delay-200 hover-lift group cursor-pointer" onclick="window.location.href='/dashboard/portfolios?market=intl'">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-secondary-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-              <span class="text-2xl">🌍</span>
-            </div>
-            <div>
-              <h3 class="font-bold text-gray-900 group-hover:text-secondary-600 transition-colors">Internacional</h3>
-              <p class="text-sm text-gray-600">REITs & Bonds</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-1">
-            <svg class="w-4 h-4 text-attention-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-            </svg>
-            <span class="text-attention-600 font-bold text-sm">+0.9%</span>
-          </div>
-        </div>
-        <div class="space-y-3">
-          <p class="text-3xl font-bold text-gray-900" x-text="formatCurrency(marketData.intl.total, currentCurrency)">€ 0</p>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 text-sm">
-              <span class="text-attention-600 font-semibold">+$ 890</span>
-              <span class="text-gray-500">hoje</span>
-            </div>
-            <div class="w-16 h-8">
-              <canvas id="sparkline-intl"></canvas>
-            </div>
-          </div>
-        </div>
-        <!-- Mini Gráfico -->
-        <div class="mt-4 pt-4 border-t border-gray-100">
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-gray-500">Top ativo:</span>
-            <span class="font-semibold text-gray-700">VNQ</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Total -->
-      <div class="card-moderno p-6 bg-gradient-success text-white animate-scale-in animate-delay-300 hover-lift group cursor-pointer relative overflow-hidden" onclick="window.location.href='/dashboard/portfolios'">
-        <!-- Efeito de brilho -->
-        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform"></div>
         
-        <div class="relative z-10">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span class="text-2xl">💰</span>
-              </div>
-              <div>
-                <h3 class="font-bold text-white">Total</h3>
-                <p class="text-sm text-white/80">Todos os mercados</p>
-              </div>
-            </div>
-            <div class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg font-bold text-sm flex items-center gap-1">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-              </svg>
-              +1.9%
-            </div>
-          </div>
-          <div class="space-y-3">
-            <p class="text-3xl font-bold text-white" x-text="formatCurrency(marketData.total, currentCurrency)">R$ 0</p>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2 text-sm">
-                <span class="text-white font-semibold">+$ 15.680</span>
-                <span class="text-white/75">hoje</span>
-              </div>
-              <div class="w-16 h-8">
-                <canvas id="sparkline-total"></canvas>
-              </div>
-            </div>
-          </div>
-          <!-- Mini Gráfico -->
-          <div class="mt-4 pt-4 border-t border-white/20">
-            <div class="flex items-center justify-between text-xs">
-              <span class="text-white/70">Ranking:</span>
-              <span class="font-semibold text-white">Top 5%</span>
-            </div>
-          </div>
+        <div class="resumo-item">
+            <div class="label">Ativos</div>
+            <div class="valor">12</div>
+            <div class="variacao">3 carteiras</div>
         </div>
-      </div>
+        
+        <div class="resumo-item">
+            <div class="label">Setores</div>
+            <div class="valor">3</div>
+            <div class="variacao">Diversificação</div>
+        </div>
     </div>
-
-    <!-- Gráficos -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <!-- Alocação Geográfica -->
-      <div class="card card-elevated">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="h3">Alocação Geográfica</h3>
-            <button class="btn btn-outline btn-icon btn-icon-sm">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-              </svg>
-            </button>
-          </div>
-          <div class="h-80">
-            <canvas id="allocation-chart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- Evolução Patrimonial -->
-      <div class="card card-elevated">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="h3">Evolução Patrimonial</h3>
-            <div class="flex gap-2">
-              <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('1M')" :class="period === '1M' ? 'btn-primary' : ''">1M</button>
-              <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('6M')" :class="period === '6M' ? 'btn-primary' : ''">6M</button>
-              <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('1A')" :class="period === '1A' ? 'btn-primary' : ''">1A</button>
-              <button class="btn btn-outline btn-icon btn-icon-sm" @click="changePeriod('5A')" :class="period === '5A' ? 'btn-primary' : ''">5A</button>
+    
+    <!-- 2. LAYOUT PRINCIPAL: 2/3 + 1/3 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- COLUNA PRINCIPAL (2/3) -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- GRÁFICO DE EVOLUÇÃO -->
+            <div class="chart-container">
+                <h3 class="chart-title">Evolução do Patrimônio - Últimos 12 Meses</h3>
+                <canvas id="chartEvolucao" height="80"></canvas>
             </div>
-          </div>
-          <div class="h-80">
-            <canvas id="evolution-chart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Top 5 Ativos -->
-    <div class="card card-elevated mb-8">
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="h3">Top 5 Ativos</h3>
-          <a href="/dashboard/portfolios" class="btn btn-outline btn-sm">Ver todos</a>
-        </div>
-        <div class="space-y-4">
-          <template x-for="(asset, index) in topAssets" :key="asset.ticker">
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                  <span class="text-primary-600 font-semibold" x-text="index + 1"></span>
-                </div>
-                <div>
-                  <p class="font-semibold text-gray-900" x-text="asset.ticker"></p>
-                  <p class="text-sm text-gray-600" x-text="asset.name"></p>
-                </div>
-              </div>
-              <div class="text-right">
-                <p class="font-semibold text-gray-900" x-text="formatCurrency(asset.value, currentCurrency)"></p>
-                <p class="text-sm" :class="asset.change >= 0 ? 'text-success' : 'text-danger'" x-text="asset.change >= 0 ? '+' + asset.change + '%' : asset.change + '%'"></p>
-              </div>
+            
+            <!-- TOP 5 ATIVOS -->
+            <div class="section-box">
+                <h2>Top 5 Ativos</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <td><strong>Ativo</strong></td>
+                            <td><strong>Quantidade</strong></td>
+                            <td><strong>Preço Médio</strong></td>
+                            <td><strong>Valor Atual</strong></td>
+                            <td><strong>Rentabilidade</strong></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PETR4</strong></td>
+                            <td>100</td>
+                            <td>R$ 38,50</td>
+                            <td>R$ 4.567,00</td>
+                            <td style="color: #10b981;">+18.6%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>VALE3</strong></td>
+                            <td>50</td>
+                            <td>R$ 68,20</td>
+                            <td>R$ 3.850,00</td>
+                            <td style="color: #10b981;">+12.8%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ITUB4</strong></td>
+                            <td>200</td>
+                            <td>R$ 28,90</td>
+                            <td>R$ 6.120,00</td>
+                            <td style="color: #10b981;">+5.9%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>BBAS3</strong></td>
+                            <td>80</td>
+                            <td>R$ 52,30</td>
+                            <td>R$ 4.344,00</td>
+                            <td style="color: #10b981;">+4.2%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WEGE3</strong></td>
+                            <td>60</td>
+                            <td>R$ 42,10</td>
+                            <td>R$ 2.646,00</td>
+                            <td style="color: #ef4444;">-2.1%</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-          </template>
+            
         </div>
-      </div>
+        
+        <!-- COLUNA LATERAL (1/3) -->
+        <div class="space-y-6">
+            
+            <!-- PRÓXIMOS EVENTOS -->
+            <div class="notification-panel">
+                <h3>Próximos Eventos</h3>
+                
+                <div class="notification-card">
+                    <div class="notification-title">Dividendo PETR4</div>
+                    <p class="text-sm" style="color: #6c757d;">R$ 0,85 por ação</p>
+                    <div class="notification-time">Em 3 dias</div>
+                </div>
+                
+                <div class="notification-card">
+                    <div class="notification-title">Vencimento Tesouro</div>
+                    <p class="text-sm" style="color: #6c757d;">Tesouro Selic 2029</p>
+                    <div class="notification-time">Em 15 dias</div>
+                </div>
+                
+                <div class="notification-card">
+                    <div class="notification-title">DARF Vencendo</div>
+                    <p class="text-sm" style="color: #6c757d;">R$ 124,50 - Swing Trade</p>
+                    <div class="notification-time">Em 5 dias</div>
+                </div>
+            </div>
+            
+            <!-- OPORTUNIDADES -->
+            <div class="card-dashboard">
+                <h3 class="text-lg font-semibold mb-4" style="color: #a38c65;">Oportunidades</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 rounded" style="background: #f8f9fa;">
+                        <span class="font-semibold">BBAS3</span>
+                        <span style="color: #ef4444;">-10% (Queda)</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 rounded" style="background: #f8f9fa;">
+                        <span class="font-semibold">WEGE3</span>
+                        <span style="color: #10b981;">+5% (Alta)</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 rounded" style="background: #f8f9fa;">
+                        <span class="font-semibold">ITUB4</span>
+                        <span style="color: #10b981;">Yield 8.2%</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
     </div>
-
-    <!-- Alertas e Transações -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Alertas Recentes -->
-      <div class="card card-elevated">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="h3">Alertas Recentes</h3>
-            <a href="/dashboard/alerts" class="btn btn-outline btn-sm">Ver todos</a>
-          </div>
-          <div class="space-y-3">
-            <template x-for="alert in recentAlerts" :key="alert.id">
-              <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center" :class="getAlertColorClass(alert.type)">
-                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                  </svg>
-                </div>
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-gray-900" x-text="alert.message"></p>
-                  <p class="text-xs text-gray-500" x-text="alert.time"></p>
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-
-      <!-- Últimas Transações -->
-      <div class="card card-elevated">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="h3">Últimas Transações</h3>
-            <a href="/dashboard/transactions" class="btn btn-outline btn-sm">Ver todas</a>
-          </div>
-          <div class="space-y-3">
-            <template x-for="transaction in recentTransactions" :key="transaction.id">
-              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full flex items-center justify-center" :class="getTransactionColorClass(transaction.type)">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-900" x-text="transaction.asset"></p>
-                    <p class="text-xs text-gray-500" x-text="transaction.date"></p>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <p class="text-sm font-medium" x-text="transaction.type === 'COMPRA' ? '-' : '+'" :class="transaction.type === 'COMPRA' ? 'text-danger' : 'text-success'"></p>
-                  <p class="text-sm font-semibold text-gray-900" x-text="formatCurrency(transaction.amount, currentCurrency)"></p>
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
+    
 </div>
 
-<script src="/static/js/dashboard.js"></script>
+<!-- GRÁFICO COM CHART.JS -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('chartEvolucao');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                datasets: [{
+                    label: 'Patrimônio',
+                    data: [100000, 102000, 105000, 108000, 110000, 112000, 115000, 118000, 120000, 122000, 123000, 125430],
+                    borderColor: '#a38c65',
+                    backgroundColor: 'rgba(163, 140, 101, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$ ' + (value/1000).toFixed(0) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
 
 {% endblock %}
