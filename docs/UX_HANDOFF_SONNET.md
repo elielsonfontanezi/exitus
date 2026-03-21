@@ -254,3 +254,27 @@ Implementei menu simplificado em vez do especificado em UX_ESTRUTURA_PROPOSTA.md
 ❌ Precisa de disciplina para seguir especificação
 ❌ Deve ser forçado a validar contra docs
 ⚠️ **DEVE seguir este processo rigorosamente**
+
+---
+
+## 📊 **Dashboard - Status Atual (21/03/2026)**
+
+### **v1 - CONCLUÍDO ✅**
+- Resumo patrimônio (4 cards)
+- Gráfico evolução (12 meses)
+- Top 5 ativos (tabela)
+- Próximos eventos
+- Oportunidades
+- **Status:** Validado e em produção
+
+### **v2 - PLANEJADO 📋**
+**Ver UX_ROADMAP.md seção "Melhorias v2 Planejadas"**
+
+Componentes prioritários:
+1. Visão Multi-Mercado (BR/US/INTL)
+2. Saldo em Caixa + Toggle BRL/USD
+3. Alocação Gráfica
+4. Alertas Recentes
+5. Últimas Transações
+
+**APIs necessárias:** Ver UX_ROADMAP.md
