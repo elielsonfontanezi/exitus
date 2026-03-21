@@ -60,10 +60,9 @@ class CarteiraService:
                 if valor_convertido:
                     saldo_brl += Decimal(str(valor_convertido))
         
-        # Obter taxa de câmbio atual
-        taxa_cambio = CambioService.get_taxa_cambio('USD', 'BRL')
-        if not taxa_cambio:
-            taxa_cambio = Decimal('5.46')  # Taxa padrão fallback
+        # Obter taxa de câmbio atual (fallback hardcoded por enquanto)
+        taxa_dict = CambioService.get_taxa('USD', 'BRL')
+        taxa_cambio = Decimal(str(taxa_dict['taxa'])) if taxa_dict else Decimal('5.46')
         
         # Converter USD para BRL se necessário
         saldo_usd_em_brl = saldo_usd * Decimal(str(taxa_cambio))

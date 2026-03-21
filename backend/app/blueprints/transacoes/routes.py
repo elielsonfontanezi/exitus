@@ -212,10 +212,15 @@ def get_transacoes_recentes():
         )
         
         # Formatar resposta
-        schema = TransacaoListSchema()
-        result = schema.dump(pagination)
+        schema = TransacaoListSchema(many=True)
+        items = schema.dump(pagination.items)
         
-        return success(result, f'{len(result.get("items", []))} transação(ões) recente(s)')
+        return success({
+            'items': items,
+            'total': pagination.total,
+            'page': pagination.page,
+            'per_page': pagination.per_page
+        }, f'{len(items)} transação(ões) recente(s)')
         
     except ExitusError as e:
         return error(str(e), e.http_status)
