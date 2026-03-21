@@ -1286,3 +1286,350 @@ body {
 /* Bordas Arredondadas */
 .rounded-xl { border-radius: var(--radius-xl); }
 .rounded-2xl { border-radius: var(--radius-2xl); }
+
+/* ==================== */
+/* 14. INVESTIDOR10 INSPIRED - UX REDESIGN 2026 */
+/* ==================== */
+
+/* Cores Investidor10 */
+:root {
+  --i10-primary-500: #a38c65;  /* Dourado/marrom */
+  --i10-primary-600: #8b7454;
+  --i10-primary-700: #735c43;
+  --i10-background: #ffffff;
+  --i10-surface: #f8f9fa;
+  --i10-border: #e9ecef;
+  --i10-text: #212529;
+  --i10-text-muted: #6c757d;
+}
+
+/* Menu Horizontal com Dropdowns */
+.nav-menu {
+  background: #212529;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nav-menu a {
+  color: white;
+  text-decoration: none;
+  padding: 12px 16px;
+  font-weight: 400;
+  transition: background 0.2s;
+}
+
+.nav-menu a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Dropdown Menu (Estilo Investidor10) */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  color: white;
+  text-decoration: none;
+  padding: 12px 16px;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-toggle::after {
+  content: '▼';
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.dropdown.active .dropdown-toggle::after {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid var(--i10-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.dropdown.active .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-section {
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.dropdown-section:last-child {
+  border-bottom: none;
+}
+
+.dropdown-section h3 {
+  color: var(--i10-primary-500);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 4px 16px;
+  margin: 0;
+}
+
+.dropdown-item {
+  display: block;
+  color: var(--i10-text);
+  text-decoration: none;
+  padding: 8px 16px 8px 24px;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: var(--i10-surface);
+  color: var(--i10-primary-500);
+}
+
+.dropdown-item i {
+  margin-right: 8px;
+  width: 12px;
+  text-align: center;
+}
+
+/* Cards Modulares (Padrão - Opção B) */
+.card-ativo {
+  background: white;
+  border: 1px solid var(--i10-border);
+  border-radius: 4px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.card-ativo:hover {
+  border-color: var(--i10-primary-500);
+  box-shadow: 0 2px 8px rgba(163, 140, 101, 0.1);
+}
+
+/* Cards Originais Investidor10 (Opção A - Alternativa) */
+.card-ativo-original {
+  background: white;
+  border: none;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 66px;
+  width: 100%;
+  font-size: 16px;
+}
+
+.card-ativo-original:hover {
+  background: var(--i10-surface);
+}
+
+.card-ativo-original span {
+  padding: 0 8px;
+  border-right: 1px solid #f1f3f4;
+}
+
+/* Quadros de Seção */
+.section-box {
+  background: var(--i10-surface);
+  border: 1px solid var(--i10-border);
+  border-radius: 8px;
+  padding: 24px;
+  margin: 16px 0;
+}
+
+.section-box h2 {
+  color: var(--i10-primary-500);
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--i10-primary-500);
+  padding-bottom: 8px;
+}
+
+/* Tabelas de Dados (Estilo Investidor10) */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  font-size: 14px;
+}
+
+.data-table tr {
+  background: white;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.data-table td {
+  padding: 8px 15px;
+  text-align: left;
+  border: none;
+}
+
+.data-table tr:hover {
+  background: var(--i10-surface);
+}
+
+/* Gráficos e Charts */
+.chart-container {
+  background: white;
+  border: 1px solid var(--i10-border);
+  border-radius: 4px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.chart-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--i10-text);
+  margin-bottom: 12px;
+}
+
+/* Cards de Notificação/Alerta */
+.notification-card {
+  background: white;
+  border-left: 4px solid var(--i10-primary-500);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin: 8px 0;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: var(--i10-text);
+  margin-bottom: 4px;
+}
+
+.notification-time {
+  font-size: 12px;
+  color: var(--i10-text-muted);
+}
+
+/* Dashboard Específico */
+.card-dashboard {
+  background: white;
+  border: 1px solid var(--i10-border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.card-dashboard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.resumo-patrimonio {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.resumo-item {
+  background: var(--i10-surface);
+  border: 1px solid var(--i10-border);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.resumo-item .label {
+  font-size: 12px;
+  color: var(--i10-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.resumo-item .valor {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--i10-text);
+}
+
+.resumo-item .variacao {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.resumo-item .variacao.positiva {
+  color: var(--success-500);
+}
+
+.resumo-item .variacao.negativa {
+  color: var(--danger-500);
+}
+
+.notification-panel {
+  background: white;
+  border: 1px solid var(--i10-border);
+  border-radius: 8px;
+  padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-panel h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--i10-text);
+}
+
+/* Links Primários */
+.link-primary {
+  color: var(--i10-primary-500);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link-primary:hover {
+  color: var(--i10-primary-600);
+  text-decoration: underline;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .dropdown-menu {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    min-width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .resumo-patrimonio {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-dashboard {
+    padding: 16px;
+  }
+}

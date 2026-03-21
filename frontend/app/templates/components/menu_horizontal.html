@@ -1,0 +1,56 @@
+<!-- Menu Horizontal Investidor10 Style -->
+<nav class="nav-menu" x-data="{ activeDropdown: null }">
+    <div class="container mx-auto px-4 flex items-center justify-between">
+        <!-- Logo -->
+        <a href="/dashboard" class="flex items-center gap-2 py-3">
+            <i class="fas fa-chart-line text-2xl" style="color: #a38c65;"></i>
+            <span class="text-xl font-bold">Exitus</span>
+        </a>
+        
+        <!-- Menu Desktop -->
+        <div class="hidden md:flex items-center gap-1">
+            <!-- Visão Geral -->
+            <div class="dropdown" :class="{ 'active': activeDropdown === 'visao' }">
+                <button @click="activeDropdown = activeDropdown === 'visao' ? null : 'visao'" class="dropdown-toggle">
+                    Visão Geral
+                </button>
+                <div class="dropdown-menu" @click.away="activeDropdown = null">
+                    <a href="/dashboard" class="dropdown-item"><i class="fas fa-home"></i> Dashboard</a>
+                    <a href="/patrimonio" class="dropdown-item"><i class="fas fa-wallet"></i> Patrimônio</a>
+                </div>
+            </div>
+            
+            <!-- Ativos -->
+            <div class="dropdown" :class="{ 'active': activeDropdown === 'ativos' }">
+                <button @click="activeDropdown = activeDropdown === 'ativos' ? null : 'ativos'" class="dropdown-toggle">
+                    Ativos
+                </button>
+                <div class="dropdown-menu" @click.away="activeDropdown = null">
+                    <div class="dropdown-section">
+                        <h3>Nacional</h3>
+                        <a href="/ativos/acoes" class="dropdown-item"><i class="fas fa-chart-bar"></i> Ações</a>
+                        <a href="/ativos/fiis" class="dropdown-item"><i class="fas fa-building"></i> FIIs</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Análises -->
+            <div class="dropdown" :class="{ 'active': activeDropdown === 'analises' }">
+                <button @click="activeDropdown = activeDropdown === 'analises' ? null : 'analises'" class="dropdown-toggle">
+                    Análises
+                </button>
+                <div class="dropdown-menu" @click.away="activeDropdown = null">
+                    <a href="/proventos" class="dropdown-item"><i class="fas fa-hand-holding-usd"></i> Proventos</a>
+                    <a href="/imposto-renda" class="dropdown-item"><i class="fas fa-file-invoice-dollar"></i> IR</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Menu -->
+        <div class="flex items-center gap-4">
+            <a href="/logout" class="text-white hover:bg-white/10 px-3 py-2 rounded">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+</nav>

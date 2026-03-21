@@ -405,7 +405,7 @@ Código Frontend
 - [x] Padrão de cards definidos
 
 ### 🔄 **Em Andamento:**
-- [ ] Implementação CSS no código
+- [x] Implementação CSS no código - **Dashboard iniciado 21/03/2026**
 - [ ] Aplicação nos templates
 - [ ] Testes visuais
 
@@ -414,6 +414,53 @@ Código Frontend
 2. Aplicar estrutura (UX_ESTRUTURA_PROPOSTA.md)
 3. Validar com usuários
 4. Iterar conforme feedback
+
+---
+
+## 📱 **Implementação por Tela**
+
+### **Dashboard** 🔄 Em Execução
+- **Data Início:** 21/03/2026
+- **Status:** Em Implementação
+- **Responsável:** Sonnet
+- **Prioridade:** Alta
+
+#### **Planejamento:**
+- **Dependências:** Nenhuma (primeira tela)
+- **Componentes:** Cards modulares, gráficos, notificações, resumo patrimônio
+
+#### **Implementação:**
+- **CSS:** design-system.css
+  - [x] .card-dashboard ✅
+  - [x] .chart-container ✅
+  - [x] .notification-panel ✅
+  - [x] .resumo-patrimonio ✅
+  - [x] .dropdown-menu (menu horizontal) ✅
+  - [x] 347 linhas CSS adicionadas (21/03/2026)
+  
+- **HTML:** 
+  - [ ] templates/base.html (menu horizontal)
+  - [ ] templates/dashboard/index.html (estrutura)
+
+- **JS:**
+  - [ ] Dropdowns Alpine.js
+  - [ ] Cards expansíveis
+  - [ ] Notificações
+
+#### **Validação:**
+- **Testes Funcionais:**
+  - [ ] Carregamento correto
+  - [ ] Responsividade (Desktop/Tablet/Mobile)
+  - [ ] Interações funcionando
+  - [ ] Performance OK
+
+- **Validação Usuário:**
+  - Data: __/__/____
+  - Feedback: ___________
+  - Status: [ ] Aprovado [ ] Revisar
+
+#### **Registro de Mudanças:**
+- **21/03/2026:** Início da implementação (Sonnet)
 
 ---
 

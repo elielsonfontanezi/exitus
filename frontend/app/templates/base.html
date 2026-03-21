@@ -16,6 +16,14 @@
     <!-- Custom Tailwind CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css') }}">
     
+    <!-- Design System Investidor10 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
+    
+    <!-- Google Fonts - Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     
@@ -31,7 +39,7 @@
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-50" x-data="{ sidebarOpen: false }">
+<body class="bg-gray-50" x-data="{ mobileMenuOpen: false }" style="font-family: 'Nunito', sans-serif;">
     
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -64,26 +72,17 @@
     {% endwith %}
 
     <!-- Main Container -->
-    <div class="min-h-screen flex">
+    <div class="min-h-screen flex flex-col">
         
-        <!-- Sidebar Desktop (lg:hidden) -->
+        <!-- Menu Horizontal -->
         {% if session.get('user_id') %}
-            {% include 'components/sidebar_moderno.html' %}
-            {% include 'components/sidebar_mobile.html' %}
+            {% include 'components/menu_horizontal.html' %}
         {% endif %}
         
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col">
-            
-            <!-- Navbar -->
-            {% if session.get('user_id') %}
-                {% include 'components/navbar.html' %}
-            {% endif %}
-            
-            <!-- Page Content -->
-            <main class="flex-1 p-6 overflow-y-auto">
-                {% block content %}{% endblock %}
-            </main>
+        <!-- Page Content -->
+        <main class="flex-1 p-6 overflow-y-auto bg-gray-50">
+            {% block content %}{% endblock %}
+        </main>
             
             <!-- Footer -->
             <footer class="bg-white border-t border-gray-200 py-4 px-6">

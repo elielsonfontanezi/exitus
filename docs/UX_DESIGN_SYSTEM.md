@@ -345,14 +345,7 @@ Transformar interface tecnicista → design moderno para público geral, inspira
   margin-bottom: 4px;
 }
 
-.notification-time {
-  font-size: 12px;
-  color: var(--color-text-muted);
-}
-```
-
 ---
-
 ## �� Design System Implementado
 
 ### Paleta Emocional (Inspirada em Apps Populares)
