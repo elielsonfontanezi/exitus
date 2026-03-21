@@ -1386,7 +1386,7 @@ body {
 }
 
 .dropdown-section h3 {
-  color: var(--i10-primary-500);
+  color: #a38c65 !important;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -1396,7 +1396,7 @@ body {
 
 .dropdown-item {
   display: block;
-  color: var(--i10-text);
+  color: #212529 !important;
   text-decoration: none;
   padding: 8px 16px 8px 24px;
   font-size: 14px;
@@ -1405,7 +1405,7 @@ body {
 
 .dropdown-item:hover {
   background: var(--i10-surface);
-  color: var(--i10-primary-500);
+  color: var(--i10-primary-500) !important;
 }
 
 .dropdown-item i {
