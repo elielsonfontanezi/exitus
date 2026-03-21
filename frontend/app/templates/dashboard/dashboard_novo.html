@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Exitus{% endblock %}
+
+{% block content %}
+<div class="container mx-auto max-w-7xl py-6">
+    
+    <!-- 1. RESUMO DO PATRIMÔNIO -->
+    <div class="resumo-patrimonio mb-6">
+        <div class="resumo-item">
+            <div class="label">Patrimônio Total</div>
+            <div class="valor">R$ 125.430</div>
+            <div class="variacao positiva">▲ +5.2% no mês</div>
+        </div>
+        
+        <div class="resumo-item">
+            <div class="label">Rentabilidade</div>
+            <div class="valor">+12.4%</div>
+            <div class="variacao positiva">▲ vs IBOV +8.1%</div>
+        </div>
+        
+        <div class="resumo-item">
+            <div class="label">Ativos</div>
+            <div class="valor">12</div>
+            <div class="variacao">3 carteiras</div>
+        </div>
+        
+        <div class="resumo-item">
+            <div class="label">Setores</div>
+            <div class="valor">3</div>
+            <div class="variacao">Diversificação</div>
+        </div>
+    </div>
+    
+    <!-- 2. LAYOUT PRINCIPAL: 2/3 + 1/3 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- COLUNA PRINCIPAL (2/3) -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- GRÁFICO DE EVOLUÇÃO -->
+            <div class="chart-container">
+                <h3 class="chart-title">Evolução do Patrimônio - Últimos 12 Meses</h3>
+                <canvas id="chartEvolucao" height="80"></canvas>
+            </div>
+            
+            <!-- TOP 5 ATIVOS -->
+            <div class="section-box">
+                <h2>Top 5 Ativos</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <td><strong>Ativo</strong></td>
+                            <td><strong>Quantidade</strong></td>
+                            <td><strong>Preço Médio</strong></td>
+                            <td><strong>Valor Atual</strong></td>
+                            <td><strong>Rentabilidade</strong></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PETR4</strong></td>
+                            <td>100</td>
+                            <td>R$ 38,50</td>
+                            <td>R$ 4.567,00</td>
+                            <td style="color: #10b981;">+18.6%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>VALE3</strong></td>
+                            <td>50</td>
+                            <td>R$ 68,20</td>
+                            <td>R$ 3.850,00</td>
+                            <td style="color: #10b981;">+12.8%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ITUB4</strong></td>
+                            <td>200</td>
+                            <td>R$ 28,90</td>
+                            <td>R$ 6.120,00</td>
+                            <td style="color: #10b981;">+5.9%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>BBAS3</strong></td>
+                            <td>80</td>
+                            <td>R$ 52,30</td>
+                            <td>R$ 4.344,00</td>
+                            <td style="color: #10b981;">+4.2%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WEGE3</strong></td>
+                            <td>60</td>
+                            <td>R$ 42,10</td>
+                            <td>R$ 2.646,00</td>
+                            <td style="color: #ef4444;">-2.1%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        
+        <!-- COLUNA LATERAL (1/3) -->
+        <div class="space-y-6">
+            
+            <!-- PRÓXIMOS EVENTOS -->
+            <div class="notification-panel">
+                <h3>Próximos Eventos</h3>
+                
+                <div class="notification-card">
+                    <div class="notification-title">Dividendo PETR4</div>
+                    <p class="text-sm" style="color: #6c757d;">R$ 0,85 por ação</p>
+                    <div class="notification-time">Em 3 dias</div>
+                </div>
+                
+                <div class="notification-card">
+                    <div class="notification-title">Vencimento Tesouro</div>
+                    <p class="text-sm" style="color: #6c757d;">Tesouro Selic 2029</p>
+                    <div class="notification-time">Em 15 dias</div>
+                </div>
+                
+                <div class="notification-card">
+                    <div class="notification-title">DARF Vencendo</div>
+                    <p class="text-sm" style="color: #6c757d;">R$ 124,50 - Swing Trade</p>
+                    <div class="notification-time">Em 5 dias</div>
+                </div>
+            </div>
+            
+            <!-- OPORTUNIDADES -->
+            <div class="card-dashboard">
+                <h3 class="text-lg font-semibold mb-4" style="color: #a38c65;">Oportunidades</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 rounded" style="background: #f8f9fa;">
+                        <span class="font-semibold">BBAS3</span>
+                        <span style="color: #ef4444;">-10% (Queda)</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 rounded" style="background: #f8f9fa;">
+                        <span class="font-semibold">WEGE3</span>
+                        <span style="color: #10b981;">+5% (Alta)</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 rounded" style="background: #f8f9fa;">
+                        <span class="font-semibold">ITUB4</span>
+                        <span style="color: #10b981;">Yield 8.2%</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+</div>
+
+<!-- GRÁFICO COM CHART.JS -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('chartEvolucao');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                datasets: [{
+                    label: 'Patrimônio',
+                    data: [100000, 102000, 105000, 108000, 110000, 112000, 115000, 118000, 120000, 122000, 123000, 125430],
+                    borderColor: '#a38c65',
+                    backgroundColor: 'rgba(163, 140, 101, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$ ' + (value/1000).toFixed(0) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}
