@@ -190,3 +190,67 @@ Não considere concluído sem feedback explícito.
 **BOA IMPLEMENTAÇÃO! 🎨**
 
 *Lembre-se: Documentos vivos = Sempre atualizados!*
+
+---
+
+## 🚨 **LIÇÃO APRENDIDA - 21/03/2026**
+
+### **ERRO CRÍTICO:**
+Implementei menu simplificado em vez do especificado em UX_ESTRUTURA_PROPOSTA.md item 2
+
+### **CAUSA:**
+- Foco excessivo em "fazer funcionar" tecnicamente
+- Esqueci de validar contra especificação completa
+- Não usei documentação como checklist obrigatório
+
+### **SOLUÇÃO:**
+1. **Sempre comparar implementação com UX_*.md**
+2. **Criar checklist dos itens especificados**
+3. **Marcar cada item antes de considerar concluído**
+4. **Documentação guia, não apenas informa**
+
+### **REGRA DE OURO:**
+> "Documentação UX*.md é FONTE DA VERDADE, não referência opcional"
+
+### **🔄 NOVO PROCESSO OBRIGATÓRIO (A partir de 21/03/2026):**
+
+#### **Passo 1: Preparação**
+```
+□ Ler UX_ESTRUTURA_PROPOSTA.md completamente
+□ Criar checklist dos itens especificados
+□ Identificar cada componente/estrutura/item
+```
+
+#### **Passo 2: Implementação**
+```
+□ Implementar marcando cada item do checklist
+□ NÃO avançar sem marcar item anterior
+□ Seguir exatamente o especificado
+```
+
+#### **Passo 3: Verificação Cruzada**
+```
+□ Comparar implementação com documento original
+□ Marcar cada item como "✅ Implementado"
+□ Verificar se NADA foi esquecido
+```
+
+#### **Passo 4: Validação**
+```
+□ Apresentar para usuário
+□ Aguardar feedback explícito
+□ Ajustar conforme necessário
+```
+
+#### **Passo 5: Registro**
+```
+□ Atualizar UX_ROADMAP.md
+□ Registrar lições aprendidas
+□ Fazer commit com status claro
+```
+
+### **Sonnet é bom para:**
+✅ Implementação técnica complexa
+❌ Precisa de disciplina para seguir especificação
+❌ Deve ser forçado a validar contra docs
+⚠️ **DEVE seguir este processo rigorosamente**

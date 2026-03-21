@@ -238,7 +238,44 @@ Mantenha o progresso visual sempre atualizado
 
 ---
 
-## 💡 **Lembre-se Sempre:**
+## � **PROCESSO OBRIGATÓRIO ATUALIZADO - 21/03/2026**
+
+### **APÓS ERRO CRÍTICO DE IMPLEMENTAÇÃO:**
+
+**ERRO:** Menu simplificado implementado sem seguir UX_ESTRUTURA_PROPOSTA.md
+
+**NOVO FLUXO OBRIGATÓRIO PARA QUALQUER IMPLEMENTAÇÃO:**
+
+#### **1. Preparação (NUNCA pular)**
+- □ Ler documento UX específico (Estrutura, Design System, etc.)
+- □ Criar checklist exato dos itens especificados
+- □ Identificar cada componente/estrutura/item
+
+#### **2. Implementação (Rigorosa)**
+- □ Implementar marcando cada item do checklist
+- □ NÃO avançar sem marcar item anterior
+- □ Seguir exatamente o especificado
+
+#### **3. Verificação Cruzada (Obrigatória)**
+- □ Comparar implementação com documento original
+- □ Marcar cada item como "✅ Implementado"
+- □ Verificar se NADA foi esquecido
+
+#### **4. Validação (Antes de concluir)**
+- □ Apresentar para usuário
+- □ Aguardar feedback explícito
+- □ Ajustar conforme necessário
+
+#### **5. Registro (Final)**
+- □ Atualizar documentação
+- □ Fazer commit com status claro
+- □ Registrar lições aprendidas
+
+**REGRA FUNDAMENTAL:** Documentação UX*.md é FONTE DA VERDADE
+
+---
+
+## �💡 **Lembre-se Sempre:**
 
 1. **Documentos são vivos** - refletem o real implementado
 2. **Validação é obrigatória** - sem feedback não está concluído
