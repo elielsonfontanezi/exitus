@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-03-14 11:16:25
+Gerado em: 2026-03-22 00:32:36
 ================================================================================
 
 ================================================================================
@@ -13,6 +13,7 @@ TABELAS DO BANCO EXITUS
 --------+------------------------+--------
  public | alembic_version        | exitus
  public | alertas                | exitus
+ public | assessora              | exitus
  public | ativo                  | exitus
  public | auditoria_relatorios   | exitus
  public | calendario_dividendo   | exitus
@@ -27,6 +28,7 @@ TABELAS DO BANCO EXITUS
  public | movimentacao_caixa     | exitus
  public | parametros_macro       | exitus
  public | plano_compra           | exitus
+ public | plano_venda            | exitus
  public | portfolio              | exitus
  public | posicao                | exitus
  public | projecoes_renda        | exitus
@@ -38,7 +40,7 @@ TABELAS DO BANCO EXITUS
  public | taxa_cambio            | exitus
  public | transacao              | exitus
  public | usuario                | exitus
-(27 rows)
+(29 rows)
 
 
 ================================================================================
@@ -115,15 +117,18 @@ TABELA: alertas
  timestamp_ultimo_acionamento | timestamp without time zone |           |          |                   | plain    |             |              | 
  created_at                   | timestamp without time zone |           |          | now()             | plain    |             |              | 
  updated_at                   | timestamp without time zone |           |          | now()             | plain    |             |              | 
+ assessora_id                 | uuid                        |           |          |                   | plain    |             |              | 
 Indexes:
     "alertas_pkey" PRIMARY KEY, btree (id)
     "idx_alertas_nome" btree (nome)
     "idx_alertas_tipo" btree (tipo_alerta)
     "idx_alertas_usuario_id" btree (usuario_id)
+    "ix_alertas_assessora_id" btree (assessora_id)
 Check constraints:
     "alertas_condicao_valor_positivo" CHECK (condicao_valor > 0::numeric)
 Foreign-key constraints:
     "alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    "fk_alertas_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
 Access method: heap
 
  Pos |            Coluna            |            Tipo             | Tamanho | Null? |      Default      
@@ -143,14 +148,16 @@ Access method: heap
   13 | timestamp_ultimo_acionamento | timestamp without time zone |         | YES   | 
   14 | created_at                   | timestamp without time zone |         | YES   | now()
   15 | updated_at                   | timestamp without time zone |         | YES   | now()
-(15 rows)
+  16 | assessora_id                 | uuid                        |         | YES   | 
+(16 rows)
 
 
 Foreign Keys:
-         Nome FK         |   Coluna   | Tabela Referenciada | Coluna Referenciada 
--------------------------+------------+---------------------+---------------------
- alertas_usuario_id_fkey | usuario_id | usuario             | id
-(1 row)
+         Nome FK         |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+-------------------------+--------------+---------------------+---------------------
+ alertas_usuario_id_fkey | usuario_id   | usuario             | id
+ fk_alertas_assessora_id | assessora_id | assessora           | id
+(2 rows)
 
 
 Primary Keys:
@@ -167,13 +174,134 @@ Unique Constraints:
 
 
 Índices:
-     Nome do Índice     |                                   Definição                                    
-------------------------+--------------------------------------------------------------------------------
- alertas_pkey           | CREATE UNIQUE INDEX alertas_pkey ON public.alertas USING btree (id)
- idx_alertas_nome       | CREATE INDEX idx_alertas_nome ON public.alertas USING btree (nome)
- idx_alertas_tipo       | CREATE INDEX idx_alertas_tipo ON public.alertas USING btree (tipo_alerta)
- idx_alertas_usuario_id | CREATE INDEX idx_alertas_usuario_id ON public.alertas USING btree (usuario_id)
-(4 rows)
+     Nome do Índice      |                                     Definição                                     
+-------------------------+-----------------------------------------------------------------------------------
+ alertas_pkey            | CREATE UNIQUE INDEX alertas_pkey ON public.alertas USING btree (id)
+ idx_alertas_nome        | CREATE INDEX idx_alertas_nome ON public.alertas USING btree (nome)
+ idx_alertas_tipo        | CREATE INDEX idx_alertas_tipo ON public.alertas USING btree (tipo_alerta)
+ idx_alertas_usuario_id  | CREATE INDEX idx_alertas_usuario_id ON public.alertas USING btree (usuario_id)
+ ix_alertas_assessora_id | CREATE INDEX ix_alertas_assessora_id ON public.alertas USING btree (assessora_id)
+(5 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: assessora
+################################################################################
+
+                                                      Table "public.assessora"
+     Column     |            Type             | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+----------------+-----------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id             | uuid                        |           | not null |         | plain    |             |              | 
+ nome           | character varying(200)      |           | not null |         | extended |             |              | 
+ razao_social   | character varying(200)      |           |          |         | extended |             |              | 
+ cnpj           | character varying(18)       |           |          |         | extended |             |              | 
+ email          | character varying(120)      |           | not null |         | extended |             |              | 
+ telefone       | character varying(20)       |           |          |         | extended |             |              | 
+ site           | character varying(200)      |           |          |         | extended |             |              | 
+ endereco       | text                        |           |          |         | extended |             |              | 
+ cidade         | character varying(100)      |           |          |         | extended |             |              | 
+ estado         | character varying(2)        |           |          |         | extended |             |              | 
+ cep            | character varying(9)        |           |          |         | extended |             |              | 
+ numero_cvm     | character varying(50)       |           |          |         | extended |             |              | 
+ anbima         | boolean                     |           |          |         | plain    |             |              | 
+ ativo          | boolean                     |           | not null |         | plain    |             |              | 
+ data_cadastro  | timestamp without time zone |           | not null |         | plain    |             |              | 
+ logo_url       | character varying(500)      |           |          |         | extended |             |              | 
+ cor_primaria   | character varying(7)        |           |          |         | extended |             |              | 
+ cor_secundaria | character varying(7)        |           |          |         | extended |             |              | 
+ max_usuarios   | integer                     |           |          |         | plain    |             |              | 
+ max_portfolios | integer                     |           |          |         | plain    |             |              | 
+ plano          | character varying(50)       |           | not null |         | extended |             |              | 
+ created_at     | timestamp without time zone |           | not null |         | plain    |             |              | 
+ updated_at     | timestamp without time zone |           | not null |         | plain    |             |              | 
+Indexes:
+    "assessora_pkey" PRIMARY KEY, btree (id)
+    "ix_assessora_ativo" btree (ativo)
+    "ix_assessora_cnpj" UNIQUE, btree (cnpj)
+    "ix_assessora_email" UNIQUE, btree (email)
+    "ix_assessora_nome" UNIQUE, btree (nome)
+Referenced by:
+    TABLE "alertas" CONSTRAINT "fk_alertas_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "auditoria_relatorios" CONSTRAINT "fk_auditoria_relatorios_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "calendario_dividendo" CONSTRAINT "fk_calendario_dividendo_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "configuracoes_alertas" CONSTRAINT "fk_configuracoes_alertas_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "evento_corporativo" CONSTRAINT "fk_evento_corporativo_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "evento_custodia" CONSTRAINT "fk_evento_custodia_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "historico_preco" CONSTRAINT "fk_historico_preco_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "log_auditoria" CONSTRAINT "fk_log_auditoria_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "movimentacao_caixa" CONSTRAINT "fk_movimentacao_caixa_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "plano_compra" CONSTRAINT "fk_plano_compra_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "plano_venda" CONSTRAINT "fk_plano_venda_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "portfolio" CONSTRAINT "fk_portfolio_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "posicao" CONSTRAINT "fk_posicao_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "projecoes_renda" CONSTRAINT "fk_projecoes_renda_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "provento" CONSTRAINT "fk_provento_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "relatorios_performance" CONSTRAINT "fk_relatorios_performance_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "saldo_darf_acumulado" CONSTRAINT "fk_saldo_darf_acumulado_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "saldo_prejuizo" CONSTRAINT "fk_saldo_prejuizo_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "transacao" CONSTRAINT "fk_transacao_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "usuario" CONSTRAINT "fk_usuario_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |     Coluna     |            Tipo             | Tamanho | Null? | Default 
+-----+----------------+-----------------------------+---------+-------+---------
+   1 | id             | uuid                        |         | NO    | 
+   2 | nome           | character varying           | (200)   | NO    | 
+   3 | razao_social   | character varying           | (200)   | YES   | 
+   4 | cnpj           | character varying           | (18)    | YES   | 
+   5 | email          | character varying           | (120)   | NO    | 
+   6 | telefone       | character varying           | (20)    | YES   | 
+   7 | site           | character varying           | (200)   | YES   | 
+   8 | endereco       | text                        |         | YES   | 
+   9 | cidade         | character varying           | (100)   | YES   | 
+  10 | estado         | character varying           | (2)     | YES   | 
+  11 | cep            | character varying           | (9)     | YES   | 
+  12 | numero_cvm     | character varying           | (50)    | YES   | 
+  13 | anbima         | boolean                     |         | YES   | 
+  14 | ativo          | boolean                     |         | NO    | 
+  15 | data_cadastro  | timestamp without time zone |         | NO    | 
+  16 | logo_url       | character varying           | (500)   | YES   | 
+  17 | cor_primaria   | character varying           | (7)     | YES   | 
+  18 | cor_secundaria | character varying           | (7)     | YES   | 
+  19 | max_usuarios   | integer                     |         | YES   | 
+  20 | max_portfolios | integer                     |         | YES   | 
+  21 | plano          | character varying           | (50)    | NO    | 
+  22 | created_at     | timestamp without time zone |         | NO    | 
+  23 | updated_at     | timestamp without time zone |         | NO    | 
+(23 rows)
+
+
+Foreign Keys:
+ Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
+---------+--------+---------------------+---------------------
+(0 rows)
+
+
+Primary Keys:
+    Nome PK     | Coluna 
+----------------+--------
+ assessora_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+   Nome do Índice   |                                   Definição                                    
+--------------------+--------------------------------------------------------------------------------
+ assessora_pkey     | CREATE UNIQUE INDEX assessora_pkey ON public.assessora USING btree (id)
+ ix_assessora_nome  | CREATE UNIQUE INDEX ix_assessora_nome ON public.assessora USING btree (nome)
+ ix_assessora_cnpj  | CREATE UNIQUE INDEX ix_assessora_cnpj ON public.assessora USING btree (cnpj)
+ ix_assessora_email | CREATE UNIQUE INDEX ix_assessora_email ON public.assessora USING btree (email)
+ ix_assessora_ativo | CREATE INDEX ix_assessora_ativo ON public.assessora USING btree (ativo)
+(5 rows)
 
 
 ________________________________________________________________________________
@@ -215,6 +343,9 @@ TABELA: ativo
  classe              | classeativo              |           | not null |         | plain    |             |              | 
 Indexes:
     "ativo_pkey" PRIMARY KEY, btree (id)
+    "idx_ativo_mercado" btree (mercado)
+    "idx_ativo_ticker" btree (ticker)
+    "idx_ativo_tipo" btree (tipo)
     "ix_ativo_ativo" btree (ativo)
     "ix_ativo_data_ultima_cotacao" btree (data_ultima_cotacao)
     "ix_ativo_data_vencimento" btree (data_vencimento)
@@ -235,6 +366,7 @@ Referenced by:
     TABLE "evento_custodia" CONSTRAINT "evento_custodia_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
     TABLE "plano_compra" CONSTRAINT "fk_plano_compra_ativo" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE CASCADE
     TABLE "historico_preco" CONSTRAINT "historico_preco_ativoid_fkey" FOREIGN KEY (ativoid) REFERENCES ativo(id) ON DELETE CASCADE
+    TABLE "plano_venda" CONSTRAINT "plano_venda_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
     TABLE "posicao" CONSTRAINT "posicao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     TABLE "provento" CONSTRAINT "provento_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     TABLE "transacao" CONSTRAINT "transacao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
@@ -303,7 +435,10 @@ Unique Constraints:
  ix_ativo_nome                | CREATE INDEX ix_ativo_nome ON public.ativo USING btree (nome)
  ix_ativo_ticker              | CREATE INDEX ix_ativo_ticker ON public.ativo USING btree (ticker)
  ix_ativo_data_vencimento     | CREATE INDEX ix_ativo_data_vencimento ON public.ativo USING btree (data_vencimento)
-(9 rows)
+ idx_ativo_ticker             | CREATE INDEX idx_ativo_ticker ON public.ativo USING btree (ticker)
+ idx_ativo_tipo               | CREATE INDEX idx_ativo_tipo ON public.ativo USING btree (tipo)
+ idx_ativo_mercado            | CREATE INDEX idx_ativo_mercado ON public.ativo USING btree (mercado)
+(12 rows)
 
 
 ________________________________________________________________________________
@@ -329,8 +464,10 @@ TABELA: auditoria_relatorios
  chave_api_auditoria | character varying(64)    |           |          |                               | extended |             |              | Chave para rastreamento de API
  created_at          | timestamp with time zone |           | not null | now()                         | plain    |             |              | Data de criação do registro
  updated_at          | timestamp with time zone |           | not null | now()                         | plain    |             |              | Data da última atualização
+ assessora_id        | uuid                     |           |          |                               | plain    |             |              | 
 Indexes:
     "auditoria_relatorios_pkey" PRIMARY KEY, btree (id)
+    "ix_auditoria_relatorios_assessora_id" btree (assessora_id)
     "ix_auditoria_relatorios_chave_api_auditoria" btree (chave_api_auditoria)
     "ix_auditoria_relatorios_data_fim" btree (data_fim)
     "ix_auditoria_relatorios_data_inicio" btree (data_inicio)
@@ -343,6 +480,7 @@ Check constraints:
     "auditoria_relatorio_datas_validas" CHECK (data_inicio IS NULL OR data_fim IS NULL OR data_inicio <= data_fim)
 Foreign-key constraints:
     "auditoria_relatorios_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    "fk_auditoria_relatorios_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
 Access method: heap
 
  Pos |       Coluna        |           Tipo           | Tamanho | Null? |            Default            
@@ -360,14 +498,16 @@ Access method: heap
   11 | chave_api_auditoria | character varying        | (64)    | YES   | 
   12 | created_at          | timestamp with time zone |         | NO    | now()
   13 | updated_at          | timestamp with time zone |         | NO    | now()
-(13 rows)
+  14 | assessora_id        | uuid                     |         | YES   | 
+(14 rows)
 
 
 Foreign Keys:
-               Nome FK                |   Coluna   | Tabela Referenciada | Coluna Referenciada 
---------------------------------------+------------+---------------------+---------------------
- auditoria_relatorios_usuario_id_fkey | usuario_id | usuario             | id
-(1 row)
+               Nome FK                |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+--------------------------------------+--------------+---------------------+---------------------
+ auditoria_relatorios_usuario_id_fkey | usuario_id   | usuario             | id
+ fk_auditoria_relatorios_assessora_id | assessora_id | assessora           | id
+(2 rows)
 
 
 Primary Keys:
@@ -395,7 +535,8 @@ Unique Constraints:
  ix_auditoria_relatorios_timestamp_download  | CREATE INDEX ix_auditoria_relatorios_timestamp_download ON public.auditoria_relatorios USING btree (timestamp_download)
  ix_auditoria_relatorios_tipo_relatorio      | CREATE INDEX ix_auditoria_relatorios_tipo_relatorio ON public.auditoria_relatorios USING btree (tipo_relatorio)
  ix_auditoria_relatorios_usuario_id          | CREATE INDEX ix_auditoria_relatorios_usuario_id ON public.auditoria_relatorios USING btree (usuario_id)
-(9 rows)
+ ix_auditoria_relatorios_assessora_id        | CREATE INDEX ix_auditoria_relatorios_assessora_id ON public.auditoria_relatorios USING btree (assessora_id)
+(10 rows)
 
 
 ________________________________________________________________________________
@@ -422,17 +563,20 @@ TABELA: calendario_dividendo
  valor_real     | numeric(18,2)               |           |          |         | main     |             |              | Valor real pago
  created_at     | timestamp without time zone |           | not null |         | plain    |             |              | 
  updated_at     | timestamp without time zone |           | not null |         | plain    |             |              | 
+ assessora_id   | uuid                        |           |          |         | plain    |             |              | 
 Indexes:
     "calendario_dividendo_pkey" PRIMARY KEY, btree (id)
     "idx_calendario_ativo_data" btree (ativo_id, data_esperada)
     "idx_calendario_status" btree (status)
     "idx_calendario_usuario_ativo" btree (usuario_id, ativo_id)
     "idx_calendario_usuario_data" btree (usuario_id, data_esperada)
+    "ix_calendario_dividendo_assessora_id" btree (assessora_id)
 Check constraints:
     "ck_calendario_quantidade_positiva" CHECK (quantidade >= 0)
 Foreign-key constraints:
     "calendario_dividendo_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
     "calendario_dividendo_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+    "fk_calendario_dividendo_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
 Access method: heap
 
  Pos |     Coluna     |            Tipo             | Tamanho | Null? | Default 
@@ -451,15 +595,17 @@ Access method: heap
   12 | valor_real     | numeric                     |         | YES   | 
   13 | created_at     | timestamp without time zone |         | NO    | 
   14 | updated_at     | timestamp without time zone |         | NO    | 
-(14 rows)
+  15 | assessora_id   | uuid                        |         | YES   | 
+(15 rows)
 
 
 Foreign Keys:
-               Nome FK                |   Coluna   | Tabela Referenciada | Coluna Referenciada 
---------------------------------------+------------+---------------------+---------------------
- calendario_dividendo_ativo_id_fkey   | ativo_id   | ativo               | id
- calendario_dividendo_usuario_id_fkey | usuario_id | usuario             | id
-(2 rows)
+               Nome FK                |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+--------------------------------------+--------------+---------------------+---------------------
+ calendario_dividendo_ativo_id_fkey   | ativo_id     | ativo               | id
+ calendario_dividendo_usuario_id_fkey | usuario_id   | usuario             | id
+ fk_calendario_dividendo_assessora_id | assessora_id | assessora           | id
+(3 rows)
 
 
 Primary Keys:
@@ -476,14 +622,15 @@ Unique Constraints:
 
 
 Índices:
-        Nome do Índice        |                                                    Definição                                                    
-------------------------------+-----------------------------------------------------------------------------------------------------------------
- calendario_dividendo_pkey    | CREATE UNIQUE INDEX calendario_dividendo_pkey ON public.calendario_dividendo USING btree (id)
- idx_calendario_usuario_data  | CREATE INDEX idx_calendario_usuario_data ON public.calendario_dividendo USING btree (usuario_id, data_esperada)
- idx_calendario_ativo_data    | CREATE INDEX idx_calendario_ativo_data ON public.calendario_dividendo USING btree (ativo_id, data_esperada)
- idx_calendario_status        | CREATE INDEX idx_calendario_status ON public.calendario_dividendo USING btree (status)
- idx_calendario_usuario_ativo | CREATE INDEX idx_calendario_usuario_ativo ON public.calendario_dividendo USING btree (usuario_id, ativo_id)
-(5 rows)
+            Nome do Índice            |                                                    Definição                                                    
+--------------------------------------+-----------------------------------------------------------------------------------------------------------------
+ calendario_dividendo_pkey            | CREATE UNIQUE INDEX calendario_dividendo_pkey ON public.calendario_dividendo USING btree (id)
+ idx_calendario_usuario_data          | CREATE INDEX idx_calendario_usuario_data ON public.calendario_dividendo USING btree (usuario_id, data_esperada)
+ idx_calendario_ativo_data            | CREATE INDEX idx_calendario_ativo_data ON public.calendario_dividendo USING btree (ativo_id, data_esperada)
+ idx_calendario_status                | CREATE INDEX idx_calendario_status ON public.calendario_dividendo USING btree (status)
+ idx_calendario_usuario_ativo         | CREATE INDEX idx_calendario_usuario_ativo ON public.calendario_dividendo USING btree (usuario_id, ativo_id)
+ ix_calendario_dividendo_assessora_id | CREATE INDEX ix_calendario_dividendo_assessora_id ON public.calendario_dividendo USING btree (assessora_id)
+(6 rows)
 
 
 ________________________________________________________________________________
@@ -512,8 +659,10 @@ TABELA: configuracoes_alertas
  timestamp_ultimo_acionamento | timestamp with time zone |           |          |                                       | plain    |             |              | Data do último acionamento (null se nunca acionado)
  created_at                   | timestamp with time zone |           | not null | now()                                 | plain    |             |              | Data de criação do registro
  updated_at                   | timestamp with time zone |           | not null | now()                                 | plain    |             |              | Data da última atualização
+ assessora_id                 | uuid                     |           |          |                                       | plain    |             |              | 
 Indexes:
     "configuracoes_alertas_pkey" PRIMARY KEY, btree (id)
+    "ix_configuracoes_alertas_assessora_id" btree (assessora_id)
     "ix_configuracoes_alertas_ativo" btree (ativo)
     "ix_configuracoes_alertas_ativo_id" btree (ativo_id)
     "ix_configuracoes_alertas_portfolio_id" btree (portfolio_id)
@@ -528,6 +677,7 @@ Foreign-key constraints:
     "configuracoes_alertas_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE CASCADE
     "configuracoes_alertas_portfolio_id_fkey" FOREIGN KEY (portfolio_id) REFERENCES portfolio(id) ON DELETE CASCADE
     "configuracoes_alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    "fk_configuracoes_alertas_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
 Access method: heap
 
  Pos |            Coluna            |           Tipo           | Tamanho | Null? |                Default                
@@ -548,7 +698,8 @@ Access method: heap
   14 | timestamp_ultimo_acionamento | timestamp with time zone |         | YES   | 
   15 | created_at                   | timestamp with time zone |         | NO    | now()
   16 | updated_at                   | timestamp with time zone |         | NO    | now()
-(16 rows)
+  17 | assessora_id                 | uuid                     |         | YES   | 
+(17 rows)
 
 
 Foreign Keys:
@@ -557,7 +708,8 @@ Foreign Keys:
  configuracoes_alertas_ativo_id_fkey     | ativo_id     | ativo               | id
  configuracoes_alertas_portfolio_id_fkey | portfolio_id | portfolio           | id
  configuracoes_alertas_usuario_id_fkey   | usuario_id   | usuario             | id
-(3 rows)
+ fk_configuracoes_alertas_assessora_id   | assessora_id | assessora           | id
+(4 rows)
 
 
 Primary Keys:
@@ -584,7 +736,8 @@ Unique Constraints:
  ix_configuracoes_alertas_timestamp_ultimo_acionamento | CREATE INDEX ix_configuracoes_alertas_timestamp_ultimo_acionamento ON public.configuracoes_alertas USING btree (timestamp_ultimo_acionamento)
  ix_configuracoes_alertas_tipo_alerta                  | CREATE INDEX ix_configuracoes_alertas_tipo_alerta ON public.configuracoes_alertas USING btree (tipo_alerta)
  ix_configuracoes_alertas_usuario_id                   | CREATE INDEX ix_configuracoes_alertas_usuario_id ON public.configuracoes_alertas USING btree (usuario_id)
-(8 rows)
+ ix_configuracoes_alertas_assessora_id                 | CREATE INDEX ix_configuracoes_alertas_assessora_id ON public.configuracoes_alertas USING btree (assessora_id)
+(9 rows)
 
 
 ________________________________________________________________________________
@@ -700,8 +853,10 @@ TABELA: evento_corporativo
  created_at       | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
  updated_at       | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
  tipo_evento      | tipoeventocorporativo    |           | not null |         | plain    |             |              | 
+ assessora_id     | uuid                     |           |          |         | plain    |             |              | 
 Indexes:
     "evento_corporativo_pkey" PRIMARY KEY, btree (id)
+    "ix_evento_corporativo_assessora_id" btree (assessora_id)
     "ix_evento_corporativo_ativo_id" btree (ativo_id)
     "ix_evento_corporativo_ativo_novo_id" btree (ativo_novo_id)
     "ix_evento_corporativo_data_com" btree (data_com)
@@ -712,6 +867,7 @@ Check constraints:
 Foreign-key constraints:
     "evento_corporativo_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     "evento_corporativo_ativo_novo_id_fkey" FOREIGN KEY (ativo_novo_id) REFERENCES ativo(id) ON DELETE SET NULL
+    "fk_evento_corporativo_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
 Access method: heap
 
  Pos |      Coluna      |           Tipo           | Tamanho | Null? | Default 
@@ -728,7 +884,8 @@ Access method: heap
   11 | created_at       | timestamp with time zone |         | NO    | 
   12 | updated_at       | timestamp with time zone |         | NO    | 
   14 | tipo_evento      | USER-DEFINED             |         | NO    | 
-(12 rows)
+  15 | assessora_id     | uuid                     |         | YES   | 
+(13 rows)
 
 
 Foreign Keys:
@@ -736,7 +893,8 @@ Foreign Keys:
 ---------------------------------------+---------------+---------------------+---------------------
  evento_corporativo_ativo_id_fkey      | ativo_id      | ativo               | id
  evento_corporativo_ativo_novo_id_fkey | ativo_novo_id | ativo               | id
-(2 rows)
+ fk_evento_corporativo_assessora_id    | assessora_id  | assessora           | id
+(3 rows)
 
 
 Primary Keys:
@@ -761,7 +919,8 @@ Unique Constraints:
  ix_evento_corporativo_data_com         | CREATE INDEX ix_evento_corporativo_data_com ON public.evento_corporativo USING btree (data_com)
  ix_evento_corporativo_data_evento      | CREATE INDEX ix_evento_corporativo_data_evento ON public.evento_corporativo USING btree (data_evento)
  ix_evento_corporativo_impacto_posicoes | CREATE INDEX ix_evento_corporativo_impacto_posicoes ON public.evento_corporativo USING btree (impacto_posicoes)
-(6 rows)
+ ix_evento_corporativo_assessora_id     | CREATE INDEX ix_evento_corporativo_assessora_id ON public.evento_corporativo USING btree (assessora_id)
+(7 rows)
 
 
 ________________________________________________________________________________
@@ -787,8 +946,10 @@ TABELA: evento_custodia
  created_at     | timestamp without time zone |           | not null | CURRENT_TIMESTAMP              | plain    |             |              | 
  updated_at     | timestamp without time zone |           | not null | CURRENT_TIMESTAMP              | plain    |             |              | 
  tipo_evento    | tipo_evento_custodia        |           |          |                                | plain    |             |              | 
+ assessora_id   | uuid                        |           |          |                                | plain    |             |              | 
 Indexes:
     "evento_custodia_pkey" PRIMARY KEY, btree (id)
+    "ix_evento_custodia_assessora_id" btree (assessora_id)
     "ix_evento_custodia_ativo_id" btree (ativo_id)
     "ix_evento_custodia_data_evento" btree (data_evento)
     "ix_evento_custodia_usuario_id" btree (usuario_id)
@@ -799,6 +960,7 @@ Foreign-key constraints:
     "evento_custodia_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
     "evento_custodia_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id)
     "evento_custodia_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+    "fk_evento_custodia_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
 Access method: heap
 
  Pos |     Coluna     |            Tipo             | Tamanho | Null? |            Default             
@@ -816,7 +978,8 @@ Access method: heap
   12 | created_at     | timestamp without time zone |         | NO    | CURRENT_TIMESTAMP
   13 | updated_at     | timestamp without time zone |         | NO    | CURRENT_TIMESTAMP
   15 | tipo_evento    | USER-DEFINED                |         | YES   | 
-(13 rows)
+  16 | assessora_id   | uuid                        |         | YES   | 
+(14 rows)
 
 
 Foreign Keys:
@@ -825,7 +988,8 @@ Foreign Keys:
  evento_custodia_usuario_id_fkey   | usuario_id   | usuario             | id
  evento_custodia_ativo_id_fkey     | ativo_id     | ativo               | id
  evento_custodia_corretora_id_fkey | corretora_id | corretora           | id
-(3 rows)
+ fk_evento_custodia_assessora_id   | assessora_id | assessora           | id
+(4 rows)
 
 
 Primary Keys:
@@ -842,13 +1006,14 @@ Unique Constraints:
 
 
 Índices:
-         Nome do Índice         |                                            Definição                                            
---------------------------------+-------------------------------------------------------------------------------------------------
- evento_custodia_pkey           | CREATE UNIQUE INDEX evento_custodia_pkey ON public.evento_custodia USING btree (id)
- ix_evento_custodia_usuario_id  | CREATE INDEX ix_evento_custodia_usuario_id ON public.evento_custodia USING btree (usuario_id)
- ix_evento_custodia_ativo_id    | CREATE INDEX ix_evento_custodia_ativo_id ON public.evento_custodia USING btree (ativo_id)
- ix_evento_custodia_data_evento | CREATE INDEX ix_evento_custodia_data_evento ON public.evento_custodia USING btree (data_evento)
-(4 rows)
+         Nome do Índice          |                                             Definição                                             
+---------------------------------+---------------------------------------------------------------------------------------------------
+ evento_custodia_pkey            | CREATE UNIQUE INDEX evento_custodia_pkey ON public.evento_custodia USING btree (id)
+ ix_evento_custodia_usuario_id   | CREATE INDEX ix_evento_custodia_usuario_id ON public.evento_custodia USING btree (usuario_id)
+ ix_evento_custodia_ativo_id     | CREATE INDEX ix_evento_custodia_ativo_id ON public.evento_custodia USING btree (ativo_id)
+ ix_evento_custodia_data_evento  | CREATE INDEX ix_evento_custodia_data_evento ON public.evento_custodia USING btree (data_evento)
+ ix_evento_custodia_assessora_id | CREATE INDEX ix_evento_custodia_assessora_id ON public.evento_custodia USING btree (assessora_id)
+(5 rows)
 
 
 ________________________________________________________________________________
@@ -1040,14 +1205,17 @@ TABELA: historico_preco
  volume           | bigint                      |           |          |                   | plain   |             |              | 
  createdat        | timestamp without time zone |           | not null | now()             | plain   |             |              | 
  updatedat        | timestamp without time zone |           |          |                   | plain   |             |              | 
+ assessora_id     | uuid                        |           |          |                   | plain   |             |              | 
 Indexes:
     "historico_preco_pkey" PRIMARY KEY, btree (id)
     "ix_historico_ativoid_data" btree (ativoid, data)
+    "ix_historico_preco_assessora_id" btree (assessora_id)
     "uq_historico_ativo_data" UNIQUE CONSTRAINT, btree (ativoid, data)
 Check constraints:
     "ck_historico_fechamento_positivo" CHECK (preco_fechamento > 0::numeric)
     "ck_historico_minmax" CHECK (preco_minimo IS NULL OR preco_maximo IS NULL OR preco_minimo <= preco_maximo)
 Foreign-key constraints:
+    "fk_historico_preco_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "historico_preco_ativoid_fkey" FOREIGN KEY (ativoid) REFERENCES ativo(id) ON DELETE CASCADE
 Access method: heap
 
@@ -1063,14 +1231,16 @@ Access method: heap
    8 | volume           | bigint                      |         | YES   | 
    9 | createdat        | timestamp without time zone |         | NO    | now()
   10 | updatedat        | timestamp without time zone |         | YES   | 
-(10 rows)
+  11 | assessora_id     | uuid                        |         | YES   | 
+(11 rows)
 
 
 Foreign Keys:
-           Nome FK            | Coluna  | Tabela Referenciada | Coluna Referenciada 
-------------------------------+---------+---------------------+---------------------
- historico_preco_ativoid_fkey | ativoid | ativo               | id
-(1 row)
+             Nome FK             |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+---------------------------------+--------------+---------------------+---------------------
+ historico_preco_ativoid_fkey    | ativoid      | ativo               | id
+ fk_historico_preco_assessora_id | assessora_id | assessora           | id
+(2 rows)
 
 
 Primary Keys:
@@ -1089,12 +1259,13 @@ Unique Constraints:
 
 
 Índices:
-      Nome do Índice       |                                             Definição                                             
----------------------------+---------------------------------------------------------------------------------------------------
- historico_preco_pkey      | CREATE UNIQUE INDEX historico_preco_pkey ON public.historico_preco USING btree (id)
- uq_historico_ativo_data   | CREATE UNIQUE INDEX uq_historico_ativo_data ON public.historico_preco USING btree (ativoid, data)
- ix_historico_ativoid_data | CREATE INDEX ix_historico_ativoid_data ON public.historico_preco USING btree (ativoid, data)
-(3 rows)
+         Nome do Índice          |                                             Definição                                             
+---------------------------------+---------------------------------------------------------------------------------------------------
+ historico_preco_pkey            | CREATE UNIQUE INDEX historico_preco_pkey ON public.historico_preco USING btree (id)
+ uq_historico_ativo_data         | CREATE UNIQUE INDEX uq_historico_ativo_data ON public.historico_preco USING btree (ativoid, data)
+ ix_historico_ativoid_data       | CREATE INDEX ix_historico_ativoid_data ON public.historico_preco USING btree (ativoid, data)
+ ix_historico_preco_assessora_id | CREATE INDEX ix_historico_preco_assessora_id ON public.historico_preco USING btree (assessora_id)
+(4 rows)
 
 
 ________________________________________________________________________________
@@ -1119,9 +1290,11 @@ TABELA: log_auditoria
  timestamp    | timestamp with time zone |           | not null |         | plain    |             |              | Data/hora da ação
  sucesso      | boolean                  |           | not null |         | plain    |             |              | Indica se ação foi bem-sucedida
  mensagem     | text                     |           |          |         | extended |             |              | Mensagem de erro ou detalhes adicionais
+ assessora_id | uuid                     |           |          |         | plain    |             |              | 
 Indexes:
     "log_auditoria_pkey" PRIMARY KEY, btree (id)
     "ix_log_auditoria_acao" btree (acao)
+    "ix_log_auditoria_assessora_id" btree (assessora_id)
     "ix_log_auditoria_entidade" btree (entidade)
     "ix_log_auditoria_entidade_id" btree (entidade_id)
     "ix_log_auditoria_ip_address" btree (ip_address)
@@ -1131,6 +1304,7 @@ Indexes:
 Check constraints:
     "log_acao_min_length" CHECK (length(acao::text) >= 3)
 Foreign-key constraints:
+    "fk_log_auditoria_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "log_auditoria_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL
 Access method: heap
 
@@ -1148,14 +1322,16 @@ Access method: heap
   10 | timestamp    | timestamp with time zone |         | NO    | 
   11 | sucesso      | boolean                  |         | NO    | 
   12 | mensagem     | text                     |         | YES   | 
-(12 rows)
+  13 | assessora_id | uuid                     |         | YES   | 
+(13 rows)
 
 
 Foreign Keys:
-            Nome FK            |   Coluna   | Tabela Referenciada | Coluna Referenciada 
--------------------------------+------------+---------------------+---------------------
- log_auditoria_usuario_id_fkey | usuario_id | usuario             | id
-(1 row)
+            Nome FK            |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+-------------------------------+--------------+---------------------+---------------------
+ log_auditoria_usuario_id_fkey | usuario_id   | usuario             | id
+ fk_log_auditoria_assessora_id | assessora_id | assessora           | id
+(2 rows)
 
 
 Primary Keys:
@@ -1172,17 +1348,18 @@ Unique Constraints:
 
 
 Índices:
-        Nome do Índice        |                                          Definição                                          
-------------------------------+---------------------------------------------------------------------------------------------
- log_auditoria_pkey           | CREATE UNIQUE INDEX log_auditoria_pkey ON public.log_auditoria USING btree (id)
- ix_log_auditoria_acao        | CREATE INDEX ix_log_auditoria_acao ON public.log_auditoria USING btree (acao)
- ix_log_auditoria_entidade    | CREATE INDEX ix_log_auditoria_entidade ON public.log_auditoria USING btree (entidade)
- ix_log_auditoria_entidade_id | CREATE INDEX ix_log_auditoria_entidade_id ON public.log_auditoria USING btree (entidade_id)
- ix_log_auditoria_ip_address  | CREATE INDEX ix_log_auditoria_ip_address ON public.log_auditoria USING btree (ip_address)
- ix_log_auditoria_sucesso     | CREATE INDEX ix_log_auditoria_sucesso ON public.log_auditoria USING btree (sucesso)
- ix_log_auditoria_timestamp   | CREATE INDEX ix_log_auditoria_timestamp ON public.log_auditoria USING btree ("timestamp")
- ix_log_auditoria_usuario_id  | CREATE INDEX ix_log_auditoria_usuario_id ON public.log_auditoria USING btree (usuario_id)
-(8 rows)
+        Nome do Índice         |                                           Definição                                           
+-------------------------------+-----------------------------------------------------------------------------------------------
+ log_auditoria_pkey            | CREATE UNIQUE INDEX log_auditoria_pkey ON public.log_auditoria USING btree (id)
+ ix_log_auditoria_acao         | CREATE INDEX ix_log_auditoria_acao ON public.log_auditoria USING btree (acao)
+ ix_log_auditoria_entidade     | CREATE INDEX ix_log_auditoria_entidade ON public.log_auditoria USING btree (entidade)
+ ix_log_auditoria_entidade_id  | CREATE INDEX ix_log_auditoria_entidade_id ON public.log_auditoria USING btree (entidade_id)
+ ix_log_auditoria_ip_address   | CREATE INDEX ix_log_auditoria_ip_address ON public.log_auditoria USING btree (ip_address)
+ ix_log_auditoria_sucesso      | CREATE INDEX ix_log_auditoria_sucesso ON public.log_auditoria USING btree (sucesso)
+ ix_log_auditoria_timestamp    | CREATE INDEX ix_log_auditoria_timestamp ON public.log_auditoria USING btree ("timestamp")
+ ix_log_auditoria_usuario_id   | CREATE INDEX ix_log_auditoria_usuario_id ON public.log_auditoria USING btree (usuario_id)
+ ix_log_auditoria_assessora_id | CREATE INDEX ix_log_auditoria_assessora_id ON public.log_auditoria USING btree (assessora_id)
+(9 rows)
 
 
 ________________________________________________________________________________
@@ -1208,8 +1385,10 @@ TABELA: movimentacao_caixa
  created_at           | timestamp with time zone |           | not null |         | plain    |             |              | Data de criação do registro
  updated_at           | timestamp with time zone |           | not null |         | plain    |             |              | Data da última atualização
  tipo_movimentacao    | tipomovimentacao         |           | not null |         | plain    |             |              | 
+ assessora_id         | uuid                     |           |          |         | plain    |             |              | 
 Indexes:
     "movimentacao_caixa_pkey" PRIMARY KEY, btree (id)
+    "ix_movimentacao_caixa_assessora_id" btree (assessora_id)
     "ix_movimentacao_caixa_corretora_destino_id" btree (corretora_destino_id)
     "ix_movimentacao_caixa_corretora_id" btree (corretora_id)
     "ix_movimentacao_caixa_data_movimentacao" btree (data_movimentacao)
@@ -1220,6 +1399,7 @@ Check constraints:
     "movimentacao_moeda_iso_format" CHECK (moeda::text ~* '^[A-Z]{3}$'::text)
     "movimentacao_valor_positivo" CHECK (valor > 0::numeric)
 Foreign-key constraints:
+    "fk_movimentacao_caixa_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "movimentacao_caixa_corretora_destino_id_fkey" FOREIGN KEY (corretora_destino_id) REFERENCES corretora(id) ON DELETE SET NULL
     "movimentacao_caixa_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id) ON DELETE CASCADE
     "movimentacao_caixa_provento_id_fkey" FOREIGN KEY (provento_id) REFERENCES provento(id) ON DELETE SET NULL
@@ -1241,7 +1421,8 @@ Access method: heap
   12 | created_at           | timestamp with time zone |         | NO    | 
   13 | updated_at           | timestamp with time zone |         | NO    | 
   15 | tipo_movimentacao    | USER-DEFINED             |         | NO    | 
-(13 rows)
+  16 | assessora_id         | uuid                     |         | YES   | 
+(14 rows)
 
 
 Foreign Keys:
@@ -1251,7 +1432,8 @@ Foreign Keys:
  movimentacao_caixa_corretora_id_fkey         | corretora_id         | corretora           | id
  movimentacao_caixa_provento_id_fkey          | provento_id          | provento            | id
  movimentacao_caixa_usuario_id_fkey           | usuario_id           | usuario             | id
-(4 rows)
+ fk_movimentacao_caixa_assessora_id           | assessora_id         | assessora           | id
+(5 rows)
 
 
 Primary Keys:
@@ -1277,7 +1459,8 @@ Unique Constraints:
  ix_movimentacao_caixa_moeda                | CREATE INDEX ix_movimentacao_caixa_moeda ON public.movimentacao_caixa USING btree (moeda)
  ix_movimentacao_caixa_provento_id          | CREATE INDEX ix_movimentacao_caixa_provento_id ON public.movimentacao_caixa USING btree (provento_id)
  ix_movimentacao_caixa_usuario_id           | CREATE INDEX ix_movimentacao_caixa_usuario_id ON public.movimentacao_caixa USING btree (usuario_id)
-(7 rows)
+ ix_movimentacao_caixa_assessora_id         | CREATE INDEX ix_movimentacao_caixa_assessora_id ON public.movimentacao_caixa USING btree (assessora_id)
+(8 rows)
 
 
 ________________________________________________________________________________
@@ -1385,12 +1568,17 @@ TABELA: plano_compra
  proximo_aporte       | timestamp without time zone |           |          |                            | plain    |             |              | 
  created_at           | timestamp without time zone |           | not null |                            | plain    |             |              | 
  updated_at           | timestamp without time zone |           | not null |                            | plain    |             |              | 
+ assessora_id         | uuid                        |           |          |                            | plain    |             |              | 
 Indexes:
     "plano_compra_pkey" PRIMARY KEY, btree (id)
+    "idx_plano_status" btree (status)
+    "idx_plano_usuario_status" btree (usuario_id, status)
+    "ix_plano_compra_assessora_id" btree (assessora_id)
     "ix_plano_compra_ativo_id" btree (ativo_id)
     "ix_plano_compra_status" btree (status)
     "ix_plano_compra_usuario_id" btree (usuario_id)
 Foreign-key constraints:
+    "fk_plano_compra_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "fk_plano_compra_ativo" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE CASCADE
     "fk_plano_compra_usuario" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 Access method: heap
@@ -1412,15 +1600,17 @@ Access method: heap
   13 | proximo_aporte       | timestamp without time zone |         | YES   | 
   14 | created_at           | timestamp without time zone |         | NO    | 
   15 | updated_at           | timestamp without time zone |         | NO    | 
-(15 rows)
+  16 | assessora_id         | uuid                        |         | YES   | 
+(16 rows)
 
 
 Foreign Keys:
-         Nome FK         |   Coluna   | Tabela Referenciada | Coluna Referenciada 
--------------------------+------------+---------------------+---------------------
- fk_plano_compra_usuario | usuario_id | usuario             | id
- fk_plano_compra_ativo   | ativo_id   | ativo               | id
-(2 rows)
+           Nome FK            |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+------------------------------+--------------+---------------------+---------------------
+ fk_plano_compra_usuario      | usuario_id   | usuario             | id
+ fk_plano_compra_ativo        | ativo_id     | ativo               | id
+ fk_plano_compra_assessora_id | assessora_id | assessora           | id
+(3 rows)
 
 
 Primary Keys:
@@ -1437,13 +1627,120 @@ Unique Constraints:
 
 
 Índices:
-       Nome do Índice       |                                        Definição                                        
-----------------------------+-----------------------------------------------------------------------------------------
- plano_compra_pkey          | CREATE UNIQUE INDEX plano_compra_pkey ON public.plano_compra USING btree (id)
- ix_plano_compra_usuario_id | CREATE INDEX ix_plano_compra_usuario_id ON public.plano_compra USING btree (usuario_id)
- ix_plano_compra_ativo_id   | CREATE INDEX ix_plano_compra_ativo_id ON public.plano_compra USING btree (ativo_id)
- ix_plano_compra_status     | CREATE INDEX ix_plano_compra_status ON public.plano_compra USING btree (status)
-(4 rows)
+        Nome do Índice        |                                           Definição                                           
+------------------------------+-----------------------------------------------------------------------------------------------
+ plano_compra_pkey            | CREATE UNIQUE INDEX plano_compra_pkey ON public.plano_compra USING btree (id)
+ ix_plano_compra_usuario_id   | CREATE INDEX ix_plano_compra_usuario_id ON public.plano_compra USING btree (usuario_id)
+ ix_plano_compra_ativo_id     | CREATE INDEX ix_plano_compra_ativo_id ON public.plano_compra USING btree (ativo_id)
+ ix_plano_compra_status       | CREATE INDEX ix_plano_compra_status ON public.plano_compra USING btree (status)
+ idx_plano_usuario_status     | CREATE INDEX idx_plano_usuario_status ON public.plano_compra USING btree (usuario_id, status)
+ idx_plano_status             | CREATE INDEX idx_plano_status ON public.plano_compra USING btree (status)
+ ix_plano_compra_assessora_id | CREATE INDEX ix_plano_compra_assessora_id ON public.plano_compra USING btree (assessora_id)
+(7 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: plano_venda
+################################################################################
+
+                                                                 Table "public.plano_venda"
+       Column        |            Type             | Collation | Nullable |          Default           | Storage  | Compression | Stats target | Description 
+---------------------+-----------------------------+-----------+----------+----------------------------+----------+-------------+--------------+-------------
+ id                  | uuid                        |           | not null | gen_random_uuid()          | plain    |             |              | 
+ nome                | character varying(200)      |           | not null |                            | extended |             |              | 
+ descricao           | text                        |           |          |                            | extended |             |              | 
+ usuario_id          | uuid                        |           | not null |                            | plain    |             |              | 
+ ativo_id            | uuid                        |           | not null |                            | plain    |             |              | 
+ quantidade_total    | numeric(18,8)               |           | not null |                            | main     |             |              | 
+ quantidade_vendida  | numeric(18,8)               |           | not null | 0                          | main     |             |              | 
+ preco_minimo        | numeric(18,6)               |           |          |                            | main     |             |              | 
+ preco_alvo          | numeric(18,6)               |           |          |                            | main     |             |              | 
+ tipo_gatilho        | character varying(50)       |           | not null |                            | extended |             |              | 
+ gatilho_valor       | numeric(18,6)               |           |          |                            | main     |             |              | 
+ data_limite         | date                        |           |          |                            | plain    |             |              | 
+ parcelas_total      | integer                     |           |          |                            | plain    |             |              | 
+ parcelas_executadas | integer                     |           | not null | 0                          | plain    |             |              | 
+ valor_parcela_fixo  | numeric(18,2)               |           |          |                            | main     |             |              | 
+ status              | character varying(20)       |           | not null | 'ativo'::character varying | extended |             |              | 
+ data_inicio         | date                        |           |          |                            | plain    |             |              | 
+ data_conclusao      | date                        |           |          |                            | plain    |             |              | 
+ created_at          | timestamp without time zone |           | not null | now()                      | plain    |             |              | 
+ updated_at          | timestamp without time zone |           | not null | now()                      | plain    |             |              | 
+ assessora_id        | uuid                        |           |          |                            | plain    |             |              | 
+Indexes:
+    "plano_venda_pkey" PRIMARY KEY, btree (id)
+    "ix_plano_venda_assessora_id" btree (assessora_id)
+    "ix_plano_venda_ativo_id" btree (ativo_id)
+    "ix_plano_venda_status" btree (status)
+    "ix_plano_venda_usuario_id" btree (usuario_id)
+    "ix_plano_venda_usuario_status" btree (usuario_id, status)
+Foreign-key constraints:
+    "fk_plano_venda_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    "plano_venda_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
+    "plano_venda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+Access method: heap
+
+ Pos |       Coluna        |            Tipo             | Tamanho | Null? |          Default           
+-----+---------------------+-----------------------------+---------+-------+----------------------------
+   1 | id                  | uuid                        |         | NO    | gen_random_uuid()
+   2 | nome                | character varying           | (200)   | NO    | 
+   3 | descricao           | text                        |         | YES   | 
+   4 | usuario_id          | uuid                        |         | NO    | 
+   5 | ativo_id            | uuid                        |         | NO    | 
+   6 | quantidade_total    | numeric                     |         | NO    | 
+   7 | quantidade_vendida  | numeric                     |         | NO    | 0
+   8 | preco_minimo        | numeric                     |         | YES   | 
+   9 | preco_alvo          | numeric                     |         | YES   | 
+  10 | tipo_gatilho        | character varying           | (50)    | NO    | 
+  11 | gatilho_valor       | numeric                     |         | YES   | 
+  12 | data_limite         | date                        |         | YES   | 
+  13 | parcelas_total      | integer                     |         | YES   | 
+  14 | parcelas_executadas | integer                     |         | NO    | 0
+  15 | valor_parcela_fixo  | numeric                     |         | YES   | 
+  16 | status              | character varying           | (20)    | NO    | 'ativo'::character varying
+  17 | data_inicio         | date                        |         | YES   | 
+  18 | data_conclusao      | date                        |         | YES   | 
+  19 | created_at          | timestamp without time zone |         | NO    | now()
+  20 | updated_at          | timestamp without time zone |         | NO    | now()
+  21 | assessora_id        | uuid                        |         | YES   | 
+(21 rows)
+
+
+Foreign Keys:
+           Nome FK           |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+-----------------------------+--------------+---------------------+---------------------
+ plano_venda_usuario_id_fkey | usuario_id   | usuario             | id
+ plano_venda_ativo_id_fkey   | ativo_id     | ativo               | id
+ fk_plano_venda_assessora_id | assessora_id | assessora           | id
+(3 rows)
+
+
+Primary Keys:
+     Nome PK      | Coluna 
+------------------+--------
+ plano_venda_pkey | id
+(1 row)
+
+
+Unique Constraints:
+ Nome Constraint | Coluna 
+-----------------+--------
+(0 rows)
+
+
+Índices:
+        Nome do Índice         |                                             Definição                                             
+-------------------------------+---------------------------------------------------------------------------------------------------
+ plano_venda_pkey              | CREATE UNIQUE INDEX plano_venda_pkey ON public.plano_venda USING btree (id)
+ ix_plano_venda_usuario_id     | CREATE INDEX ix_plano_venda_usuario_id ON public.plano_venda USING btree (usuario_id)
+ ix_plano_venda_ativo_id       | CREATE INDEX ix_plano_venda_ativo_id ON public.plano_venda USING btree (ativo_id)
+ ix_plano_venda_status         | CREATE INDEX ix_plano_venda_status ON public.plano_venda USING btree (status)
+ ix_plano_venda_usuario_status | CREATE INDEX ix_plano_venda_usuario_status ON public.plano_venda USING btree (usuario_id, status)
+ ix_plano_venda_assessora_id   | CREATE INDEX ix_plano_venda_assessora_id ON public.plano_venda USING btree (assessora_id)
+(6 rows)
 
 
 ________________________________________________________________________________
@@ -1466,8 +1763,11 @@ TABELA: portfolio
  percentual_alocacao_target | numeric(5,2)             |           |          |         | main     |             |              | Percentual de alocação desejada do patrimônio total (0-100)
  created_at                 | timestamp with time zone |           | not null | now()   | plain    |             |              | Data de criação do registro
  updated_at                 | timestamp with time zone |           | not null | now()   | plain    |             |              | Data da última atualização
+ assessora_id               | uuid                     |           |          |         | plain    |             |              | 
 Indexes:
     "portfolio_pkey" PRIMARY KEY, btree (id)
+    "ix_portfolio_assessora_id" btree (assessora_id)
+    "ix_portfolio_assessora_usuario" btree (assessora_id, usuario_id)
     "ix_portfolio_ativo" btree (ativo)
     "ix_portfolio_usuario_id" btree (usuario_id)
 Check constraints:
@@ -1475,6 +1775,7 @@ Check constraints:
     "portfolio_percentual_valido" CHECK (percentual_alocacao_target IS NULL OR percentual_alocacao_target >= 0::numeric AND percentual_alocacao_target <= 100::numeric)
     "portfolio_valor_inicial_positivo" CHECK (valor_inicial IS NULL OR valor_inicial >= 0::numeric)
 Foreign-key constraints:
+    "fk_portfolio_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "portfolio_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 Referenced by:
     TABLE "configuracoes_alertas" CONSTRAINT "configuracoes_alertas_portfolio_id_fkey" FOREIGN KEY (portfolio_id) REFERENCES portfolio(id) ON DELETE CASCADE
@@ -1492,14 +1793,16 @@ Access method: heap
    8 | percentual_alocacao_target | numeric                  |         | YES   | 
    9 | created_at                 | timestamp with time zone |         | NO    | now()
   10 | updated_at                 | timestamp with time zone |         | NO    | now()
-(10 rows)
+  11 | assessora_id               | uuid                     |         | YES   | 
+(11 rows)
 
 
 Foreign Keys:
-          Nome FK          |   Coluna   | Tabela Referenciada | Coluna Referenciada 
----------------------------+------------+---------------------+---------------------
- portfolio_usuario_id_fkey | usuario_id | usuario             | id
-(1 row)
+          Nome FK          |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+---------------------------+--------------+---------------------+---------------------
+ portfolio_usuario_id_fkey | usuario_id   | usuario             | id
+ fk_portfolio_assessora_id | assessora_id | assessora           | id
+(2 rows)
 
 
 Primary Keys:
@@ -1516,12 +1819,14 @@ Unique Constraints:
 
 
 Índices:
-     Nome do Índice      |                                     Definição                                     
--------------------------+-----------------------------------------------------------------------------------
- portfolio_pkey          | CREATE UNIQUE INDEX portfolio_pkey ON public.portfolio USING btree (id)
- ix_portfolio_ativo      | CREATE INDEX ix_portfolio_ativo ON public.portfolio USING btree (ativo)
- ix_portfolio_usuario_id | CREATE INDEX ix_portfolio_usuario_id ON public.portfolio USING btree (usuario_id)
-(3 rows)
+         Nome do Índice         |                                               Definição                                                
+--------------------------------+--------------------------------------------------------------------------------------------------------
+ portfolio_pkey                 | CREATE UNIQUE INDEX portfolio_pkey ON public.portfolio USING btree (id)
+ ix_portfolio_ativo             | CREATE INDEX ix_portfolio_ativo ON public.portfolio USING btree (ativo)
+ ix_portfolio_usuario_id        | CREATE INDEX ix_portfolio_usuario_id ON public.portfolio USING btree (usuario_id)
+ ix_portfolio_assessora_id      | CREATE INDEX ix_portfolio_assessora_id ON public.portfolio USING btree (assessora_id)
+ ix_portfolio_assessora_usuario | CREATE INDEX ix_portfolio_assessora_usuario ON public.portfolio USING btree (assessora_id, usuario_id)
+(5 rows)
 
 
 ________________________________________________________________________________
@@ -1550,8 +1855,12 @@ TABELA: posicao
  data_ultima_atualizacao      | timestamp with time zone |           |          |         | plain   |             |              | Data da última atualização de valores
  created_at                   | timestamp with time zone |           | not null |         | plain   |             |              | Data de criação do registro
  updated_at                   | timestamp with time zone |           | not null |         | plain   |             |              | Data da última atualização
+ assessora_id                 | uuid                     |           |          |         | plain   |             |              | 
 Indexes:
     "posicao_pkey" PRIMARY KEY, btree (id)
+    "idx_posicao_usuario_id" btree (usuario_id)
+    "ix_posicao_assessora_ativo" btree (assessora_id, ativo_id)
+    "ix_posicao_assessora_id" btree (assessora_id)
     "ix_posicao_ativo_id" btree (ativo_id)
     "ix_posicao_corretora_id" btree (corretora_id)
     "ix_posicao_data_primeira_compra" btree (data_primeira_compra)
@@ -1565,6 +1874,7 @@ Check constraints:
     "posicao_quantidade_positiva" CHECK (quantidade >= 0::numeric)
     "posicao_taxas_positivas" CHECK (taxas_acumuladas >= 0::numeric)
 Foreign-key constraints:
+    "fk_posicao_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "posicao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
     "posicao_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id) ON DELETE CASCADE
     "posicao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
@@ -1588,7 +1898,8 @@ Access method: heap
   14 | data_ultima_atualizacao      | timestamp with time zone |         | YES   | 
   15 | created_at                   | timestamp with time zone |         | NO    | 
   16 | updated_at                   | timestamp with time zone |         | NO    | 
-(16 rows)
+  17 | assessora_id                 | uuid                     |         | YES   | 
+(17 rows)
 
 
 Foreign Keys:
@@ -1597,7 +1908,8 @@ Foreign Keys:
  posicao_ativo_id_fkey     | ativo_id     | ativo               | id
  posicao_corretora_id_fkey | corretora_id | corretora           | id
  posicao_usuario_id_fkey   | usuario_id   | usuario             | id
-(3 rows)
+ fk_posicao_assessora_id   | assessora_id | assessora           | id
+(4 rows)
 
 
 Primary Keys:
@@ -1626,7 +1938,10 @@ Unique Constraints:
  ix_posicao_data_primeira_compra        | CREATE INDEX ix_posicao_data_primeira_compra ON public.posicao USING btree (data_primeira_compra)
  ix_posicao_data_ultima_atualizacao     | CREATE INDEX ix_posicao_data_ultima_atualizacao ON public.posicao USING btree (data_ultima_atualizacao)
  ix_posicao_usuario_id                  | CREATE INDEX ix_posicao_usuario_id ON public.posicao USING btree (usuario_id)
-(7 rows)
+ idx_posicao_usuario_id                 | CREATE INDEX idx_posicao_usuario_id ON public.posicao USING btree (usuario_id)
+ ix_posicao_assessora_id                | CREATE INDEX ix_posicao_assessora_id ON public.posicao USING btree (assessora_id)
+ ix_posicao_assessora_ativo             | CREATE INDEX ix_posicao_assessora_ativo ON public.posicao USING btree (assessora_id, ativo_id)
+(10 rows)
 
 
 ________________________________________________________________________________
@@ -1650,8 +1965,10 @@ TABELA: projecoes_renda
  renda_anual_projetada       | numeric(18,2)            |           |          |                   | main     |             |              | 
  created_at                  | timestamp with time zone |           | not null | now()             | plain    |             |              | 
  updated_at                  | timestamp with time zone |           | not null | now()             | plain    |             |              | 
+ assessora_id                | uuid                     |           |          |                   | plain    |             |              | 
 Indexes:
     "projecoes_renda_pkey" PRIMARY KEY, btree (id)
+    "ix_projecoes_renda_assessora_id" btree (assessora_id)
     "ix_projecoes_renda_mes_ano" btree (mes_ano)
     "ix_projecoes_renda_usuario_id" btree (usuario_id)
     "projecoes_renda_usuario_id_portfolio_id_mes_ano_key" UNIQUE CONSTRAINT, btree (usuario_id, portfolio_id, mes_ano)
@@ -1661,6 +1978,7 @@ Check constraints:
     "projecao_renda_rendimentos_nao_negativo" CHECK (renda_rendimentos_projetada >= 0::numeric)
     "projecao_renda_total_nao_negativo" CHECK (renda_total_mes >= 0::numeric)
 Foreign-key constraints:
+    "fk_projecoes_renda_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "projecoes_renda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 Access method: heap
 
@@ -1677,14 +1995,16 @@ Access method: heap
    9 | renda_anual_projetada       | numeric                  |         | YES   | 
   10 | created_at                  | timestamp with time zone |         | NO    | now()
   11 | updated_at                  | timestamp with time zone |         | NO    | now()
-(11 rows)
+  12 | assessora_id                | uuid                     |         | YES   | 
+(12 rows)
 
 
 Foreign Keys:
-             Nome FK             |   Coluna   | Tabela Referenciada | Coluna Referenciada 
----------------------------------+------------+---------------------+---------------------
- projecoes_renda_usuario_id_fkey | usuario_id | usuario             | id
-(1 row)
+             Nome FK             |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+---------------------------------+--------------+---------------------+---------------------
+ projecoes_renda_usuario_id_fkey | usuario_id   | usuario             | id
+ fk_projecoes_renda_assessora_id | assessora_id | assessora           | id
+(2 rows)
 
 
 Primary Keys:
@@ -1710,7 +2030,8 @@ Unique Constraints:
  projecoes_renda_usuario_id_portfolio_id_mes_ano_key | CREATE UNIQUE INDEX projecoes_renda_usuario_id_portfolio_id_mes_ano_key ON public.projecoes_renda USING btree (usuario_id, portfolio_id, mes_ano)
  ix_projecoes_renda_mes_ano                          | CREATE INDEX ix_projecoes_renda_mes_ano ON public.projecoes_renda USING btree (mes_ano)
  ix_projecoes_renda_usuario_id                       | CREATE INDEX ix_projecoes_renda_usuario_id ON public.projecoes_renda USING btree (usuario_id)
-(4 rows)
+ ix_projecoes_renda_assessora_id                     | CREATE INDEX ix_projecoes_renda_assessora_id ON public.projecoes_renda USING btree (assessora_id)
+(5 rows)
 
 
 ________________________________________________________________________________
@@ -1738,8 +2059,11 @@ TABELA: provento
  tipo_provento     | tipoprovento             |           | not null |         | plain    |             |              | 
  hash_importacao   | character varying(64)    |           |          |         | extended |             |              | Hash MD5 da linha original do arquivo B3 para deduplicação
  arquivo_origem    | character varying(255)   |           |          |         | extended |             |              | Nome do arquivo B3 de origem da importação
+ assessora_id      | uuid                     |           |          |         | plain    |             |              | 
 Indexes:
     "provento_pkey" PRIMARY KEY, btree (id)
+    "idx_provento_ativo_data" btree (ativo_id, data_pagamento)
+    "ix_provento_assessora_id" btree (assessora_id)
     "ix_provento_ativo_id" btree (ativo_id)
     "ix_provento_data_com" btree (data_com)
     "ix_provento_data_pagamento" btree (data_pagamento)
@@ -1753,6 +2077,7 @@ Check constraints:
     "provento_valor_liquido_positivo" CHECK (valor_liquido > 0::numeric)
     "provento_valor_por_acao_positivo" CHECK (valor_por_acao > 0::numeric)
 Foreign-key constraints:
+    "fk_provento_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "provento_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id) ON DELETE RESTRICT
 Referenced by:
     TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_provento_id_fkey" FOREIGN KEY (provento_id) REFERENCES provento(id) ON DELETE SET NULL
@@ -1775,14 +2100,16 @@ Access method: heap
   15 | tipo_provento     | USER-DEFINED             |         | NO    | 
   16 | hash_importacao   | character varying        | (64)    | YES   | 
   17 | arquivo_origem    | character varying        | (255)   | YES   | 
-(15 rows)
+  18 | assessora_id      | uuid                     |         | YES   | 
+(16 rows)
 
 
 Foreign Keys:
-        Nome FK         |  Coluna  | Tabela Referenciada | Coluna Referenciada 
-------------------------+----------+---------------------+---------------------
- provento_ativo_id_fkey | ativo_id | ativo               | id
-(1 row)
+         Nome FK          |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+--------------------------+--------------+---------------------+---------------------
+ provento_ativo_id_fkey   | ativo_id     | ativo               | id
+ fk_provento_assessora_id | assessora_id | assessora           | id
+(2 rows)
 
 
 Primary Keys:
@@ -1799,14 +2126,16 @@ Unique Constraints:
 
 
 Índices:
-       Nome do Índice        |                                         Definição                                         
------------------------------+-------------------------------------------------------------------------------------------
+       Nome do Índice        |                                           Definição                                            
+-----------------------------+------------------------------------------------------------------------------------------------
  provento_pkey               | CREATE UNIQUE INDEX provento_pkey ON public.provento USING btree (id)
  ix_provento_ativo_id        | CREATE INDEX ix_provento_ativo_id ON public.provento USING btree (ativo_id)
  ix_provento_data_com        | CREATE INDEX ix_provento_data_com ON public.provento USING btree (data_com)
  ix_provento_data_pagamento  | CREATE INDEX ix_provento_data_pagamento ON public.provento USING btree (data_pagamento)
  ix_provento_hash_importacao | CREATE INDEX ix_provento_hash_importacao ON public.provento USING btree (hash_importacao)
-(5 rows)
+ idx_provento_ativo_data     | CREATE INDEX idx_provento_ativo_data ON public.provento USING btree (ativo_id, data_pagamento)
+ ix_provento_assessora_id    | CREATE INDEX ix_provento_assessora_id ON public.provento USING btree (assessora_id)
+(7 rows)
 
 
 ________________________________________________________________________________
@@ -1918,12 +2247,15 @@ TABELA: relatorios_performance
  max_drawdown_percentual    | numeric(8,4)             |           |          |                   | main    |             |              | 
  created_at                 | timestamp with time zone |           | not null | now()             | plain   |             |              | 
  updated_at                 | timestamp with time zone |           | not null | now()             | plain   |             |              | 
+ assessora_id               | uuid                     |           |          |                   | plain   |             |              | 
 Indexes:
     "relatorios_performance_pkey" PRIMARY KEY, btree (id)
+    "ix_relatorios_performance_assessora_id" btree (assessora_id)
     "ix_relatorios_performance_usuario_id" btree (usuario_id)
 Check constraints:
     "relatorios_performance_check" CHECK (periodo_inicio <= periodo_fim)
 Foreign-key constraints:
+    "fk_relatorios_performance_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "relatorios_performance_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 Access method: heap
 
@@ -1940,14 +2272,16 @@ Access method: heap
    9 | max_drawdown_percentual    | numeric                  |         | YES   | 
   10 | created_at                 | timestamp with time zone |         | NO    | now()
   11 | updated_at                 | timestamp with time zone |         | NO    | now()
-(11 rows)
+  12 | assessora_id               | uuid                     |         | YES   | 
+(12 rows)
 
 
 Foreign Keys:
-                Nome FK                 |   Coluna   | Tabela Referenciada | Coluna Referenciada 
-----------------------------------------+------------+---------------------+---------------------
- relatorios_performance_usuario_id_fkey | usuario_id | usuario             | id
-(1 row)
+                Nome FK                 |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+----------------------------------------+--------------+---------------------+---------------------
+ relatorios_performance_usuario_id_fkey | usuario_id   | usuario             | id
+ fk_relatorios_performance_assessora_id | assessora_id | assessora           | id
+(2 rows)
 
 
 Primary Keys:
@@ -1964,11 +2298,12 @@ Unique Constraints:
 
 
 Índices:
-            Nome do Índice            |                                                  Definição                                                  
---------------------------------------+-------------------------------------------------------------------------------------------------------------
- relatorios_performance_pkey          | CREATE UNIQUE INDEX relatorios_performance_pkey ON public.relatorios_performance USING btree (id)
- ix_relatorios_performance_usuario_id | CREATE INDEX ix_relatorios_performance_usuario_id ON public.relatorios_performance USING btree (usuario_id)
-(2 rows)
+             Nome do Índice             |                                                    Definição                                                    
+----------------------------------------+-----------------------------------------------------------------------------------------------------------------
+ relatorios_performance_pkey            | CREATE UNIQUE INDEX relatorios_performance_pkey ON public.relatorios_performance USING btree (id)
+ ix_relatorios_performance_usuario_id   | CREATE INDEX ix_relatorios_performance_usuario_id ON public.relatorios_performance USING btree (usuario_id)
+ ix_relatorios_performance_assessora_id | CREATE INDEX ix_relatorios_performance_assessora_id ON public.relatorios_performance USING btree (assessora_id)
+(3 rows)
 
 
 ________________________________________________________________________________
@@ -1989,8 +2324,10 @@ TABELA: saldo_darf_acumulado
  saldo          | numeric(15,2)               |           | not null |         | main     |             |              | 
  created_at     | timestamp without time zone |           | not null |         | plain    |             |              | 
  updated_at     | timestamp without time zone |           | not null |         | plain    |             |              | 
+ assessora_id   | uuid                        |           |          |         | plain    |             |              | 
 Indexes:
     "saldo_darf_acumulado_pkey" PRIMARY KEY, btree (id)
+    "ix_saldo_darf_acumulado_assessora_id" btree (assessora_id)
     "ix_saldo_darf_acumulado_usuario_id" btree (usuario_id)
     "unique_saldo_darf_usuario_categoria_codigo_mes" UNIQUE CONSTRAINT, btree (usuario_id, categoria, codigo_receita, ano_mes)
 Check constraints:
@@ -1998,6 +2335,7 @@ Check constraints:
     "saldo_darf_codigo_receita_valido" CHECK (codigo_receita::text = ANY (ARRAY['6015'::character varying, '0561'::character varying, '9453'::character varying]::text[]))
     "saldo_darf_nao_negativo" CHECK (saldo >= 0::numeric)
 Foreign-key constraints:
+    "fk_saldo_darf_acumulado_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "saldo_darf_acumulado_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 Access method: heap
 
@@ -2011,14 +2349,16 @@ Access method: heap
    6 | saldo          | numeric                     |         | NO    | 
    7 | created_at     | timestamp without time zone |         | NO    | 
    8 | updated_at     | timestamp without time zone |         | NO    | 
-(8 rows)
+   9 | assessora_id   | uuid                        |         | YES   | 
+(9 rows)
 
 
 Foreign Keys:
-               Nome FK                |   Coluna   | Tabela Referenciada | Coluna Referenciada 
---------------------------------------+------------+---------------------+---------------------
- saldo_darf_acumulado_usuario_id_fkey | usuario_id | usuario             | id
-(1 row)
+               Nome FK                |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+--------------------------------------+--------------+---------------------+---------------------
+ saldo_darf_acumulado_usuario_id_fkey | usuario_id   | usuario             | id
+ fk_saldo_darf_acumulado_assessora_id | assessora_id | assessora           | id
+(2 rows)
 
 
 Primary Keys:
@@ -2044,7 +2384,8 @@ Unique Constraints:
  saldo_darf_acumulado_pkey                      | CREATE UNIQUE INDEX saldo_darf_acumulado_pkey ON public.saldo_darf_acumulado USING btree (id)
  unique_saldo_darf_usuario_categoria_codigo_mes | CREATE UNIQUE INDEX unique_saldo_darf_usuario_categoria_codigo_mes ON public.saldo_darf_acumulado USING btree (usuario_id, categoria, codigo_receita, ano_mes)
  ix_saldo_darf_acumulado_usuario_id             | CREATE INDEX ix_saldo_darf_acumulado_usuario_id ON public.saldo_darf_acumulado USING btree (usuario_id)
-(3 rows)
+ ix_saldo_darf_acumulado_assessora_id           | CREATE INDEX ix_saldo_darf_acumulado_assessora_id ON public.saldo_darf_acumulado USING btree (assessora_id)
+(4 rows)
 
 
 ________________________________________________________________________________
@@ -2054,44 +2395,49 @@ ________________________________________________________________________________
 TABELA: saldo_prejuizo
 ################################################################################
 
-                                                Table "public.saldo_prejuizo"
-   Column   |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
-------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
- id         | uuid                     |           | not null |         | plain    |             |              | 
- usuario_id | uuid                     |           | not null |         | plain    |             |              | 
- categoria  | character varying(20)    |           | not null |         | extended |             |              | 
- ano_mes    | character varying(7)     |           | not null |         | extended |             |              | 
- saldo      | numeric(18,2)            |           | not null | 0       | main     |             |              | 
- created_at | timestamp with time zone |           | not null | now()   | plain    |             |              | 
- updated_at | timestamp with time zone |           | not null | now()   | plain    |             |              | 
+                                                 Table "public.saldo_prejuizo"
+    Column    |           Type           | Collation | Nullable | Default | Storage  | Compression | Stats target | Description 
+--------------+--------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id           | uuid                     |           | not null |         | plain    |             |              | 
+ usuario_id   | uuid                     |           | not null |         | plain    |             |              | 
+ categoria    | character varying(20)    |           | not null |         | extended |             |              | 
+ ano_mes      | character varying(7)     |           | not null |         | extended |             |              | 
+ saldo        | numeric(18,2)            |           | not null | 0       | main     |             |              | 
+ created_at   | timestamp with time zone |           | not null | now()   | plain    |             |              | 
+ updated_at   | timestamp with time zone |           | not null | now()   | plain    |             |              | 
+ assessora_id | uuid                     |           |          |         | plain    |             |              | 
 Indexes:
     "saldo_prejuizo_pkey" PRIMARY KEY, btree (id)
+    "ix_saldo_prejuizo_assessora_id" btree (assessora_id)
     "ix_saldo_prejuizo_usuario_id" btree (usuario_id)
     "unique_saldo_prejuizo_usuario_categoria_mes" UNIQUE CONSTRAINT, btree (usuario_id, categoria, ano_mes)
 Check constraints:
     "saldo_prejuizo_categoria_valida" CHECK (categoria::text = ANY (ARRAY['swing_acoes'::character varying, 'day_trade'::character varying, 'fiis'::character varying, 'exterior'::character varying]::text[]))
     "saldo_prejuizo_nao_negativo" CHECK (saldo >= 0::numeric)
 Foreign-key constraints:
+    "fk_saldo_prejuizo_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "saldo_prejuizo_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 Access method: heap
 
- Pos |   Coluna   |           Tipo           | Tamanho | Null? | Default 
------+------------+--------------------------+---------+-------+---------
-   1 | id         | uuid                     |         | NO    | 
-   2 | usuario_id | uuid                     |         | NO    | 
-   3 | categoria  | character varying        | (20)    | NO    | 
-   4 | ano_mes    | character varying        | (7)     | NO    | 
-   5 | saldo      | numeric                  |         | NO    | 0
-   6 | created_at | timestamp with time zone |         | NO    | now()
-   7 | updated_at | timestamp with time zone |         | NO    | now()
-(7 rows)
+ Pos |    Coluna    |           Tipo           | Tamanho | Null? | Default 
+-----+--------------+--------------------------+---------+-------+---------
+   1 | id           | uuid                     |         | NO    | 
+   2 | usuario_id   | uuid                     |         | NO    | 
+   3 | categoria    | character varying        | (20)    | NO    | 
+   4 | ano_mes      | character varying        | (7)     | NO    | 
+   5 | saldo        | numeric                  |         | NO    | 0
+   6 | created_at   | timestamp with time zone |         | NO    | now()
+   7 | updated_at   | timestamp with time zone |         | NO    | now()
+   8 | assessora_id | uuid                     |         | YES   | 
+(8 rows)
 
 
 Foreign Keys:
-            Nome FK             |   Coluna   | Tabela Referenciada | Coluna Referenciada 
---------------------------------+------------+---------------------+---------------------
- saldo_prejuizo_usuario_id_fkey | usuario_id | usuario             | id
-(1 row)
+            Nome FK             |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+--------------------------------+--------------+---------------------+---------------------
+ saldo_prejuizo_usuario_id_fkey | usuario_id   | usuario             | id
+ fk_saldo_prejuizo_assessora_id | assessora_id | assessora           | id
+(2 rows)
 
 
 Primary Keys:
@@ -2116,7 +2462,8 @@ Unique Constraints:
  saldo_prejuizo_pkey                         | CREATE UNIQUE INDEX saldo_prejuizo_pkey ON public.saldo_prejuizo USING btree (id)
  unique_saldo_prejuizo_usuario_categoria_mes | CREATE UNIQUE INDEX unique_saldo_prejuizo_usuario_categoria_mes ON public.saldo_prejuizo USING btree (usuario_id, categoria, ano_mes)
  ix_saldo_prejuizo_usuario_id                | CREATE INDEX ix_saldo_prejuizo_usuario_id ON public.saldo_prejuizo USING btree (usuario_id)
-(3 rows)
+ ix_saldo_prejuizo_assessora_id              | CREATE INDEX ix_saldo_prejuizo_assessora_id ON public.saldo_prejuizo USING btree (assessora_id)
+(4 rows)
 
 
 ________________________________________________________________________________
@@ -2221,14 +2568,22 @@ TABELA: transacao
  tipo            | tipooperacao             |           | not null |         | plain    |             |              | 
  hash_importacao | character varying(64)    |           |          |         | extended |             |              | Hash MD5 da linha original do arquivo B3 para deduplicação
  arquivo_origem  | character varying(255)   |           |          |         | extended |             |              | Nome do arquivo B3 de origem da importação
+ assessora_id    | uuid                     |           |          |         | plain    |             |              | 
 Indexes:
     "transacao_pkey" PRIMARY KEY, btree (id)
+    "idx_transacao_usuario_ativo" btree (usuario_id, ativo_id)
+    "idx_transacao_usuario_data" btree (usuario_id, data_transacao)
+    "idx_transacao_usuario_data_tipo" btree (usuario_id, data_transacao, tipo)
+    "idx_transacao_usuario_tipo" btree (usuario_id, tipo)
+    "ix_transacao_assessora_data" btree (assessora_id, data_transacao)
+    "ix_transacao_assessora_id" btree (assessora_id)
     "ix_transacao_hash_importacao" btree (hash_importacao)
 Check constraints:
     "transacao_preco_unitario_positivo" CHECK (preco_unitario > 0::numeric)
     "transacao_quantidade_positiva" CHECK (quantidade > 0::numeric)
     "transacao_valor_total_positivo" CHECK (valor_total > 0::numeric)
 Foreign-key constraints:
+    "fk_transacao_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     "transacao_ativo_id_fkey" FOREIGN KEY (ativo_id) REFERENCES ativo(id)
     "transacao_corretora_id_fkey" FOREIGN KEY (corretora_id) REFERENCES corretora(id)
     "transacao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
@@ -2257,7 +2612,8 @@ Access method: heap
   21 | tipo            | USER-DEFINED             |         | NO    | 
   22 | hash_importacao | character varying        | (64)    | YES   | 
   23 | arquivo_origem  | character varying        | (255)   | YES   | 
-(21 rows)
+  24 | assessora_id    | uuid                     |         | YES   | 
+(22 rows)
 
 
 Foreign Keys:
@@ -2266,7 +2622,8 @@ Foreign Keys:
  transacao_ativo_id_fkey     | ativo_id     | ativo               | id
  transacao_corretora_id_fkey | corretora_id | corretora           | id
  transacao_usuario_id_fkey   | usuario_id   | usuario             | id
-(3 rows)
+ fk_transacao_assessora_id   | assessora_id | assessora           | id
+(4 rows)
 
 
 Primary Keys:
@@ -2283,11 +2640,17 @@ Unique Constraints:
 
 
 Índices:
-        Nome do Índice        |                                          Definição                                          
-------------------------------+---------------------------------------------------------------------------------------------
- transacao_pkey               | CREATE UNIQUE INDEX transacao_pkey ON public.transacao USING btree (id)
- ix_transacao_hash_importacao | CREATE INDEX ix_transacao_hash_importacao ON public.transacao USING btree (hash_importacao)
-(2 rows)
+         Nome do Índice          |                                                    Definição                                                    
+---------------------------------+-----------------------------------------------------------------------------------------------------------------
+ transacao_pkey                  | CREATE UNIQUE INDEX transacao_pkey ON public.transacao USING btree (id)
+ ix_transacao_hash_importacao    | CREATE INDEX ix_transacao_hash_importacao ON public.transacao USING btree (hash_importacao)
+ idx_transacao_usuario_data      | CREATE INDEX idx_transacao_usuario_data ON public.transacao USING btree (usuario_id, data_transacao)
+ idx_transacao_usuario_ativo     | CREATE INDEX idx_transacao_usuario_ativo ON public.transacao USING btree (usuario_id, ativo_id)
+ idx_transacao_usuario_tipo      | CREATE INDEX idx_transacao_usuario_tipo ON public.transacao USING btree (usuario_id, tipo)
+ idx_transacao_usuario_data_tipo | CREATE INDEX idx_transacao_usuario_data_tipo ON public.transacao USING btree (usuario_id, data_transacao, tipo)
+ ix_transacao_assessora_id       | CREATE INDEX ix_transacao_assessora_id ON public.transacao USING btree (assessora_id)
+ ix_transacao_assessora_data     | CREATE INDEX ix_transacao_assessora_data ON public.transacao USING btree (assessora_id, data_transacao)
+(8 rows)
 
 
 ________________________________________________________________________________
@@ -2309,10 +2672,15 @@ TABELA: usuario
  created_at    | timestamp with time zone |           | not null |         | plain    |             |              | 
  updated_at    | timestamp with time zone |           | not null |         | plain    |             |              | 
  role          | userrole                 |           | not null |         | plain    |             |              | 
+ assessora_id  | uuid                     |           |          |         | plain    |             |              | 
 Indexes:
     "usuario_pkey" PRIMARY KEY, btree (id)
+    "ix_usuario_assessora_ativo" btree (assessora_id, ativo)
+    "ix_usuario_assessora_id" btree (assessora_id)
     "ix_usuario_email" UNIQUE, btree (email)
     "ix_usuario_username" UNIQUE, btree (username)
+Foreign-key constraints:
+    "fk_usuario_assessora_id" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
 Referenced by:
     TABLE "alertas" CONSTRAINT "alertas_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "auditoria_relatorios" CONSTRAINT "auditoria_relatorios_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
@@ -2323,6 +2691,7 @@ Referenced by:
     TABLE "plano_compra" CONSTRAINT "fk_plano_compra_usuario" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "log_auditoria" CONSTRAINT "log_auditoria_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL
     TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+    TABLE "plano_venda" CONSTRAINT "plano_venda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
     TABLE "portfolio" CONSTRAINT "portfolio_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "posicao" CONSTRAINT "posicao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "projecoes_renda" CONSTRAINT "projecoes_renda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
@@ -2343,13 +2712,15 @@ Access method: heap
    8 | created_at    | timestamp with time zone |         | NO    | 
    9 | updated_at    | timestamp with time zone |         | NO    | 
   11 | role          | USER-DEFINED             |         | NO    | 
-(9 rows)
+  12 | assessora_id  | uuid                     |         | YES   | 
+(10 rows)
 
 
 Foreign Keys:
- Nome FK | Coluna | Tabela Referenciada | Coluna Referenciada 
----------+--------+---------------------+---------------------
-(0 rows)
+         Nome FK         |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+-------------------------+--------------+---------------------+---------------------
+ fk_usuario_assessora_id | assessora_id | assessora           | id
+(1 row)
 
 
 Primary Keys:
@@ -2366,12 +2737,14 @@ Unique Constraints:
 
 
 Índices:
-   Nome do Índice    |                                    Definição                                     
----------------------+----------------------------------------------------------------------------------
- usuario_pkey        | CREATE UNIQUE INDEX usuario_pkey ON public.usuario USING btree (id)
- ix_usuario_email    | CREATE UNIQUE INDEX ix_usuario_email ON public.usuario USING btree (email)
- ix_usuario_username | CREATE UNIQUE INDEX ix_usuario_username ON public.usuario USING btree (username)
-(3 rows)
+       Nome do Índice       |                                          Definição                                          
+----------------------------+---------------------------------------------------------------------------------------------
+ usuario_pkey               | CREATE UNIQUE INDEX usuario_pkey ON public.usuario USING btree (id)
+ ix_usuario_email           | CREATE UNIQUE INDEX ix_usuario_email ON public.usuario USING btree (email)
+ ix_usuario_username        | CREATE UNIQUE INDEX ix_usuario_username ON public.usuario USING btree (username)
+ ix_usuario_assessora_id    | CREATE INDEX ix_usuario_assessora_id ON public.usuario USING btree (assessora_id)
+ ix_usuario_assessora_ativo | CREATE INDEX ix_usuario_assessora_ativo ON public.usuario USING btree (assessora_id, ativo)
+(5 rows)
 
 
 ________________________________________________________________________________
@@ -2384,7 +2757,7 @@ RESUMO GERAL
 Total de Tabelas:
  Total 
 -------
-    27
+    29
 (1 row)
 
 
@@ -2392,58 +2765,62 @@ Total de Colunas por Tabela:
          Tabela         | Num Colunas 
 ------------------------+-------------
  alembic_version        |           1
- alertas                |          15
+ alertas                |          16
+ assessora              |          23
  ativo                  |          27
- auditoria_relatorios   |          13
- calendario_dividendo   |          14
- configuracoes_alertas  |          16
+ auditoria_relatorios   |          14
+ calendario_dividendo   |          15
+ configuracoes_alertas  |          17
  corretora              |          11
- evento_corporativo     |          12
- evento_custodia        |          13
+ evento_corporativo     |          13
+ evento_custodia        |          14
  feriado_mercado        |          11
  fonte_dados            |          14
- historico_preco        |          10
- log_auditoria          |          12
- movimentacao_caixa     |          13
+ historico_preco        |          11
+ log_auditoria          |          13
+ movimentacao_caixa     |          14
  parametros_macro       |          12
- plano_compra           |          15
- portfolio              |          10
- posicao                |          16
- projecoes_renda        |          11
- provento               |          15
+ plano_compra           |          16
+ plano_venda            |          21
+ portfolio              |          11
+ posicao                |          17
+ projecoes_renda        |          12
+ provento               |          16
  regra_fiscal           |          13
- relatorios_performance |          11
- saldo_darf_acumulado   |           8
- saldo_prejuizo         |           7
+ relatorios_performance |          12
+ saldo_darf_acumulado   |           9
+ saldo_prejuizo         |           8
  taxa_cambio            |           8
- transacao              |          21
- usuario                |           9
-(27 rows)
+ transacao              |          22
+ usuario                |          10
+(29 rows)
 
 
 Total de Foreign Keys por Tabela:
          Tabela         | Num FKs 
 ------------------------+---------
- alertas                |       1
- auditoria_relatorios   |       1
- calendario_dividendo   |       2
- configuracoes_alertas  |       3
+ alertas                |       2
+ auditoria_relatorios   |       2
+ calendario_dividendo   |       3
+ configuracoes_alertas  |       4
  corretora              |       1
- evento_corporativo     |       2
- evento_custodia        |       3
- historico_preco        |       1
- log_auditoria          |       1
- movimentacao_caixa     |       4
- plano_compra           |       2
- portfolio              |       1
- posicao                |       3
- projecoes_renda        |       1
- provento               |       1
- relatorios_performance |       1
- saldo_darf_acumulado   |       1
- saldo_prejuizo         |       1
- transacao              |       3
-(19 rows)
+ evento_corporativo     |       3
+ evento_custodia        |       4
+ historico_preco        |       2
+ log_auditoria          |       2
+ movimentacao_caixa     |       5
+ plano_compra           |       3
+ plano_venda            |       3
+ portfolio              |       2
+ posicao                |       4
+ projecoes_renda        |       2
+ provento               |       2
+ relatorios_performance |       2
+ saldo_darf_acumulado   |       2
+ saldo_prejuizo         |       2
+ transacao              |       4
+ usuario                |       1
+(21 rows)
 
 
 ================================================================================
@@ -2458,6 +2835,7 @@ ENUMS DO BANCO
  incidenciaimposto     | lucro, receita, provento, operacao
  operadorcondicao      | >, <, ==, >=, <=, ENTRE
  statusplanocompra     | ativo, pausado, concluido, cancelado
+ statusplanoventa      | ativo, pausado, concluido, cancelado
  tipo_evento_custodia  | liquidacao_d2, transferencia_entrada, transferencia_saida, ajuste_posicao, desdobramento, agrupamento, amortizacao, outro
  tipoalerta            | queda_preco, alta_preco, dividendo_previsto, meta_rentabilidade, volatilidade_alta, desvio_alocacao, noticias_ativo
  tipoativo             | acao, fii, reit, bond, etf, cripto, outro, cdb, lci_lca, tesouro_direto, debenture, stock, stock_intl, etf_intl, unit
@@ -2471,7 +2849,7 @@ ENUMS DO BANCO
  tiporelatorio         | portfolio, performance, renda_passiva, investimento, customizado
  tipotransacao         | compra, venda, dividendo, jcp, aluguel, bonificacao, split, grupamento, subscricao, amortizacao
  userrole              | admin, user, readonly
-(19 rows)
+(20 rows)
 
 
 ================================================================================
