@@ -1,0 +1,369 @@
+{
+  "version": "1.0",
+  "description": "Cenário COMPLETO para TODAS as telas - cobertura 100% do sistema",
+  "timestamp": "2026-03-22T00:00:00Z",
+  "usuarios": [
+    {
+      "username": "e2e_admin",
+      "email": "admin@e2e.exitus",
+      "password": "e2e_senha_123",
+      "role": "ADMIN",
+      "nome_completo": "Administrador E2E",
+      "ativo": true
+    },
+    {
+      "username": "e2e_user",
+      "email": "usuario@e2e.exitus",
+      "password": "e2e_senha_123",
+      "role": "USER",
+      "nome_completo": "Usuário E2E",
+      "ativo": true
+    },
+    {
+      "username": "e2e_viewer",
+      "email": "viewer@e2e.exitus",
+      "password": "e2e_senha_123",
+      "role": "READONLY",
+      "nome_completo": "Visualizador E2E",
+      "ativo": true
+    }
+  ],
+  "assessoras": [
+    {
+      "nome": "Assessora E2E Teste",
+      "razao_social": "Assessora E2E LTDA",
+      "cnpj": "12345678901234",
+      "email": "contato@e2e.exitus",
+      "telefone": "11999999999",
+      "ativo": true
+    }
+  ],
+  "ativos": [
+    {
+      "ticker": "PETR4",
+      "nome": "Petrobras PN",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 38.50,
+      "preco_teto": 45.00,
+      "dividend_yield": 15.2,
+      "p_l": 4.1,
+      "p_vp": 1.05,
+      "observacoes": "Setor: Petróleo e Gás",
+      "ativo": true
+    },
+    {
+      "ticker": "VALE3",
+      "nome": "Vale ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 68.90,
+      "preco_teto": 75.00,
+      "dividend_yield": 12.8,
+      "p_l": 5.2,
+      "p_vp": 0.95,
+      "observacoes": "Setor: Mineração",
+      "ativo": true
+    },
+    {
+      "ticker": "ITUB4",
+      "nome": "Itaú Unibanco PN",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 32.45,
+      "preco_teto": 38.00,
+      "dividend_yield": 8.5,
+      "p_l": 10.2,
+      "p_vp": 1.45,
+      "observacoes": "Setor: Financeiro",
+      "ativo": true
+    },
+    {
+      "ticker": "HGLG11",
+      "nome": "CSHG Logística FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 185.20,
+      "preco_teto": 195.00,
+      "dividend_yield": 8.2,
+      "p_vp": 0.85,
+      "observacoes": "FII Logística",
+      "ativo": true
+    },
+    {
+      "ticker": "KNRI11",
+      "nome": "KN Recebíveis Imobiliários FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 145.80,
+      "preco_teto": 155.00,
+      "dividend_yield": 7.5,
+      "p_vp": 0.92,
+      "observacoes": "FII Recebíveis",
+      "ativo": true
+    },
+    {
+      "ticker": "AAPL",
+      "nome": "Apple Inc.",
+      "tipo": "STOCK",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "pais": "US",
+      "preco_atual": 178.50,
+      "preco_teto": 195.00,
+      "dividend_yield": 0.5,
+      "p_l": 28.5,
+      "observacoes": "Technology Sector",
+      "ativo": true
+    },
+    {
+      "ticker": "MSFT",
+      "nome": "Microsoft Corporation",
+      "tipo": "STOCK",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "US",
+      "moeda": "USD",
+      "pais": "US",
+      "preco_atual": 415.20,
+      "preco_teto": 450.00,
+      "dividend_yield": 0.7,
+      "p_l": 32.8,
+      "observacoes": "Technology Sector",
+      "ativo": true
+    }
+  ],
+  "corretoras": [
+    {
+      "nome": "ITAU CV S/A",
+      "cnpj": "60701190000104",
+      "tipo": "CORRETORA",
+      "pais": "BR",
+      "ativa": true
+    },
+    {
+      "nome": "XP INVESTIMENTOS",
+      "cnpj": "08764140000176",
+      "tipo": "CORRETORA",
+      "pais": "BR",
+      "ativa": true
+    },
+    {
+      "nome": "INTER BANCO",
+      "cnpj": "00416986000106",
+      "tipo": "CORRETORA",
+      "pais": "BR",
+      "ativa": true
+    }
+  ],
+  "transacoes": [
+    {
+      "usuario": "e2e_user",
+      "ativo": "PETR4",
+      "corretora": "ITAU CV S/A",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-01-15",
+      "quantidade": 100,
+      "preco_unitario": 35.50,
+      "taxa_corretagem": 5.00,
+      "custos_totais": 8.50
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "VALE3",
+      "corretora": "XP INVESTIMENTOS",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-02-20",
+      "quantidade": 200,
+      "preco_unitario": 65.20,
+      "taxa_corretagem": 8.00,
+      "custos_totais": 12.00
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "HGLG11",
+      "corretora": "INTER BANCO",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-03-10",
+      "quantidade": 50,
+      "preco_unitario": 180.00,
+      "taxa_corretagem": 6.00,
+      "custos_totais": 9.00
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "PETR4",
+      "corretora": "ITAU CV S/A",
+      "tipo": "VENDA",
+      "data_transacao": "2024-04-05",
+      "quantidade": 50,
+      "preco_unitario": 39.80,
+      "taxa_corretagem": 5.00,
+      "custos_totais": 7.50
+    }
+  ],
+  "proventos": [
+    {
+      "ativo": "PETR4",
+      "tipo_provento": "DIVIDENDO",
+      "data_com": "2024-03-20",
+      "data_pagamento": "2024-04-05",
+      "valor_unitario": 2.50,
+      "observacoes": "Dividendo ordinário"
+    },
+    {
+      "ativo": "HGLG11",
+      "tipo_provento": "RENDIMENTO",
+      "data_com": "2024-03-25",
+      "data_pagamento": "2024-04-10",
+      "valor_unitario": 1.20,
+      "observacoes": "Rendimento mensal FII"
+    }
+  ],
+  "movimentacoes_caixa": [
+    {
+      "usuario": "e2e_user",
+      "corretora": "XP INVESTIMENTOS",
+      "tipo": "DEPOSITO",
+      "data_movimentacao": "2024-01-10",
+      "valor": 10000.00,
+      "observacoes": "Depósito inicial"
+    },
+    {
+      "usuario": "e2e_user",
+      "corretora": "XP INVESTIMENTOS",
+      "tipo": "SAQUE",
+      "data_movimentacao": "2024-04-15",
+      "valor": 500.00,
+      "observacoes": "Saque parcial"
+    }
+  ],
+  "alertas": [
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "PETR4",
+      "tipo_alerta": "PRECO_ALVO",
+      "condicao": "MAIOR_IGUAL",
+      "valor_referencia": 40.00,
+      "ativo": true,
+      "notificar_email": true,
+      "mensagem": "PETR4 atingiu preço alvo de R$ 40,00"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "VALE3",
+      "tipo_alerta": "STOP_LOSS",
+      "condicao": "MENOR_IGUAL",
+      "valor_referencia": 60.00,
+      "ativo": true,
+      "notificar_email": false,
+      "mensagem": "VALE3 atingiu stop loss de R$ 60,00"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "HGLG11",
+      "tipo_alerta": "DIVIDENDO",
+      "ativo": true,
+      "notificar_email": true,
+      "mensagem": "HGLG11 pagou dividendos"
+    }
+  ],
+  "portfolios": [
+    {
+      "usuario": "e2e_user",
+      "nome": "Portfolio Principal",
+      "descricao": "Portfolio de longo prazo - Ações e FIIs",
+      "objetivo": "Crescimento e renda passiva",
+      "horizonte_anos": 10,
+      "perfil_risco": "MODERADO",
+      "ativo": true
+    },
+    {
+      "usuario": "e2e_user",
+      "nome": "Portfolio Dividendos",
+      "descricao": "Foco em dividendos e proventos",
+      "objetivo": "Renda passiva mensal",
+      "horizonte_anos": 5,
+      "perfil_risco": "CONSERVADOR",
+      "ativo": true
+    },
+    {
+      "usuario": "e2e_admin",
+      "nome": "Portfolio Admin",
+      "descricao": "Portfolio administrativo para testes",
+      "objetivo": "Testes e validações",
+      "horizonte_anos": 1,
+      "perfil_risco": "AGRESSIVO",
+      "ativo": true
+    }
+  ],
+  "planos_compra": [
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "PETR4",
+      "preco_alvo": 35.00,
+      "quantidade_desejada": 100,
+      "valor_total_planejado": 3500.00,
+      "data_limite": "2024-12-31",
+      "status": "ATIVO",
+      "observacoes": "Comprar se cair abaixo de R$ 35"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "ITUB4",
+      "preco_alvo": 30.00,
+      "quantidade_desejada": 200,
+      "valor_total_planejado": 6000.00,
+      "data_limite": "2024-12-31",
+      "status": "ATIVO",
+      "observacoes": "Aumentar posição em ITUB4"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "KNRI11",
+      "preco_alvo": 140.00,
+      "quantidade_desejada": 50,
+      "valor_total_planejado": 7000.00,
+      "data_limite": "2024-12-31",
+      "status": "PENDENTE",
+      "observacoes": "Aguardando correção do mercado"
+    }
+  ],
+  "planos_venda": [
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "VALE3",
+      "preco_alvo": 75.00,
+      "percentual_venda": 50,
+      "quantidade_planejada": 100,
+      "data_limite": "2024-12-31",
+      "status": "ATIVO",
+      "observacoes": "Realizar lucro parcial em VALE3"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "HGLG11",
+      "preco_alvo": 195.00,
+      "percentual_venda": 100,
+      "quantidade_planejada": 50,
+      "data_limite": "2024-12-31",
+      "status": "ATIVO",
+      "observacoes": "Vender tudo se atingir teto"
+    }
+  ]
+}

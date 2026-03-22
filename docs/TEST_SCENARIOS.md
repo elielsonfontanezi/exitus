@@ -13,6 +13,7 @@ Cenários de teste são conjuntos de dados predefinidos para diferentes tipos de
 ```
 scripts/seed_data/scenarios/
 ├── test_e2e.json    # Testes E2E - dados completos e realistas
+├── test_full.json   # Cobertura 100% - TODAS as telas do sistema ⭐ NOVO!
 ├── test_ir.json     # Testes de IR - operações específicas para cálculo fiscal
 ├── test_stress.json # Testes de carga - volume alto de dados
 └── custom.json      # Cenários personalizados (criados pelo usuário)
@@ -42,7 +43,55 @@ scripts/seed_data/scenarios/
 - Testes de API com dados realistas
 - Testes de tela de alertas e notificações
 
-### 2. test_ir - Testes de Imposto de Renda
+### 2. test_full - Cobertura Completa (100% das Telas) ⭐
+
+**Objetivo:** Dados completos para TODAS as telas do sistema - cobertura 100%
+
+**Conteúdo:**
+- **Usuários:** 3 (admin, user, viewer)
+- **Assessoras:** 1
+- **Ativos:** 7 (Ações BR, FII, Stocks US)
+- **Corretoras:** 3
+- **Transações:** 4 (compras e vendas)
+- **Proventos:** 2 (dividendos, rendimentos)
+- **Movimentações:** 2 (depósito R$ 10.000, saque R$ 500)
+- **Alertas:** 3 (preço alvo, stop loss, dividendo)
+- **Portfolios:** 3 (principal, dividendos, admin) ← **NOVO!**
+- **Planos de Compra:** 3 (PETR4, ITUB4, KNRI11) ← **NOVO!**
+- **Planos de Venda:** 2 (VALE3, HGLG11) ← **NOVO!**
+
+**Telas cobertas (100%):**
+- ✅ Dashboard Principal
+- ✅ Dashboard Novo
+- ✅ Buy Signals
+- ✅ Portfolios (NOVO!)
+- ✅ Assets
+- ✅ Transactions
+- ✅ Dividends
+- ✅ Alerts
+- ✅ Planos de Compra (NOVO!)
+- ✅ Planos de Venda (NOVO!)
+- ✅ Movimentações
+- ✅ Ativo Detalhes
+- ✅ Proventos Calendário
+- ✅ Alocação
+- ✅ Fluxo de Caixa
+- ✅ Comparador
+- ✅ Profile
+
+**Uso recomendado:**
+- **Testes completos de UX** - todas as telas funcionais
+- **Validação de fluxos end-to-end** - jornadas completas do usuário
+- **Testes de aceitação** - validação com stakeholders
+- **Desenvolvimento de novas features** - base de dados rica
+
+**Quando usar:**
+- ✅ Revisão completa de UX (tela por tela)
+- ✅ Testes de aceitação com cliente
+- ✅ Desenvolvimento de features que dependem de múltiplas entidades
+- ✅ Demonstrações do sistema
+
+### 3. test_ir - Testes de Imposto de Renda
 
 **Objetivo:** Dados específicos para validar cálculos fiscais
 
