@@ -527,12 +527,16 @@ podman exec exitus-backend python reset_and_seed.py --clean --scenario test_full
 
 # Carregar cenário para testes de IR
 podman exec exitus-backend python reset_and_seed.py --clean --scenario test_ir
+
+# Carregar cenário de stress (volume alto)
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_stress
 ```
 
 **Cenários disponíveis:**
 - `test_e2e` - Dados realistas para testes E2E (3 usuários, 7 ativos, 4 transações, 2 proventos, 2 movimentações, 3 alertas)
 - `test_full` - Cenário completo para todas as telas (cobertura 100% do sistema)
 - `test_ir` - Dados específicos para cálculo de Imposto de Renda
+- `test_stress` - Volume alto para testes de performance (6 usuários, 13 transações)
 
 **O que é carregado:**
 - Assessoras
