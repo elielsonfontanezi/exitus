@@ -284,14 +284,14 @@ curl -s "http://localhost:5000/api/ativos?mercado=BR&tipo=DEBENTURE" \
 
 ---
 
-## 📅 Validação
+## Validação
 - **Data:** 22/03/2026
 - **Versão:** **v0.9.4** (Cenários de teste + dados atualizados)
 - **PostgreSQL:** 16.11
 - **Total ativos seedados:** **47** (Ações BR, FIIs, Stocks US, Ações EU)
 - **Total regras fiscais:** **6** (IR básico para operações)
 - **Total usuários:** **5** (admin, users, viewer, teste)
-- **Status:** ✅ **VALIDADO**
+- **Status:** **VALIDADO**
 
 **Documentação relacionada:**
 - [TEST_SCENARIOS.md](TEST_SCENARIOS.md) - Cenários de teste específicos

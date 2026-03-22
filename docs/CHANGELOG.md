@@ -8,6 +8,40 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feature — Histórico de Evolução Patrimonial (22/03/2026)
+
+**Artefatos criados:**
+- `backend/app/models/historico_patrimonio.py` - Modelo para snapshots mensais de patrimônio
+- `backend/alembic/versions/20260322_1830_add_historico_patrimonio.py` - Migration da tabela
+- Tabela `historico_patrimonio` no banco de dados
+
+**Artefatos modificados:**
+- `backend/app/models/__init__.py` - Adicionado import do HistoricoPatrimonio
+- `backend/app/models/usuario.py` - Adicionado relacionamento historico_patrimonio
+- `backend/seed_data/scenarios/test_full.json` - Adicionados 16 registros de evolução patrimonial (Mar/2023 a Jun/2024)
+- `backend/load_scenario.py` - Adicionada função _seed_historico_patrimonio
+
+**Funcionalidades:**
+- Armazenamento de snapshots mensais de patrimônio por usuário
+- Campos: patrimônio total, renda variável, renda fixa, saldo em caixa
+- Constraint unique por (usuario_id, data) para evitar duplicatas
+- Índices otimizados para consultas por usuário e período
+- Suporte a observações descritivas por período
+
+**Dados de exemplo (e2e_user):**
+- 16 meses de histórico (10 meses zerados + 6 meses com evolução)
+- Evolução de R$ 0 (Mar/2023) até R$ 58.050 (Jun/2024)
+- Reflete transações reais: depósitos, compras BR/US/INTL, vendas, saques
+
+**Uso para card "Evolução Patrimonial":**
+```sql
+SELECT data, patrimonio_total 
+FROM historico_patrimonio 
+WHERE usuario_id = :usuario_id 
+AND data >= CURRENT_DATE - INTERVAL '12 months'
+ORDER BY data;
+```
+
 ### Feature — Integração de Cenários JSON ao Sistema de Seeds (22/03/2026)
 
 **Commits realizados:**
