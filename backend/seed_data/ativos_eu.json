@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "description": "Ativos do mercado europeu (EU) - migrado de seed_ativos_eu.py",
+  "timestamp": "2026-03-02T18:35:00Z",
+  "ativos": [
+    {
+      "ticker": "ASML",
+      "nome": "ASML Holding NV",
+      "tipo": "STOCK_INTL",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "EU",
+      "moeda": "EUR",
+      "preco_atual": 750.30,
+      "observacoes": "Bolsa: EURONEXT | Setor: Technology",
+      "ativo": true
+    },
+    {
+      "ticker": "SAP",
+      "nome": "SAP SE",
+      "tipo": "STOCK_INTL",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "EU",
+      "moeda": "EUR",
+      "preco_atual": 145.80,
+      "observacoes": "Bolsa: XETRA | Setor: Technology",
+      "ativo": true
+    },
+    {
+      "ticker": "VWCE.DE",
+      "nome": "Vanguard FTSE All-World ETF",
+      "tipo": "ETF_INTL",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "EU",
+      "moeda": "EUR",
+      "preco_atual": 105.40,
+      "observacoes": "Bolsa: XETRA | Categoria: Global Equity",
+      "ativo": true
+    }
+  ]
+}

@@ -1,0 +1,282 @@
+{
+  "version": "1.0",
+  "description": "Ativos Brasileiros B3 (migrado de seed_ativos_br.py)",
+  "timestamp": "2026-03-02T18:45:00Z",
+  "ativos": [
+    {
+      "ticker": "PETR4",
+      "nome": "Petrobras PN",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Petróleo e Gás",
+      "ativo": true
+    },
+    {
+      "ticker": "VALE3",
+      "nome": "Vale ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Mineração",
+      "ativo": true
+    },
+    {
+      "ticker": "ITUB4",
+      "nome": "Itaú Unibanco PN",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Bancos",
+      "ativo": true
+    },
+    {
+      "ticker": "BBDC4",
+      "nome": "Bradesco PN",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Bancos",
+      "ativo": true
+    },
+    {
+      "ticker": "BBAS3",
+      "nome": "Banco do Brasil ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Bancos",
+      "ativo": true
+    },
+    {
+      "ticker": "MGLU3",
+      "nome": "Magazine Luiza ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Varejo",
+      "ativo": true
+    },
+    {
+      "ticker": "WEGE3",
+      "nome": "WEG ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Máquinas e Equipamentos",
+      "ativo": true
+    },
+    {
+      "ticker": "RENT3",
+      "nome": "Localiza ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Locação de Veículos",
+      "ativo": true
+    },
+    {
+      "ticker": "RAIL3",
+      "nome": "Rumo ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Transporte",
+      "ativo": true
+    },
+    {
+      "ticker": "SUZB3",
+      "nome": "Suzano ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Papel e Celulose",
+      "ativo": true
+    },
+    {
+      "ticker": "KLBN11",
+      "nome": "Klabin Units",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Papel e Celulose",
+      "ativo": true
+    },
+    {
+      "ticker": "ELET3",
+      "nome": "Eletrobras ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Energia Elétrica",
+      "ativo": true
+    },
+    {
+      "ticker": "CMIG4",
+      "nome": "Cemig PN",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Energia Elétrica",
+      "ativo": true
+    },
+    {
+      "ticker": "CPLE6",
+      "nome": "Copel PNB",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Energia Elétrica",
+      "ativo": true
+    },
+    {
+      "ticker": "ABEV3",
+      "nome": "Ambev ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Bebidas",
+      "ativo": true
+    },
+    {
+      "ticker": "HGLG11",
+      "nome": "CSHG Logística FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Logística",
+      "ativo": true
+    },
+    {
+      "ticker": "VISC11",
+      "nome": "Vinci Shopping Centers FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Shopping",
+      "ativo": true
+    },
+    {
+      "ticker": "KNRI11",
+      "nome": "Kinea Renda Imobiliária FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Híbrido",
+      "ativo": true
+    },
+    {
+      "ticker": "BTLG11",
+      "nome": "BTG Pactual Logística FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Logística",
+      "ativo": true
+    },
+    {
+      "ticker": "XPML11",
+      "nome": "XP Malls FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Shopping",
+      "ativo": true
+    },
+    {
+      "ticker": "MXRF11",
+      "nome": "Maxi Renda FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Híbrido",
+      "ativo": true
+    },
+    {
+      "ticker": "TRXF11",
+      "nome": "TRX Real Estate FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Lajes Corporativas",
+      "ativo": true
+    },
+    {
+      "ticker": "KNCR11",
+      "nome": "Kinea Rendimentos Imobiliários FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Papel",
+      "ativo": true
+    },
+    {
+      "ticker": "LVBI11",
+      "nome": "VBI Logístico FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Logística",
+      "ativo": true
+    },
+    {
+      "ticker": "GGRC11",
+      "nome": "GGR Covepi Renda FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Lajes Corporativas",
+      "ativo": true
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "version": "1.0",
+  "description": "Dados mínimos para testes básicos",
+  "timestamp": "2026-03-02T18:35:00Z",
+  "usuarios": [
+    {
+      "username": "admin",
+      "email": "admin@exitus.com",
+      "password": "senha123",
+      "role": "ADMIN",
+      "nome_completo": "Administrador do Sistema",
+      "ativo": true
+    },
+    {
+      "username": "joao.silva",
+      "email": "joao.silva@example.com",
+      "password": "senha123",
+      "role": "USER",
+      "nome_completo": "João Silva",
+      "ativo": true
+    },
+    {
+      "username": "viewer",
+      "email": "viewer@exitus.com",
+      "password": "senha123",
+      "role": "READONLY",
+      "nome_completo": "Usuário Visualizador",
+      "ativo": true
+    }
+  ],
+  "ativos": [
+    {
+      "ticker": "PETR4",
+      "nome": "Petrobras PN",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Petróleo e Gás",
+      "ativo": true
+    },
+    {
+      "ticker": "VALE3",
+      "nome": "Vale ON",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Setor: Mineração",
+      "ativo": true
+    },
+    {
+      "ticker": "HGLG11",
+      "nome": "CSHG Logística FII",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "observacoes": "Segmento: Logística",
+      "ativo": true
+    }
+  ],
+  "corretoras": [
+    {
+      "nome": "ITAU CV S/A",
+      "cnpj": "60701190000104",
+      "ativa": true
+    },
+    {
+      "nome": "XP INVESTIMENTOS",
+      "cnpj": "08764140000176",
+      "ativa": true
+    }
+  ]
+}

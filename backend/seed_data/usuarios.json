@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "description": "Usuários do sistema (migrado de seed_usuarios.py)",
+  "timestamp": "2026-03-02T18:45:00Z",
+  "usuarios": [
+    {
+      "username": "admin",
+      "email": "admin@exitus.com",
+      "password": "senha123",
+      "role": "ADMIN",
+      "nome_completo": "Administrador do Sistema",
+      "ativo": true
+    },
+    {
+      "username": "joao.silva",
+      "email": "joao.silva@example.com",
+      "password": "senha123",
+      "role": "USER",
+      "nome_completo": "João Silva",
+      "ativo": true
+    },
+    {
+      "username": "maria.santos",
+      "email": "maria.santos@example.com",
+      "password": "senha123",
+      "role": "USER",
+      "nome_completo": "Maria Santos",
+      "ativo": true
+    },
+    {
+      "username": "viewer",
+      "email": "viewer@exitus.com",
+      "password": "senha123",
+      "role": "READONLY",
+      "nome_completo": "Usuário Visualizador",
+      "ativo": true
+    },
+    {
+      "username": "teste.user",
+      "email": "teste@exitus.com",
+      "password": "senha123",
+      "role": "USER",
+      "nome_completo": "Usuário Teste",
+      "ativo": true
+    }
+  ]
+}
