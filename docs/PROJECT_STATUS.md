@@ -16,7 +16,7 @@
 | **Testes Backend** | 🟡 87.7% | 436/497 passando (61 failed, 35 errors) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services com filtros |
-| **Cenários de Teste** | ✅ 100% | 3 cenários predefinidos (E2E, IR, Stress) |
+| **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
 ---
 

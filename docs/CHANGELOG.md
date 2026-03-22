@@ -10,15 +10,28 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ### Feature — Integração de Cenários JSON ao Sistema de Seeds (22/03/2026)
 
+**Commits realizados:**
+- `3164353` - feat(seeds): Integração de cenários JSON ao sistema de seeds
+- `687bf69` - feat(tests): Adiciona fixture load_scenario e cenários complementares
+- `e83a7c0` - fix(models): Adiciona values_callable aos enums de PlanoCompra e PlanoVenda
+- `8f57173` - feat(backend): Adiciona arquivos de seed necessários para execução no container
+- `9b5ae1a` - refactor: Remove duplicação de arquivos de seed
+- `329a8ee` - docs: Adiciona comando test_stress ao OPERATIONS_RUNBOOK
+
 **Artefatos criados:**
-- `scripts/load_scenario.py` - Carregador de cenários JSON com resolução de referências
-- Integração completa com sistema de seeds existente
+- `backend/load_scenario.py` (655 linhas) - Carregador de cenários JSON com resolução de referências
+- `backend/reset_and_seed.py` - Script modificado para aceitar opção `--scenario`
+- `backend/seed_data/scenarios/` - Diretório com 4 cenários JSON (test_e2e, test_full, test_ir, test_stress)
+- `backend/tests/conftest.py` - Fixture `load_scenario` para testes pytest
+- `backend/tests/test_scenarios_example.py` - Exemplo de uso da fixture
 
 **Artefatos modificados:**
 - `scripts/reset_and_seed.py` - Adicionada opção `--scenario` para carregar cenários JSON
+- `backend/app/models/plano_compra.py` - Adicionado `values_callable` ao enum StatusPlanoCompra
+- `backend/app/models/plano_venda.py` - Adicionado `values_callable` ao enum StatusPlanoVenda
 
 **Funcionalidades:**
-- Carregamento de cenários JSON predefinidos (test_e2e, test_full, test_ir)
+- Carregamento de cenários JSON predefinidos (test_e2e, test_full, test_ir, test_stress)
 - Resolução automática de referências (username → usuario_id, ticker → ativo_id)
 - Validação de dados antes de inserção
 - Idempotência garantida (verificação de duplicatas)
@@ -28,19 +41,29 @@ e este projeto adere semanticamente à versão v0.8.0.
 **Mapeamentos implementados:**
 - Tipos de ativo: 18 tipos mapeados (incluindo BDR→STOCK, FUNDO→OUTRO)
 - Classes de ativo: 8 classes mapeadas
-- Enums de status: StatusPlanoCompra, StatusPlanoVenda
+- Enums de status: StatusPlanoCompra, StatusPlanoVenda (com values_callable para lowercase)
 - Condições de alerta: operadores reduzidos para max 10 chars
 
 **Resultado:**
-- Dashboard com saldo de caixa funcional
-- Alertas carregados e ativos
-- Portfolios criados
-- Planos de compra/venda funcionais
+- Dashboard com saldo de caixa funcional (R$ 9.500,00 = 10.000 - 500)
+- 3 alertas carregados e ativos
+- 3 portfolios criados
+- 3 planos de compra + 2 planos de venda funcionais
 - Todas as telas com dados completos
 
-**Comando:**
+**Comandos disponíveis:**
 ```bash
-python scripts/reset_and_seed.py --clean --scenario test_e2e
+# Cenário E2E (desenvolvimento)
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_e2e
+
+# Cenário completo (todas as telas)
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_full
+
+# Cenário IR (testes fiscais)
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_ir
+
+# Cenário stress (performance)
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_stress
 ```
 
 ### Feature — Cenários de Teste (22/03/2026)
