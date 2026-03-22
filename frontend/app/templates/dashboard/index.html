@@ -4,7 +4,37 @@
 {% block extra_css %}
 <style>
     body {
-        background: #f5f5f5 !important;
+        background: #F5F5F4 !important;
+    }
+    
+    /* Cards no estilo Investidor10 */
+    .card, .resumo-item, .card-metrica, .card-ativo, .card-dashboard, .chart-container, .section-box {
+        background: #FFFFFF !important;
+        border: 1px solid #E3E6ED !important;
+        border-radius: 8px !important;
+        box-shadow: rgb(230, 230, 229) 0px 0px 12px 0px !important;
+        padding: 8px 16px !important;
+    }
+    
+    /* Padding específico para cards de mercado */
+    .card-dashboard {
+        padding: 16px !important;
+    }
+    
+    /* Padding específico para containers */
+    .chart-container, .section-box {
+        padding: 20px !important;
+    }
+    
+    /* Ajustes específicos para diferentes tipos de cards */
+    .resumo-patrimonio {
+        gap: 1rem;
+    }
+    
+    .resumo-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 </style>
 {% endblock %}
