@@ -74,8 +74,7 @@ def seed_ativos_intl():
                 classe=ClasseAtivo.RENDA_VARIAVEL,
                 mercado='INTL', moeda='USD',
                 preco_atual=preco,
-                setor=setor,
-                bolsa=bolsa
+                observacoes=f"Bolsa: {bolsa} | Setor: {setor}"
             )
             db.session.add(ativo)
             created += 1
@@ -94,8 +93,7 @@ def seed_ativos_intl():
                 classe=ClasseAtivo.RENDA_VARIAVEL,
                 mercado='INTL', moeda='BRL',
                 preco_atual=preco,
-                setor=setor,
-                bolsa=bolsa
+                observacoes=f"Bolsa: {bolsa} | Setor: {setor}"
             )
             db.session.add(ativo)
             created += 1
@@ -115,7 +113,8 @@ def seed_ativos_intl():
                 tipo=TipoAtivo.ETF,
                 classe=ClasseAtivo.RENDA_VARIAVEL,
                 mercado='INTL', moeda=moeda,
-                preco_atual=preco
+                preco_atual=preco,
+                observacoes=f"Bolsa: {bolsa} | Setor: {setor}"
             )
             db.session.add(ativo)
             created += 1
