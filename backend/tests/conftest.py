@@ -283,3 +283,216 @@ def transacao_seed(app, usuario_seed, ativo_seed, corretora_seed):
     yield t
     
     # Não faz DELETE - cleanup_test_data já limpa todas as transações
+
+
+# ---------------------------------------------------------------------------
+# load_scenario — carrega cenário específico de teste
+# ---------------------------------------------------------------------------
+@pytest.fixture(scope='function')
+def load_scenario(app, request):
+    """
+    Carrega um cenário específico de teste do diretório scenarios.
+    
+    Uso:
+    @pytest.mark.parametrize("scenario", ["test_e2e", "test_ir", "test_stress"])
+    def test_meu_cenario(app, load_scenario, scenario):
+        # Cenário já está carregado no banco
+        pass
+    """
+    scenario_name = request.param
+    
+    # Caminho do cenário (suporta execução via container ou direto)
+    from pathlib import Path
+    container_scenarios = Path('/app/seed_data/scenarios')
+    local_scenarios = Path('./scripts/seed_data/scenarios')
+    scenarios_dir = container_scenarios if container_scenarios.exists() else local_scenarios
+    
+    scenario_file = scenarios_dir / f'{scenario_name}.json'
+    
+    if not scenario_file.exists():
+        pytest.fail(f"Cenário não encontrado: {scenario_file}")
+    
+    # Carregar e parsear JSON
+    import json
+    with open(scenario_file, 'r', encoding='utf-8') as f:
+        scenario_data = json.load(f)
+    
+    # Popular banco com dados do cenário
+    with app.app_context():
+        from app.models.assessora import Assessora
+        from app.models.usuario import Usuario, UserRole
+        from app.models.ativo import Ativo, TipoAtivo, ClasseAtivo
+        from app.models.corretora import Corretora, TipoCorretora
+        from app.models.transacao import Transacao, TipoTransacao
+        from app.models.provento import Provento, TipoProvento
+        from app.models.movimentacao_caixa import MovimentacaoCaixa, TipoMovimentacao
+        from datetime import datetime
+        from decimal import Decimal
+        
+        # Mapeamento de usuários para assessoras
+        assessora_map = {}
+        usuario_map = {}
+        ativo_map = {}
+        corretora_map = {}
+        
+        try:
+            # 1. Criar assessoras
+            for assessora_data in scenario_data.get('assessoras', []):
+                assessora = Assessora(
+                    nome=assessora_data['nome'],
+                    razao_social=assessora_data['razao_social'],
+                    cnpj=assessora_data['cnpj'],
+                    email=assessora_data.get('email'),
+                    telefone=assessora_data.get('telefone'),
+                    ativo=assessora_data.get('ativo', True)
+                )
+                _db.session.add(assessora)
+                _db.session.flush()
+                assessora_map[assessora.nome] = assessora
+            
+            # 2. Criar usuários
+            for usuario_data in scenario_data.get('usuarios', []):
+                # Encontrar assessora (primeira disponível se não especificada)
+                assessora_id = None
+                if assessora_map:
+                    assessora_id = list(assessora_map.values())[0].id
+                
+                usuario = Usuario(
+                    username=usuario_data['username'],
+                    email=usuario_data['email'],
+                    role=UserRole[usuario_data['role']],
+                    nome_completo=usuario_data.get('nome_completo'),
+                    assessora_id=assessora_id,
+                    ativo=usuario_data.get('ativo', True)
+                )
+                usuario.set_password(usuario_data['password'])
+                _db.session.add(usuario)
+                _db.session.flush()
+                usuario_map[usuario.username] = usuario
+            
+            # 3. Criar ativos
+            for ativo_data in scenario_data.get('ativos', []):
+                ativo = Ativo(
+                    ticker=ativo_data['ticker'],
+                    nome=ativo_data['nome'],
+                    tipo=TipoAtivo[ativo_data['tipo']],
+                    classe=ClasseAtivo[ativo_data['classe']],
+                    mercado=ativo_data['mercado'],
+                    moeda=ativo_data['moeda'],
+                    pais=ativo_data['pais'],
+                    preco_atual=Decimal(str(ativo_data.get('preco_atual', 0))),
+                    preco_teto=Decimal(str(ativo_data.get('preco_teto', 0))),
+                    dividend_yield=Decimal(str(ativo_data.get('dividend_yield', 0))),
+                    p_l=Decimal(str(ativo_data.get('p_l', 0))),
+                    p_vp=Decimal(str(ativo_data.get('p_vp', 0))),
+                    taxa=Decimal(str(ativo_data.get('taxa', 0))) if ativo_data.get('taxa') else None,
+                    vencimento=datetime.fromisoformat(ativo_data['vencimento']).date() if ativo_data.get('vencimento') else None,
+                    observacoes=ativo_data.get('observacoes'),
+                    ativo=ativo_data.get('ativo', True)
+                )
+                _db.session.add(ativo)
+                _db.session.flush()
+                ativo_map[ativo.ticker] = ativo
+            
+            # 4. Criar corretoras
+            for corretora_data in scenario_data.get('corretoras', []):
+                # Vincular a primeiro usuário se não especificado
+                usuario_id = None
+                if usuario_map:
+                    usuario_id = list(usuario_map.values())[0].id
+                
+                corretora = Corretora(
+                    nome=corretora_data['nome'],
+                    cnpj=corretora_data['cnpj'],
+                    tipo=TipoCorretora[corretora_data['tipo']],
+                    pais=corretora_data['pais'],
+                    usuario_id=usuario_id,
+                    ativa=corretora_data.get('ativa', True)
+                )
+                _db.session.add(corretora)
+                _db.session.flush()
+                corretora_map[corretora.nome] = corretora
+            
+            # 5. Criar transações
+            for transacao_data in scenario_data.get('transacoes', []):
+                usuario = usuario_map.get(transacao_data['usuario'])
+                ativo = ativo_map.get(transacao_data['ativo'])
+                corretora = corretora_map.get(transacao_data['corretora'])
+                
+                if not all([usuario, ativo, corretora]):
+                    pytest.fail(f"Dados incompletos para transação: {transacao_data}")
+                
+                quantidade = Decimal(str(transacao_data['quantidade']))
+                preco_unitario = Decimal(str(transacao_data['preco_unitario']))
+                valor_total = quantidade * preco_unitario
+                custos = Decimal(str(transacao_data.get('custos_totais', 0)))
+                
+                tipo = TipoTransacao[transacao_data['tipo']]
+                if tipo == TipoTransacao.COMPRA:
+                    valor_liquido = valor_total + custos
+                else:
+                    valor_liquido = valor_total - custos
+                
+                transacao = Transacao(
+                    usuario_id=usuario.id,
+                    ativo_id=ativo.id,
+                    corretora_id=corretora.id,
+                    tipo=tipo,
+                    data_transacao=datetime.fromisoformat(transacao_data['data_transacao']).date(),
+                    quantidade=quantidade,
+                    preco_unitario=preco_unitario,
+                    valor_total=valor_total,
+                    taxa_corretagem=Decimal(str(transacao_data.get('taxa_corretagem', 0))),
+                    taxa_liquidacao=Decimal('0'),
+                    emolumentos=Decimal('0'),
+                    imposto=Decimal('0'),
+                    outros_custos=Decimal('0'),
+                    custos_totais=custos,
+                    valor_liquido=valor_liquido
+                )
+                _db.session.add(transacao)
+            
+            # 6. Criar proventos
+            for provento_data in scenario_data.get('proventos', []):
+                ativo = ativo_map.get(provento_data['ativo'])
+                if not ativo:
+                    pytest.fail(f"Ativo não encontrado para provento: {provento_data['ativo']}")
+                
+                provento = Provento(
+                    ativo_id=ativo.id,
+                    tipo_provento=TipoProvento[provento_data['tipo_provento']],
+                    data_com=datetime.fromisoformat(provento_data['data_com']).date(),
+                    data_pagamento=datetime.fromisoformat(provento_data['data_pagamento']).date(),
+                    valor_unitario=Decimal(str(provento_data['valor_unitario'])),
+                    observacoes=provento_data.get('observacoes')
+                )
+                _db.session.add(provento)
+            
+            # 7. Criar movimentações de caixa
+            for mov_data in scenario_data.get('movimentacoes_caixa', []):
+                usuario = usuario_map.get(mov_data['usuario'])
+                corretora = corretora_map.get(mov_data['corretora'])
+                
+                if not all([usuario, corretora]):
+                    pytest.fail(f"Dados incompletos para movimentação: {mov_data}")
+                
+                movimentacao = MovimentacaoCaixa(
+                    usuario_id=usuario.id,
+                    corretora_id=corretora.id,
+                    tipo=TipoMovimentacao[mov_data['tipo']],
+                    data_movimentacao=datetime.fromisoformat(mov_data['data_movimentacao']).date(),
+                    valor=Decimal(str(mov_data['valor'])),
+                    observacoes=mov_data.get('observacoes')
+                )
+                _db.session.add(movimentacao)
+            
+            _db.session.commit()
+            print(f"✅ Cenário '{scenario_name}' carregado com sucesso")
+            
+        except Exception as e:
+            _db.session.rollback()
+            pytest.fail(f"Erro ao carregar cenário '{scenario_name}': {e}")
+    
+    yield
+    
+    # Limpeza será feita pelo cleanup_test_data automático

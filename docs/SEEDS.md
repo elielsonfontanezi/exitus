@@ -3,7 +3,26 @@
 
 **APENAS PARA AMBIENTE DE DESENVOLVIMENTO** ⚠️
 
-> **v0.8.3** — Regras fiscais atualizadas: IR-004 (+4 regras proventos) + IR-009 (+3 regras 2026). Total: 12 regras.
+> **v0.9.4** — Cenários de teste implementados (E2E, IR, Stress) + dados atualizados
+
+---
+
+## 🚀 Como Popular o Banco de Dados
+
+### Para Desenvolvimento (Dados Completos)
+
+```bash
+# Reset + seed completo (70 ativos, usuários, regras, etc.)
+./scripts/reset_and_seed.sh --clean --seed-type=full
+```
+
+**Resultado esperado:**
+- **5 usuários** (admin, user, viewer, etc.)
+- **47 ativos** (Ações BR, FIIs, Stocks US, Ações EU)
+- **5 corretoras** (Itaú, XP, Nu, Inter, Clear)
+- **6 regras fiscais** (IR para diferentes operações)
+- **7 fontes de dados** (APIs de cotações)
+- **3 feriados** (principais feriados nacionais)
 
 ---
 
@@ -267,11 +286,27 @@ curl -s "http://localhost:5000/api/ativos?mercado=BR&tipo=DEBENTURE" \
 ---
 
 ## 📅 Validação
-- **Data:** 04/Mar/2026
-- **Versão:** **v0.8.3** (Regras fiscais proventos IR-004 + regras 2026 IR-009)
+- **Data:** 22/03/2026
+- **Versão:** **v0.9.4** (Cenários de teste + dados atualizados)
 - **PostgreSQL:** 16.11
-- **Total ativos seedados:** **70** (47 BR + 16 US + 3 EU + 4 outros)
-- **Total regras fiscais:** **12** (5 originais + 4 proventos pré-2026 + 3 regras 2026+)
+- **Total ativos seedados:** **47** (Ações BR, FIIs, Stocks US, Ações EU)
+- **Total regras fiscais:** **6** (IR básico para operações)
+- **Total usuários:** **5** (admin, users, viewer, teste)
 - **Status:** ✅ **VALIDADO**
 
-**Referência:** [ENUMS.md](../docs/ENUMS.md) (14 tipos) | [CHANGELOG.md](../docs/CHANGELOG.md) | [EXITUS-IR-001.md](./EXITUS-IR-001.md)
+**Documentação relacionada:**
+- [TEST_SCENARIOS.md](TEST_SCENARIOS.md) - Cenários de teste específicos
+- [ENUMS.md](ENUMS.md) - 15 tipos de ativos disponíveis
+- [CHANGELOG.md](CHANGELOG.md) - Histórico de mudanças
+
+**Comandos úteis:**
+```bash
+# Reset completo + dados dev
+./scripts/reset_and_seed.sh --clean --seed-type=full
+
+# Listar cenários de teste disponíveis
+python scripts/reset_and_seed.py --list-scenarios
+
+# Usar cenário específico para testes
+./scripts/reset_and_seed.sh --clean --restore test_e2e
+```
