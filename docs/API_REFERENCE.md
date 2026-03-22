@@ -50,7 +50,7 @@ Obter Token:
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "senha123"}'
+  -d '{"username": "e2e_admin", "password": "e2e_senha_123"}'
 ```
 
 Expiry: 1 hora (3600 segundos).
@@ -110,7 +110,7 @@ Autentica usuário e retorna token JWT.
 
 Request:
 ```json
-{"username": "admin", "password": "senha123"}
+{"username": "e2e_admin", "password": "e2e_senha_123"}
 ```
 
 Response 200:

@@ -28,12 +28,11 @@
 
 ## 📋 Usuários Seedados
 
-| Username       | Email                         | Senha      | Perfil            |
-|----------------|-------------------------------|------------|-------------------|
-| `admin`        | `admin@exitus.com`            | `senha123` | **Administrador** |
-| `joao.silva`   | `joao.silva@example.com`      | `senha123` | Usuário           |
-| `maria.santos` | `maria.santos@example.com`    | `senha123` | Usuário           |
-| `viewer`       | `viewer@exitus.com`           | `senha123` | Visualizador      |
+| Username       | Email                         | Senha          | Perfil            |
+|----------------|-------------------------------|----------------|-------------------|
+| `e2e_admin`    | `admin@e2e.exitus`            | `e2e_senha_123` | **Administrador** |
+| `e2e_user`     | `usuario@e2e.exitus`          | `e2e_senha_123` | Usuário           |
+| `e2e_viewer`   | `viewer@e2e.exitus`           | `e2e_senha_123` | Visualizador      |
 | `teste.user`   | `teste@exitus.com`            | `senha123` | Teste             |
 
 ---
@@ -45,7 +44,7 @@
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"senha123"}'
+  -d '{"username":"e2e_admin","password":"e2e_senha_123"}'
 ```
 
 **Response esperada:**
@@ -72,7 +71,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 # Exportar token para variável de ambiente
 export TOKEN=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"senha123"}' | jq -r '.data.access_token')
+  -d '{"username":"e2e_admin","password":"e2e_senha_123"}' | jq -r '.data.access_token')
 
 # Usar token em requisições protegidas
 curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/ativos
@@ -260,7 +259,7 @@ ORDER BY total DESC;
 ```bash
 TOKEN=$(curl -s -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"senha123"}' | jq -r '.data.access_token')
+  -d '{"username":"e2e_admin","password":"e2e_senha_123"}' | jq -r '.data.access_token')
 
 # CDB — esperado: total=3
 curl -s "http://localhost:5000/api/ativos?mercado=BR&tipo=CDB" \

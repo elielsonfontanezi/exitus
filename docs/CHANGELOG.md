@@ -66,6 +66,14 @@ podman exec exitus-backend python reset_and_seed.py --clean --scenario test_ir
 podman exec exitus-backend python reset_and_seed.py --clean --scenario test_stress
 ```
 
+**⚠️ IMPORTANTE - Credenciais de Acesso:**
+Os cenários JSON criam usuários com prefixo `e2e_` para isolamento de ambiente:
+- **Admin:** `e2e_admin` / `e2e_senha_123`
+- **User:** `e2e_user` / `e2e_senha_123`
+- **Viewer:** `e2e_viewer` / `e2e_senha_123`
+
+Documentação atualizada em `docs/SEEDS.md` e `docs/API_REFERENCE.md`.
+
 ### Feature — Cenários de Teste (22/03/2026)
 
 **Sistema de Cenários:**
