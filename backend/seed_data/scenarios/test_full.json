@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "description": "Cenário COMPLETO para TODAS as telas - cobertura 100% do sistema",
+  "description": "Cenário COMPLETO para TODAS as telas - cobertura 100% do sistema (com ativos US e INTL)",
   "timestamp": "2026-03-22T00:00:00Z",
   "usuarios": [
     {
@@ -47,8 +47,8 @@
       "mercado": "BR",
       "moeda": "BRL",
       "pais": "BR",
-      "preco_atual": 38.50,
-      "preco_teto": 45.00,
+      "preco_atual": 38.5,
+      "preco_teto": 45.0,
       "dividend_yield": 15.2,
       "p_l": 4.1,
       "p_vp": 1.05,
@@ -63,8 +63,8 @@
       "mercado": "BR",
       "moeda": "BRL",
       "pais": "BR",
-      "preco_atual": 68.90,
-      "preco_teto": 75.00,
+      "preco_atual": 68.9,
+      "preco_teto": 75.0,
       "dividend_yield": 12.8,
       "p_l": 5.2,
       "p_vp": 0.95,
@@ -80,7 +80,7 @@
       "moeda": "BRL",
       "pais": "BR",
       "preco_atual": 32.45,
-      "preco_teto": 38.00,
+      "preco_teto": 38.0,
       "dividend_yield": 8.5,
       "p_l": 10.2,
       "p_vp": 1.45,
@@ -95,8 +95,8 @@
       "mercado": "BR",
       "moeda": "BRL",
       "pais": "BR",
-      "preco_atual": 185.20,
-      "preco_teto": 195.00,
+      "preco_atual": 185.2,
+      "preco_teto": 195.0,
       "dividend_yield": 8.2,
       "p_vp": 0.85,
       "observacoes": "FII Logística",
@@ -110,8 +110,8 @@
       "mercado": "BR",
       "moeda": "BRL",
       "pais": "BR",
-      "preco_atual": 145.80,
-      "preco_teto": 155.00,
+      "preco_atual": 145.8,
+      "preco_teto": 155.0,
       "dividend_yield": 7.5,
       "p_vp": 0.92,
       "observacoes": "FII Recebíveis",
@@ -125,8 +125,8 @@
       "mercado": "US",
       "moeda": "USD",
       "pais": "US",
-      "preco_atual": 178.50,
-      "preco_teto": 195.00,
+      "preco_atual": 178.5,
+      "preco_teto": 195.0,
       "dividend_yield": 0.5,
       "p_l": 28.5,
       "observacoes": "Technology Sector",
@@ -140,11 +140,41 @@
       "mercado": "US",
       "moeda": "USD",
       "pais": "US",
-      "preco_atual": 415.20,
-      "preco_teto": 450.00,
+      "preco_atual": 415.2,
+      "preco_teto": 450.0,
       "dividend_yield": 0.7,
       "p_l": 32.8,
       "observacoes": "Technology Sector",
+      "ativo": true
+    },
+    {
+      "ticker": "TSLA34",
+      "nome": "Tesla GDR",
+      "tipo": "STOCK_INTL",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "INTL",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 85.6,
+      "preco_teto": 95.0,
+      "dividend_yield": 0.0,
+      "p_l": 45.2,
+      "observacoes": "Bolsa: B3 | Setor: Automotive",
+      "ativo": true
+    },
+    {
+      "ticker": "AAPL34",
+      "nome": "Apple GDR",
+      "tipo": "STOCK_INTL",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "INTL",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 125.9,
+      "preco_teto": 140.0,
+      "dividend_yield": 0.5,
+      "p_l": 28.5,
+      "observacoes": "Bolsa: B3 | Setor: Technology",
       "ativo": true
     }
   ],
@@ -179,9 +209,9 @@
       "tipo": "COMPRA",
       "data_transacao": "2024-01-15",
       "quantidade": 100,
-      "preco_unitario": 35.50,
-      "taxa_corretagem": 5.00,
-      "custos_totais": 8.50
+      "preco_unitario": 35.5,
+      "taxa_corretagem": 5.0,
+      "custos_totais": 8.5
     },
     {
       "usuario": "e2e_user",
@@ -190,9 +220,9 @@
       "tipo": "COMPRA",
       "data_transacao": "2024-02-20",
       "quantidade": 200,
-      "preco_unitario": 65.20,
-      "taxa_corretagem": 8.00,
-      "custos_totais": 12.00
+      "preco_unitario": 65.2,
+      "taxa_corretagem": 8.0,
+      "custos_totais": 12.0
     },
     {
       "usuario": "e2e_user",
@@ -201,9 +231,9 @@
       "tipo": "COMPRA",
       "data_transacao": "2024-03-10",
       "quantidade": 50,
-      "preco_unitario": 180.00,
-      "taxa_corretagem": 6.00,
-      "custos_totais": 9.00
+      "preco_unitario": 180.0,
+      "taxa_corretagem": 6.0,
+      "custos_totais": 9.0
     },
     {
       "usuario": "e2e_user",
@@ -212,9 +242,57 @@
       "tipo": "VENDA",
       "data_transacao": "2024-04-05",
       "quantidade": 50,
-      "preco_unitario": 39.80,
-      "taxa_corretagem": 5.00,
-      "custos_totais": 7.50
+      "preco_unitario": 39.8,
+      "taxa_corretagem": 5.0,
+      "custos_totais": 7.5
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "AAPL",
+      "corretora": "XP INVESTIMENTOS",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-05-10",
+      "quantidade": 10,
+      "preco_unitario": 178.5,
+      "taxa_corretagem": 15.0,
+      "custos_totais": 18.5,
+      "observacoes": "Compra ativo US - Apple"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "MSFT",
+      "corretora": "XP INVESTIMENTOS",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-05-15",
+      "quantidade": 5,
+      "preco_unitario": 415.2,
+      "taxa_corretagem": 12.0,
+      "custos_totais": 15.0,
+      "observacoes": "Compra ativo US - Microsoft"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "TSLA34",
+      "corretora": "INTER BANCO",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-06-01",
+      "quantidade": 20,
+      "preco_unitario": 85.6,
+      "taxa_corretagem": 8.0,
+      "custos_totais": 10.5,
+      "observacoes": "Compra ativo INTL - Tesla GDR"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "AAPL34",
+      "corretora": "INTER BANCO",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-06-10",
+      "quantidade": 15,
+      "preco_unitario": 125.9,
+      "taxa_corretagem": 9.0,
+      "custos_totais": 12.0,
+      "observacoes": "Compra ativo INTL - Apple GDR"
     }
   ],
   "proventos": [
@@ -223,7 +301,7 @@
       "tipo_provento": "DIVIDENDO",
       "data_com": "2024-03-20",
       "data_pagamento": "2024-04-05",
-      "valor_unitario": 2.50,
+      "valor_unitario": 2.5,
       "observacoes": "Dividendo ordinário"
     },
     {
@@ -231,7 +309,7 @@
       "tipo_provento": "RENDIMENTO",
       "data_com": "2024-03-25",
       "data_pagamento": "2024-04-10",
-      "valor_unitario": 1.20,
+      "valor_unitario": 1.2,
       "observacoes": "Rendimento mensal FII"
     }
   ],
@@ -241,7 +319,7 @@
       "corretora": "XP INVESTIMENTOS",
       "tipo": "DEPOSITO",
       "data_movimentacao": "2024-01-10",
-      "valor": 10000.00,
+      "valor": 10000.0,
       "observacoes": "Depósito inicial"
     },
     {
@@ -249,7 +327,7 @@
       "corretora": "XP INVESTIMENTOS",
       "tipo": "SAQUE",
       "data_movimentacao": "2024-04-15",
-      "valor": 500.00,
+      "valor": 500.0,
       "observacoes": "Saque parcial"
     }
   ],
@@ -259,7 +337,7 @@
       "ativo_ticker": "PETR4",
       "tipo_alerta": "PRECO_ALVO",
       "condicao": "MAIOR_IGUAL",
-      "valor_referencia": 40.00,
+      "valor_referencia": 40.0,
       "ativo": true,
       "notificar_email": true,
       "mensagem": "PETR4 atingiu preço alvo de R$ 40,00"
@@ -269,7 +347,7 @@
       "ativo_ticker": "VALE3",
       "tipo_alerta": "STOP_LOSS",
       "condicao": "MENOR_IGUAL",
-      "valor_referencia": 60.00,
+      "valor_referencia": 60.0,
       "ativo": true,
       "notificar_email": false,
       "mensagem": "VALE3 atingiu stop loss de R$ 60,00"
@@ -316,9 +394,9 @@
     {
       "usuario": "e2e_user",
       "ativo_ticker": "PETR4",
-      "preco_alvo": 35.00,
+      "preco_alvo": 35.0,
       "quantidade_desejada": 100,
-      "valor_total_planejado": 3500.00,
+      "valor_total_planejado": 3500.0,
       "data_limite": "2024-12-31",
       "status": "ATIVO",
       "observacoes": "Comprar se cair abaixo de R$ 35"
@@ -326,9 +404,9 @@
     {
       "usuario": "e2e_user",
       "ativo_ticker": "ITUB4",
-      "preco_alvo": 30.00,
+      "preco_alvo": 30.0,
       "quantidade_desejada": 200,
-      "valor_total_planejado": 6000.00,
+      "valor_total_planejado": 6000.0,
       "data_limite": "2024-12-31",
       "status": "ATIVO",
       "observacoes": "Aumentar posição em ITUB4"
@@ -336,9 +414,9 @@
     {
       "usuario": "e2e_user",
       "ativo_ticker": "KNRI11",
-      "preco_alvo": 140.00,
+      "preco_alvo": 140.0,
       "quantidade_desejada": 50,
-      "valor_total_planejado": 7000.00,
+      "valor_total_planejado": 7000.0,
       "data_limite": "2024-12-31",
       "status": "PENDENTE",
       "observacoes": "Aguardando correção do mercado"
@@ -348,7 +426,7 @@
     {
       "usuario": "e2e_user",
       "ativo_ticker": "VALE3",
-      "preco_alvo": 75.00,
+      "preco_alvo": 75.0,
       "percentual_venda": 50,
       "quantidade_planejada": 100,
       "data_limite": "2024-12-31",
@@ -358,7 +436,7 @@
     {
       "usuario": "e2e_user",
       "ativo_ticker": "HGLG11",
-      "preco_alvo": 195.00,
+      "preco_alvo": 195.0,
       "percentual_venda": 100,
       "quantidade_planejada": 50,
       "data_limite": "2024-12-31",
