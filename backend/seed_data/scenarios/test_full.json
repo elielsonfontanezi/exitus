@@ -443,5 +443,151 @@
       "status": "ATIVO",
       "observacoes": "Vender tudo se atingir teto"
     }
+  ],
+  "historico_patrimonio": [
+    {
+      "usuario": "e2e_user",
+      "data": "2023-03-31",
+      "patrimonio_total": 0.00,
+      "patrimonio_renda_variavel": 0.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 0.00,
+      "observacoes": "Antes de iniciar investimentos"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2023-04-30",
+      "patrimonio_total": 0.00,
+      "patrimonio_renda_variavel": 0.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 0.00,
+      "observacoes": "Sem movimentações"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2023-05-31",
+      "patrimonio_total": 0.00,
+      "patrimonio_renda_variavel": 0.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 0.00,
+      "observacoes": "Sem movimentações"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2023-06-30",
+      "patrimonio_total": 0.00,
+      "patrimonio_renda_variavel": 0.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 0.00,
+      "observacoes": "Sem movimentações"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2023-07-31",
+      "patrimonio_total": 0.00,
+      "patrimonio_renda_variavel": 0.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 0.00,
+      "observacoes": "Sem movimentações"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2023-08-31",
+      "patrimonio_total": 0.00,
+      "patrimonio_renda_variavel": 0.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 0.00,
+      "observacoes": "Sem movimentações"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2023-09-30",
+      "patrimonio_total": 0.00,
+      "patrimonio_renda_variavel": 0.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 0.00,
+      "observacoes": "Sem movimentações"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2023-10-31",
+      "patrimonio_total": 0.00,
+      "patrimonio_renda_variavel": 0.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 0.00,
+      "observacoes": "Sem movimentações"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2023-11-30",
+      "patrimonio_total": 0.00,
+      "patrimonio_renda_variavel": 0.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 0.00,
+      "observacoes": "Sem movimentações"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2023-12-31",
+      "patrimonio_total": 0.00,
+      "patrimonio_renda_variavel": 0.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 0.00,
+      "observacoes": "Fim do ano - sem investimentos"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2024-01-31",
+      "patrimonio_total": 13455.00,
+      "patrimonio_renda_variavel": 3850.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 9605.00,
+      "observacoes": "Depósito inicial + primeira compra PETR4"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2024-02-29",
+      "patrimonio_total": 26495.00,
+      "patrimonio_renda_variavel": 17378.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 9117.00,
+      "observacoes": "Compra VALE3 - carteira diversificada"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2024-03-31",
+      "patrimonio_total": 35710.00,
+      "patrimonio_renda_variavel": 26593.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 9117.00,
+      "observacoes": "Compra HGLG11 - entrada em FIIs"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2024-04-30",
+      "patrimonio_total": 37205.00,
+      "patrimonio_renda_variavel": 28588.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 8617.00,
+      "observacoes": "Venda parcial PETR4 + saque R$ 500"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2024-05-31",
+      "patrimonio_total": 52450.00,
+      "patrimonio_renda_variavel": 43833.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 8617.00,
+      "observacoes": "Entrada em mercado US - AAPL e MSFT"
+    },
+    {
+      "usuario": "e2e_user",
+      "data": "2024-06-30",
+      "patrimonio_total": 58050.00,
+      "patrimonio_renda_variavel": 49433.00,
+      "patrimonio_renda_fixa": 0.00,
+      "saldo_caixa": 8617.00,
+      "observacoes": "Entrada em GDRs - TSLA34 e AAPL34"
+    }
   ]
 }
