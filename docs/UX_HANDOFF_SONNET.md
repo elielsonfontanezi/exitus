@@ -27,17 +27,28 @@ O dashboard não mostra todos os dados porque:
 Implementar integração completa dos cenários JSON com sistema de seeds.
 
 **Arquivos a criar:**
-1. `scripts/load_scenario.py` - Carregador de cenários
-2. `backend/app/seeds/seed_movimentacoes.py` - Seed movimentações
-3. `backend/app/seeds/seed_alertas.py` - Seed alertas
+1. `scripts/load_scenario.py` - Carregador de cenários JSON
+2. `backend/app/seeds/seed_movimentacoes.py` - Seed movimentações de caixa
+3. `backend/app/seeds/seed_alertas.py` - Seed alertas (3 tipos: PRECO_ALVO, STOP_LOSS, DIVIDENDO)
 
 **Arquivos a modificar:**
 1. `scripts/reset_and_seed.py` - Adicionar opção --scenario
 
+**Dados do test_e2e.json (ATUALIZADO 22/03/2026):**
+- ✅ 3 usuários (admin, user, viewer)
+- ✅ 1 assessora
+- ✅ 7 ativos (3 ações BR, 2 FIIs, 2 stocks US)
+- ✅ 3 corretoras
+- ✅ 4 transações (compras e vendas)
+- ✅ 2 proventos (dividendo + rendimento FII)
+- ✅ 2 movimentações de caixa (depósito R$ 10.000, saque R$ 500)
+- ✅ **3 alertas** (preço alvo, stop loss, dividendo) ← NOVO!
+
 **Resultado esperado:**
-- Dashboard com saldo caixa != 0
-- Alertas carregados
-- Dados completos do test_e2e.json
+- Dashboard com saldo caixa = R$ 9.500,00 (10.000 - 500)
+- 3 alertas carregados e visíveis
+- Tela de alertas funcional
+- Dados completos para todas as telas principais
 
 ---
 
