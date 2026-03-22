@@ -173,9 +173,9 @@
         <div class="space-y-6">
             
             <!-- ALOCAÇÃO GRÁFICA -->
-            <div class="card-dashboard">
+            <div class="chart-container">
                 <h3 class="text-lg font-semibold mb-4" style="color: #a38c65;">Alocação por Mercado</h3>
-                <canvas id="alocacaoChart" height="200"></canvas>
+                <canvas id="alocacaoChart" height="150"></canvas>
             </div>
             
             <!-- ALERTAS RECENTES -->
@@ -267,14 +267,22 @@ function dashboardV2() {
             
             if (this.chartEvolucao) this.chartEvolucao.destroy();
             
+            // Se não há dados históricos, mostrar mensagem
+            if (this.dados.evolucao.length === 0) {
+                ctx.getContext('2d').font = '14px Arial';
+                ctx.fillStyle = '#6c757d';
+                ctx.textAlign = 'center';
+                ctx.fillText('Dados históricos não disponíveis', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
             this.chartEvolucao = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
                     datasets: [{
                         label: 'Patrimônio',
-                        data: this.dados.evolucao.length > 0 ? this.dados.evolucao : 
-                              [100000, 102000, 105000, 108000, 110000, 112000, 115000, 118000, 120000, 122000, 123000, this.dados.resumo.patrimonio_total],
+                        data: this.dados.evolucao,
                         borderColor: '#a38c65',
                         backgroundColor: 'rgba(163, 140, 101, 0.1)',
                         tension: 0.4,
