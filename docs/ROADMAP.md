@@ -44,6 +44,7 @@
 | **Importação** | ✅ | B3 Excel/CSV, 56 ativos seed |
 | **APIs** | ✅ | Cotações multi-provider, cache, circuit breaker |
 | **Exportação** | ✅ | CSV, Excel, JSON, PDF |
+| **Cenários de Teste** | ✅ | 3 cenários predefinidos (E2E, IR, Stress) + integração com seeds |
 | **Documentação** | ✅ | Swagger/OpenAPI auto-doc |
 | **Testes** | ✅ | 491 testes automatizados (100%) |
 

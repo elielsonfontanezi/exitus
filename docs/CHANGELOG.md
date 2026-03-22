@@ -8,6 +8,57 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feature — Integração de Cenários JSON ao Sistema de Seeds (22/03/2026)
+
+**Artefatos criados:**
+- `scripts/load_scenario.py` - Carregador de cenários JSON com resolução de referências
+- Integração completa com sistema de seeds existente
+
+**Artefatos modificados:**
+- `scripts/reset_and_seed.py` - Adicionada opção `--scenario` para carregar cenários JSON
+
+**Funcionalidades:**
+- Carregamento de cenários JSON predefinidos (test_e2e, test_full, test_ir)
+- Resolução automática de referências (username → usuario_id, ticker → ativo_id)
+- Validação de dados antes de inserção
+- Idempotência garantida (verificação de duplicatas)
+- Suporte a multi-tenant (assessora_id automático)
+- Seed completo: usuários, ativos, corretoras, transações, proventos, movimentações de caixa, alertas, portfolios, planos de compra/venda
+
+**Mapeamentos implementados:**
+- Tipos de ativo: 18 tipos mapeados (incluindo BDR→STOCK, FUNDO→OUTRO)
+- Classes de ativo: 8 classes mapeadas
+- Enums de status: StatusPlanoCompra, StatusPlanoVenda
+- Condições de alerta: operadores reduzidos para max 10 chars
+
+**Resultado:**
+- Dashboard com saldo de caixa funcional
+- Alertas carregados e ativos
+- Portfolios criados
+- Planos de compra/venda funcionais
+- Todas as telas com dados completos
+
+**Comando:**
+```bash
+python scripts/reset_and_seed.py --clean --scenario test_e2e
+```
+
+### Feature — Cenários de Teste (22/03/2026)
+
+**Sistema de Cenários:**
+- `test_e2e.json` - Dados realistas para testes E2E (3 usuários, 7 ativos, 4 transações)
+- `test_ir.json` - Dados específicos para cálculo de IR (múltiplas compras/vendas, proventos)
+- `test_stress.json` - Volume alto para testes de performance (6 usuários, 13 transações)
+- Fixture `load_scenario` no conftest.py para carregar cenários via pytest
+- Documentação completa em `docs/TEST_SCENARIOS.md`
+- Exemplo de uso em `backend/tests/test_scenarios_example.py`
+
+**Integração:**
+- Compatível com script `reset_and_seed.py` existente
+- Suporte a execução via container e diretamente no host
+- Validação automática de dados dos cenários
+- Idempotência garantida via cleanup_test_data automático
+
 ### Feature — DASHBOARD V2 + NOVAS APIs (21/03/2026)
 
 **Backend - Novas APIs:**

@@ -514,6 +514,45 @@ podman exec exitus-backend python3 -c "print('Hello')"
 
 ## Manutenção do Database
 
+### Carregamento de Cenários de Teste JSON
+
+**Novo comando disponível (22/03/2026):**
+
+```bash
+# Carregar cenário de teste E2E
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_e2e
+
+# Carregar cenário completo (test_full)
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_full
+
+# Carregar cenário para testes de IR
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_ir
+```
+
+**Cenários disponíveis:**
+- `test_e2e` - Dados realistas para testes E2E (3 usuários, 7 ativos, 4 transações, 2 proventos, 2 movimentações, 3 alertas)
+- `test_full` - Cenário completo para todas as telas (cobertura 100% do sistema)
+- `test_ir` - Dados específicos para cálculo de Imposto de Renda
+
+**O que é carregado:**
+- Assessoras
+- Usuários
+- Ativos (BR, US, EU)
+- Corretoras
+- Transações (compra/venda)
+- Proventos (dividendos, JCP, rendimentos)
+- Movimentações de caixa (depósitos, saques)
+- Alertas de preço
+- Portfolios
+- Planos de compra/venda
+
+**Resultado esperado:**
+- Dashboard com saldo de caixa != 0
+- Alertas ativos e funcionais
+- Portfolios criados
+- Planos de compra/venda ativos
+- Todas as telas com dados completos
+
 ### Executar Migrations
 
 #### Aplicar Migrations Pendentes

@@ -444,15 +444,27 @@ def show_help():
    python scripts/reset_and_seed.py --clean --seed-type=full
    → 5 usuários, 35+ ativos, 5 corretoras
 
-3️⃣ APENAS USUÁRIOS:
+3️⃣ CENÁRIO DE TESTE COMPLETO (NOVO):
+   python scripts/reset_and_seed.py --clean --scenario test_full
+   → Usuários, ativos, transações, movimentações, alertas, portfolios, planos
+
+4️⃣ CENÁRIO E2E:
+   python scripts/reset_and_seed.py --clean --scenario test_e2e
+   → Dados realistas para testes E2E
+
+5️⃣ CENÁRIO IR:
+   python scripts/reset_and_seed.py --clean --scenario test_ir
+   → Dados específicos para testes de Imposto de Renda
+
+6️⃣ APENAS USUÁRIOS:
    python scripts/reset_and_seed.py --clean --seed-type=usuarios
    → 5 usuários completos
 
-4️⃣ APENAS ATIVOS:
+7️⃣ APENAS ATIVOS:
    python scripts/reset_and_seed.py --clean --seed-type=ativos
    → Ativos BR, US, EU
 
-5️⃣ LEGACY COMPLETO:
+8️⃣ LEGACY COMPLETO:
    python scripts/reset_and_seed.py --clean --seed-type=legacy
    → Equivalente ao run_all_seeds.py antigo
 
@@ -487,6 +499,7 @@ def show_help():
 🔧 OPÇÕES:
    --clean         → Reset completo do banco
    --seed-type     → Tipo de seed (default: minimal)
+   --scenario      → Carregar cenário de teste JSON (test_full, test_e2e, test_ir)
    --backup        → Nome do cenário para backup
    --restore       → Nome do cenário para restaurar
    --list-scenarios→ Listar cenários disponíveis
@@ -516,6 +529,7 @@ def main():
         epilog="""
 Exemplos:
   python scripts/reset_and_seed.py --clean --seed-type=minimal
+  python scripts/reset_and_seed.py --clean --scenario test_full
   python scripts/reset_and_seed.py --backup meu_teste
   python scripts/reset_and_seed.py --restore meu_teste
   python scripts/reset_and_seed.py --list-scenarios
@@ -525,6 +539,7 @@ Exemplos:
     parser.add_argument('--clean', action='store_true', help='Reset completo do banco')
     parser.add_argument('--seed-type', choices=['minimal', 'full', 'usuarios', 'ativos', 'legacy'], 
                        default='minimal', help='Tipo de seed (default: minimal)')
+    parser.add_argument('--scenario', help='Nome do cenário de teste JSON (test_full, test_e2e, test_ir)')
     parser.add_argument('--backup', help='Nome do cenário para backup')
     parser.add_argument('--restore', help='Nome do cenário para restaurar')
     parser.add_argument('--list-scenarios', action='store_true', help='Listar cenários disponíveis')
@@ -563,7 +578,14 @@ Exemplos:
     if args.clean:
         manager.reset_database()
     
-    success = manager.load_seed_data(args.seed_type)
+    # Carregar cenário JSON se especificado
+    if args.scenario:
+        from load_scenario import ScenarioLoader
+        loader = ScenarioLoader()
+        loader.load_scenario(args.scenario)
+        success = loader.seed_all()
+    else:
+        success = manager.load_seed_data(args.seed_type)
     
     if success:
         print("🎉 Operação concluída com sucesso!")
