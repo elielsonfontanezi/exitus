@@ -67,7 +67,7 @@ class PlanoVenda(db.Model):
     valor_parcela_fixo = Column(Numeric(18, 2), nullable=True)  # Valor fixo por parcela
     
     # Controle
-    status = Column(Enum(StatusPlanoVenda), nullable=False, default=StatusPlanoVenda.ATIVO)
+    status = Column(Enum(StatusPlanoVenda, values_callable=lambda x: [e.value for e in x]), nullable=False, default=StatusPlanoVenda.ATIVO)
     data_inicio = Column(Date, nullable=True)
     data_conclusao = Column(Date, nullable=True)
     

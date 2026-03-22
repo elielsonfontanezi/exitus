@@ -26,7 +26,8 @@ try:
     from app.models.alerta import Alerta
     from app.models.portfolio import Portfolio
     from app.models.plano_compra import PlanoCompra, StatusPlanoCompra
-    from app.models.plano_venda import PlanoVenda, StatusPlanoVenda
+    from app.models.plano_venda import PlanoVenda, StatusPlanoVenda, TipoGatilho
+    from app.models.plano_venda import TipoGatilho
     from werkzeug.security import generate_password_hash
 except ImportError as e:
     print(f"Erro ao importar módulos: {e}")
@@ -552,13 +553,18 @@ class ScenarioLoader:
                 print(f"⚠️  Referências faltando para plano de compra: {plano_data}")
                 continue
             
-            status_map = {
-                'ATIVO': StatusPlanoCompra.ATIVO,
-                'PAUSADO': StatusPlanoCompra.PAUSADO,
-                'CONCLUIDO': StatusPlanoCompra.CONCLUIDO,
-                'CANCELADO': StatusPlanoCompra.CANCELADO,
-                'PENDENTE': StatusPlanoCompra.ATIVO  # Mapear PENDENTE para ATIVO
-            }
+            # Mapear status do JSON para enum (usar enum diretamente, não string)
+            status_str = plano_data.get('status', 'ATIVO')
+            if status_str == 'ATIVO' or status_str == 'PENDENTE':
+                status_enum = StatusPlanoCompra.ATIVO
+            elif status_str == 'PAUSADO':
+                status_enum = StatusPlanoCompra.PAUSADO
+            elif status_str == 'CONCLUIDO':
+                status_enum = StatusPlanoCompra.CONCLUIDO
+            elif status_str == 'CANCELADO':
+                status_enum = StatusPlanoCompra.CANCELADO
+            else:
+                status_enum = StatusPlanoCompra.ATIVO
             
             # Adaptar campos do JSON para o model PlanoCompra
             plano = PlanoCompra(
@@ -569,7 +575,7 @@ class ScenarioLoader:
                 quantidade_alvo=plano_data.get('quantidade_desejada', 0),
                 valor_aporte_mensal=Decimal(str(plano_data.get('valor_total_planejado', 0))) / 12,  # Dividir em 12 meses
                 data_fim_prevista=datetime.strptime(plano_data['data_limite'], '%Y-%m-%d') if plano_data.get('data_limite') else None,
-                status=status_map.get(plano_data.get('status', 'ATIVO'), StatusPlanoCompra.ATIVO)
+                status=status_enum
             )
             
             db.session.add(plano)
@@ -595,25 +601,32 @@ class ScenarioLoader:
                 print(f"⚠️  Referências faltando para plano de venda: {plano_data}")
                 continue
             
-            status_map = {
-                'ATIVO': StatusPlanoVenda.ATIVO,
-                'PAUSADO': StatusPlanoVenda.PAUSADO,
-                'EXECUTADO': StatusPlanoVenda.EXECUTADO,
-                'CANCELADO': StatusPlanoVenda.CANCELADO,
-                'PENDENTE': StatusPlanoVenda.ATIVO  # Mapear PENDENTE para ATIVO
-            }
+            # Mapear status do JSON para enum (usar enum diretamente, não string)
+            status_str = plano_data.get('status', 'ATIVO')
+            if status_str == 'ATIVO' or status_str == 'PENDENTE':
+                status_enum = StatusPlanoVenda.ATIVO
+            elif status_str == 'PAUSADO':
+                status_enum = StatusPlanoVenda.PAUSADO
+            elif status_str == 'EXECUTADO' or status_str == 'CONCLUIDO':
+                status_enum = StatusPlanoVenda.CONCLUIDO  # EXECUTADO mapeia para CONCLUIDO
+            elif status_str == 'CANCELADO':
+                status_enum = StatusPlanoVenda.CANCELADO
+            else:
+                status_enum = StatusPlanoVenda.ATIVO
             
             # Adaptar campos do JSON para o model PlanoVenda
+            from app.models.plano_venda import TipoGatilho
+            
             plano = PlanoVenda(
                 usuario_id=usuario_id,
                 ativo_id=ativo_id,
                 assessora_id=assessora_id,
                 nome=f"Venda {plano_data['ativo_ticker']}",
+                quantidade_total=plano_data.get('quantidade_planejada', 0),
                 preco_alvo=Decimal(str(plano_data['preco_alvo'])),
-                percentual_venda=plano_data.get('percentual_venda', 100),
-                quantidade_alvo=plano_data.get('quantidade_planejada', 0),
-                data_limite=datetime.strptime(plano_data['data_limite'], '%Y-%m-%d') if plano_data.get('data_limite') else None,
-                status=status_map.get(plano_data.get('status', 'ATIVO'), StatusPlanoVenda.ATIVO)
+                tipo_gatilho=TipoGatilho.PRECO_ALVO,  # Usar PRECO_ALVO como padrão
+                data_limite=datetime.strptime(plano_data['data_limite'], '%Y-%m-%d').date() if plano_data.get('data_limite') else None,
+                status=status_enum
             )
             
             db.session.add(plano)

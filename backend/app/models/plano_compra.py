@@ -44,7 +44,7 @@ class PlanoCompra(db.Model):
     data_conclusao = Column(DateTime, nullable=True)
     
     # Status e controle
-    status = Column(SQLEnum(StatusPlanoCompra), nullable=False, default=StatusPlanoCompra.ATIVO, index=True)
+    status = Column(SQLEnum(StatusPlanoCompra, values_callable=lambda x: [e.value for e in x]), nullable=False, default=StatusPlanoCompra.ATIVO, index=True)
     proximo_aporte = Column(DateTime, nullable=True)
     
     # Metadados
