@@ -278,6 +278,47 @@ Authorization: Bearer <token>
 - `evolucao`: histórico patrimonial (futuro)
 - Mercados: BR (Brasil), US (Estados Unidos), INTL (Europa/Ásia/Global)
 
+### GET /api/portfolios/evolucao
+Retorna evolução do patrimônio ao longo do tempo usando snapshots mensais.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+- `meses` — Número de meses a retornar (default: 12, max: 60)
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "evolucao": [
+      {
+        "data": "2024-04-30",
+        "valor": 37205.00
+      },
+      {
+        "data": "2024-05-31",
+        "valor": 52450.00
+      },
+      {
+        "data": "2024-06-30",
+        "valor": 58050.00
+      }
+    ]
+  },
+  "message": "Evolução de 12 meses calculada"
+}
+```
+
+**Notas:**
+- Baseado na tabela `historico_patrimonio` com snapshots mensais
+- Retorna apenas meses com dados disponíveis
+- Ordenado cronologicamente (mais antigo para mais recente)
+- Útil para gráficos de evolução patrimonial no dashboard
+
 ---
 
 ## 6. Posições

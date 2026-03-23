@@ -10,7 +10,7 @@
 
 | Componente | Progresso | Detalhe |
 |------------|-----------|---------|
-| **Backend** | ✅ 87% | 47/54 GAPs, 436/497 testes (87.7%), 155 endpoints |
+| **Backend** | ✅ 87% | 48/54 GAPs, 436/497 testes (87.7%), 156 endpoints |
 | **Frontend V2.0** | ✅ 100% | 17/17 telas premium, design classe mundial |
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | 🟡 87.7% | 436/497 passando (61 failed, 35 errors) |
@@ -22,9 +22,9 @@
 
 ## 🖥️ Backend — 87% Concluído
 
-- **GAPs:** 47/54 implementados (Fases 1-6 ✅, MULTICLIENTE-001 ✅)
+- **GAPs:** 48/54 implementados (Fases 1-6 ✅, MULTICLIENTE-001 ✅, HistoricoPatrimonio ✅)
 - **Testes:** 436/497 passando (87.7%)
-- **Endpoints:** 155 funcionais
+- **Endpoints:** 156 funcionais (/api/portfolios/evolucao)
 - **Multi-tenancy:** ✅ Concluído — 10 services com `filter_by_assessora()`
 - **Motor Fiscal:** IR completo, IOF, DARF, compensação
 - **Importação:** B3 Excel/CSV, 56 ativos seed

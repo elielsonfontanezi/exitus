@@ -37,7 +37,7 @@
 
 | Componente | Status | Detalhes |
 |------------|--------|----------|
-| **Backend** | ✅ | 155 endpoints REST, Flask + SQLAlchemy |
+| **Backend** | ✅ | 156 endpoints REST, Flask + SQLAlchemy |
 | **Banco** | ✅ | PostgreSQL, 23 tabelas, constraints robustas |
 | **Autenticação** | ✅ | JWT, 3 roles (ADMIN/USER/READONLY) |
 | **Motor Fiscal** | ✅ | IR completo, IOF, DARF, compensação |
@@ -45,6 +45,7 @@
 | **APIs** | ✅ | Cotações multi-provider, cache, circuit breaker |
 | **Exportação** | ✅ | CSV, Excel, JSON, PDF |
 | **Cenários de Teste** | ✅ | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa com seeds |
+| **Histórico Patrimonial** | ✅ | Snapshots mensais, endpoint /api/portfolios/evolucao |
 | **Documentação** | ✅ | Swagger/OpenAPI auto-doc |
 | **Testes** | ✅ | 491 testes automatizados (100%) |
 
