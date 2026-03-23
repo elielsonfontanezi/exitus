@@ -11,6 +11,8 @@
 * **Cotações em Tempo Real**: Multi-provider com cache inteligente (15min TTL)
 * **Dashboards Interativos**: Performance, alocação, evolução patrimonial e métricas de risco
 * **Histórico Patrimonial**: Snapshots mensais com evolução detalhada por categoria (renda variável, fixa, caixa)
+  - API `/api/portfolios/evolucao` retorna histórico completo (default) ou últimos N meses
+  - Dashboard exibe jornada completa desde o primeiro registro
 * **Sistema de Alertas**: Notificações configuráveis por preço, percentual e indicadores
 * **Relatórios Avançados**: Geração automática de relatórios de performance com Sharpe Ratio
 * **Cálculos Fiscais**: Regras configuráveis por país e tipo de ativo
