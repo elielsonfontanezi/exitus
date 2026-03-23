@@ -266,7 +266,6 @@ function dashboardV2() {
         
         renderizarEvolucao() {
             const ctx = document.getElementById('chartEvolucao');
-            console.log('renderizarEvolucao - ctx:', ctx);
             if (!ctx) {
                 console.error('Canvas chartEvolucao não encontrado!');
                 return;
@@ -319,8 +318,6 @@ function dashboardV2() {
         
         renderizarAlocacao() {
             const ctx = document.getElementById('alocacaoChart');
-            console.log('renderizarAlocacao - ctx:', ctx);
-            console.log('renderizarAlocacao - dados:', this.dados.alocacao_geografica);
             if (!ctx) {
                 console.error('Canvas alocacaoChart não encontrado!');
                 return;

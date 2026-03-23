@@ -7,7 +7,7 @@ Serviços para dados consolidados da carteira
 from uuid import UUID
 from typing import Dict
 from decimal import Decimal
-from app.models import MovimentacaoCaixa
+from app.models.movimentacao_caixa import MovimentacaoCaixa, TipoMovimentacao
 from app.services.cambio_service import CambioService
 import logging
 
@@ -42,7 +42,7 @@ class CarteiraService:
             moeda = mov.moeda.upper()
             
             # Entrada positiva, saída negativa
-            if mov.tipo_movimentacao in ['DEPOSITO', 'CREDITO', 'DIVIDENDO', 'JCP', 'RENDIMENTO']:
+            if mov.tipo_movimentacao in [TipoMovimentacao.DEPOSITO, TipoMovimentacao.CREDITO_PROVENTO, TipoMovimentacao.AJUSTE]:
                 multiplicador = Decimal('1')
             else:
                 multiplicador = Decimal('-1')

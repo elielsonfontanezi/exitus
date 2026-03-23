@@ -319,8 +319,8 @@
       "corretora": "XP INVESTIMENTOS",
       "tipo": "DEPOSITO",
       "data_movimentacao": "2024-01-10",
-      "valor": 10000.0,
-      "observacoes": "Depósito inicial"
+      "valor": 300000.0,
+      "observacoes": "Aporte inicial para compras de ativos"
     },
     {
       "usuario": "e2e_user",
