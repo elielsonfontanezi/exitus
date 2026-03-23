@@ -287,7 +287,9 @@ Authorization: Bearer <token>
 ```
 
 **Query Parameters:**
-- `meses` — Número de meses a retornar (default: 12, max: 60)
+- `meses` — Número de meses a retornar (opcional)
+  - `0` ou ausente = todo histórico disponível (recomendado para dashboard)
+  - `N > 0` = últimos N meses
 
 **Response 200:**
 ```json

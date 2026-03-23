@@ -352,26 +352,33 @@ class PortfolioService:
         return resultado
     
     @staticmethod
-    def get_evolucao_patrimonio(usuario_id: UUID, meses: int = 12) -> List[Dict]:
+    def get_evolucao_patrimonio(usuario_id: UUID, meses: int = 0) -> List[Dict]:
         """
         Retorna evolução do patrimônio ao longo do tempo usando histórico armazenado.
         
         Args:
             usuario_id: UUID do usuário
-            meses: Número de meses a retornar (default: 12)
+            meses: Número de meses a retornar (default: 0 = todo histórico)
+                   0 = todo histórico disponível
+                   N > 0 = últimos N meses
             
         Returns:
             Lista de dicts com 'data' e 'valor'
         """
         from datetime import datetime, timedelta
         
-        # Buscar histórico dos últimos N meses
-        data_limite = datetime.now().date() - timedelta(days=meses * 30)
+        # Construir query base
+        query = HistoricoPatrimonio.query.filter(
+            HistoricoPatrimonio.usuario_id == usuario_id
+        )
         
-        historico = HistoricoPatrimonio.query.filter(
-            HistoricoPatrimonio.usuario_id == usuario_id,
-            HistoricoPatrimonio.data >= data_limite
-        ).order_by(HistoricoPatrimonio.data).all()
+        # Aplicar filtro de período se meses > 0
+        if meses > 0:
+            data_limite = datetime.now().date() - timedelta(days=meses * 30)
+            query = query.filter(HistoricoPatrimonio.data >= data_limite)
+        
+        # Buscar histórico ordenado
+        historico = query.order_by(HistoricoPatrimonio.data).all()
         
         # Formatar resposta
         return [
