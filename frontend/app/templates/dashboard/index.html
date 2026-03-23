@@ -224,7 +224,10 @@ function dashboardV2() {
         
         async init() {
             await this.carregarDados();
-            this.renderizarGraficos();
+            // Deferir renderização dos gráficos para garantir DOM pronto
+            setTimeout(() => {
+                this.renderizarGraficos();
+            }, 100);
         },
         
         async carregarDados() {
@@ -263,7 +266,11 @@ function dashboardV2() {
         
         renderizarEvolucao() {
             const ctx = document.getElementById('chartEvolucao');
-            if (!ctx) return;
+            console.log('renderizarEvolucao - ctx:', ctx);
+            if (!ctx) {
+                console.error('Canvas chartEvolucao não encontrado!');
+                return;
+            }
             
             if (this.chartEvolucao) this.chartEvolucao.destroy();
             
@@ -312,7 +319,12 @@ function dashboardV2() {
         
         renderizarAlocacao() {
             const ctx = document.getElementById('alocacaoChart');
-            if (!ctx) return;
+            console.log('renderizarAlocacao - ctx:', ctx);
+            console.log('renderizarAlocacao - dados:', this.dados.alocacao_geografica);
+            if (!ctx) {
+                console.error('Canvas alocacaoChart não encontrado!');
+                return;
+            }
             
             if (this.chartAlocacao) this.chartAlocacao.destroy();
             
