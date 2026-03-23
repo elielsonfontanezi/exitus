@@ -11,8 +11,9 @@
 ### **Situação Atual:**
 1. ✅ Dashboard v2 implementado e funcionando
 2. ✅ Cenários de teste criados em `scripts/seed_data/scenarios/` 
-3. ❌ Cenários NÃO integrados ao sistema de seeds
-4. ❌ Dados faltantes no dashboard (saldo caixa = R$ 0, alertas = [])
+3. ✅ Cenários integrados ao sistema de seeds (load_scenario.py)
+4. ✅ Histórico Patrimonial implementado (/api/portfolios/evolucao)
+5. ❌ Dados faltantes no dashboard (saldo caixa = R$ 0, alertas = [])
 
 ### **Problema:**
 O dashboard não mostra todos os dados porque:

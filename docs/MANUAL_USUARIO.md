@@ -118,6 +118,10 @@ Content-Type: application/json
 GET /api/portfolios/dashboard
 Authorization: Bearer <token>
 
+# Evolução patrimonial
+GET /api/portfolios/evolucao?meses=12
+Authorization: Bearer <token>
+
 # Resposta:
 {
   "success": true,
