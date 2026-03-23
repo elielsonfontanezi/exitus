@@ -234,7 +234,7 @@ class PortfolioService:
             },
             "por_mercado": por_mercado,
             "alocacao_geografica": alocacao_geografica,
-            "evolucao": []
+            "evolucao": PortfolioService.get_evolucao_patrimonio(usuario_id, meses=0)
         }
         
         # Salvar no cache por 5 minutos
