@@ -268,7 +268,7 @@ function dashboardV2() {
             if (this.chartEvolucao) this.chartEvolucao.destroy();
             
             // Se não há dados históricos, mostrar mensagem
-            if (this.dados.evolucao.length === 0) {
+            if (!this.dados.evolucao || this.dados.evolucao.length === 0) {
                 ctx.getContext('2d').font = '14px Arial';
                 ctx.fillStyle = '#6c757d';
                 ctx.textAlign = 'center';
@@ -276,13 +276,20 @@ function dashboardV2() {
                 return;
             }
             
+            // Extrair labels (Mês/Ano) e valores dos dados da API
+            const labels = this.dados.evolucao.map(e => {
+                const date = new Date(e.data);
+                return date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+            });
+            const valores = this.dados.evolucao.map(e => e.valor);
+            
             this.chartEvolucao = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                    labels: labels,
                     datasets: [{
                         label: 'Patrimônio',
-                        data: this.dados.evolucao,
+                        data: valores,
                         borderColor: '#a38c65',
                         backgroundColor: 'rgba(163, 140, 101, 0.1)',
                         tension: 0.4,
@@ -295,7 +302,7 @@ function dashboardV2() {
                     plugins: { legend: { display: false } },
                     scales: {
                         y: {
-                            beginAtZero: false,
+                            beginAtZero: true,
                             ticks: { callback: (v) => 'R$ ' + (v/1000).toFixed(0) + 'k' }
                         }
                     }
@@ -309,15 +316,24 @@ function dashboardV2() {
             
             if (this.chartAlocacao) this.chartAlocacao.destroy();
             
+            // Verificar se dados existem
+            if (!this.dados.alocacao_geografica) {
+                ctx.getContext('2d').font = '14px Arial';
+                ctx.fillStyle = '#6c757d';
+                ctx.textAlign = 'center';
+                ctx.fillText('Dados de alocação não disponíveis', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
             this.chartAlocacao = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Brasil', 'EUA', 'Internacional'],
                     datasets: [{
                         data: [
-                            this.dados.alocacao_geografica.BR,
-                            this.dados.alocacao_geografica.US,
-                            this.dados.alocacao_geografica.INTL
+                            this.dados.alocacao_geografica.BR || 0,
+                            this.dados.alocacao_geografica.US || 0,
+                            this.dados.alocacao_geografica.INTL || 0
                         ],
                         backgroundColor: ['#a38c65', '#6c757d', '#495057'],
                         borderWidth: 0

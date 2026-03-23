@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from uuid import UUID
 from app.services.alerta_service import AlertaService
-from app.models.configuracao_alerta import ConfiguracaoAlerta
+from app.models.alerta import Alerta
 from app.database import db
 
 # Prefixo definido. Rotas abaixo serão relativas a /api/alertas
@@ -16,8 +16,8 @@ def listar_alertas():
     try:
         usuario_id = UUID(get_jwt_identity())
         # Busca alertas e ordena por criação
-        alertas = ConfiguracaoAlerta.query.filter_by(usuario_id=usuario_id)\
-            .order_by(ConfiguracaoAlerta.timestamp_criacao.desc()).all()
+        alertas = Alerta.query.filter_by(usuario_id=usuario_id)\
+            .order_by(Alerta.created_at.desc()).all()
         
         result = [a.to_dict() for a in alertas]
         return jsonify({"success": True, "data": result, "message": f"{len(result)} alerta(s) encontrado(s)"}), 200
@@ -63,20 +63,20 @@ def listar_alertas_recentes():
         usuario_id = UUID(get_jwt_identity())
         limit = request.args.get('limit', 5, type=int)
         
-        # Buscar alertas ativos disparados recentemente
-        alertas = ConfiguracaoAlerta.query.filter_by(
+        # Buscar alertas ativos ordenados por data de criação
+        alertas = Alerta.query.filter_by(
             usuario_id=usuario_id,
             ativo=True
         ).order_by(
-            ConfiguracaoAlerta.timestamp_criacao.desc()
+            Alerta.created_at.desc()
         ).limit(limit).all()
         
         result = [{
             'id': str(a.id),
             'nome': a.nome,
             'tipo': a.tipo_alerta,
-            'mensagem': a.mensagem or f"Alerta {a.tipo_alerta}",
-            'data': a.timestamp_criacao.isoformat() if a.timestamp_criacao else None
+            'mensagem': f"Alerta {a.tipo_alerta} - {a.ticker}" if a.ticker else f"Alerta {a.tipo_alerta}",
+            'data': a.created_at.isoformat() if a.created_at else None
         } for a in alertas]
         
         return jsonify({
