@@ -7,6 +7,7 @@ from app.database import db
 from app.models.portfolio import Portfolio
 from app.models.posicao import Posicao
 from app.models.ativo import Ativo
+from app.models.historico_patrimonio import HistoricoPatrimonio
 from app.services.cache_service import cache
 from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
@@ -349,4 +350,35 @@ class PortfolioService:
                 resultado[classe] = {"valor": 0.0, "percentual": 0.0}
         
         return resultado
+    
+    @staticmethod
+    def get_evolucao_patrimonio(usuario_id: UUID, meses: int = 12) -> List[Dict]:
+        """
+        Retorna evolução do patrimônio ao longo do tempo usando histórico armazenado.
+        
+        Args:
+            usuario_id: UUID do usuário
+            meses: Número de meses a retornar (default: 12)
+            
+        Returns:
+            Lista de dicts com 'data' e 'valor'
+        """
+        from datetime import datetime, timedelta
+        
+        # Buscar histórico dos últimos N meses
+        data_limite = datetime.now().date() - timedelta(days=meses * 30)
+        
+        historico = HistoricoPatrimonio.query.filter(
+            HistoricoPatrimonio.usuario_id == usuario_id,
+            HistoricoPatrimonio.data >= data_limite
+        ).order_by(HistoricoPatrimonio.data).all()
+        
+        # Formatar resposta
+        return [
+            {
+                'data': h.data.isoformat(),
+                'valor': float(h.patrimonio_total)
+            }
+            for h in historico
+        ]
 

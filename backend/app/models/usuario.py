@@ -44,6 +44,7 @@ class Usuario(db.Model):
     portfolios = relationship('Portfolio', back_populates='usuario', lazy='dynamic', cascade='all, delete-orphan')
     planos_compra = relationship('PlanoCompra', back_populates='usuario', lazy='dynamic', cascade='all, delete-orphan')
     planos_venda = relationship('PlanoVenda', back_populates='usuario', lazy='dynamic', cascade='all, delete-orphan')
+    historico_patrimonio = relationship('HistoricoPatrimonio', back_populates='usuario', lazy='dynamic', cascade='all, delete-orphan')
 
     def set_password(self, password):
         """Define a senha do usuário (gera hash bcrypt)"""

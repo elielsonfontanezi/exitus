@@ -42,6 +42,7 @@ from .relatorio_performance import RelatorioPerformance
 from .portfolio import Portfolio
 
 from app.models.historico_preco import HistoricoPreco
+from app.models.historico_patrimonio import HistoricoPatrimonio
 
 # Fase 3 - Planos de Compra
 from .plano_compra import PlanoCompra, StatusPlanoCompra
@@ -94,6 +95,8 @@ __all__ = [
     "ProjecaoRenda",
     "RelatorioPerformance",
     "Portfolio",
+    "HistoricoPreco",
+    "HistoricoPatrimonio",
     
     # Fase 3 - Planos de Compra
     "PlanoCompra",

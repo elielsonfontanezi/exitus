@@ -27,7 +27,7 @@ try:
     from app.models.portfolio import Portfolio
     from app.models.plano_compra import PlanoCompra, StatusPlanoCompra
     from app.models.plano_venda import PlanoVenda, StatusPlanoVenda, TipoGatilho
-    from app.models.plano_venda import TipoGatilho
+    from app.models.historico_patrimonio import HistoricoPatrimonio
     from werkzeug.security import generate_password_hash
 except ImportError as e:
     print(f"Erro ao importar módulos: {e}")
@@ -89,6 +89,7 @@ class ScenarioLoader:
                 self._seed_alertas()
                 self._seed_planos_compra()
                 self._seed_planos_venda()
+                self._seed_historico_patrimonio()
                 
                 db.session.commit()
                 print("✅ Cenário carregado com sucesso!")
@@ -631,6 +632,50 @@ class ScenarioLoader:
             
             db.session.add(plano)
             print(f"✅ Plano de venda criado: {plano_data['ativo_ticker']}")
+        
+        db.session.flush()
+    
+    def _seed_historico_patrimonio(self):
+        """Seed de histórico de patrimônio"""
+        historico_data = self.scenario_data.get('historico_patrimonio', [])
+        
+        if not historico_data:
+            print("⏭️  Sem histórico de patrimônio para carregar")
+            return
+        
+        print(f"📊 Carregando {len(historico_data)} registros de histórico de patrimônio...")
+        
+        for hist_data in historico_data:
+            usuario_username = hist_data['usuario']
+            usuario_id = self.references['usuarios'].get(usuario_username)
+            
+            if not usuario_id:
+                print(f"⚠️  Usuário não encontrado: {usuario_username}")
+                continue
+            
+            data_snapshot = datetime.strptime(hist_data['data'], '%Y-%m-%d').date()
+            
+            existing = HistoricoPatrimonio.query.filter_by(
+                usuario_id=usuario_id,
+                data=data_snapshot
+            ).first()
+            
+            if existing:
+                print(f"⏭️  Histórico já existe: {usuario_username} - {data_snapshot}")
+                continue
+            
+            historico = HistoricoPatrimonio(
+                usuario_id=usuario_id,
+                data=data_snapshot,
+                patrimonio_total=Decimal(str(hist_data['patrimonio_total'])),
+                patrimonio_renda_variavel=Decimal(str(hist_data.get('patrimonio_renda_variavel', 0))),
+                patrimonio_renda_fixa=Decimal(str(hist_data.get('patrimonio_renda_fixa', 0))),
+                saldo_caixa=Decimal(str(hist_data.get('saldo_caixa', 0))),
+                observacoes=hist_data.get('observacoes')
+            )
+            
+            db.session.add(historico)
+            print(f"✅ Histórico criado: {usuario_username} - {data_snapshot} - R$ {hist_data['patrimonio_total']}")
         
         db.session.flush()
 
