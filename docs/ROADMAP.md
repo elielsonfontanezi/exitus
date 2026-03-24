@@ -1,7 +1,7 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 48/54 GAPs (87%) | **Testes:** 436/497 passing (87.7%)  
+> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 436/497 passing (87.7%)  
 > **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅  
 > **Dashboard:** ✅ Corrigido (race condition Chart.js) | **Versão:** v0.9.3 | **Última atualização:** 23/03/2026
 
@@ -243,6 +243,7 @@ Transações | Movimentações | Proventos | Relatórios | Análises |
 - [ ] CI/CD automatizado
 - [ ] 80%+ cobertura
 - [ ] SLA 99.9%
+- [ ] **HIST-001:** Job mensal para histórico patrimonial (débito técnico)
 
 ---
 

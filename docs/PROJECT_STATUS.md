@@ -201,6 +201,30 @@
 
 ---
 
+## 🔄 Dívidas Técnicas Identificadas
+
+| Item | Descrição | Impacto | Prioridade | Sprint |
+|------|-----------|---------|------------|--------|
+| **HIST-001** | Job mensal para `historico_patrimonio` | Dashboard inconsistente | Média | 7 |
+
+### HIST-001 — Processo Agendado: Histórico Patrimonial
+
+**Problema:** Tabela `historico_patrimonio` não tem processo de atualização automática.
+- Último snapshot: jun/2024 (R$ 58.050)
+- Patrimônio atual: mar/2026 (R$ 249.907,10)
+- Gap: 21 meses de dados ausentes
+
+**Solução temporária:** Snapshot manual adicionado (23/03/2026).
+
+**Implementação futura:**
+- Job mensal para criar snapshots automáticos
+- Scheduler (APScheduler ou cron) no dia 1 de cada mês
+- Logging e monitoramento de falhas
+
+**Detalhes técnicos:** Ver `docs/LESSONS_LEARNED.md` (L-FE-003)
+
+---
+
 ## 🎯 Próximos Passos (por prioridade)
 
 1. **Corrigir testes backend** — 61 falhas + 35 erros (IR, constraints)
