@@ -10,6 +10,22 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ### Feature — Dashboard UX Improvements (24/03/2026)
 
+### Feature — Dashboard 5 Novos Cards (24/03/2026)
+
+**Artefatos modificados:**
+- `frontend/app/templates/dashboard/index.html` - Adicionados 5 novos cards informativos
+
+**Mudanças:**
+- **📅 Calendário Econômico:** Próximos eventos (dividendos, vencimentos) em 30 dias
+- **💸 Cash Flow Mensal:** Entradas (proventos) vs Saídas (impostos) com saldo líquido
+- **🏢 Setores:** Diversificação por setor econômico (calculado a partir dos top ativos BR)
+- **📋 Resumo Fiscal:** DARF acumulado + IR a pagar no mês
+- **💡 Recomendações:** Sugestões de compra/venda baseadas em planos
+- Logs de debug adicionados para facilitar troubleshooting
+- Proteções contra dados undefined/null
+- Layout responsivo em grid 2x2
+
+
 **Artefatos modificados:**
 - `frontend/app/templates/dashboard/index.html` - Melhorias de UX no dashboard
 

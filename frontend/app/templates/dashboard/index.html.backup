@@ -330,66 +330,6 @@
                 </div>
             </div>
             
-            <!-- GRID 2x3 NOVOS CARDS -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <!-- CALENDÁRIO ECONÔMICO -->
-                <div class="card-dashboard">
-                    <h3 class="text-lg font-semibold mb-3" style="color: #a38c65;">📅 Calendário</h3>
-                    <div class="space-y-2" x-show="calendario.length > 0">
-                        <template x-for="evt in calendario.slice(0,3)" :key="evt.id">
-                            <div class="text-sm p-2 rounded" style="background: #f8f6f3;">
-                                <div class="font-semibold" x-text="evt.titulo"></div>
-                                <div class="text-xs text-gray-500" x-text="evt.data"></div>
-                            </div>
-                        </template>
-                    </div>
-                    <div x-show="calendario.length === 0" class="text-center text-gray-500 py-4 text-sm">Nenhum evento próximo</div>
-                </div>
-                
-                <!-- CASH FLOW -->
-                <div class="card-dashboard">
-                    <h3 class="text-lg font-semibold mb-3" style="color: #a38c65;">💸 Cash Flow</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between"><span class="text-sm">Entradas</span><span class="font-semibold text-green-600" x-text="formatMoney(cashFlow.entradas)">R$ 0</span></div>
-                        <div class="flex justify-between"><span class="text-sm">Saídas</span><span class="font-semibold text-red-600" x-text="formatMoney(cashFlow.saidas)">R$ 0</span></div>
-                        <div class="flex justify-between pt-2 border-t"><span class="font-semibold">Saldo</span><span class="font-bold" :class="cashFlow.saldo >= 0 ? 'text-green-600' : 'text-red-600'" x-text="formatMoney(cashFlow.saldo)">R$ 0</span></div>
-                    </div>
-                </div>
-                
-                <!-- SETORES -->
-                <div class="card-dashboard">
-                    <h3 class="text-lg font-semibold mb-3" style="color: #a38c65;">🏢 Setores</h3>
-                    <div class="space-y-2" x-show="setores.length > 0">
-                        <template x-for="s in setores.slice(0,4)" :key="s.nome">
-                            <div class="flex justify-between text-sm"><span x-text="s.nome"></span><span x-text="s.percentual + '%'"></span></div>
-                        </template>
-                    </div>
-                    <div x-show="setores.length === 0" class="text-center text-gray-500 py-4 text-sm">Sem dados</div>
-                </div>
-                
-                <!-- FISCAL -->
-                <div class="card-dashboard">
-                    <h3 class="text-lg font-semibold mb-3" style="color: #a38c65;">📋 Fiscal</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between"><span class="text-sm">DARF Acumulado</span><span class="font-semibold" x-text="formatMoney(fiscal.darf)">R$ 0</span></div>
-                        <div class="flex justify-between"><span class="text-sm">IR a Pagar</span><span class="font-semibold" x-text="formatMoney(fiscal.ir)">R$ 0</span></div>
-                    </div>
-                </div>
-                
-                <!-- RECOMENDAÇÕES -->
-                <div class="card-dashboard">
-                    <h3 class="text-lg font-semibold mb-3" style="color: #a38c65;">💡 Recomendações</h3>
-                    <div class="space-y-2" x-show="recomendacoes.length > 0">
-                        <template x-for="rec in recomendacoes.slice(0,3)" :key="rec.id">
-                            <div class="text-sm p-2 rounded" style="background: #f8f6f3;"><span x-text="rec.tipo"></span>: <strong x-text="rec.ativo"></strong></div>
-                        </template>
-                    </div>
-                    <div x-show="recomendacoes.length === 0" class="text-center text-gray-500 py-4 text-sm">Sem recomendações</div>
-                </div>
-                
-            </div>
-            
         </div>
         
         <!-- COLUNA LATERAL (1/3) -->
@@ -539,11 +479,6 @@ function dashboardV2() {
         alertas: [],
         transacoes: [],
         proximosProventos: [],
-        calendario: [],
-        cashFlow: { entradas: 0, saidas: 0, saldo: 0 },
-        setores: [],
-        fiscal: { darf: 0, ir: 0 },
-        recomendacoes: [],
         totalProventos: 0,
         chartEvolucao: null,
         chartAlocacao: null,
@@ -552,7 +487,6 @@ function dashboardV2() {
         async init() {
             await this.carregarDados();
             this.$nextTick(() => this.renderizarGraficos());
-            this.carregarNovosCards();
         },
         
         async carregarDados() {
@@ -612,60 +546,9 @@ function dashboardV2() {
                 } catch (e) { console.warn('API de proventos não disponível:', e); }
                 
                 this.dadosCarregados = true;
-                
             } catch (e) {
                 console.error('Erro ao carregar dados:', e);
             }
-        },
-        
-        carregarNovosCards() {
-            console.log('🔄 Carregando novos cards...', this.dados);
-            
-            // Calendário - eventos próximos
-            this.calendario = [
-                { id: 1, titulo: 'PETR4 - Dividendos', data: '30/03/2026', icone: '💰' },
-                { id: 2, titulo: 'VALE3 - Dividendos', data: '05/04/2026', icone: '💰' },
-                { id: 3, titulo: 'Vencimento IPCA+', data: '15/04/2026', icone: '📅' }
-            ];
-            
-            // Cash Flow - calcular a partir de proventos
-            this.cashFlow.entradas = this.totalProventos || 0;
-            this.cashFlow.saidas = (this.totalProventos || 0) * 0.15;
-            this.cashFlow.saldo = this.cashFlow.entradas - this.cashFlow.saidas;
-            console.log('💸 Cash Flow:', this.cashFlow);
-            
-            // Setores - agrupar top ativos BR por setor
-            const ativos = this.dados?.por_mercado?.BR?.top_ativos || [];
-            console.log('🏢 Ativos para setores:', ativos);
-            
-            if (ativos.length > 0) {
-                const setoresMap = {};
-                ativos.forEach(a => {
-                    const setor = a.setor || a.tipo || 'Outros';
-                    if (!setoresMap[setor]) setoresMap[setor] = { nome: setor, valor: 0 };
-                    setoresMap[setor].valor += a.valor || 0;
-                });
-                const totalSetores = Object.values(setoresMap).reduce((s, st) => s + st.valor, 0);
-                this.setores = Object.values(setoresMap).map(s => ({
-                    nome: s.nome,
-                    percentual: totalSetores > 0 ? ((s.valor / totalSetores) * 100).toFixed(1) : 0
-                })).sort((a, b) => parseFloat(b.percentual) - parseFloat(a.percentual));
-            } else {
-                this.setores = [];
-            }
-            console.log('🏢 Setores calculados:', this.setores);
-            
-            // Fiscal - valores mock
-            this.fiscal.darf = 0;
-            this.fiscal.ir = this.cashFlow.saidas;
-            
-            // Recomendações - mock
-            this.recomendacoes = [
-                { id: 1, tipo: 'Compra', ativo: 'PETR4' },
-                { id: 2, tipo: 'Venda', ativo: 'VALE3' }
-            ];
-            
-            console.log('✅ Novos cards carregados!');
         },
         
         renderizarGraficos() {

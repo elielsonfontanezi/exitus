@@ -197,6 +197,11 @@
 | **Benchmark vs CDI** | Comparativo: Carteira vs CDI vs Ibovespa | ✅ Implementado |
 | **Próximos Proventos** | Dividendos esperados em 30 dias | ✅ Implementado |
 
+| **Calendário Econômico** | Próximos eventos (dividendos, vencimentos) | ✅ Implementado |
+| **Cash Flow Mensal** | Entradas vs Saídas com saldo líquido | ✅ Implementado |
+| **Diversificação Setores** | Distribuição por setor econômico | ✅ Implementado |
+| **Resumo Fiscal** | DARF acumulado + IR a pagar | ✅ Implementado |
+| **Recomendações** | Sugestões de compra/venda | ✅ Implementado |
 ---
 
 ## 📈 Métricas e KPIs
