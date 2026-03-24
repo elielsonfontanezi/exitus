@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 23/03/2026  
-> **Status:** ✅ **DASHBOARD CORRIGIDO E ESTÁVEL**  
-> **Versão:** v0.9.3
+> **Data:** 24/03/2026  
+> **Status:** ✅ **DASHBOARD COM MELHORIAS UX IMPLEMENTADAS**  
+> **Versão:** v0.9.4
 
 ---
 
@@ -183,6 +183,19 @@
 | Configurações | 4/5 | ✅ 80% |
 | Imposto Renda | 5/7 | ✅ 71% |
 | Demais 12 telas | 68/73 | ✅ 93% |
+
+---
+
+## 🎯 Dashboard Features (24/03/2026)
+
+| Feature | Descrição | Status |
+|---------|-----------|--------|
+| **Loading Skeleton** | Animação shimmer durante carregamento | ✅ Implementado |
+| **Cards de Ação Rápida** | Nova Compra, Vender, Depositar, Análises | ✅ Implementado |
+| **Tooltips Educacionais** | Ícones ℹ️ com explicações contextuais | ✅ Implementado |
+| **Meta de Patrimônio** | Barra de progresso visual (R$ 500k) | ✅ Implementado |
+| **Benchmark vs CDI** | Comparativo: Carteira vs CDI vs Ibovespa | ✅ Implementado |
+| **Próximos Proventos** | Dividendos esperados em 30 dias | ✅ Implementado |
 
 ---
 

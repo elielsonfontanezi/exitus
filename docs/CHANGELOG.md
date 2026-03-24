@@ -8,6 +8,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feature — Dashboard UX Improvements (24/03/2026)
+
+**Artefatos modificados:**
+- `frontend/app/templates/dashboard/index.html` - Melhorias de UX no dashboard
+
+**Mudanças:**
+- **Loading Skeleton:** Animação shimmer durante carregamento dos dados (4 cards skeleton)
+- **Cards de Ação Rápida:** Botões para Nova Compra, Vender, Depositar, Ver Análises
+- **Tooltips Educacionais:** Ícones ℹ️ com explicações nos gráficos e cards
+- **Meta de Patrimônio:** Barra de progresso visual (ex: 50% de R$ 500k)
+- **Benchmark vs CDI:** Comparativo de rentabilidade vs CDI (11.75%) e Ibovespa (8.32%)
+- **Próximos Proventos:** Lista dos próximos dividendos em 30 dias com total esperado
+- Integração com API `/api/calendario-dividendos` para dados de proventos
+
 ### Fix — Dashboard Charts Race Condition (23/03/2026)
 
 **Artefatos modificados:**
