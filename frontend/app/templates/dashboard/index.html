@@ -224,10 +224,7 @@ function dashboardV2() {
         
         async init() {
             await this.carregarDados();
-            // Deferir renderização dos gráficos para garantir DOM pronto
-            setTimeout(() => {
-                this.renderizarGraficos();
-            }, 100);
+            this.$nextTick(() => this.renderizarGraficos());
         },
         
         async carregarDados() {
@@ -271,14 +268,15 @@ function dashboardV2() {
                 return;
             }
             
-            if (this.chartEvolucao) this.chartEvolucao.destroy();
+            if (this.chartEvolucao) { this.chartEvolucao.destroy(); this.chartEvolucao = null; }
             
             // Se não há dados históricos, mostrar mensagem
             if (!this.dados.evolucao || this.dados.evolucao.length === 0) {
-                ctx.getContext('2d').font = '14px Arial';
-                ctx.fillStyle = '#6c757d';
-                ctx.textAlign = 'center';
-                ctx.fillText('Dados históricos não disponíveis', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                const c = ctx.getContext('2d');
+                c.font = '14px Arial';
+                c.fillStyle = '#6c757d';
+                c.textAlign = 'center';
+                c.fillText('Dados históricos não disponíveis', ctx.width / 2, ctx.height / 2);
                 return;
             }
             
@@ -303,6 +301,7 @@ function dashboardV2() {
                     }]
                 },
                 options: {
+                    animation: false,
                     responsive: true,
                     maintainAspectRatio: true,
                     plugins: { legend: { display: false } },
@@ -323,14 +322,15 @@ function dashboardV2() {
                 return;
             }
             
-            if (this.chartAlocacao) this.chartAlocacao.destroy();
+            if (this.chartAlocacao) { this.chartAlocacao.destroy(); this.chartAlocacao = null; }
             
             // Verificar se dados existem
             if (!this.dados.alocacao_geografica) {
-                ctx.getContext('2d').font = '14px Arial';
-                ctx.fillStyle = '#6c757d';
-                ctx.textAlign = 'center';
-                ctx.fillText('Dados de alocação não disponíveis', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                const c = ctx.getContext('2d');
+                c.font = '14px Arial';
+                c.fillStyle = '#6c757d';
+                c.textAlign = 'center';
+                c.fillText('Dados de alocação não disponíveis', ctx.width / 2, ctx.height / 2);
                 return;
             }
             
@@ -349,6 +349,7 @@ function dashboardV2() {
                     }]
                 },
                 options: {
+                    animation: false,
                     responsive: true,
                     maintainAspectRatio: true,
                     plugins: {
