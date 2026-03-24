@@ -498,26 +498,52 @@ function dashboardV2() {
             
             try {
                 const baseUrl = 'http://localhost:5000';
-                const [resDash, resCaixa, resAlertas, resTrx, resProventos] = await Promise.all([
-                    fetch(`${baseUrl}/api/portfolios/dashboard`, { headers: { 'Authorization': `Bearer ${token}` }}),
-                    fetch(`${baseUrl}/api/carteira/saldo-caixa`, { headers: { 'Authorization': `Bearer ${token}` }}),
-                    fetch(`${baseUrl}/api/alertas/recentes?limit=3`, { headers: { 'Authorization': `Bearer ${token}` }}),
-                    fetch(`${baseUrl}/api/transacoes/recentes?limit=5`, { headers: { 'Authorization': `Bearer ${token}` }}),
-                    fetch(`${baseUrl}/api/calendario-dividendos?dias=30&limit=5`, { headers: { 'Authorization': `Bearer ${token}` }})
-                ]);
                 
-                const [dataDash, dataCaixa, dataAlertas, dataTrx, dataProventos] = await Promise.all([
-                    resDash.json(), resCaixa.json(), resAlertas.json(), resTrx.json(), resProventos.json()
-                ]);
-                
+                // Dashboard principal (obrigatório)
+                const resDash = await fetch(`${baseUrl}/api/portfolios/dashboard`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                const dataDash = await resDash.json();
                 if (dataDash.success) this.dados = dataDash.data;
-                if (dataCaixa.success) this.saldoCaixa = dataCaixa.data;
-                if (dataAlertas.success) this.alertas = dataAlertas.data;
-                if (dataTrx.success) this.transacoes = dataTrx.data.items || [];
-                if (dataProventos.success) {
-                    this.proximosProventos = dataProventos.data || [];
-                    this.totalProventos = this.proximosProventos.reduce((sum, p) => sum + (p.valor_total || 0), 0);
-                }
+                
+                // Dados secundários (não bloqueantes)
+                try {
+                    const resCaixa = await fetch(`${baseUrl}/api/carteira/saldo-caixa`, { 
+                        headers: { 'Authorization': `Bearer ${token}` } 
+                    });
+                    const dataCaixa = await resCaixa.json();
+                    if (dataCaixa.success) this.saldoCaixa = dataCaixa.data;
+                } catch (e) { console.warn('Erro ao carregar saldo caixa:', e); }
+                
+                try {
+                    const resAlertas = await fetch(`${baseUrl}/api/alertas/recentes?limit=3`, { 
+                        headers: { 'Authorization': `Bearer ${token}` } 
+                    });
+                    const dataAlertas = await resAlertas.json();
+                    if (dataAlertas.success) this.alertas = dataAlertas.data;
+                } catch (e) { console.warn('Erro ao carregar alertas:', e); }
+                
+                try {
+                    const resTrx = await fetch(`${baseUrl}/api/transacoes/recentes?limit=5`, { 
+                        headers: { 'Authorization': `Bearer ${token}` } 
+                    });
+                    const dataTrx = await resTrx.json();
+                    if (dataTrx.success) this.transacoes = dataTrx.data.items || [];
+                } catch (e) { console.warn('Erro ao carregar transações:', e); }
+                
+                // Proventos (opcional - pode não existir endpoint)
+                try {
+                    const resProventos = await fetch(`${baseUrl}/api/calendario-dividendos/?dias=30&limit=5`, { 
+                        headers: { 'Authorization': `Bearer ${token}` } 
+                    });
+                    if (resProventos.ok) {
+                        const dataProventos = await resProventos.json();
+                        if (dataProventos.success) {
+                            this.proximosProventos = dataProventos.data || [];
+                            this.totalProventos = this.proximosProventos.reduce((sum, p) => sum + (p.valor_total || 0), 0);
+                        }
+                    }
+                } catch (e) { console.warn('API de proventos não disponível:', e); }
                 
                 this.dadosCarregados = true;
             } catch (e) {
