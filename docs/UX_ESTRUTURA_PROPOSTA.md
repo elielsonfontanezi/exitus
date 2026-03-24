@@ -11,6 +11,11 @@
 > - ✅ Meta de Patrimônio
 > - ✅ Benchmark vs CDI
 > - ✅ Próximos Proventos
+> - ✅ Calendário Econômico
+> - ✅ Cash Flow Mensal
+> - ✅ Diversificação Setores
+> - ✅ Resumo Fiscal
+> - ✅ Recomendações
 > 
 > **📌 IMPORTANTE:** Verifique **UX_PLANO_EXECUCAO.md** para a metodologia de implementação interativa!
 

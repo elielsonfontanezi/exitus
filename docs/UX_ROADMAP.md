@@ -122,6 +122,11 @@ Código Frontend
 - [x] **Meta de Patrimônio** - Barra de progresso visual (R$ 500k)
 - [x] **Benchmark vs CDI** - Comparativo de rentabilidade
 - [x] **Próximos Proventos** - Dividendos esperados em 30 dias
+- [x] **Calendário Econômico** - Próximos eventos (dividendos, vencimentos)
+- [x] **Cash Flow Mensal** - Entradas vs Saídas com saldo líquido
+- [x] **Diversificação Setores** - Distribuição por setor econômico
+- [x] **Resumo Fiscal** - DARF acumulado + IR a pagar
+- [x] **Recomendações** - Sugestões de compra/venda
 
 #### **Dia 1-2: Tabelas de Dados (Estilo Investidor10)**
 - [ ] **Tabelas Limpas**
