@@ -8,6 +8,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — Dashboard Charts Race Condition (23/03/2026)
+
+**Artefatos modificados:**
+- `frontend/app/templates/dashboard/index.html` - Corrigida race condition no Chart.js
+
+**Mudanças:**
+- Substituído `setTimeout(100ms)` por `$nextTick` do Alpine.js para garantir DOM pronto
+- Adicionado `animation: false` nos charts para eliminar loop de animação que causava `getContext` null
+- Corrigido bug no path "sem dados" (usando `ctx` em vez de `canvas`)
+- Adicionado `null` explícito após `destroy()` para evitar referências órfãs
+- Dashboard agora renderiza "Evolução do Patrimônio - Histórico Completo" e "Alocação por Mercado" corretamente
+
 ### Feature — Histórico de Evolução Patrimonial (22/03/2026)
 
 **Artefatos criados:**

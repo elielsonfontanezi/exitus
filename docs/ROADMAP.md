@@ -1,9 +1,9 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 46/54 GAPs (85%) | **Testes:** 491/491 passing (100%) ✅  
+> **Progresso Backend:** 48/54 GAPs (87%) | **Testes:** 436/497 passing (87.7%)  
 > **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅  
-> **Testes E2E:** 108 criados (Fase 1 concluída) | **Versão:** v0.9.3 | **Última atualização:** 21/03/2026
+> **Dashboard:** ✅ Corrigido (race condition Chart.js) | **Versão:** v0.9.3 | **Última atualização:** 23/03/2026
 
 ---
 

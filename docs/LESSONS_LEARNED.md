@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 19/03/2026 — L-TEST-001 adicionado (banco de testes multi-tenant)  
+> **Atualizado:** 23/03/2026 — L-FE-001 adicionado (race condition Chart.js)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -24,7 +24,25 @@ db.create_all()
 
 ## 🎨 Frontend Templates
 
-### L-FE-001 — Sintaxe Jinja2: include não usa 'with' para passar variáveis
+### L-FE-001 — Chart.js: nunca usar setTimeout para renderização após Alpine.js
+**Origem:** Dashboard race condition | **Data:** 23/03/2026
+
+```javascript
+// ❌ ERRADO — race condition entre Alpine.js re-render e Chart.js
+setTimeout(() => this.renderizarGraficos(), 100);
+
+// ✅ CORRETO — aguardar ciclo completo do Alpine.js
+this.$nextTick(() => this.renderizarGraficos());
+```
+
+**Problema:** `setTimeout` não garante que o DOM esteja pronto quando Alpine.js atualiza reativamente `this.dados`. Chart.js pode receber canvas nulo ou destruído durante animação pendente.
+
+**Solução:** 
+- Usar `$nextTick` do Alpine.js para aguardar o ciclo de reatividade
+- Adicionar `animation: false` nas opções do Chart.js
+- Null explícito após `destroy()` para evitar referências órfãs
+
+### L-FE-002 — Sintaxe Jinja2: include não usa 'with' para passar variáveis
 **Origem:** Frontend Template Error | **Data:** 17/03/2026
 
 ```jinja2
