@@ -69,10 +69,10 @@ Código Frontend
   - Focus states claros e acessíveis
 
 #### **Dia 5: Animações e Transições**
-- [ ] **Microinterações**
-  - Implementar animações suaves (fade-in, slide-up)
-  - Adicionar hover states em todos elementos interativos
-  - Criar loading skeletons
+- [x] **Microinterações** ✅ IMPLEMENTADO (24/03/2026)
+  - Loading skeletons com animação shimmer no dashboard
+  - Hover states em cards de ação rápida
+  - Transições suaves nos gráficos (animation: false)
 
 ### **📅 SEMANA 2: Navegação Simplificada**
 
@@ -113,7 +113,15 @@ Código Frontend
   - Implementar menu hambúrguer
   - Otimizar toques e gestos
 
-### **📅 SEMANA 3: Layout Denso e Gráficos**
+### **📅 SEMANA 3: Layout Denso e Gráficos** ✅ EM PROGRESSO
+
+#### **Dashboard - Melhorias UX Implementadas (24/03/2026)**
+- [x] **Loading Skeleton** - Animação shimmer durante carregamento
+- [x] **Cards de Ação Rápida** - Nova Compra, Vender, Depositar, Ver Análises
+- [x] **Tooltips Educacionais** - Ícones ℹ️ com explicações contextuais
+- [x] **Meta de Patrimônio** - Barra de progresso visual (R$ 500k)
+- [x] **Benchmark vs CDI** - Comparativo de rentabilidade
+- [x] **Próximos Proventos** - Dividendos esperados em 30 dias
 
 #### **Dia 1-2: Tabelas de Dados (Estilo Investidor10)**
 - [ ] **Tabelas Limpas**
