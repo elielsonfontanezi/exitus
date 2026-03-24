@@ -42,6 +42,33 @@ this.$nextTick(() => this.renderizarGraficos());
 - Adicionar `animation: false` nas opções do Chart.js
 - Null explícito após `destroy()` para evitar referências órfãs
 
+### L-FE-003 — Histórico patrimonial requer snapshots mensais automáticos
+**Origem:** Dashboard inconsistente | **Data:** 23/03/2026
+
+```python
+# ❌ PROBLEMA — histórico parado vs patrimônio atual
+historico_ultimo = R$ 58.050  # jun/2024
+patrimonio_atual = R$ 249.907,10  # mar/2026
+
+# ✅ SOLUÇÃO — snapshot manual (temporário)
+snapshot_manual = HistoricoPatrimonio(
+    data=date.today(),
+    patrimonio_total=patrimonio_atual
+)
+
+# 🔄 NECESSÁRIO — job mensal automático (implementação futura)
+def job_mensal_historico_patrimonial():
+    for usuario in Usuario.query.all():
+        patrimonio = PortfolioService.get_dashboard(usuario.id)['resumo']['patrimonio_total']
+        # Criar snapshot mensal para cada usuário
+```
+
+**Problema:** Tabela `historico_patrimonio` não tinha processo de atualização automática, causando discrepância entre histórico do gráfico e valor atual.
+
+**Solução temporária:** Snapshot manual adicionado para corrigir visualização imediata.
+
+**Ação futura obrigatória:** Implementar job agendado (mensal) para atualizar snapshots de todos os usuários automaticamente.
+
 ### L-FE-002 — Sintaxe Jinja2: include não usa 'with' para passar variáveis
 **Origem:** Frontend Template Error | **Data:** 17/03/2026
 

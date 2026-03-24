@@ -20,6 +20,12 @@ e este projeto adere semanticamente à versão v0.8.0.
 - Adicionado `null` explícito após `destroy()` para evitar referências órfãs
 - Dashboard agora renderiza "Evolução do Patrimônio - Histórico Completo" e "Alocação por Mercado" corretamente
 
+**Nota técnica:** 
+- Histórico patrimonial estava parado em jun/2024 (R$ 58.050) vs patrimônio atual R$ 249.907,10
+- Causa: Ausência de processo agendado para snapshots mensais da tabela `historico_patrimonio`
+- Solução temporária: Snapshot manual adicionado (23/03/2026)
+- **Ação futura necessária:** Implementar job mensal para atualizar `historico_patrimonio` automaticamente
+
 ### Feature — Histórico de Evolução Patrimonial (22/03/2026)
 
 **Artefatos criados:**
