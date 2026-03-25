@@ -115,12 +115,13 @@ Código Frontend
 
 ### **📅 SEMANA 3: Layout Denso e Gráficos** ✅ EM PROGRESSO
 
-#### **Dashboard - Melhorias UX Implementadas (24/03/2026)**
+#### **Dashboard - Melhorias UX Implementadas (25/03/2026)**
 - [x] **Loading Skeleton** - Animação shimmer durante carregamento
 - [x] **Cards de Ação Rápida** - Nova Compra, Vender, Depositar, Ver Análises
 - [x] **Tooltips Educacionais** - Ícones ℹ️ com explicações contextuais
 - [x] **Meta de Patrimônio** - Barra de progresso visual (R$ 500k)
 - [x] **Benchmark vs CDI** - Comparativo de rentabilidade
+- [x] **Novos Cards Principais** - Proventos (12M) e Rentabilidade Total
 - [x] **Próximos Proventos** - Dividendos esperados em 30 dias
 - [x] **Calendário Econômico** - Próximos eventos (dividendos, vencimentos)
 - [x] **Cash Flow Mensal** - Entradas vs Saídas com saldo líquido
