@@ -17,7 +17,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Libera a porta 5000 antes de começar (Evita o erro de 'bind')
-#sudo fuser -k 8080/tcp 2>/dev/null || true
+fuser -k 8080/tcp 2>/dev/null || true
 
 # 1. Parar container se estiver rodando
 echo -e "${YELLOW}[1/5]${NC} Parando container exitus-frontend..."
