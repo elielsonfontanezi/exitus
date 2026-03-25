@@ -21,7 +21,42 @@
 
 ---
 
-## 📋 Análise Comparativa
+## � Tela: Dashboard
+
+### 📋 **Planejamento de Validação**
+- **Data:** 25/03/2026
+- **Objetivo:** Validar 100% dos componentes, botões e APIs do Dashboard.
+- **Status Geral:** 🔄 Em Execução
+
+### 🧪 **Checklist de Testes por Bloco**
+
+#### **1. Bloco de Resumo (6 Cards)** ✅ VALIDADO 25/03/2026
+- [x] **Patrimônio Total:** R$ 249.907,10 ✅
+- [x] **Rentabilidade:** 4.13% ✅
+- [x] **Rentabilidade Total:** 8.45% ✅
+- [x] **Proventos (12M):** R$ 0,00 ✅
+- [x] **Ativos:** 7 posições ✅
+- [x] **Saldo em Caixa:** R$ 299.500,00 ✅
+
+#### **2. Widgets e Gráficos** ✅ VALIDADO 25/03/2026
+- [x] **Evolução do Patrimônio:** 17 pontos históricos (R$ 0 → R$ 249.907,10) ✅
+- [x] **Top 5 Ativos:** VALE3, HGLG11, PETR4 ordenados corretamente ✅
+- [x] **Alocação por Mercado:** BR 89.91% + US 8.65% + INTL 1.44% = 100% ✅
+- [x] **Meta de Patrimônio:** 249.907/500.000 = 50.0% ✅
+
+#### **3. Interações e Navegação**
+- [x] **Menu Sticky:** Permanece no topo durante o scroll?
+- [x] **Menu Geral:** Abre dropdown e links funcionam?
+- [ ] **Botões de Ação:** Nova Compra, Vender, Depositar redirecionam?
+- [ ] **Tooltips (ℹ️):** Mostram explicações ao passar o mouse?
+
+### ✅ **Validação em Tempo Real**
+- **25/03/2026:** Login com `e2e_user` validado. Dados populados aparecem.
+- **25/03/2026:** Menu Sticky e renomeação para "Geral" aprovados.
+
+---
+
+## �📋 Análise Comparativa
 
 ### Investidor10 - Site de CONTEÚDO/ANÁLISE
 - **Foco:** Informação, educação, análise de mercado
