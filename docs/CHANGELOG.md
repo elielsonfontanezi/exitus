@@ -8,6 +8,22 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — Calendário de Dividendos no Dashboard (25/03/2026)
+
+**Artefatos modificados:**
+- `backend/app/blueprints/calendario_dividendo_blueprint.py`
+- `backend/app/services/calendario_dividendo_service.py`
+- `frontend/app/templates/dashboard/index.html`
+- `backend/tests/test_calendario_dividendos.py`
+
+**Mudanças:**
+- `GET /api/calendario-dividendos/` agora aceita `ticker`, `dias` e `limit`
+- `POST /api/calendario-dividendos/gerar` usa `usuario_id` do JWT durante validação
+- Persistência no service de geração para evitar retorno vazio após refresh
+- Proteção contra duplicidade na persistência (chave lógica por usuário+ativo+data+tipo)
+- Dashboard passou a consumir `data.calendario` e mapear `valor_estimado`/`data_esperada`
+- Card "Calendário Econômico" agora usa dados reais retornados pela API
+
 ### Feature — Dashboard UX Improvements (24/03/2026)
 
 ### Feature — Dashboard 5 Novos Cards (24/03/2026)

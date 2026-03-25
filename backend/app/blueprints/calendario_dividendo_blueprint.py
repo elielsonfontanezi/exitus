@@ -7,7 +7,7 @@ Endpoints para gerenciamento de calendário de dividendos futuros
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Dict, Any
 
 from app.services.calendario_dividendo_service import CalendarioDividendoService
@@ -44,6 +44,9 @@ def listar_calendario():
         data_inicio_str = request.args.get("data_inicio")
         data_fim_str = request.args.get("data_fim")
         ativo_id = request.args.get("ativo_id")
+        ticker = request.args.get("ticker")
+        dias_str = request.args.get("dias")
+        limit_str = request.args.get("limit")
         
         # Converter datas
         data_inicio = None
@@ -66,13 +69,40 @@ def listar_calendario():
                     "success": False,
                     "error": "data_fim deve estar no formato YYYY-MM-DD"
                 }), 400
+
+        if dias_str:
+            try:
+                dias = int(dias_str)
+                if dias < 1:
+                    raise ValueError()
+                data_inicio = date.today()
+                data_fim = data_inicio + timedelta(days=dias)
+            except ValueError:
+                return jsonify({
+                    "success": False,
+                    "error": "dias deve ser um inteiro positivo"
+                }), 400
+
+        limit = None
+        if limit_str:
+            try:
+                limit = int(limit_str)
+                if limit < 1:
+                    raise ValueError()
+            except ValueError:
+                return jsonify({
+                    "success": False,
+                    "error": "limit deve ser um inteiro positivo"
+                }), 400
         
         # Listar calendário
         calendario = CalendarioDividendoService.listar_calendario(
             usuario_id=usuario_id,
             data_inicio=data_inicio,
             data_fim=data_fim,
-            ativo_id=ativo_id
+            ativo_id=ativo_id,
+            ticker=ticker,
+            limit=limit,
         )
         
         return jsonify({
@@ -267,19 +297,18 @@ def gerar_calendario():
     try:
         usuario_id = get_jwt_identity()
         data = request.get_json()
+        payload = data or {}
+        payload["usuario_id"] = usuario_id
         
         # Validar dados
         try:
-            params = gerar_schema.load(data or {})
+            params = gerar_schema.load(payload)
         except ValidationError as e:
             return jsonify({
                 "success": False,
                 "error": "Parâmetros inválidos",
                 "details": e.messages
             }), 400
-        
-        # Garantir que usuário_id seja o do usuário autenticado
-        params["usuario_id"] = usuario_id
         
         # Gerar calendário
         calendario = CalendarioDividendoService.gerar_calendario(

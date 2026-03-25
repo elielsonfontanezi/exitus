@@ -156,10 +156,20 @@ class CalendarioDividendoResponseSchema(Schema):
     updated_at = fields.DateTime(description="Data de atualização")
     
     # Relacionamentos
-    ativo = fields.Dict(
+    ativo = fields.Method(
+        "get_ativo",
         allow_none=True,
         description="Dados do ativo"
     )
+
+    def get_ativo(self, obj):
+        if not getattr(obj, "ativo", None):
+            return None
+        return {
+            "id": str(obj.ativo.id),
+            "ticker": obj.ativo.ticker,
+            "nome": obj.ativo.nome,
+        }
 
 
 class CalendarioDividendoConfirmarPagamentoSchema(Schema):

@@ -8,6 +8,7 @@ from datetime import datetime, date, timedelta
 from decimal import Decimal
 from typing import List, Optional, Dict, Any
 import calendar
+from sqlalchemy import and_
 
 from app.database import db
 from app.models.calendario_dividendo import CalendarioDividendo
@@ -46,10 +47,34 @@ class CalendarioDividendoService:
             )
             calendario.extend(calendario_ativo)
         
+        # Persistir sem duplicar registros já existentes
+        calendario_persistido = []
+        for item in calendario:
+            existente = CalendarioDividendo.query.filter(
+                and_(
+                    CalendarioDividendo.usuario_id == usuario_id,
+                    CalendarioDividendo.ativo_id == item.ativo_id,
+                    CalendarioDividendo.data_esperada == item.data_esperada,
+                    CalendarioDividendo.tipo_provento == item.tipo_provento,
+                )
+            ).first()
+
+            if existente:
+                existente.valor_estimado = item.valor_estimado
+                existente.quantidade = item.quantidade
+                existente.status = 'previsto'
+                existente.updated_at = datetime.utcnow()
+                calendario_persistido.append(existente)
+            else:
+                db.session.add(item)
+                calendario_persistido.append(item)
+
+        db.session.commit()
+
         # Ordenar por data
-        calendario.sort(key=lambda x: x.data_esperada)
-        
-        return calendario
+        calendario_persistido.sort(key=lambda x: x.data_esperada)
+
+        return calendario_persistido
     
     @staticmethod
     def _gerar_calendario_ativo(ativo: Ativo, quantidade: int, usuario_id: str, 
@@ -209,7 +234,8 @@ class CalendarioDividendoService:
                 valor_por_yield = (preco_atual * yield_estimado / 100) / 4  # Trimestral
                 media_valor_por_acao = max(media_valor_por_acao, valor_por_yield)
         
-        return Decimal(str(media_valor_por_acao * quantidade))
+        quantidade_float = float(quantidade or 0)
+        return Decimal(str(media_valor_por_acao * quantidade_float))
     
     @staticmethod
     def criar_calendario(calendario_data: Dict[str, Any]) -> CalendarioDividendo:
@@ -230,9 +256,14 @@ class CalendarioDividendoService:
         return calendario
     
     @staticmethod
-    def listar_calendario(usuario_id: str, data_inicio: Optional[date] = None,
-                         data_fim: Optional[date] = None, 
-                         ativo_id: Optional[str] = None) -> List[CalendarioDividendo]:
+    def listar_calendario(
+        usuario_id: str,
+        data_inicio: Optional[date] = None,
+        data_fim: Optional[date] = None,
+        ativo_id: Optional[str] = None,
+        ticker: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[CalendarioDividendo]:
         """
         Lista calendário de dividendos com filtros
         
@@ -241,6 +272,8 @@ class CalendarioDividendoService:
             data_inicio: Data inicial (opcional)
             data_fim: Data final (opcional)
             ativo_id: ID do ativo (opcional)
+            ticker: Ticker do ativo (opcional, busca parcial)
+            limit: Limite de registros (opcional)
             
         Returns:
             Lista de CalendarioDividendo
@@ -255,8 +288,16 @@ class CalendarioDividendoService:
         
         if ativo_id:
             query = query.filter(CalendarioDividendo.ativo_id == ativo_id)
+
+        if ticker:
+            query = query.join(Ativo).filter(Ativo.ticker.ilike(f"%{ticker}%"))
+
+        query = query.order_by(CalendarioDividendo.data_esperada.asc())
+
+        if limit:
+            query = query.limit(limit)
         
-        return query.order_by(CalendarioDividendo.data_esperada.asc()).all()
+        return query.all()
     
     @staticmethod
     def atualizar_calendario(calendario_id: str, dados: Dict[str, Any]) -> Optional[CalendarioDividendo]:

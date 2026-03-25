@@ -6,6 +6,7 @@ Teste simples do Calendário de Dividendos - DIVCALENDAR-001
 
 import requests
 import json
+import os
 from datetime import date, datetime
 
 # Configuração
@@ -15,10 +16,13 @@ TOKEN = None
 def login():
     """Faz login e obtém token JWT"""
     global TOKEN
+
+    username = os.getenv("EXITUS_TEST_USERNAME", "admin")
+    password = os.getenv("EXITUS_TEST_PASSWORD", "senha123")
     
     login_data = {
-        "username": "admin",
-        "password": "senha123"
+        "username": username,
+        "password": password
     }
     
     response = requests.post(f"{BASE_URL}/api/auth/login", json=login_data)
@@ -37,7 +41,10 @@ def test_listar_calendario():
     """Testa listagem de calendário"""
     headers = {"Authorization": f"Bearer {TOKEN}"}
     
-    response = requests.get(f"{BASE_URL}/api/calendario-dividendos/", headers=headers)
+    response = requests.get(
+        f"{BASE_URL}/api/calendario-dividendos/?dias=30&limit=5",
+        headers=headers,
+    )
     
     if response.status_code == 200:
         data = response.json()
@@ -50,21 +57,8 @@ def test_listar_calendario():
 def test_gerar_calendario():
     """Testa geração automática de calendário"""
     headers = {"Authorization": f"Bearer {TOKEN}"}
-    
-    # Extrair user_id do token (simplificado)
-    import base64
-    import json
-    
-    # Decodificar payload do JWT
-    payload = TOKEN.split('.')[1]
-    # Adicionar padding se necessário
-    padding = '=' * (4 - len(payload) % 4)
-    decoded = base64.b64decode(payload + padding)
-    user_data = json.loads(decoded)
-    usuario_id = user_data.get('sub')
-    
+
     data = {
-        "usuario_id": usuario_id,
         "meses_futuros": 6
     }
     
@@ -78,6 +72,25 @@ def test_gerar_calendario():
         return True
     else:
         print(f"❌ Falha ao gerar: {response.status_code} - {response.text}")
+        return False
+
+
+def test_listar_calendario_por_ticker():
+    """Testa listagem com filtro por ticker"""
+    headers = {"Authorization": f"Bearer {TOKEN}"}
+
+    response = requests.get(
+        f"{BASE_URL}/api/calendario-dividendos/?ticker=PETR&dias=365&limit=10",
+        headers=headers,
+    )
+
+    if response.status_code == 200:
+        data = response.json()
+        total = data.get("data", {}).get("total", 0)
+        print(f"✅ Listar por ticker: {total} itens")
+        return True
+    else:
+        print(f"❌ Falha ao listar por ticker: {response.status_code} - {response.text}")
         return False
 
 def test_resumo_calendario():
@@ -111,6 +124,7 @@ def main():
     testes = [
         ("Listar Calendário", test_listar_calendario),
         ("Gerar Calendário", test_gerar_calendario),
+        ("Listar por Ticker", test_listar_calendario_por_ticker),
         ("Resumo Calendário", test_resumo_calendario),
     ]
     

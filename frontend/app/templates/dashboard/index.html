@@ -466,7 +466,7 @@
                         <div class="flex justify-between items-center p-2 rounded" style="background: #f8f6f3;">
                             <div>
                                 <div class="font-semibold text-sm" x-text="provento.ativo_ticker"></div>
-                                <div class="text-xs text-gray-500" x-text="provento.data_pagamento"></div>
+                                <div class="text-xs text-gray-500" x-text="formatDate(provento.data_pagamento)"></div>
                             </div>
                             <div class="text-right">
                                 <div class="font-semibold text-sm" style="color: #a38c65;" x-text="'R$ ' + provento.valor_total.toFixed(2)"></div>
@@ -605,7 +605,14 @@ function dashboardV2() {
                     if (resProventos.ok) {
                         const dataProventos = await resProventos.json();
                         if (dataProventos.success) {
-                            this.proximosProventos = dataProventos.data || [];
+                            const itens_calendario = dataProventos.data?.calendario || [];
+                            this.proximosProventos = itens_calendario.map(item => ({
+                                id: item.id,
+                                ativo_ticker: item.ativo?.ticker || item.ticker || 'N/A',
+                                data_pagamento: item.data_esperada,
+                                valor_total: parseFloat(item.valor_estimado || item.valor_real || 0),
+                                tipo: item.tipo_provento || 'dividendo'
+                            }));
                             this.totalProventos = this.proximosProventos.reduce((sum, p) => sum + (p.valor_total || 0), 0);
                         }
                     }
@@ -619,24 +626,21 @@ function dashboardV2() {
         },
         
         carregarNovosCards() {
-            console.log('🔄 Carregando novos cards...', this.dados);
-            
-            // Calendário - eventos próximos
-            this.calendario = [
-                { id: 1, titulo: 'PETR4 - Dividendos', data: '30/03/2026', icone: '💰' },
-                { id: 2, titulo: 'VALE3 - Dividendos', data: '05/04/2026', icone: '💰' },
-                { id: 3, titulo: 'Vencimento IPCA+', data: '15/04/2026', icone: '📅' }
-            ];
+            // Calendário - eventos próximos vindos da API
+            this.calendario = this.proximosProventos.slice(0, 4).map(item => ({
+                id: item.id,
+                titulo: `${item.ativo_ticker} - ${item.tipo}`,
+                data: this.formatDate(item.data_pagamento),
+                icone: '�'
+            }));
             
             // Cash Flow - calcular a partir de proventos
             this.cashFlow.entradas = this.totalProventos || 0;
             this.cashFlow.saidas = (this.totalProventos || 0) * 0.15;
             this.cashFlow.saldo = this.cashFlow.entradas - this.cashFlow.saidas;
-            console.log('💸 Cash Flow:', this.cashFlow);
             
             // Setores - agrupar top ativos BR por setor
             const ativos = this.dados?.por_mercado?.BR?.top_ativos || [];
-            console.log('🏢 Ativos para setores:', ativos);
             
             if (ativos.length > 0) {
                 const setoresMap = {};
@@ -653,7 +657,6 @@ function dashboardV2() {
             } else {
                 this.setores = [];
             }
-            console.log('🏢 Setores calculados:', this.setores);
             
             // Fiscal - valores mock
             this.fiscal.darf = 0;
@@ -664,8 +667,6 @@ function dashboardV2() {
                 { id: 1, tipo: 'Compra', ativo: 'PETR4' },
                 { id: 2, tipo: 'Venda', ativo: 'VALE3' }
             ];
-            
-            console.log('✅ Novos cards carregados!');
         },
         
         renderizarGraficos() {

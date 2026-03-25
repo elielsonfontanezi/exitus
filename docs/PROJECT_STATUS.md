@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 24/03/2026  
-> **Status:** ✅ **DASHBOARD COM MELHORIAS UX IMPLEMENTADAS**  
-> **Versão:** v0.9.4
+> **Data:** 25/03/2026  
+> **Status:** ✅ **DASHBOARD COM CARDS INTEGRADOS AO CALENDÁRIO DE DIVIDENDOS**  
+> **Versão:** v0.9.5
 
 ---
 
@@ -196,6 +196,7 @@
 | **Meta de Patrimônio** | Barra de progresso visual (R$ 500k) | ✅ Implementado |
 | **Benchmark vs CDI** | Comparativo: Carteira vs CDI vs Ibovespa | ✅ Implementado |
 | **Próximos Proventos** | Dividendos esperados em 30 dias | ✅ Implementado |
+| **API Calendário Dividendos** | Filtros `ticker`, `dias`, `limit` + persistência no `/gerar` | ✅ Implementado |
 
 | **Calendário Econômico** | Próximos eventos (dividendos, vencimentos) | ✅ Implementado |
 | **Cash Flow Mensal** | Entradas vs Saídas com saldo líquido | ✅ Implementado |
