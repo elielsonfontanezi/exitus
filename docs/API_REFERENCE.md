@@ -1148,6 +1148,9 @@ Lista itens do calendário com filtros opcionais.
 - `data_inicio` (string, opcional): Data inicial no formato YYYY-MM-DD
 - `data_fim` (string, opcional): Data final no formato YYYY-MM-DD
 - `ativo_id` (UUID, opcional): ID do ativo específico
+- `ticker` (string, opcional): Código do ticker para filtrar (ex: PETR4)
+- `dias` (int, opcional): Dias a partir de hoje para filtrar eventos futuros
+- `limit` (int, opcional): Limite máximo de itens retornados (default: 100)
 
 **Response:**
 ```json

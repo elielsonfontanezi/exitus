@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 23/03/2026 — L-FE-001 adicionado (race condition Chart.js)  
+> **Atualizado:** 25/03/2026 — L-API-005 adicionado (integração calendário dividendos)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -364,6 +364,42 @@ Afeta 11 arquivos: `ativo_service.py`, `usuario_service.py`, `corretora_service.
 ---
 
 ## 🌐 Contrato da API
+
+### L-API-005 — POST /gerar sem persistência causa API vazia no refresh
+**Origem:** EXITUS-UX-003 | **Data:** 25/03/2026
+
+**Problema:** Endpoint `POST /calendario-dividendos/gerar` retornava dados corretos mas não persistia. Dashboard recebia lista vazia no refresh porque GET listava apenas itens persistidos.
+
+```python
+# ❌ ERRADO — gera mas não persiste
+def gerar_calendario(usuario_id, meses_futuros=12):
+    calendario = [...]
+    return calendario  # 🪦 perdido no próximo refresh
+
+# ✅ CORRETO — persiste com proteção contra duplicidade
+def gerar_calendario(usuario_id, meses_futuros=12):
+    calendario = [...]
+    for item in calendario:
+        existente = CalendarioDividendo.query.filter(
+            and_(
+                CalendarioDividendo.usuario_id == usuario_id,
+                CalendarioDividendo.ativo_id == item.ativo_id,
+                CalendarioDividendo.data_esperada == item.data_esperada,
+                CalendarioDividendo.tipo_provento == item.tipo_provento,
+            )
+        ).first()
+        if existente:
+            existente.valor_estimado = item.valor_estimado
+            existente.status = 'previsto'
+        else:
+            db.session.add(item)
+    db.session.commit()
+    return calendario_persistido
+```
+
+**Sintoma relacionado:** Frontend esperava `data.calendario` mas recebia `data` direto, causando undefined no Alpine.js.
+
+**Regra:** APIs de geração automática devem persistir resultados. Frontend deve consumir contrato exato da API. Testes devem validar persistência e contrato.
 
 ### L-API-001 — Endpoint de listagem usa envelope de paginação aninhado
 **Origem:** EXITUS-TESTS-001 | **Data:** 03/03/2026

@@ -4,7 +4,7 @@
 {% block extra_css %}
 <style>
     body {
-        background: #F5F5F4 !important;
+        background: #f8f9fa !important;
     }
     
     /* Loading Skeleton Animation */
@@ -175,6 +175,16 @@
             <div class="skeleton skeleton-value"></div>
             <div class="skeleton skeleton-text" style="width: 40%;"></div>
         </div>
+        <div class="resumo-item">
+            <div class="skeleton skeleton-text" style="width: 60%;"></div>
+            <div class="skeleton skeleton-value"></div>
+            <div class="skeleton skeleton-text" style="width: 40%;"></div>
+        </div>
+        <div class="resumo-item">
+            <div class="skeleton skeleton-text" style="width: 60%;"></div>
+            <div class="skeleton skeleton-value"></div>
+            <div class="skeleton skeleton-text" style="width: 40%;"></div>
+        </div>
     </div>
 
     <!-- 1. RESUMO DO PATRIMÔNIO + SALDO CAIXA (mostrado após carregar) -->
@@ -190,9 +200,21 @@
         <div class="resumo-item">
             <div class="label">Rentabilidade</div>
             <div class="valor" x-text="dados.resumo.rentabilidade_geral.toFixed(2) + '%'">0%</div>
-            <div class="variacao">Geral</div>
+            <div class="variacao">Sobre Custo</div>
+        </div>
+
+        <div class="resumo-item">
+            <div class="label">Rentabilidade Total</div>
+            <div class="valor" x-text="dados.resumo.rentabilidade_total.toFixed(2) + '%'">0%</div>
+            <div class="variacao positiva">Inclui Proventos</div>
         </div>
         
+        <div class="resumo-item">
+            <div class="label">Proventos (12M)</div>
+            <div class="valor" x-text="formatMoney(dados.resumo.proventos_12m)">R$ 0,00</div>
+            <div class="variacao" style="color: #10b981; font-weight: 600;">Recebidos</div>
+        </div>
+
         <div class="resumo-item">
             <div class="label">Ativos</div>
             <div class="valor" x-text="dados.resumo.total_posicoes">0</div>

@@ -3,7 +3,7 @@
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
 > **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 436/497 passing (87.7%)  
 > **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅  
-> **Dashboard:** ✅ Corrigido (race condition + integração calendário dividendos) | **Versão:** v0.9.5 | **Última atualização:** 25/03/2026
+> **Dashboard:** ✅ Corrigido (race condition + integração calendário dividendos) + Novos cards (Proventos 12M, Rentabilidade Total) | **Versão:** v0.9.5 | **Última atualização:** 25/03/2026
 
 ---
 

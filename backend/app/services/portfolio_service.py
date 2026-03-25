@@ -129,14 +129,38 @@ class PortfolioService:
         
         logger.debug(f"Dashboard cache MISS para usuário {usuario_id}")
         
-        from app.models import Posicao, Ativo
+        from app.models import Posicao, Ativo, Provento, HistoricoPatrimonio
         from app.services.cambio_service import CambioService
         from decimal import Decimal
         from collections import defaultdict
+        from datetime import datetime, timedelta
         
+        # Data limite para proventos (últimos 12 meses)
+        data_limite_12m = datetime.now().date() - timedelta(days=365)
+        
+        # Obter IDs dos ativos do usuário para filtrar proventos
+        posicoes_usuario = Posicao.query.filter_by(usuario_id=usuario_id).all()
+        ativos_usuario_ids = [p.ativo_id for p in posicoes_usuario]
+
+        if ativos_usuario_ids:
+            # Proventos 12 meses (Liquido)
+            proventos_12m_raw = db.session.query(db.func.sum(Provento.valor_liquido))\
+                .filter(Provento.ativo_id.in_(ativos_usuario_ids))\
+                .filter(Provento.data_pagamento >= data_limite_12m).scalar() or 0.0
+            
+            # Proventos totais (histórico completo) para cálculo de rentabilidade real
+            proventos_totais_raw = db.session.query(db.func.sum(Provento.valor_liquido))\
+                .filter(Provento.ativo_id.in_(ativos_usuario_ids)).scalar() or 0.0
+        else:
+            proventos_12m_raw = 0.0
+            proventos_totais_raw = 0.0
+
+        proventos_12m = float(proventos_12m_raw)
+        proventos_totais = float(proventos_totais_raw)
+
         total_portfolios = Portfolio.query.filter_by(usuario_id=usuario_id, ativo=True).count()
-        posicoes = Posicao.query.filter_by(usuario_id=usuario_id).all()
-        total_posicoes = len(posicoes)
+        total_posicoes = len(posicoes_usuario)
+        posicoes = posicoes_usuario
         
         if not posicoes:
             return {
@@ -144,7 +168,9 @@ class PortfolioService:
                     "total_portfolios": total_portfolios,
                     "total_posicoes": 0,
                     "patrimonio_total": 0.0,
-                    "rentabilidade_geral": 0.0
+                    "rentabilidade_geral": 0.0,
+                    "rentabilidade_total": 0.0,
+                    "proventos_12m": 0.0
                 },
                 "por_mercado": {
                     "BR": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
@@ -199,6 +225,9 @@ class PortfolioService:
         
         rentabilidade_geral = ((patrimonio_total - custo_total) / custo_total * 100) if custo_total > 0 else 0.0
         
+        # Rentabilidade Total (incluindo proventos)
+        rentabilidade_total = ((patrimonio_total + proventos_totais - custo_total) / custo_total * 100) if custo_total > 0 else 0.0
+        
         por_mercado = {}
         for mercado in ['BR', 'US', 'INTL']:
             patrimonio = patrimonio_por_mercado.get(mercado, 0.0)
@@ -230,7 +259,9 @@ class PortfolioService:
                 "total_portfolios": total_portfolios,
                 "total_posicoes": total_posicoes,
                 "patrimonio_total": round(patrimonio_total, 2),
-                "rentabilidade_geral": round(rentabilidade_geral, 2)
+                "rentabilidade_geral": round(rentabilidade_geral, 2),
+                "rentabilidade_total": round(rentabilidade_total, 2),
+                "proventos_12m": round(proventos_12m, 2)
             },
             "por_mercado": por_mercado,
             "alocacao_geografica": alocacao_geografica,

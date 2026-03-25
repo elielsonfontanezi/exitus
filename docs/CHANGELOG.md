@@ -8,6 +8,19 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feature — Novos Cards Dashboard: Proventos 12M e Rentabilidade Total (25/03/2026)
+
+**Artefatos modificados:**
+- `backend/app/services/portfolio_service.py` - Adicionados cálculos de proventos e rentabilidade total
+- `frontend/app/templates/dashboard/index.html` - Novos cards no resumo principal
+
+**Mudanças:**
+- **💰 Proventos (12M):** Total recebido nos últimos 12 meses (valor líquido)
+- **📈 Rentabilidade Total:** Inclui proventos históricos no cálculo (vs rentabilidade sobre custo)
+- **🔄 Fundo do Dashboard:** Cor ajustada para `#f8f9fa` (cinza claro similar ao Investidor10)
+- **Layout expandido:** Dashboard agora exibe 6 cards principais (vs 4 anteriores)
+- **Cálculo otimizado:** Proventos filtrados por ativos das posições do usuário
+
 ### Fix — Calendário de Dividendos no Dashboard (25/03/2026)
 
 **Artefatos modificados:**

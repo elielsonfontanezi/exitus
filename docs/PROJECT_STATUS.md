@@ -1,7 +1,7 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 25/03/2026  
-> **Status:** ✅ **DASHBOARD COM CARDS INTEGRADOS AO CALENDÁRIO DE DIVIDENDOS**  
+> **Status:** ✅ **DASHBOARD COM NOVOS CARDS (PROVENTOS 12M E RENTABILIDADE TOTAL)**  
 > **Versão:** v0.9.5
 
 ---
@@ -42,6 +42,7 @@
 - **Design:** Premium com gradientes, animações, micro-interações
 - **UX:** Comparável a StatusInvest/Investidor10
 - **Diferenciais:** Planos de Compra/Venda Disciplinada, Compensação Visual IR
+- **Dashboard:** ✅ Novos cards implementados (Proventos 12M, Rentabilidade Total)
 - **Auditoria Visual:** ✅ Concluída (P0 corrigido, P1/P2 OK)
 - **Documentação:** ✅ Manual do Usuário completo (16 módulos, 800+ linhas)
 
