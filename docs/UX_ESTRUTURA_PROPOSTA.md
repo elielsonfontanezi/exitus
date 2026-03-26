@@ -44,11 +44,11 @@
 - [x] **Alocação por Mercado:** BR 89.91% + US 8.65% + INTL 1.44% = 100% ✅
 - [x] **Meta de Patrimônio:** 249.907/500.000 = 50.0% ✅
 
-#### **3. Interações e Navegação**
-- [x] **Menu Sticky:** Permanece no topo durante o scroll?
-- [x] **Menu Geral:** Abre dropdown e links funcionam?
-- [ ] **Botões de Ação:** Nova Compra, Vender, Depositar redirecionam?
-- [ ] **Tooltips (ℹ️):** Mostram explicações ao passar o mouse?
+#### **3. Interações e Navegação** ✅ VALIDADO PARCIAL 25/03/2026
+- [x] **Menu Sticky:** Permanece no topo durante o scroll? ✅
+- [x] **Menu Geral:** Abre dropdown e links funcionam? ✅
+- [x] **Botões de Ação:** Redirecionam corretamente (mas páginas 404) ⚠️
+- [x] **Tooltips (ℹ️):** 5 tooltips funcionam com textos explicativos ✅
 
 ### ✅ **Validação em Tempo Real**
 - **25/03/2026:** Login com `e2e_user` validado. Dados populados aparecem.
