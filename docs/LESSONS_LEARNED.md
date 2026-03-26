@@ -452,6 +452,30 @@ transacoes = list(data)[:10] if data else []
 
 **Regra:** Sempre processar dados (slices, filtros) no Python, passar dados prontos para o template.
 
+---
+
+### L-BE-006 — Filtro assessora_id impede exibição de posições do usuário
+**Origem:** EXITUS-DASHBOARD-002 | **Data:** 26/03/2026
+
+```python
+# ❌ ERRADO — Dashboard filtrando por assessora esconde posições do usuário
+posicoes_usuario = Posicao.query.filter_by(usuario_id=usuario_id, assessora_id=assessora_id).all()
+# Resultado: Dashboard mostra R$ 0,00 mesmo com 7 posições
+
+# ✅ CORRETO — Dashboard mostra TODAS as posições do usuário
+posicoes_usuario = Posicao.query.filter_by(usuario_id=usuario_id).all()
+# Resultado: Dashboard exibe R$ 249.907,10 corretamente
+```
+
+**Problema:** Multi-tenancy com `assessora_id` é útil para isolamento de dados, mas no dashboard do usuário queremos exibir TODAS as posições independentemente da assessora vinculada.
+
+**Solução:**
+- Remover filtro `assessora_id` do método `get_dashboard()`
+- Manter filtro em outras views onde isolamento é necessário
+- Documentar regra: "Dashboard exibe todas as posições do usuário"
+
+**Regra:** Dashboard do usuário = visão consolidada de todos os investimentos, não apenas por assessora.
+
 **Regra:** APIs de geração automática devem persistir resultados. Frontend deve consumir contrato exato da API. Testes devem validar persistência e contrato.
 
 ### L-API-001 — Endpoint de listagem usa envelope de paginação aninhado

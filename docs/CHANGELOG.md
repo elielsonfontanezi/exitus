@@ -8,6 +8,22 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — Dashboard Exibe Patrimônio Correto (26/03/2026)
+
+**Artefatos modificados:**
+- `backend/app/services/portfolio_service.py` - Removido filtro assessora_id do dashboard
+
+**Mudanças:**
+- **💰 Patrimônio:** R$ 249.907,10 (vs R$ 0,00 zerado)
+- **📊 Posições:** 7 ativos exibidos (VALE3, HGLG11, PETR4, AAPL, MSFT, etc.)
+- **🎯 API:** `/api/portfolios/dashboard` retorna dados reais
+- **🔍 Diagnóstico:** Filtro assessora_id impedia exibição das posições do usuário
+
+**Testes:**
+- API retorna patrimônio correto
+- Frontend exibe valores reais
+- Top 5 ativos visíveis com rentabilidades
+
 ### Fixed — Frontend Token Expirado e Template Resiliente (26/03/2026)
 
 **Artefatos modificados:**

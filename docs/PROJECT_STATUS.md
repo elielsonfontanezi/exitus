@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 26/03/2026  
-> **Status:** ✅ **FRONTEND CORRIGIDO — Token Refresh Automático + Templates Resilientes**  
-> **Versão:** v0.9.6
+> **Status:** ✅ **DASHBOARD CORRIGIDO — Exibe R$ 249.907,10 (vs R$ 0,00)**  
+> **Versão:** v0.9.7
 
 ---
 
