@@ -56,6 +56,7 @@ class SeedManager:
             # Ordem de DELETE respeitando dependências FK
             # (dependentes primeiro, pais depois)
             ordered_tables = [
+                'calendario_dividendo',
                 'evento_custodia',
                 'evento_corporativo',
                 'movimentacao_caixa',
@@ -65,14 +66,21 @@ class SeedManager:
                 'alertas',
                 'configuracoes_alertas',
                 'projecoes_renda',
+                'plano_compra',
+                'plano_venda',
                 'relatorios_performance',
                 'auditoria_relatorios',
                 'log_auditoria',
                 'historico_preco',
+                'historico_patrimonio',
                 'portfolio',
+                'saldo_darf_acumulado',
+                'saldo_prejuizo',
+                'taxa_cambio',
                 'corretora',
                 'ativo',
                 'usuario',
+                'assessora',
                 'feriado_mercado',
                 'fonte_dados',
                 'regra_fiscal',
@@ -356,7 +364,6 @@ class SeedManager:
                 'tipo': a.tipo.value,
                 'classe': a.classe.value,
                 'moeda': a.moeda,
-                'pais': a.pais,
                 'ativo': a.ativo
             }
             for a in ativos
@@ -368,7 +375,6 @@ class SeedManager:
         return [
             {
                 'nome': c.nome,
-                'cnpj': c.cnpj,
                 'ativa': c.ativa
             }
             for c in corretoras

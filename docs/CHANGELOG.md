@@ -8,6 +8,23 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — Reset Completo do test_full.json (26/03/2026)
+
+**Artefatos modificados:**
+- `backend/reset_and_seed.py` - Adicionado historico_patrimonio e tabelas faltantes à ordered_tables
+
+**Mudanças:**
+- **🧹 Limpeza completa**: `--clean --scenario test_full` agora zera TODAS as tabelas
+- **📊 Histórico patrimonial**: 12 registros recriados (vs "já existe" antes)
+- **👥 Usuários/ativos**: Recriados do zero (vs preservados antes)
+- **🔧 ordered_tables**: Adicionadas calendario_dividendo, plano_compra, plano_venda, saldo_darf_acumulado, saldo_prejuizo, taxa_cambio, assessora
+- **✅ test_full operacional**: Carga idêntica sempre que executado
+
+**Testes:**
+- `podman exec exitus-backend python reset_and_seed.py --clean --scenario test_full`
+- Histórico: R$ 119.452 → R$ 330.200 (Jan-Dez/2024)
+- 30 ativos, 48 transações, 32 proventos, 15 movimentações
+
 ### Fixed — Dashboard Exibe Patrimônio Correto (26/03/2026)
 
 **Artefatos modificados:**

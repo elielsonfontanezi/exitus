@@ -3,7 +3,7 @@
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
 > **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 436/497 passing (87.7%)  
 > **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅ | **Token Refresh:** ✅ Concluído (26/03/2026)  
-> **Dashboard:** ✅ Corrigido (exibe R$ 249.907,10 vs R$ 0,00) + Novos cards (Proventos 12M, Rentabilidade Total) | **Versão:** v0.9.7 | **Última atualização:** 26/03/2026
+> **Dashboard:** ✅ Corrigido (exibe R$ 249.907,10 vs R$ 0,00) + Novos cards (Proventos 12M, Rentabilidade Total) | **Versão:** v0.9.8 | **Última atualização:** 26/03/2026
 
 ---
 

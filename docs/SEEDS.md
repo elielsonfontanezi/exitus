@@ -80,17 +80,18 @@ backend/
 
 **Conteúdo:**
 - **Usuários:** 3 (e2e_admin, e2e_user, e2e_viewer)
-- **Ativos:** 9 (BR, US, INTL)
-- **Transações:** 8 (compras e vendas)
-- **Proventos:** 2 (dividendos)
-- **Movimentações:** 2 (depósito, saque)
-- **Portfolios:** 3
-- **Alertas:** 3
-- **Planos:** 3 compra + 2 venda
-- **Histórico Patrimonial:** 16 registros (Mar/2023 a Jun/2024)
+- **Ativos:** 30 (10 BR + 10 US + 10 INTL)
+- **Transações:** 48 (compras, vendas, IR)
+- **Proventos:** 32 (DIVIDENDO, JCP, RENDIMENTO)
+- **Movimentações:** 15 (aportes BRL/USD, saques, DARF)
+- **Portfolios:** 4 (Aposentadoria, Dividendos BR, Growth US)
+- **Alertas:** 5
+- **Planos:** 4 compra + 3 venda
+- **Histórico Patrimonial:** 12 registros (Jan-Dez/2024)
 
 **Uso:**
 ```bash
+# Limpa base completamente e carrega cenário idêntico
 podman exec exitus-backend python reset_and_seed.py --clean --scenario test_full
 ```
 
