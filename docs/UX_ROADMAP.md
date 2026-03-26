@@ -46,8 +46,9 @@ Código Frontend
 
 ### 📊 **Progresso da Validação:**
 ```
-█████████░ 90% - 4.5/5 Blocos validados
+█████████░ 95% - 4.75/5 Blocos validados
 ✅ Frontend Corrigido (26/03/2026): Token refresh + templates resilientes
+✅ Dashboard Dados (26/03/2026): Exibe R$ 249.907,10 vs R$ 0,00
 ```
 
 ### 📱 **Status de Testes por Componente:**
