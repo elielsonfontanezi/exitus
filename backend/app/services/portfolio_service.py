@@ -138,7 +138,7 @@ class PortfolioService:
         # Data limite para proventos (últimos 12 meses)
         data_limite_12m = datetime.now().date() - timedelta(days=365)
         
-        # Obter IDs dos ativos do usuário para filtrar proventos
+        # Obter posições do usuário (sem filtro de assessora para mostrar todas)
         posicoes_usuario = Posicao.query.filter_by(usuario_id=usuario_id).all()
         ativos_usuario_ids = [p.ativo_id for p in posicoes_usuario]
 
