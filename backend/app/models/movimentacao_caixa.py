@@ -21,7 +21,7 @@ class TipoMovimentacao(enum.Enum):
     TRANSFERENCIA_RECEBIDA = "transf_rec"   # Transferência de outra corretora
     CREDITO_PROVENTO = "credito_prov"       # Crédito de provento
     PAGAMENTO_TAXA = "pagto_taxa"           # Pagamento de taxa/custódia
-    PAGAMENTO_IMPOSTO = "pagto_imposto"     # Pagamento de imposto
+    PAGAMENTO_IMPOSTO = "pagamento_imposto"     # Pagamento de imposto
     AJUSTE = "ajuste"                        # Ajuste manual
     OUTRO = "outro"                          # Outros tipos
 

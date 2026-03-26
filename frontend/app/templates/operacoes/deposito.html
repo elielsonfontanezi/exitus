@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Depositar - Exitus{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h4 mb-1">💵 Depositar</h2>
+                    <p class="text-muted mb-0">Adicionar fundos à sua conta</p>
+                </div>
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                    ← Voltar
+                </a>
+            </div>
+
+            <!-- Formulário -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="formDeposito">
+                        <!-- Valor -->
+                        <div class="mb-4">
+                            <label for="valor" class="form-label fw-semibold">
+                                💰 Valor do Depósito <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text" id="moeda-simbolo">R$</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="valor" 
+                                       name="valor" 
+                                       min="10.00" 
+                                       step="0.01"
+                                       placeholder="0,00"
+                                       required>
+                            </div>
+                            <div class="form-text">
+                                Valor mínimo: R$ 10,00
+                            </div>
+                        </div>
+
+                        <!-- Moeda -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                🌍 Moeda
+                            </label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="moeda" id="moeda_brl" value="BRL" checked>
+                                <label class="btn btn-outline-primary" for="moeda_brl">
+                                    🇧🇷 BRL - Real Brasileiro
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="moeda" id="moeda_usd" value="USD">
+                                <label class="btn btn-outline-primary" for="moeda_usd">
+                                    🇺🇸 USD - Dólar Americano
+                                </label>
+                            </div>
+                            <div class="form-text mt-2">
+                                Escolha a moeda do depósito
+                            </div>
+                        </div>
+
+                        <!-- Corretora -->
+                        <div class="mb-4">
+                            <label for="corretora_id" class="form-label fw-semibold">
+                                🏢 Corretora <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="corretora_id" name="corretora_id" required>
+                                <option value="">Selecione a corretora...</option>
+                                {% for corretora in corretoras %}
+                                <option value="{{ corretora.id }}">
+                                    {{ corretora.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Descrição -->
+                        <div class="mb-4">
+                            <label for="descricao" class="form-label fw-semibold">
+                                📝 Descrição (opcional)
+                            </label>
+                            <textarea class="form-control" 
+                                      id="descricao" 
+                                      name="descricao" 
+                                      rows="3"
+                                      placeholder="Ex: Depósito inicial, aporte mensal..."></textarea>
+                        </div>
+
+                        <!-- Resumo -->
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">📋 Resumo do Depósito</h6>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <strong>Valor:</strong> <span id="resumo-valor">R$ 0,00</span><br>
+                                    <strong>Moeda:</strong> <span id="resumo-moeda">BRL</span><br>
+                                    <strong>Corretora:</strong> <span id="resumo-corretora">-</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="confirmacao" required>
+                                        <label class="form-check-label" for="confirmacao">
+                                            Confirmo os dados do depósito
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                💵 Confirmar Depósito
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Informações Adicionais -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">ℹ️ Informações Importantes</h6>
+                    <ul class="mb-0 small">
+                        <li>Depósitos são processados em até 1 dia útil</li>
+                        <li>O valor ficará disponível para investimento após confirmação</li>
+                        <li>Depósitos em USD podem estar sujeitos a taxas de conversão</li>
+                        <li>Guarde o comprovante para fins de controle</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formDeposito');
+    const valorInput = document.getElementById('valor');
+    const moedaBRL = document.getElementById('moeda_brl');
+    const moedaUSD = document.getElementById('moeda_usd');
+    const corretoraSelect = document.getElementById('corretora_id');
+    const descricaoTextarea = document.getElementById('descricao');
+    
+    // Atualizar símbolo da moeda
+    function atualizarSimboloMoeda() {
+        const simbolo = moedaUSD.checked ? 'US$' : 'R$';
+        document.getElementById('moeda-simbolo').textContent = simbolo;
+        atualizarResumo();
+    }
+    
+    // Atualizar resumo
+    function atualizarResumo() {
+        const valor = parseFloat(valorInput.value) || 0;
+        const moeda = moedaUSD.checked ? 'USD' : 'BRL';
+        const simbolo = moeda === 'USD' ? 'US$' : 'R$';
+        const corretoraOption = corretoraSelect.options[corretoraSelect.selectedIndex];
+        
+        document.getElementById('resumo-valor').textContent = 
+            `${simbolo} ${valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        document.getElementById('resumo-moeda').textContent = moeda;
+        document.getElementById('resumo-corretora').textContent = corretoraOption.text || '-';
+    }
+    
+    // Event listeners
+    moedaBRL.addEventListener('change', atualizarSimboloMoeda);
+    moedaUSD.addEventListener('change', atualizarSimboloMoeda);
+    valorInput.addEventListener('input', atualizarResumo);
+    corretoraSelect.addEventListener('change', atualizarResumo);
+    
+    // Valores sugeridos
+    const valoresSugeridos = [100, 500, 1000, 5000];
+    const container = valorInput.parentElement;
+    
+    // Adicionar botões de valores rápidos
+    const botoesContainer = document.createElement('div');
+    botoesContainer.className = 'mt-2';
+    botoesContainer.innerHTML = '<div class="form-text">Valores rápidos:</div>';
+    
+    valoresSugeridos.forEach(valor => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-sm btn-outline-secondary me-2 mb-2';
+        btn.textContent = moedaUSD.checked ? `US$ ${valor}` : `R$ ${valor}`;
+        btn.onclick = function() {
+            valorInput.value = valor;
+            atualizarResumo();
+        };
+        botoesContainer.appendChild(btn);
+    });
+    
+    container.parentNode.insertBefore(botoesContainer, container.nextSibling);
+    
+    // Validação do formulário
+    form.addEventListener('submit', function(e) {
+        const valor = parseFloat(valorInput.value);
+        const moeda = moedaUSD.checked ? 'USD' : 'BRL';
+        const simbolo = moeda === 'USD' ? 'US$' : 'R$';
+        const corretoraOption = corretoraSelect.options[corretoraSelect.selectedIndex];
+        
+        if (!valor || valor < 10) {
+            e.preventDefault();
+            alert('Valor mínimo de depósito é de R$ 10,00');
+            return;
+        }
+        
+        if (!corretoraSelect.value) {
+            e.preventDefault();
+            alert('Por favor, selecione uma corretora.');
+            return;
+        }
+        
+        if (!document.getElementById('confirmacao').checked) {
+            e.preventDefault();
+            alert('Por favor, confirme os dados do depósito.');
+            return;
+        }
+        
+        if (confirm(`Confirmar depósito de ${simbolo} ${valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})} em ${corretoraOption.text}?`)) {
+            // Submit
+        } else {
+            e.preventDefault();
+        }
+    });
+    
+    // Inicializar
+    atualizarSimboloMoeda();
+});
+</script>
+{% endblock %}

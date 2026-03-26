@@ -152,21 +152,19 @@ podman exec exitus-backend python reset_and_seed.py --clean --scenario test_stre
 
 ```json
 {
-  "historico_patrimonio": [
-    {
-      "usuario": "e2e_user",
-      "data": "2024-06-30",
-      "patrimonio_total": 58050.00,
-      "patrimonio_renda_variavel": 49433.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 8617.00,
-      "observacoes": "Entrada em GDRs - TSLA34 e AAPL34"
-    }
-  ]
+  "version": "2.0",
+  "description": "Cenário COMPLETO e2e_user — Carteira Aposentadoria com 30 ativos (10 BR + 10 US + 10 INTL), proventos, vendas com lucro/prejuízo, IR e compensação",
+  "timestamp": "2026-03-25T00:00:00Z",
+  "ativos": [...], // 30 ativos diversificados
+  "transacoes": [...], // 48 transações (compras, vendas, day trades)
+  "proventos": [...], // 32 proventos (DIVIDENDO, JCP, RENDIMENTO)
+  "movimentacoes_caixa": [...], // 15 movimentações (aportes BRL/USD, saques, DARF)
+  "portfolios": [...], // 4 portfolios (Aposentadoria, Dividendos BR, Growth US)
+  "historico_patrimonio": [...] // 12 snapshots mensais (Jan-Dez/2024)
 }
 ```
 
-### Campos
+### Campos Principais
 
 | Campo | Tipo | Descrição |
 |-------|------|----------|
@@ -177,18 +175,38 @@ podman exec exitus-backend python reset_and_seed.py --clean --scenario test_stre
 | `patrimonio_renda_fixa` | decimal | Valor em renda fixa |
 | `saldo_caixa` | decimal | Saldo disponível |
 | `observacoes` | string | Observações do período |
+| `moeda` | string | Moeda da movimentação (BRL, USD) |
+| `quantidade_ativos` | integer | Quantidade de ativos para proventos |
+| `imposto_retido` | decimal | IR retido na fonte (JCP) |
 
-### Evolução do e2e_user
+### Evolução do e2e_user - Carteira Aposentadoria
 
-| Período | Patrimônio | Evento |
-|---------|------------|--------|
-| Mar-Dez/2023 | R$ 0 | Sem investimentos |
-| Jan/2024 | R$ 13.455 | Depósito + PETR4 |
-| Fev/2024 | R$ 26.495 | + VALE3 |
-| Mar/2024 | R$ 35.710 | + HGLG11 (FII) |
-| Abr/2024 | R$ 37.205 | Venda parcial + saque |
-| Mai/2024 | R$ 52.450 | + AAPL + MSFT (US) |
-| Jun/2024 | R$ 58.050 | + TSLA34 + AAPL34 (INTL) |
+| Período | Patrimônio | Evento Principal |
+|---------|------------|------------------|
+| Jan/2024 | R$ 119.452 | Aportes iniciais BRL — PETR4, ITUB4, HGLG11, BBDC4 |
+| Fev/2024 | R$ 172.815 | + VALE3, WEGE3, KNRI11, MXRF11 + aporte USD Avenue |
+| Mar/2024 | R$ 188.920 | + AAPL, MSFT (US) + BBAS3, TAEE11 + proventos |
+| Abr/2024 | R$ 227.350 | + TSLA34, AAPL34, MSFT34, GOOGL (INTL/US) |
+| Mai/2024 | R$ 255.680 | + NVDA, AMZN (US) + AMZO34, GOGL34 (INTL) |
+| Jun/2024 | R$ 278.900 | Venda PETR4 lucro + JPM, VTI, NVDC34 + saque |
+| Jul/2024 | R$ 301.250 | Venda BBDC4 lucro + SCHD, O, DISB34 + aporte Nomad |
+| Ago/2024 | R$ 335.100 | Venda VALE3 prejuízo + PLD, COCA34, IVVB11 |
+| Set/2024 | R$ 348.750 | Venda WEGE3/MXRF11 prejuízo + EURP11, IVVB11 |
+| Out/2024 | R$ 342.800 | Vendas PETR4/ITUB4/TSLA34/AAPL (IR gerado) |
+| Nov/2024 | R$ 338.450 | Vendas MSFT/HGLG11/DISB34/GOOGL + DARF R$ 685,50 |
+| Dez/2024 | R$ 330.200 | Vendas KNRI11/NVDA/BBAS3/GOGL34 + saque R$ 5K |
+
+### Cenários de IR e Compensação
+
+| Mês | Operações | Resultado | IR Pago |
+|-----|-----------|-----------|---------|
+| Outubro | Vendas PETR4/ITUB4 (>R$ 20K) + TSLA34/AAPL | Lucro líquido | R$ 685,50 |
+| Novembro | Vendas MSFT/HGLG11/DISB34/GOOGL | Lucro/prejuízo misto | R$ 76,00 |
+| Dezembro | Vendas KNRI11/NVDA/BBAS3/GOGL34 | Compensação prejuízos | — |
+
+**Total investido**: R$ 173.000 (BRL) + US$ 23.000 (USD)  
+**Proventos recebidos**: R$ 4.850 + US$ 45  
+**IR total pago**: R$ 761,50
 
 ---
 

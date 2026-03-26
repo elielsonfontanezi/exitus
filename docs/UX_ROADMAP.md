@@ -42,7 +42,24 @@ Código Frontend
 
 ---
 
-## 🎯 Fases de Implementação - 4 Semanas Incrementais
+## � **Painel de Controle de Validação - Dashboard**
+
+### 📊 **Progresso da Validação:**
+```
+████████░░ 80% - 4/5 Blocos validados
+```
+
+### 📱 **Status de Testes por Componente:**
+| Componente | API Endpoint | Status | Data | Observações |
+|:---|:---|:---|:---|:---|
+| **Bloco Resumo (6 cards)** | `/api/portfolios/dashboard` + `/api/carteira/saldo-caixa` | ✅ Validado | 25/03/2026 | 6/6 cards com 100% precisão |
+| **Widgets Laterais** | `/api/portfolios/dashboard` | ⏳ Planejado | - | Calendário, Cash Flow, Meta |
+| **Top Ativos / Mercado** | `/api/portfolios/dashboard` | ⏳ Planejado | - | |
+| **Navegação / Menus** | N/A | ✅ Validado | 25/03/2026 | Sticky menu e 'Geral' OK |
+
+---
+
+## �🎯 Fases de Implementação - 4 Semanas Incrementais
 
 ### **📅 SEMANA 1: Design System Moderno**
 

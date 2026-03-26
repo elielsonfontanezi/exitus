@@ -8,6 +8,49 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — Frontend Token Expirado e Template Resiliente (26/03/2026)
+
+**Artefatos modificados:**
+- `frontend/app/routes/auth.py` - Implementado refresh token automático
+- `frontend/app/routes/analises.py` - Usa helper e trata 401/403 com redirect
+- `frontend/app/templates/analises/index.html` - Templates resilientes com .get()
+
+**Mudanças:**
+- **🔄 Refresh Token:** `get_api_headers()` renova automaticamente 5 min antes de expirar
+- **🛡️ Templates:** Uso defensivo com `.get()` e valores padrão para evitar 500
+- **🔐 Segurança:** Token expirado força logout limpo em vez de erro interno
+- **🎯 UX:** Página `/analises` carrega corretamente com dados reais (R$ 249.907,10)
+- **🐛 Bugs:** Corrigido TypeError slice e sintaxe CSS em progress-bar
+
+**Testes:**
+- Login → `/analises` funciona
+- Expiração forçada → redirect login
+- Re-login → página funcional
+
+### Feature — Expansão Massa Testes E2E: Carteira Aposentadoria (26/03/2026)
+
+**Artefatos modificados:**
+- `backend/seed_data/scenarios/test_full.json` - Expandido para 30 ativos, 48 transações, 32 proventos
+- `backend/load_scenario.py` - Suporte a moeda dinâmica, quantidade/imposto em proventos
+- `backend/app/models/movimentacao_caixa.py` - Corrigido enum PAGAMENTO_IMPOSTO
+- `docs/SEEDS.md` - Atualizada com nova estrutura e cenários de IR
+
+**Mudanças:**
+- **📊 Cenário Completo:** 30 ativos (10 BR + 10 US + 10 INTL) vs 9 anteriores
+- **💼 Transações:** 48 operações com vendas lucro/prejuízo para simulação de IR
+- **💰 Proventos:** 32 proventos (DIVIDENDO, JCP, RENDIMENTO) com IR retido
+- **💳 Movimentações:** 15 movimentações (aportes BRL/USD, saques, DARF)
+- **🎯 Portfolios:** 4 portfolios incluindo "Aposentadoria" como principal
+- **📈 Histórico:** 12 snapshots mensais (Jan-Dez/2024) vs 6 anteriores
+- **🌐 Multi-moeda:** Suporte a aportes em USD e corretoras internacionais
+- **💸 IR Simulado:** Cenários reais com DARF pagos (R$ 761,50 total)
+
+**Dados da Carteira Aposentadoria:**
+- Investimento: R$ 173K + US$ 23K
+- Patrimônio final: R$ 330,2K
+- Proventos: R$ 4.850 + US$ 45
+- IR total: R$ 761,50
+
 ### Feature — Novos Cards Dashboard: Proventos 12M e Rentabilidade Total (25/03/2026)
 
 **Artefatos modificados:**

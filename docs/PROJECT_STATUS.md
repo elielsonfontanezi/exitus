@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 25/03/2026  
-> **Status:** ✅ **DASHBOARD COM NOVOS CARDS (PROVENTOS 12M E RENTABILIDADE TOTAL)**  
-> **Versão:** v0.9.5
+> **Data:** 26/03/2026  
+> **Status:** ✅ **FRONTEND CORRIGIDO — Token Refresh Automático + Templates Resilientes**  
+> **Versão:** v0.9.6
 
 ---
 

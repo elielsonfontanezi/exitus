@@ -1,7 +1,7 @@
 {
-  "version": "1.0",
-  "description": "Cenário COMPLETO para TODAS as telas - cobertura 100% do sistema (com ativos US e INTL)",
-  "timestamp": "2026-03-22T00:00:00Z",
+  "version": "2.0",
+  "description": "Cenário COMPLETO e2e_user — Carteira Aposentadoria com 30 ativos (10 BR + 10 US + 10 INTL), proventos, vendas com lucro/prejuízo, IR e compensação",
+  "timestamp": "2026-03-25T00:00:00Z",
   "usuarios": [
     {
       "username": "e2e_admin",
@@ -39,555 +39,204 @@
     }
   ],
   "ativos": [
-    {
-      "ticker": "PETR4",
-      "nome": "Petrobras PN",
-      "tipo": "ACAO",
-      "classe": "RENDA_VARIAVEL",
-      "mercado": "BR",
-      "moeda": "BRL",
-      "pais": "BR",
-      "preco_atual": 38.5,
-      "preco_teto": 45.0,
-      "dividend_yield": 15.2,
-      "p_l": 4.1,
-      "p_vp": 1.05,
-      "observacoes": "Setor: Petróleo e Gás",
-      "ativo": true
-    },
-    {
-      "ticker": "VALE3",
-      "nome": "Vale ON",
-      "tipo": "ACAO",
-      "classe": "RENDA_VARIAVEL",
-      "mercado": "BR",
-      "moeda": "BRL",
-      "pais": "BR",
-      "preco_atual": 68.9,
-      "preco_teto": 75.0,
-      "dividend_yield": 12.8,
-      "p_l": 5.2,
-      "p_vp": 0.95,
-      "observacoes": "Setor: Mineração",
-      "ativo": true
-    },
-    {
-      "ticker": "ITUB4",
-      "nome": "Itaú Unibanco PN",
-      "tipo": "ACAO",
-      "classe": "RENDA_VARIAVEL",
-      "mercado": "BR",
-      "moeda": "BRL",
-      "pais": "BR",
-      "preco_atual": 32.45,
-      "preco_teto": 38.0,
-      "dividend_yield": 8.5,
-      "p_l": 10.2,
-      "p_vp": 1.45,
-      "observacoes": "Setor: Financeiro",
-      "ativo": true
-    },
-    {
-      "ticker": "HGLG11",
-      "nome": "CSHG Logística FII",
-      "tipo": "FII",
-      "classe": "RENDA_VARIAVEL",
-      "mercado": "BR",
-      "moeda": "BRL",
-      "pais": "BR",
-      "preco_atual": 185.2,
-      "preco_teto": 195.0,
-      "dividend_yield": 8.2,
-      "p_vp": 0.85,
-      "observacoes": "FII Logística",
-      "ativo": true
-    },
-    {
-      "ticker": "KNRI11",
-      "nome": "KN Recebíveis Imobiliários FII",
-      "tipo": "FII",
-      "classe": "RENDA_VARIAVEL",
-      "mercado": "BR",
-      "moeda": "BRL",
-      "pais": "BR",
-      "preco_atual": 145.8,
-      "preco_teto": 155.0,
-      "dividend_yield": 7.5,
-      "p_vp": 0.92,
-      "observacoes": "FII Recebíveis",
-      "ativo": true
-    },
-    {
-      "ticker": "AAPL",
-      "nome": "Apple Inc.",
-      "tipo": "STOCK",
-      "classe": "RENDA_VARIAVEL",
-      "mercado": "US",
-      "moeda": "USD",
-      "pais": "US",
-      "preco_atual": 178.5,
-      "preco_teto": 195.0,
-      "dividend_yield": 0.5,
-      "p_l": 28.5,
-      "observacoes": "Technology Sector",
-      "ativo": true
-    },
-    {
-      "ticker": "MSFT",
-      "nome": "Microsoft Corporation",
-      "tipo": "STOCK",
-      "classe": "RENDA_VARIAVEL",
-      "mercado": "US",
-      "moeda": "USD",
-      "pais": "US",
-      "preco_atual": 415.2,
-      "preco_teto": 450.0,
-      "dividend_yield": 0.7,
-      "p_l": 32.8,
-      "observacoes": "Technology Sector",
-      "ativo": true
-    },
-    {
-      "ticker": "TSLA34",
-      "nome": "Tesla GDR",
-      "tipo": "STOCK_INTL",
-      "classe": "RENDA_VARIAVEL",
-      "mercado": "INTL",
-      "moeda": "BRL",
-      "pais": "BR",
-      "preco_atual": 85.6,
-      "preco_teto": 95.0,
-      "dividend_yield": 0.0,
-      "p_l": 45.2,
-      "observacoes": "Bolsa: B3 | Setor: Automotive",
-      "ativo": true
-    },
-    {
-      "ticker": "AAPL34",
-      "nome": "Apple GDR",
-      "tipo": "STOCK_INTL",
-      "classe": "RENDA_VARIAVEL",
-      "mercado": "INTL",
-      "moeda": "BRL",
-      "pais": "BR",
-      "preco_atual": 125.9,
-      "preco_teto": 140.0,
-      "dividend_yield": 0.5,
-      "p_l": 28.5,
-      "observacoes": "Bolsa: B3 | Setor: Technology",
-      "ativo": true
-    }
+    {"ticker":"PETR4","nome":"Petrobras PN","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":38.50,"preco_teto":45.00,"dividend_yield":15.2,"p_l":4.1,"p_vp":1.05,"observacoes":"Setor: Petróleo e Gás","ativo":true},
+    {"ticker":"VALE3","nome":"Vale ON","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":68.90,"preco_teto":75.00,"dividend_yield":12.8,"p_l":5.2,"p_vp":0.95,"observacoes":"Setor: Mineração","ativo":true},
+    {"ticker":"ITUB4","nome":"Itaú Unibanco PN","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":32.45,"preco_teto":38.00,"dividend_yield":8.5,"p_l":10.2,"p_vp":1.45,"observacoes":"Setor: Financeiro","ativo":true},
+    {"ticker":"BBDC4","nome":"Bradesco PN","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":14.80,"preco_teto":18.00,"dividend_yield":7.2,"p_l":8.5,"p_vp":0.92,"observacoes":"Setor: Financeiro","ativo":true},
+    {"ticker":"WEGE3","nome":"WEG ON","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":34.50,"preco_teto":40.00,"dividend_yield":1.8,"p_l":35.0,"p_vp":8.50,"observacoes":"Setor: Bens Industriais","ativo":true},
+    {"ticker":"BBAS3","nome":"Banco do Brasil ON","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":28.00,"preco_teto":35.00,"dividend_yield":10.5,"p_l":5.8,"p_vp":0.85,"observacoes":"Setor: Financeiro","ativo":true},
+    {"ticker":"TAEE11","nome":"Taesa UNIT","tipo":"UNIT","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":36.50,"preco_teto":42.00,"dividend_yield":9.8,"p_l":7.2,"p_vp":1.60,"observacoes":"Setor: Energia Elétrica","ativo":true},
+    {"ticker":"HGLG11","nome":"CSHG Logística FII","tipo":"FII","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":185.20,"preco_teto":195.00,"dividend_yield":8.2,"p_vp":0.85,"observacoes":"FII Logística","ativo":true},
+    {"ticker":"KNRI11","nome":"Kinea Renda Imobiliária FII","tipo":"FII","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":145.80,"preco_teto":155.00,"dividend_yield":7.5,"p_vp":0.92,"observacoes":"FII Renda Imobiliária","ativo":true},
+    {"ticker":"MXRF11","nome":"Maxi Renda FII","tipo":"FII","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":10.80,"preco_teto":12.00,"dividend_yield":11.0,"p_vp":1.02,"observacoes":"FII Papel - Recebíveis","ativo":true},
+
+    {"ticker":"AAPL","nome":"Apple Inc.","tipo":"STOCK","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":172.50,"preco_teto":195.00,"dividend_yield":0.5,"p_l":28.5,"observacoes":"Sector: Technology","ativo":true},
+    {"ticker":"MSFT","nome":"Microsoft Corporation","tipo":"STOCK","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":420.00,"preco_teto":450.00,"dividend_yield":0.7,"p_l":32.8,"observacoes":"Sector: Technology","ativo":true},
+    {"ticker":"GOOGL","nome":"Alphabet Inc. Class A","tipo":"STOCK","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":175.00,"preco_teto":190.00,"dividend_yield":0.0,"p_l":22.5,"observacoes":"Sector: Technology","ativo":true},
+    {"ticker":"AMZN","nome":"Amazon.com Inc.","tipo":"STOCK","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":185.00,"preco_teto":200.00,"dividend_yield":0.0,"p_l":42.0,"observacoes":"Sector: Consumer Cyclical","ativo":true},
+    {"ticker":"NVDA","nome":"NVIDIA Corporation","tipo":"STOCK","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":900.00,"preco_teto":950.00,"dividend_yield":0.02,"p_l":65.0,"observacoes":"Sector: Technology - AI/GPU","ativo":true},
+    {"ticker":"JPM","nome":"JPMorgan Chase & Co.","tipo":"STOCK","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":210.00,"preco_teto":230.00,"dividend_yield":2.3,"p_l":12.0,"observacoes":"Sector: Financial Services","ativo":true},
+    {"ticker":"VTI","nome":"Vanguard Total Stock Market ETF","tipo":"ETF","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":260.00,"preco_teto":280.00,"dividend_yield":1.3,"observacoes":"ETF: US Total Market","ativo":true},
+    {"ticker":"SCHD","nome":"Schwab US Dividend Equity ETF","tipo":"ETF","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":82.00,"preco_teto":90.00,"dividend_yield":3.5,"observacoes":"ETF: US Dividend","ativo":true},
+    {"ticker":"O","nome":"Realty Income Corporation","tipo":"REIT","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":58.00,"preco_teto":65.00,"dividend_yield":5.4,"p_l":40.0,"p_vp":1.20,"observacoes":"REIT: Monthly Dividend","ativo":true},
+    {"ticker":"PLD","nome":"Prologis Inc.","tipo":"REIT","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":130.00,"preco_teto":145.00,"dividend_yield":2.8,"p_l":35.0,"p_vp":2.10,"observacoes":"REIT: Industrial Logistics","ativo":true},
+
+    {"ticker":"TSLA34","nome":"Tesla BDR","tipo":"STOCK_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":85.60,"preco_teto":95.00,"dividend_yield":0.0,"p_l":45.2,"observacoes":"BDR: Tesla Inc. (B3)","ativo":true},
+    {"ticker":"AAPL34","nome":"Apple BDR","tipo":"STOCK_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":55.00,"preco_teto":62.00,"dividend_yield":0.5,"p_l":28.5,"observacoes":"BDR: Apple Inc. (B3)","ativo":true},
+    {"ticker":"MSFT34","nome":"Microsoft BDR","tipo":"STOCK_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":70.00,"preco_teto":78.00,"dividend_yield":0.7,"p_l":32.8,"observacoes":"BDR: Microsoft Corp. (B3)","ativo":true},
+    {"ticker":"AMZO34","nome":"Amazon BDR","tipo":"STOCK_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":48.00,"preco_teto":55.00,"dividend_yield":0.0,"p_l":42.0,"observacoes":"BDR: Amazon.com (B3)","ativo":true},
+    {"ticker":"GOGL34","nome":"Alphabet BDR","tipo":"STOCK_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":38.00,"preco_teto":44.00,"dividend_yield":0.0,"p_l":22.5,"observacoes":"BDR: Alphabet Inc. (B3)","ativo":true},
+    {"ticker":"NVDC34","nome":"NVIDIA BDR","tipo":"STOCK_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":120.00,"preco_teto":135.00,"dividend_yield":0.02,"p_l":65.0,"observacoes":"BDR: NVIDIA Corp. (B3)","ativo":true},
+    {"ticker":"DISB34","nome":"Walt Disney BDR","tipo":"STOCK_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":22.50,"preco_teto":28.00,"dividend_yield":0.8,"p_l":55.0,"observacoes":"BDR: Walt Disney Co. (B3)","ativo":true},
+    {"ticker":"COCA34","nome":"Coca-Cola BDR","tipo":"STOCK_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":28.00,"preco_teto":32.00,"dividend_yield":3.0,"p_l":24.0,"observacoes":"BDR: Coca-Cola Co. (B3)","ativo":true},
+    {"ticker":"IVVB11","nome":"iShares S&P 500 BRL","tipo":"ETF_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":320.00,"preco_teto":350.00,"dividend_yield":1.2,"observacoes":"ETF INTL: replica S&P 500 em BRL (B3)","ativo":true},
+    {"ticker":"EURP11","nome":"Trend MSCI Europe ETF","tipo":"ETF_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":45.00,"preco_teto":52.00,"dividend_yield":2.0,"observacoes":"ETF INTL: replica MSCI Europe em BRL (B3)","ativo":true}
   ],
   "corretoras": [
-    {
-      "nome": "ITAU CV S/A",
-      "cnpj": "60701190000104",
-      "tipo": "CORRETORA",
-      "pais": "BR",
-      "ativa": true
-    },
-    {
-      "nome": "XP INVESTIMENTOS",
-      "cnpj": "08764140000176",
-      "tipo": "CORRETORA",
-      "pais": "BR",
-      "ativa": true
-    },
-    {
-      "nome": "INTER BANCO",
-      "cnpj": "00416986000106",
-      "tipo": "CORRETORA",
-      "pais": "BR",
-      "ativa": true
-    }
+    {"nome":"XP INVESTIMENTOS","cnpj":"08764140000176","tipo":"CORRETORA","pais":"BR","moeda_padrao":"BRL","ativa":true},
+    {"nome":"ITAU CV S/A","cnpj":"60701190000104","tipo":"CORRETORA","pais":"BR","moeda_padrao":"BRL","ativa":true},
+    {"nome":"INTER BANCO","cnpj":"00416986000106","tipo":"CORRETORA","pais":"BR","moeda_padrao":"BRL","ativa":true},
+    {"nome":"AVENUE SECURITIES","cnpj":"00000000000001","tipo":"CORRETORA","pais":"US","moeda_padrao":"USD","ativa":true},
+    {"nome":"NOMAD GLOBAL","cnpj":"00000000000002","tipo":"CORRETORA","pais":"US","moeda_padrao":"USD","ativa":true}
   ],
   "transacoes": [
-    {
-      "usuario": "e2e_user",
-      "ativo": "PETR4",
-      "corretora": "ITAU CV S/A",
-      "tipo": "COMPRA",
-      "data_transacao": "2024-01-15",
-      "quantidade": 100,
-      "preco_unitario": 35.5,
-      "taxa_corretagem": 5.0,
-      "custos_totais": 8.5
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo": "VALE3",
-      "corretora": "XP INVESTIMENTOS",
-      "tipo": "COMPRA",
-      "data_transacao": "2024-02-20",
-      "quantidade": 200,
-      "preco_unitario": 65.2,
-      "taxa_corretagem": 8.0,
-      "custos_totais": 12.0
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo": "HGLG11",
-      "corretora": "INTER BANCO",
-      "tipo": "COMPRA",
-      "data_transacao": "2024-03-10",
-      "quantidade": 50,
-      "preco_unitario": 180.0,
-      "taxa_corretagem": 6.0,
-      "custos_totais": 9.0
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo": "PETR4",
-      "corretora": "ITAU CV S/A",
-      "tipo": "VENDA",
-      "data_transacao": "2024-04-05",
-      "quantidade": 50,
-      "preco_unitario": 39.8,
-      "taxa_corretagem": 5.0,
-      "custos_totais": 7.5
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo": "AAPL",
-      "corretora": "XP INVESTIMENTOS",
-      "tipo": "COMPRA",
-      "data_transacao": "2024-05-10",
-      "quantidade": 10,
-      "preco_unitario": 178.5,
-      "taxa_corretagem": 15.0,
-      "custos_totais": 18.5,
-      "observacoes": "Compra ativo US - Apple"
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo": "MSFT",
-      "corretora": "XP INVESTIMENTOS",
-      "tipo": "COMPRA",
-      "data_transacao": "2024-05-15",
-      "quantidade": 5,
-      "preco_unitario": 415.2,
-      "taxa_corretagem": 12.0,
-      "custos_totais": 15.0,
-      "observacoes": "Compra ativo US - Microsoft"
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo": "TSLA34",
-      "corretora": "INTER BANCO",
-      "tipo": "COMPRA",
-      "data_transacao": "2024-06-01",
-      "quantidade": 20,
-      "preco_unitario": 85.6,
-      "taxa_corretagem": 8.0,
-      "custos_totais": 10.5,
-      "observacoes": "Compra ativo INTL - Tesla GDR"
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo": "AAPL34",
-      "corretora": "INTER BANCO",
-      "tipo": "COMPRA",
-      "data_transacao": "2024-06-10",
-      "quantidade": 15,
-      "preco_unitario": 125.9,
-      "taxa_corretagem": 9.0,
-      "custos_totais": 12.0,
-      "observacoes": "Compra ativo INTL - Apple GDR"
-    }
+    {"usuario":"e2e_user","ativo":"PETR4","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-01-08","quantidade":500,"preco_unitario":35.50,"taxa_corretagem":8.90,"custos_totais":12.50,"observacoes":"Aporte inicial — Petrobras"},
+    {"usuario":"e2e_user","ativo":"ITUB4","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-01-10","quantidade":400,"preco_unitario":32.00,"taxa_corretagem":6.40,"custos_totais":9.80,"observacoes":"Aporte inicial — Itaú"},
+    {"usuario":"e2e_user","ativo":"HGLG11","corretora":"ITAU CV S/A","tipo":"COMPRA","data_transacao":"2024-01-15","quantidade":60,"preco_unitario":180.00,"taxa_corretagem":5.40,"custos_totais":8.20,"observacoes":"Aporte inicial — FII Logística"},
+    {"usuario":"e2e_user","ativo":"BBDC4","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-01-22","quantidade":300,"preco_unitario":14.80,"taxa_corretagem":2.22,"custos_totais":4.10,"observacoes":"Aporte inicial — Bradesco"},
+
+    {"usuario":"e2e_user","ativo":"VALE3","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-02-05","quantidade":200,"preco_unitario":65.20,"taxa_corretagem":6.52,"custos_totais":10.30,"observacoes":"Diversificação — Vale"},
+    {"usuario":"e2e_user","ativo":"WEGE3","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-02-12","quantidade":150,"preco_unitario":34.50,"taxa_corretagem":2.59,"custos_totais":5.40,"observacoes":"Diversificação — WEG"},
+    {"usuario":"e2e_user","ativo":"KNRI11","corretora":"ITAU CV S/A","tipo":"COMPRA","data_transacao":"2024-02-19","quantidade":50,"preco_unitario":145.00,"taxa_corretagem":3.62,"custos_totais":6.10,"observacoes":"Aporte FII Renda Imobiliária"},
+    {"usuario":"e2e_user","ativo":"MXRF11","corretora":"ITAU CV S/A","tipo":"COMPRA","data_transacao":"2024-02-26","quantidade":300,"preco_unitario":10.80,"taxa_corretagem":1.62,"custos_totais":3.20,"observacoes":"Aporte FII Papel"},
+
+    {"usuario":"e2e_user","ativo":"AAPL","corretora":"AVENUE SECURITIES","tipo":"COMPRA","data_transacao":"2024-03-04","quantidade":25,"preco_unitario":172.50,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"Primeira compra US — Apple"},
+    {"usuario":"e2e_user","ativo":"MSFT","corretora":"AVENUE SECURITIES","tipo":"COMPRA","data_transacao":"2024-03-06","quantidade":12,"preco_unitario":420.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"Primeira compra US — Microsoft"},
+    {"usuario":"e2e_user","ativo":"BBAS3","corretora":"INTER BANCO","tipo":"COMPRA","data_transacao":"2024-03-11","quantidade":200,"preco_unitario":28.00,"taxa_corretagem":2.80,"custos_totais":5.00,"observacoes":"Aporte Banco do Brasil"},
+    {"usuario":"e2e_user","ativo":"TAEE11","corretora":"INTER BANCO","tipo":"COMPRA","data_transacao":"2024-03-18","quantidade":120,"preco_unitario":36.50,"taxa_corretagem":2.19,"custos_totais":4.00,"observacoes":"Aporte UNIT Taesa"},
+
+    {"usuario":"e2e_user","ativo":"TSLA34","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-04-02","quantidade":80,"preco_unitario":85.60,"taxa_corretagem":3.42,"custos_totais":5.80,"observacoes":"Primeira compra BDR — Tesla"},
+    {"usuario":"e2e_user","ativo":"AAPL34","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-04-08","quantidade":100,"preco_unitario":55.00,"taxa_corretagem":2.75,"custos_totais":4.50,"observacoes":"BDR Apple"},
+    {"usuario":"e2e_user","ativo":"MSFT34","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-04-15","quantidade":80,"preco_unitario":70.00,"taxa_corretagem":2.80,"custos_totais":4.60,"observacoes":"BDR Microsoft"},
+    {"usuario":"e2e_user","ativo":"GOOGL","corretora":"AVENUE SECURITIES","tipo":"COMPRA","data_transacao":"2024-04-22","quantidade":18,"preco_unitario":175.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"Compra US — Alphabet"},
+
+    {"usuario":"e2e_user","ativo":"NVDA","corretora":"AVENUE SECURITIES","tipo":"COMPRA","data_transacao":"2024-05-06","quantidade":10,"preco_unitario":900.00,"taxa_corretagem":1.00,"custos_totais":2.00,"observacoes":"Compra US — NVIDIA (AI boom)"},
+    {"usuario":"e2e_user","ativo":"AMZN","corretora":"AVENUE SECURITIES","tipo":"COMPRA","data_transacao":"2024-05-13","quantidade":15,"preco_unitario":185.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"Compra US — Amazon"},
+    {"usuario":"e2e_user","ativo":"AMZO34","corretora":"INTER BANCO","tipo":"COMPRA","data_transacao":"2024-05-20","quantidade":60,"preco_unitario":48.00,"taxa_corretagem":1.44,"custos_totais":3.00,"observacoes":"BDR Amazon"},
+    {"usuario":"e2e_user","ativo":"GOGL34","corretora":"INTER BANCO","tipo":"COMPRA","data_transacao":"2024-05-27","quantidade":80,"preco_unitario":38.00,"taxa_corretagem":1.52,"custos_totais":3.00,"observacoes":"BDR Alphabet"},
+
+    {"usuario":"e2e_user","ativo":"PETR4","corretora":"XP INVESTIMENTOS","tipo":"VENDA","data_transacao":"2024-06-03","quantidade":200,"preco_unitario":42.00,"taxa_corretagem":4.20,"custos_totais":7.50,"observacoes":"Realização parcial PETR4 — lucro R$ 1.300"},
+    {"usuario":"e2e_user","ativo":"JPM","corretora":"AVENUE SECURITIES","tipo":"COMPRA","data_transacao":"2024-06-10","quantidade":10,"preco_unitario":210.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"Compra US — JPMorgan"},
+    {"usuario":"e2e_user","ativo":"VTI","corretora":"AVENUE SECURITIES","tipo":"COMPRA","data_transacao":"2024-06-17","quantidade":20,"preco_unitario":260.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"ETF US Total Market"},
+    {"usuario":"e2e_user","ativo":"NVDC34","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-06-24","quantidade":40,"preco_unitario":120.00,"taxa_corretagem":2.40,"custos_totais":4.20,"observacoes":"BDR NVIDIA"},
+
+    {"usuario":"e2e_user","ativo":"BBDC4","corretora":"XP INVESTIMENTOS","tipo":"VENDA","data_transacao":"2024-07-01","quantidade":150,"preco_unitario":16.50,"taxa_corretagem":1.24,"custos_totais":3.00,"observacoes":"Realização parcial BBDC4 — lucro R$ 255"},
+    {"usuario":"e2e_user","ativo":"SCHD","corretora":"NOMAD GLOBAL","tipo":"COMPRA","data_transacao":"2024-07-08","quantidade":25,"preco_unitario":82.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"ETF US Dividendos"},
+    {"usuario":"e2e_user","ativo":"O","corretora":"NOMAD GLOBAL","tipo":"COMPRA","data_transacao":"2024-07-15","quantidade":30,"preco_unitario":58.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"REIT Monthly Dividend"},
+    {"usuario":"e2e_user","ativo":"DISB34","corretora":"INTER BANCO","tipo":"COMPRA","data_transacao":"2024-07-22","quantidade":120,"preco_unitario":22.50,"taxa_corretagem":1.35,"custos_totais":2.80,"observacoes":"BDR Walt Disney"},
+
+    {"usuario":"e2e_user","ativo":"VALE3","corretora":"XP INVESTIMENTOS","tipo":"VENDA","data_transacao":"2024-08-05","quantidade":80,"preco_unitario":60.00,"taxa_corretagem":2.40,"custos_totais":4.80,"observacoes":"Venda VALE3 — PREJUÍZO R$ 416 (PM 65.20, venda 60.00)"},
+    {"usuario":"e2e_user","ativo":"PLD","corretora":"NOMAD GLOBAL","tipo":"COMPRA","data_transacao":"2024-08-12","quantidade":12,"preco_unitario":130.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"REIT Industrial Logistics"},
+    {"usuario":"e2e_user","ativo":"COCA34","corretora":"INTER BANCO","tipo":"COMPRA","data_transacao":"2024-08-19","quantidade":100,"preco_unitario":28.00,"taxa_corretagem":1.40,"custos_totais":2.80,"observacoes":"BDR Coca-Cola"},
+    {"usuario":"e2e_user","ativo":"IVVB11","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-08-26","quantidade":50,"preco_unitario":320.00,"taxa_corretagem":8.00,"custos_totais":11.50,"observacoes":"ETF INTL S&P 500 BRL"},
+
+    {"usuario":"e2e_user","ativo":"WEGE3","corretora":"XP INVESTIMENTOS","tipo":"VENDA","data_transacao":"2024-09-02","quantidade":80,"preco_unitario":32.00,"taxa_corretagem":1.28,"custos_totais":3.00,"observacoes":"Venda WEGE3 — PREJUÍZO R$ 200 (PM 34.50, venda 32.00)"},
+    {"usuario":"e2e_user","ativo":"MXRF11","corretora":"ITAU CV S/A","tipo":"VENDA","data_transacao":"2024-09-09","quantidade":150,"preco_unitario":10.50,"taxa_corretagem":0.79,"custos_totais":1.80,"observacoes":"Venda parcial MXRF11 — PREJUÍZO R$ 45 (FII 20% s/ ganho, aqui prejuízo)"},
+    {"usuario":"e2e_user","ativo":"EURP11","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-09-16","quantidade":80,"preco_unitario":45.00,"taxa_corretagem":1.80,"custos_totais":3.20,"observacoes":"ETF INTL MSCI Europe"},
+    {"usuario":"e2e_user","ativo":"IVVB11","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-09-23","quantidade":30,"preco_unitario":325.00,"taxa_corretagem":4.88,"custos_totais":7.00,"observacoes":"Reforço IVVB11"},
+
+    {"usuario":"e2e_user","ativo":"PETR4","corretora":"XP INVESTIMENTOS","tipo":"VENDA","data_transacao":"2024-10-07","quantidade":200,"preco_unitario":44.00,"taxa_corretagem":4.40,"custos_totais":7.80,"observacoes":"Venda PETR4 lote grande — LUCRO R$ 1.700 (vendas mês > R$ 20K gera DARF)"},
+    {"usuario":"e2e_user","ativo":"ITUB4","corretora":"XP INVESTIMENTOS","tipo":"VENDA","data_transacao":"2024-10-07","quantidade":250,"preco_unitario":38.00,"taxa_corretagem":4.75,"custos_totais":8.20,"observacoes":"Venda ITUB4 lote grande — LUCRO R$ 1.500 (vendas mês > R$ 20K gera DARF)"},
+    {"usuario":"e2e_user","ativo":"TSLA34","corretora":"XP INVESTIMENTOS","tipo":"VENDA","data_transacao":"2024-10-14","quantidade":30,"preco_unitario":98.00,"taxa_corretagem":1.47,"custos_totais":3.00,"observacoes":"Venda parcial BDR Tesla — LUCRO R$ 372 (BDR 15% IR sempre)"},
+    {"usuario":"e2e_user","ativo":"AAPL","corretora":"AVENUE SECURITIES","tipo":"VENDA","data_transacao":"2024-10-21","quantidade":12,"preco_unitario":230.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"Venda parcial AAPL — LUCRO $690 (US 15% IR s/ ganho)"},
+
+    {"usuario":"e2e_user","ativo":"MSFT","corretora":"AVENUE SECURITIES","tipo":"VENDA","data_transacao":"2024-11-04","quantidade":6,"preco_unitario":445.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"Venda parcial MSFT — LUCRO $150"},
+    {"usuario":"e2e_user","ativo":"HGLG11","corretora":"ITAU CV S/A","tipo":"VENDA","data_transacao":"2024-11-11","quantidade":20,"preco_unitario":192.00,"taxa_corretagem":1.92,"custos_totais":3.50,"observacoes":"Venda parcial FII — LUCRO R$ 240 (FII 20% IR sempre)"},
+    {"usuario":"e2e_user","ativo":"DISB34","corretora":"INTER BANCO","tipo":"VENDA","data_transacao":"2024-11-18","quantidade":50,"preco_unitario":20.00,"taxa_corretagem":0.50,"custos_totais":1.20,"observacoes":"Venda parcial BDR Disney — PREJUÍZO R$ 125 (PM 22.50, venda 20.00)"},
+    {"usuario":"e2e_user","ativo":"GOOGL","corretora":"AVENUE SECURITIES","tipo":"VENDA","data_transacao":"2024-11-25","quantidade":8,"preco_unitario":158.00,"taxa_corretagem":1.00,"custos_totais":1.50,"observacoes":"Venda parcial GOOGL — PREJUÍZO $136 (PM 175, venda 158)"},
+
+    {"usuario":"e2e_user","ativo":"KNRI11","corretora":"ITAU CV S/A","tipo":"VENDA","data_transacao":"2024-12-02","quantidade":20,"preco_unitario":152.00,"taxa_corretagem":1.52,"custos_totais":2.80,"observacoes":"Venda parcial FII — LUCRO R$ 140 (FII 20% IR)"},
+    {"usuario":"e2e_user","ativo":"NVDA","corretora":"AVENUE SECURITIES","tipo":"VENDA","data_transacao":"2024-12-09","quantidade":4,"preco_unitario":1050.00,"taxa_corretagem":1.00,"custos_totais":2.00,"observacoes":"Venda parcial NVDA — LUCRO $600 (US 15% IR)"},
+    {"usuario":"e2e_user","ativo":"BBAS3","corretora":"INTER BANCO","tipo":"VENDA","data_transacao":"2024-12-16","quantidade":100,"preco_unitario":26.50,"taxa_corretagem":1.32,"custos_totais":2.60,"observacoes":"Venda parcial BBAS3 — PREJUÍZO R$ 150 (PM 28.00, venda 26.50)"},
+    {"usuario":"e2e_user","ativo":"GOGL34","corretora":"INTER BANCO","tipo":"VENDA","data_transacao":"2024-12-20","quantidade":30,"preco_unitario":42.00,"taxa_corretagem":0.63,"custos_totais":1.40,"observacoes":"Venda parcial BDR Alphabet — LUCRO R$ 120 (BDR 15% IR)"}
   ],
   "proventos": [
-    {
-      "ativo": "PETR4",
-      "tipo_provento": "DIVIDENDO",
-      "data_com": "2024-03-20",
-      "data_pagamento": "2024-04-05",
-      "valor_unitario": 2.5,
-      "observacoes": "Dividendo ordinário"
-    },
-    {
-      "ativo": "HGLG11",
-      "tipo_provento": "RENDIMENTO",
-      "data_com": "2024-03-25",
-      "data_pagamento": "2024-04-10",
-      "valor_unitario": 1.2,
-      "observacoes": "Rendimento mensal FII"
-    }
+    {"ativo":"PETR4","tipo_provento":"DIVIDENDO","data_com":"2024-02-15","data_pagamento":"2024-03-08","valor_unitario":2.50,"quantidade_ativos":500,"observacoes":"Dividendo ordinário PETR4 — 1T24"},
+    {"ativo":"HGLG11","tipo_provento":"RENDIMENTO","data_com":"2024-02-28","data_pagamento":"2024-03-15","valor_unitario":1.20,"quantidade_ativos":60,"observacoes":"Rendimento mensal FII HGLG11"},
+    {"ativo":"KNRI11","tipo_provento":"RENDIMENTO","data_com":"2024-02-28","data_pagamento":"2024-03-15","valor_unitario":0.95,"quantidade_ativos":50,"observacoes":"Rendimento mensal FII KNRI11"},
+    {"ativo":"MXRF11","tipo_provento":"RENDIMENTO","data_com":"2024-02-28","data_pagamento":"2024-03-15","valor_unitario":0.11,"quantidade_ativos":300,"observacoes":"Rendimento mensal FII MXRF11"},
+
+    {"ativo":"ITUB4","tipo_provento":"JCP","data_com":"2024-03-20","data_pagamento":"2024-04-10","valor_unitario":0.85,"quantidade_ativos":400,"imposto_retido":51.00,"observacoes":"JCP Itaú — IR 15% retido na fonte"},
+    {"ativo":"HGLG11","tipo_provento":"RENDIMENTO","data_com":"2024-03-28","data_pagamento":"2024-04-15","valor_unitario":1.25,"quantidade_ativos":60,"observacoes":"Rendimento mensal FII HGLG11"},
+    {"ativo":"KNRI11","tipo_provento":"RENDIMENTO","data_com":"2024-03-28","data_pagamento":"2024-04-15","valor_unitario":0.98,"quantidade_ativos":50,"observacoes":"Rendimento mensal FII KNRI11"},
+    {"ativo":"MXRF11","tipo_provento":"RENDIMENTO","data_com":"2024-03-28","data_pagamento":"2024-04-15","valor_unitario":0.10,"quantidade_ativos":300,"observacoes":"Rendimento mensal FII MXRF11"},
+
+    {"ativo":"PETR4","tipo_provento":"DIVIDENDO","data_com":"2024-05-15","data_pagamento":"2024-06-05","valor_unitario":1.80,"quantidade_ativos":500,"observacoes":"Dividendo PETR4 — 2T24 (antes da venda jun)"},
+    {"ativo":"VALE3","tipo_provento":"DIVIDENDO","data_com":"2024-05-20","data_pagamento":"2024-06-10","valor_unitario":3.50,"quantidade_ativos":200,"observacoes":"Dividendo ordinário VALE3"},
+    {"ativo":"TAEE11","tipo_provento":"DIVIDENDO","data_com":"2024-05-25","data_pagamento":"2024-06-15","valor_unitario":1.20,"quantidade_ativos":120,"observacoes":"Dividendo UNIT Taesa"},
+    {"ativo":"HGLG11","tipo_provento":"RENDIMENTO","data_com":"2024-05-30","data_pagamento":"2024-06-14","valor_unitario":1.30,"quantidade_ativos":60,"observacoes":"Rendimento mensal FII HGLG11"},
+
+    {"ativo":"BBAS3","tipo_provento":"JCP","data_com":"2024-06-18","data_pagamento":"2024-07-05","valor_unitario":0.92,"quantidade_ativos":200,"imposto_retido":27.60,"observacoes":"JCP Banco do Brasil — IR 15% retido"},
+    {"ativo":"AAPL","tipo_provento":"DIVIDENDO","data_com":"2024-06-20","data_pagamento":"2024-07-12","valor_unitario":0.25,"quantidade_ativos":25,"observacoes":"Dividend Apple — trimestral (USD)"},
+    {"ativo":"MSFT","tipo_provento":"DIVIDENDO","data_com":"2024-06-22","data_pagamento":"2024-07-15","valor_unitario":0.75,"quantidade_ativos":12,"observacoes":"Dividend Microsoft — trimestral (USD)"},
+    {"ativo":"MXRF11","tipo_provento":"RENDIMENTO","data_com":"2024-06-28","data_pagamento":"2024-07-15","valor_unitario":0.11,"quantidade_ativos":300,"observacoes":"Rendimento mensal FII MXRF11"},
+
+    {"ativo":"PETR4","tipo_provento":"JCP","data_com":"2024-08-12","data_pagamento":"2024-09-05","valor_unitario":1.50,"quantidade_ativos":300,"imposto_retido":67.50,"observacoes":"JCP Petrobras — IR 15% retido (após venda parcial, 300 restantes)"},
+    {"ativo":"HGLG11","tipo_provento":"RENDIMENTO","data_com":"2024-08-29","data_pagamento":"2024-09-16","valor_unitario":1.35,"quantidade_ativos":60,"observacoes":"Rendimento mensal FII HGLG11"},
+    {"ativo":"KNRI11","tipo_provento":"RENDIMENTO","data_com":"2024-08-29","data_pagamento":"2024-09-16","valor_unitario":1.00,"quantidade_ativos":50,"observacoes":"Rendimento mensal FII KNRI11"},
+    {"ativo":"O","tipo_provento":"DIVIDENDO","data_com":"2024-08-30","data_pagamento":"2024-09-15","valor_unitario":0.26,"quantidade_ativos":30,"observacoes":"Monthly dividend Realty Income (USD)"},
+
+    {"ativo":"VALE3","tipo_provento":"DIVIDENDO","data_com":"2024-09-15","data_pagamento":"2024-10-05","valor_unitario":2.80,"quantidade_ativos":120,"observacoes":"Dividendo VALE3 (120 restantes após venda ago)"},
+    {"ativo":"TAEE11","tipo_provento":"DIVIDENDO","data_com":"2024-09-20","data_pagamento":"2024-10-10","valor_unitario":1.30,"quantidade_ativos":120,"observacoes":"Dividendo UNIT Taesa — 2S24"},
+    {"ativo":"SCHD","tipo_provento":"DIVIDENDO","data_com":"2024-09-25","data_pagamento":"2024-10-08","valor_unitario":0.65,"quantidade_ativos":25,"observacoes":"Dividend SCHD ETF — trimestral (USD)"},
+    {"ativo":"JPM","tipo_provento":"DIVIDENDO","data_com":"2024-09-28","data_pagamento":"2024-10-15","valor_unitario":1.15,"quantidade_ativos":10,"observacoes":"Dividend JPMorgan — trimestral (USD)"},
+
+    {"ativo":"ITUB4","tipo_provento":"JCP","data_com":"2024-10-15","data_pagamento":"2024-11-08","valor_unitario":0.90,"quantidade_ativos":150,"imposto_retido":20.25,"observacoes":"JCP Itaú — IR 15% retido (150 restantes após venda out)"},
+    {"ativo":"HGLG11","tipo_provento":"RENDIMENTO","data_com":"2024-10-30","data_pagamento":"2024-11-15","valor_unitario":1.38,"quantidade_ativos":60,"observacoes":"Rendimento mensal FII HGLG11"},
+    {"ativo":"AAPL","tipo_provento":"DIVIDENDO","data_com":"2024-10-25","data_pagamento":"2024-11-12","valor_unitario":0.25,"quantidade_ativos":13,"observacoes":"Dividend Apple — trimestral (13 restantes)"},
+
+    {"ativo":"BBAS3","tipo_provento":"DIVIDENDO","data_com":"2024-11-15","data_pagamento":"2024-12-05","valor_unitario":1.15,"quantidade_ativos":100,"observacoes":"Dividendo BB (100 restantes após venda dez prevista)"},
+    {"ativo":"TAEE11","tipo_provento":"DIVIDENDO","data_com":"2024-11-20","data_pagamento":"2024-12-10","valor_unitario":1.40,"quantidade_ativos":120,"observacoes":"Dividendo UNIT Taesa — extra"},
+    {"ativo":"KNRI11","tipo_provento":"RENDIMENTO","data_com":"2024-11-28","data_pagamento":"2024-12-16","valor_unitario":1.02,"quantidade_ativos":30,"observacoes":"Rendimento FII KNRI11 (30 restantes após venda dez)"},
+    {"ativo":"MXRF11","tipo_provento":"RENDIMENTO","data_com":"2024-11-28","data_pagamento":"2024-12-16","valor_unitario":0.12,"quantidade_ativos":150,"observacoes":"Rendimento FII MXRF11 (150 restantes)"},
+    {"ativo":"PLD","tipo_provento":"DIVIDENDO","data_com":"2024-11-29","data_pagamento":"2024-12-15","valor_unitario":0.96,"quantidade_ativos":12,"observacoes":"Dividend Prologis REIT — trimestral (USD)"}
   ],
   "movimentacoes_caixa": [
-    {
-      "usuario": "e2e_user",
-      "corretora": "XP INVESTIMENTOS",
-      "tipo": "DEPOSITO",
-      "data_movimentacao": "2024-01-10",
-      "valor": 300000.0,
-      "observacoes": "Aporte inicial para compras de ativos"
-    },
-    {
-      "usuario": "e2e_user",
-      "corretora": "XP INVESTIMENTOS",
-      "tipo": "SAQUE",
-      "data_movimentacao": "2024-04-15",
-      "valor": 500.0,
-      "observacoes": "Saque parcial"
-    }
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-01-05","valor":50000.00,"moeda":"BRL","observacoes":"Aporte inicial BRL — início carteira Aposentadoria"},
+    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"DEPOSITO","data_movimentacao":"2024-01-05","valor":30000.00,"moeda":"BRL","observacoes":"Aporte inicial BRL — Itaú para FIIs"},
+    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"DEPOSITO","data_movimentacao":"2024-01-05","valor":20000.00,"moeda":"BRL","observacoes":"Aporte inicial BRL — Inter"},
+    {"usuario":"e2e_user","corretora":"AVENUE SECURITIES","tipo":"DEPOSITO","data_movimentacao":"2024-02-28","valor":8000.00,"moeda":"USD","observacoes":"Primeiro aporte em dólar — Avenue"},
+
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-04-01","valor":25000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — XP (BDRs)"},
+    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"DEPOSITO","data_movimentacao":"2024-05-01","valor":15000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — Inter (BDRs)"},
+    {"usuario":"e2e_user","corretora":"AVENUE SECURITIES","tipo":"DEPOSITO","data_movimentacao":"2024-05-15","valor":5000.00,"moeda":"USD","observacoes":"Segundo aporte USD — NVDA e AMZN"},
+    {"usuario":"e2e_user","corretora":"NOMAD GLOBAL","tipo":"DEPOSITO","data_movimentacao":"2024-07-01","valor":6000.00,"moeda":"USD","observacoes":"Aporte USD Nomad — ETFs e REITs"},
+
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-08-01","valor":20000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — IVVB11"},
+    {"usuario":"e2e_user","corretora":"AVENUE SECURITIES","tipo":"DEPOSITO","data_movimentacao":"2024-09-01","valor":4000.00,"moeda":"USD","observacoes":"Aporte USD — reforço carteira US"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-10-01","valor":15000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — out"},
+
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"SAQUE","data_movimentacao":"2024-06-20","valor":3000.00,"moeda":"BRL","observacoes":"Saque parcial — despesas pessoais"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"SAQUE","data_movimentacao":"2024-12-23","valor":5000.00,"moeda":"BRL","observacoes":"Saque fim de ano"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"PAGAMENTO_IMPOSTO","data_movimentacao":"2024-11-30","valor":685.50,"moeda":"BRL","observacoes":"DARF referente vendas outubro (ações > R$ 20K + BDR)"},
+    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"PAGAMENTO_IMPOSTO","data_movimentacao":"2024-12-30","valor":76.00,"moeda":"BRL","observacoes":"DARF referente venda FII novembro (20% s/ lucro HGLG11)"}
   ],
   "alertas": [
-    {
-      "usuario": "e2e_user",
-      "ativo_ticker": "PETR4",
-      "tipo_alerta": "PRECO_ALVO",
-      "condicao": "MAIOR_IGUAL",
-      "valor_referencia": 40.0,
-      "ativo": true,
-      "notificar_email": true,
-      "mensagem": "PETR4 atingiu preço alvo de R$ 40,00"
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo_ticker": "VALE3",
-      "tipo_alerta": "STOP_LOSS",
-      "condicao": "MENOR_IGUAL",
-      "valor_referencia": 60.0,
-      "ativo": true,
-      "notificar_email": false,
-      "mensagem": "VALE3 atingiu stop loss de R$ 60,00"
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo_ticker": "HGLG11",
-      "tipo_alerta": "DIVIDENDO",
-      "ativo": true,
-      "notificar_email": true,
-      "mensagem": "HGLG11 pagou dividendos"
-    }
+    {"usuario":"e2e_user","ativo_ticker":"PETR4","tipo_alerta":"PRECO_ALVO","condicao":"MAIOR_IGUAL","valor_referencia":45.00,"ativo":true,"notificar_email":true,"mensagem":"PETR4 atingiu preço teto de R$ 45,00"},
+    {"usuario":"e2e_user","ativo_ticker":"VALE3","tipo_alerta":"STOP_LOSS","condicao":"MENOR_IGUAL","valor_referencia":55.00,"ativo":true,"notificar_email":true,"mensagem":"VALE3 atingiu stop loss de R$ 55,00"},
+    {"usuario":"e2e_user","ativo_ticker":"HGLG11","tipo_alerta":"DIVIDENDO","ativo":true,"notificar_email":true,"mensagem":"HGLG11 pagou rendimento mensal"},
+    {"usuario":"e2e_user","ativo_ticker":"NVDA","tipo_alerta":"PRECO_ALVO","condicao":"MAIOR_IGUAL","valor_referencia":1100.00,"ativo":true,"notificar_email":false,"mensagem":"NVDA atingiu $1.100 — avaliar realização"},
+    {"usuario":"e2e_user","ativo_ticker":"IVVB11","tipo_alerta":"PRECO_ALVO","condicao":"MENOR_IGUAL","valor_referencia":290.00,"ativo":true,"notificar_email":true,"mensagem":"IVVB11 abaixo de R$ 290 — oportunidade de compra"}
   ],
   "portfolios": [
-    {
-      "usuario": "e2e_user",
-      "nome": "Portfolio Principal",
-      "descricao": "Portfolio de longo prazo - Ações e FIIs",
-      "objetivo": "Crescimento e renda passiva",
-      "horizonte_anos": 10,
-      "perfil_risco": "MODERADO",
-      "ativo": true
-    },
-    {
-      "usuario": "e2e_user",
-      "nome": "Portfolio Dividendos",
-      "descricao": "Foco em dividendos e proventos",
-      "objetivo": "Renda passiva mensal",
-      "horizonte_anos": 5,
-      "perfil_risco": "CONSERVADOR",
-      "ativo": true
-    },
-    {
-      "usuario": "e2e_admin",
-      "nome": "Portfolio Admin",
-      "descricao": "Portfolio administrativo para testes",
-      "objetivo": "Testes e validações",
-      "horizonte_anos": 1,
-      "perfil_risco": "AGRESSIVO",
-      "ativo": true
-    }
+    {"usuario":"e2e_user","nome":"Aposentadoria","descricao":"Carteira principal de longo prazo — Ações BR, FIIs, US Stocks, BDRs e ETFs","objetivo":"Independência financeira e renda passiva","ativo":true},
+    {"usuario":"e2e_user","nome":"Dividendos BR","descricao":"Foco em dividendos e proventos de ativos brasileiros","objetivo":"Renda passiva mensal acima de R$ 2.000","ativo":true},
+    {"usuario":"e2e_user","nome":"Growth US","descricao":"Carteira de crescimento com foco em tecnologia US","objetivo":"Valorização de capital em USD","ativo":true},
+    {"usuario":"e2e_admin","nome":"Portfolio Admin","descricao":"Portfolio administrativo para testes do sistema","objetivo":"Testes e validações","ativo":true}
   ],
   "planos_compra": [
-    {
-      "usuario": "e2e_user",
-      "ativo_ticker": "PETR4",
-      "preco_alvo": 35.0,
-      "quantidade_desejada": 100,
-      "valor_total_planejado": 3500.0,
-      "data_limite": "2024-12-31",
-      "status": "ATIVO",
-      "observacoes": "Comprar se cair abaixo de R$ 35"
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo_ticker": "ITUB4",
-      "preco_alvo": 30.0,
-      "quantidade_desejada": 200,
-      "valor_total_planejado": 6000.0,
-      "data_limite": "2024-12-31",
-      "status": "ATIVO",
-      "observacoes": "Aumentar posição em ITUB4"
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo_ticker": "KNRI11",
-      "preco_alvo": 140.0,
-      "quantidade_desejada": 50,
-      "valor_total_planejado": 7000.0,
-      "data_limite": "2024-12-31",
-      "status": "PENDENTE",
-      "observacoes": "Aguardando correção do mercado"
-    }
+    {"usuario":"e2e_user","ativo_ticker":"PETR4","preco_alvo":34.00,"quantidade_desejada":200,"valor_total_planejado":6800.00,"data_limite":"2025-06-30","status":"ATIVO","observacoes":"Recomprar PETR4 se cair abaixo de R$ 34"},
+    {"usuario":"e2e_user","ativo_ticker":"VALE3","preco_alvo":58.00,"quantidade_desejada":100,"valor_total_planejado":5800.00,"data_limite":"2025-06-30","status":"ATIVO","observacoes":"Aumentar posição VALE3 na baixa"},
+    {"usuario":"e2e_user","ativo_ticker":"NVDA","preco_alvo":800.00,"quantidade_desejada":5,"valor_total_planejado":4000.00,"data_limite":"2025-12-31","status":"ATIVO","observacoes":"Comprar mais NVDA se corrigir"},
+    {"usuario":"e2e_user","ativo_ticker":"MXRF11","preco_alvo":10.00,"quantidade_desejada":500,"valor_total_planejado":5000.00,"data_limite":"2025-06-30","status":"PENDENTE","observacoes":"Reforçar posição FII Papel"}
   ],
   "planos_venda": [
-    {
-      "usuario": "e2e_user",
-      "ativo_ticker": "VALE3",
-      "preco_alvo": 75.0,
-      "percentual_venda": 50,
-      "quantidade_planejada": 100,
-      "data_limite": "2024-12-31",
-      "status": "ATIVO",
-      "observacoes": "Realizar lucro parcial em VALE3"
-    },
-    {
-      "usuario": "e2e_user",
-      "ativo_ticker": "HGLG11",
-      "preco_alvo": 195.0,
-      "percentual_venda": 100,
-      "quantidade_planejada": 50,
-      "data_limite": "2024-12-31",
-      "status": "ATIVO",
-      "observacoes": "Vender tudo se atingir teto"
-    }
+    {"usuario":"e2e_user","ativo_ticker":"NVDA","preco_alvo":1200.00,"percentual_venda":30,"quantidade_planejada":2,"data_limite":"2025-12-31","status":"ATIVO","observacoes":"Realizar lucro parcial NVDA se atingir $1.200"},
+    {"usuario":"e2e_user","ativo_ticker":"TSLA34","preco_alvo":110.00,"percentual_venda":50,"quantidade_planejada":25,"data_limite":"2025-06-30","status":"ATIVO","observacoes":"Vender metade BDR Tesla no teto"},
+    {"usuario":"e2e_user","ativo_ticker":"HGLG11","preco_alvo":200.00,"percentual_venda":100,"quantidade_planejada":40,"data_limite":"2025-12-31","status":"ATIVO","observacoes":"Vender tudo se P/VP > 1.10"}
   ],
   "historico_patrimonio": [
-    {
-      "usuario": "e2e_user",
-      "data": "2023-03-31",
-      "patrimonio_total": 0.00,
-      "patrimonio_renda_variavel": 0.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 0.00,
-      "observacoes": "Antes de iniciar investimentos"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2023-04-30",
-      "patrimonio_total": 0.00,
-      "patrimonio_renda_variavel": 0.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 0.00,
-      "observacoes": "Sem movimentações"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2023-05-31",
-      "patrimonio_total": 0.00,
-      "patrimonio_renda_variavel": 0.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 0.00,
-      "observacoes": "Sem movimentações"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2023-06-30",
-      "patrimonio_total": 0.00,
-      "patrimonio_renda_variavel": 0.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 0.00,
-      "observacoes": "Sem movimentações"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2023-07-31",
-      "patrimonio_total": 0.00,
-      "patrimonio_renda_variavel": 0.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 0.00,
-      "observacoes": "Sem movimentações"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2023-08-31",
-      "patrimonio_total": 0.00,
-      "patrimonio_renda_variavel": 0.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 0.00,
-      "observacoes": "Sem movimentações"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2023-09-30",
-      "patrimonio_total": 0.00,
-      "patrimonio_renda_variavel": 0.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 0.00,
-      "observacoes": "Sem movimentações"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2023-10-31",
-      "patrimonio_total": 0.00,
-      "patrimonio_renda_variavel": 0.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 0.00,
-      "observacoes": "Sem movimentações"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2023-11-30",
-      "patrimonio_total": 0.00,
-      "patrimonio_renda_variavel": 0.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 0.00,
-      "observacoes": "Sem movimentações"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2023-12-31",
-      "patrimonio_total": 0.00,
-      "patrimonio_renda_variavel": 0.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 0.00,
-      "observacoes": "Fim do ano - sem investimentos"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2024-01-31",
-      "patrimonio_total": 13455.00,
-      "patrimonio_renda_variavel": 3850.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 9605.00,
-      "observacoes": "Depósito inicial + primeira compra PETR4"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2024-02-29",
-      "patrimonio_total": 26495.00,
-      "patrimonio_renda_variavel": 17378.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 9117.00,
-      "observacoes": "Compra VALE3 - carteira diversificada"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2024-03-31",
-      "patrimonio_total": 35710.00,
-      "patrimonio_renda_variavel": 26593.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 9117.00,
-      "observacoes": "Compra HGLG11 - entrada em FIIs"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2024-04-30",
-      "patrimonio_total": 37205.00,
-      "patrimonio_renda_variavel": 28588.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 8617.00,
-      "observacoes": "Venda parcial PETR4 + saque R$ 500"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2024-05-31",
-      "patrimonio_total": 52450.00,
-      "patrimonio_renda_variavel": 43833.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 8617.00,
-      "observacoes": "Entrada em mercado US - AAPL e MSFT"
-    },
-    {
-      "usuario": "e2e_user",
-      "data": "2024-06-30",
-      "patrimonio_total": 58050.00,
-      "patrimonio_renda_variavel": 49433.00,
-      "patrimonio_renda_fixa": 0.00,
-      "saldo_caixa": 8617.00,
-      "observacoes": "Entrada em GDRs - TSLA34 e AAPL34"
-    }
+    {"usuario":"e2e_user","data":"2024-01-31","patrimonio_total":119452.00,"patrimonio_renda_variavel":97750.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":21702.00,"observacoes":"Aportes iniciais BRL — PETR4, ITUB4, HGLG11, BBDC4"},
+    {"usuario":"e2e_user","data":"2024-02-29","patrimonio_total":172815.00,"patrimonio_renda_variavel":128460.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":44355.00,"observacoes":"+ VALE3, WEGE3, KNRI11, MXRF11 + aporte USD Avenue"},
+    {"usuario":"e2e_user","data":"2024-03-31","patrimonio_total":188920.00,"patrimonio_renda_variavel":162300.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":26620.00,"observacoes":"+ AAPL, MSFT (US) + BBAS3, TAEE11 + proventos recebidos"},
+    {"usuario":"e2e_user","data":"2024-04-30","patrimonio_total":227350.00,"patrimonio_renda_variavel":192800.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":34550.00,"observacoes":"+ TSLA34, AAPL34, MSFT34, GOOGL (INTL/US) + aporte BRL"},
+    {"usuario":"e2e_user","data":"2024-05-31","patrimonio_total":255680.00,"patrimonio_renda_variavel":226150.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":29530.00,"observacoes":"+ NVDA, AMZN (US) + AMZO34, GOGL34 (INTL) + aporte USD"},
+    {"usuario":"e2e_user","data":"2024-06-30","patrimonio_total":278900.00,"patrimonio_renda_variavel":248200.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":30700.00,"observacoes":"Venda PETR4 lucro + JPM, VTI, NVDC34 + proventos + saque"},
+    {"usuario":"e2e_user","data":"2024-07-31","patrimonio_total":301250.00,"patrimonio_renda_variavel":268400.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":32850.00,"observacoes":"Venda BBDC4 lucro + SCHD, O, DISB34 + aporte Nomad USD"},
+    {"usuario":"e2e_user","data":"2024-08-31","patrimonio_total":335100.00,"patrimonio_renda_variavel":296800.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":38300.00,"observacoes":"Venda VALE3 prejuízo + PLD, COCA34, IVVB11 + aporte BRL"},
+    {"usuario":"e2e_user","data":"2024-09-30","patrimonio_total":348750.00,"patrimonio_renda_variavel":312500.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":36250.00,"observacoes":"Venda WEGE3/MXRF11 prejuízo + EURP11, IVVB11 + aporte USD"},
+    {"usuario":"e2e_user","data":"2024-10-31","patrimonio_total":342800.00,"patrimonio_renda_variavel":295600.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":47200.00,"observacoes":"Vendas PETR4/ITUB4/TSLA34/AAPL lote grande (IR gerado) + aporte BRL"},
+    {"usuario":"e2e_user","data":"2024-11-30","patrimonio_total":338450.00,"patrimonio_renda_variavel":286900.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":51550.00,"observacoes":"Vendas MSFT/HGLG11/DISB34/GOOGL + DARF pago R$ 685.50"},
+    {"usuario":"e2e_user","data":"2024-12-31","patrimonio_total":330200.00,"patrimonio_renda_variavel":278800.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":51400.00,"observacoes":"Vendas KNRI11/NVDA/BBAS3/GOGL34 + saque R$ 5K + DARF R$ 76 + proventos"}
   ]
 }

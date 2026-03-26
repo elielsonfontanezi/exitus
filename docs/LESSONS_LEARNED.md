@@ -399,6 +399,59 @@ def gerar_calendario(usuario_id, meses_futuros=12):
 
 **Sintoma relacionado:** Frontend esperava `data.calendario` mas recebia `data` direto, causando undefined no Alpine.js.
 
+---
+
+## 🌐 Frontend Templates
+
+### L-FE-004 — Token JWT expira durante navegação → 500 Internal Server Error
+**Origem:** EXITUS-FRONTEND-001 | **Data:** 26/03/2026
+
+```python
+# ❌ ERRADO — Token fixo na sessão, sem renovação
+headers = {'Authorization': f"Bearer {session.get('access_token')}"}
+# API retorna 401 → dashboard_data vazio → template quebra
+
+# ✅ CORRETO — Helper com refresh automático
+def get_api_headers():
+    if token_expirado_soon():
+        new_token = refresh_token()
+        session['access_token'] = new_token
+    return {'Authorization': f'Bearer {new_token}'}
+```
+
+**Problema:** Token JWT expirava na sessão, API retornava 401, `dashboard_data` ficava vazio e template tentava acessar `dashboard.resumo.patrimonio_total`, gerando `jinja2.exceptions.UndefinedError`.
+
+**Solução:**
+- Implementar `get_api_headers()` com verificação de expiração
+- Renovar token 5 minutos antes de expirar
+- Tratar 401/403 com redirect para login
+- Usar `.get()` com valores padrão nos templates
+
+**Template defensivo:**
+```jinja2
+# ❌ ERRADO — Quebra se dashboard estiver vazio
+R$ {{ "%.2f"|format(dashboard.resumo.patrimonio_total) }}
+
+# ✅ CORRETO — Resiliente a dados ausentes
+R$ {{ "%.2f"|format(dashboard.get('resumo', {}).get('patrimonio_total', 0)) }}
+```
+
+---
+
+### L-FE-005 — TypeError: unhashable type: 'slice' em Jinja2
+**Origem:** EXITUS-FRONTEND-001 | **Data:** 26/03/2026
+
+```python
+# ❌ ERRADO — Slice em template não funciona com todos tipos
+{% for tx in transacoes[:10] %}  # TypeError se transacoes não for list
+
+# ✅ CORRETO — Limitar no Python antes do template
+transacoes = list(data)[:10] if data else []
+{% for tx in transacoes %}
+```
+
+**Regra:** Sempre processar dados (slices, filtros) no Python, passar dados prontos para o template.
+
 **Regra:** APIs de geração automática devem persistir resultados. Frontend deve consumir contrato exato da API. Testes devem validar persistência e contrato.
 
 ### L-API-001 — Endpoint de listagem usa envelope de paginação aninhado

@@ -290,7 +290,7 @@ class ScenarioLoader:
                 nome=corretora_data['nome'],
                 usuario_id=usuario_id,
                 pais=corretora_data.get('pais', 'BR'),
-                moeda_padrao='BRL',
+                moeda_padrao=corretora_data.get('moeda_padrao', 'BRL'),
                 saldo_atual=Decimal('0.00'),
                 ativa=corretora_data.get('ativa', True)
             )
@@ -378,9 +378,9 @@ class ScenarioLoader:
             
             # Calcular valores do provento
             valor_por_acao = Decimal(str(prov_data['valor_unitario']))
-            quantidade_ativos = Decimal('100')  # Quantidade padrão para seed
+            quantidade_ativos = Decimal(str(prov_data.get('quantidade_ativos', 100)))
             valor_bruto = valor_por_acao * quantidade_ativos
-            imposto_retido = Decimal('0.00')  # Sem IR para simplificar
+            imposto_retido = Decimal(str(prov_data.get('imposto_retido', 0)))
             valor_liquido = valor_bruto - imposto_retido
             
             provento = Provento(
@@ -441,7 +441,7 @@ class ScenarioLoader:
                 assessora_id=assessora_id,
                 tipo_movimentacao=tipo_map.get(mov_data['tipo'], TipoMovimentacao.DEPOSITO),
                 valor=Decimal(str(mov_data['valor'])),
-                moeda='BRL',
+                moeda=mov_data.get('moeda', 'BRL'),
                 data_movimentacao=datetime.strptime(mov_data['data_movimentacao'], '%Y-%m-%d').date(),
                 descricao=mov_data.get('observacoes')
             )
