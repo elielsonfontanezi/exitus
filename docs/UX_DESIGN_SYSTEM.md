@@ -1,9 +1,9 @@
 # 🎨 UX Design System - Exitus
 
 > **Consolidado de:** UX_MODERNIZACAO.md + UX_IMPLEMENTACAO_WEEK1.md + UX_BENCHMARKING.md  
-> **Data:** 25/03/2026  
-> **Status:** ✅ **Dashboard com Novos Cards Implementados**  
-> **Implementação:** ✅ Loading Skeleton, Tooltips, Ações Rápidas, Meta Patrimônio, Benchmark, Próximos Proventos, Calendário, Cash Flow, Setores, Fiscal, Recomendações, Proventos 12M, Rentabilidade Total
+> **Data:** 26/03/2026  
+> **Status:** ✅ **Frontend Corrigido — Token Refresh + Templates Resilientes**  
+> **Implementação:** ✅ Loading Skeleton, Tooltips, Ações Rápidas, Meta Patrimônio, Benchmark, Próximos Proventos, Calendário, Cash Flow, Setores, Fiscal, Recomendações, Proventos 12M, Rentabilidade Total, Refresh Token Automático
 > 
 > **📌 IMPORTANTE:** Verifique **UX_PLANO_EXECUCAO.md** para a metodologia de implementação interativa!
 

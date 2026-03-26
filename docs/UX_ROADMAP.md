@@ -46,7 +46,8 @@ Código Frontend
 
 ### 📊 **Progresso da Validação:**
 ```
-████████░░ 80% - 4/5 Blocos validados
+█████████░ 90% - 4.5/5 Blocos validados
+✅ Frontend Corrigido (26/03/2026): Token refresh + templates resilientes
 ```
 
 ### 📱 **Status de Testes por Componente:**
