@@ -8,6 +8,24 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — Geração Automática de Posições (26/03/2026)
+
+**Artefatos modificados:**
+- `backend/reset_and_seed.py` - Adicionado _seed_transacoes() e _processar_posicoes_apos_transacoes()
+- `backend/app/models/transacao.py` - Adicionado método save() com hook automático
+- `backend/app/services/posicao_service.py` - Serviço existente utilizado para processamento
+
+**Mudanças:**
+- **🔄 Hook Automático:** Método save() em Transacao atualiza posições automaticamente
+- **📊 Seed Completo:** reset_and_seed.py agora cria transações E gera posições
+- **✅ Dashboard Consistente:** Sempre exibe dados corretos após seed ou nova transação
+- **🎯 Teste Validado:** Nova compra de 100 PETR4 atualizou 30 posições automaticamente
+
+**Testes:**
+- `reset_and_seed.py --clean --scenario test_full` cria 30 posições
+- Nova transação via API atualiza posições automaticamente
+- Dashboard exibe R$ 257.677,50 com dados corretos
+
 ### Fixed — Reset Completo do test_full.json (26/03/2026)
 
 **Artefatos modificados:**

@@ -2,8 +2,8 @@
 
 > **Consolidado de:** UX_MODERNIZACAO.md + UX_IMPLEMENTACAO_WEEK1.md + UX_BENCHMARKING.md  
 > **Data:** 26/03/2026  
-> **Status:** ✅ **Dashboard Completo — Dados Corretos + UX Moderna**  
-> **Implementação:** ✅ Loading Skeleton, Tooltips, Ações Rápidas, Meta Patrimônio, Benchmark, Próximos Proventos, Calendário, Cash Flow, Setores, Fiscal, Recomendações, Proventos 12M, Rentabilidade Total, Refresh Token Automático, Dados Reais (R$ 249.907,10)
+> **Status:** ✅ **Dashboard Completo — Posições Automáticas + UX Moderna**  
+> **Implementação:** ✅ Loading Skeleton, Tooltips, Ações Rápidas, Meta Patrimônio, Benchmark, Próximos Proventos, Calendário, Cash Flow, Setores, Fiscal, Recomendações, Proventos 12M, Rentabilidade Total, Refresh Token Automático, Hook Transacoes, Seed Completo, Dados Reais (R$ 257.677,50)
 > 
 > **📌 IMPORTANTE:** Verifique **UX_PLANO_EXECUCAO.md** para a metodologia de implementação interativa!
 

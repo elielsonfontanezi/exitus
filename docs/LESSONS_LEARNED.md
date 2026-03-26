@@ -476,6 +476,40 @@ posicoes_usuario = Posicao.query.filter_by(usuario_id=usuario_id).all()
 
 **Regra:** Dashboard do usuário = visão consolidada de todos os investimentos, não apenas por assessora.
 
+---
+
+### L-BE-007 — Posições não são geradas automaticamente ao criar transações
+**Origem:** EXITUS-POSITIONS-001 | **Data:** 26/03/2026
+
+```python
+# ❌ PROBLEMA — Criar transação não atualiza posições
+transacao = Transacao(...)
+db.session.add(transacao)
+db.session.commit()
+# Resultado: Dashboard continua zerado (posições não existem)
+
+# ✅ SOLUÇÃO 1 — Hook automático no modelo
+def save(self):
+    """Salva transação e atualiza posições automaticamente"""
+    db.session.add(self)
+    db.session.commit()
+    PosicaoService.calcular_posicoes(self.usuario_id)
+
+# ✅ SOLUÇÃO 2 — Processamento no seed
+def _processar_posicoes_apos_transacoes(self, transacoes_data):
+    """Processa posições após criar transações"""
+    for username in usuarios_unicos:
+        resultado = PosicaoService.calcular_posicoes(usuario.id)
+```
+
+**Problema:** Sistema criava transações mas não gerava posições automaticamente, causando dashboard zerado mesmo após `reset_and_seed.py`.
+
+**Solução Híbrida:**
+1. **Hook no Modelo:** `Transacao.save()` atualiza posições automaticamente (operações do dia a dia)
+2. **Seed Completo:** `reset_and_seed.py` processa posições após criar transações (carga inicial)
+
+**Regra:** Toda transação deve gerar/atualizar posição correspondente automaticamente.
+
 **Regra:** APIs de geração automática devem persistir resultados. Frontend deve consumir contrato exato da API. Testes devem validar persistência e contrato.
 
 ### L-API-001 — Endpoint de listagem usa envelope de paginação aninhado

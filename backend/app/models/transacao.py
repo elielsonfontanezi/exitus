@@ -105,6 +105,22 @@ class Transacao(db.Model):
                 f'{self.ativo.ticker if self.ativo else "?"} '
                 f'{self.data_transacao.date()}>')
 
+    def save(self):
+        """Salva transação e atualiza posições automaticamente"""
+        from app.services.posicao_service import PosicaoService
+        
+        # Salvar transação
+        db.session.add(self)
+        db.session.commit()
+        
+        # Atualizar posições do usuário
+        try:
+            resultado = PosicaoService.calcular_posicoes(self.usuario_id)
+            print(f"✅ Posições atualizadas: {resultado}")
+        except Exception as e:
+            print(f"⚠️  Erro ao atualizar posições: {e}")
+            # Não falhar se posições não puderem ser atualizadas
+    
     def to_dict(self):
         """Serializa transação para dict."""
         return {

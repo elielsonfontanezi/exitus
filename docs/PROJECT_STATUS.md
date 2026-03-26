@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 26/03/2026  
-> **Status:** ✅ **DASHBOARD CORRIGIDO — Exibe R$ 249.907,10 (vs R$ 0,00)**  
-> **Versão:** v0.9.7
+> **Status:** ✅ **POSIÇÕES GERADAS AUTOMATICAMENTE — Dashboard sempre consistente**  
+> **Versão:** v0.9.8
 
 ---
 
