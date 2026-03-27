@@ -95,6 +95,42 @@ Maio 2026:
 
 ---
 
+## 🎨 Frontend — Integração API-Driven (Nova Fase)
+
+**Status:** 📋 Planejamento | **Início:** 27/03/2026 | **Duração:** 8 semanas
+
+### Objetivo
+Integrar sistematicamente as **156 APIs do backend** com o frontend, criando jornadas completas de usuário.
+
+### Estratégia
+- **API-Driven Development:** Cada tela consome APIs existentes
+- **User-Centric:** Priorização por valor ao usuário
+- **Progressive:** Implementação incremental (8 sprints)
+
+### Roadmap de Sprints
+
+| Sprint | Foco | APIs | Telas | Status |
+|--------|------|------|-------|--------|
+| **1-2** | Operações | 25 | Compra, Venda, Import | 📋 |
+| **3-4** | Análises | 30 | Gráficos, Evolução | 📋 |
+| **5** | Rendimentos | 15 | Proventos, Calendário | 📋 |
+| **6** | Fiscal | 20 | IR, DARF | 📋 |
+| **7** | Portfolio | 20 | Carteiras, Posições | 📋 |
+| **8** | Config | 10 | Alertas, Preferências | 📋 |
+
+### Documentação
+- **FRONTEND_INTEGRATION_PLAN.md** — Estratégia completa
+- **API_FRONTEND_MAPPING.md** — Mapeamento API ↔ Tela
+- **UX_DESIGN_SYSTEM.md** — Componentes visuais
+
+### Progresso Atual
+- ✅ Dashboard: 8/8 APIs integradas (100%)
+- ⏳ Operações: 2/25 APIs integradas (8%)
+- ⏳ Análises: 1/30 APIs integradas (3%)
+- **Total:** 12/143 APIs integradas (8%)
+
+---
+
 ## 🔮 Backend — Fase 8: Futuro
 
 | GAP ID | Funcionalidade | Status |
