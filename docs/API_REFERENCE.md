@@ -22,6 +22,8 @@
 - 18. Cotações
 - 19. Projeções
 - 20. Performance
+- 21. Reconciliação
+- 22. Calendário de Dividendos
 - Health Checks
 
 ---
@@ -48,7 +50,7 @@ Obter Token:
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "senha123"}'
+  -d '{"username": "e2e_admin", "password": "e2e_senha_123"}'
 ```
 
 Expiry: 1 hora (3600 segundos).
@@ -108,7 +110,7 @@ Autentica usuário e retorna token JWT.
 
 Request:
 ```json
-{"username": "admin", "password": "senha123"}
+{"username": "e2e_admin", "password": "e2e_senha_123"}
 ```
 
 Response 200:
@@ -206,11 +208,118 @@ Para referência completa dos enums, consulte `ENUMS.md`.
 
 ## 5. Portfólios
 APIs de dashboard, alocação, performance e carteiras customizadas:
-- `GET /api/portfolio/dashboard`
+- `GET /api/portfolios/dashboard` - Dashboard consolidado com dados por mercado
 - `GET /api/portfolio/alocacao`
 - `GET /api/portfolio/performance`
 - `GET /api/portfolio/evolucao`
 - CRUD de `/api/portfolios`
+
+### GET /api/portfolios/dashboard
+Retorna dashboard consolidado do portfólio com agrupamento por mercado (BR, US, INTL).
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "resumo": {
+      "patrimonio_total": 68450.00,
+      "rentabilidade_geral": 12.5,
+      "total_portfolios": 3,
+      "total_posicoes": 25
+    },
+    "por_mercado": {
+      "BR": {
+        "patrimonio": 50000.00,
+        "percentual": 73.08,
+        "rentabilidade": 15.2,
+        "top_ativos": [
+          {
+            "ticker": "PETR4",
+            "nome": "Petrobras PN",
+            "tipo": "acao",
+            "valor": 12500.00,
+            "rentabilidade": 18.5
+          }
+        ]
+      },
+      "US": {
+        "patrimonio": 15000.00,
+        "percentual": 21.92,
+        "rentabilidade": 8.3,
+        "top_ativos": []
+      },
+      "INTL": {
+        "patrimonio": 3450.00,
+        "percentual": 5.04,
+        "rentabilidade": 5.1,
+        "top_ativos": []
+      }
+    },
+    "alocacao_geografica": {
+      "BR": 73.08,
+      "US": 21.92,
+      "INTL": 5.04
+    },
+    "evolucao": []
+  },
+  "message": "Dashboard gerado com sucesso"
+}
+```
+
+**Notas:**
+- Todos os valores em BRL (conversão automática via CambioService)
+- `top_ativos`: até 5 maiores posições por mercado
+- `evolucao`: histórico patrimonial (futuro)
+- Mercados: BR (Brasil), US (Estados Unidos), INTL (Europa/Ásia/Global)
+
+### GET /api/portfolios/evolucao
+Retorna evolução do patrimônio ao longo do tempo usando snapshots mensais.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+- `meses` — Número de meses a retornar (opcional)
+  - `0` ou ausente = todo histórico disponível (recomendado para dashboard)
+  - `N > 0` = últimos N meses
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "evolucao": [
+      {
+        "data": "2024-04-30",
+        "valor": 37205.00
+      },
+      {
+        "data": "2024-05-31",
+        "valor": 52450.00
+      },
+      {
+        "data": "2024-06-30",
+        "valor": 58050.00
+      }
+    ]
+  },
+  "message": "Evolução de 12 meses calculada"
+}
+```
+
+**Notas:**
+- Baseado na tabela `historico_patrimonio` com snapshots mensais
+- Retorna apenas meses com dados disponíveis
+- Ordenado cronologicamente (mais antigo para mais recente)
+- Útil para gráficos de evolução patrimonial no dashboard
 
 ---
 
@@ -334,6 +443,33 @@ Response 200:
 ## 7. Transações
 Filtros e payload mantidos — `tipo` usa Enum TipoTransacao
 (ex.: `COMPRA`, `VENDA`, `DIVIDENDO`, `JCP`, etc.).
+
+### GET /api/transacoes/recentes
+**Dashboard v2** - Retorna últimas transações do usuário.
+
+Query params:
+- `limit` (int, default: 5) - Número máximo de transações
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "ativo_ticker": "PETR4",
+        "tipo": "COMPRA",
+        "quantidade": 100,
+        "preco_unitario": 38.50,
+        "valor_total": 3850.00,
+        "data_operacao": "2026-03-20"
+      }
+    ]
+  },
+  "message": "5 transação(ões) recente(s)"
+}
+```
 
 ---
 
@@ -752,8 +888,471 @@ Engine de apuração mensal de IR sobre renda variável.
 
 ---
 
-*Documento atualizado: 03 de Março de 2026*
+## 21. Rentabilidade (EXITUS-RENTABILIDADE-001)
+
+**Auth:** Bearer JWT obrigatório.  
+**Resposta:** envelope padrão `{"success": true, "data": {...}}`.
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/portfolios/rentabilidade` | Calcula TWR, MWR/XIRR e comparação com benchmark |
+
+**Query params:**
+
+| Parâmetro | Valores aceitos | Default |
+|-----------|----------------|---------|
+| `periodo` | `1m`, `3m`, `6m`, `12m`, `24m`, `ytd`, `max` | `12m` |
+| `benchmark` | `CDI`, `IBOV`, `IFIX`, `IPCA6`, `SP500` | `CDI` |
+
+**Exemplo:**
+```bash
+GET /api/portfolios/rentabilidade?periodo=6m&benchmark=CDI
+```
+
+**Resposta:**
+```json
+{
+  "success": true,
+  "data": {
+    "periodo": "6m",
+    "data_inicio": "2025-09-08",
+    "data_fim": "2026-03-08",
+    "dias": 181,
+    "twr": 0.1234,
+    "twr_percentual": 12.34,
+    "mwr": 0.1189,
+    "mwr_percentual": 11.89,
+    "benchmark": {
+      "nome": "CDI",
+      "retorno": 0.0672,
+      "retorno_percentual": 6.72
+    },
+    "alpha": 0.0562,
+    "alpha_percentual": 5.62,
+    "total_fluxos": 3
+  }
+}
+```
+
+**Observações:**
+- **TWR** (Time-Weighted Return): remove efeito de aportes/resgates. Padrão GIPS.
+- **MWR** (Money-Weighted Return / XIRR): TIR considerando fluxo de caixa real do investidor.
+- **CDI**: calculado via `parametros_macro.taxa_livre_risco` (dias úteis/252).
+- **IBOV/IFIX/SP500**: retorno via `historico_preco` dos ativos BOVA11/IFIX11/IVVB11.
+- **IPCA6**: IPCA (`parametros_macro.inflacao_anual`) + 6% a.a.
+
+---
+
+## 21. Reconciliação (EXITUS-RECONCILIACAO-001)
+
+**Auth:** Bearer JWT obrigatório.  
+**Resposta:** envelope padrão.
+
+Endpoints para verificação de consistência entre dados calculados e importados.
+
+### GET /api/reconciliacao/verificar
+
+Executa verificação completa de reconciliação (posições, saldos, integridade).
+
+**Resposta:**
+```json
+{
+  "status": "OK",
+  "divergencias": [],
+  "resumo": {
+    "total_divergencias": 0,
+    "erros": 0,
+    "avisos": 0
+  }
+}
+```
+
+**Status possíveis:**
+- `OK`: Nenhuma divergência encontrada
+- `WARNING`: Divergências menores (custos, saldos com tolerância)
+- `ERROR`: Divergências críticas (quantidade de posições)
+
+**Exemplo com divergências:**
+```json
+{
+  "status": "ERROR",
+  "divergencias": [
+    {
+      "tipo": "POSICAO_QUANTIDADE",
+      "severidade": "ERROR",
+      "ativo_ticker": "PETR4",
+      "corretora_nome": "Clear",
+      "quantidade_posicao": 100.0,
+      "quantidade_calculada": 150.0,
+      "diferenca": 50.0,
+      "mensagem": "Divergência de quantidade: PETR4 na Clear"
+    }
+  ],
+  "resumo": {
+    "total_divergencias": 1,
+    "erros": 1,
+    "avisos": 0
+  }
+}
+```
+
+### GET /api/reconciliacao/posicoes
+
+Verifica apenas reconciliação de posições (quantidade e custo).
+
+**Resposta:**
+```json
+{
+  "divergencias": [
+    {
+      "tipo": "POSICAO_CUSTO",
+      "severidade": "WARNING",
+      "ativo_ticker": "VALE3",
+      "corretora_nome": "XP",
+      "custo_posicao": 5000.0,
+      "custo_calculado": 5050.0,
+      "diferenca": 50.0,
+      "mensagem": "Divergência de custo: VALE3"
+    }
+  ],
+  "total": 1
+}
+```
+
+### GET /api/reconciliacao/saldos
+
+Verifica saldos de corretoras vs soma de movimentações de caixa.
+
+**Resposta:**
+```json
+{
+  "divergencias": [
+    {
+      "tipo": "SALDO_CORRETORA",
+      "severidade": "WARNING",
+      "corretora_nome": "Clear",
+      "saldo_registrado": 10000.0,
+      "saldo_calculado": 9950.0,
+      "diferenca": 50.0,
+      "mensagem": "Divergência de saldo na corretora Clear"
+    }
+  ],
+  "total": 1
+}
+```
+
+### GET /api/reconciliacao/integridade
+
+Verifica integridade geral de transações (sem ativo, duplicadas, quantidade zero).
+
+**Resposta:**
+```json
+{
+  "divergencias": [
+    {
+      "tipo": "TRANSACAO_DUPLICADA",
+      "severidade": "WARNING",
+      "hash_importacao": "a1b2c3d4e5f6...",
+      "quantidade": 2,
+      "mensagem": "2 transações com mesmo hash de importação"
+    }
+  ],
+  "total": 1
+}
+```
+
+### GET /api/reconciliacao/ativo/{ativo_id}
+
+Verifica reconciliação de um ativo específico.
+
+**Query params:**
+- `corretora_id` (opcional): Filtrar por corretora específica
+
+**Resposta:**
+```json
+{
+  "ativo_id": "uuid-do-ativo",
+  "corretoras": [
+    {
+      "corretora_id": "uuid-corretora",
+      "corretora_nome": "Clear",
+      "quantidade_posicao": 100.0,
+      "quantidade_calculada": 100.0,
+      "diferenca": 0.0,
+      "status": "OK"
+    }
+  ],
+  "divergencias": []
+}
+```
+
+**Tolerâncias:**
+- Quantidade: 0.01 (arredondamento)
+- Custos/Saldos: R$ 1,00
+
+---
+
+## 22. Importação B3 (EXITUS-VALIDATION-001)
+
+**Auth:** Bearer JWT obrigatório.  
+**Resposta:** envelope padrão.
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/api/import/movimentacoes` | Importa movimentações B3 (proventos, eventos de custódia) |
+| POST | `/api/import/negociacoes` | Importa negociações B3 (compras e vendas) |
+
+**Body (multipart/form-data):**
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `file` | File | Arquivo `.xlsx` ou `.csv` exportado do Portal B3 |
+| `dry_run` | bool | `true` = preview sem persistir (default: `false`) |
+
+**Resposta importação movimentações:**
+```json
+{
+  "success": true,
+  "data": {
+    "proventos": {
+      "sucesso": 12,
+      "erros": 0,
+      "duplicatas_ignoradas": 3,
+      "duplicatas_lista": ["Duplicata ignorada: PETR4 em 2025-03-15 (hash=a1b2c3d4...)"]
+    },
+    "ativos_criados": 2,
+    "corretoras_criadas": 0,
+    "dry_run": false
+  }
+}
+```
+
+**Comportamento de idempotência:**
+- Hash MD5 calculado por linha (`arquivo_origem + conteúdo`) — reimportar o mesmo arquivo é bloqueado.
+- Arquivos distintos com mesmo conteúdo geram hashes diferentes (arquivo faz parte da chave).
+- Campos de texto sanitizados: tags HTML removidas, caracteres de controle Unicode removidos.
+
+---
+
+## 22. Calendário de Dividendos
+
+Gerenciamento de calendário de proventos futuros para planejamento de fluxo de caixa.
+
+### 22.1 Listar Calendário
+
+**GET** `/calendario-dividendos/`
+
+Lista itens do calendário com filtros opcionais.
+
+**Parâmetros Query:**
+- `data_inicio` (string, opcional): Data inicial no formato YYYY-MM-DD
+- `data_fim` (string, opcional): Data final no formato YYYY-MM-DD
+- `ativo_id` (UUID, opcional): ID do ativo específico
+- `ticker` (string, opcional): Código do ticker para filtrar (ex: PETR4)
+- `dias` (int, opcional): Dias a partir de hoje para filtrar eventos futuros
+- `limit` (int, opcional): Limite máximo de itens retornados (default: 100)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "calendario": [
+      {
+        "id": "uuid",
+        "ativo_id": "uuid",
+        "usuario_id": "uuid",
+        "data_esperada": "2026-04-15",
+        "tipo_provento": "dividendo",
+        "yield_estimado": 0.05,
+        "valor_estimado": 150.00,
+        "quantidade": 100,
+        "status": "previsto",
+        "observacoes": null,
+        "data_pagamento": null,
+        "valor_real": null,
+        "created_at": "2026-03-10T17:00:00",
+        "updated_at": "2026-03-10T17:00:00",
+        "ativo": {
+          "ticker": "PETR4",
+          "nome": "Petrobras"
+        }
+      }
+    ],
+    "total": 1
+  },
+  "message": "1 itens encontrados"
+}
+```
+
+### 22.2 Criar Item
+
+**POST** `/calendario-dividendos/`
+
+Cria novo item no calendário.
+
+**Request Body:**
+```json
+{
+  "ativo_id": "uuid",
+  "usuario_id": "uuid",
+  "data_esperada": "2026-04-15",
+  "tipo_provento": "dividendo",
+  "yield_estimado": 0.05,
+  "valor_estimado": 150.00,
+  "quantidade": 100,
+  "status": "previsto",
+  "observacoes": "Provento Q2-2026"
+}
+```
+
+### 22.3 Gerar Calendário Automático
+
+**POST** `/calendario-dividendos/gerar`
+
+Gera calendário automático baseado em posições e histórico.
+
+**Request Body:**
+```json
+{
+  "usuario_id": "uuid",
+  "meses_futuros": 12,
+  "ativo_id": "uuid"  // opcional
+}
+```
+
+### 22.4 Resumo do Calendário
+
+**GET** `/calendario-dividendos/resumo`
+
+Retorna estatísticas agregadas do calendário.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "total_itens": 10,
+    "valor_total_estimado": 1500.00,
+    "valor_total_real": 800.00,
+    "resumo_mensal": {
+      "2026-04": {
+        "valor_estimado": 500.00,
+        "valor_real": 300.00,
+        "quantidade": 3
+      }
+    },
+    "resumo_ativos": {
+      "PETR4": {
+        "valor_estimado": 800.00,
+        "valor_real": 500.00,
+        "quantidade": 5
+      }
+    }
+  }
+}
+```
+
+### 22.5 Confirmar Pagamento
+
+**POST** `/calendario-dividendos/{id}/confirmar-pagamento`
+
+Confirma pagamento real de um provento.
+
+**Request Body:**
+```json
+{
+  "data_pagamento": "2026-04-15",
+  "valor_real": 155.50
+}
+```
+
+### 22.6 Outros Endpoints
+
+- **GET** `/calendario-dividendos/{id}` - Buscar item específico
+- **PUT** `/calendario-dividendos/{id}` - Atualizar item
+- **DELETE** `/calendario-dividendos/{id}` - Excluir item
+
+**Status Possíveis:**
+- `previsto` - Provento estimado
+- `confirmado` - Empresa confirmou data/valor
+- `atrasado` - Data passou, não pago ainda
+- `pago` - Pagamento realizado
+
+**Tipos de Provento:**
+- `dividendo` - Dividendos
+- `jcp` - Juros sobre Capital Próprio
+- `rendimento` - Rendimentos (FIIs)
+- `cupom` - Cupoms (Renda Fixa)
+- `bonificacao` - Bonificações em ações
+- `direito_sub` - Direito de subscrição
+- `outro` - Outros tipos
+
+---
+
+## 23. Carteira (Dashboard v2)
+
+**Base URL**: `/api/carteira`  
+**Auth**: Bearer JWT obrigatório
+
+### GET /api/carteira/saldo-caixa
+Retorna saldo disponível em caixa do usuário com suporte a múltiplas moedas.
+
+Query params:
+- `moeda` (string, default: BRL) - Moeda para exibição (BRL ou USD)
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": {
+    "saldo_brl": 12450.00,
+    "saldo_usd": 2280.50,
+    "saldo_total_brl": 24896.73,
+    "moeda_exibicao": "BRL",
+    "taxa_cambio": 5.46
+  },
+  "message": "Saldo em caixa obtido com sucesso"
+}
+```
+
+---
+
+## 24. Alertas (Dashboard v2)
+
+**Base URL**: `/api/alertas`  
+**Auth**: Bearer JWT obrigatório
+
+### GET /api/alertas/recentes
+Retorna alertas disparados recentemente.
+
+Query params:
+- `limit` (int, default: 5) - Número máximo de alertas
+
+Response 200:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "nome": "Dividendo PETR4",
+      "tipo": "dividendo",
+      "mensagem": "R$ 0,85 por ação",
+      "data": "2026-03-18T10:30:00"
+    }
+  ],
+  "message": "3 alerta(s) recente(s)"
+}
+```
+
+---
+
+*Documento atualizado: 21 de Março de 2026*
 *Versão da API: v0.8.0-dev*
 *GAPs fechados: EXITUS-POS-001→007, EXITUS-ATIVOS-ENUM-001, EXITUS-POS-PAGIN-001,*
 *EXITUS-PROV-SLASH-001, EXITUS-BUYSIG-SCORE-001, EXITUS-ALERTAS-RESP-001, EXITUS-COTACOES-RESP-001,*
-*EXITUS-SQLALCHEMY-001, EXITUS-CRUD-001, EXITUS-IR-001, EXITUS-EXPORT-001*
+*EXITUS-SQLALCHEMY-001, EXITUS-CRUD-001, EXITUS-IR-001, EXITUS-EXPORT-001,*
+*EXITUS-VALIDATION-001, EXITUS-RENTABILIDADE-001, EXITUS-SERVICE-REVIEW-001, EXITUS-COVERAGE-001,*
+*EXITUS-DOCS-SYNC-001, EXITUS-AUDITLOG-001, EXITUS-RECONCILIACAO-001, EXITUS-DIVCALENDAR-001*
+*Dashboard v2: CARTEIRA-001, ALERTAS-RECENTES-001, TRANSACOES-RECENTES-001*

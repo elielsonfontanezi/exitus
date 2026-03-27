@@ -20,39 +20,46 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# --- Rota de Teste - Novo Dashboard UX ---
+@bp.route('/novo', methods=['GET'])
+@login_required
+def dashboard_novo():
+    """Dashboard Novo - Estilo Investidor10"""
+    return render_template('dashboard/dashboard_novo.html')
+
 # --- Rota Principal (Home) ---
 @bp.route('/', methods=['GET'])
 @login_required
 def index():
-    """Dashboard Principal (Home) - Integrado M7"""
+    """Dashboard Multi-Mercado - Fase 1 Sprint 1.2"""
     token = session.get('access_token')
 
     # Estrutura padrão (zerada) para evitar erros no template
     dados = {
-        "patrimonio_total": 0.0,
-        "rentabilidade_geral": 0.0,
-        "total_portfolios": 0,
-        "total_ativos": 0,
-        "alocacao": {},
-        "evolucao": [],
-        "ultimas_transacoes": []
+        "resumo": {
+            "patrimonio_total": 0.0,
+            "rentabilidade_geral": 0.0,
+            "total_portfolios": 0,
+            "total_posicoes": 0
+        },
+        "por_mercado": {
+            "BR": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
+            "US": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
+            "INTL": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []}
+        },
+        "alocacao_geografica": {"BR": 0.0, "US": 0.0, "INTL": 0.0},
+        "evolucao": []
     }
 
     if token:
         try:
             headers = {'Authorization': f'Bearer {token}'}
 
-            # Chamada A: Resumo Portfolio
+            # Chamada: Dashboard com dados por mercado
             resp_dash = requests.get(f'{Config.BACKEND_API_URL}/api/portfolios/dashboard', headers=headers, timeout=5)
             if resp_dash.status_code == 200:
                 data = resp_dash.json().get('data', {})
-                resumo = data.get('resumo', {})
-                dados.update({
-                    "patrimonio_total": resumo.get('patrimonio_total', 0.0),
-                    "rentabilidade_geral": resumo.get('rentabilidade_geral', 0.0),
-                    "total_portfolios": resumo.get('total_portfolios', 0),
-                    "total_ativos": resumo.get('total_posicoes', 0)
-                })
+                dados = data
 
         except Exception as e:
             print(f"Erro no dashboard home: {e}")
@@ -91,6 +98,33 @@ def buy_signals():
             print(f"Erro buy-signals: {e}")
     
     return render_template('dashboard/buy_signals.html', signals=signals)
+
+
+@bp.route('/buy-signals/analisar/<ticker>')
+@login_required
+def analisar_ativo(ticker):
+    """API para análise individual de ativo - proxy para backend"""
+    token = session.get('access_token')
+    
+    if not token:
+        return {'success': False, 'message': 'Não autenticado'}, 401
+    
+    try:
+        headers = {'Authorization': f'Bearer {token}'}
+        response = requests.get(
+            f'{Config.BACKEND_API_URL}/api/buy-signals/analisar/{ticker}',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {'success': False, 'message': 'Ativo não encontrado ou sem dados suficientes'}, 404
+            
+    except Exception as e:
+        print(f"Erro ao analisar ativo {ticker}: {e}")
+        return {'success': False, 'message': 'Erro ao comunicar com backend'}, 500
 
 
 @bp.route('/portfolios')
@@ -868,6 +902,132 @@ def alerts_delete(alert_id):
     requests.delete(f'{Config.BACKEND_API_URL}/api/alertas/{alert_id}', headers=headers)
     return redirect(url_for('dashboard.alerts'))
 
+# --- Rotas de Planos de Compra (Fase 3 Sprint 3.2) ---
+@bp.route('/planos-compra')
+@login_required
+def planos_compra():
+    """Lista de Planos de Compra"""
+    token = session.get('access_token')
+    planos = []
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/plano-compra/', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                planos = data.get('data', [])
+                # Calcular progresso percentual para cada plano
+                for plano in planos:
+                    quantidade_alvo = float(plano.get('quantidade_alvo', 0))
+                    quantidade_acumulada = float(plano.get('quantidade_acumulada', 0))
+                    if quantidade_alvo > 0:
+                        plano['progresso_percentual'] = (quantidade_acumulada / quantidade_alvo) * 100
+                    else:
+                        plano['progresso_percentual'] = 0
+        except Exception as e:
+            print(f"Erro ao buscar planos de compra: {e}")
+    
+    return render_template('dashboard/planos_compra.html', planos=planos)
+
+
+@bp.route('/planos-compra/novo')
+@login_required
+def planos_compra_novo():
+    """Formulário de Novo Plano de Compra"""
+    token = session.get('access_token')
+    ativos = []
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/ativos', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                ativos = data.get('data', {}).get('ativos', [])
+        except Exception as e:
+            print(f"Erro ao buscar ativos: {e}")
+    
+    return render_template('dashboard/planos_compra_novo.html', ativos=ativos)
+
+
+@bp.route('/planos-compra/<plano_id>')
+@login_required
+def planos_compra_detalhes(plano_id):
+    """Detalhes do Plano de Compra"""
+    token = session.get('access_token')
+    plano = None
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/plano-compra/{plano_id}', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                plano = data.get('data')
+                # Calcular progresso
+                if plano:
+                    quantidade_alvo = float(plano.get('quantidade_alvo', 0))
+                    quantidade_acumulada = float(plano.get('quantidade_acumulada', 0))
+                    if quantidade_alvo > 0:
+                        plano['progresso_percentual'] = (quantidade_acumulada / quantidade_alvo) * 100
+                    else:
+                        plano['progresso_percentual'] = 0
+        except Exception as e:
+            print(f"Erro ao buscar plano: {e}")
+            flash('Plano não encontrado.', 'error')
+            return redirect(url_for('dashboard.planos_compra'))
+    
+    if not plano:
+        flash('Plano não encontrado.', 'error')
+        return redirect(url_for('dashboard.planos_compra'))
+    
+    return render_template('dashboard/planos_compra_detalhes.html', plano=plano)
+
+
+@bp.route('/planos-compra/<plano_id>/editar')
+@login_required
+def planos_compra_editar(plano_id):
+    """Editar Plano de Compra"""
+    token = session.get('access_token')
+    plano = None
+    ativos = []
+    
+    if token:
+        # Buscar plano
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/plano-compra/{plano_id}', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                plano = data.get('data')
+        except Exception as e:
+            print(f"Erro ao buscar plano: {e}")
+            flash('Plano não encontrado.', 'error')
+            return redirect(url_for('dashboard.planos_compra'))
+        
+        # Buscar ativos
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/ativos', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                ativos = data.get('data', {}).get('ativos', [])
+        except Exception as e:
+            print(f"Erro ao buscar ativos: {e}")
+    
+    if not plano:
+        flash('Plano não encontrado.', 'error')
+        return redirect(url_for('dashboard.planos_compra'))
+    
+    return render_template('dashboard/planos_compra_novo.html', plano=plano, ativos=ativos)
+
+
 # ✅ ADICIONAR NO FINAL (usando bp Blueprint)
 @bp.route('/movimentacoes')
 @login_required
@@ -908,3 +1068,144 @@ def dashboard_movimentacoes():
         total_movimentacoes=total,
         page_title="Movimentações - Exitus"
     )
+
+
+# --- Análise de Ativos (NOVO) ---
+@bp.route('/ativo/<ticker>')
+@login_required
+def ativo_detalhes(ticker):
+    """Análise detalhada de ativo - Fase 1 Sprint 1.3"""
+    token = session.get('access_token')
+    ativo = None
+    
+    if token:
+        try:
+            headers = {'Authorization': f'Bearer {token}'}
+            response = requests.get(f'{Config.BACKEND_API_URL}/api/ativos/ticker/{ticker}', headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                ativo = data.get('data')
+            else:
+                flash('Ativo não encontrado.', 'error')
+                return redirect(url_for('dashboard.index'))
+        except Exception as e:
+            print(f'Erro ao buscar ativo: {e}')
+            flash('Erro ao carregar dados do ativo.', 'error')
+            return redirect(url_for('dashboard.index'))
+    
+    if not ativo:
+        flash('Ativo não encontrado.', 'error')
+        return redirect(url_for('dashboard.index'))
+    
+    return render_template('dashboard/ativo_detalhes.html', ativo=ativo)
+
+
+# --- Performance e Rentabilidade (NOVO) ---
+@bp.route('/performance')
+@login_required
+def performance():
+    """Performance e Rentabilidade - Fase 1 Sprint 1.4"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/performance.html')
+
+
+# --- Gestão de Proventos (NOVO) ---
+@bp.route('/proventos-calendario')
+@login_required
+def proventos_calendario():
+    """Gestão de Proventos - Fase 1 Sprint 1.5"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/proventos_calendario.html')
+
+
+# --- Alocação e Rebalanceamento (NOVO) ---
+@bp.route('/alocacao')
+@login_required
+def alocacao():
+    """Alocação e Rebalanceamento - Fase 2 Sprint 2.1"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/alocacao.html')
+
+
+# --- Fluxo de Caixa (NOVO) ---
+@bp.route('/fluxo-caixa')
+@login_required
+def fluxo_caixa():
+    """Fluxo de Caixa - Fase 2 Sprint 2.2"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/fluxo_caixa.html')
+
+
+# --- Imposto de Renda (NOVO) ---
+@bp.route('/imposto-renda')
+@login_required
+def imposto_renda():
+    """Imposto de Renda - Fase 2 Sprint 2.3"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/imposto_renda.html')
+
+
+# --- Central de Alertas (NOVO) ---
+@bp.route('/alertas')
+@login_required
+def alertas():
+    """Central de Alertas - Fase 2 Sprint 2.4"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/alertas.html')
+
+
+# --- Comparador de Ativos (NOVO) ---
+@bp.route('/comparador')
+@login_required
+def comparador():
+    """Comparador de Ativos - Fase 3 Sprint 3.1"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/comparador.html')
+
+
+
+
+# --- Planos de Venda Disciplinada (NOVO) ---
+@bp.route('/planos-venda')
+@login_required
+def planos_venda():
+    """Planos de Venda Disciplinada - Fase 3 Sprint 3.3"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/planos_venda.html')
+
+
+# --- Educação e Insights (NOVO) ---
+@bp.route('/educacao')
+@login_required
+def educacao():
+    """Educação e Insights - Fase 3 Sprint 3.4"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/educacao.html')
+
+
+# --- Configurações (NOVO) ---
+@bp.route('/configuracoes')
+@login_required
+def configuracoes():
+    """Configurações - Fase 3 Sprint 3.5"""
+    token = session.get('access_token')
+    
+    return render_template('dashboard/configuracoes.html')
+
+
+# --- UX Test - Design System (TEMPORÁRIO) ---
+@bp.route('/ux-test')
+@login_required
+def ux_test():
+    """Página de teste do Design System Moderno - Week 1"""
+    return render_template('dashboard/ux_test.html')

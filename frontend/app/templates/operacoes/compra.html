@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Nova Compra - Exitus{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h4 mb-1">➕ Nova Compra</h2>
+                    <p class="text-muted mb-0">Comprar ativos para sua carteira</p>
+                </div>
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                    ← Voltar
+                </a>
+            </div>
+
+            <!-- Formulário -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="formCompra">
+                        <!-- Seleção de Ativo -->
+                        <div class="mb-4">
+                            <label for="ativo_id" class="form-label fw-semibold">
+                                📈 Ativo <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="ativo_id" name="ativo_id" required>
+                                <option value="">Selecione um ativo...</option>
+                                {% for ativo in ativos %}
+                                <option value="{{ ativo.id }}" 
+                                        data-ticker="{{ ativo.ticker }}"
+                                        data-nome="{{ ativo.nome }}"
+                                        data-tipo="{{ ativo.tipo.value if ativo.tipo else '' }}">
+                                    {{ ativo.ticker }} - {{ ativo.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                Busque o ativo que deseja comprar
+                            </div>
+                        </div>
+
+                        <!-- Quantidade e Preço -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="quantidade" class="form-label fw-semibold">
+                                    📊 Quantidade <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="quantidade" 
+                                       name="quantidade" 
+                                       min="1" 
+                                       step="0.01"
+                                       required>
+                                <div class="form-text">
+                                    Quantidade de ativos a comprar
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="preco" class="form-label fw-semibold">
+                                    💰 Preço Unitário <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="preco" 
+                                       name="preco" 
+                                       min="0.01" 
+                                       step="0.01"
+                                       required>
+                                <div class="form-text">
+                                    Preço por unidade
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Corretora -->
+                        <div class="mb-4">
+                            <label for="corretora_id" class="form-label fw-semibold">
+                                🏢 Corretora <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="corretora_id" name="corretora_id" required>
+                                <option value="">Selecione a corretora...</option>
+                                {% for corretora in corretoras %}
+                                <option value="{{ corretora.id }}">
+                                    {{ corretora.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Resumo da Operação -->
+                        <div class="alert alert-light">
+                            <h6 class="alert-heading">📋 Resumo da Operação</h6>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <strong>Ativo:</strong> <span id="resumo-ativo">-</span><br>
+                                    <strong>Quantidade:</strong> <span id="resumo-quantidade">-</span><br>
+                                    <strong>Preço Unitário:</strong> R$ <span id="resumo-preco">-</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Valor Total:</strong> R$ <span id="resumo-total" class="fs-5 text-primary">0,00</span><br>
+                                    <strong>Corretora:</strong> <span id="resumo-corretora">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                💰 Confirmar Compra
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formCompra');
+    const ativoSelect = document.getElementById('ativo_id');
+    const quantidadeInput = document.getElementById('quantidade');
+    const precoInput = document.getElementById('preco');
+    const corretoraSelect = document.getElementById('corretora_id');
+    
+    // Atualizar resumo em tempo real
+    function atualizarResumo() {
+        const ativoOption = ativoSelect.options[ativoSelect.selectedIndex];
+        const quantidade = parseFloat(quantidadeInput.value) || 0;
+        const preco = parseFloat(precoInput.value) || 0;
+        const total = quantidade * preco;
+        
+        // Atualizar texto do resumo
+        document.getElementById('resumo-ativo').textContent = 
+            ativoOption.dataset.ticker ? `${ativoOption.dataset.ticker} - ${ativoOption.dataset.nome}` : '-';
+        document.getElementById('resumo-quantidade').textContent = quantidade ? quantidade.toLocaleString('pt-BR') : '-';
+        document.getElementById('resumo-preco').textContent = preco ? preco.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : '-';
+        document.getElementById('resumo-total').textContent = total.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        
+        const corretoraOption = corretoraSelect.options[corretoraSelect.selectedIndex];
+        document.getElementById('resumo-corretora').textContent = corretoraOption.text || '-';
+    }
+    
+    // Adicionar event listeners
+    ativoSelect.addEventListener('change', atualizarResumo);
+    quantidadeInput.addEventListener('input', atualizarResumo);
+    precoInput.addEventListener('input', atualizarResumo);
+    corretoraSelect.addEventListener('change', atualizarResumo);
+    
+    // Validação do formulário
+    form.addEventListener('submit', function(e) {
+        const quantidade = parseFloat(quantidadeInput.value);
+        const preco = parseFloat(precoInput.value);
+        
+        if (!quantidade || quantidade <= 0) {
+            e.preventDefault();
+            alert('Por favor, informe uma quantidade válida.');
+            return;
+        }
+        
+        if (!preco || preco <= 0) {
+            e.preventDefault();
+            alert('Por favor, informe um preço válido.');
+            return;
+        }
+        
+        const total = quantidade * preco;
+        if (confirm(`Confirmar compra no valor total de R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}?`)) {
+            // Submit
+        } else {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,37 +1,98 @@
 {% extends "base.html" %}
 {% block title %}Proventos - Exitus{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
 {% block content %}
-<div class="container mx-auto p-6 space-y-6">
+<div class="min-h-screen bg-gray-50" 
+     x-data="dividendsData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
   <!-- Header -->
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900">
-        <i class="fas fa-hand-holding-usd text-green-600 mr-3"></i>Proventos
-      </h1>
-      <p class="text-gray-600 mt-1">Dividendos, JCP e Rendimentos recebidos</p>
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Proventos</h1>
+          <p class="text-xl opacity-90">Dividendos, JCP e Rendimentos recebidos</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10 hover:border-white/50">
+            <i class="fas fa-arrow-left mr-2"></i>Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-    <div class="card p-6 text-center hover:shadow-xl">
-      <div class="text-3xl font-bold text-blue-600 mb-2">{{ stats.total }}</div>
-      <div class="text-sm text-gray-600 uppercase">Total Proventos</div>
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Total Proventos -->
+      <div class="card card-elevated animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-hand-holding-usd text-blue-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <h3 class="h3 mb-2">{{ stats.total }}</h3>
+          <p class="text-gray-600">Total Proventos</p>
+        </div>
+      </div>
+
+      <!-- Recebido -->
+      <div class="card card-elevated animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <h3 class="h3 mb-2">R$ {{ "%.2f"|format(stats.recebido) }}</h3>
+          <p class="text-gray-600">Recebido</p>
+        </div>
+      </div>
+
+      <!-- A Receber -->
+      <div class="card card-elevated animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-clock text-orange-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <h3 class="h3 mb-2">R$ {{ "%.2f"|format(stats.previsto) }}</h3>
+          <p class="text-gray-600">A Receber</p>
+        </div>
+      </div>
+
+      <!-- Total Geral -->
+      <div class="card card-elevated animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-chart-line text-emerald-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+          <h3 class="h3 mb-2">R$ {{ "%.2f"|format(stats.total_geral) }}</h3>
+          <p class="text-gray-600">Total Geral</p>
+        </div>
+      </div>
     </div>
-    <div class="card p-6 text-center hover:shadow-xl">
-      <div class="text-3xl font-bold text-green-600 mb-2">R$ {{ "%.2f"|format(stats.recebido) }}</div>
-      <div class="text-sm text-gray-600 uppercase">Recebido</div>
-    </div>
-    <div class="card p-6 text-center hover:shadow-xl">
-      <div class="text-3xl font-bold text-orange-600 mb-2">R$ {{ "%.2f"|format(stats.previsto) }}</div>
-      <div class="text-sm text-gray-600 uppercase">A Receber</div>
-    </div>
-    <div class="card p-6 text-center hover:shadow-xl">
-      <div class="text-3xl font-bold text-emerald-600 mb-2">R$ {{ "%.2f"|format(stats.total_geral) }}</div>
-      <div class="text-sm text-gray-600 uppercase">Total Geral</div>
-    </div>
-  </div>
 
   <!-- Filtros -->
   <div class="card p-6">
@@ -142,6 +203,7 @@
   </div>
 </div>
 
+<script src="/static/js/dividends.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){

@@ -2,7 +2,7 @@
 echo "🔄 Exitus Backend - Rebuild SEGURO (preserva banco)"
 
 # 1. Libera a porta 5000 antes de começar (Evita o erro de 'bind')
-sudo fuser -k 5000/tcp 2>/dev/null || true
+fuser -k 5000/tcp 2>/dev/null || true
 
 # 2. Build com formato Docker e SEM cache para garantir as libs novas
 

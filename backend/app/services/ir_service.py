@@ -31,6 +31,7 @@ from app.models.ativo import Ativo, TipoAtivo
 from app.models.corretora import Corretora
 from app.models.posicao import Posicao
 from app.models.saldo_prejuizo import SaldoPrejuizo
+from app.models.saldo_darf_acumulado import SaldoDarfAcumulado
 from app.models.regra_fiscal import RegraFiscal
 from app.utils.exceptions import BusinessRuleError
 
@@ -77,6 +78,41 @@ TABELA_REGRESSIVA_RF = [
     (720, Decimal('0.175')),   # 361–720 dias
 ]  # >720 dias → 15%
 ALIQUOTA_RF_MINIMA = Decimal('0.150')
+
+# Tabela regressiva IOF sobre rendimentos de RF (art. 7º do Decreto 6.306/2007)
+# Índice = dias corridos desde a aplicação (1 a 29); dia 0 e >=30 → 0%
+TABELA_IOF_REGRESSIVA = [
+    Decimal('0'),    # dia 0  → 0% (não se aplica)
+    Decimal('0.96'), # dia 1  → 96%
+    Decimal('0.93'), # dia 2  → 93%
+    Decimal('0.90'), # dia 3  → 90%
+    Decimal('0.86'), # dia 4  → 86%
+    Decimal('0.83'), # dia 5  → 83%
+    Decimal('0.80'), # dia 6  → 80%
+    Decimal('0.76'), # dia 7  → 76%
+    Decimal('0.73'), # dia 8  → 73%
+    Decimal('0.70'), # dia 9  → 70%
+    Decimal('0.66'), # dia 10 → 66%
+    Decimal('0.63'), # dia 11 → 63%
+    Decimal('0.60'), # dia 12 → 60%
+    Decimal('0.56'), # dia 13 → 56%
+    Decimal('0.53'), # dia 14 → 53%
+    Decimal('0.50'), # dia 15 → 50%
+    Decimal('0.46'), # dia 16 → 46%
+    Decimal('0.43'), # dia 17 → 43%
+    Decimal('0.40'), # dia 18 → 40%
+    Decimal('0.36'), # dia 19 → 36%
+    Decimal('0.33'), # dia 20 → 33%
+    Decimal('0.30'), # dia 21 → 30%
+    Decimal('0.26'), # dia 22 → 26%
+    Decimal('0.23'), # dia 23 → 23%
+    Decimal('0.20'), # dia 24 → 20%
+    Decimal('0.16'), # dia 25 → 16%
+    Decimal('0.13'), # dia 26 → 13%
+    Decimal('0.10'), # dia 27 → 10%
+    Decimal('0.06'), # dia 28 →  6%
+    Decimal('0.03'), # dia 29 →  3%
+]  # dia 30+ → 0%
 
 
 # ---------------------------------------------------------------------------
@@ -198,6 +234,24 @@ def _aliquota_rf(prazo_dias: int) -> Decimal:
         if prazo_dias <= limite:
             return aliquota
     return ALIQUOTA_RF_MINIMA
+
+
+def _calcular_iof(prazo_dias: int, rendimento: Decimal) -> Decimal:
+    """
+    Calcula IOF sobre rendimento de RF conforme tabela regressiva
+    (art. 7º do Decreto 6.306/2007).
+
+    Args:
+        prazo_dias: número de dias corridos entre aplicação e resgate
+        rendimento: rendimento bruto da operação (base de cálculo)
+
+    Returns:
+        Decimal com o valor de IOF devido (zero se prazo >= 30 dias ou rendimento <= 0)
+    """
+    if prazo_dias >= 30 or rendimento <= 0:
+        return Decimal('0')
+    aliquota = TABELA_IOF_REGRESSIVA[prazo_dias] if prazo_dias < len(TABELA_IOF_REGRESSIVA) else Decimal('0')
+    return (rendimento * aliquota).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
 
 def _custo_medio(compras: list) -> Decimal:
@@ -433,7 +487,7 @@ class IRService:
         ir_total    = ir_swing + ir_dt + ir_fii + ir_exterior + ir_rf
 
         # DARF
-        darf = IRService._calcular_darf(ir_swing + ir_dt + ir_fii, ir_exterior, ir_rf)
+        darf = IRService._calcular_darf(usuario_id, mes_str, ir_swing + ir_dt + ir_fii, ir_exterior, ir_rf, persist)
 
         # Alertas
         alertas = []
@@ -447,8 +501,7 @@ class IRService:
             alertas.extend(res.pop('_alertas_pm', []))
         if res_swing.get('isento'):
             alertas.append(f"Vendas de ações em {mes_str} abaixo de R$20.000 — isento de IR (swing trade).")
-        if ir_total < DARF_MINIMO and ir_total > 0:
-            alertas.append(f"IR total R${ir_total:.2f} abaixo do mínimo de DARF (R$10,00) — acumular para mês seguinte.")
+        # Alerta de DARF < R$10 removido - agora é tratado por acúmulo automático
 
         # Serializar por_corretora
         corretoras_lista = [
@@ -763,6 +816,7 @@ class IRService:
                 'rendimento_bruto': 0.0,
                 'ir_devido':        Decimal('0'),
                 'ir_retido':        0.0,
+                'iof_devido':       0.0,
                 'aliquota_media':   0.0,
                 'operacoes':        0,
                 'isento':           True,
@@ -774,6 +828,7 @@ class IRService:
         total_rendimento = Decimal('0')
         total_ir_devido  = Decimal('0')
         total_ir_retido  = Decimal('0')
+        total_iof        = Decimal('0')
         alertas_pm       = []
         detalhes         = []
 
@@ -790,6 +845,7 @@ class IRService:
                     'aliquota':  0.0,
                     'ir_devido': 0.0,
                     'ir_retido': float(ir_retido_op),
+                    'iof_devido': 0.0,
                     'prazo_dias': None,
                     'isento':    True,
                     'motivo_isencao': 'LCI/LCA — isento PF (Lei 12.431)',
@@ -821,10 +877,14 @@ class IRService:
             if rendimento > 0:
                 ir_op = (rendimento * aliquota).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
+            # IOF regressivo (art. 7º Decreto 6.306/2007) — só para prazo < 30 dias
+            iof_op = _calcular_iof(prazo_dias, rendimento) if rendimento > 0 else Decimal('0')
+
             total_resgatado  += valor_resgate
             total_rendimento += rendimento
             total_ir_devido  += ir_op
             total_ir_retido  += ir_retido_op
+            total_iof        += iof_op
 
             detalhes.append({
                 'ticker':    ticker,
@@ -833,6 +893,7 @@ class IRService:
                 'aliquota':  float(aliquota * 100),
                 'ir_devido': float(ir_op),
                 'ir_retido': float(ir_retido_op),
+                'iof_devido': float(iof_op),
                 'prazo_dias': prazo_dias,
                 'isento':    False,
                 'motivo_isencao': None,
@@ -848,6 +909,7 @@ class IRService:
             'rendimento_bruto': float(total_rendimento.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
             'ir_devido':        total_ir_devido,
             'ir_retido':        float(total_ir_retido.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+            'iof_devido':       float(total_iof.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
             'aliquota_media':   aliquota_media,
             'operacoes':        len(resgates),
             'isento':           total_ir_devido == Decimal('0'),
@@ -860,38 +922,140 @@ class IRService:
     # -----------------------------------------------------------------------
 
     @staticmethod
-    def _calcular_darf(ir_br: Decimal, ir_exterior: Decimal, ir_rf: Decimal = Decimal('0')) -> dict:
-        """Monta resumo de DARF a pagar."""
+    def _calcular_darf(usuario_id: str, mes_str: str, ir_br: Decimal, ir_exterior: Decimal, ir_rf: Decimal = Decimal('0'), persist: bool = True) -> dict:
+        """
+        Monta resumo de DARF a pagar com acúmulo de valores < R$10,00.
+        
+        Args:
+            usuario_id: ID do usuário
+            mes_str: Mês no formato YYYY-MM
+            ir_br: IR de renda variável BR
+            ir_exterior: IR de renda variável exterior
+            ir_rf: IR de renda fixa (retido na fonte)
+            persist: Se True, persiste saldos acumulados
+            
+        Returns:
+            dict com lista de DARFs
+        """
         darfs = []
-
+        mes_ant = _mes_anterior(*_parse_mes(mes_str))
+        
+        # Processar IR BR (swing + day trade + FIIs)
         if ir_br > 0:
-            darfs.append({
-                'codigo_receita': DARF_SWING_ACAO,
-                'descricao':      'Ganho de capital — renda variável BR (ações, FIIs, day-trade)',
-                'valor':          float(ir_br.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
-                'pagar':          ir_br >= DARF_MINIMO,
-                'obs':            None if ir_br >= DARF_MINIMO else f'Abaixo do mínimo (R$10,00) — acumular',
-            })
-
+            saldo_acumulado = IRService._processar_acumulo_darf(
+                usuario_id, mes_str, mes_ant, 'swing_acoes', DARF_SWING_ACAO, ir_br, persist
+            )
+            if saldo_acumulado['valor_pagar'] > 0:
+                darfs.append({
+                    'codigo_receita': DARF_SWING_ACAO,
+                    'descricao': 'Ganho de capital — renda variável BR (ações, FIIs, day-trade)',
+                    'valor': float(saldo_acumulado['valor_pagar'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                    'pagar': True,
+                    'obs': saldo_acumulado.get('obs'),
+                })
+        
+        # Processar IR Exterior
         if ir_exterior > 0:
-            darfs.append({
-                'codigo_receita': DARF_RENDA_FIXA,
-                'descricao':      'Ganho de capital — renda variável exterior',
-                'valor':          float(ir_exterior.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
-                'pagar':          ir_exterior >= DARF_MINIMO,
-                'obs':            None if ir_exterior >= DARF_MINIMO else f'Abaixo do mínimo (R$10,00) — acumular',
-            })
-
+            saldo_acumulado = IRService._processar_acumulo_darf(
+                usuario_id, mes_str, mes_ant, 'exterior', DARF_RENDA_FIXA, ir_exterior, persist
+            )
+            if saldo_acumulado['valor_pagar'] > 0:
+                darfs.append({
+                    'codigo_receita': DARF_RENDA_FIXA,
+                    'descricao': 'Ganho de capital — renda variável exterior',
+                    'valor': float(saldo_acumulado['valor_pagar'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                    'pagar': True,
+                    'obs': saldo_acumulado.get('obs'),
+                })
+        
+        # IR RF é sempre informativo (retido na fonte)
         if ir_rf > 0:
             darfs.append({
                 'codigo_receita': DARF_RENDA_FIXA,
-                'descricao':      'IR renda fixa — tabela regressiva (retido na fonte)',
-                'valor':          float(ir_rf.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
-                'pagar':          False,
-                'obs':            'Retido na fonte pela instituição financeira — informativo',
+                'descricao': 'IR renda fixa — tabela regressiva (retido na fonte)',
+                'valor': float(ir_rf.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+                'pagar': False,
+                'obs': 'Retido na fonte pela instituição financeira — informativo',
             })
-
-        return darfs
+        
+        return {'darfs': darfs}
+    
+    @staticmethod
+    def _processar_acumulo_darf(usuario_id: str, mes_atual: str, mes_anterior: str, categoria: str, codigo_receita: str, ir_mes: Decimal, persist: bool) -> dict:
+        """
+        Processa acúmulo de DARF para valores < R$10,00.
+        
+        Returns:
+            dict com:
+            - valor_pagar: Valor a pagar neste mês (0 se < R$10)
+            - obs: Observação sobre acúmulo
+        """
+        # Buscar saldo acumulado do mês anterior
+        saldo_anterior = SaldoDarfAcumulado.query.filter_by(
+            usuario_id=usuario_id,
+            categoria=categoria,
+            codigo_receita=codigo_receita,
+            ano_mes=mes_anterior
+        ).first()
+        
+        valor_anterior = saldo_anterior.saldo if saldo_anterior else Decimal('0')
+        valor_total = valor_anterior + ir_mes
+        
+        if valor_total < DARF_MINIMO:
+            # Ainda abaixo do mínimo - acumular
+            valor_pagar = Decimal('0')
+            obs = f'Abaixo do mínimo (R$10,00) — acumulado: R${valor_total:.2f}'
+            
+            # Persistir acumulado do mês atual
+            if persist:
+                saldo_atual = SaldoDarfAcumulado.query.filter_by(
+                    usuario_id=usuario_id,
+                    categoria=categoria,
+                    codigo_receita=codigo_receita,
+                    ano_mes=mes_atual
+                ).first()
+                
+                if saldo_atual:
+                    saldo_atual.saldo = valor_total
+                else:
+                    saldo_atual = SaldoDarfAcumulado(
+                        usuario_id=usuario_id,
+                        categoria=categoria,
+                        codigo_receita=codigo_receita,
+                        ano_mes=mes_atual,
+                        saldo=valor_total
+                    )
+                    db.session.add(saldo_atual)
+        else:
+            # Alcançou ou ultrapassou o mínimo - pagar tudo
+            valor_pagar = valor_total
+            obs = None if valor_anterior == 0 else f'Inclui acumulado de meses anteriores: R${valor_anterior:.2f}'
+            
+            # Zerar saldo acumulado (já pago)
+            if persist:
+                saldo_atual = SaldoDarfAcumulado.query.filter_by(
+                    usuario_id=usuario_id,
+                    categoria=categoria,
+                    codigo_receita=codigo_receita,
+                    ano_mes=mes_atual
+                ).first()
+                
+                if saldo_atual:
+                    saldo_atual.saldo = Decimal('0')
+                else:
+                    saldo_atual = SaldoDarfAcumulado(
+                        usuario_id=usuario_id,
+                        categoria=categoria,
+                        codigo_receita=codigo_receita,
+                        ano_mes=mes_atual,
+                        saldo=Decimal('0')
+                    )
+                    db.session.add(saldo_atual)
+        
+        return {
+            'valor_pagar': valor_pagar,
+            'obs': obs
+        }
 
     # -----------------------------------------------------------------------
     # Histórico

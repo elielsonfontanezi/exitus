@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% block title %}Educação e Insights{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" 
+     x-data="educacaoData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Hero Section Ultra-Moderna -->
+  <section class="bg-gradient-hero rounded-3xl mx-6 mt-6 p-8 text-white shadow-large animate-fade-in relative overflow-hidden">
+    <!-- Elementos Decorativos -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
+    
+    <div class="relative z-10">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse-slow">
+              <span class="text-3xl">🎓</span>
+            </div>
+            <div>
+              <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                Educação
+              </h1>
+              <p class="text-xl text-white/80">Aprenda e tome decisões mais inteligentes</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-8 lg:mt-0 lg:ml-8">
+          <div class="flex flex-wrap gap-3">
+            <a href="/dashboard/" class="btn-secundario">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Voltar
+            </a>
+            {% include 'components/forms/currency_toggle.html' %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Hero Section -->
+    <div class="card card-gradient-primary mb-8">
+      <div class="p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div>
+            <h2 class="text-3xl font-bold text-white mb-4">Centro de Aprendizado</h2>
+            <p class="text-lg text-white opacity-90 mb-6">
+              Acesse conteúdo exclusivo, análises de especialistas e ferramentas educacionais 
+              para potencializar seus investimentos.
+            </p>
+            <div class="flex flex-wrap gap-4">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-white">50+ artigos</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                <span class="text-white">20 vídeos</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span class="text-white">15 e-books</span>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-2">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+              <p class="text-white font-semibold">Fundamentos</p>
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-2">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <p class="text-white font-semibold">Análises</p>
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-2">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+              <p class="text-white font-semibold">Estratégias</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Abas -->
+    <div class="card card-elevated mb-8">
+      <div class="border-b border-gray-200">
+        <nav class="flex -mb-px">
+          <button @click="abaAtiva = 'artigos'" :class="abaAtiva === 'artigos' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+            Artigos
+          </button>
+          <button @click="abaAtiva = 'videos'" :class="abaAtiva === 'videos' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            Vídeos
+          </button>
+          <button @click="abaAtiva = 'cursos'" :class="abaAtiva === 'cursos' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+            Cursos
+          </button>
+          <button @click="abaAtiva = 'calculadoras'" :class="abaAtiva === 'calculadoras' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            Calculadoras
+          </button>
+        </nav>
+      </div>
+
+      <!-- Conteúdo das Abas -->
+      <div class="p-6">
+        <!-- Artigos -->
+        <div x-show="abaAtiva === 'artigos'" x-transition>
+          <div class="mb-6">
+            <div class="flex items-center justify-between">
+              <h3 class="h3">Artigos Educativos</h3>
+              <div class="flex gap-2">
+                <select x-model="filtroCategoria" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                  <option value="">Todas categorias</option>
+                  <option value="fundamentos">Fundamentos</option>
+                  <option value="analise">Análise Técnica</option>
+                  <option value="estrategias">Estratégias</option>
+                  <option value="macro">Macroeconomia</option>
+                </select>
+                <select x-model="ordenarPor" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                  <option value="recentes">Mais recentes</option>
+                  <option value="populares">Mais populares</option>
+                  <option value="lidos">Mais lidos</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <template x-for="artigo in artigosFiltrados" :key="artigo.id">
+              <div class="card card-elevated hover:shadow-lg transition-shadow cursor-pointer" @click="abrirArtigo(artigo)">
+                <div class="aspect-w-16 aspect-h-9 bg-gray-200 rounded-t-lg overflow-hidden">
+                  <img :src="artigo.imagem" :alt="artigo.titulo" class="w-full h-48 object-cover">
+                </div>
+                <div class="p-6">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="badge badge-primary" x-text="artigo.categoria"></span>
+                    <span class="text-xs text-gray-500" x-text="artigo.tempo_leitura + ' min'"></span>
+                  </div>
+                  <h4 class="font-semibold text-gray-900 mb-2" x-text="artigo.titulo"></h4>
+                  <p class="text-sm text-gray-600 mb-4" x-text="artigo.resumo"></p>
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                      <span class="text-xs text-gray-500" x-text="artigo.visualizacoes"></span>
+                    </div>
+                    <span class="text-xs text-gray-500" x-text="formatDate(artigo.data)"></span>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- Vídeos -->
+        <div x-show="abaAtiva === 'videos'" x-transition>
+          <div class="mb-6">
+            <h3 class="h3">Vídeos Educativos</h3>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <template x-for="video in videos" :key="video.id">
+              <div class="card card-elevated hover:shadow-lg transition-shadow cursor-pointer" @click="abrirVideo(video)">
+                <div class="relative">
+                  <img :src="video.thumbnail" :alt="video.titulo" class="w-full h-48 object-cover rounded-t-lg">
+                  <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-t-lg">
+                    <div class="w-16 h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                      <svg class="w-8 h-8 text-primary-600 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <span class="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded" x-text="video.duracao"></span>
+                </div>
+                <div class="p-6">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="badge badge-primary" x-text="video.categoria"></span>
+                    <span class="text-xs text-gray-500" x-text="video.duracao"></span>
+                  </div>
+                  <h4 class="font-semibold text-gray-900 mb-2" x-text="video.titulo"></h4>
+                  <p class="text-sm text-gray-600 mb-4" x-text="video.descricao"></p>
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                      <span class="text-xs text-gray-500" x-text="video.visualizacoes"></span>
+                    </div>
+                    <span class="text-xs text-gray-500" x-text="formatDate(video.data)"></span>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- Cursos -->
+        <div x-show="abaAtiva === 'cursos'" x-transition>
+          <div class="mb-6">
+            <h3 class="h3">Cursos e E-books</h3>
+          </div>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <template x-for="curso in cursos" :key="curso.id">
+              <div class="card card-elevated hover:shadow-lg transition-shadow">
+                <div class="p-6">
+                  <div class="flex gap-6">
+                    <div class="flex-shrink-0">
+                      <div class="w-24 h-24 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="badge badge-primary" x-text="curso.tipo"></span>
+                        <span class="badge badge-success" x-text="curso.nivel"></span>
+                      </div>
+                      <h4 class="font-semibold text-gray-900 mb-2" x-text="curso.titulo"></h4>
+                      <p class="text-sm text-gray-600 mb-4" x-text="curso.descricao"></p>
+                      <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-4 text-sm text-gray-500">
+                          <span x-text="curso.modulos + ' módulos'"></span>
+                          <span x-text="curso.duracao"></span>
+                        </div>
+                        <span class="font-semibold text-primary-600" x-text="curso.preco"></span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-primary-500 h-2 rounded-full" :style="`width: ${curso.progresso}%`"></div>
+                      </div>
+                      <p class="text-xs text-gray-500" x-text="curso.progresso + '% concluído'"></p>
+                    </div>
+                  </div>
+                  <div class="flex gap-2 mt-4">
+                    <button @click="continuarCurso(curso)" class="btn btn-primary flex-1">
+                      <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      Continuar
+                    </button>
+                    <button @click="verDetalhesCurso(curso)" class="btn btn-outline">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- Calculadoras -->
+        <div x-show="abaAtiva === 'calculadoras'" x-transition>
+          <div class="mb-6">
+            <h3 class="h3">Calculadoras Financeiras</h3>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <template x-for="calc in calculadoras" :key="calc.id">
+              <div class="card card-elevated hover:shadow-lg transition-shadow cursor-pointer" @click="abrirCalculadora(calc)">
+                <div class="p-6 text-center">
+                  <div class="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                  <h4 class="font-semibold text-gray-900 mb-2" x-text="calc.nome"></h4>
+                  <p class="text-sm text-gray-600" x-text="calc.descricao"></p>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insights Personalizados -->
+    <div class="card card-elevated">
+      <div class="p-6">
+        <h3 class="h3 mb-6">Insights Personalizados para Você</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Recomendação Baseada em Portfolio -->
+          <div class="bg-gradient-to-r from-primary-50 to-info-50 rounded-lg p-6">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Baseado no seu portfolio</h4>
+                <p class="text-sm text-gray-700 mb-3">Seu portfolio tem 65% em ações. Considere diversificar com FIIs para reduzir volatilidade.</p>
+                <button class="btn btn-primary btn-sm">Ver Análise</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Oportunidade Detectada -->
+          <div class="bg-gradient-to-r from-success-50 to-warning-50 rounded-lg p-6">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 bg-success-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Oportunidade detectada</h4>
+                <p class="text-sm text-gray-700 mb-3">Bancários em baixa histórica. ITUB4 e BBDC4 com potencial de recuperação de 20%.</p>
+                <button class="btn btn-success btn-sm">Analisar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Risco de Portfolio -->
+          <div class="bg-gradient-to-r from-warning-50 to-danger-50 rounded-lg p-6">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 bg-warning-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">Alerta de risco</h4>
+                <p class="text-sm text-gray-700 mb-3">Concentração elevada em PETR4 (35%). Considere reduzir para máximo 20%.</p>
+                <button class="btn btn-warning btn-sm">Ver Sugestões</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/educacao.js"></script>
+{% endblock %}

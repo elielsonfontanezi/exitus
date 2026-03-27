@@ -1,0 +1,205 @@
+# 🚀 Exitus — Roadmap de Implementação
+
+> **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
+> **Progresso:** 46/54 GAPs (85%) | **Testes:** 491/491 passing (100%) ✅ | **Endpoints:** 155 | **Versão:** v0.9.1
+
+---
+
+## 📊 Visão Geral
+
+```
+ Fase 1-2: Fundações ✅
+ Fase 3: Motor Fiscal ✅
+ Fase 4: Expansão ✅
+ Fase 5: Qualidade ✅
+ Fase 6: Infraestrutura ✅
+ Fase 7: Produção 🎯
+ Fase 8: Futuro 📋
+```
+
+### 🎯 O que está pronto
+
+| Componente | Status | Detalhes |
+|------------|--------|----------|
+| **Backend** | ✅ | 155 endpoints REST, Flask + SQLAlchemy |
+| **Banco** | ✅ | PostgreSQL, 23 tabelas, constraints robustas |
+| **Autenticação** | ✅ | JWT, 3 roles (ADMIN/USER/READONLY) |
+| **Motor Fiscal** | ✅ | IR completo, IOF, DARF, compensação |
+| **Importação** | ✅ | B3 Excel/CSV, 56 ativos seed |
+| **APIs** | ✅ | Cotações multi-provider, cache, circuit breaker |
+| **Exportação** | ✅ | CSV, Excel, JSON, PDF |
+| **Documentação** | ✅ | Swagger/OpenAPI auto-doc |
+| **Testes** | ✅ | 491 testes automatizados (100%) |
+
+---
+
+## 📋 Roadmap Detalhado
+
+### ✅ Fases Concluídas (1-6)
+
+| Fase | GAPs | Status | Data | Principais Entregas |
+|------|------|--------|------|-------------------|
+| **1** | Setup | ✅ | Fev/2026 | Infraestrutura base |
+| **2** | 9 GAPs | ✅ | Fev/2026 | Scripts, CRUD, Importação |
+| **3** | 13 GAPs | ✅ | Mar/2026 | Motor IR completo |
+| **4** | 9 GAPs | ✅ | Mar/2026 | APIs, Multi-moeda, Planos de Venda |
+| **5** | 6 GAPs | ✅ | 08/03/2026 | Rentabilidade, Qualidade |
+| **6** | 9 GAPs | ✅ | 09/03/2026 | IOF, Auditoria, Scripts |
+
+### 🎯 Fase 7 — Produção e Escala (Próxima)
+
+| GAP ID | Funcionalidade | Prioridade | Status | Data |
+|--------|---------------|------------|--------|------|
+| **MULTICLIENTE-001** | Multi-tenancy para assessoras | 🔴 Alta | 🟡 85% (16/03/2026) | Parte 3 em andamento |
+| **MONITOR-001** | Monitoramento e alertas | 🟡 Média | 📋 Planejado | - |
+| **RATELIMIT-001** | Rate limiting | 🟡 Média | 📋 Planejado | - |
+| **CICD-001** | CI/CD + deploy | 🟡 Média | 📋 Planejado | - |
+
+### 🔮 Fase 8 — Futuro
+
+| GAP ID | Funcionalidade | Status |
+|--------|---------------|--------|
+| REBALANCE-001 | Rebalanceamento automático | 📋 Planejado |
+| **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
+| DIVCALENDAR-001 | Calendário de dividendos | ✅ Concluído (10/03/2026) |
+| CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
+| BLUEPRINT-CONSOLIDATION-001 | Consolidação de blueprints | ✅ Concluído (10/03/2026) |
+| ORPHAN-001 | Limpeza de código órfão | ❌ Cancelado (arriscado) |
+
+---
+
+## 🏗️ Arquitetura Atual
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │    Backend      │    │   Banco dados   │
+│   (HTMX)        │◄──►│   (Flask)       │◄──►│  (PostgreSQL)   │
+│                 │    │                 │    │                 │
+│ - Tailwind CSS  │    │ - 155 endpoints  │    │ - 23 tabelas    │
+│ - JWT Auth      │    │ - SQLAlchemy    │    │ - Constraints   │
+│ - Swagger UI    │    │ - Redis cache   │    │ - Índices       │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │  Infraestrutura │
+                    │                 │
+                    │ - Podman 3x     │
+                    │ - Circuit Break │
+                    │ - Audit Logs    │
+                    └─────────────────┘
+```
+
+---
+
+## 📈 Métricas e KPIs
+
+| Métrica | Atual | Meta | Status |
+|---------|-------|------|--------|
+| **GAPs Concluídos** | 46/54 (85%) | 54/54 | ✅ Em dia |
+| **Testes Coletados** | 491 testes | 500+ | ✅ Quase lá |
+| **Testes Passando** | 491 (100%) | 480+ | ✅ Superou! |
+| **Testes Pendentes** | 0 (0 failed + 0 errors) | 0 | ✅ [Ver docs/TESTES_HISTORICO.md](TESTES_HISTORICO.md) |
+| **Cobertura** | ?% | 80%+ | ⚠️ Medir |
+| **Endpoints** | 155 | 150+ | ✅ Superou! |
+| **Ativos** | 56 | 100+ | ✅ Conforme |
+
+---
+
+## 🎯 Próximos Passos Imediatos
+
+### 1. MULTICLIENTE-001 (Prioridade 🔴)
+
+**Objetivo:** Transformar sistema single-tenant em multi-tenant para assessoras
+
+**Escopo:**
+- [ ] Adicionar `assessora_id` em todas as tabelas
+- [ ] Implementar row-level security
+- [ ] Migrar dados existentes
+- [ ] Atualizar todos os endpoints
+- [ ] Dashboard admin por assessora
+
+**Modelo IA:** Claude Sonnet (complexidade moderada-alta)
+
+---
+
+## 📝 Decisões Arquiteturais
+
+### ✅ Consolidadas
+
+- **Frontend:** Manter HTMX/Tailwind (foco em backend)
+- **Multi-tenancy:** Por assessora (não por usuário final)
+- **Banco:** PostgreSQL (manter stack atual)
+- **Cache:** Redis (funcionando bem)
+- **Testes:** pytest (padrão estabelecido)
+
+### 🔄 Em Avaliação
+
+- **CI/CD:** GitHub Actions vs GitLab CI
+- **Monitoramento:** Prometheus + Grafana vs DataDog
+- **Deploy:** Cloud (AWS/GCP/Azure) vs On-premise
+
+---
+
+## 🚀 Timeline Estimada
+
+```
+Março 2026:
+├── Semana 1: MULTICLIENTE-001 (2-3 dias)
+├── Semana 2: MONITOR-001 + RATELIMIT-001
+└── Semana 3: CICD-001
+
+Abril 2026:
+├── Semana 1: Testes integrados multi-tenant
+├── Semana 2: Documentação Fase 7
+└── Semana 3: Preparação produção
+
+Maio 2026:
+└── Go-live Fase 7 🎯
+```
+
+---
+
+## 🎯 Metas de Produção (Q2-2026)
+
+- [x] Backend production-ready
+- [x] Motor fiscal completo
+- [x] APIs robustas
+- [ ] Multi-tenancy real
+- [ ] Monitoramento 24/7
+- [ ] CI/CD automatizado
+- [ ] 80%+ cobertura
+- [ ] SLA 99.9%
+
+---
+
+## 📚 Auditoria de Documentação
+
+> **Última auditoria:** 11/03/2026  
+> **Status:** ✅ Documentação otimizada
+
+### Ações Realizadas
+- ✅ Removida pasta `pmpt/` (backups antigos)
+- ✅ Renomeado `TESTES_PENDENTES.md` → `TESTES_HISTORICO.md`
+- ✅ Consolidado `DOCUMENTATION_AUDIT.md` neste documento
+
+### Estrutura Atual (26 arquivos)
+- **Core Operacional:** 8 arquivos (ROADMAP, CHANGELOG, API_REFERENCE, etc.)
+- **Referência Técnica:** 5 arquivos (ENUMS, SEEDS, MODULES, DB_STRUCTURE, ER_DIAGRAM)
+- **GAPs Ativos:** 7 arquivos (IR-001, IMPORT-001, EXPORT-001, etc.)
+- **GAPs Recentes:** 2 arquivos (DIVCALENDAR-001, BLUEPRINT-CONSOLIDATION-001)
+- **Guias:** 3 arquivos (USER_GUIDE, VISION, README)
+- **Histórico:** 1 arquivo (TESTES_HISTORICO)
+
+### Métricas
+- **Arquivos:** 26 (redução de 10% após limpeza)
+- **Tamanho total:** ~565KB
+- **Redundância:** 0%
+- **Cobertura:** Completa
+
+---
+
+*Última atualização: 16/03/2026*  
+*Próxima revisão: Após Fase 7*  
+*Responsável: Elielson Fontanezi + Cascade AI*

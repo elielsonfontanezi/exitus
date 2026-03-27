@@ -1,0 +1,70 @@
+{# 
+  Componente: Performance by Asset Chart
+  Descrição: Gráfico de barras para performance por ativo
+  Props:
+    - data: list - lista de ativos com performance
+    - chart_id: string - ID único do canvas
+    - title: string - Título do gráfico
+  Uso:
+    {% include 'components/charts/performance_by_asset_chart.html' with data=ativos chart_id='performance-chart' title='Performance por Ativo' %}
+#}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ title or 'Performance por Ativo' }}</h3>
+  <div class="h-64">
+    <canvas id="{{ chart_id or 'performance-chart' }}"></canvas>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('{{ chart_id or 'performance-chart' }}').getContext('2d');
+      
+      const data = {{ data|tojson|safe }};
+      const labels = data.map(a => a.ticker);
+      const performance = data.map(a => a.rentabilidade);
+      const colors = performance.map(p => p >= 0 ? 'rgba(34, 197, 94, 0.8)' : 'rgba(239, 68, 68, 0.8)');
+      const borderColors = performance.map(p => p >= 0 ? 'rgba(34, 197, 94, 1)' : 'rgba(239, 68, 68, 1)');
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Rentabilidade (%)',
+            data: performance,
+            backgroundColor: colors,
+            borderColor: borderColors,
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.parsed.y >= 0 
+                    ? '+' + context.parsed.y.toFixed(2) + '%'
+                    : context.parsed.y.toFixed(2) + '%';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</div>

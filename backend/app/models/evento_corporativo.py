@@ -80,6 +80,14 @@ class EventoCorporativo(db.Model):
         comment="ID do novo ativo (fusões, mudanças de ticker)"
     )
     
+    assessora_id = db.Column(
+        UUID(as_uuid=True),
+        ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID da assessora (multi-tenancy)"
+    )
+    
     # Dados do evento
     tipo_evento = db.Column(
         Enum(TipoEventoCorporativo, values_callable=lambda x: [e.value for e in x]),
@@ -147,6 +155,7 @@ class EventoCorporativo(db.Model):
     )
     
     # Relacionamentos
+    assessora = relationship('Assessora', back_populates='eventos_corporativos')
     ativo = relationship(
         'Ativo',
         foreign_keys=[ativo_id],

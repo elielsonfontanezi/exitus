@@ -68,6 +68,11 @@ podman run -d --name exitus-db \
 echo "Aguardando PostgreSQL inicializar..."
 sleep 10
 
+# Obter UID/GID do usuário atual
+USER_UID=$(id -u)
+USER_GID=$(id -g)
+echo "UID: $USER_UID, GID: $USER_GID"
+
 # Criar container Backend (usando .env)
 echo "Criando container Backend..."
 podman run -d --name exitus-backend \
@@ -76,6 +81,8 @@ podman run -d --name exitus-backend \
   -v ./backend:/app:Z \
   -v exitus-backend-logs:/app/logs:Z \
   --env-file ./backend/.env \
+  -e USER_UID=$USER_UID \
+  -e USER_GID=$USER_GID \
   exitus-backend:latest
 
 # Criar container Frontend (usando .env)
@@ -86,6 +93,8 @@ podman run -d --name exitus-frontend \
   -v ./frontend:/app:Z \
   -v exitus-frontend-logs:/app/logs:Z \
   --env-file ./frontend/.env \
+  -e USER_UID=$USER_UID \
+  -e USER_GID=$USER_GID \
   exitus-frontend:latest
 
 echo ""

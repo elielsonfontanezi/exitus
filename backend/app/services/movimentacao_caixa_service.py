@@ -6,6 +6,8 @@ Exitus - MovimentacaoCaixa Service M3.2 (Corrigido)
 from app.database import db
 from app.models import MovimentacaoCaixa, Corretora
 from app.utils.exceptions import NotFoundError
+from app.services.auditoria_service import AuditoriaService
+from app.utils.tenant import filter_by_assessora
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 from decimal import Decimal
@@ -19,6 +21,7 @@ class MovimentacaoCaixaService:
     def get_all(usuario_id, page=1, per_page=50, corretora_id=None, data_inicio=None, data_fim=None):
         try:
             query = MovimentacaoCaixa.query.filter_by(usuario_id=usuario_id)
+            query = filter_by_assessora(query, MovimentacaoCaixa)
 
             if corretora_id:
                 query = query.filter_by(corretora_id=corretora_id)
@@ -55,6 +58,16 @@ class MovimentacaoCaixaService:
             
             db.session.add(nova_mov)
             db.session.commit()
+            db.session.refresh(nova_mov)
+            
+            # Auditoria
+            AuditoriaService.registrar_create(
+                usuario_id=usuario_id,
+                entidade='MovimentacaoCaixa',
+                entidade_id=nova_mov.id,
+                dados_depois=nova_mov.to_dict()
+            )
+            
             return nova_mov
         except Exception as e:
             db.session.rollback()
@@ -65,10 +78,12 @@ class MovimentacaoCaixaService:
     def get_saldo(usuario_id, corretora_id):
         """Calcula saldo somando movimentações (simples)"""
         try:
-            movimentacoes = MovimentacaoCaixa.query.filter_by(
+            query = MovimentacaoCaixa.query.filter_by(
                 usuario_id=usuario_id, 
                 corretora_id=corretora_id
-            ).all()
+            )
+            query = filter_by_assessora(query, MovimentacaoCaixa)
+            movimentacoes = query.all()
             
             saldo = Decimal('0.0')
             for m in movimentacoes:

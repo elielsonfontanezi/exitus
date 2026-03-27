@@ -45,7 +45,7 @@
             </div>
 
             <!-- Formulário de Login - USERNAME para Backend M2 -->
-            <form method="POST" action="/auth/login" class="card space-y-4">
+            <form id="loginForm" method="POST" action="/auth/login" class="card space-y-4">
                 <div>
                     <label for="username" class="label">
                         <i class="fas fa-user mr-1"></i> Usuário
@@ -115,6 +115,68 @@
                 setTimeout(() => flashMessages.remove(), 500);
             }
         }, 5000);
+        
+        // Verificar se tem mensagem de sucesso e extrair token
+        {% if get_flashed_messages(with_categories=true) %}
+            // Se chegou aqui com sucesso, tentar extrair token da resposta anterior
+            // Em produção, o backend deve retornar o token via JavaScript
+            console.log('Login realizado com sucesso');
+        {% endif %}
     </script>
+    
+    <!-- Script de Login AJAX -->
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                username: formData.get('username'),
+                password: formData.get('password')
+            };
+            
+            // Desabilitar botão
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Entrando...';
+            
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Salvar token e usuário
+                    if (window.auth) {
+                        window.auth.saveToken(result.token, result.user);
+                    }
+                    
+                    // Redirecionar para dashboard
+                    window.location.href = result.redirect || '/dashboard/';
+                } else {
+                    // Mostrar erro
+                    alert('Login falhou: ' + (result.message || 'Verifique suas credenciais'));
+                }
+            } catch (error) {
+                console.error('Erro no login:', error);
+                alert('Erro de conexão. Tente novamente.');
+            } finally {
+                // Restaurar botão
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+    </script>
+    
+    <!-- Script de autenticação -->
+    <script src="/static/js/auth.js"></script>
 </body>
 </html>

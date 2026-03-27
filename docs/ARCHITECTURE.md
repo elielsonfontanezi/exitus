@@ -97,7 +97,7 @@ Configurações:
 - Persistência via volume mapeado
 - Backup automático configurável
 - Migrations gerenciadas por Alembic
-- 22 tabelas + 86+ índices otimizados
+- 23 tabelas + 86+ índices otimizados
 
 ### Container 2: Flask Backend API
 
@@ -128,11 +128,12 @@ Healthcheck: /health (30s interval)
 ```
 
 **Características**:
-- 16 blueprints registrados
-- 67 rotas RESTful
+- 17 blueprints registrados (incluindo reconciliação)
+- 72+ rotas RESTful
 - Autenticação JWT (1h expiry)
 - Rate limiting configurável
 - Logs estruturados (INFO/WARNING/ERROR)
+- Auditoria automática de operações CRUD
 
 ### Container 3: Flask Frontend
 
@@ -356,7 +357,7 @@ ativo = db.session.get(Ativo, id)
 
 ## Modelo de Dados
 
-### Entidades Principais (22 Tabelas)
+### Entidades Principais (23 Tabelas)
 
 #### Core Tables
 
@@ -597,7 +598,21 @@ ativo = db.session.get(Ativo, id)
 
 21. **projecaorenda** / **relatoriosperformance** — tabelas auxiliares de analytics (detalhadas em `MODULES.md`).[file:10]
 
-22. **outros metadados** (ex.: tabelas auxiliares futuras para monitoramento/parametrização).
+22. **calendario_dividendo** — calendário de proventos futuros para planejamento (DIVCALENDAR-001):
+    - `usuario_id` (FK)
+    - `ativo_id` (FK)
+    - `data_esperada` (Date)
+    - `tipo_provento` (String)
+    - `yield_estimado` (Numeric)
+    - `valor_estimado` (Numeric)
+    - `quantidade` (Integer)
+    - `status` (String: previsto/confirmado/atrasado/pago)
+    - `data_pagamento` (Date, opcional)
+    - `valor_real` (Numeric, opcional)
+    - `observacoes` (Text)
+    - `created_at`, `updated_at`
+
+23. **outros metadados** (ex.: tabelas auxiliares futuras para monitoramento/parametrização).
 
 ### Relacionamentos Chave
 
@@ -608,12 +623,14 @@ usuario (1) ─────> (N) saldo_prejuizo
 usuario (1) ─────> (N) transacao
 usuario (1) ─────> (N) alerta
 usuario (1) ─────> (N) portfolio
+usuario (1) ─────> (N) calendario_dividendo
 
 ativo (1) ─────> (N) posicao
 ativo (1) ─────> (N) transacao
 ativo (1) ─────> (N) provento
 ativo (1) ─────> (N) evento_corporativo
 ativo (1) ─────> (N) historico_preco
+ativo (1) ─────> (N) calendario_dividendo
 
 corretora (1) ─────> (N) posicao
 corretora (1) ─────> (N) transacao
@@ -997,12 +1014,68 @@ Cloud Provider
 
 ---
 
+## Novos Componentes (Dashboard v2 - 21/03/2026)
+
+### Backend - Blueprints Adicionados:
+- **carteira_blueprint.py** - `/api/carteira/*`
+  - GET `/saldo-caixa` - Saldo disponível em BRL/USD com toggle
+
+### Backend - Services Adicionados:
+- **carteira_service.py** - Lógica de negócio para saldo em caixa
+  - `get_saldo_caixa(usuario_id, moeda_exibicao)` - Calcula saldo por moeda
+
+### Backend - Endpoints Modificados:
+- **alertas.py** - Adicionado GET `/recentes?limit=N`
+- **transacoes/routes.py** - Adicionado GET `/recentes?limit=N`
+
+### Frontend - Templates Modificados:
+- **dashboard/index.html** - Reescrito completo para Dashboard v2
+  - Integração com 4 APIs via Alpine.js
+  - 2 gráficos Chart.js (evolução + alocação)
+  - Toggle BRL/USD dinâmico
+  - Visão multi-mercado (BR/US/INTL)
+
+---
+
 ## Referências
 
 - [MODULES.md](MODULES.md) - Detalhes de cada módulo M0-M7
-- [API_REFERENCE.md](API_REFERENCE.md) - Endpoints completos
+- [API_REFERENCE.md](API_REFERENCE.md) - Endpoints completos (23 seções)
 - [OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md) - Deploy e troubleshooting
 - [ENUMS.md](ENUMS.md) - Documentação completa de ENUMs
+
+---
+
+### Circuit Breaker — Resiliência de APIs Externas (08/03/2026)
+
+Implementado em `backend/app/utils/circuit_breaker.py` — EXITUS-CIRCUITBREAKER-001.
+
+**Componentes:**
+
+| Classe/Função | Responsabilidade |
+|---|---|
+| `CircuitBreaker` | Estados CLOSED/OPEN/HALF_OPEN por provider |
+| `get_circuit_breaker(name)` | Registry global — singleton por provider no processo |
+| `with_retry(func, ...)` | Retry + backoff exponencial integrado ao breaker |
+| `reset_all()` | Limpa todos os breakers (uso em testes) |
+
+**Integração no `CotacoesService`:**
+
+```
+Providers BR:  brapi.dev → hgfinance → yfinance.BR → twelvedata
+Providers US:  finnhub → alphavantage → twelvedata → yfinance.US
+
+failure_threshold = 3  (3 falhas consecutivas → OPEN)
+recovery_timeout  = 60s (brapi, hgfinance, twelve, finnhub, alpha)
+recovery_timeout  = 120s (yfinance.BR, yfinance.US — cold start lento)
+
+Provider OPEN → pula imediatamente para o próximo (sem aguardar timeout HTTP)
+Provider volta a HALF_OPEN após recovery_timeout → tenta 1 request
+Sucesso em HALF_OPEN → fecha circuito (CLOSED)
+```
+
+**Estado:** em memória de processo (single-instance). Não persiste entre restarts.
+Para multi-instância futura, substituir pelo Redis (CIRCUITBREAKER-002 potencial).
 
 ---
 
@@ -1012,5 +1085,5 @@ O frontend atual (Flask + HTMX + Tailwind, container `exitus-frontend:8080`) é 
 
 ---
 
-**Documento atualizado**: 05 de Março de 2026  
-**Versão arquitetural**: v0.8.0-dev (Fases 2-4 concluídas — 30 GAPs implementados, 255+ testes, ver ROADMAP.md v3.0)
+**Documento atualizado**: 09 de Março de 2026  
+**Versão arquitetural**: v0.8.0-dev (Fases 2-5 concluídas + 2 da Fase 6 — 37 GAPs implementados, 371 testes passed, ver ROADMAP.md v3.0)

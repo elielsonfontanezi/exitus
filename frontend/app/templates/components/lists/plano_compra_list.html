@@ -1,0 +1,246 @@
+{# 
+  Componente: Plano Compra List
+  Descrição: Lista de planos de compra com filtros e ordenação
+  Props:
+    - planos: list - lista de planos de compra
+    - show_filters: boolean - exibe filtros (default: true)
+    - show_actions: boolean - exibe ações nos cards (default: true)
+    - compact: boolean - modo compacto (default: false)
+  Uso:
+    {% include 'components/lists/plano_compra_list.html' with planos=planos_data show_filters=true %}
+#}
+
+<!-- Filtros e Ordenação -->
+{% if show_filters %}
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+  <div class="flex flex-wrap items-center gap-4">
+    <div class="flex-1 min-w-[200px]">
+      <label for="filtro_status" class="block text-sm font-medium text-gray-700 mb-1">
+        Status
+      </label>
+      <select id="filtro_status" onchange="filtrarPlanos()" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="">Todos os status</option>
+        <option value="ativo">Ativos</option>
+        <option value="pausado">Pausados</option>
+        <option value="concluido">Concluídos</option>
+        <option value="cancelado">Cancelados</option>
+      </select>
+    </div>
+    
+    <div class="flex-1 min-w-[200px]">
+      <label for="ordenacao" class="block text-sm font-medium text-gray-700 mb-1">
+        Ordenar por
+      </label>
+      <select id="ordenacao" onchange="ordenarPlanos()" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="created_at_desc">Mais recentes</option>
+        <option value="created_at_asc">Mais antigos</option>
+        <option value="nome_asc">Nome (A-Z)</option>
+        <option value="nome_desc">Nome (Z-A)</option>
+        <option value="progresso_desc">Maior progresso</option>
+        <option value="progresso_asc">Menor progresso</option>
+        <option value="valor_aporte_desc">Maior aporte</option>
+        <option value="valor_aporte_asc">Menor aporte</option>
+      </select>
+    </div>
+    
+    <div class="flex items-end">
+      <button onclick="resetarFiltros()" 
+              class="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+        Resetar Filtros
+      </button>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Estatísticas Rápidas -->
+<div id="estatisticas" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500">Total</p>
+        <p class="text-2xl font-bold text-gray-900" id="stat_total">0</p>
+      </div>
+      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500">Ativos</p>
+        <p class="text-2xl font-bold text-green-600" id="stat_ativos">0</p>
+      </div>
+      <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500">Pausados</p>
+        <p class="text-2xl font-bold text-yellow-600" id="stat_pausados">0</p>
+      </div>
+      <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500">Aporte Total</p>
+        <p class="text-2xl font-bold text-blue-600" id="stat_aporte">R$ 0</p>
+      </div>
+      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lista de Planos -->
+<div id="planos-container">
+  {% if planos %}
+    <div class="grid grid-cols-1 {% if compact %}lg:grid-cols-2 xl:grid-cols-3{% else %}lg:grid-cols-2{% endif %} gap-6">
+      {% for plano in planos %}
+        <div class="plano-item" data-status="{{ plano.status }}" 
+             data-nome="{{ plano.nome }}" 
+             data-progresso="{{ plano.progresso_percentual }}"
+             data-aporte="{{ plano.valor_aporte_mensal }}"
+             data-created="{{ plano.created_at }}">
+          {% include 'components/cards/plano_compra_card.html' with plano=plano show_actions=show_actions compact=compact %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-12">
+      <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum plano de compra encontrado</h3>
+      <p class="text-gray-500 mb-4">Crie seu primeiro plano de compra programada para começar a investir de forma disciplinada.</p>
+      <a href="/dashboard/planos-compra/novo" 
+         class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Criar Primeiro Plano
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Mensagem de nenhum resultado após filtro -->
+<div id="no-results" class="hidden text-center py-12">
+  <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+  </svg>
+  <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum plano encontrado</h3>
+  <p class="text-gray-500">Tente ajustar os filtros ou criar um novo plano de compra.</p>
+</div>
+
+<script>
+let planosData = {{ planos|tojson }};
+
+function atualizarEstatisticas(planos) {
+  const total = planos.length;
+  const ativos = planos.filter(p => p.status === 'ativo').length;
+  const pausados = planos.filter(p => p.status === 'pausado').length;
+  const aporteTotal = planos
+    .filter(p => p.status === 'ativo')
+    .reduce((sum, p) => sum + parseFloat(p.valor_aporte_mensal), 0);
+  
+  document.getElementById('stat_total').textContent = total;
+  document.getElementById('stat_ativos').textContent = ativos;
+  document.getElementById('stat_pausados').textContent = pausados;
+  document.getElementById('stat_aporte').textContent = `R$ ${aporteTotal.toFixed(2)}`;
+}
+
+function filtrarPlanos() {
+  const status = document.getElementById('filtro_status').value;
+  const items = document.querySelectorAll('.plano-item');
+  let visibleCount = 0;
+  
+  items.forEach(item => {
+    if (!status || item.dataset.status === status) {
+      item.style.display = '';
+      visibleCount++;
+    } else {
+      item.style.display = 'none';
+    }
+  });
+  
+  // Mostrar/ocultar mensagem de nenhum resultado
+  document.getElementById('no-results').classList.toggle('hidden', visibleCount > 0);
+  document.getElementById('planos-container').classList.toggle('hidden', visibleCount === 0);
+  
+  // Atualizar estatísticas com itens visíveis
+  const visiblePlanos = status ? planosData.filter(p => p.status === status) : planosData;
+  atualizarEstatisticas(visiblePlanos);
+}
+
+function ordenarPlanos() {
+  const ordenacao = document.getElementById('ordenacao').value;
+  const container = document.querySelector('#planos-container .grid');
+  const items = Array.from(container.children);
+  
+  items.sort((a, b) => {
+    const planoA = planosData.find(p => p.id === a.querySelector('[onclick*="verDetalhes"]')?.getAttribute('onclick').match(/'([^']+)'/)?.[1]);
+    const planoB = planosData.find(p => p.id === b.querySelector('[onclick*="verDetalhes"]')?.getAttribute('onclick').match(/'([^']+)'/)?.[1]);
+    
+    if (!planoA || !planoB) return 0;
+    
+    switch (ordenacao) {
+      case 'created_at_desc':
+        return new Date(planoB.created_at) - new Date(planoA.created_at);
+      case 'created_at_asc':
+        return new Date(planoA.created_at) - new Date(planoB.created_at);
+      case 'nome_asc':
+        return planoA.nome.localeCompare(planoB.nome);
+      case 'nome_desc':
+        return planoB.nome.localeCompare(planoA.nome);
+      case 'progresso_desc':
+        return planoB.progresso_percentual - planoA.progresso_percentual;
+      case 'progresso_asc':
+        return planoA.progresso_percentual - planoB.progresso_percentual;
+      case 'valor_aporte_desc':
+        return parseFloat(planoB.valor_aporte_mensal) - parseFloat(planoA.valor_aporte_mensal);
+      case 'valor_aporte_asc':
+        return parseFloat(planoA.valor_aporte_mensal) - parseFloat(planoB.valor_aporte_mensal);
+      default:
+        return 0;
+    }
+  });
+  
+  // Reordenar no DOM
+  items.forEach(item => container.appendChild(item));
+}
+
+function resetarFiltros() {
+  document.getElementById('filtro_status').value = '';
+  document.getElementById('ordenacao').value = 'created_at_desc';
+  filtrarPlanos();
+  ordenarPlanos();
+}
+
+// Inicializar estatísticas
+document.addEventListener('DOMContentLoaded', function() {
+  atualizarEstatisticas(planosData);
+});
+</script>

@@ -1,0 +1,48 @@
+{# 
+  Componente: Transaction Table
+  Descrição: Tabela específica para histórico de transações
+  Props:
+    - transacoes: list - lista de transações
+  Uso:
+    {% include 'components/tables/transaction_table.html' with transacoes=[...] %}
+#}
+
+<div class="overflow-x-auto">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ativo</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Qtd</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Corretora</th>
+        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      {% for tx in transacoes %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ tx.data }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs font-medium rounded-full 
+              {% if tx.tipo == 'COMPRA' %}bg-green-100 text-green-800
+              {% elif tx.tipo == 'VENDA' %}bg-red-100 text-red-800
+              {% else %}bg-blue-100 text-blue-800{% endif %}">
+              {{ tx.tipo }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ tx.ativo }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ tx.quantidade }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ tx.preco }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">{{ tx.total }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ tx.corretora }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+            <a href="#" class="text-blue-600 hover:text-blue-900">📄</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

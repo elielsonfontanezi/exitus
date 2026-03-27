@@ -47,6 +47,14 @@ class SaldoPrejuizo(db.Model):
         index=True,
         comment="ID do usuário"
     )
+    
+    assessora_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID da assessora (multi-tenancy)"
+    )
 
     categoria = db.Column(
         String(20),
@@ -81,6 +89,7 @@ class SaldoPrejuizo(db.Model):
     )
 
     # Relacionamentos
+    assessora = relationship('Assessora', back_populates='saldos_prejuizo')
     usuario = relationship('Usuario', backref='saldos_prejuizo', lazy='joined')
 
     __table_args__ = (

@@ -10,6 +10,7 @@ class RelatorioPerformance(db.Model):
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     usuario_id = Column(UUID(as_uuid=True), ForeignKey('usuario.id'), nullable=False, index=True)
+    assessora_id = Column(UUID(as_uuid=True), ForeignKey('assessora.id', ondelete='CASCADE'), nullable=True, index=True)
     portfolio_id = Column(UUID(as_uuid=True), nullable=True)
     periodo_inicio = Column(Date, nullable=False)
     periodo_fim = Column(Date, nullable=False)

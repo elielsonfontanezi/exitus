@@ -10,11 +10,13 @@ from sqlalchemy import and_
 from app.database import db
 from app.models.configuracao_alerta import ConfiguracaoAlerta
 from app.models.ativo import Ativo
+from app.utils.tenant import filter_by_assessora
 
 class AlertaService:
     @staticmethod
     def listar_alertas(usuario_id: UUID, ativo_id: Optional[UUID] = None, apenas_ativos: bool = True) -> List[Dict]:
         query = ConfiguracaoAlerta.query.filter(ConfiguracaoAlerta.usuario_id == usuario_id)
+        query = filter_by_assessora(query, ConfiguracaoAlerta)
 
         if ativo_id:
             query = query.filter(ConfiguracaoAlerta.ativo_id == ativo_id)
@@ -39,16 +41,20 @@ class AlertaService:
         # 1. Busca os alertas de forma segura contra conflitos de nome no Model
         try:
             # Tenta via ORM padrão
-            alertas = ConfiguracaoAlerta.query.filter(
+            query = ConfiguracaoAlerta.query.filter(
                 and_(
                     ConfiguracaoAlerta.usuario_id == usuario_id,
                     ConfiguracaoAlerta.ativo.is_(True)
                 )
-            ).all()
+            )
+            query = filter_by_assessora(query, ConfiguracaoAlerta)
+            alertas = query.all()
         except Exception:
             # Fallback: Se der erro de Ambiguidade ou Coluna, busca todos e filtra no Python
             # Isso contorna o problema do 'text' e do 'AmbiguousColumn' definitivamente
-            todos = ConfiguracaoAlerta.query.filter_by(usuario_id=usuario_id).all()
+            query = ConfiguracaoAlerta.query.filter_by(usuario_id=usuario_id)
+            query = filter_by_assessora(query, ConfiguracaoAlerta)
+            todos = query.all()
             # Filtra manualmente checando se o atributo 'ativo' é True (bool)
             alertas = []
             for a in todos:
@@ -153,12 +159,14 @@ class AlertaService:
 
     @staticmethod
     def obter_alerta(usuario_id: UUID, alerta_id: UUID) -> Dict:
-        alerta = ConfiguracaoAlerta.query.filter(
+        query = ConfiguracaoAlerta.query.filter(
             and_(
                 ConfiguracaoAlerta.id == alerta_id,
                 ConfiguracaoAlerta.usuario_id == usuario_id
             )
-        ).first()
+        )
+        query = filter_by_assessora(query, ConfiguracaoAlerta)
+        alerta = query.first()
         if not alerta:
             raise ValueError("Alerta não encontrado")
         return alerta.to_dict()

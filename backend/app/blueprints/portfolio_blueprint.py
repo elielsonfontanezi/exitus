@@ -55,6 +55,45 @@ def distribuicao_classes():
         return error_response(str(e), 500)
 
 
+@portfolio_bp.route('/rentabilidade', methods=['GET'])
+@jwt_required()
+def rentabilidade():
+    """
+    Calcula rentabilidade do portfólio (TWR, MWR, benchmark).
+    Query params:
+        - periodo: 1m, 3m, 6m, 12m, 24m, ytd, max (default: 12m)
+        - benchmark: CDI, IBOV, IFIX, IPCA6, SP500 (default: CDI)
+    """
+    try:
+        usuario_id = get_jwt_identity()
+        periodo = request.args.get('periodo', '12m')
+        benchmark = request.args.get('benchmark', 'CDI')
+
+        periodos_validos = {'1m', '3m', '6m', '12m', '24m', 'ytd', 'max'}
+        if periodo not in periodos_validos:
+            return error_response(
+                f"Período inválido. Use: {', '.join(sorted(periodos_validos))}", 400
+            )
+
+        benchmarks_validos = {'CDI', 'IBOV', 'IFIX', 'IPCA6', 'SP500'}
+        if benchmark.upper() not in benchmarks_validos:
+            return error_response(
+                f"Benchmark inválido. Use: {', '.join(sorted(benchmarks_validos))}", 400
+            )
+
+        from app.services.rentabilidade_service import RentabilidadeService
+        resultado = RentabilidadeService.calcular(usuario_id, periodo, benchmark)
+
+        return success_response(
+            data=resultado,
+            message="Rentabilidade calculada com sucesso"
+        )
+
+    except Exception as e:
+        logger.error(f"Erro ao calcular rentabilidade: {e}")
+        return error_response(str(e), 500)
+
+
 @portfolio_bp.route('/distribuicao/setores', methods=['GET'])
 @jwt_required()
 def distribuicao_setores():
@@ -79,16 +118,18 @@ def evolucao_patrimonio():
     """Retorna evolução do patrimônio ao longo do tempo"""
     try:
         usuario_id = get_jwt_identity()
-        meses = request.args.get('meses', 12, type=int)
+        meses = request.args.get('meses', 0, type=int)
         
-        if meses < 1 or meses > 60:
-            return error_response("Meses deve estar entre 1 e 60", 400)
+        if meses < 0 or meses > 60:
+            return error_response("Meses deve estar entre 0 e 60 (0 = todo histórico)", 400)
         
         evolucao = PortfolioService.get_evolucao_patrimonio(usuario_id, meses)
         
+        mensagem = "Todo histórico calculado" if meses == 0 else f"Evolução de {meses} meses calculada"
+        
         return success_response(
             data={'evolucao': evolucao},
-            message=f"Evolução de {meses} meses calculada"
+            message=mensagem
         )
         
     except Exception as e:

@@ -1,49 +1,78 @@
 # Documentação do Sistema Exitus
 
-## 📁 Estrutura de Documentos
+> **Total:** 18 arquivos ativos + archive  
+> **Última atualização:** 19/03/2026  
+> **Versão:** v0.9.2
 
-### 🎯 Visão e Estratégia
-- **[VISION.md](VISION.md)** — Visão de negócio, proposta de valor, roadmap funcional
-- **[PERSONAS.md](PERSONAS.md)** — **Manual de Operação da IA** — define como a assistente deve se comportar, fontes de verdade, fluxo de trabalho
+---
 
-### 🏗️ Arquitetura e Design
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** — Arquitetura técnica, containers, stack, princípios de design
-- **[MODULES.md](MODULES.md)** — Status dos módulos M0-M7, endpoints por módulo, roadmap de implementação
-- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** — Padrões de codificação e SQLAlchemy (v2.0)
+## 🎯 Visão de Negócio
 
-### 📋 GAPs e Implementações
-- **[ROADMAP.md](ROADMAP.md)** — Roadmap completo com GAPs identificados e status
-- **[EXITUS-SQLALCHEMY-001.md](EXITUS-SQLALCHEMY-001.md)** — Padrões SQLAlchemy (problemas recorrentes)
-- **[EXITUS-IMPORT-001.md](EXITUS-IMPORT-001.md)** — Importação B3 Portal Investidor (completo)
-- **[EXITUS-CASHFLOW-001.md](EXITUS-CASHFLOW-001.md)** — Eventos de Custódia B3 (completo)
-- **[EXITUS-ASSETS-001.md](EXITUS-ASSETS-001.md)** — Massa de dados de teste (design)
+**Exitus** é uma plataforma multi-usuário de gestão e análise de investimentos para investidores individuais e assessoras que operam em múltiplos mercados e classes de ativos.
 
-### 🔌 APIs e Contratos
-- **[API_REFERENCE.md](API_REFERENCE.md)** — **Referência completa** de todas as APIs com exemplos cURL
-- **[ENUMS.md](ENUMS.md)** — Enums do sistema (TipoAtivo, TipoOperacao, etc.) com mapeamentos
+**Diferenciais:** Consolidação multi-mercado (BR/US/INTL), 15 tipos de ativos, análise fundamentalista avançada (Buy Score, Preço Teto, Z-Score), cotações near real-time, motor fiscal completo (IR/IOF/DARF), multi-moeda nativo.
 
-### 🗄️ Database e Dados
-- **[EXITUS_DB_STRUCTURE.txt](EXITUS_DB_STRUCTURE.txt)** — Schema completo do PostgreSQL (21 tabelas, 86+ índices)
-- **[SEEDS.md](SEEDS.md)** — Dados iniciais, credenciais de desenvolvimento, usuários teste
+**Mercados:** 🇧🇷 Brasil (Ações, FIIs, CDB, LCI/LCA, Tesouro, Debêntures) | 🇺🇸 EUA (Stocks, REITs, Bonds, ETFs) | 🌍 Internacional (Stocks, ETFs) | 🔷 Cripto
 
-### 📋 Operações e Manuais
-- **[OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md)** — **Manual de Operações** — deploy, troubleshooting, scripts úteis
-- **[USER_GUIDE.md](USER_GUIDE.md)** — **Guia do Usuário Final** — como usar o sistema (dashboards, operações)
-- **[CHANGELOG.md](CHANGELOG.md)** — Histórico de versões, GAPs registrados, roadmap futuro
-- **[ROADMAP.md](ROADMAP.md)** — Roadmap de implementação — GAPs identificados e plano de desenvolvimento
+**Stack:** Python/Flask + PostgreSQL 16 + HTMX/Alpine.js/Tailwind CSS | 3 containers Podman rootless
+
+**Status:** Ver [PROJECT_STATUS.md](PROJECT_STATUS.md)
+
+---
+
+## 📁 Documentação (18 arquivos)
+
+### 🔴 Core Operacional
+
+| Arquivo | Descrição |
+|---------|-----------|
+| **[ROADMAP.md](ROADMAP.md)** | Roadmap consolidado — backend, frontend, testes, pendências |
+| **[CHANGELOG.md](CHANGELOG.md)** | Histórico completo de mudanças |
+| **[PROJECT_STATUS.md](PROJECT_STATUS.md)** | Status consolidado do projeto |
+| **[ARCHITECTURE.md](ARCHITECTURE.md)** | Decisões arquiteturais, stack, containers |
+| **[CODING_STANDARDS.md](CODING_STANDARDS.md)** | Padrões obrigatórios (snake_case, SQLAlchemy) |
+| **[API_REFERENCE.md](API_REFERENCE.md)** | Contratos da API, endpoints |
+| **[OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md)** | Scripts, troubleshooting, procedimentos |
+| **[PERSONAS.md](PERSONAS.md)** | Manual da IA, comportamento esperado |
+| **[LESSONS_LEARNED.md](LESSONS_LEARNED.md)** | Erros reais, lições aprendidas |
+
+### 🟡 Referência Técnica
+
+| Arquivo | Descrição |
+|---------|-----------|
+| **[ENUMS.md](ENUMS.md)** | 15 TipoAtivo, mapeamentos DB/API/JSON |
+| **[SEEDS.md](SEEDS.md)** | Credenciais dev, dados de teste |
+| **[MODULES.md](MODULES.md)** | Status M0-M7, 17 blueprints, 23 tabelas |
+| **[EXITUS_DB_STRUCTURE.txt](EXITUS_DB_STRUCTURE.txt)** | Schema completo (auto-gerado) |
+| **[EXITUS_ER_DIAGRAM.md](EXITUS_ER_DIAGRAM.md)** | Diagramas ER |
+
+### 📋 GAPs e Funcionalidades
+
+| Arquivo | Descrição | Status |
+|---------|-----------|--------|
+| **[MULTICLIENTE.md](MULTICLIENTE.md)** | Multi-tenancy consolidado (4 partes) | 🟡 85% |
+| **[EXITUS-CRUD-002.md](EXITUS-CRUD-002.md)** | Revisão Service/Route | ❌ Pendente |
+
+### 📖 Guias
+
+| Arquivo | Descrição |
+|---------|-----------|
+| **[USER_GUIDE.md](USER_GUIDE.md)** | Guia do usuário final |
+
+### 📚 Archive (`docs/archive/`)
+
+28 documentos históricos preservados: GAPs concluídos, roadmaps anteriores, análises de frontend, planos de teste. Acessíveis para consulta mas não fazem parte da documentação ativa.
 
 ---
 
 ## 🔄 Como Usar Esta Documentação
 
-### Para Desenvolvedores/Manutenção
-1. **PERSONAS.md** — Entender como interagir com a IA assistente
-2. **CODING_STANDARDS.md** — Padrões de codificação e SQLAlchemy (OBRIGATÓRIO)
-3. **EXITUS-SQLALCHEMY-001.md** — Padrões SQLAlchemy (evitar problemas recorrentes)
-4. **API_REFERENCE.md** — Contratos dos endpoints
-5. **ARCHITECTURE.md** — Decisões arquiteturais
-6. **CHANGELOG.md** — O que mudou recentemente
-7. **ROADMAP.md** — O que falta implementar e plano de desenvolvimento
+### Para Desenvolvedores
+1. **CODING_STANDARDS.md** — Padrões obrigatórios
+2. **API_REFERENCE.md** — Contratos dos endpoints
+3. **ARCHITECTURE.md** — Decisões arquiteturais
+4. **ROADMAP.md** — O que falta implementar
+5. **CHANGELOG.md** — O que mudou recentemente
 
 ### Para Operações/DevOps
 1. **OPERATIONS_RUNBOOK.md** — Comandos e troubleshooting
@@ -52,55 +81,32 @@
 
 ### Para Usuários Finais
 1. **USER_GUIDE.md** — Como usar o sistema
-2. **VISION.md** — O que o sistema oferece
 
 ### Para IA Assistente (Cascade/Windsurf)
-1. **LESSONS_LEARNED.md** — **Ler PRIMEIRO — erros reais, regras ativas**
-2. **PERSONAS.md** — Manual de operação do Cascade
-3. **CODING_STANDARDS.md** — Padrões SQLAlchemy (CRÍTICO para evitar erros)
-4. **API_REFERENCE.md** — Contratos para validação
-5. **ENUMS.md** — Valores válidos para campos
-6. **ROADMAP.md** — Status dos GAPs para planejamento
+1. **LESSONS_LEARNED.md** — **Ler PRIMEIRO**
+2. **PERSONAS.md** — Manual de operação
+3. **CODING_STANDARDS.md** — Padrões (CRÍTICO)
+4. **API_REFERENCE.md** — Contratos
+5. **ENUMS.md** — Valores válidos
+6. **ROADMAP.md** — Status dos GAPs
+7. **PROJECT_STATUS.md** — Métricas e testes
 
-**Regras operacionais da IA:** `.windsurfrules` na raiz do projeto (lido automaticamente pelo Cascade)
+**Regras operacionais:** `.windsurfrules` na raiz do projeto
 
-**🚨 REGRA CRÍTICA:** A IA pode opinar e propor ideias, mas **NUNCA** deve executar mudanças sem aprovação explícita. Fluxo: 1) Propor → 2) Aguardar "APROVADO" → 3) Implementar
-
----
-
-## 📈 Fluxo de Trabalho com IA
-
-```
-1. .windsurfrules define regras operacionais do Cascade (injetado automaticamente)
-2. PERSONAS.md define comportamento, fontes de verdade e fluxo de trabalho
-3. LESSONS_LEARNED.md é lido ANTES de qualquer ação
-4. Cascade segue: ANÁLISE → MODELO IA → ESTRATÉGIA → APROVADO → IMPLEMENTAÇÃO → TESTES → DOCS → COMMIT
-5. Problemas recorrentes? → Criar GAP + registrar em LESSONS_LEARNED.md
-6. CHANGELOG.md registra todos os GAPs e correções
-```
+**🚨 REGRA CRÍTICA:** A IA **NUNCA** executa mudanças sem aprovação explícita.  
+Fluxo: Análise → Modelo IA → Estratégia → "APROVADO" → Implementação → Testes → Docs → Commit
 
 ---
 
-## 🚨 Importante
+## 🧪 Testes
 
-- **PERSONAS.md** é o manual de controle da IA — não altere sem entender o impacto
-- **CODING_STANDARDS.md** é OBRIGATÓRIO para evitar erros SQLAlchemy
-- **EXITUS-SQLALCHEMY-001.md** contém soluções para problemas recorrentes
-- **API_REFERENCE.md** é sempre a fonte da verdade para contratos de API
-- **CHANGELOG.md** mantém o histórico de todas as decisões técnicas
-- **OPERATIONS_RUNBOOK.md** contém comandos que podem afetar o sistema em produção
-
----
-
-## 🎯 **Regras de Ouro para Desenvolvimento**
-
-1. **🔍 SEMPRE consultar** CODING_STANDARDS.md antes de implementar
-2. **✅ SEMPRE validar** enums e constraints (EXITUS-SQLAlchemy-001)
-3. **📝 SEMPRE documentar** problemas recorrentes como GAPs
-4. **🔄 SEMPRE fazer** rollback após erros de session
-5. **🚀 SEMPRE seguir** fluxo: Proposta → Aprovação → Implementação
+| Tipo | Local | Quantidade | Status |
+|------|-------|------------|--------|
+| **Backend (pytest)** | `backend/tests/` | 491 | ✅ 100% |
+| **E2E (Playwright)** | `tests/e2e/specs/` | 108 | ✅ 96% passando |
+| **Validação (shell)** | `tests/` | 6 scripts | ✅ Ativos |
 
 ---
 
-*Atualizado: 04 de Março de 2026*  
-*Versão: 3.0 — Migrado de Perplexity/Spaces para Cascade/Windsurf*
+*Atualizado: 18 de Março de 2026*  
+*Versão: 5.0 — Documentação consolidada (42 → 18 arquivos)*

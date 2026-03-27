@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% block title %}Fluxo de Caixa{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" 
+     x-data="fluxoCaixaData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Header -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Fluxo de Caixa</h1>
+          <p class="text-xl opacity-90">Acompanhe entradas, saídas e saldo da conta</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10 hover:border-white/50">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Cards de Resumo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Saldo Atual -->
+      <div class="card card-gradient-success animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Saldo Atual</h3>
+                <p class="text-sm text-white opacity-90">Conta Corrente</p>
+              </div>
+            </div>
+            <span class="badge badge-white text-success-600">Disponível</span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="formatCurrency(resumo.saldo_atual, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white">Atualizado:</span>
+              <span class="text-white font-medium" x-text="resumo.ultima_atualizacao"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Entradas Mês -->
+      <div class="card card-gradient animate-fade-in" style="animation-delay: 100ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Entradas</h3>
+                <p class="text-sm text-gray-600" x-text="mesAtual"></p>
+              </div>
+            </div>
+            <span class="badge badge-success" x-text="resumo.entradas_quantidade"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.entradas_mes, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-success">Média:</span>
+              <span class="text-gray-900 font-medium" x-text="formatCurrency(resumo.entradas_media, currentCurrency)"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saídas Mês -->
+      <div class="card card-gradient-danger animate-fade-in" style="animation-delay: 200ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-danger-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-danger-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Saídas</h3>
+                <p class="text-sm text-white opacity-90" x-text="mesAtual"></p>
+              </div>
+            </div>
+            <span class="badge badge-white text-danger-600" x-text="resumo.saidas_quantidade"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="formatCurrency(resumo.saidas_mes, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75">Média:</span>
+              <span class="text-white font-medium" x-text="formatCurrency(resumo.saidas_media, currentCurrency)"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saldo Líquido -->
+      <div class="card card-gradient-info animate-fade-in" style="animation-delay: 300ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-info-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-info-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Saldo Líquido</h3>
+                <p class="text-sm text-white opacity-90" x-text="mesAtual"></p>
+              </div>
+            </div>
+            <span class="badge badge-white" :class="resumo.saldo_liquido >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                  x-text="(resumo.saldo_liquido >= 0 ? '+' : '') + resumo.saldo_liquido_percentual.toFixed(1) + '%'"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" :class="resumo.saldo_liquido >= 0 ? 'text-white' : 'text-white'" 
+               x-text="formatCurrency(resumo.saldo_liquido, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75" x-text="resumo.saldo_liquido >= 0 ? 'Superávit' : 'Déficit'"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros e Período -->
+    <div class="card card-elevated mb-8">
+      <div class="p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div class="flex flex-wrap gap-4">
+            <select x-model="periodo" @change="carregarDados()" class="btn btn-outline">
+              <option value="7d">Últimos 7 dias</option>
+              <option value="30d">Últimos 30 dias</option>
+              <option value="90d">Últimos 90 dias</option>
+              <option value="1y">Último ano</option>
+            </select>
+            <select x-model="tipoMovimento" @change="filtrarMovimentos()" class="btn btn-outline">
+              <option value="todos">Todos</option>
+              <option value="entrada">Entradas</option>
+              <option value="saida">Saídas</option>
+            </select>
+            <select x-model="categoria" @change="filtrarMovimentos()" class="btn btn-outline">
+              <option value="todas">Todas categorias</option>
+              <option value="aporte">Aporte</option>
+              <option value="resgate">Resgate</option>
+              <option value="dividendo">Dividendo</option>
+              <option value="taxa">Taxa</option>
+            </select>
+          </div>
+          <div class="flex gap-2">
+            <button @click="exportarDados()" class="btn btn-primary">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              Exportar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico de Fluxo de Caixa -->
+    <div class="card card-elevated mb-8">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="h3">Evolução do Fluxo de Caixa</h3>
+          <div class="flex gap-2">
+            <button @click="changeChartType('line')" :class="chartType === 'line' ? 'btn-primary' : 'btn-outline'" class="btn btn-icon btn-icon-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+              </svg>
+            </button>
+            <button @click="changeChartType('bar')" :class="chartType === 'bar' ? 'btn-primary' : 'btn-outline'" class="btn btn-icon btn-icon-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="h-96">
+          <canvas id="fluxo-caixa-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline de Movimentações -->
+    <div class="card card-elevated">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="h3">Timeline de Movimentações</h3>
+          <span class="badge badge-primary" x-text="filteredMovimentos.length + ' movimentos'"></span>
+        </div>
+        <div class="space-y-4">
+          <template x-for="movimento in filteredMovimentos" :key="movimento.id">
+            <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <!-- Data e Hora -->
+              <div class="flex flex-col items-center">
+                <div class="text-sm font-semibold text-gray-900" x-text="formatDate(movimento.data).split('/')[0]"></div>
+                <div class="text-xs text-gray-500" x-text="getMesNome(formatDate(movimento.data).split('/')[1])"></div>
+              </div>
+              
+              <!-- Ícone e Tipo -->
+              <div class="flex-shrink-0">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center"
+                     :class="movimento.tipo === 'entrada' ? 'bg-success-100' : 'bg-danger-100'">
+                  <svg class="w-5 h-5" :class="movimento.tipo === 'entrada' ? 'text-success-600' : 'text-danger-600'" 
+                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          x-show="movimento.tipo === 'entrada'"
+                          d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          x-show="movimento.tipo === 'saida'"
+                          d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Detalhes -->
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h4 class="font-semibold text-gray-900" x-text="movimento.descricao"></h4>
+                    <p class="text-sm text-gray-600" x-text="movimento.categoria + ' • ' + movimento.conta"></p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-lg font-semibold" 
+                       :class="movimento.tipo === 'entrada' ? 'text-success-600' : 'text-danger-600'"
+                       x-text="(movimento.tipo === 'entrada' ? '+' : '-') + formatCurrency(movimento.valor, currentCurrency)"></p>
+                    <p class="text-xs text-gray-500" x-text="formatTime(movimento.data)"></p>
+                  </div>
+                </div>
+                
+                <!-- Detalhes adicionais -->
+                <div x-show="movimento.detalhes" class="mt-2 text-sm text-gray-600">
+                  <p x-text="movimento.detalhes"></p>
+                </div>
+              </div>
+            </div>
+          </template>
+          
+          <!-- Estado vazio -->
+          <div x-show="filteredMovimentos.length === 0" class="text-center py-12 text-gray-500">
+            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p>Nenhuma movimentação encontrada</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/fluxo_caixa.js"></script>
+{% endblock %}

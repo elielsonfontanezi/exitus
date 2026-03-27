@@ -1,0 +1,67 @@
+{# 
+  Componente: Skeleton Loader
+  Descrição: Placeholder animado para conteúdo em carregamento
+  Props:
+    - type: string (card, table, list, text) - tipo de skeleton
+    - count: number - quantidade de itens (opcional, padrão 1)
+  Uso:
+    {% include 'components/utils/skeleton_loader.html' with type='card' count=3 %}
+#}
+
+{% set skeleton_type = type|default('card') %}
+{% set item_count = count|default(1) %}
+
+{% if skeleton_type == 'card' %}
+  <!-- Skeleton Card -->
+  {% for i in range(item_count) %}
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
+    <div class="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+    <div class="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
+    <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
+    <div class="h-3 bg-gray-200 rounded w-5/6"></div>
+  </div>
+  {% endfor %}
+
+{% elif skeleton_type == 'table' %}
+  <!-- Skeleton Table -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="p-4 border-b border-gray-200 animate-pulse">
+      <div class="h-6 bg-gray-200 rounded w-1/4"></div>
+    </div>
+    <div class="divide-y divide-gray-200">
+      {% for i in range(item_count) %}
+      <div class="p-4 animate-pulse">
+        <div class="grid grid-cols-4 gap-4">
+          <div class="h-4 bg-gray-200 rounded"></div>
+          <div class="h-4 bg-gray-200 rounded"></div>
+          <div class="h-4 bg-gray-200 rounded"></div>
+          <div class="h-4 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+{% elif skeleton_type == 'list' %}
+  <!-- Skeleton List -->
+  <div class="space-y-3">
+    {% for i in range(item_count) %}
+    <div class="flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200 animate-pulse">
+      <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+      <div class="flex-1">
+        <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+{% elif skeleton_type == 'text' %}
+  <!-- Skeleton Text -->
+  <div class="space-y-2 animate-pulse">
+    {% for i in range(item_count) %}
+    <div class="h-4 bg-gray-200 rounded w-full"></div>
+    {% endfor %}
+  </div>
+
+{% endif %}

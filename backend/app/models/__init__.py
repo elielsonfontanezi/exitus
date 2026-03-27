@@ -5,6 +5,7 @@ Exportação centralizada de todos os models
 """
 
 # Módulo 1 e 2 - Core
+from .assessora import Assessora
 from .usuario import Usuario, UserRole
 from .corretora import Corretora, TipoCorretora
 from .ativo import Ativo, TipoAtivo, ClasseAtivo
@@ -13,6 +14,7 @@ from .transacao import Transacao, TipoTransacao
 # Módulo 3 - Entidades Financeiras
 from .posicao import Posicao
 from .saldo_prejuizo import SaldoPrejuizo
+from .saldo_darf_acumulado import SaldoDarfAcumulado
 from .provento import Provento, TipoProvento
 from .movimentacao_caixa import MovimentacaoCaixa, TipoMovimentacao
 from .evento_corporativo import EventoCorporativo
@@ -40,9 +42,17 @@ from .relatorio_performance import RelatorioPerformance
 from .portfolio import Portfolio
 
 from app.models.historico_preco import HistoricoPreco
+from app.models.historico_patrimonio import HistoricoPatrimonio
+
+# Fase 3 - Planos de Compra
+from .plano_compra import PlanoCompra, StatusPlanoCompra
+
+# Fase 4 - Planos de Venda
+from .plano_venda import PlanoVenda, StatusPlanoVenda, TipoGatilho
 
 __all__ = [
     # Core
+    "Assessora",
     "Usuario",
     "UserRole",
     "Corretora",
@@ -56,6 +66,7 @@ __all__ = [
     # Entidades Financeiras
     "Posicao",
     "SaldoPrejuizo",
+    "SaldoDarfAcumulado",
     "Provento",
     "TipoProvento",
     "MovimentacaoCaixa",
@@ -84,4 +95,15 @@ __all__ = [
     "ProjecaoRenda",
     "RelatorioPerformance",
     "Portfolio",
+    "HistoricoPreco",
+    "HistoricoPatrimonio",
+    
+    # Fase 3 - Planos de Compra
+    "PlanoCompra",
+    "StatusPlanoCompra",
+    
+    # Fase 4 - Planos de Venda
+    "PlanoVenda",
+    "StatusPlanoVenda",
+    "TipoGatilho",
 ]

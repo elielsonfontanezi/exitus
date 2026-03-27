@@ -11,6 +11,7 @@ from sqlalchemy.orm import joinedload
 from decimal import Decimal
 from datetime import datetime
 import logging
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,9 @@ class PosicaoService:
                 joinedload(Posicao.ativo),
                 joinedload(Posicao.corretora)
             )
+            
+            # Filtro por assessora (multi-tenancy)
+            query = filter_by_assessora(query, Posicao)
             
             if filters:
                 if filters.get('ativo_id'):

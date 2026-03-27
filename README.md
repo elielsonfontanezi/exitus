@@ -10,6 +10,9 @@
 * **Análise Fundamentalista**: Buy Score (0-100), Preço Teto (4 métodos), Z-Score com histórico real
 * **Cotações em Tempo Real**: Multi-provider com cache inteligente (15min TTL)
 * **Dashboards Interativos**: Performance, alocação, evolução patrimonial e métricas de risco
+* **Histórico Patrimonial**: Snapshots mensais com evolução detalhada por categoria (renda variável, fixa, caixa)
+  - API `/api/portfolios/evolucao` retorna histórico completo (default) ou últimos N meses
+  - Dashboard exibe jornada completa desde o primeiro registro
 * **Sistema de Alertas**: Notificações configuráveis por preço, percentual e indicadores
 * **Relatórios Avançados**: Geração automática de relatórios de performance com Sharpe Ratio
 * **Cálculos Fiscais**: Regras configuráveis por país e tipo de ativo
@@ -361,7 +364,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE]() para mais deta
 
 ---
 
-**Versão atual**: v0.7.10 (API Validation & Documentation Update)
+**Versão atual**: v0.9.3 (HistoricoPatrimonio Implementation)
 
-**Última atualização**: 27 de Fevereiro de 2026
+**Última atualização**: 22 de Março de 2026
 

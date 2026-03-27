@@ -1,6 +1,6 @@
 # .windsurfrules — Sistema Exitus
 ## Arquivo de regras para Cascade (Windsurf AI Assistant)
-### Versão: 2.1 — 05/03/2026 (adicionada seção scripts, métricas atualizadas)
+### Versão: 2.5 — 19/03/2026 (guia docs + MCPs, MULTI-CLIENTE concluído)
 
 ---
 
@@ -11,12 +11,14 @@ Consultar ANTES de gerar qualquer código ou proposta:
 ```
 PRIORIDADE 1 — Ler antes de qualquer ação:
 ├── docs/LESSONS_LEARNED.md     # Erros reais — ler PRIMEIRO, sempre
+├── docs/PROJECT_STATUS.md     # Status consolidado do projeto (métricas, testes)
 ├── docs/PERSONAS.md            # Manual de operação da IA (comportamento, fluxo)
 ├── docs/CODING_STANDARDS.md    # snake_case obrigatório, padrões SQLAlchemy
-├── docs/ROADMAP.md             # GAPs registrados, status, plano de implementação
+├── docs/ROADMAP.md             # Roadmap consolidado (backend, frontend, testes)
 ├── docs/CHANGELOG.md           # Histórico de mudanças, versão atual
 │
 PRIORIDADE 2 — Consultar conforme contexto:
+├── MCP PostgreSQL              # Schema real do banco via list_resources/read_resource
 ├── docs/API_REFERENCE.md       # Contratos completos dos endpoints
 ├── docs/ENUMS.md               # 15 TipoAtivo (inclui UNIT), mapeamentos DB/API/JSON
 ├── docs/ARCHITECTURE.md        # Stack, containers, convenções
@@ -32,11 +34,11 @@ PRIORIDADE 2 — Consultar conforme contexto:
 
 Fluxo obrigatório em toda atividade:
 1. **Analisar** → ler fontes de verdade relevantes
-2. **Indicar modelo de IA recomendado** (ver REGRA #5)
-3. **Apresentar estratégia** com diagnóstico, arquivos, ordem de implementação (ver REGRA #6)
+2. **Indicar modelo de IA recomendado** (ver REGRA #3)
+3. **Apresentar estratégia** com diagnóstico, arquivos, ordem de implementação (ver REGRA #4)
 4. **Aguardar "APROVADO"** explicitamente do usuário
 5. **Implementar** — código completo, funcional, sem omissões (`...`)
-6. **Testar** → suite deve passar (255+ testes)
+6. **Testar** → suite deve passar (491 testes)
 7. **Documentar** → mesma sessão, mesmo commit
 8. **Apresentar commit** e aguardar aprovação antes de executar
 
@@ -44,7 +46,7 @@ Fluxo obrigatório em toda atividade:
 
 ---
 
-## 🤖 REGRA #5 — INDICAR MODELO DE IA POR ATIVIDADE
+## 🤖 REGRA #3 — INDICAR MODELO DE IA POR ATIVIDADE
 
 Ao iniciar qualquer GAP, indicar obrigatoriamente:
 
@@ -59,7 +61,7 @@ Critérios:
 
 ---
 
-## 🗺️ REGRA #6 — APRESENTAR ESTRATÉGIA ANTES DE CODIFICAR
+## 🗺️ REGRA #4 — APRESENTAR ESTRATÉGIA ANTES DE CODIFICAR
 
 Formato obrigatório antes de qualquer implementação:
 
@@ -71,7 +73,7 @@ Formato obrigatório antes de qualquer implementação:
 
 ---
 
-## 📦 REGRA #7 — COMMIT AO FIM DE CADA FASE VALIDADA
+## 📦 REGRA #5 — COMMIT AO FIM DE CADA FASE VALIDADA
 
 - **Uma atividade por commit** — nunca agrupar GAPs distintos
 - Apresentar o comando **antes** de executar, aguardar aprovação
@@ -92,24 +94,73 @@ Tipos de commit: `feat` / `fix` / `docs` / `refactor` / `test`
 
 ---
 
-## 📝 REGRA #8 — DOCUMENTAÇÃO NO MESMO COMMIT
+## 📝 REGRA #6 — DOCUMENTAÇÃO NO MESMO COMMIT
 
 Ao fechar qualquer GAP, os seguintes docs DEVEM ser atualizados **no mesmo commit**:
 
-| Documento | Quando atualizar |
-|---|---|
-| `docs/CHANGELOG.md` | Sempre — entrada com artefatos criados/modificados |
-| `docs/ROADMAP.md` | Sempre — status "✅ Concluído (DD/MM/AAAA)" |
-| `docs/CODING_STANDARDS.md` | Se o GAP introduz novo padrão de código |
-| `docs/ARCHITECTURE.md` | Se adiciona componentes, endpoints ou muda estrutura |
-| `docs/OPERATIONS_RUNBOOK.md` | Se adiciona scripts ou procedimentos operacionais |
-| `docs/LESSONS_LEARNED.md` | Se o GAP gerou lição nova sobre erro recorrente |
+| Documento | Quando atualizar | Conteúdo |
+|---|---|---|
+| `docs/CHANGELOG.md` | **Sempre** | Entrada com artefatos criados/modificados, data |
+| `docs/ROADMAP.md` | **Sempre** | Status "✅ Concluído (DD/MM/AAAA)", GAPs atualizados |
+| `docs/PROJECT_STATUS.md` | **Sempre** | Métricas, testes, progresso geral, versão |
+| `docs/CODING_STANDARDS.md` | Se novo padrão | Padrões de código, convenções, exemplos |
+| `docs/ARCHITECTURE.md` | Se mudança estrutural | Novos componentes, endpoints, stack |
+| `docs/OPERATIONS_RUNBOOK.md` | Se scripts/procedimentos | Scripts novos, troubleshooting, procedimentos |
+| `docs/LESSONS_LEARNED.md` | Se lição aprendida | Erros reais, soluções, padrões a evitar |
+| `docs/README.md` | Se versão/mudança | Versão, data, status geral do projeto |
 
-O usuário **nunca** deve precisar perguntar "e a documentação?" — ela já vem junto.
+**O usuário nunca deve perguntar "e a documentação?" — ela já vem junto.**
 
 ---
 
-## 🗄️ REGRA #9 — ATUALIZAR SCHEMA APÓS MUDANÇA NO BANCO
+## 🔧 REGRA #9 — FERRAMENTAS E MCPs DISPONÍVEIS
+
+### MCPs (Model Context Protocol)
+Usar MCPs para acesso direto a dados e sistemas:
+
+```
+@postgres <consulta em linguagem natural>
+# Exemplo: @postgres list tables → mostra schema completo
+# Conexão: postgresql://exitus:exitus123@127.0.0.1:5433/exitusdb
+@mcp0_browser_* <ações no navegador>
+# Para testes E2E, debug de frontend, screenshots
+```
+
+### Scripts Essenciais
+```
+Banco de dados:
+├── scripts/create_test_db.sh        # Recriar banco de testes (pós-schema)
+├── scripts/update_db_structure.sh   # Gerar docs/EXITUS_DB_STRUCTURE.txt
+├── scripts/backup_db.sh             # Backup PostgreSQL
+
+Containers:
+├── scripts/restart_backend.sh       # Reload backend (pós-código)
+├── scripts/start_exitus.sh          # Iniciar todos os containers
+└── scripts/stop_exitus.sh           # Parar todos os containers
+
+Testes:
+├── podman exec exitus-backend python -m pytest --no-cov -q  # Suite backend
+└── cd tests/e2e && npm test                          # Suite E2E
+```
+
+### Comandos Úteis
+```bash
+# Verificar status dos containers
+podman ps
+
+# Verificar logs de um container
+podman logs -f exitus-backend
+
+# Acessar shell do container
+podman exec -it exitus-backend bash
+
+# Verificar schema do banco
+podman exec exitus-db psql -U exitus -d exitusdb -c "\dt"
+```
+
+---
+
+## 🗄️ REGRA #8 — ATUALIZAR SCHEMA APÓS MUDANÇA NO BANCO
 
 Sempre que uma atividade alterar o banco (nova tabela, migration, ALTER TABLE, novo índice):
 
@@ -121,7 +172,20 @@ Isso sobrescreve `docs/EXITUS_DB_STRUCTURE.txt`. Executar antes do commit final.
 
 ---
 
-## 🚨 REGRA #2 — snake_case OBRIGATÓRIO
+## 🧪 REGRA #9 — PRESERVAR TESTES FORMAIS
+
+Arquivos em `/backend/tests/` são testes formais e **NUNCA devem ser removidos**:
+- `test_darf_acumulado.py` (8 testes)
+- `test_rentabilidade.py` (21 testes)
+- `test_import_b3_parsers.py` (59 testes)
+- `test_import_b3_idempotencia.py` (18 testes)
+- Outros arquivos `.py` em `/tests/`
+
+Apenas scripts de teste temporários na raiz podem ser removidos após validação.
+
+---
+
+## 🚨 REGRA #10 — snake_case OBRIGATÓRIO
 
 ```
 ✅ Tabelas:    historico_preco, movimentacao_caixa
@@ -163,6 +227,10 @@ Operações de container:
 ├── scripts/cleanup_containers.sh    # Remover containers e volumes
 ├── scripts/rebuild_restart_exitus-backend.sh   # Rebuild + restart backend
 ├── scripts/rebuild_restart_exitus-frontend.sh  # Rebuild + restart frontend
+
+Scripts especiais:
+├── scripts/exitus.sh                 # Script principal de orquestração
+├── scripts/import_b3.sh              # Importação B3 (Excel/CSV) - TIPOS TRATADOS
 
 Banco de dados:
 ├── scripts/backup_db.sh             # Backup completo do PostgreSQL
@@ -232,11 +300,18 @@ bash scripts/update_db_structure.sh
 ## ✅ CHECKLIST DE INÍCIO DE ATIVIDADE
 
 Antes de qualquer ação, confirmar mentalmente:
-- [ ] Li `docs/LESSONS_LEARNED.md`?
-- [ ] Indiquei o modelo de IA recomendado? (REGRA #5)
-- [ ] Apresentei estratégia e aguardei "APROVADO"? (REGRA #6)
-- [ ] Sei quais docs precisarão ser atualizados? (REGRA #8)
-- [ ] A atividade altera o banco? Se sim, rodar `exitus_db_doc.sh` (REGRA #9)
+- [ ] Li `docs/LESSONS_LEARNED.md`? (erros reais)
+- [ ] Indiquei o modelo de IA recomendado? (REGRA #3)
+- [ ] Apresentei estratégia e aguardei "APROVADO"? (REGRA #4)
+- [ ] Sei quais docs precisarão ser atualizados? (REGRA #6)
+- [ ] A atividade altera o banco? Se sim:
+  - [ ] Aplicar migration no banco dev: `alembic upgrade head`
+  - [ ] Aplicar migration no banco teste (L-MIG-001)
+  - [ ] Rodar `./scripts/update_db_structure.sh` (REGRA #7)
+- [ ] É um novo blueprint? Se sim:
+  - [ ] Seguir padrão A (pasta + routes.py) ou B (arquivo único)
+  - [ ] Registrar com try/except em `app/__init__.py`
+- [ ] Envolve chaves de API? Se sim, usar variáveis de ambiente
 
 ---
 
@@ -246,3 +321,127 @@ Antes de qualquer ação, confirmar mentalmente:
 - [ ] PKs são UUID — nunca tentar resetar sequences
 - [ ] Usar `DELETE` para dados, nunca `DROP TABLE` para reset
 - [ ] Usar `db.session.get(Model, pk)` — não `Model.query.get(pk)` (depreciado)
+- [ ] Para inspecionar schema real, usar MCP PostgreSQL: `list_resources` → `read_resource` (mais rápido que psql)
+
+---
+
+## � MIGRATIONS E TESTES
+
+- **L-MIG-001:** Aplicar migrations em AMBOS os bancos (dev e teste)
+  - Banco dev: `alembic upgrade head`
+  - Banco teste: Criar app com `testing=True`, setar URL no alembic_cfg, aplicar upgrade
+  - Ou aplicar manualmente via SQL se necessário
+- **Testes em /backend/tests/**: Sempre colocar testes formais aqui, nunca na raiz
+- **Scripts temporários:** Podem ficar na raiz, mas devem ser removidos após validação
+
+---
+
+## 🏗️ BLUEPRINTS E ESTRUTURA
+
+- **Padrão A (recomendado):** Pasta + routes.py (ex: `/blueprints/nome/routes.py`)
+- **Padrão B (legacy):** Arquivo único (ex: `/blueprints/nome_blueprint.py`)
+- **Nunca misturar padrões no mesmo blueprint**
+- **Registrar em app/__init__.py** com try/except para fallback
+- **Imports:** Sempre usar try/except para blueprints opcionais
+
+---
+
+## 🔐 CHAVES DE API E SEGREDO
+
+- Nenhuma chave de API configurada no momento
+- Para adicionar: configurar em `.windsurf/windsurf.config.json`
+- Nunca escrever chaves diretamente no código Python
+
+---
+
+## 🧪 ESTRUTURA DE TESTES
+
+### Scripts de Validação (`tests/`):
+- **6 scripts** bash para validação por fase (Módulo 0-5)
+- `mod0_validacao_final.sh` - Health checks do sistema
+- `mod1_validacao_final_fase[1-5].sh` - Validação estrutural
+
+### Testes Formais (`backend/tests/`):
+- **33 arquivos** Python
+- **491 testes** (100% passando)
+- **Preservar permanentemente** - NUNCA remover (regra crítica)
+- **Principais:** `test_darf_acumulado.py` (8), `test_rentabilidade.py` (21), `test_ir_integration.py` (47KB)
+
+### Regras:
+- **Testes formais** devem ficar em `/backend/tests/`
+- **Scripts temporários** podem ficar na raiz, mas devem ser removidos após validação
+- **Nunca remover** testes formais (patrimônio do código)
+
+---
+
+## 📊 MÓDULOS E ENDPOINTS ATUAIS
+
+### Módulos Implementados (v0.8.0-dev):
+- **M2:** Core API (auth, usuarios, corretoras, ativos, transacoes)
+- **M3:** Portfolio (posicoes, proventos, movimentacoes, eventos, portfolio)
+- **M4:** Buy Signals + Fiscais (feriados, fontes, regras-fiscais, calculos, buy-signals)
+- **M7.4:** Alertas
+- **M7.5:** Cotações
+- **NOVO:** Calendário de Dividendos (DIVCALENDAR-001)
+
+### Total:
+- **17 blueprints** registrados
+- **23 tabelas** no banco
+- **491 testes** passando
+- **67+ endpoints** REST
+
+### Novos Endpoints (DIVCALENDAR-001):
+- `/api/calendario-dividendos/` - CRUD completo
+- `/api/calendario-dividendos/gerar` - Geração automática
+- `/api/calendario-dividendos/resumo` - Estatísticas
+
+---
+
+## 🤖 MODELOS DE IA DISPONÍVEIS PARA CASCADE
+
+### Modelos Internos (padrão):
+- **Claude Sonnet** - Padrão para maioria das tarefas
+- **Claude Opus** - Para tarefas complexas (design, arquitetura)
+- **SWE-1.5** - Para CRUD simples, refatorações pontuais
+
+### Modelos Disponíveis:
+- **SWE-1.5**: CRUD, ajustes simples, scripts
+- **Claude Sonnet**: Lógica de negócio, integrações, testes
+- **Claude Opus**: Design de sistemas, decisões arquitetônicas
+
+### Quando usar cada modelo:
+- **SWE-1.5**: CRUD, ajustes simples, scripts
+- **Claude Sonnet**: Lógica de negócio, integrações, testes
+- **Claude Opus**: Design de sistemas, decisões arquitetônicas
+
+---
+
+## 🔌 MCP SERVERS CONFIGURADOS
+
+### Servidores Ativos:
+- **postgres** - Acesso ao banco PostgreSQL
+  - Script: `.windsurf/mcp_postgres.sh`
+  - Uso: `@postgres <consulta em linguagem natural>`
+  - Exemplo: `@postgres list tables`
+- **playwright** - Ações no navegador (testes E2E)
+  - Uso: `@mcp0_browser_* <ações>`
+  - Exemplo: `@mcp0_browser_navigate`, `@mcp0_browser_click`
+
+### Como usar:
+- PostgreSQL: `@postgres list tables`
+- Browser: `@mcp0_browser_*` (para testes E2E)
+
+---
+
+## 📋 RESUMO: NUNCA PERGUNTAR "E A DOCUMENTAÇÃO?"
+
+**Guia Rápido:**
+1. **SEMPRE**: CHANGELOG.md, ROADMAP.md, PROJECT_STATUS.md
+2. **SE APLICÁVEL**: CODING_STANDARDS.md, ARCHITECTURE.md, OPERATIONS_RUNBOOK.md, LESSONS_LEARNED.md, README.md
+3. **MANUAIS**: MANUAL_USUARIO.md (usuário final), TECHNICAL_GUIDE.md (desenvolvedores)
+4. **AUDITORIA**: AUDITORIA_VISUAL.md (análise frontend)
+5. **MCPs**: @postgres (banco), @mcp0_browser_* (navegador)
+
+**Regra de ouro:** Documentação vai junto, sempre!
+
+---

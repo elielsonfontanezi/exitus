@@ -1,0 +1,29 @@
+{# 
+  Componente: Currency Badge
+  Descrição: Badge visual para identificar moeda
+  Props:
+    - moeda: string (BRL, USD, EUR)
+    - size: string (sm, md, lg) - opcional, padrão 'md'
+  Uso:
+    {% include 'components/badges/currency_badge.html' with moeda='BRL' size='md' %}
+#}
+
+{% set badge_classes = {
+  'sm': 'px-2 py-0.5 text-xs',
+  'md': 'px-2.5 py-1 text-sm',
+  'lg': 'px-3 py-1.5 text-base'
+} %}
+
+{% set currency_config = {
+  'BRL': {'symbol': 'R$', 'label': 'BRL', 'color': 'bg-emerald-100 text-emerald-800 border-emerald-300'},
+  'USD': {'symbol': '$', 'label': 'USD', 'color': 'bg-sky-100 text-sky-800 border-sky-300'},
+  'EUR': {'symbol': '€', 'label': 'EUR', 'color': 'bg-indigo-100 text-indigo-800 border-indigo-300'}
+} %}
+
+{% set size_class = badge_classes.get(size, badge_classes['md']) %}
+{% set config = currency_config.get(moeda, currency_config['BRL']) %}
+
+<span class="inline-flex items-center gap-1 font-medium rounded-md border {{ size_class }} {{ config.color }}">
+  <span>{{ config.symbol }}</span>
+  <span>{{ config.label }}</span>
+</span>

@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+{% block title %}Imposto de Renda{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" 
+     x-data="impostoRendaData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Hero Section Ultra-Moderna -->
+  <section class="bg-gradient-hero rounded-3xl mx-6 mt-6 p-8 text-white shadow-large animate-fade-in relative overflow-hidden">
+    <!-- Elementos Decorativos -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
+    
+    <div class="relative z-10">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse-slow">
+              <span class="text-3xl">🧾</span>
+            </div>
+            <div>
+              <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                Imposto de Renda
+              </h1>
+              <p class="text-xl text-white/80">Calculadora, DARFs e compensação de prejuízos</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-8 lg:mt-0 lg:ml-8">
+          <div class="flex flex-wrap gap-3">
+            <a href="/dashboard/" class="btn-secundario">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Voltar
+            </a>
+            {% include 'components/forms/currency_toggle.html' %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Cards de Resumo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- IR Acumulado -->
+      <div class="card card-gradient-danger animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-danger-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-danger-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">IR Acumulado</h3>
+                <p class="text-sm text-white opacity-90">A pagar</p>
+              </div>
+            </div>
+            <span class="badge badge-white text-danger-600" x-text="resumo.ir_acumulado_qtd + ' DARFs'"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="formatCurrency(resumo.ir_acumulado, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white">Próximo venc:</span>
+              <span class="text-white font-medium" x-text="resumo.proximo_vencimento"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prejuízos Acumulados -->
+      <div class="card card-gradient-warning animate-fade-in" style="animation-delay: 100ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-warning-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Prejuízos Acumulados</h3>
+                <p class="text-sm text-gray-600">Compensáveis</p>
+              </div>
+            </div>
+            <span class="badge badge-warning">Disponível</span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.prejuizos_acumulados, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-warning-600">Economia:</span>
+              <span class="text-gray-900 font-medium" x-text="formatCurrency(resumo.prejuizos_economia, currentCurrency)"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IR Pago no Ano -->
+      <div class="card card-gradient animate-fade-in" style="animation-delay: 200ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">IR Pago</h3>
+                <p class="text-sm text-gray-600" x-text="anoAtual"></p>
+              </div>
+            </div>
+            <span class="badge badge-success" x-text="resumo.ir_pago_qtd + ' DARFs'"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.ir_pago_ano, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-gray-600">Média mensal:</span>
+              <span class="text-gray-900 font-medium" x-text="formatCurrency(resumo.ir_pago_medio, currentCurrency)"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alíquota Efetiva -->
+      <div class="card card-gradient-info animate-fade-in" style="animation-delay: 300ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-info-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-info-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Alíquota Efetiva</h3>
+                <p class="text-sm text-white opacity-90">Sobre lucros</p>
+              </div>
+            </div>
+            <span class="badge badge-white text-info-600" x-text="resumo.aliquota_oficial + '%'"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="resumo.aliquota_efetiva.toFixed(2) + '%'"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75">Economia:</span>
+              <span class="text-white font-medium" x-text="(resumo.aliquota_oficial - resumo.aliquota_efetiva).toFixed(2) + '%'"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Abas -->
+    <div class="card card-elevated mb-8">
+      <div class="border-b border-gray-200">
+        <nav class="flex -mb-px">
+          <button @click="abaAtiva = 'calculadora'" :class="abaAtiva === 'calculadora' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            Calculadora
+          </button>
+          <button @click="abaAtiva = 'darfs'" :class="abaAtiva === 'darfs' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            DARFs
+          </button>
+          <button @click="abaAtiva = 'prejuizos'" :class="abaAtiva === 'prejuizos' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+            </svg>
+            Prejuízos
+          </button>
+          <button @click="abaAtiva = 'relatorio'" :class="abaAtiva === 'relatorio' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v1a3 3 0 003 3h0a3 3 0 003-3v-1m-6 0h6M9 11h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Relatório
+          </button>
+        </nav>
+      </div>
+
+      <!-- Conteúdo das Abas -->
+      <div class="p-6">
+        <!-- Calculadora -->
+        <div x-show="abaAtiva === 'calculadora'" x-transition>
+          <h3 class="h3 mb-6">Simulador de IR sobre Venda</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Formulário -->
+            <div>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Ativo</label>
+                  <select x-model="calculadora.ativo" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <option value="">Selecione um ativo</option>
+                    <template x-for="ativo in ativos" :key="ativo.ticker">
+                      <option :value="ativo.ticker" x-text="ativo.ticker + ' - ' + ativo.nome"></option>
+                    </template>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Quantidade</label>
+                  <input type="number" x-model="calculadora.quantidade" @input="calcularIR()" 
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="0">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Preço de Venda</label>
+                  <input type="number" x-model="calculadora.preco_venda" @input="calcularIR()" step="0.01"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="0.00">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Preço de Compra Médio</label>
+                  <input type="number" x-model="calculadora.preco_compra" @input="calcularIR()" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="0.00">
+                </div>
+                <button @click="calcularIR()" class="btn btn-primary w-full">
+                  <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                  </svg>
+                  Calcular IR
+                </button>
+              </div>
+            </div>
+
+            <!-- Resultado -->
+            <div>
+              <div class="bg-gray-50 rounded-lg p-6">
+                <h4 class="font-semibold text-gray-900 mb-4">Resultado da Simulação</h4>
+                <div class="space-y-3">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Valor Total Venda:</span>
+                    <span class="font-medium" x-text="formatCurrency(calculadora.valor_total_venda)"></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Custo Total:</span>
+                    <span class="font-medium" x-text="formatCurrency(calculadora.custo_total)"></span>
+                  </div>
+                  <div class="border-t pt-3">
+                    <div class="flex justify-between">
+                      <span class="text-gray-900 font-semibold">Lucro/Prejuízo:</span>
+                      <span class="font-bold" :class="calculadora.lucro_prejuizo >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                            x-text="formatCurrency(calculadora.lucro_prejuizo)"></span>
+                    </div>
+                  </div>
+                  <div class="border-t pt-3">
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">IR Devido (15%):</span>
+                      <span class="font-bold text-danger-600" x-text="formatCurrency(calculadora.ir_devido)"></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-500">Prejuízo Compensado:</span>
+                      <span class="text-success-600" x-text="formatCurrency(calculadora.prejuizo_compensado)"></span>
+                    </div>
+                  </div>
+                  <div class="border-t pt-3">
+                    <div class="flex justify-between">
+                      <span class="text-gray-900 font-semibold">IR a Pagar:</span>
+                      <span class="font-bold text-danger-600 text-lg" x-text="formatCurrency(calculadora.ir_a_pagar)"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DARFs -->
+        <div x-show="abaAtiva === 'darfs'" x-transition>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">DARFs Emitidos</h3>
+            <button @click="gerarDARF()" class="btn btn-primary">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Gerar DARF
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-3 px-4">Código</th>
+                  <th class="text-left py-3 px-4">Período</th>
+                  <th class="text-right py-3 px-4">Valor</th>
+                  <th class="text-right py-3 px-4">Vencimento</th>
+                  <th class="text-center py-3 px-4">Status</th>
+                  <th class="text-center py-3 px-4">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="darf in darfs" :key="darf.id">
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                      <span class="font-mono text-sm" x-text="darf.codigo"></span>
+                    </td>
+                    <td class="py-3 px-4" x-text="darf.periodo"></td>
+                    <td class="text-right py-3 px-4 font-semibold" x-text="formatCurrency(darf.valor)"></td>
+                    <td class="text-right py-3 px-4" x-text="formatDate(darf.vencimento)"></td>
+                    <td class="text-center py-3 px-4">
+                      <span class="badge" :class="darf.status === 'PAGO' ? 'badge-success' : 
+                                             darf.status === 'VENCIDO' ? 'badge-danger' : 'badge-warning'" 
+                            x-text="darf.status"></span>
+                    </td>
+                    <td class="text-center py-3 px-4">
+                      <div class="flex items-center justify-center gap-2">
+                        <button @click="visualizarDARF(darf)" class="btn btn-outline btn-icon btn-icon-sm">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                          </svg>
+                        </button>
+                        <button @click="baixarDARF(darf)" class="btn btn-outline btn-icon btn-icon-sm">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Prejuízos -->
+        <div x-show="abaAtiva === 'prejuizos'" x-transition>
+          <h3 class="h3 mb-6">Prejuízos Acumulados por Mês/Ano</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Lista de Prejuízos -->
+            <div>
+              <div class="space-y-3">
+                <template x-for="prejuizo in prejuizos" :key="prejuizo.ano + '-' + prejuizo.mes">
+                  <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p class="font-semibold text-gray-900" x-text="prejuizo.mes + '/' + prejuizo.ano"></p>
+                      <p class="text-sm text-gray-600" x-text="prejuizo.ativos + ' ativos'"></p>
+                    </div>
+                    <div class="text-right">
+                      <p class="font-bold text-danger-600" x-text="formatCurrency(prejuizo.valor)"></p>
+                      <p class="text-xs text-success-600" x-text="'Disponível: ' + formatCurrency(prejuizo.disponivel)"></p>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- Gráfico de Prejuízos -->
+            <div>
+              <div class="h-80">
+                <canvas id="prejuizos-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Relatório -->
+        <div x-show="abaAtiva === 'relatorio'" x-transition>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">Relatório Anual de IR</h3>
+            <div class="flex gap-2">
+              <select x-model="anoRelatorio" @change="carregarRelatorio()" class="btn btn-outline">
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+              </select>
+              <button @click="exportarRelatorio()" class="btn btn-primary">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Exportar
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Resumo Anual -->
+            <div class="bg-gray-50 rounded-lg p-6">
+              <h4 class="font-semibold text-gray-900 mb-4">Resumo <span x-text="anoRelatorio"></span></h4>
+              <div class="space-y-3">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Lucros Sujeitos a IR:</span>
+                  <span class="font-medium" x-text="formatCurrency(relatorio.lucros)"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Prejuízos Compensados:</span>
+                  <span class="font-medium text-success-600" x-text="formatCurrency(relatorio.prejuizos_compensados)"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Base de Cálculo:</span>
+                  <span class="font-medium" x-text="formatCurrency(relatorio.base_calculo)"></span>
+                </div>
+                <div class="border-t pt-3">
+                  <div class="flex justify-between">
+                    <span class="text-gray-900 font-semibold">IR Total:</span>
+                    <span class="font-bold text-danger-600" x-text="formatCurrency(relatorio.ir_total)"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gráfico Mensal -->
+            <div>
+              <div class="h-64">
+                <canvas id="relatorio-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/imposto_renda.js"></script>
+{% endblock %}

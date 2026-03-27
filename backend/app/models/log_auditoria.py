@@ -53,6 +53,14 @@ class LogAuditoria(db.Model):
         comment="ID do usuário (NULL para ações anônimas)"
     )
     
+    assessora_id = db.Column(
+        UUID(as_uuid=True),
+        ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID da assessora (multi-tenancy)"
+    )
+    
     # Dados da ação
     acao = db.Column(
         String(50),
@@ -126,6 +134,7 @@ class LogAuditoria(db.Model):
     )
     
     # Relacionamentos
+    assessora = relationship('Assessora', back_populates='logs_auditoria')
     usuario = relationship('Usuario', backref='logs_auditoria', lazy='joined')
     
     # Constraints de tabela

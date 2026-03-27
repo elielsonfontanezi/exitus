@@ -1,0 +1,492 @@
+{% extends "base.html" %}
+{% block title %}Planos de Venda Disciplinada{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50" 
+     x-data="planosVendaData()" 
+     @currency-changed.window="handleCurrencyChange($event.detail)">
+  
+  <!-- Header -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-12">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="display-3 mb-4">Planos de Venda Disciplinada</h1>
+          <p class="text-xl opacity-90">Proteja seus lucros com stop gain e stop loss inteligentes</p>
+        </div>
+        <div class="flex gap-4">
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10 hover:border-white/50">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar
+          </a>
+          {% include 'components/forms/currency_toggle.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-8">
+    
+    <!-- Cards de Resumo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Planos Ativos -->
+      <div class="card card-gradient-success animate-fade-in">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Planos Ativos</h3>
+                <p class="text-sm text-white opacity-90">Monitorando</p>
+              </div>
+            </div>
+            <span class="badge badge-white text-success-600" x-text="resumo.planos_ativos"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="resumo.planos_ativos"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white">Posições:</span>
+              <span class="text-white font-medium" x-text="resumo.posicoes_monitoradas"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lucro Protegido -->
+      <div class="card card-gradient animate-fade-in" style="animation-delay: 100ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Lucro Protegido</h3>
+                <p class="text-sm text-gray-600">Stop gains</p>
+              </div>
+            </div>
+            <span class="badge badge-primary" x-text="resumo.stop_gains"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.lucro_protegido, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-primary-600">Média:</span>
+              <span class="text-gray-900 font-medium" x-text="resumo.media_gains.toFixed(1) + '%'"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prejuízo Limitado -->
+      <div class="card card-gradient-warning animate-fade-in" style="animation-delay: 200ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-warning-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Prejuízo Limitado</h3>
+                <p class="text-sm text-gray-600">Stop losses</p>
+              </div>
+            </div>
+            <span class="badge badge-warning" x-text="resumo.stop_losses"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-gray-900" x-text="formatCurrency(resumo.prejuizo_limitado, currentCurrency)"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-warning-600">Máximo:</span>
+              <span class="text-gray-900 font-medium" x-text="resumo.media_losses.toFixed(1) + '%'"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Execuções Hoje -->
+      <div class="card card-gradient-info animate-fade-in" style="animation-delay: 300ms">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-info-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-info-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white">Execuções Hoje</h3>
+                <p class="text-sm text-white opacity-90">Disparados</p>
+              </div>
+            </div>
+            <span class="badge badge-white text-info-600" x-text="resumo.execucoes_hoje"></span>
+          </div>
+          <div class="space-y-2">
+            <p class="text-2xl font-bold text-white" x-text="resumo.execucoes_hoje"></p>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-white opacity-75">Gains:</span>
+              <span class="text-white font-medium" x-text="resumo.gains_hoje"></span>
+              <span class="text-white opacity-75">Losses:</span>
+              <span class="text-white font-medium" x-text="resumo.losses_hoje"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Abas -->
+    <div class="card card-elevated mb-8">
+      <div class="border-b border-gray-200">
+        <nav class="flex -mb-px">
+          <button @click="abaAtiva = 'planos'" :class="abaAtiva === 'planos' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            Meus Planos
+          </button>
+          <button @click="abaAtiva = 'novo'" :class="abaAtiva === 'novo' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Novo Plano
+          </button>
+          <button @click="abaAtiva = 'posicoes'" :class="abaAtiva === 'posicoes' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            Posições
+          </button>
+          <button @click="abaAtiva = 'historico'" :class="abaAtiva === 'historico' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'" 
+                  class="py-4 px-6 border-b-2 font-medium text-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Histórico
+          </button>
+        </nav>
+      </div>
+
+      <!-- Conteúdo das Abas -->
+      <div class="p-6">
+        <!-- Meus Planos -->
+        <div x-show="abaAtiva === 'planos'" x-transition>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="h3">Planos de Venda Ativos</h3>
+            <button @click="abaAtiva = 'novo'" class="btn btn-primary">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Criar Plano
+            </button>
+          </div>
+          <div class="space-y-4">
+            <template x-for="plano in planos" :key="plano.id">
+              <div class="border rounded-lg p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-4 mb-4">
+                      <h4 class="text-lg font-semibold text-gray-900" x-text="plano.nome"></h4>
+                      <span class="badge" :class="plano.status === 'ativo' ? 'badge-success' : 'badge-warning'" 
+                            x-text="plano.status"></span>
+                      <span class="badge badge-primary" x-text="plano.tipo"></span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                      <div>
+                        <p class="text-sm text-gray-600">Ativo</p>
+                        <p class="font-medium" x-text="plano.ativo"></p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-600">Stop Gain</p>
+                        <p class="font-medium text-success-600" x-text="'+' + plano.stop_gain + '%'"></p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-600">Stop Loss</p>
+                        <p class="font-medium text-danger-600" x-text="'-' + plano.stop_loss + '%'"></p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-600">Quantidade</p>
+                        <p class="font-medium" x-text="plano.quantidade"></p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-6 text-sm text-gray-600">
+                      <span>Preço entrada: <span class="font-medium" x-text="formatCurrency(plano.preco_entrada, currentCurrency)"></span></span>
+                      <span>Preço atual: <span class="font-medium" :class="plano.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                            x-text="formatCurrency(plano.preco_atual, currentCurrency)"></span></span>
+                      <span>Variação: <span class="font-medium" :class="plano.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                            x-text="(plano.variacao >= 0 ? '+' : '') + plano.variacao.toFixed(2) + '%'"></span></span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 ml-4">
+                    <button @click="pausarPlano(plano)" 
+                            :class="plano.status === 'ativo' ? 'btn-warning' : 'btn-success'"
+                            class="btn btn-icon btn-icon-sm">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              x-show="plano.status === 'ativo'"
+                              d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              x-show="plano.status !== 'ativo'"
+                              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                      </svg>
+                    </button>
+                    <button @click="editarPlano(plano)" class="btn btn-outline btn-icon btn-icon-sm">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                    <button @click="excluirPlano(plano)" class="btn btn-outline btn-icon btn-icon-sm text-danger-600">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- Novo Plano -->
+        <div x-show="abaAtiva === 'novo'" x-transition>
+          <h3 class="h3 mb-6">Criar Novo Plano de Venda</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Formulário -->
+            <div>
+              <form @submit.prevent="criarPlano()" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Plano</label>
+                  <input type="text" x-model="novoPlano.nome" required
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                         placeholder="Ex: Venda PETR4 Stop Gain">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Ativo</label>
+                  <select x-model="novoPlano.ativo" required @change="carregarPosicao()" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <option value="">Selecione um ativo</option>
+                    <template x-for="posicao in posicoesDisponiveis" :key="posicao.ativo.ticker">
+                      <option :value="posicao.ativo.ticker" x-text="posicao.ativo.ticker + ' - ' + posicao.ativo.nome + ' (' + posicao.quantidade + ' unidades)'"></option>
+                    </template>
+                  </select>
+                </div>
+                <div x-show="posicaoSelecionada">
+                  <div class="bg-gray-50 p-3 rounded-lg mb-4">
+                    <p class="text-sm text-gray-600">Posição atual:</p>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                      <span class="text-sm">Quantidade: <strong x-text="posicaoSelecionada.quantidade"></strong></span>
+                      <span class="text-sm">Preço médio: <strong x-text="formatCurrency(posicaoSelecionada.preco_medio, currentCurrency)"></strong></span>
+                      <span class="text-sm">Total: <strong x-text="formatCurrency(posicaoSelecionada.quantidade * posicaoSelecionada.preco_medio, currentCurrency)"></strong></span>
+                      <span class="text-sm">Variação: <strong :class="posicaoSelecionada.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" x-text="(posicaoSelecionada.variacao >= 0 ? '+' : '') + posicaoSelecionada.variacao.toFixed(2) + '%'"></strong></span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Plano</label>
+                  <select x-model="novoPlano.tipo" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <option value="stop_gain">Stop Gain</option>
+                    <option value="stop_loss">Stop Loss</option>
+                    <option value="ambos">Stop Gain + Loss</option>
+                  </select>
+                </div>
+                <div x-show="novoPlano.tipo === 'stop_gain' || novoPlano.tipo === 'ambos'">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Stop Gain (%)</label>
+                  <input type="number" x-model="novoPlano.stop_gain" step="0.1" min="0.1" max="100"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="20.0">
+                </div>
+                <div x-show="novoPlano.tipo === 'stop_loss' || novoPlano.tipo === 'ambos'">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Stop Loss (%)</label>
+                  <input type="number" x-model="novoPlano.stop_loss" step="0.1" min="0.1" max="100"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="10.0">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Quantidade para Vender</label>
+                  <input type="number" x-model="novoPlano.quantidade" min="1" :max="posicaoSelecionada?.quantidade || 999999"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="100">
+                  <p class="text-xs text-gray-500 mt-1" x-show="posicaoSelecionada">
+                    Máximo disponível: <span x-text="posicaoSelecionada.quantidade"></span> unidades
+                  </p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Vencimento (opcional)</label>
+                  <input type="date" x-model="novoPlano.data_vencimento"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <div class="flex gap-2">
+                  <button type="submit" class="btn btn-primary flex-1">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Criar Plano
+                  </button>
+                  <button type="button" @click="simularPlano()" class="btn btn-outline">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    Simular
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Preview e Alertas -->
+            <div>
+              <div class="bg-gray-50 rounded-lg p-6 mb-4">
+                <h4 class="font-semibold text-gray-900 mb-4">Preview do Plano</h4>
+                <div class="space-y-3">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Valor da posição:</span>
+                    <span class="font-medium" x-text="formatCurrency(getValorPosicao())"></span>
+                  </div>
+                  <div x-show="novoPlano.stop_gain">
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Preço Stop Gain:</span>
+                      <span class="font-medium text-success-600" x-text="formatCurrency(getPrecoStopGain())"></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Lucro estimado:</span>
+                      <span class="font-medium text-success-600" x-text="formatCurrency(getLucroEstimado())"></span>
+                    </div>
+                  </div>
+                  <div x-show="novoPlano.stop_loss">
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Preço Stop Loss:</span>
+                      <span class="font-medium text-danger-600" x-text="formatCurrency(getPrecoStopLoss())"></span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Prejuízo máximo:</span>
+                      <span class="font-medium text-danger-600" x-text="formatCurrency(getPrejuizoMaximo())"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Alertas Inteligentes -->
+              <div class="bg-gradient-to-r from-warning-50 to-danger-50 rounded-lg p-6">
+                <h4 class="font-semibold text-gray-900 mb-4">
+                  <svg class="w-4 h-4 inline mr-2 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                  Alertas Inteligentes
+                </h4>
+                <div class="space-y-2 text-sm">
+                  <p class="text-gray-700">• <span class="font-medium">Volatilidade alta detectada:</span> Considere stop loss mais apertado</p>
+                  <p class="text-gray-700">• <span class="font-medium">Proximidade de suporte:</span> Preço atual próximo a R$ 28,50</p>
+                  <p class="text-gray-700">• <span class="font-medium">Volume anômalo:</span> Aumento de 300% nas últimas 2 horas</p>
+                  <p class="text-gray-700">• <span class="font-medium">Recomendação:</span> Stop gain em +25% para capturar tendência</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Posições -->
+        <div x-show="abaAtiva === 'posicoes'" x-transition>
+          <h3 class="h3 mb-6">Posições Disponíveis</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-3 px-4">Ativo</th>
+                  <th class="text-right py-3 px-4">Quantidade</th>
+                  <th class="text-right py-3 px-4">Preço Médio</th>
+                  <th class="text-right py-3 px-4">Preço Atual</th>
+                  <th class="text-right py-3 px-4">Variação</th>
+                  <th class="text-right py-3 px-4">Total</th>
+                  <th class="text-center py-3 px-4">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="posicao in posicoesDisponiveis" :key="posicao.ativo.ticker">
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                      <div>
+                        <p class="font-medium" x-text="posicao.ativo.ticker"></p>
+                        <p class="text-sm text-gray-600" x-text="posicao.ativo.nome"></p>
+                      </div>
+                    </td>
+                    <td class="text-right py-3 px-4" x-text="posicao.quantidade"></td>
+                    <td class="text-right py-3 px-4" x-text="formatCurrency(posicao.preco_medio, currentCurrency)"></td>
+                    <td class="text-right py-3 px-4" x-text="formatCurrency(posicao.preco_atual, currentCurrency)"></td>
+                    <td class="text-right py-3 px-4">
+                      <span :class="posicao.variacao >= 0 ? 'text-success-600' : 'text-danger-600'" 
+                            x-text="(posicao.variacao >= 0 ? '+' : '') + posicao.variacao.toFixed(2) + '%'"></span>
+                    </td>
+                    <td class="text-right py-3 px-4 font-semibold" x-text="formatCurrency(posicao.quantidade * posicao.preco_atual, currentCurrency)"></td>
+                    <td class="text-center py-3 px-4">
+                      <button @click="criarPlanoParaPosicao(posicao)" class="btn btn-primary btn-sm">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Criar Plano
+                      </button>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Histórico -->
+        <div x-show="abaAtiva === 'historico'" x-transition>
+          <h3 class="h3 mb-6">Histórico de Execuções</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-3 px-4">Data</th>
+                  <th class="text-left py-3 px-4">Plano</th>
+                  <th class="text-left py-3 px-4">Ativo</th>
+                  <th class="text-right py-3 px-4">Quantidade</th>
+                  <th class="text-right py-3 px-4">Preço</th>
+                  <th class="text-right py-3 px-4">Total</th>
+                  <th class="text-center py-3 px-4">Tipo</th>
+                  <th class="text-center py-3 px-4">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template xfor="execucao in historico" :key="execucao.id">
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4" x-text="formatDateTime(execucao.data)"></td>
+                    <td class="py-3 px-4" x-text="execucao.plano"></td>
+                    <td class="py-3 px-4" x-text="execucao.ativo"></td>
+                    <td class="text-right py-3 px-4" x-text="execucao.quantidade"></td>
+                    <td class="text-right py-3 px-4" x-text="formatCurrency(execucao.preco, currentCurrency)"></td>
+                    <td class="text-right py-3 px-4 font-semibold" x-text="formatCurrency(execucao.total, currentCurrency)"></td>
+                    <td class="text-center py-3 px-4">
+                      <span class="badge" :class="execucao.tipo === 'gain' ? 'badge-success' : 'badge-danger'" 
+                            x-text="execucao.tipo"></span>
+                    </td>
+                    <td class="text-center py-3 px-4">
+                      <span class="badge" :class="execucao.status === 'executado' ? 'badge-success' : 'badge-warning'" 
+                            x-text="execucao.status"></span>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/js/planos_venda.js"></script>
+{% endblock %}

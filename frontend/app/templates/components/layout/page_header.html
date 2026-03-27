@@ -1,0 +1,32 @@
+{# 
+  Componente: Page Header
+  Descrição: Cabeçalho padrão de página
+  Props:
+    - title: string - título da página
+    - subtitle: string - subtítulo (opcional)
+    - icon: string - emoji/ícone (opcional)
+    - actions: boolean - slot para ações (opcional)
+  Uso:
+    {% include 'components/layout/page_header.html' with title='Ativos Cadastrados' subtitle='Gerencie seus ativos' icon='📊' %}
+#}
+
+<div class="bg-white border-b border-gray-200 px-6 py-4">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      {% if icon %}
+        <span class="text-3xl">{{ icon }}</span>
+      {% endif %}
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">{{ title }}</h1>
+        {% if subtitle %}
+          <p class="text-sm text-gray-600 mt-1">{{ subtitle }}</p>
+        {% endif %}
+      </div>
+    </div>
+    {% if actions %}
+      <div class="flex items-center gap-2">
+        {{ caller() if caller }}
+      </div>
+    {% endif %}
+  </div>
+</div>

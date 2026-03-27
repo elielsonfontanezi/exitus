@@ -1,0 +1,71 @@
+{# 
+  Componente: Performance Bar Chart
+  Descrição: Gráfico de barras para performance por ativo
+  Props:
+    - data: list - dados [{ticker, rentabilidade}]
+    - chart_id: string - ID único do canvas
+  Uso:
+    {% include 'components/charts/performance_bar_chart.html' with data=[...] chart_id='performance-chart' %}
+#}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">Performance por Ativo</h3>
+  <div class="relative h-64">
+    <canvas id="{{ chart_id|default('performance-chart') }}"></canvas>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('{{ chart_id|default('performance-chart') }}').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [{% for item in data %}'{{ item.ticker }}'{% if not loop.last %},{% endif %}{% endfor %}],
+          datasets: [{
+            label: 'Rentabilidade (%)',
+            data: [{% for item in data %}{{ item.rentabilidade }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: [
+              {% for item in data %}
+                {% if item.rentabilidade >= 0 %}
+                  'rgba(34, 197, 94, 0.8)'
+                {% else %}
+                  'rgba(239, 68, 68, 0.8)'
+                {% endif %}
+                {% if not loop.last %},{% endif %}
+              {% endfor %}
+            ],
+            borderColor: [
+              {% for item in data %}
+                {% if item.rentabilidade >= 0 %}
+                  'rgba(34, 197, 94, 1)'
+                {% else %}
+                  'rgba(239, 68, 68, 1)'
+                {% endif %}
+                {% if not loop.last %},{% endif %}
+              {% endfor %}
+            ],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</div>

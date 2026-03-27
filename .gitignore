@@ -47,3 +47,13 @@ exitus-db/
 Thumbs.db
 exitus_fontes.txt
 docs/exitus_fontes.txt
+
+# Windsuf
+.windsurf/
+
+# Temporarios
+cookies*.txt
+# Pastas de dependências e artefatos de teste e2e
+tests/e2e/node_modules/
+tests/e2e/reports/
+tests/e2e/test-results/
