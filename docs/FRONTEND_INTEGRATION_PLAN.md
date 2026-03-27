@@ -109,14 +109,41 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 
 ---
 
-## 🔄 Próximos Passos
+## � Dashboard Evolution Strategy
 
-1. ✅ Arquivar docs UX obsoletos
-2. ⏳ Criar API_FRONTEND_MAPPING.md detalhado
-3. ⏳ Fechar branch atual
-4. ⏳ Criar branch feature/frontend-api-integration
-5. ⏳ Iniciar Sprint 1
+### Decisão: EVOLUIR, não substituir
+
+O dashboard atual (`/dashboard`) está **100% funcional** com dados reais (R$ 257.677,50).
+
+**Estratégia:**
+- ✅ **Manter** 6 cards principais e quick actions
+- ➕ **Adicionar** widgets incrementalmente (Sprints 3-8)
+- �🔄 **Evoluir** para multi-moeda quando backend suportar
+
+**Roadmap de Widgets:**
+- Sprint 3-4: Gráficos (Evolução, Alocação, Top 5)
+- Sprint 5: Proventos (Calendário, Próximos)
+- Sprint 6: Fiscal (IR, DARF)
+- Sprint 7-8: Multi-moeda (se backend pronto)
+
+**Detalhes:** Consultar `DASHBOARD_EVOLUTION.md`
 
 ---
 
-**Consultar:** `API_FRONTEND_MAPPING.md` para detalhes de cada endpoint
+## 🔄 Próximos Passos
+
+1. ✅ Arquivar docs UX obsoletos
+2. ✅ Criar API_FRONTEND_MAPPING.md detalhado
+3. ✅ Documentar estratégia de dashboard
+4. ⏳ Iniciar Sprint 1 (Operações)
+
+---
+
+## 📚 Documentação de Referência
+
+- **`FRONTEND_INTEGRATION_PLAN.md`** (este documento) — Estratégia geral
+- **`API_FRONTEND_MAPPING.md`** — Mapeamento API ↔ Tela
+- **`DASHBOARD_EVOLUTION.md`** — Evolução do dashboard
+- **`FRONTEND_WIREFRAMES.md`** — Wireframes completos
+- **`API_REFERENCE.md`** — Contratos das APIs
+- **`UX_DESIGN_SYSTEM.md`** — Componentes visuais
