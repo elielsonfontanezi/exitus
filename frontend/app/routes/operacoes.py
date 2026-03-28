@@ -25,8 +25,8 @@ def compra():
     corretoras = []
     if corretoras_response.status_code == 200:
         result = corretoras_response.json()
-        # A API retorna {corretoras: [...], total: n}
-        corretoras = result.get('corretoras', [])
+        # A API retorna {data: {corretoras: [...], total: n}, success: true}
+        corretoras = result.get('data', {}).get('corretoras', [])
     
     return render_template('operacoes/compra.html', corretoras=corretoras)
 
@@ -66,8 +66,8 @@ def venda():
     corretoras = []
     if corretoras_response.status_code == 200:
         result = corretoras_response.json()
-        # A API retorna {corretoras: [...], total: n}
-        corretoras = result.get('corretoras', [])
+        # A API retorna {data: {corretoras: [...], total: n}, success: true}
+        corretoras = result.get('data', {}).get('corretoras', [])
     
     return render_template('operacoes/venda.html', 
                          posicoes=posicoes, 

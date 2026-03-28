@@ -285,7 +285,7 @@ function compraForm() {
                 });
                 const data = await response.json();
                 if (data.success) {
-                    this.suggestions = data.data.slice(0, 10);
+                    this.suggestions = data.data.ativos.slice(0, 10);
                 }
             } catch (error) {
                 console.error('Erro ao buscar ativos:', error);
