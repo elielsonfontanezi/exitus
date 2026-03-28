@@ -2,158 +2,238 @@
 
 {% block title %}Nova Compra - Exitus{% endblock %}
 
+{% block extra_css %}
+<style>
+    body {
+        background: #f8f9fa !important;
+    }
+    
+    .compra-card {
+        background: #FFFFFF !important;
+        border: 1px solid #E3E6ED !important;
+        border-radius: 12px !important;
+        box-shadow: rgb(230, 230, 229) 0px 0px 12px 0px !important;
+        padding: 24px !important;
+    }
+
+    .form-label {
+        color: #735c43;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #E3E6ED !important;
+        border-radius: 8px !important;
+        padding: 0.625rem 1rem !important;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #a38c65 !important;
+        box-shadow: 0 0 0 3px rgba(163, 140, 101, 0.1) !important;
+        outline: none;
+    }
+
+    .btn-primary-exitus {
+        background: linear-gradient(135deg, #a38c65 0%, #8b7355 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary-exitus:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(163, 140, 101, 0.4);
+    }
+
+    .btn-primary-exitus:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .suggestion-item {
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    .suggestion-item:hover {
+        background-color: #f8f6f3;
+    }
+
+    .badge-ativo {
+        background-color: #f8f6f3;
+        color: #a38c65;
+        border: 1px solid #e0dacc;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .resumo-box {
+        background-color: #fcfbf9;
+        border: 1px dashed #e0dacc;
+        border-radius: 8px;
+        padding: 16px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid py-4" x-data="compraForm()">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="h4 mb-1">➕ Nova Compra</h2>
-                    <p class="text-muted mb-0">Comprar ativos para sua carteira</p>
-                </div>
-                <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
-                    ← Voltar
-                </a>
-            </div>
-
-            <!-- Formulário -->
-            <div class="card">
-                <div class="card-body">
-                    <form @submit.prevent="submitCompra" id="formCompra">
-                        <!-- Seleção de Ativo com Autocomplete -->
-                        <div class="mb-4">
-                            <label for="ativo_search" class="form-label fw-semibold">
-                                📈 Ativo <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="ativo_search"
-                                   x-model="searchTicker"
-                                   @input.debounce.300ms="searchAtivos"
-                                   @focus="showSuggestions = true"
-                                   placeholder="Digite o ticker (ex: PETR4, VALE3)..."
-                                   autocomplete="off"
-                                   required>
-                            
-                            <!-- Sugestões de Ativos -->
-                            <div x-show="showSuggestions && suggestions.length > 0" 
-                                 class="list-group position-absolute" 
-                                 style="z-index: 1000; max-width: 100%;">
-                                <template x-for="ativo in suggestions" :key="ativo.id">
-                                    <button type="button" 
-                                            class="list-group-item list-group-item-action"
-                                            @click="selectAtivo(ativo)"
-                                            x-text="`${ativo.ticker} - ${ativo.nome}`">
-                                    </button>
-                                </template>
-                            </div>
-                            
-                            <!-- Ativo Selecionado -->
-                            <div x-show="selectedAtivo" class="mt-2">
-                                <span class="badge bg-primary" x-text="selectedAtivo?.ticker + ' - ' + selectedAtivo?.nome"></span>
-                                <button type="button" class="btn btn-sm btn-link text-danger" @click="clearAtivo">✕ Limpar</button>
-                            </div>
-                            
-                            <div class="form-text">
-                                Busque o ativo que deseja comprar
-                            </div>
-                        </div>
-
-                        <!-- Data da Transação -->
-                        <div class="mb-4">
-                            <label for="data_transacao" class="form-label fw-semibold">
-                                📅 Data da Transação <span class="text-danger">*</span>
-                            </label>
-                            <input type="date" 
-                                   class="form-control" 
-                                   id="data_transacao"
-                                   x-model="form.data_transacao"
-                                   required>
-                            <div class="form-text">
-                                Data em que a operação foi realizada
-                            </div>
-                        </div>
-
-                        <!-- Quantidade e Preço -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label for="quantidade" class="form-label fw-semibold">
-                                    📊 Quantidade <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="quantidade" 
-                                       x-model="form.quantidade"
-                                       min="0.01" 
-                                       step="0.01"
-                                       required>
-                                <div class="form-text">
-                                    Quantidade de ativos a comprar
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="preco" class="form-label fw-semibold">
-                                    💰 Preço Unitário <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="preco" 
-                                       x-model="form.preco_unitario"
-                                       min="0.01" 
-                                       step="0.01"
-                                       required>
-                                <div class="form-text">
-                                    Preço por unidade
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Corretora -->
-                        <div class="mb-4">
-                            <label for="corretora_id" class="form-label fw-semibold">
-                                🏢 Corretora <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select" id="corretora_id" x-model="form.corretora_id" required>
-                                <option value="">Selecione a corretora...</option>
-                                {% for corretora in corretoras %}
-                                <option value="{{ corretora.id }}">
-                                    {{ corretora.nome }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <!-- Resumo da Operação -->
-                        <div class="alert alert-light">
-                            <h6 class="alert-heading">📋 Resumo da Operação</h6>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <strong>Ativo:</strong> <span x-text="selectedAtivo ? `${selectedAtivo.ticker} - ${selectedAtivo.nome}` : '-'"></span><br>
-                                    <strong>Quantidade:</strong> <span x-text="form.quantidade || '-'"></span><br>
-                                    <strong>Preço Unitário:</strong> R$ <span x-text="form.preco_unitario ? parseFloat(form.preco_unitario).toFixed(2) : '-'"></span>
-                                </div>
-                                <div class="col-sm-6">
-                                    <strong>Valor Total:</strong> R$ <span class="fs-5 text-primary" x-text="valorTotal.toFixed(2)"></span><br>
-                                    <strong>Data:</strong> <span x-text="form.data_transacao || '-'"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Botões -->
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
-                                Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-success btn-lg" :disabled="loading || !selectedAtivo">
-                                <span x-show="!loading">💰 Confirmar Compra</span>
-                                <span x-show="loading">⏳ Processando...</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<div class="container mx-auto max-w-4xl py-8" x-data="compraForm()">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-bold flex items-center gap-3" style="color: #735c43;">
+                <span class="text-3xl">➕</span> Nova Compra
+            </h1>
+            <p class="text-gray-500 mt-1">Registre a aquisição de um novo ativo em sua carteira</p>
         </div>
+        <a href="{{ url_for('dashboard.index') }}" class="flex items-center gap-2 text-[#a38c65] font-semibold hover:underline">
+            <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+        </a>
+    </div>
+
+    <div class="compra-card">
+        <form @submit.prevent="submitCompra" class="space-y-6">
+            
+            <!-- Seleção de Ativo -->
+            <div class="relative">
+                <label class="form-label">
+                    <i class="fas fa-chart-line"></i> Ativo <span class="text-red-500">*</span>
+                </label>
+                
+                <div x-show="!selectedAtivo">
+                    <input type="text" 
+                           class="form-control w-full" 
+                           x-model="searchTicker"
+                           @input.debounce.300ms="searchAtivos"
+                           @focus="showSuggestions = true"
+                           placeholder="Digite o ticker (ex: PETR4, VALE3, AAPL)..."
+                           autocomplete="off">
+                    
+                    <div x-show="showSuggestions && suggestions.length > 0" 
+                         class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                        <template x-for="ativo in suggestions" :key="ativo.id">
+                            <div class="suggestion-item" @click="selectAtivo(ativo)">
+                                <div class="font-bold text-[#735c43]" x-text="ativo.ticker"></div>
+                                <div class="text-sm text-gray-500" x-text="ativo.nome"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div x-show="selectedAtivo" class="flex items-center">
+                    <div class="badge-ativo">
+                        <span x-text="selectedAtivo?.ticker"></span>
+                        <span class="text-gray-400">|</span>
+                        <span x-text="selectedAtivo?.nome" class="text-sm"></span>
+                        <button type="button" @click="clearAtivo" class="text-red-400 hover:text-red-600 ml-2">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Data -->
+                <div>
+                    <label class="form-label">
+                        <i class="far fa-calendar-alt"></i> Data da Operação <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date" class="form-control w-full" x-model="form.data_transacao" required>
+                </div>
+
+                <!-- Corretora -->
+                <div>
+                    <label class="form-label">
+                        <i class="fas fa-building"></i> Corretora <span class="text-red-500">*</span>
+                    </label>
+                    <select class="form-select w-full" x-model="form.corretora_id" required>
+                        <option value="">Selecione uma corretora</option>
+                        {% for corretora in corretoras %}
+                        <option value="{{ corretora.id }}">{{ corretora.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Quantidade -->
+                <div>
+                    <label class="form-label">
+                        <i class="fas fa-layer-group"></i> Quantidade <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" class="form-control w-full" x-model="form.quantidade" min="0.00000001" step="any" placeholder="0,00" required>
+                </div>
+
+                <!-- Preço Unitário -->
+                <div>
+                    <label class="form-label">
+                        <i class="fas fa-tag"></i> Preço Unitário <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-semibold" x-text="moedaSimbolo"></span>
+                        <input type="number" class="form-control w-full pl-12" x-model="form.preco_unitario" min="0.01" step="0.01" placeholder="0,00" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumo da Operação -->
+            <div class="resumo-box mt-8">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
+                    <i class="fas fa-file-invoice-dollar"></i> Resumo da Operação
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-xs text-gray-500">Ativo</div>
+                        <div class="font-bold text-[#735c43]" x-text="selectedAtivo ? selectedAtivo.ticker : '---'"></div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500">Investimento Total</div>
+                        <div class="text-lg font-bold text-[#a38c65]" x-text="formatCurrency(valorTotal)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex justify-end items-center gap-4 pt-4">
+                <a href="{{ url_for('dashboard.index') }}" class="text-gray-500 font-semibold hover:text-gray-700">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn-primary-exitus min-w-[200px]" :disabled="loading || !selectedAtivo || !form.quantidade || !form.preco_unitario">
+                    <template x-if="!loading">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Confirmar Compra</span>
+                        </div>
+                    </template>
+                    <template x-if="loading">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Processando...</span>
+                        </div>
+                    </template>
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -164,6 +244,8 @@ function compraForm() {
         suggestions: [],
         showSuggestions: false,
         selectedAtivo: null,
+        loading: false,
+        moedaSimbolo: 'R$',
         form: {
             tipo: 'compra',
             ativo_id: '',
@@ -171,13 +253,12 @@ function compraForm() {
             data_transacao: new Date().toISOString().split('T')[0],
             quantidade: '',
             preco_unitario: '',
-            taxa_corretagem: 0,
-            taxa_liquidacao: 0,
-            emolumentos: 0,
-            imposto: 0,
-            outros_custos: 0
+            taxa_corretagem: '0',
+            taxa_liquidacao: '0',
+            emolumentos: '0',
+            imposto: '0',
+            outros_custos: '0'
         },
-        loading: false,
 
         get valorTotal() {
             const qtd = parseFloat(this.form.quantidade) || 0;
@@ -211,6 +292,15 @@ function compraForm() {
             this.searchTicker = ativo.ticker;
             this.suggestions = [];
             this.showSuggestions = false;
+            
+            // Ajustar símbolo da moeda baseado no mercado
+            if (ativo.mercado === 'US') {
+                this.moedaSimbolo = '$';
+            } else if (ativo.mercado === 'EU') {
+                this.moedaSimbolo = '€';
+            } else {
+                this.moedaSimbolo = 'R$';
+            }
         },
 
         clearAtivo() {
@@ -218,34 +308,28 @@ function compraForm() {
             this.form.ativo_id = '';
             this.searchTicker = '';
             this.suggestions = [];
+            this.moedaSimbolo = 'R$';
+        },
+
+        formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: this.moedaSimbolo === '$' ? 'USD' : (this.moedaSimbolo === '€' ? 'EUR' : 'BRL')
+            }).format(value);
         },
 
         async submitCompra() {
-            if (!this.selectedAtivo) {
-                alert('Por favor, selecione um ativo.');
-                return;
-            }
-
-            if (!confirm(`Confirmar compra de ${this.form.quantidade} ${this.selectedAtivo.ticker} por R$ ${this.valorTotal.toFixed(2)}?`)) {
-                return;
-            }
+            if (!this.selectedAtivo) return;
 
             this.loading = true;
             const token = localStorage.getItem('access_token');
 
             try {
                 const payload = {
-                    tipo: 'compra',
-                    ativo_id: this.form.ativo_id,
-                    corretora_id: this.form.corretora_id,
+                    ...this.form,
                     data_transacao: this.form.data_transacao + 'T12:00:00',
                     quantidade: this.form.quantidade.toString(),
-                    preco_unitario: this.form.preco_unitario.toString(),
-                    taxa_corretagem: '0',
-                    taxa_liquidacao: '0',
-                    emolumentos: '0',
-                    imposto: '0',
-                    outros_custos: '0'
+                    preco_unitario: this.form.preco_unitario.toString()
                 };
 
                 const response = await fetch('http://localhost:5000/api/transacoes', {
@@ -260,6 +344,7 @@ function compraForm() {
                 const data = await response.json();
 
                 if (data.success) {
+                    // Feedback visual pode ser melhorado com toast no futuro
                     alert('✅ Compra registrada com sucesso!');
                     window.location.href = '{{ url_for("dashboard.index") }}';
                 } else {
@@ -267,7 +352,7 @@ function compraForm() {
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                alert('❌ Erro ao processar compra. Verifique o console.');
+                alert('❌ Erro de conexão com o servidor.');
             } finally {
                 this.loading = false;
             }

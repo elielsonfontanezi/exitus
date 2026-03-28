@@ -135,9 +135,9 @@ O dashboard atual (`/dashboard`) está **100% funcional** com dados reais (R$ 25
 1. ✅ Arquivar docs UX obsoletos
 2. ✅ Criar API_FRONTEND_MAPPING.md detalhado
 3. ✅ Documentar estratégia de dashboard
-4. ✅ Sprint 1: Tela Compra implementada (precisa correção de estilo)
-5. ⏳ Corrigir tela de compra para seguir UX_DESIGN_SYSTEM.md
-6. ⏳ Implementar tela de venda com estilo consistente
+4. ✅ Sprint 1: Tela Compra refatorada (Tailwind/API REST) - 28/03/2026
+5. ⏳ Implementar tela de venda com estilo consistente (Próximo)
+6. ⏳ Implementar Importação B3 (upload drag & drop)
 
 ---
 

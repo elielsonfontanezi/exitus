@@ -2,7 +2,7 @@
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
 > **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 436/497 passing (87.7%)  
-> **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅ | **Token Refresh:** ✅ Concluído (26/03/2026)  
+> **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅ | **Frontend API-Driven:** 🔄 Sprint 1 em Progresso (28/03/2026) | **Token Refresh:** ✅ Concluído (26/03/2026)  
 > **Dashboard:** ✅ Posições geradas automaticamente (R$ 257.677,50) + Hook em Transacao + Seed completo | **Versão:** v0.9.8 | **Última atualização:** 26/03/2026
 
 ---
@@ -100,8 +100,8 @@ Maio 2026:
 **Status:** � Sprint 1 em Progresso | **Início:** 27/03/2026 | **Duração:** 8 semanas
 
 ### Sprint 1: Operações Essenciais (P0)
-- ✅ **Tela Compra:** Alpine.js, autocomplete, API REST (28/03/2026)
-- ⏳ **Tela Venda:** Similar à compra (em progresso)
+- ✅ **Tela Compra:** Refatorada para Tailwind/Design System + API REST (28/03/2026)
+- ⏳ **Tela Venda:** Similar à compra (próximo passo)
 - ⏳ **Importação B3:** Upload drag & drop
 - ⏳ **Histórico Transações:** Tabela paginada
 
