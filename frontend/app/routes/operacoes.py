@@ -10,35 +10,13 @@ from .auth import login_required
 
 bp = Blueprint('operacoes', __name__, url_prefix='/operacoes')
 
-@bp.route('/compra', methods=['GET', 'POST'])
+@bp.route('/compra', methods=['GET'])
 @login_required
 def compra():
-    """Página de compra de ativos"""
-    if request.method == 'POST':
-        # Processar formulário de compra
-        ativo_id = request.form.get('ativo_id')
-        quantidade = request.form.get('quantidade')
-        preco = request.form.get('preco')
-        corretora_id = request.form.get('corretora_id')
-        
-        # TODO: Validar e submeter para API
-        flash('Operação de compra registrada com sucesso!', 'success')
-        return redirect(url_for('dashboard.index'))
-    
-    # Buscar ativos disponíveis
+    """Página de compra de ativos (integração via API REST no frontend)"""
     headers = {'Authorization': f"Bearer {session.get('access_token')}"}
     
-    # Buscar ativos do usuário
-    ativos_response = requests.get(
-        f"{Config.BACKEND_API_URL}/api/ativos",
-        headers=headers
-    )
-    
-    ativos = []
-    if ativos_response.status_code == 200:
-        ativos = ativos_response.json().get('data', [])
-    
-    # Buscar corretoras
+    # Buscar corretoras para popular select
     corretoras_response = requests.get(
         f"{Config.BACKEND_API_URL}/api/corretoras",
         headers=headers
@@ -48,9 +26,7 @@ def compra():
     if corretoras_response.status_code == 200:
         corretoras = corretoras_response.json().get('data', [])
     
-    return render_template('operacoes/compra.html', 
-                         ativos=ativos, 
-                         corretoras=corretoras)
+    return render_template('operacoes/compra.html', corretoras=corretoras)
 
 @bp.route('/venda', methods=['GET', 'POST'])
 @login_required

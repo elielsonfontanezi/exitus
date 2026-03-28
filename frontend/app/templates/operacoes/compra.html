@@ -3,7 +3,7 @@
 {% block title %}Nova Compra - Exitus{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-4" x-data="compraForm()">
     <div class="row">
         <div class="col-lg-8 mx-auto">
             <!-- Header -->
@@ -20,25 +20,58 @@
             <!-- Formulário -->
             <div class="card">
                 <div class="card-body">
-                    <form method="POST" id="formCompra">
-                        <!-- Seleção de Ativo -->
+                    <form @submit.prevent="submitCompra" id="formCompra">
+                        <!-- Seleção de Ativo com Autocomplete -->
                         <div class="mb-4">
-                            <label for="ativo_id" class="form-label fw-semibold">
+                            <label for="ativo_search" class="form-label fw-semibold">
                                 📈 Ativo <span class="text-danger">*</span>
                             </label>
-                            <select class="form-select" id="ativo_id" name="ativo_id" required>
-                                <option value="">Selecione um ativo...</option>
-                                {% for ativo in ativos %}
-                                <option value="{{ ativo.id }}" 
-                                        data-ticker="{{ ativo.ticker }}"
-                                        data-nome="{{ ativo.nome }}"
-                                        data-tipo="{{ ativo.tipo.value if ativo.tipo else '' }}">
-                                    {{ ativo.ticker }} - {{ ativo.nome }}
-                                </option>
-                                {% endfor %}
-                            </select>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="ativo_search"
+                                   x-model="searchTicker"
+                                   @input.debounce.300ms="searchAtivos"
+                                   @focus="showSuggestions = true"
+                                   placeholder="Digite o ticker (ex: PETR4, VALE3)..."
+                                   autocomplete="off"
+                                   required>
+                            
+                            <!-- Sugestões de Ativos -->
+                            <div x-show="showSuggestions && suggestions.length > 0" 
+                                 class="list-group position-absolute" 
+                                 style="z-index: 1000; max-width: 100%;">
+                                <template x-for="ativo in suggestions" :key="ativo.id">
+                                    <button type="button" 
+                                            class="list-group-item list-group-item-action"
+                                            @click="selectAtivo(ativo)"
+                                            x-text="`${ativo.ticker} - ${ativo.nome}`">
+                                    </button>
+                                </template>
+                            </div>
+                            
+                            <!-- Ativo Selecionado -->
+                            <div x-show="selectedAtivo" class="mt-2">
+                                <span class="badge bg-primary" x-text="selectedAtivo?.ticker + ' - ' + selectedAtivo?.nome"></span>
+                                <button type="button" class="btn btn-sm btn-link text-danger" @click="clearAtivo">✕ Limpar</button>
+                            </div>
+                            
                             <div class="form-text">
                                 Busque o ativo que deseja comprar
+                            </div>
+                        </div>
+
+                        <!-- Data da Transação -->
+                        <div class="mb-4">
+                            <label for="data_transacao" class="form-label fw-semibold">
+                                📅 Data da Transação <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="data_transacao"
+                                   x-model="form.data_transacao"
+                                   required>
+                            <div class="form-text">
+                                Data em que a operação foi realizada
                             </div>
                         </div>
 
@@ -51,8 +84,8 @@
                                 <input type="number" 
                                        class="form-control" 
                                        id="quantidade" 
-                                       name="quantidade" 
-                                       min="1" 
+                                       x-model="form.quantidade"
+                                       min="0.01" 
                                        step="0.01"
                                        required>
                                 <div class="form-text">
@@ -66,7 +99,7 @@
                                 <input type="number" 
                                        class="form-control" 
                                        id="preco" 
-                                       name="preco" 
+                                       x-model="form.preco_unitario"
                                        min="0.01" 
                                        step="0.01"
                                        required>
@@ -81,7 +114,7 @@
                             <label for="corretora_id" class="form-label fw-semibold">
                                 🏢 Corretora <span class="text-danger">*</span>
                             </label>
-                            <select class="form-select" id="corretora_id" name="corretora_id" required>
+                            <select class="form-select" id="corretora_id" x-model="form.corretora_id" required>
                                 <option value="">Selecione a corretora...</option>
                                 {% for corretora in corretoras %}
                                 <option value="{{ corretora.id }}">
@@ -96,13 +129,13 @@
                             <h6 class="alert-heading">📋 Resumo da Operação</h6>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <strong>Ativo:</strong> <span id="resumo-ativo">-</span><br>
-                                    <strong>Quantidade:</strong> <span id="resumo-quantidade">-</span><br>
-                                    <strong>Preço Unitário:</strong> R$ <span id="resumo-preco">-</span>
+                                    <strong>Ativo:</strong> <span x-text="selectedAtivo ? `${selectedAtivo.ticker} - ${selectedAtivo.nome}` : '-'"></span><br>
+                                    <strong>Quantidade:</strong> <span x-text="form.quantidade || '-'"></span><br>
+                                    <strong>Preço Unitário:</strong> R$ <span x-text="form.preco_unitario ? parseFloat(form.preco_unitario).toFixed(2) : '-'"></span>
                                 </div>
                                 <div class="col-sm-6">
-                                    <strong>Valor Total:</strong> R$ <span id="resumo-total" class="fs-5 text-primary">0,00</span><br>
-                                    <strong>Corretora:</strong> <span id="resumo-corretora">-</span>
+                                    <strong>Valor Total:</strong> R$ <span class="fs-5 text-primary" x-text="valorTotal.toFixed(2)"></span><br>
+                                    <strong>Data:</strong> <span x-text="form.data_transacao || '-'"></span>
                                 </div>
                             </div>
                         </div>
@@ -112,8 +145,9 @@
                             <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
                                 Cancelar
                             </a>
-                            <button type="submit" class="btn btn-success btn-lg">
-                                💰 Confirmar Compra
+                            <button type="submit" class="btn btn-success btn-lg" :disabled="loading || !selectedAtivo">
+                                <span x-show="!loading">💰 Confirmar Compra</span>
+                                <span x-show="loading">⏳ Processando...</span>
                             </button>
                         </div>
                     </form>
@@ -124,61 +158,121 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('formCompra');
-    const ativoSelect = document.getElementById('ativo_id');
-    const quantidadeInput = document.getElementById('quantidade');
-    const precoInput = document.getElementById('preco');
-    const corretoraSelect = document.getElementById('corretora_id');
-    
-    // Atualizar resumo em tempo real
-    function atualizarResumo() {
-        const ativoOption = ativoSelect.options[ativoSelect.selectedIndex];
-        const quantidade = parseFloat(quantidadeInput.value) || 0;
-        const preco = parseFloat(precoInput.value) || 0;
-        const total = quantidade * preco;
-        
-        // Atualizar texto do resumo
-        document.getElementById('resumo-ativo').textContent = 
-            ativoOption.dataset.ticker ? `${ativoOption.dataset.ticker} - ${ativoOption.dataset.nome}` : '-';
-        document.getElementById('resumo-quantidade').textContent = quantidade ? quantidade.toLocaleString('pt-BR') : '-';
-        document.getElementById('resumo-preco').textContent = preco ? preco.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : '-';
-        document.getElementById('resumo-total').textContent = total.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-        
-        const corretoraOption = corretoraSelect.options[corretoraSelect.selectedIndex];
-        document.getElementById('resumo-corretora').textContent = corretoraOption.text || '-';
-    }
-    
-    // Adicionar event listeners
-    ativoSelect.addEventListener('change', atualizarResumo);
-    quantidadeInput.addEventListener('input', atualizarResumo);
-    precoInput.addEventListener('input', atualizarResumo);
-    corretoraSelect.addEventListener('change', atualizarResumo);
-    
-    // Validação do formulário
-    form.addEventListener('submit', function(e) {
-        const quantidade = parseFloat(quantidadeInput.value);
-        const preco = parseFloat(precoInput.value);
-        
-        if (!quantidade || quantidade <= 0) {
-            e.preventDefault();
-            alert('Por favor, informe uma quantidade válida.');
-            return;
+function compraForm() {
+    return {
+        searchTicker: '',
+        suggestions: [],
+        showSuggestions: false,
+        selectedAtivo: null,
+        form: {
+            tipo: 'compra',
+            ativo_id: '',
+            corretora_id: '',
+            data_transacao: new Date().toISOString().split('T')[0],
+            quantidade: '',
+            preco_unitario: '',
+            taxa_corretagem: 0,
+            taxa_liquidacao: 0,
+            emolumentos: 0,
+            imposto: 0,
+            outros_custos: 0
+        },
+        loading: false,
+
+        get valorTotal() {
+            const qtd = parseFloat(this.form.quantidade) || 0;
+            const preco = parseFloat(this.form.preco_unitario) || 0;
+            return qtd * preco;
+        },
+
+        async searchAtivos() {
+            if (this.searchTicker.length < 2) {
+                this.suggestions = [];
+                return;
+            }
+
+            const token = localStorage.getItem('access_token');
+            try {
+                const response = await fetch(`http://localhost:5000/api/ativos?search=${this.searchTicker}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    this.suggestions = data.data.slice(0, 10);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar ativos:', error);
+            }
+        },
+
+        selectAtivo(ativo) {
+            this.selectedAtivo = ativo;
+            this.form.ativo_id = ativo.id;
+            this.searchTicker = ativo.ticker;
+            this.suggestions = [];
+            this.showSuggestions = false;
+        },
+
+        clearAtivo() {
+            this.selectedAtivo = null;
+            this.form.ativo_id = '';
+            this.searchTicker = '';
+            this.suggestions = [];
+        },
+
+        async submitCompra() {
+            if (!this.selectedAtivo) {
+                alert('Por favor, selecione um ativo.');
+                return;
+            }
+
+            if (!confirm(`Confirmar compra de ${this.form.quantidade} ${this.selectedAtivo.ticker} por R$ ${this.valorTotal.toFixed(2)}?`)) {
+                return;
+            }
+
+            this.loading = true;
+            const token = localStorage.getItem('access_token');
+
+            try {
+                const payload = {
+                    tipo: 'compra',
+                    ativo_id: this.form.ativo_id,
+                    corretora_id: this.form.corretora_id,
+                    data_transacao: this.form.data_transacao + 'T12:00:00',
+                    quantidade: this.form.quantidade.toString(),
+                    preco_unitario: this.form.preco_unitario.toString(),
+                    taxa_corretagem: '0',
+                    taxa_liquidacao: '0',
+                    emolumentos: '0',
+                    imposto: '0',
+                    outros_custos: '0'
+                };
+
+                const response = await fetch('http://localhost:5000/api/transacoes', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Compra registrada com sucesso!');
+                    window.location.href = '{{ url_for("dashboard.index") }}';
+                } else {
+                    alert('❌ Erro: ' + (data.message || 'Erro ao processar compra'));
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('❌ Erro ao processar compra. Verifique o console.');
+            } finally {
+                this.loading = false;
+            }
         }
-        
-        if (!preco || preco <= 0) {
-            e.preventDefault();
-            alert('Por favor, informe um preço válido.');
-            return;
-        }
-        
-        const total = quantidade * preco;
-        if (confirm(`Confirmar compra no valor total de R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}?`)) {
-            // Submit
-        } else {
-            e.preventDefault();
-        }
-    });
-});
+    };
+}
 </script>
 {% endblock %}
