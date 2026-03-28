@@ -8,6 +8,30 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Frontend API-Driven Integration (28/03/2026)
+
+**Artefatos criados/modificados:**
+- `frontend/app/templates/operacoes/compra.html` - Modernização com Alpine.js, autocomplete, API REST
+- `frontend/app/routes/operacoes.py` - Simplificado para GET apenas (POST via API)
+- `frontend/app/static/js/compra.js` - Funções de API (base)
+- `docs/SPRINT1_COMPRA_IMPLEMENTATION.md` - Documentação completa da implementação
+
+**Mudanças:**
+- **🔄 API-Driven:** Tela de compra agora usa `POST /api/transacoes` via AJAX
+- **🔍 Autocomplete:** Busca de ativos com API `/api/ativos?search=` e debounce (300ms)
+- **⚛️ Reactividade:** Alpine.js para binding reativo e computed properties
+- **📅 Data Transação:** Campo obrigatório para data da operação (ISO 8601)
+- **💡 Feedback Visual:** Loading states, validações, mensagens de sucesso/erro
+- **🔄 Dashboard Update:** Redirect automático após compra bem-sucedida
+
+**Tecnologias:**
+- Alpine.js para reatividade
+- Fetch API para chamadas REST
+- Schema TransacaoCreateSchema validado
+- Debounce para performance
+
+**Status:** Sprint 1 - Operações Essenciais (25% completo, 1/4 telas)
+
 ### Fixed — Geração Automática de Posições (26/03/2026)
 
 **Artefatos modificados:**

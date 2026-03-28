@@ -95,9 +95,17 @@ Maio 2026:
 
 ---
 
-## 🎨 Frontend — Integração API-Driven (Nova Fase)
+## 🎨 Frontend — Integração API-Driven (Em Progresso)
 
-**Status:** 📋 Planejamento | **Início:** 27/03/2026 | **Duração:** 8 semanas
+**Status:** � Sprint 1 em Progresso | **Início:** 27/03/2026 | **Duração:** 8 semanas
+
+### Sprint 1: Operações Essenciais (P0)
+- ✅ **Tela Compra:** Alpine.js, autocomplete, API REST (28/03/2026)
+- ⏳ **Tela Venda:** Similar à compra (em progresso)
+- ⏳ **Importação B3:** Upload drag & drop
+- ⏳ **Histórico Transações:** Tabela paginada
+
+**Progresso:** 1/4 telas (25%) | **APIs Integradas:** 1/25
 
 ### Objetivo
 Integrar sistematicamente as **156 APIs do backend** com o frontend, criando jornadas completas de usuário.

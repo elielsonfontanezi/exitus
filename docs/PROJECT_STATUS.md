@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 26/03/2026  
-> **Status:** ✅ **POSIÇÕES GERADAS AUTOMATICAMENTE — Dashboard sempre consistente**  
-> **Versão:** v0.9.8
+> **Data:** 28/03/2026  
+> **Status:** 🔄 **FRONTEND API-DRIVEN INTEGRATION — Sprint 1 em Progresso**  
+> **Versão:** v0.9.9
 
 ---
 
@@ -15,6 +15,7 @@
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | 🟡 87.7% | 436/497 passando (61 failed, 35 errors) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
+| **Frontend API-Driven** | 🔄 8% | Sprint 1 em progresso, 1/4 telas (25%), 1/25 APIs integradas |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services com filtros |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
@@ -31,6 +32,27 @@
 - **APIs:** Cotações multi-provider, cache, circuit breaker
 - **Exportação:** CSV, Excel, JSON, PDF
 - **Próxima Fase:** 7 — Monitoramento, Rate Limiting, CI/CD
+
+---
+
+## 🔄 Frontend API-Driven Integration — 8% Concluído
+
+- **Sprint 1:** Operações Essenciais (em progresso)
+- **Telas:** 1/4 implementadas (25%)
+- **APIs:** 1/25 integradas (4%)
+- **Tecnologia:** Alpine.js + Fetch API + API REST
+- **Concluído:** Tela de compra com autocomplete e validações
+- **Próxima:** Tela de venda, importação B3, histórico transações
+
+### Sprint 1 — Operações Essenciais
+- ✅ **Tela Compra:** Alpine.js, autocomplete, API REST (28/03/2026)
+  - Autocomplete de ativos com API `/api/ativos?search=`
+  - Binding reativo com Alpine.js
+  - POST `/api/transacoes` via AJAX
+  - Loading states e validações
+- ⏳ **Tela Venda:** Similar à compra
+- ⏳ **Importação B3:** Upload drag & drop
+- ⏳ **Histórico Transações:** Tabela paginada
 
 ---
 

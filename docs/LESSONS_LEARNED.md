@@ -478,6 +478,47 @@ posicoes_usuario = Posicao.query.filter_by(usuario_id=usuario_id).all()
 
 ---
 
+## 🎨 Frontend
+
+### L-FE-001 — Alpine.js + API REST para modernização de telas
+**Origem:** SPRINT1-COMPRA | **Data:** 28/03/2026
+
+```javascript
+// ❌ PROBLEMA — Form tradicional sem API REST
+<form method="POST" action="/operacoes/compra">
+  <select name="ativo_id">
+    <option value="{{ ativo.id }}">{{ ativo.ticker }}</option>
+  </select>
+</form>
+// Resultado: Sem autocomplete, sem feedback, API não utilizada
+
+// ✅ SOLUÇÃO — Alpine.js + API REST
+<div x-data="compraForm()">
+  <input x-model="searchTicker" @input.debounce.300ms="searchAtivos">
+  <form @submit.prevent="submitCompra">
+    <button :disabled="loading || !selectedAtivo">
+      <span x-show="!loading">Confirmar</span>
+      <span x-show="loading">⏳ Processando...</span>
+    </button>
+  </form>
+</div>
+```
+
+**Problema:** Telas de frontend usavam forms tradicionais sem integração com APIs REST, resultando em UX estática e sem feedback visual.
+
+**Solução:**
+- Modernizar template existente com Alpine.js para reatividade
+- Implementar autocomplete com API `/api/ativos?search=` e debounce (300ms)
+- Converter POST tradicional para AJAX via `fetch()`
+- Adicionar loading states e validações visuais
+- Manter estrutura HTML existente (menos retrabalho)
+
+**Resultado:** Tela de compra 100% API-Driven com UX moderna e performance otimizada.
+
+**Aprendizado:** Alpine.js é ideal para modernizar telas existentes sem rewrite completo.
+
+---
+
 ### L-BE-007 — Posições não são geradas automaticamente ao criar transações
 **Origem:** EXITUS-POSITIONS-001 | **Data:** 26/03/2026
 
