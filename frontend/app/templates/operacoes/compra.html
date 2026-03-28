@@ -307,6 +307,9 @@ function compraForm() {
             } else {
                 this.moedaSimbolo = 'R$';
             }
+            
+            // Buscar preço atual automaticamente
+            this.fetchPrecoAtual();
         },
 
         clearAtivo() {

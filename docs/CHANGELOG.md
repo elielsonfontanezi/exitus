@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — Remoção de Endpoints Públicos - Autenticação JWT Obrigatória (29/03/2026)
+
+**Artefatos modificados:**
+- `backend/app/blueprints/corretoras/routes.py` - Removido endpoint `/api/corretoras/all` (público)
+- `backend/app/services/corretora_service.py` - Removido método `get_all_public()`
+- `backend/app/blueprints/cotacoes_blueprint.py` - Removido endpoint `/api/cotacoes/public/<ticker>` (público)
+- `frontend/app/routes/operacoes.py` - Corrigido para usar API autenticada `/api/corretoras` com token
+- `frontend/app/templates/operacoes/compra.html` - Corrigido `fetchPrecoAtual()` para usar token JWT
+- `docs/SPRINT1_COMPRA_IMPLEMENTATION.md` - Documentada correção de autenticação
+
+**Mudanças:**
+- **🔒 Segurança:** Todas as APIs do backend requerem autenticação JWT conforme OPERATIONS_RUNBOOK.md
+- **❌ Endpoints públicos removidos:** Não fazem sentido no contexto do projeto
+- **✅ APIs autenticadas:**
+  - `GET /api/corretoras` - Lista corretoras do usuário (com token)
+  - `GET /api/cotacoes/<ticker>` - Obtém cotação (com token)
+- **🔑 Token:** Frontend obtém via `localStorage.getItem('access_token')`
+- **🐛 Fix:** Preço unitário agora atualiza automaticamente ao selecionar ativo
+
+**Status:** Correção de segurança - APIs 100% autenticadas
+
 ### Enhanced — Tela de Compra - Melhorias UX (28/03/2026)
 
 **Artefatos modificados:**

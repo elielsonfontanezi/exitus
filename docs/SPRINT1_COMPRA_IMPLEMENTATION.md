@@ -95,3 +95,7 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 - **Correção de Porta:** Alterado de 3000 para 8080 (padrão do projeto).
 - **Correção de Estilo:** Revertida implementação Bootstrap para Tailwind/Design System.
 - **Sincronização:** Todos os documentos de controle foram atualizados para refletir o estado atual.
+- **Correção de Autenticação:** Todas as chamadas às APIs do backend usam token JWT conforme OPERATIONS_RUNBOOK.md. Endpoints públicos removidos - não fazem sentido no contexto do projeto onde todas as APIs requerem autenticação.
+  - Corretoras: `GET /api/corretoras` com header `Authorization: Bearer <token>`
+  - Cotações: `GET /api/cotacoes/<ticker>` com header `Authorization: Bearer <token>`
+  - O frontend obtém o token via `localStorage.getItem('access_token')`

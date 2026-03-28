@@ -16,7 +16,7 @@ def compra():
     """Página de compra de ativos (integração via API REST no frontend)"""
     headers = {'Authorization': f"Bearer {session.get('access_token')}"}
     
-    # Buscar corretoras para popular select
+    # Buscar corretoras para popular select (usando token da sessão)
     corretoras_response = requests.get(
         f"{Config.BACKEND_API_URL}/api/corretoras",
         headers=headers
@@ -24,7 +24,9 @@ def compra():
     
     corretoras = []
     if corretoras_response.status_code == 200:
-        corretoras = corretoras_response.json().get('data', [])
+        result = corretoras_response.json()
+        # A API retorna {corretoras: [...], total: n}
+        corretoras = result.get('corretoras', [])
     
     return render_template('operacoes/compra.html', corretoras=corretoras)
 
@@ -55,7 +57,7 @@ def venda():
     if posicoes_response.status_code == 200:
         posicoes = posicoes_response.json().get('data', {}).get('posicoes', [])
     
-    # Buscar corretoras
+    # Buscar corretoras para popular select (API autenticada)
     corretoras_response = requests.get(
         f"{Config.BACKEND_API_URL}/api/corretoras",
         headers=headers
@@ -63,7 +65,9 @@ def venda():
     
     corretoras = []
     if corretoras_response.status_code == 200:
-        corretoras = corretoras_response.json().get('data', [])
+        result = corretoras_response.json()
+        # A API retorna {corretoras: [...], total: n}
+        corretoras = result.get('corretoras', [])
     
     return render_template('operacoes/venda.html', 
                          posicoes=posicoes, 
