@@ -135,7 +135,9 @@ O dashboard atual (`/dashboard`) está **100% funcional** com dados reais (R$ 25
 1. ✅ Arquivar docs UX obsoletos
 2. ✅ Criar API_FRONTEND_MAPPING.md detalhado
 3. ✅ Documentar estratégia de dashboard
-4. ⏳ Iniciar Sprint 1 (Operações)
+4. ✅ Sprint 1: Tela Compra implementada (precisa correção de estilo)
+5. ⏳ Corrigir tela de compra para seguir UX_DESIGN_SYSTEM.md
+6. ⏳ Implementar tela de venda com estilo consistente
 
 ---
 

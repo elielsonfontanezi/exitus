@@ -121,8 +121,35 @@ Modernizar tela de compra existente com integração completa da API REST.
 
 ---
 
-## 🔗 Referências
+## � Correções Necessárias (Identificadas em 28/03/2026)
+
+### ❌ Erros Cometidos
+
+1. **Porta Incorreta**
+   - ❌ Documentado: `http://localhost:3000/operacoes/compra`
+   - ✅ Correto: `http://localhost:8080/operacoes/compra` (conforme ARCHITECTURE.md)
+
+2. **Estilo Inconsistente**
+   - ❌ Implementado: Bootstrap tradicional
+   - ✅ Requerido: UX_DESIGN_SYSTEM.md (Nunito, cores #A38C65, design moderno como dashboard)
+
+3. **Não Leu Fontes de Verdade**
+   - ❌ Pulei: ARCHITECTURE.md, UX_DESIGN_SYSTEM.md antes de implementar
+   - ✅ Regra .windsurfrules: Consultar PRIORIDADE 1 antes de qualquer ação
+
+### ✅ Plano de Correção
+
+1. **Corrigir porta** em toda documentação
+2. **Refatorar HTML** para seguir UX_DESIGN_SYSTEM.md
+3. **Aplicar estilo consistente** com dashboard
+4. **Atualizar documentação** de controle
+
+---
+
+## �🔗 Referências
 
 - API: `/backend/app/blueprints/transacoes/routes.py`
 - Schema: `/backend/app/schemas/transacao_schema.py`
 - Docs: `API_REFERENCE.md`, `FRONTEND_INTEGRATION_PLAN.md`
+- Estilo: `UX_DESIGN_SYSTEM.md` (NÃO aplicado)
+- Arquitetura: `ARCHITECTURE.md` (porta 8080)
