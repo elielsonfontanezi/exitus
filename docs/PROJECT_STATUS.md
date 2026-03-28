@@ -35,22 +35,25 @@
 
 ---
 
-## 🔄 Frontend API-Driven Integration — 8% Concluído
+## 🔄 Frontend API-Driven Integration — 12% Concluído
 
 - **Sprint 1:** Operações Essenciais (em progresso)
 - **Telas:** 1/4 implementadas (25%)
-- **APIs:** 1/25 integradas (4%)
+- **APIs:** 3/25 integradas (12%) — transacoes, ativos, cotacoes
 - **Tecnologia:** Alpine.js + Fetch API + API REST
-- **Concluído:** Tela de compra com autocomplete e validações
-- **Próxima:** Tela de venda, importação B3, histórico transações
+- **Concluído:** Tela de compra com autocomplete, validações e melhorias UX
+- **Próxima:** Tela de venda com mesmas melhorias
 
 ### Sprint 1 — Operações Essenciais
-- ✅ **Tela Compra:** Alpine.js, autocomplete, API REST (28/03/2026)
+- ✅ **Tela Compra:** Alpine.js, autocomplete, API REST + Melhorias UX (28/03/2026)
   - Autocomplete de ativos com API `/api/ativos?search=`
   - Binding reativo com Alpine.js
   - POST `/api/transacoes` via AJAX
   - Loading states e validações
-- ⏳ **Tela Venda:** Similar à compra
+  - **Novo:** Integração API cotações (`GET /api/cotacoes/<ticker>`)
+  - **Novo:** Quantidade restrita a inteiros (`step=1`, `min=0`)
+  - **Novo:** Corretoras dinâmicas via `GET /api/corretoras`
+- ⏳ **Tela Venda:** Similar à compra com mesmas melhorias
 - ⏳ **Importação B3:** Upload drag & drop
 - ⏳ **Histórico Transações:** Tabela paginada
 

@@ -100,12 +100,12 @@ Maio 2026:
 **Status:** � Sprint 1 em Progresso | **Início:** 27/03/2026 | **Duração:** 8 semanas
 
 ### Sprint 1: Operações Essenciais (P0)
-- ✅ **Tela Compra:** Refatorada para Tailwind/Design System + API REST (28/03/2026)
-- ⏳ **Tela Venda:** Similar à compra (próximo passo)
+- ✅ **Tela Compra:** Refatorada + Melhorias UX (cotações API, quantidade inteira, corretoras dinâmicas) - 28/03/2026
+- ⏳ **Tela Venda:** Similar à compra com mesmas melhorias (próximo passo)
 - ⏳ **Importação B3:** Upload drag & drop
 - ⏳ **Histórico Transações:** Tabela paginada
 
-**Progresso:** 1/4 telas (25%) | **APIs Integradas:** 1/25
+**Progresso:** 1/4 telas (25%) | **APIs Integradas:** 3/25 (transacoes, ativos, cotacoes)
 
 ### Objetivo
 Integrar sistematicamente as **156 APIs do backend** com o frontend, criando jornadas completas de usuário.

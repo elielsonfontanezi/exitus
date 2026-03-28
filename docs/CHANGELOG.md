@@ -8,6 +8,24 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Enhanced — Tela de Compra - Melhorias UX (28/03/2026)
+
+**Artefatos modificados:**
+- `frontend/app/templates/operacoes/compra.html` - Integração API cotações, quantidade inteira, corretoras dinâmicas
+
+**Mudanças:**
+- **💰 Preço Atual:** Botão para buscar cotação via `GET /api/cotacoes/<ticker>` com cache 15min
+- **🔢 Quantidade Inteira:** Campo restrito a inteiros (`step=1`, `min=0`) para ativos não fracionários
+- **🏢 Corretoras Dinâmicas:** Lista populada via `GET /api/corretoras` (já implementado)
+- **📊 Feedback Visual:** Indicador de loading e provider da cotação (brapi.dev, yfinance, cache)
+
+**Tecnologias:**
+- API Cotações M7.5 (TTL 15min conforme Prompt Mestre)
+- Alpine.js para reatividade
+- FontAwesome para ícones de sincronização
+
+**Status:** Sprint 1 - Operações Essenciais (melhorias aplicadas)
+
 ### Added — Frontend API-Driven Integration (28/03/2026)
 
 **Artefatos criados/modificados:**

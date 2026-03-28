@@ -69,6 +69,27 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 
 ---
 
+## 🎨 Melhorias UX Implementadas (28/03/2026)
+
+### 1. Integração API de Cotações
+- ✅ **Botão de Sincronização:** Ícone de refresh ao lado do campo Preço Unitário
+- ✅ **Endpoint:** `GET /api/cotacoes/<ticker>` com cache TTL 15min (Prompt Mestre)
+- ✅ **Feedback Visual:** Indicador de loading durante busca e provider da cotação
+- ✅ **Providers:** brapi.dev (FREE tier), yfinance, alphavantage, database_cache
+- ✅ **Fallback:** Dados antigos do banco se APIs falharem
+
+### 2. Quantidade Restrita a Inteiros
+- ✅ **Campo Numérico:** `step="1"` e `min="0"` para aceitar apenas inteiros
+- ✅ **Validação HTML5:** Navegador impede entrada de valores decimais
+- ✅ **Placeholder:** Alterado de "0,00" para "0" para indicar inteiros
+
+### 3. Lista de Corretoras Dinâmica
+- ✅ **Backend Integration:** `GET /api/corretoras` via `operacoes.py`
+- ✅ **Template Rendering:** Loop Jinja2 para popular `<select>` dinamicamente
+- ✅ **Dados Reais:** Corretoras seedadas no banco (Clear, XP, Rico, etc.)
+
+---
+
 ## 🚨 Histórico de Correções (28/03/2026)
 
 - **Correção de Porta:** Alterado de 3000 para 8080 (padrão do projeto).
