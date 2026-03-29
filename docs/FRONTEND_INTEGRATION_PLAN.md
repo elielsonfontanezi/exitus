@@ -120,7 +120,37 @@ As rotas em `dashboard.py` ainda usam `session.get('access_token')` diretamente.
 
 ---
 
-## 🛠️ Metodologia
+## � Padrão de Tipos de Ativo (Multi-Mercado)
+
+**Implementado em:** 29/03/2026 | EXITUS-COMP-002
+
+O sistema suporta **15 tipos de ativos** em **4 mercados** (BR, US, INTL, Cripto). Todas as telas de operação devem usar o seletor de tipo com comportamento dinâmico.
+
+### Configuração Padrão (8 Categorias)
+
+| Categoria | Tipos Incluídos | Quantidade | Moeda |
+|-----------|-----------------|------------|-------|
+| **Ação BR** | ACAO, UNIT | Inteiro (step=1) | R$ |
+| **FII** | FII | Inteiro (step=1) | R$ |
+| **Renda Fixa** | CDB, LCI_LCA, TESOURO, DEBENTURE | Inteiro (step=1) | R$ |
+| **Stock EUA** | STOCK | Fração 6 decimais | $ |
+| **REIT** | REIT | Fração 6 decimais | $ |
+| **ETF** | ETF, ETF_INTL | Fração 6 decimais | $ |
+| **Intl** | STOCK_INTL, BOND | Fração 6 decimais | $ |
+| **Cripto** | CRIPTO | Fração 8 decimais | $ |
+
+### Implementação
+
+Ver `docs/LESSONS_LEARNED.md` — L-FE-003 para código completo do `tiposAtivo` array e funções auxiliares.
+
+### APIs Envolvidas
+
+- `GET /api/ativos?search=TICKER&tipo=STOCK` — Busca com filtro por tipo
+- `GET /api/cotacoes/<ticker>` — Cotação atual (TTL 15min)
+
+---
+
+## �🛠️ Metodologia
 
 ### Fluxo por Tela
 1. Mapear APIs necessárias

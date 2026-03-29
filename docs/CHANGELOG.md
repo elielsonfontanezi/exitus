@@ -8,6 +8,32 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Tela Compra: Seletor de Tipo de Ativo com Quantidade Dinâmica (29/03/2026)
+
+**Artefatos modificados:**
+- `frontend/app/templates/operacoes/compra.html` - Seletor de 8 tipos, quantidade dinâmica, moeda dinâmica
+- `docs/LESSONS_LEARNED.md` - L-FE-003: padrão para telas de operação multi-tipo
+
+**Mudanças:**
+- **8 Tipos de Ativo:** Ação BR, FII, Renda Fixa, Stock EUA, REIT, ETF, Intl, Cripto
+- **Campo Quantidade Dinâmico:**
+  - Inteiro (`step=1`): Ações BR, FII, Renda Fixa
+  - Fração 6 decimais (`step=0.000001`): Stocks, REITs, ETFs, Intl
+  - Fração 8 decimais (`step=0.00000001`): Cripto
+- **Moeda Dinâmica:** R$ (mercado BR) → $ (US/Intl/Cripto)
+- **Busca Filtrada:** API `/api/ativos?search=TICKER&tipo=STOCK` com filtro client-side por categoria
+- **Badges Informativos:** "Quantidade inteira"/"Fração permitida" + Moeda por tipo
+- **Resumo da Operação:** Exibe Tipo (emoji + label) + Ativo + Investimento Total
+
+**Tecnologias:**
+- Alpine.js: `tipoAtualConfig` como computed property reativa
+- CSS: Cards de seleção com estado ativo/hover
+- API: Query param `tipo` para filtrar ativos por categoria
+
+**Status:** Sprint 1 - Operações Essenciais (Tela Compra completa)
+
+---
+
 ### Fixed — Remoção de Endpoints Públicos - Autenticação JWT Obrigatória (29/03/2026)
 
 **Artefatos modificados:**

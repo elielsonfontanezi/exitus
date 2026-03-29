@@ -100,7 +100,7 @@ Maio 2026:
 **Status:** � Sprint 1 em Progresso | **Início:** 27/03/2026 | **Duração:** 8 semanas
 
 ### Sprint 1: Operações Essenciais (P0)
-- ✅ **Tela Compra:** Refatorada + Melhorias UX (cotações API, quantidade inteira, corretoras dinâmicas) - 28/03/2026
+- ✅ **Tela Compra:** Refatorada + UX (cotações API, seletor 8 tipos de ativo, quantidade dinâmica inteiro/fração, moeda R$/$) - 29/03/2026
 - ⏳ **Tela Venda:** Similar à compra com mesmas melhorias (próximo passo)
 - ⏳ **Importação B3:** Upload drag & drop
 - ⏳ **Histórico Transações:** Tabela paginada
