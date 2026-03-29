@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Nova Compra - Exitus{% endblock %}
+{% block title %}Operação - Exitus{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -139,27 +139,130 @@
         border-radius: 20px;
         font-weight: 600;
     }
+
+    .toggle-container {
+        display: flex;
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 4px;
+        gap: 4px;
+    }
+    .toggle-btn {
+        flex: 1;
+        padding: 10px 24px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .toggle-btn.active-compra {
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+    }
+    .toggle-btn.active-venda {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+    }
+    .toggle-btn.inactive {
+        background: transparent;
+        color: #6b7280;
+    }
+    .toggle-btn.inactive:hover {
+        background: #e2e8f0;
+        color: #374151;
+    }
+    .btn-venda {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .btn-venda:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+    }
+    .btn-venda:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .posicao-item {
+        padding: 12px 15px;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f1f1f1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .posicao-item:hover {
+        background-color: #fef2f2;
+    }
+    .max-qty-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+        cursor: pointer;
+    }
+    .max-qty-badge:hover {
+        background: #fee2e2;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto max-w-4xl py-8" x-data="compraForm()">
+<div class="container mx-auto max-w-4xl py-8" x-data="operacaoForm()">
     
     <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
+    <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold flex items-center gap-3" style="color: #735c43;">
-                <span class="text-3xl">➕</span> Nova Compra
+                <span class="text-3xl" x-text="isCompra ? '➕' : '💰'"></span>
+                <span x-text="isCompra ? 'Nova Compra' : 'Nova Venda'"></span>
             </h1>
-            <p class="text-gray-500 mt-1">Registre a aquisição de um novo ativo em sua carteira</p>
+            <p class="text-gray-500 mt-1" x-text="isCompra ? 'Registre a aquisição de um novo ativo' : 'Registre a venda de um ativo da sua carteira'"></p>
         </div>
         <a href="{{ url_for('dashboard.index') }}" class="flex items-center gap-2 text-[#a38c65] font-semibold hover:underline">
             <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
         </a>
     </div>
 
+    <!-- Toggle Compra/Venda -->
+    <div class="toggle-container mb-6 max-w-md">
+        <button type="button" @click="toggleModo('compra')"
+                :class="isCompra ? 'toggle-btn active-compra' : 'toggle-btn inactive'">
+            <i class="fas fa-cart-plus"></i> Compra
+        </button>
+        <button type="button" @click="toggleModo('venda')"
+                :class="isVenda ? 'toggle-btn active-venda' : 'toggle-btn inactive'">
+            <i class="fas fa-hand-holding-usd"></i> Venda
+        </button>
+    </div>
+
     <div class="compra-card">
-        <form @submit.prevent="submitCompra" class="space-y-6">
+        <form @submit.prevent="submitOperacao" class="space-y-6">
 
             <!-- Tipo de Ativo -->
             <div>
@@ -195,7 +298,8 @@
                     <i class="fas fa-chart-line"></i> Ativo <span class="text-red-500">*</span>
                 </label>
                 
-                <div x-show="!selectedAtivo">
+                <!-- COMPRA: busca livre de ativos -->
+                <div x-show="isCompra && !selectedAtivo">
                     <input type="text" 
                            class="form-control w-full" 
                            x-model="searchTicker"
@@ -215,11 +319,45 @@
                     </div>
                 </div>
 
+                <!-- VENDA: seleção a partir das posições -->
+                <div x-show="isVenda && !selectedAtivo">
+                    <div x-show="loadingPosicoes" class="text-sm text-gray-400 py-3">
+                        <i class="fas fa-spinner fa-spin mr-1"></i> Carregando posições...
+                    </div>
+                    <div x-show="!loadingPosicoes && posicoesPorTipo.length === 0" class="text-sm text-orange-500 bg-orange-50 rounded-lg p-3">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> Nenhuma posição encontrada para este tipo de ativo.
+                    </div>
+                    <div x-show="!loadingPosicoes && posicoesPorTipo.length > 0">
+                        <input type="text" class="form-control w-full"
+                               x-model="searchPosicao"
+                               @focus="showPosicoes = true"
+                               placeholder="Buscar nas suas posições..."
+                               autocomplete="off">
+                        <div x-show="showPosicoes && posicoesFiltradas.length > 0"
+                             class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                            <template x-for="pos in posicoesFiltradas" :key="pos.id">
+                                <div class="posicao-item" @click="selectPosicao(pos)">
+                                    <div>
+                                        <div class="font-bold text-[#735c43]" x-text="pos.ativo?.ticker || '---'"></div>
+                                        <div class="text-sm text-gray-500" x-text="pos.ativo?.nome || ''"></div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-semibold" x-text="pos.quantidade + ' un'"></div>
+                                        <div class="text-xs text-gray-400" x-text="'PM: ' + moedaSimbolo + ' ' + parseFloat(pos.preco_medio).toFixed(2)"></div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Badge do ativo selecionado (ambos modos) -->
                 <div x-show="selectedAtivo" class="flex items-center">
                     <div class="badge-ativo">
                         <span x-text="selectedAtivo?.ticker"></span>
                         <span class="text-gray-400">|</span>
                         <span x-text="selectedAtivo?.nome" class="text-sm"></span>
+                        <span x-show="isVenda && quantidadeMaxima > 0" class="text-xs text-gray-400 ml-1" x-text="'(máx: ' + quantidadeMaxima + ')'"></span>
                         <button type="button" @click="clearAtivo" class="text-red-400 hover:text-red-600 ml-2">
                             <i class="fas fa-times-circle"></i>
                         </button>
@@ -261,12 +399,19 @@
                         <span x-show="tipoAtualConfig && tipoAtualConfig.fracao" class="fracao-badge bg-purple-50 text-purple-600 ml-1">
                             <i class="fas fa-divide"></i> Fração
                         </span>
+                        <span x-show="isVenda && quantidadeMaxima > 0" class="max-qty-badge ml-1" @click="usarQuantidadeMaxima()" title="Usar quantidade máxima">
+                            Máx: <strong x-text="quantidadeMaxima"></strong> <i class="fas fa-arrow-up"></i>
+                        </span>
                     </label>
                     <input type="number" class="form-control w-full" x-model="form.quantidade"
                            min="0"
+                           :max="isVenda && quantidadeMaxima > 0 ? quantidadeMaxima : undefined"
                            :step="tipoAtualConfig ? tipoAtualConfig.step : '1'"
                            :placeholder="tipoAtualConfig && tipoAtualConfig.fracao ? '0.00000000' : '0'"
                            required>
+                    <div x-show="isVenda && form.quantidade && parseFloat(form.quantidade) > quantidadeMaxima && quantidadeMaxima > 0" class="text-xs text-red-500 mt-1">
+                        <i class="fas fa-exclamation-circle"></i> Quantidade excede o disponível (<span x-text="quantidadeMaxima"></span>)
+                    </div>
                 </div>
 
                 <!-- Preço Unitário -->
@@ -290,7 +435,11 @@
                 <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
                     <i class="fas fa-file-invoice-dollar"></i> Resumo da Operação
                 </h3>
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-4 gap-4">
+                    <div>
+                        <div class="text-xs text-gray-500">Operação</div>
+                        <div class="font-bold" :class="isCompra ? 'text-green-600' : 'text-red-600'" x-text="isCompra ? '🛒 Compra' : '💰 Venda'"></div>
+                    </div>
                     <div>
                         <div class="text-xs text-gray-500">Tipo</div>
                         <div class="font-bold text-[#735c43]" x-text="tipoAtualConfig ? tipoAtualConfig.emoji + ' ' + tipoAtualConfig.label : '---'"></div>
@@ -300,8 +449,8 @@
                         <div class="font-bold text-[#735c43]" x-text="selectedAtivo ? selectedAtivo.ticker : '---'"></div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-500">Investimento Total</div>
-                        <div class="text-lg font-bold text-[#a38c65]" x-text="formatCurrency(valorTotal)"></div>
+                        <div class="text-xs text-gray-500" x-text="isCompra ? 'Investimento Total' : 'Valor da Venda'"></div>
+                        <div class="text-lg font-bold" :class="isCompra ? 'text-[#a38c65]' : 'text-red-600'" x-text="formatCurrency(valorTotal)"></div>
                     </div>
                 </div>
             </div>
@@ -311,11 +460,13 @@
                 <a href="{{ url_for('dashboard.index') }}" class="text-gray-500 font-semibold hover:text-gray-700">
                     Cancelar
                 </a>
-                <button type="submit" class="btn-primary-exitus min-w-[200px]" :disabled="loading || !selectedTipo || !selectedAtivo || !form.quantidade || !form.preco_unitario">
+                <button type="submit"
+                        :class="isCompra ? 'btn-primary-exitus min-w-[200px]' : 'btn-venda min-w-[200px]'"
+                        :disabled="loading || !selectedTipo || !selectedAtivo || !form.quantidade || !form.preco_unitario || (isVenda && quantidadeMaxima > 0 && parseFloat(form.quantidade) > quantidadeMaxima)">
                     <template x-if="!loading">
                         <div class="flex items-center gap-2">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Confirmar Compra</span>
+                            <i :class="isCompra ? 'fas fa-check-circle' : 'fas fa-hand-holding-usd'"></i>
+                            <span x-text="isCompra ? 'Confirmar Compra' : 'Confirmar Venda'"></span>
                         </div>
                     </template>
                     <template x-if="loading">
@@ -331,8 +482,11 @@
 </div>
 
 <script>
-function compraForm() {
+function operacaoForm() {
     return {
+        // --- Modo de operação ---
+        modoOperacao: 'compra',
+
         // --- Tipos de Ativo disponíveis ---
         tiposAtivo: [
             { key: 'ACAO',      label: 'Ação BR',     emoji: '🇧🇷', tipos: ['ACAO','UNIT'],                              fracao: false, moeda: 'R$', step: '1',          currency: 'BRL' },
@@ -354,6 +508,13 @@ function compraForm() {
         loadingPreco: false,
         precoInfo: '',
         moedaSimbolo: 'R$',
+
+        // Venda-specific
+        posicoes: [],
+        loadingPosicoes: false,
+        quantidadeMaxima: 0,
+        showPosicoes: false,
+        searchPosicao: '',
 
         form: {
             tipo: 'compra',
@@ -380,6 +541,43 @@ function compraForm() {
             return qtd * preco;
         },
 
+        get isCompra() { return this.modoOperacao === 'compra'; },
+        get isVenda() { return this.modoOperacao === 'venda'; },
+
+        get posicoesPorTipo() {
+            if (!this.selectedTipo) return this.posicoes;
+            const config = this.tipoAtualConfig;
+            if (!config) return this.posicoes;
+            const tiposSet = new Set(config.tipos.map(t => t.toLowerCase()));
+            return this.posicoes.filter(p => {
+                const tipoAtivo = (p.ativo?.tipo || '').toLowerCase();
+                return tiposSet.has(tipoAtivo);
+            });
+        },
+
+        get posicoesFiltradas() {
+            let lista = this.posicoesPorTipo;
+            if (this.searchPosicao.length > 0) {
+                const term = this.searchPosicao.toLowerCase();
+                lista = lista.filter(p =>
+                    (p.ativo?.ticker || '').toLowerCase().includes(term) ||
+                    (p.ativo?.nome || '').toLowerCase().includes(term)
+                );
+            }
+            return lista.slice(0, 15);
+        },
+
+        toggleModo(modo) {
+            if (this.modoOperacao === modo) return;
+            this.modoOperacao = modo;
+            this.form.tipo = modo;
+            this.clearAtivo();
+            this.selectedTipo = '';
+            if (modo === 'venda') {
+                this.fetchPosicoes();
+            }
+        },
+
         selecionarTipo(key) {
             if (this.selectedTipo === key) return;
             this.selectedTipo = key;
@@ -389,6 +587,27 @@ function compraForm() {
             }
             // Limpar ativo ao trocar tipo
             this.clearAtivo();
+            if (this.isVenda && this.posicoes.length > 0) {
+                this.showPosicoes = true;
+            }
+        },
+
+        async fetchPosicoes() {
+            this.loadingPosicoes = true;
+            const token = localStorage.getItem('access_token');
+            try {
+                const response = await fetch('http://localhost:5000/api/posicoes?per_page=200', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    this.posicoes = data.data.posicoes || [];
+                }
+            } catch (error) {
+                console.error('Erro ao buscar posições:', error);
+            } finally {
+                this.loadingPosicoes = false;
+            }
         },
 
         async searchAtivos() {
@@ -431,6 +650,28 @@ function compraForm() {
             this.fetchPrecoAtual();
         },
 
+        selectPosicao(posicao) {
+            this.selectedAtivo = {
+                id: posicao.ativo_id,
+                ticker: posicao.ativo?.ticker || '---',
+                nome: posicao.ativo?.nome || ''
+            };
+            this.form.ativo_id = posicao.ativo_id;
+            this.form.corretora_id = posicao.corretora_id;
+            this.quantidadeMaxima = parseFloat(posicao.quantidade) || 0;
+            this.showPosicoes = false;
+            this.searchPosicao = '';
+            if (posicao.preco_medio) {
+                this.form.preco_unitario = parseFloat(posicao.preco_medio).toFixed(2);
+                this.precoInfo = '✓ Preço médio da posição';
+            }
+            this.fetchPrecoAtual();
+        },
+
+        usarQuantidadeMaxima() {
+            this.form.quantidade = this.quantidadeMaxima.toString();
+        },
+
         clearAtivo() {
             this.selectedAtivo = null;
             this.form.ativo_id = '';
@@ -439,6 +680,9 @@ function compraForm() {
             this.precoInfo = '';
             this.form.quantidade = '';
             this.form.preco_unitario = '';
+            this.quantidadeMaxima = 0;
+            this.searchPosicao = '';
+            this.showPosicoes = false;
         },
 
         async fetchPrecoAtual() {
@@ -487,8 +731,12 @@ function compraForm() {
             }
         },
 
-        async submitCompra() {
+        async submitOperacao() {
             if (!this.selectedAtivo) return;
+            if (this.isVenda && this.quantidadeMaxima > 0 && parseFloat(this.form.quantidade) > this.quantidadeMaxima) {
+                alert('❌ Quantidade excede o disponível!');
+                return;
+            }
             this.loading = true;
             const token = localStorage.getItem('access_token');
             try {
@@ -505,10 +753,11 @@ function compraForm() {
                 });
                 const data = await response.json();
                 if (data.success) {
-                    alert('✅ Compra registrada com sucesso!');
+                    const msg = this.isCompra ? '✅ Compra registrada com sucesso!' : '✅ Venda registrada com sucesso!';
+                    alert(msg);
                     window.location.href = '{{ url_for("dashboard.index") }}';
                 } else {
-                    alert('❌ Erro: ' + (data.message || 'Erro ao processar compra'));
+                    alert('❌ Erro: ' + (data.message || 'Erro ao processar operação'));
                 }
             } catch (error) {
                 console.error('Erro:', error);

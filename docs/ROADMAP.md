@@ -100,12 +100,12 @@ Maio 2026:
 **Status:** � Sprint 1 em Progresso | **Início:** 27/03/2026 | **Duração:** 8 semanas
 
 ### Sprint 1: Operações Essenciais (P0)
-- ✅ **Tela Compra:** Refatorada + UX (cotações API, seletor 8 tipos de ativo, quantidade dinâmica inteiro/fração, moeda R$/$) - 29/03/2026
-- ⏳ **Tela Venda:** Similar à compra com mesmas melhorias (próximo passo)
+- ✅ **Tela Operações:** Toggle Compra/Venda unificado (UI dinâmica, busca ativos, posições usuário, validação venda, resumo 4 colunas) - 29/03/2026
 - ⏳ **Importação B3:** Upload drag & drop
 - ⏳ **Histórico Transações:** Tabela paginada
+- ⏳ **Dashboard:** Carteiras e posições API-driven
 
-**Progresso:** 1/4 telas (25%) | **APIs Integradas:** 3/25 (transacoes, ativos, cotacoes)
+**Progresso:** 1/4 telas (25%) | **APIs Integradas:** 4/25 (transacoes, ativos, cotacoes, posicoes)
 
 ### Objetivo
 Integrar sistematicamente as **156 APIs do backend** com o frontend, criando jornadas completas de usuário.

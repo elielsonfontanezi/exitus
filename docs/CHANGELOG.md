@@ -8,6 +8,34 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Tela Operações: Toggle Compra/Venda Unificado (29/03/2026)
+
+**Artefatos modificados:**
+- `frontend/app/templates/operacoes/compra.html` - Toggle, UI dinâmica, lógica compra/venda
+- `frontend/app/templates/auth/login.html` - Usuário padrão e2e_user (concentrar testes)
+
+**Mudanças:**
+- **Toggle Compra/Venda:** Botões verde/vermelho com ícones e animação suave
+- **Header Dinâmico:** Título e subtítulo mudam conforme modo (➕ Nova Compra ↔ 💰 Nova Venda)
+- **Seção Ativo Dual:**
+  - **Modo Compra:** Busca livre em `/api/ativos` (com filtro por tipo)
+  - **Modo Venda:** Lista apenas posições do usuário via `/api/posicoes` com badge "Máx: X"
+- **Validação de Venda:** Input quantidade com `max` e erro visual se exceder o disponível
+- **Badge "Máx":** Clicável para preencher quantidade máxima da posição
+- **Resumo da Operação:** 4 colunas (Operação, Tipo, Ativo, Investimento/Valor Venda) com cores dinâmicas
+- **Botão Dinâmico:** "Confirmar Compra" (verde) ↔ "Confirmar Venda" (vermelho)
+- **JavaScript:** `operacaoForm()` com `modoOperacao`, computed `isCompra/isVenda`, `posicoesPorTipo`, `toggleModo()`, `selectPosicao()`, `usarQuantidadeMaxima()`
+
+**UX:**
+- Ao trocar modo, limpa ativo e tipo selecionados
+- Em Venda, busca posições apenas ao selecionar tipo
+- Mensagem "Nenhuma posição encontrada" quando não há ativos do tipo
+- Preço médio da posição sugerido ao selecionar ativo para venda
+
+**Status:** Sprint 1 - Operações Essenciais (Tela Compra/Venda unificada)
+
+---
+
 ### Added — Tela Compra: Seletor de Tipo de Ativo com Quantidade Dinâmica (29/03/2026)
 
 **Artefatos modificados:**

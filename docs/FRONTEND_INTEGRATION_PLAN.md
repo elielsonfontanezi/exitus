@@ -150,7 +150,60 @@ Ver `docs/LESSONS_LEARNED.md` — L-FE-003 para código completo do `tiposAtivo`
 
 ---
 
-## �🛠️ Metodologia
+## 🔄 Toggle Compra/Venda — Padrão Unificado
+
+**Implementado em:** 29/03/2026 | Sprint 1
+
+A tela de operações foi unificada com um toggle para alternar entre Compra e Venda, eliminando a necessidade de duas telas separadas.
+
+### Componentes Chave
+
+| Elemento | Comportamento | APIs |
+|----------|---------------|-------|
+| **Toggle** | Botões verde/vermelho com ícones e animação | Nenhuma |
+| **Header** | Título/subtítulo dinâmicos (➕/💰) | Nenhuma |
+| **Ativo (Compra)** | Busca livre com filtro por tipo | `GET /api/ativos?search=TICKER&tipo=...` |
+| **Ativo (Venda)** | Lista apenas posições do usuário | `GET /api/posicoes` |
+| **Quantidade (Venda)** | Badge "Máx: X" + validação `max` | Nenhuma (frontend) |
+| **Resumo** | 4 colunas com cores dinâmicas | Nenhuma (frontend) |
+| **Botão** | "Confirmar Compra" (verde) ↔ "Confirmar Venda" (vermelho) | `POST /api/transacoes` |
+
+### Padrões de UX
+
+- Ao trocar modo: limpa ativo e tipo selecionados
+- Em Venda: busca posições apenas ao selecionar tipo
+- Mensagem "Nenhuma posição encontrada" quando sem ativos
+- Preço médio sugerido ao selecionar posição
+
+### JavaScript — `operacaoForm()`
+
+```javascript
+// Estado
+modoOperacao: 'compra',  // 'compra' | 'venda'
+posicoes: [],           // Array de posições do usuário
+quantidadeMaxima: 0,     // Máximo vendível para ativo selecionado
+
+// Computed
+get isCompra() { return this.modoOperacao === 'compra'; }
+get isVenda() { return this.modoOperacao === 'venda'; }
+get posicoesPorTipo() { /* filtra por selectedTipo */ }
+
+// Métodos
+toggleModo(modo)          // Alterna entre compra/venda
+fetchPosicoes()           // Busca posições via API
+selectPosicao(posicao)   // Seleciona ativo da posição
+usarQuantidadeMaxima()    // Preenche quantidade máxima
+submitOperacao()          // Envia transação (compra ou venda)
+```
+
+### APIs Envolvidas
+
+- `GET /api/posicoes` — Lista posições do usuário (modo Venda)
+- `POST /api/transacoes` — Registra compra ou venda (ambos modos)
+
+---
+
+## 🛠️ Metodologia
 
 ### Fluxo por Tela
 1. Mapear APIs necessárias

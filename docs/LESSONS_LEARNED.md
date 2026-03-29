@@ -73,6 +73,56 @@ tiposAtivo: [
 
 ---
 
+### L-FE-004 — Telas de Operação: usar Toggle Compra/Venda unificado sempre que possível
+**Origem:** Implementação toggle Compra/Venda | **Data:** 29/03/2026
+
+Para evitar duplicação de telas e simplificar UX, prefira unificar Compra/Venda em uma única tela com toggle:
+
+**Padrão Toggle:**
+```html
+<div class="toggle-container mb-6 max-w-md">
+    <button @click="toggleModo('compra')" :class="isCompra ? 'toggle-btn active-compra' : 'toggle-btn inactive'">
+        <i class="fas fa-cart-plus"></i> Compra
+    </button>
+    <button @click="toggleModo('venda')" :class="isVenda ? 'toggle-btn active-venda' : 'toggle-btn inactive'">
+        <i class="fas fa-hand-holding-usd"></i> Venda
+    </button>
+</div>
+```
+
+**Seção Ativo Dual:**
+- **Modo Compra:** Busca livre em `/api/ativos`
+- **Modo Venda:** Lista apenas posições via `/api/posicoes`
+
+**Validação de Venda:**
+```html
+<span x-show="isVenda && quantidadeMaxima > 0" class="max-qty-badge" @click="usarQuantidadeMaxima()">
+    Máx: <strong x-text="quantidadeMaxima"></strong>
+</span>
+<input :max="isVenda && quantidadeMaxima > 0 ? quantidadeMaxima : undefined" />
+```
+
+**JavaScript - Estado e Métodos:**
+```javascript
+modoOperacao: 'compra',
+posicoes: [],
+quantidadeMaxima: 0,
+
+get isCompra() { return this.modoOperacao === 'compra'; },
+get isVenda() { return this.modoOperacao === 'venda'; },
+
+toggleModo(modo) {
+    this.modoOperacao = modo;
+    this.form.tipo = modo;
+    this.clearAtivo();
+    if (modo === 'venda') this.fetchPosicoes();
+}
+```
+
+**Regra:** Sempre que precisar de Compra/Venda do mesmo ativo, usar toggle em vez de telas separadas.
+
+---
+
 ### L-FE-002 — SEMPRE usar máscara DD/MM/AAAA para campos de data
 **Origem:** Ajuste tela compra formato americano | **Data:** 29/03/2026
 
