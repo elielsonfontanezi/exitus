@@ -44,6 +44,35 @@ db.create_all()
 
 ---
 
+### L-FE-003 — Telas de Operação: sempre usar seletor de Tipo de Ativo com comportamento dinâmico
+**Origem:** Ajuste tela compra para multi-tipo de ativo | **Data:** 29/03/2026
+
+O sistema suporta 15 tipos de ativos em 4 mercados. Toda tela de operação (Compra, Venda) deve:
+
+1. **Exibir seletor de Tipo antes do campo Ativo** — filtra a busca e define comportamento
+2. **Campo Quantidade dinâmico** — baseado em `tipoAtualConfig.step`:
+   - `step: '1'` → inteiro (Ações BR, FII, Renda Fixa)
+   - `step: '0.000001'` → fração (Stocks, REITs, ETFs, Intl)
+   - `step: '0.00000001'` → 8 decimais (Cripto)
+3. **Moeda dinâmica** — R$ para mercado BR, $ para US/Intl/Cripto
+4. **Busca filtrada por tipo** → `GET /api/ativos?search=TICKER&tipo=STOCK`
+
+**Configuração padrão (copiar para novas telas):**
+```javascript
+tiposAtivo: [
+    { key: 'ACAO',       label: 'Ação BR',    emoji: '🇧🇷', tipos: ['ACAO','UNIT'],                               fracao: false, moeda: 'R$', step: '1',          currency: 'BRL' },
+    { key: 'FII',        label: 'FII',        emoji: '🏢', tipos: ['FII'],                                       fracao: false, moeda: 'R$', step: '1',          currency: 'BRL' },
+    { key: 'RENDA_FIXA', label: 'Renda Fixa', emoji: '📄', tipos: ['CDB','LCI_LCA','TESOURO_DIRETO','DEBENTURE'], fracao: false, moeda: 'R$', step: '0.01',       currency: 'BRL' },
+    { key: 'STOCK',      label: 'Stock EUA',  emoji: '🇺🇸', tipos: ['STOCK'],                                     fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+    { key: 'REIT',       label: 'REIT',       emoji: '🏗️', tipos: ['REIT'],                                      fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+    { key: 'ETF',        label: 'ETF',        emoji: '📊', tipos: ['ETF','ETF_INTL'],                            fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+    { key: 'INTL',       label: 'Intl',       emoji: '🌍', tipos: ['STOCK_INTL','BOND'],                         fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+    { key: 'CRIPTO',     label: 'Cripto',     emoji: '₿',  tipos: ['CRIPTO'],                                   fracao: true,  moeda: '$',  step: '0.00000001', currency: 'USD' },
+]
+```
+
+---
+
 ### L-FE-002 — SEMPRE usar máscara DD/MM/AAAA para campos de data
 **Origem:** Ajuste tela compra formato americano | **Data:** 29/03/2026
 

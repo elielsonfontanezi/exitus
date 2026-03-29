@@ -92,6 +92,53 @@
         border-radius: 8px;
         padding: 16px;
     }
+
+    .tipo-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 8px;
+        border: 2px solid #E3E6ED;
+        border-radius: 10px;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-align: center;
+        min-height: 64px;
+    }
+
+    .tipo-card:hover {
+        border-color: #a38c65;
+        color: #735c43;
+        background: #fdf8f2;
+        transform: translateY(-1px);
+    }
+
+    .tipo-card.active {
+        border-color: #a38c65;
+        background: linear-gradient(135deg, #fdf8f2 0%, #f5ede0 100%);
+        color: #735c43;
+        box-shadow: 0 2px 8px rgba(163, 140, 101, 0.25);
+    }
+
+    .tipo-card .tipo-icon {
+        font-size: 1.3rem;
+    }
+
+    .fracao-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
 </style>
 {% endblock %}
 
@@ -113,9 +160,37 @@
 
     <div class="compra-card">
         <form @submit.prevent="submitCompra" class="space-y-6">
-            
+
+            <!-- Tipo de Ativo -->
+            <div>
+                <label class="form-label">
+                    <i class="fas fa-layer-group"></i> Tipo de Ativo <span class="text-red-500">*</span>
+                </label>
+                <div class="grid grid-cols-4 md:grid-cols-8 gap-2">
+                    <template x-for="tipo in tiposAtivo" :key="tipo.key">
+                        <button type="button"
+                                @click="selecionarTipo(tipo.key)"
+                                :class="selectedTipo === tipo.key ? 'tipo-card active' : 'tipo-card'">
+                            <span class="tipo-icon" x-text="tipo.emoji"></span>
+                            <span x-text="tipo.label"></span>
+                        </button>
+                    </template>
+                </div>
+                <div x-show="selectedTipo" class="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                    <span x-show="tipoAtualConfig && !tipoAtualConfig.fracao" class="fracao-badge bg-blue-50 text-blue-600">
+                        <i class="fas fa-hashtag"></i> Quantidade inteira
+                    </span>
+                    <span x-show="tipoAtualConfig && tipoAtualConfig.fracao" class="fracao-badge bg-purple-50 text-purple-600">
+                        <i class="fas fa-divide"></i> Fração permitida
+                    </span>
+                    <span x-show="tipoAtualConfig" class="fracao-badge bg-gray-50 text-gray-600">
+                        Moeda: <strong x-text="tipoAtualConfig?.moeda"></strong>
+                    </span>
+                </div>
+            </div>
+
             <!-- Seleção de Ativo -->
-            <div class="relative">
+            <div class="relative" x-show="selectedTipo" x-cloak>
                 <label class="form-label">
                     <i class="fas fa-chart-line"></i> Ativo <span class="text-red-500">*</span>
                 </label>
@@ -183,8 +258,15 @@
                 <div>
                     <label class="form-label">
                         <i class="fas fa-layer-group"></i> Quantidade <span class="text-red-500">*</span>
+                        <span x-show="tipoAtualConfig && tipoAtualConfig.fracao" class="fracao-badge bg-purple-50 text-purple-600 ml-1">
+                            <i class="fas fa-divide"></i> Fração
+                        </span>
                     </label>
-                    <input type="number" class="form-control w-full" x-model="form.quantidade" min="0" step="1" placeholder="0" required>
+                    <input type="number" class="form-control w-full" x-model="form.quantidade"
+                           min="0"
+                           :step="tipoAtualConfig ? tipoAtualConfig.step : '1'"
+                           :placeholder="tipoAtualConfig && tipoAtualConfig.fracao ? '0.00000000' : '0'"
+                           required>
                 </div>
 
                 <!-- Preço Unitário -->
@@ -208,7 +290,11 @@
                 <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
                     <i class="fas fa-file-invoice-dollar"></i> Resumo da Operação
                 </h3>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <div class="text-xs text-gray-500">Tipo</div>
+                        <div class="font-bold text-[#735c43]" x-text="tipoAtualConfig ? tipoAtualConfig.emoji + ' ' + tipoAtualConfig.label : '---'"></div>
+                    </div>
                     <div>
                         <div class="text-xs text-gray-500">Ativo</div>
                         <div class="font-bold text-[#735c43]" x-text="selectedAtivo ? selectedAtivo.ticker : '---'"></div>
@@ -225,7 +311,7 @@
                 <a href="{{ url_for('dashboard.index') }}" class="text-gray-500 font-semibold hover:text-gray-700">
                     Cancelar
                 </a>
-                <button type="submit" class="btn-primary-exitus min-w-[200px]" :disabled="loading || !selectedAtivo || !form.quantidade || !form.preco_unitario">
+                <button type="submit" class="btn-primary-exitus min-w-[200px]" :disabled="loading || !selectedTipo || !selectedAtivo || !form.quantidade || !form.preco_unitario">
                     <template x-if="!loading">
                         <div class="flex items-center gap-2">
                             <i class="fas fa-check-circle"></i>
@@ -247,6 +333,19 @@
 <script>
 function compraForm() {
     return {
+        // --- Tipos de Ativo disponíveis ---
+        tiposAtivo: [
+            { key: 'ACAO',      label: 'Ação BR',     emoji: '🇧🇷', tipos: ['ACAO','UNIT'],                              fracao: false, moeda: 'R$', step: '1',          currency: 'BRL' },
+            { key: 'FII',       label: 'FII',         emoji: '🏢', tipos: ['FII'],                                      fracao: false, moeda: 'R$', step: '1',          currency: 'BRL' },
+            { key: 'RENDA_FIXA',label: 'Renda Fixa',  emoji: '📄', tipos: ['CDB','LCI_LCA','TESOURO_DIRETO','DEBENTURE'], fracao: false, moeda: 'R$', step: '0.01',       currency: 'BRL' },
+            { key: 'STOCK',     label: 'Stock EUA',   emoji: '🇺🇸', tipos: ['STOCK'],                                    fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+            { key: 'REIT',      label: 'REIT',        emoji: '🏗️', tipos: ['REIT'],                                     fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+            { key: 'ETF',       label: 'ETF',         emoji: '📊', tipos: ['ETF','ETF_INTL'],                           fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+            { key: 'INTL',      label: 'Intl',        emoji: '🌍', tipos: ['STOCK_INTL','BOND'],                        fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+            { key: 'CRIPTO',    label: 'Cripto',      emoji: '₿',  tipos: ['CRIPTO'],                                  fracao: true,  moeda: '$',  step: '0.00000001', currency: 'USD' },
+        ],
+
+        selectedTipo: '',
         searchTicker: '',
         suggestions: [],
         showSuggestions: false,
@@ -255,6 +354,7 @@ function compraForm() {
         loadingPreco: false,
         precoInfo: '',
         moedaSimbolo: 'R$',
+
         form: {
             tipo: 'compra',
             ativo_id: '',
@@ -270,10 +370,25 @@ function compraForm() {
             outros_custos: '0'
         },
 
+        get tipoAtualConfig() {
+            return this.tiposAtivo.find(t => t.key === this.selectedTipo) || null;
+        },
+
         get valorTotal() {
             const qtd = parseFloat(this.form.quantidade) || 0;
             const preco = parseFloat(this.form.preco_unitario) || 0;
             return qtd * preco;
+        },
+
+        selecionarTipo(key) {
+            if (this.selectedTipo === key) return;
+            this.selectedTipo = key;
+            const config = this.tipoAtualConfig;
+            if (config) {
+                this.moedaSimbolo = config.moeda;
+            }
+            // Limpar ativo ao trocar tipo
+            this.clearAtivo();
         },
 
         async searchAtivos() {
@@ -281,15 +396,26 @@ function compraForm() {
                 this.suggestions = [];
                 return;
             }
-
+            const config = this.tipoAtualConfig;
             const token = localStorage.getItem('access_token');
             try {
-                const response = await fetch(`http://localhost:5000/api/ativos?search=${this.searchTicker}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                // Usar o primeiro tipo da categoria como filtro principal
+                const tipoParam = config ? `&tipo=${config.tipos[0]}` : '';
+                const response = await fetch(
+                    `http://localhost:5000/api/ativos?search=${encodeURIComponent(this.searchTicker)}${tipoParam}`,
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
                 const data = await response.json();
                 if (data.success) {
-                    this.suggestions = data.data.ativos.slice(0, 10);
+                    let ativos = data.data.ativos || [];
+                    // Filtrar client-side para cobrir todos os sub-tipos da categoria
+                    if (config && config.tipos.length > 1) {
+                        const tiposSet = new Set(config.tipos.map(t => t.toLowerCase().replace('_','')));
+                        const filtered = ativos.filter(a => tiposSet.has((a.tipo || '').replace('_','')));
+                        // Se não retornou nada com filtro, mostrar todos do search
+                        ativos = filtered.length > 0 ? filtered : ativos;
+                    }
+                    this.suggestions = ativos.slice(0, 10);
                 }
             } catch (error) {
                 console.error('Erro ao buscar ativos:', error);
@@ -302,17 +428,6 @@ function compraForm() {
             this.searchTicker = ativo.ticker;
             this.suggestions = [];
             this.showSuggestions = false;
-            
-            // Ajustar símbolo da moeda baseado no mercado
-            if (ativo.mercado === 'US') {
-                this.moedaSimbolo = '$';
-            } else if (ativo.mercado === 'EU') {
-                this.moedaSimbolo = '€';
-            } else {
-                this.moedaSimbolo = 'R$';
-            }
-            
-            // Buscar preço atual automaticamente
             this.fetchPrecoAtual();
         },
 
@@ -321,27 +436,26 @@ function compraForm() {
             this.form.ativo_id = '';
             this.searchTicker = '';
             this.suggestions = [];
-            this.moedaSimbolo = 'R$';
             this.precoInfo = '';
+            this.form.quantidade = '';
+            this.form.preco_unitario = '';
         },
 
         async fetchPrecoAtual() {
             if (!this.selectedAtivo) return;
-            
             this.loadingPreco = true;
             this.precoInfo = '';
             const token = localStorage.getItem('access_token');
-            
             try {
-                const response = await fetch(`http://localhost:5000/api/cotacoes/${this.selectedAtivo.ticker}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await fetch(
+                    `http://localhost:5000/api/cotacoes/${this.selectedAtivo.ticker}`,
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
                 const data = await response.json();
-                
                 if (data.success && data.data.preco_atual) {
-                    this.form.preco_unitario = data.data.preco_atual.toFixed(2);
-                    const provider = data.data.provider || 'API';
-                    this.precoInfo = `✓ Preço atualizado via ${provider}`;
+                    const decimais = this.tipoAtualConfig?.fracao ? 8 : 2;
+                    this.form.preco_unitario = data.data.preco_atual.toFixed(decimais);
+                    this.precoInfo = `✓ Preço atualizado via ${data.data.provider || 'API'}`;
                 } else {
                     this.precoInfo = '⚠ Preço não disponível';
                 }
@@ -354,30 +468,19 @@ function compraForm() {
         },
 
         formatCurrency(value) {
+            const config = this.tipoAtualConfig;
             return new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
-                currency: this.moedaSimbolo === '$' ? 'USD' : (this.moedaSimbolo === '€' ? 'EUR' : 'BRL')
+                currency: config ? config.currency : 'BRL'
             }).format(value);
         },
 
         formatarDataInput(event) {
             let value = event.target.value.replace(/\D/g, '');
-            
-            // Limitar a 8 dígitos (DDMMYYYY)
             if (value.length > 8) value = value.slice(0, 8);
-            
-            // Aplicar máscara DD/MM/AAAA
-            if (value.length >= 2) {
-                value = value.slice(0, 2) + '/' + value.slice(2);
-            }
-            if (value.length >= 5) {
-                value = value.slice(0, 5) + '/' + value.slice(5);
-            }
-            
-            // Atualizar valor display
+            if (value.length >= 2) value = value.slice(0, 2) + '/' + value.slice(2);
+            if (value.length >= 5) value = value.slice(0, 5) + '/' + value.slice(5);
             this.form.data_transacao_display = value;
-            
-            // Converter para ISO (YYYY-MM-DD) se válido
             if (value.length === 10) {
                 const [dia, mes, ano] = value.split('/');
                 this.form.data_transacao_iso = `${ano}-${mes}-${dia}`;
@@ -386,10 +489,8 @@ function compraForm() {
 
         async submitCompra() {
             if (!this.selectedAtivo) return;
-
             this.loading = true;
             const token = localStorage.getItem('access_token');
-
             try {
                 const payload = {
                     ...this.form,
@@ -397,20 +498,13 @@ function compraForm() {
                     quantidade: this.form.quantidade.toString(),
                     preco_unitario: this.form.preco_unitario.toString()
                 };
-
                 const response = await fetch('http://localhost:5000/api/transacoes', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
                 const data = await response.json();
-
                 if (data.success) {
-                    // Feedback visual pode ser melhorado com toast no futuro
                     alert('✅ Compra registrada com sucesso!');
                     window.location.href = '{{ url_for("dashboard.index") }}';
                 } else {
