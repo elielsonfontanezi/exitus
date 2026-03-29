@@ -103,6 +103,7 @@ Ao fechar qualquer GAP, os seguintes docs DEVEM ser atualizados **no mesmo commi
 | `docs/CHANGELOG.md` | **Sempre** | Entrada com artefatos criados/modificados, data |
 | `docs/ROADMAP.md` | **Sempre** | Status "✅ Concluído (DD/MM/AAAA)", GAPs atualizados |
 | `docs/PROJECT_STATUS.md` | **Sempre** | Métricas, testes, progresso geral, versão |
+| `docs/FRONTEND_INTEGRATION_PLAN.md` | **Nova tela frontend** | Sprint, APIs integradas, padrões aplicados |
 | `docs/CODING_STANDARDS.md` | Se novo padrão | Padrões de código, convenções, exemplos |
 | `docs/ARCHITECTURE.md` | Se mudança estrutural | Novos componentes, endpoints, stack |
 | `docs/OPERATIONS_RUNBOOK.md` | Se scripts/procedimentos | Scripts novos, troubleshooting, procedimentos |
