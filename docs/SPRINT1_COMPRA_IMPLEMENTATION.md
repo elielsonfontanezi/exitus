@@ -47,7 +47,81 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 
 ---
 
-## 🧪 Como Testar
+## 🧪 Testes - Toggle Compra/Venda (Todos os 8 Tipos)
+
+**Data:** 29/03/2026 | **Status:** ⏳ Planejado | **Responsável:** Testes E2E
+
+### 📋 Preparação de Dados
+- [ ] Criar posições teste para e2e_user (via API ou seed)
+- [ ] Garantir ativos disponíveis: PETR4, KNRI11, CDB 2029, AAPL, O, IVVB11, GOOGL, BTC
+- [ ] Verificar corretoras disponíveis para cada tipo
+
+### 🛒 Modo COMPRA (8 cenários)
+
+| Tipo | Ativo | Comportamento | Validar |
+|------|-------|---------------|---------|
+| **Ação BR** | PETR4 | Quantidade inteira (step=1) | Badge "Quantidade inteira" |
+| **FII** | KNRI11 | Quantidade inteira (step=1) | Moeda R$ |
+| **Renda Fixa** | CDB 2029 | Quantidade inteira (step=1) | **⚠️ Discussão: Tesouro vs Títulos US** |
+| **Stock EUA** | AAPL | Fração 6 decimais | Moeda $, badge "Fração" |
+| **REIT** | O | Fração 6 decimais | Moeda $ |
+| **ETF** | IVVB11 | Fração 6 decimais | Moeda $ |
+| **Intl** | GOOGL | Fração 6 decimais | Moeda $ |
+| **Cripto** | BTC | Fração 8 decimais | Moeda $, badge "Fração" |
+
+### 💰 Modo VENDA (8 cenários)
+
+| Tipo | Ativo | Cenário | Validar |
+|------|-------|---------|---------|
+| **Ação BR** | PETR4 | Venda completa (usar "Máx") | Badge "Máx: X" funcional |
+| **FII** | KNRI11 | Venda parcial (50%) | Validação `max` no input |
+| **Renda Fixa** | CDB 2029 | Resgate parcial | **⚠️ Complexidade: Resgate vs Venda** |
+| **Stock EUA** | AAPL | Venda fracionada | 6 casas decimais |
+| **REIT** | O | Venda completa | Preço médio sugerido |
+| **ETF** | IVVB11 | Venda parcial | Saldo vs cota |
+| **Intl** | GOOGL | Venda fracionada | Taxas internacionais? |
+| **Cripto** | BTC | Venda fracionada | 8 casas decimais |
+
+### 🔄 Cross-Fluxo (2 cenários)
+- [ ] Compra → Toggle Venda → Voltar Compra (sem perder dados)
+- [ ] Venda → Toggle Compra → Manter tipo selecionado
+
+### ⚠️ Pontos de Discussão
+
+#### **Renda Fixa - Complexidade:**
+- **Tesouro Direto (BR):** Resgate vs Venda? Diferenças de taxas?
+- **Títulos Americanos:** Tratar como "BOND" na categoria INTL?
+- **Liquidação:** D+0, D+1, D+30? Como refletir na UI?
+
+#### **Validações Específicas:**
+- [ ] Tentar vender > quantidade disponível (erro visual)
+- [ ] Preços negativos (bloqueado)
+- [ ] Quantidade zero (bloqueado)
+- [ ] Datas futuras (permitido?)
+
+### 📊 Resultados Esperados
+
+**APIs Envolvidas:**
+- `POST /api/transacoes` - Registrar compra/venda
+- `GET /api/posicoes` - Listar posições (modo venda)
+- `GET /api/ativos` - Buscar ativos (modo compra)
+- `GET /api/cotacoes/<ticker>` - Preço atual
+
+**UX Comportamental:**
+- Toggle suave entre modos
+- Sem perda de dados ao alternar
+- Badges informativos (inteiro/fração/máx)
+- Mensagens de erro claras
+
+**Métricas de Sucesso:**
+- [ ] Todos os 8 tipos funcionando em compra
+- [ ] Todos os 8 tipos funcionando em venda  
+- [ ] Cross-fluxo sem bugs
+- [ ] Validações impedindo operações inválidas
+
+---
+
+## 🧪 Como Testar (Original)
 
 1. Acessar `http://localhost:8080/operacoes/compra`.
 2. Digitar um ticker no campo de busca (ex: "PETR", "AAPL").
