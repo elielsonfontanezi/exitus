@@ -132,6 +132,7 @@ cmd_start() {
     esac
     
     show_status
+    sleep 5
 }
 
 # Comando STOP
@@ -185,7 +186,6 @@ cmd_restart() {
     echo ""
     
     cmd_stop $target
-    sleep 2
     cmd_start $target
 }
 
@@ -216,7 +216,7 @@ cmd_rebuild() {
               --env-file backend/.env \
               exitus-backend:latest
               
-            sleep 15
+            sleep 5
             ;;
         "frontend")
             echo -e "${YELLOW}[1/3]${NC} Parando container antigo..."
