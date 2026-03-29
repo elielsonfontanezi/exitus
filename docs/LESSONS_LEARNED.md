@@ -44,6 +44,29 @@ db.create_all()
 
 ---
 
+### L-FE-002 — SEMPRE usar máscara DD/MM/AAAA para campos de data
+**Origem:** Ajuste tela compra formato americano | **Data:** 29/03/2026
+
+```html
+<!-- ❌ ERRADO — input type="date" mostra formato americano AAAA-MM-DD -->
+<input type="date" x-model="form.data_transacao">
+
+<!-- ✅ CORRETO — input type="text" com máscara DD/MM/AAAA -->
+<input type="text" x-model="form.data_transacao_display" 
+       @input="formatarDataInput($event)" 
+       placeholder="DD/MM/AAAA" maxlength="10">
+<input type="hidden" x-model="form.data_transacao_iso">
+```
+
+**Regra:** O sistema Exitus segue o **padrão Europeu**:
+- Display: `DD/MM/AAAA` (ex: 29/03/2026)
+- API: `YYYY-MM-DD` (ISO 8601)
+- Valores monetários: `R$ 9.999,99` (ponto milhar, vírgula decimal)
+
+**Implementação:** Sempre usar dois campos — um `type="text"` visível com máscara para o usuário, e um `type="hidden"` com valor ISO para envio à API.
+
+---
+
 ## 🎨 Frontend Templates
 
 ### L-FE-001 — Chart.js: nunca usar setTimeout para renderização após Alpine.js

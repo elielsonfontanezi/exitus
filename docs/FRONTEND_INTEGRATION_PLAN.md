@@ -95,6 +95,14 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 | Inatividade | 15 minutos → modal de relogin |
 | Verificação | A cada 1 minuto via `/auth/check-session` |
 
+### Padrão Europeu — Datas e Valores
+O sistema Exitus segue o **padrão Europeu** para formatação:
+- **Datas:** DD/MM/AAAA (ex: 29/03/2026)
+- **Valores monetários:** R$ 9.999,99 (ponto milhar, vírgula decimal)
+- **Percentuais:** 99,99%
+
+Ver detalhes completos em `docs/CODING_STANDARDS.md` — seção "Padrão Europeu".
+
 ### Padrão obrigatório para todas as telas
 ```python
 from .auth import login_required, get_api_headers

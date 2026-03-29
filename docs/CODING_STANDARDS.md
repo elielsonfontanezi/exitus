@@ -601,5 +601,52 @@ JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)       # Refresh token: 7 dias
 
 ---
 
-*Atualizado: 29 de Março de 2026*  
-*Versão: 3.2 - Padrão JWT obrigatório adicionado (EXITUS-JWT-001)*
+## 🌍 Padrão Europeu — Datas e Valores Monetários
+
+O sistema Exitus segue o **padrão Europeu** para formatação de datas e valores:
+
+| Tipo | Formato | Exemplo |
+|------|---------|---------|
+| **Data** | DD/MM/AAAA | `29/03/2026` |
+| **Data/Hora** | DD/MM/AAAA HH:MM:SS | `29/03/2026 14:30:00` |
+| **Valor Monetário** | R$ 9.999,99 (ponto milhar, vírgula decimal) | `R$ 1.234,56` |
+| **Percentual** | 99,99% (vírgula decimal) | `12,34%` |
+| **Quantidade** | 9.999,99 (ponto milhar, vírgula decimal) | `1.000,50` |
+
+### Implementação Frontend
+
+```javascript
+// Data para display (DD/MM/AAAA)
+new Date().toLocaleDateString('pt-BR')  // "29/03/2026"
+
+// Data para API (ISO 8601)
+new Date().toISOString().split('T')[0]  // "2026-03-29"
+
+// Valor monetário para display
+new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+}).format(1234.56)  // "R$ 1.234,56"
+
+// Valor percentual
+new Intl.NumberFormat('pt-BR', {
+    style: 'percent',
+    minimumFractionDigits: 2
+}).format(0.1234)  // "12,34%"
+```
+
+### Regras Obrigatórias
+
+1. **Campos de input de data** devem usar máscara `DD/MM/AAAA` com `type="text"`
+2. **Campos hidden** devem conter o valor em formato ISO para envio à API
+3. **Display de valores** deve sempre usar `Intl.NumberFormat('pt-BR', ...)`
+4. **API backend** sempre recebe e retorna datas em ISO 8601 (YYYY-MM-DD)
+
+### Exceções
+
+- Input `type="date"` nativo HTML5 deve ser evitado (mostra formato americano)
+- Exportações para CSV/Excel devem usar formato local do usuário quando possível
+
+---
+
+*Adicionado: 29/03/2026*

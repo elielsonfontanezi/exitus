@@ -158,7 +158,10 @@
                     <label class="form-label">
                         <i class="far fa-calendar-alt"></i> Data da Operação <span class="text-red-500">*</span>
                     </label>
-                    <input type="date" class="form-control w-full" x-model="form.data_transacao" required>
+                    <input type="text" class="form-control w-full" x-model="form.data_transacao_display" 
+                           @input="formatarDataInput($event)" 
+                           placeholder="DD/MM/AAAA" maxlength="10" required>
+                    <input type="hidden" x-model="form.data_transacao_iso">
                 </div>
 
                 <!-- Corretora -->
@@ -256,7 +259,8 @@ function compraForm() {
             tipo: 'compra',
             ativo_id: '',
             corretora_id: '',
-            data_transacao: new Date().toISOString().split('T')[0],
+            data_transacao_display: new Date().toLocaleDateString('pt-BR'),
+            data_transacao_iso: new Date().toISOString().split('T')[0],
             quantidade: '',
             preco_unitario: '',
             taxa_corretagem: '0',
@@ -356,6 +360,30 @@ function compraForm() {
             }).format(value);
         },
 
+        formatarDataInput(event) {
+            let value = event.target.value.replace(/\D/g, '');
+            
+            // Limitar a 8 dígitos (DDMMYYYY)
+            if (value.length > 8) value = value.slice(0, 8);
+            
+            // Aplicar máscara DD/MM/AAAA
+            if (value.length >= 2) {
+                value = value.slice(0, 2) + '/' + value.slice(2);
+            }
+            if (value.length >= 5) {
+                value = value.slice(0, 5) + '/' + value.slice(5);
+            }
+            
+            // Atualizar valor display
+            this.form.data_transacao_display = value;
+            
+            // Converter para ISO (YYYY-MM-DD) se válido
+            if (value.length === 10) {
+                const [dia, mes, ano] = value.split('/');
+                this.form.data_transacao_iso = `${ano}-${mes}-${dia}`;
+            }
+        },
+
         async submitCompra() {
             if (!this.selectedAtivo) return;
 
@@ -365,7 +393,7 @@ function compraForm() {
             try {
                 const payload = {
                     ...this.form,
-                    data_transacao: this.form.data_transacao + 'T12:00:00',
+                    data_transacao: this.form.data_transacao_iso + 'T12:00:00',
                     quantidade: this.form.quantidade.toString(),
                     preco_unitario: this.form.preco_unitario.toString()
                 };
