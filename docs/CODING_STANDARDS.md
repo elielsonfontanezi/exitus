@@ -563,5 +563,43 @@ tipo = Column(Enum(TipoAtivo), nullable=False)
 
 ---
 
-*Atualizado: 04 de Março de 2026*  
-*Versão: 3.1 - Padrão _setup/_teardown com decode_token adicionado (EXITUS-IR-005)*
+---
+
+## 🔐 Padrão Obrigatório — Autenticação JWT no Frontend
+
+### Regra: Toda rota Flask que chama a API backend deve usar `get_api_headers()`
+
+```python
+# ✅ PADRÃO OBRIGATÓRIO — frontend/app/routes/*.py
+from .auth import login_required, get_api_headers
+
+@bp.route('/minha-rota')
+@login_required
+def minha_rota():
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
+    
+    response = requests.get(f"{Config.BACKEND_API_URL}/api/...", headers=headers)
+```
+
+**Por que?**
+- `session.get('access_token')` diretamente **ignora a expiração** do token
+- `get_api_headers()` verifica expiração, tenta renovar silenciosamente via refresh token
+- Se renovação falhar → redireciona para login (nunca silencia o erro)
+
+### Configuração JWT (backend/app/config.py)
+```python
+JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)   # Access token: 30 min
+JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)       # Refresh token: 7 dias
+```
+
+### Inatividade do usuário (frontend/templates/base.html)
+- Timer de **15 minutos** de inatividade → modal "Sessão Expirada"
+- Eventos que resetam o timer: `click`, `keypress`, `scroll`, `mousemove`, `touchstart`
+- Verificação de sessão a cada **1 minuto** via `/auth/check-session`
+
+---
+
+*Atualizado: 29 de Março de 2026*  
+*Versão: 3.2 - Padrão JWT obrigatório adicionado (EXITUS-JWT-001)*

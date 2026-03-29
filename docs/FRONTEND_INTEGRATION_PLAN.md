@@ -1,7 +1,7 @@
 # 🚀 Plano de Integração Frontend-Backend — Exitus
 
-**Data:** 26/03/2026 | **Versão:** v1.0 | **Status:** 📋 Planejamento  
-**Modelo IA:** Claude Sonnet (análise estratégica)
+**Data:** 26/03/2026 | **Versão:** v1.1 | **Status:** � Em andamento  
+**Modelo IA:** Claude Sonnet 4.6 Thinking
 
 ---
 
@@ -80,6 +80,35 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 - Alertas, Preferências
 - APIs: CRUD /api/alertas, /api/usuarios/*
 - Critério: Usuário personaliza sistema
+
+---
+
+## 🔐 Gerenciamento de Sessão JWT
+
+**Implementado em:** 29/03/2026 | EXITUS-JWT-001
+
+### Configuração
+| Parâmetro | Valor |
+|-----------|-------|
+| Access Token | 30 minutos |
+| Refresh Token | 7 dias |
+| Inatividade | 15 minutos → modal de relogin |
+| Verificação | A cada 1 minuto via `/auth/check-session` |
+
+### Padrão obrigatório para todas as telas
+```python
+from .auth import login_required, get_api_headers
+
+@bp.route('/minha-tela')
+@login_required
+def minha_tela():
+    headers = get_api_headers()   # ✅ ÚNICO padrão autorizado
+    if not headers:
+        return redirect(url_for('auth.login'))
+```
+
+### Dívida técnica — `dashboard.py`
+As rotas em `dashboard.py` ainda usam `session.get('access_token')` diretamente. Serão migradas para `get_api_headers()` de forma gradual a cada nova tela implementada, para evitar regressões.
 
 ---
 

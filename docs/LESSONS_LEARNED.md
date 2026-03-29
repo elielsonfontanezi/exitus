@@ -2,8 +2,30 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 25/03/2026 — L-API-005 adicionado (integração calendário dividendos)  
+> **Atualizado:** 29/03/2026 — L-AUTH-001 adicionado (gerenciamento JWT obrigatório)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
+
+---
+
+## 🔐 Autenticação JWT
+
+### L-AUTH-001 — SEMPRE usar `get_api_headers()` nas rotas Flask que chamam a API
+**Origem:** Bug corretoras lista vazia | **Data:** 29/03/2026
+
+```python
+# ❌ ERRADO — token pode estar expirado, causa 401 silencioso
+headers = {'Authorization': f"Bearer {session.get('access_token')}"}
+
+# ✅ CORRETO — renova automaticamente via refresh token se expirado
+from .auth import get_api_headers
+headers = get_api_headers()
+if not headers:
+    return redirect(url_for('auth.login'))
+```
+
+**Regra:** `get_api_headers()` é a única função autorizada para construir headers de API nas rotas Flask do frontend. Ela verifica expiração, renova o token automaticamente com o refresh token e redireciona para login se não conseguir renovar.
+
+**Arquivos onde deve ser usada:** Toda rota `@login_required` que faz chamada `requests.get/post` para o backend.
 
 ---
 

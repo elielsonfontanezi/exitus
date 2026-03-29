@@ -6,7 +6,7 @@ Operações Blueprint - Páginas de Compra, Venda e Depósito
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import requests
 from app.config import Config
-from .auth import login_required
+from .auth import login_required, get_api_headers
 
 bp = Blueprint('operacoes', __name__, url_prefix='/operacoes')
 
@@ -14,9 +14,11 @@ bp = Blueprint('operacoes', __name__, url_prefix='/operacoes')
 @login_required
 def compra():
     """Página de compra de ativos (integração via API REST no frontend)"""
-    headers = {'Authorization': f"Bearer {session.get('access_token')}"}
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
     
-    # Buscar corretoras para popular select (usando token da sessão)
+    # Buscar corretoras para popular select (usando token renovado automaticamente)
     corretoras_response = requests.get(
         f"{Config.BACKEND_API_URL}/api/corretoras",
         headers=headers
@@ -46,7 +48,9 @@ def venda():
         return redirect(url_for('dashboard.index'))
     
     # Buscar posições do usuário
-    headers = {'Authorization': f"Bearer {session.get('access_token')}"}
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
     
     posicoes_response = requests.get(
         f"{Config.BACKEND_API_URL}/api/posicoes",
@@ -60,7 +64,7 @@ def venda():
     # Buscar corretoras para popular select (API autenticada)
     corretoras_response = requests.get(
         f"{Config.BACKEND_API_URL}/api/corretoras",
-        headers=headers
+        headers=headers  # headers já renovado acima
     )
     
     corretoras = []
@@ -89,7 +93,9 @@ def deposito():
         return redirect(url_for('dashboard.index'))
     
     # Buscar corretoras
-    headers = {'Authorization': f"Bearer {session.get('access_token')}"}
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
     
     corretoras_response = requests.get(
         f"{Config.BACKEND_API_URL}/api/corretoras",

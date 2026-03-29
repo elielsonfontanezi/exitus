@@ -6,7 +6,7 @@ Análises Blueprint - Página de análises e relatórios
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import requests
 from app.config import Config
-from .auth import login_required
+from .auth import login_required, get_api_headers
 
 bp = Blueprint('analises', __name__, url_prefix='/analises')
 
@@ -79,7 +79,9 @@ def index():
 @login_required
 def proventos():
     """Análise de proventos"""
-    headers = {'Authorization': f"Bearer {session.get('access_token')}"}
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
     
     # Buscar proventos com filtros
     ano = request.args.get('ano')
@@ -107,7 +109,9 @@ def proventos():
 @login_required
 def rentabilidade():
     """Análise de rentabilidade"""
-    headers = {'Authorization': f"Bearer {session.get('access_token')}"}
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
     
     # Buscar dados do dashboard
     dashboard_response = requests.get(
@@ -137,7 +141,9 @@ def rentabilidade():
 @login_required
 def impostos():
     """Análise de impostos"""
-    headers = {'Authorization': f"Bearer {session.get('access_token')}"}
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
     
     # Buscar DARFs acumulados
         # Buscar DARFs acumulados

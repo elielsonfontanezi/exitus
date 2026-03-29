@@ -148,6 +148,17 @@ def get_api_headers():
     session.clear()
     return None
 
+@bp.route('/check-session', methods=['GET'])
+def check_session():
+    """Verifica se a sessão ainda é válida e tenta renovar o token se necessário."""
+    if not session.get('user_id'):
+        return jsonify({'valid': False})
+    headers = get_api_headers()
+    if not headers:
+        return jsonify({'valid': False})
+    return jsonify({'valid': True})
+
+
 @bp.route('/logout')
 def logout():
     session.clear()
