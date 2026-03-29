@@ -191,7 +191,7 @@
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-semibold" x-text="moedaSimbolo"></span>
-                        <input type="number" class="form-control w-full pl-12 pr-12" x-model="form.preco_unitario" min="0.01" step="0.01" placeholder="0,00" required>
+                        <input type="number" class="form-control w-full pl-12 pr-12" x-model="form.preco_unitario" min="0.01" step="0.01" placeholder="0.00" required style="padding-left: 38px !important;">
                         <button type="button" @click="fetchPrecoAtual" :disabled="!selectedAtivo || loadingPreco" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#a38c65] hover:text-[#735c43] disabled:opacity-40" title="Buscar preço atual">
                             <i class="fas" :class="loadingPreco ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
                         </button>
