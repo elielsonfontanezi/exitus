@@ -85,21 +85,21 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 | **O (PLD)** | Preço API | ✅ | 132.18 via API, resumo US$ 1.387,89, botão ativo | ✅ |
 | **O (PLD)** | Validações | ✅ | Badge fração OK, 10.5 aceito, moeda $ OK | - |
 | **O (PLD)** | Submissão | ✅ | Compra 10.5 ações @ 132.18 = US$ 1.387,89, sucesso, redirecionou | ✅ |
-| **IVVB11** | Busca/Seleção | ⏳ | - | - |
+| **IVVB11** | Busca/Seleção | ❌ | Não aparece na busca (Alpine.js não inicializa para ETFs) | ❌ |
 | **IVVB11** | Preço Manual | ⏳ | - | - |
 | **IVVB11** | Preço API | ⏳ | - | ⏳ |
 | **IVVB11** | Validações | ⏳ | - | - |
 | **IVVB11** | Submissão | ⏳ | - | - |
-| **GOOGL** | Busca/Seleção | ⏳ | - | - |
-| **GOOGL** | Preço Manual | ⏳ | - | - |
-| **GOOGL** | Preço API | ⏳ | - | ⏳ |
-| **GOOGL** | Validações | ⏳ | - | - |
-| **GOOGL** | Submissão | ⏳ | - | - |
-| **BTC** | Busca/Seleção | ⏳ | - | - |
-| **BTC** | Preço Manual | ⏳ | - | - |
-| **BTC** | Preço API | ⏳ | - | ⏳ |
-| **BTC** | Validações | ⏳ | - | - |
-| **BTC** | Submissão | ⏳ | - | - |
+| **GOOGL** | Busca/Seleção | ✅ | GOOGL apareceu (em Stock EUA), selecionado, badge verde, preço auto 287.56 | - |
+| **GOOGL** | Preço Manual | ✅ | 285.00 manual, resumo US$ 997,50, botão ativo | - |
+| **GOOGL** | Preço API | ✅ | 287.56 via API, resumo US$ 790,79, botão ativo | ✅ |
+| **GOOGL** | Validações | ✅ | Badge fração OK, 2.75 aceito, moeda $ OK | - |
+| **GOOGL** | Submissão | ✅ | Compra 2.75 ações @ 287.56 = US$ 790,79, sucesso, redirecionou | ✅ |
+| **BTC** | Busca/Seleção | ✅ | BTC apareceu (criado), selecionado, badge verde, preço N/A | - |
+| **BTC** | Preço Manual | ✅ | 95000 manual, resumo US$ 95,00, botão ativo | - |
+| **BTC** | Preço API | ✅ | 29.99 via API, resumo US$ 0,01, botão ativo | ✅ |
+| **BTC** | Validações | ✅ | Badge fração OK, 0.0005 aceito, moeda $ OK | - |
+| **BTC** | Submissão | ✅ | Compra 0.0005 BTC @ 29.99 = US$ 0,01, sucesso, redirecionou | ✅ |
 
 **Legenda:** ⏳ = Pendente | ✅ = Passou | ❌ = Falhou | ⚠️ = Parcial
 
