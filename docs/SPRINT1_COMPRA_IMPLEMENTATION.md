@@ -85,11 +85,11 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 | **O (PLD)** | Preço API | ✅ | 132.18 via API, resumo US$ 1.387,89, botão ativo | ✅ |
 | **O (PLD)** | Validações | ✅ | Badge fração OK, 10.5 aceito, moeda $ OK | - |
 | **O (PLD)** | Submissão | ✅ | Compra 10.5 ações @ 132.18 = US$ 1.387,89, sucesso, redirecionou | ✅ |
-| **IVVB11** | Busca/Seleção | ❌ | Não aparece na busca (Alpine.js não inicializa para ETFs) | ❌ |
-| **IVVB11** | Preço Manual | ⏳ | - | - |
-| **IVVB11** | Preço API | ⏳ | - | ⏳ |
-| **IVVB11** | Validações | ⏳ | - | - |
-| **IVVB11** | Submissão | ⏳ | - | - |
+| **IVVB11** | Busca/Seleção | ✅ | IVVB11 apareceu (após fix filtro), selecionado, badge verde, preço 320.00 | - |
+| **IVVB11** | Preço Manual | ✅ | 330 manual, resumo US$ 1.650,00, botão ativo | - |
+| **IVVB11** | Preço API | ✅ | 320 via API, resumo US$ 1.600,00, botão ativo | ✅ |
+| **IVVB11** | Validações | ✅ | Badge fração OK, 5 aceito, moeda $ OK | - |
+| **IVVB11** | Submissão | ✅ | Compra 5 cotas @ 330 = US$ 1.650,00, sucesso, redirecionou | ✅ |
 | **GOOGL** | Busca/Seleção | ✅ | GOOGL apareceu (em Stock EUA), selecionado, badge verde, preço auto 287.56 | - |
 | **GOOGL** | Preço Manual | ✅ | 285.00 manual, resumo US$ 997,50, botão ativo | - |
 | **GOOGL** | Preço API | ✅ | 287.56 via API, resumo US$ 790,79, botão ativo | ✅ |

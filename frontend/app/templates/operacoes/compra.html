@@ -619,8 +619,8 @@ function operacaoForm() {
             const config = this.tipoAtualConfig;
             const token = localStorage.getItem('access_token');
             try {
-                // Usar o primeiro tipo da categoria como filtro principal
-                const tipoParam = config ? `&tipo=${config.tipos[0]}` : '';
+                // Não usar filtro quando há múltiplos tipos na categoria
+                const tipoParam = (config && config.tipos.length === 1) ? `&tipo=${config.tipos[0]}` : '';
                 const response = await fetch(
                     `http://localhost:5000/api/ativos?search=${encodeURIComponent(this.searchTicker)}${tipoParam}`,
                     { headers: { 'Authorization': `Bearer ${token}` } }
@@ -630,8 +630,8 @@ function operacaoForm() {
                     let ativos = data.data.ativos || [];
                     // Filtrar client-side para cobrir todos os sub-tipos da categoria
                     if (config && config.tipos.length > 1) {
-                        const tiposSet = new Set(config.tipos.map(t => t.toLowerCase().replace('_','')));
-                        const filtered = ativos.filter(a => tiposSet.has((a.tipo || '').replace('_','')));
+                        const tiposSet = new Set(config.tipos.map(t => t.toLowerCase()));
+                        const filtered = ativos.filter(a => tiposSet.has((a.tipo || '').toLowerCase()));
                         // Se não retornou nada com filtro, mostrar todos do search
                         ativos = filtered.length > 0 ? filtered : ativos;
                     }
