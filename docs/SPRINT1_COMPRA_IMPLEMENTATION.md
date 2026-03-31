@@ -65,11 +65,11 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 | **PETR4** | Preço API | ✅ | 49.67 via API, resumo R$ 4.967,00, botão ativo | ✅ |
 | **PETR4** | Validações | ✅ | Badge inteiro OK, alerta funcionou para 100.5, moeda R$ OK | - |
 | **PETR4** | Submissão | ✅ | Compra 100 ações @ 48.60 = R$ 4.860, sucesso, redirecionou | ✅ |
-| **KNRI11** | Busca/Seleção | ⏳ | - | - |
-| **KNRI11** | Preço Manual | ⏳ | - | - |
-| **KNRI11** | Preço API | ⏳ | - | ⏳ |
-| **KNRI11** | Validações | ⏳ | - | - |
-| **KNRI11** | Submissão | ⏳ | - | - |
+| **KNRI11** | Busca/Seleção | ✅ | KNRI11 apareceu, selecionado, badge verde, preço auto 167.98 | - |
+| **KNRI11** | Preço Manual | ✅ | 165.50 manual, resumo R$ 1.655,00, botão ativo | - |
+| **KNRI11** | Preço API | ✅ | 167.98 via API, resumo R$ 839,90, botão ativo | ✅ |
+| **KNRI11** | Validações | ✅ | Alerta funcionou para 5.5, badge inteiro OK, moeda R$ OK | - |
+| **KNRI11** | Submissão | ✅ | Compra 5 cotas @ 167.98 = R$ 839,90, sucesso, redirecionou | ✅ |
 | **CDB 2029** | Busca/Seleção | ⏳ | - | - |
 | **CDB 2029** | Preço Manual | ⏳ | - | - |
 | **CDB 2029** | Preço API | ⏳ | - | ⏳ |
