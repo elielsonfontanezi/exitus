@@ -56,18 +56,65 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 - [ ] Garantir ativos disponíveis: PETR4, KNRI11, CDB 2029, AAPL, O, IVVB11, GOOGL, BTC
 - [ ] Verificar corretoras disponíveis para cada tipo
 
-### 🛒 Modo COMPRA (8 cenários)
+### � Registro de Resultados - Tempo Real
 
-| Tipo | Ativo | Comportamento | Validar |
-|------|-------|---------------|---------|
-| **Ação BR** | PETR4 | Quantidade inteira (step=1) | Badge "Quantidade inteira" |
-| **FII** | KNRI11 | Quantidade inteira (step=1) | Moeda R$ |
-| **Renda Fixa** | CDB 2029 | Quantidade inteira (step=1) | **⚠️ Discussão: Tesouro vs Títulos US** |
-| **Stock EUA** | AAPL | Fração 6 decimais | Moeda $, badge "Fração" |
-| **REIT** | O | Fração 6 decimais | Moeda $ |
-| **ETF** | IVVB11 | Fração 6 decimais | Moeda $ |
-| **Intl** | GOOGL | Fração 6 decimais | Moeda $ |
-| **Cripto** | BTC | Fração 8 decimais | Moeda $, badge "Fração" |
+| Ativo | Cenário | Status | Observações | API Funciona? |
+|-------|---------|--------|-------------|---------------|
+| **PETR4** | Busca/Seleção | ✅ | PETR4 apareceu, selecionado, badge verde, preço auto 49.67 | - |
+| **PETR4** | Preço Manual | ✅ | 38.50 manual, resumo R$ 3.850,00, botão ativo | - |
+| **PETR4** | Preço API | ✅ | 49.67 via API, resumo R$ 4.967,00, botão ativo | ✅ |
+| **PETR4** | Validações | ✅ | Badge inteiro OK, alerta funcionou para 100.5, moeda R$ OK | - |
+| **PETR4** | Submissão | ✅ | Compra 100 ações @ 48.60 = R$ 4.860, sucesso, redirecionou | ✅ |
+| **KNRI11** | Busca/Seleção | ⏳ | - | - |
+| **KNRI11** | Preço Manual | ⏳ | - | - |
+| **KNRI11** | Preço API | ⏳ | - | ⏳ |
+| **KNRI11** | Validações | ⏳ | - | - |
+| **KNRI11** | Submissão | ⏳ | - | - |
+| **CDB 2029** | Busca/Seleção | ⏳ | - | - |
+| **CDB 2029** | Preço Manual | ⏳ | - | - |
+| **CDB 2029** | Preço API | ⏳ | - | ⏳ |
+| **CDB 2029** | Validações | ⏳ | - | - |
+| **CDB 2029** | Submissão | ⏳ | - | - |
+| **AAPL** | Busca/Seleção | ⏳ | - | - |
+| **AAPL** | Preço Manual | ⏳ | - | - |
+| **AAPL** | Preço API | ⏳ | - | ⏳ |
+| **AAPL** | Validações | ⏳ | - | - |
+| **AAPL** | Submissão | ⏳ | - | - |
+| **O** | Busca/Seleção | ⏳ | - | - |
+| **O** | Preço Manual | ⏳ | - | - |
+| **O** | Preço API | ⏳ | - | ⏳ |
+| **O** | Validações | ⏳ | - | - |
+| **O** | Submissão | ⏳ | - | - |
+| **IVVB11** | Busca/Seleção | ⏳ | - | - |
+| **IVVB11** | Preço Manual | ⏳ | - | - |
+| **IVVB11** | Preço API | ⏳ | - | ⏳ |
+| **IVVB11** | Validações | ⏳ | - | - |
+| **IVVB11** | Submissão | ⏳ | - | - |
+| **GOOGL** | Busca/Seleção | ⏳ | - | - |
+| **GOOGL** | Preço Manual | ⏳ | - | - |
+| **GOOGL** | Preço API | ⏳ | - | ⏳ |
+| **GOOGL** | Validações | ⏳ | - | - |
+| **GOOGL** | Submissão | ⏳ | - | - |
+| **BTC** | Busca/Seleção | ⏳ | - | - |
+| **BTC** | Preço Manual | ⏳ | - | - |
+| **BTC** | Preço API | ⏳ | - | ⏳ |
+| **BTC** | Validações | ⏳ | - | - |
+| **BTC** | Submissão | ⏳ | - | - |
+
+**Legenda:** ⏳ = Pendente | ✅ = Passou | ❌ = Falhou | ⚠️ = Parcial
+
+### �🛒 Modo COMPRA (8 cenários) - ATUALIZADO
+
+| Tipo | Ativo | Fonte do Preço | Comportamento | Validar |
+|------|-------|----------------|---------------|---------|
+| **Ação BR** | PETR4 | Manual + API | Quantidade inteira (step=1) | Badge "Quantidade inteira", botão 🔄 funciona |
+| **FII** | KNRI11 | Manual + API | Quantidade inteira (step=1) | Moeda R$, preço via API |
+| **Renda Fixa** | CDB 2029 | Manual + API | Quantidade inteira (step=1) | **⚠️ Discussão: Tesouro vs Títulos US** |
+| **Stock EUA** | AAPL | Manual + API | Fração 6 decimais | Moeda $, badge "Fração", API USD |
+| **REIT** | O | Manual + API | Fração 6 decimais | Moeda $, preço via API |
+| **ETF** | IVVB11 | Manual + API | Fração 6 decimais | Moeda $, preço via API |
+| **Intl** | GOOGL | Manual + API | Fração 6 decimais | Moeda $, preço via API |
+| **Cripto** | BTC | Manual + API | Fração 8 decimais | Moeda $, badge "Fração", API crypto |
 
 ### 💰 Modo VENDA (8 cenários)
 
@@ -81,6 +128,60 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 | **ETF** | IVVB11 | Venda parcial | Saldo vs cota |
 | **Intl** | GOOGL | Venda fracionada | Taxas internacionais? |
 | **Cripto** | BTC | Venda fracionada | 8 casas decimais |
+
+### 🎯 Cenários por Ativo - Modo COMPRA
+
+#### **PETR4 - Ação BR**
+- [ ] **Busca/Seleção:** "PETR" → PETR4 aparece → selecionar
+- [ ] **Preço Manual:** Digitar 38.50 → resumo mostra R$ 3.850,00
+- [ ] **Preço API:** Limpar preço → clicar 🔄 → preço automático da API
+- [ ] **Validações:** Badge "Quantidade inteira", moeda R$, step=1
+- [ ] **Submissão:** Botão "Confirmar Compra" verde → sucesso
+
+#### **KNRI11 - FII**
+- [ ] **Busca/Seleção:** "KNRI" → KNRI11 → selecionar
+- [ ] **Preço Manual:** Digitar preço → resumo OK
+- [ ] **Preço API:** Botão 🔄 → preço via API
+- [ ] **Validações:** Badge "Quantidade inteira", moeda R$
+- [ ] **Submissão:** Confirmar compra
+
+#### **CDB 2029 - Renda Fixa**
+- [ ] **Busca/Seleção:** "CDB" → CDB 2029 → selecionar
+- [ ] **Preço Manual:** Digitar preço unitário
+- [ ] **Preço API:** Botão 🔄 → preço via API
+- [ ] **Validações:** Badge "Quantidade inteira", moeda R$
+- [ ] **Submissão:** Confirmar compra
+
+#### **AAPL - Stock EUA**
+- [ ] **Busca/Seleção:** "AAPL" → AAPL → selecionar
+- [ ] **Preço Manual:** Digitar preço em $
+- [ ] **Preço API:** Botão 🔄 → preço USD via API
+- [ ] **Validações:** Badge "Fração permitida", moeda $, step=0.000001
+- [ ] **Submissão:** Confirmar compra
+
+#### **O - REIT**
+- [ ] **Busca/Seleção:** "O" → REIT → selecionar
+- [ ] **Preço Manual/API:** Testar ambas fontes
+- [ ] **Validações:** Badge "Fração permitida", moeda $
+- [ ] **Submissão:** Confirmar compra
+
+#### **IVVB11 - ETF**
+- [ ] **Busca/Seleção:** "IVVB" → ETF → selecionar
+- [ ] **Preço Manual/API:** Testar ambas fontes
+- [ ] **Validações:** Badge "Fração permitida", moeda $
+- [ ] **Submissão:** Confirmar compra
+
+#### **GOOGL - Intl**
+- [ ] **Busca/Seleção:** "GOOGL" → Intl → selecionar
+- [ ] **Preço Manual/API:** Testar ambas fontes
+- [ ] **Validações:** Badge "Fração permitida", moeda $
+- [ ] **Submissão:** Confirmar compra
+
+#### **BTC - Cripto**
+- [ ] **Busca/Seleção:** "BTC" → Cripto → selecionar
+- [ ] **Preço Manual/API:** Testar ambas fontes
+- [ ] **Validações:** Badge "Fração permitida", moeda $, step=0.00000001
+- [ ] **Submissão:** Confirmar compra
 
 ### 🔄 Cross-Fluxo (2 cenários)
 - [ ] Compra → Toggle Venda → Voltar Compra (sem perder dados)

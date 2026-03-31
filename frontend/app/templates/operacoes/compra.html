@@ -406,8 +406,9 @@
                     <input type="number" class="form-control w-full" x-model="form.quantidade"
                            min="0"
                            :max="isVenda && quantidadeMaxima > 0 ? quantidadeMaxima : undefined"
-                           :step="tipoAtualConfig ? tipoAtualConfig.step : '1'"
+                           :step="tipoAtualConfig && !tipoAtualConfig.fracao ? '1' : '0.00000001'"
                            :placeholder="tipoAtualConfig && tipoAtualConfig.fracao ? '0.00000000' : '0'"
+                           @change="if (tipoAtualConfig && !tipoAtualConfig.fracao && form.quantidade) { const q = parseFloat(form.quantidade); if (!Number.isInteger(q)) { alert('❌ Quantidade deve ser inteira para ' + tipoAtualConfig.label); $el.focus(); } }"
                            required>
                     <div x-show="isVenda && form.quantidade && parseFloat(form.quantidade) > quantidadeMaxima && quantidadeMaxima > 0" class="text-xs text-red-500 mt-1">
                         <i class="fas fa-exclamation-circle"></i> Quantidade excede o disponível (<span x-text="quantidadeMaxima"></span>)
@@ -733,6 +734,16 @@ function operacaoForm() {
 
         async submitOperacao() {
             if (!this.selectedAtivo) return;
+            
+            // Validação de quantidade inteira para tipos não-fracionados
+            if (this.tipoAtualConfig && !this.tipoAtualConfig.fracao) {
+                const quantidade = parseFloat(this.form.quantidade);
+                if (!Number.isInteger(quantidade)) {
+                    alert('❌ Quantidade deve ser inteira para ' + this.tipoAtualConfig.label);
+                    return;
+                }
+            }
+            
             if (this.isVenda && this.quantidadeMaxima > 0 && parseFloat(this.form.quantidade) > this.quantidadeMaxima) {
                 alert('❌ Quantidade excede o disponível!');
                 return;
@@ -741,10 +752,17 @@ function operacaoForm() {
             const token = localStorage.getItem('access_token');
             try {
                 const payload = {
-                    ...this.form,
+                    tipo: this.form.tipo,
+                    ativo_id: this.form.ativo_id,
+                    corretora_id: this.form.corretora_id,
                     data_transacao: this.form.data_transacao_iso + 'T12:00:00',
                     quantidade: this.form.quantidade.toString(),
-                    preco_unitario: this.form.preco_unitario.toString()
+                    preco_unitario: this.form.preco_unitario.toString(),
+                    taxa_corretagem: this.form.taxa_corretagem,
+                    taxa_liquidacao: this.form.taxa_liquidacao,
+                    emolumentos: this.form.emolumentos,
+                    imposto: this.form.imposto,
+                    outros_custos: this.form.outros_custos
                 };
                 const response = await fetch('http://localhost:5000/api/transacoes', {
                     method: 'POST',
