@@ -80,11 +80,11 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 | **AAPL** | Preço API | ✅ | 253.79 via API, resumo US$ 1.395,85, botão ativo | ✅ |
 | **AAPL** | Validações | ✅ | Badge fração OK, 5.5 aceito, moeda $ OK | - |
 | **AAPL** | Submissão | ✅ | Compra 5.5 ações @ 253.79 = US$ 1.395,85, sucesso, redirecionou | ✅ |
-| **O** | Busca/Seleção | ⏳ | - | - |
-| **O** | Preço Manual | ⏳ | - | - |
-| **O** | Preço API | ⏳ | - | ⏳ |
-| **O** | Validações | ⏳ | - | - |
-| **O** | Submissão | ⏳ | - | - |
+| **O (PLD)** | Busca/Seleção | ✅ | PLD apareceu, selecionado, badge verde, preço N/A | - |
+| **O (PLD)** | Preço Manual | ✅ | 130.00 manual, resumo US$ 2.600,00, botão ativo | - |
+| **O (PLD)** | Preço API | ✅ | 132.18 via API, resumo US$ 1.387,89, botão ativo | ✅ |
+| **O (PLD)** | Validações | ✅ | Badge fração OK, 10.5 aceito, moeda $ OK | - |
+| **O (PLD)** | Submissão | ✅ | Compra 10.5 ações @ 132.18 = US$ 1.387,89, sucesso, redirecionou | ✅ |
 | **IVVB11** | Busca/Seleção | ⏳ | - | - |
 | **IVVB11** | Preço Manual | ⏳ | - | - |
 | **IVVB11** | Preço API | ⏳ | - | ⏳ |
