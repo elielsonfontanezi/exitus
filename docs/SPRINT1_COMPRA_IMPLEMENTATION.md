@@ -70,11 +70,11 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 | **KNRI11** | Preço API | ✅ | 167.98 via API, resumo R$ 839,90, botão ativo | ✅ |
 | **KNRI11** | Validações | ✅ | Alerta funcionou para 5.5, badge inteiro OK, moeda R$ OK | - |
 | **KNRI11** | Submissão | ✅ | Compra 5 cotas @ 167.98 = R$ 839,90, sucesso, redirecionou | ✅ |
-| **CDB 2029** | Busca/Seleção | ⏳ | - | - |
-| **CDB 2029** | Preço Manual | ⏳ | - | - |
-| **CDB 2029** | Preço API | ⏳ | - | ⏳ |
-| **CDB 2029** | Validações | ⏳ | - | - |
-| **CDB 2029** | Submissão | ⏳ | - | - |
+| **CDB2029** | Busca/Seleção | ✅ | CDB2029 apareceu (criado), selecionado, badge verde | - |
+| **CDB2029** | Preço Manual | ✅ | 1000 manual, resumo R$ 1.000.000,00, botão ativo | - |
+| **CDB2029** | Preço API | ⚠️ | API não disponível (esperado), botão 🔄 desabilitado | - |
+| **CDB2029** | Validações | ✅ | Alerta funcionou para 500.5, badge inteiro OK, moeda R$ OK | - |
+| **CDB2029** | Submissão | ✅ | Compra 500 unidades @ 980.50 = R$ 490.250, sucesso, redirecionou | ✅ |
 | **AAPL** | Busca/Seleção | ⏳ | - | - |
 | **AAPL** | Preço Manual | ⏳ | - | - |
 | **AAPL** | Preço API | ⏳ | - | ⏳ |
