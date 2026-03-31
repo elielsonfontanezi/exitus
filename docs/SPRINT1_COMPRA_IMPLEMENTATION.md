@@ -75,11 +75,11 @@ Modernizar a tela de compra existente com integração completa da API REST, seg
 | **CDB2029** | Preço API | ⚠️ | API não disponível (esperado), botão 🔄 desabilitado | - |
 | **CDB2029** | Validações | ✅ | Alerta funcionou para 500.5, badge inteiro OK, moeda R$ OK | - |
 | **CDB2029** | Submissão | ✅ | Compra 500 unidades @ 980.50 = R$ 490.250, sucesso, redirecionou | ✅ |
-| **AAPL** | Busca/Seleção | ⏳ | - | - |
-| **AAPL** | Preço Manual | ⏳ | - | - |
-| **AAPL** | Preço API | ⏳ | - | ⏳ |
-| **AAPL** | Validações | ⏳ | - | - |
-| **AAPL** | Submissão | ⏳ | - | - |
+| **AAPL** | Busca/Seleção | ✅ | AAPL apareceu, selecionado, badge verde, preço auto 253.79 | - |
+| **AAPL** | Preço Manual | ✅ | 250.00 manual, resumo US$ 2.500,00, botão ativo | - |
+| **AAPL** | Preço API | ✅ | 253.79 via API, resumo US$ 1.395,85, botão ativo | ✅ |
+| **AAPL** | Validações | ✅ | Badge fração OK, 5.5 aceito, moeda $ OK | - |
+| **AAPL** | Submissão | ✅ | Compra 5.5 ações @ 253.79 = US$ 1.395,85, sucesso, redirecionou | ✅ |
 | **O** | Busca/Seleção | ⏳ | - | - |
 | **O** | Preço Manual | ⏳ | - | - |
 | **O** | Preço API | ⏳ | - | ⏳ |
