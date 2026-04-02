@@ -7,7 +7,7 @@ from app.database import db
 from app.models import MovimentacaoCaixa, Corretora
 from app.utils.exceptions import NotFoundError
 from app.services.auditoria_service import AuditoriaService
-from app.utils.tenant import filter_by_assessora
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 from decimal import Decimal
@@ -48,6 +48,7 @@ class MovimentacaoCaixaService:
             nova_mov = MovimentacaoCaixa(
                 id=str(uuid4()),
                 usuario_id=usuario_id,
+                assessora_id=get_current_assessora_id(),
                 corretora_id=data['corretora_id'],
                 tipo_movimentacao=data['tipo_movimentacao'], # String ou Enum
                 valor=data['valor'],

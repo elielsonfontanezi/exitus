@@ -10,10 +10,10 @@ from .auth import login_required, get_api_headers
 
 bp = Blueprint('operacoes', __name__, url_prefix='/operacoes')
 
-@bp.route('/compra', methods=['GET'])
+@bp.route('/', methods=['GET'])
 @login_required
-def compra():
-    """Página de compra de ativos (integração via API REST no frontend)"""
+def operacoes():
+    """Página de operações de ativos (compra/venda unificada)"""
     headers = get_api_headers()
     if not headers:
         return redirect(url_for('auth.login'))
@@ -31,6 +31,12 @@ def compra():
         corretoras = result.get('data', {}).get('corretoras', [])
     
     return render_template('operacoes/compra.html', corretoras=corretoras)
+
+@bp.route('/compra', methods=['GET'])
+@login_required
+def compra():
+    """Rota legada - redireciona para /operacoes"""
+    return redirect(url_for('operacoes.operacoes'))
 
 @bp.route('/venda', methods=['GET', 'POST'])
 @login_required

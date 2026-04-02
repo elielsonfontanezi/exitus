@@ -2,7 +2,7 @@
 from app.models.configuracao_alerta import ConfiguracaoAlerta
 from app.database import db
 from app.utils.db_utils import safe_commit, safe_delete_commit
-from app.utils.tenant import filter_by_assessora
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 from sqlalchemy import desc
 
 class ConfiguracaoAlertaService:
@@ -16,7 +16,13 @@ class ConfiguracaoAlertaService:
 
     @staticmethod
     def create(usuario_id, data):
-        alerta = ConfiguracaoAlerta(usuario_id=usuario_id, **data)
+        # Obter assessora_id do contexto
+        assessora_id = get_current_assessora_id()
+        alerta = ConfiguracaoAlerta(
+            usuario_id=usuario_id, 
+            assessora_id=assessora_id,
+            **data
+        )
         db.session.add(alerta)
         safe_commit()
         db.session.refresh(alerta)

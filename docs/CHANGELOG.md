@@ -8,6 +8,39 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — Sincronização Transações-Posições (02/04/2026)
+
+**Artefatos modificados:**
+- `backend/app/services/transacao_service.py` - Adiciona calcular_posicoes() em create/update/delete
+- `backend/app/services/posicao_service.py` - Inclui assessora_id nas posições calculadas
+- `frontend/app/routes/operacoes.py` - Nova rota /operacoes/ (legado /compra redireciona)
+- `frontend/app/templates/operacoes/compra.html` - Título "Nova Operação"
+- `frontend/app/templates/dashboard/index.html` - Link "Nova Operação"
+
+**Problema resolvido:**
+- Transações não atualizavam posições automaticamente
+- Multi-tenancy bloqueava posições sem assessora_id
+- Modo VENDA não funcional (sem posições)
+
+**Correções:**
+- **TransacaoService.create():** Chama PosicaoService.calcular_posicoes() após commit
+- **TransacaoService.update():** Chama PosicaoService.calcular_posicoes() após commit
+- **TransacaoService.delete():** Chama PosicaoService.calcular_posicoes() após commit
+- **PosicaoService._processar_posicao():** Copia assessora_id das transações
+- **Rota /operacoes/:** Nova rota principal (era /compra)
+- **Rota /compra:** Redireciona para /operacoes/ (compatibilidade)
+
+**Testes validados:**
+- ✅ Compra ITUB4 (50 unid, R$ 35,00) - Posição atualizada
+- ✅ Compra AAPL (0.5 unid, US$ 175,00) - Posição atualizada
+- ✅ Venda PETR4 (10 unid, R$ 48,22) - Posição reduzida
+- ✅ 30 posições visíveis no modo VENDA
+- ✅ Dashboard atualizado automaticamente
+
+**Status:** GAP EXITUS-TRANS-001 - Sincronização transações-posições concluída
+
+---
+
 ### Added — Tela Operações: Toggle Compra/Venda Unificado (29/03/2026)
 
 **Artefatos modificados:**

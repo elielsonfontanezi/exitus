@@ -10,7 +10,7 @@ from app.database import db
 from app.models.plano_compra import PlanoCompra, StatusPlanoCompra
 from app.models.ativo import Ativo
 from app.utils.exceptions import NotFoundError, BusinessRuleError, ConflictError
-from app.utils.tenant import filter_by_assessora
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
 
 class PlanoCompraService:
@@ -55,6 +55,7 @@ class PlanoCompraService:
         # Criar plano
         plano = PlanoCompra(
             usuario_id=usuario_id,
+            assessora_id=get_current_assessora_id(),
             ativo_id=data['ativo_id'],
             nome=data['nome'],
             descricao=data.get('descricao'),

@@ -101,6 +101,8 @@ Maio 2026:
 
 ### Sprint 1: Operações Essenciais (P0)
 - ✅ **Tela Operações:** Toggle Compra/Venda unificado (UI dinâmica, busca ativos, posições usuário, validação venda, resumo 4 colunas) - 29/03/2026
+- ✅ **Sincronização Transações-Posições:** Corrigido bug onde compras não atualizavam posições; modo VENDA 100% funcional - 02/04/2026
+- ✅ **Renomeio Tela:** "compra" → "operacoes" (rota /operacoes/, legado /compra redireciona) - 02/04/2026
 - ⏳ **Importação B3:** Upload drag & drop
 - ⏳ **Histórico Transações:** Tabela paginada
 - ⏳ **Dashboard:** Carteiras e posições API-driven

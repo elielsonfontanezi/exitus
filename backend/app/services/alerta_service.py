@@ -10,7 +10,7 @@ from sqlalchemy import and_
 from app.database import db
 from app.models.configuracao_alerta import ConfiguracaoAlerta
 from app.models.ativo import Ativo
-from app.utils.tenant import filter_by_assessora
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
 class AlertaService:
     @staticmethod
@@ -186,6 +186,7 @@ class AlertaService:
 
         alerta = ConfiguracaoAlerta(
             usuario_id=usuario_id,
+            assessora_id=get_current_assessora_id(),
             nome=dados['nome'],
             tipo_alerta=tipo_alerta, # Agora passa 'alta_preco'
             condicao_valor=Decimal(str(dados['condicao_valor'])),

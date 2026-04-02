@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 28/03/2026  
-> **Status:** 🔄 **FRONTEND API-DRIVEN INTEGRATION — Sprint 1 em Progresso**  
-> **Versão:** v0.9.9
+> **Data:** 02/04/2026  
+> **Status:** ✅ **FRONTEND API-DRIVEN INTEGRATION — Sprint 1: Operações 100% Funcionais**  
+> **Versão:** v0.9.10
 
 ---
 
@@ -15,7 +15,7 @@
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | 🟡 87.7% | 436/497 passando (61 failed, 35 errors) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
-| **Frontend API-Driven** | 🔄 8% | Sprint 1 em progresso, 1/4 telas (25%), 1/25 APIs integradas |
+| **Frontend API-Driven** | ✅ 25% | Sprint 1 Operações 100% funcionais, 1/4 telas, 4/25 APIs integradas |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services com filtros |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
@@ -35,17 +35,22 @@
 
 ---
 
-## 🔄 Frontend API-Driven Integration — 12% Concluído
+## ✅ Frontend API-Driven Integration — 25% Concluído
 
-- **Sprint 1:** Operações Essenciais (em progresso)
+- **Sprint 1:** Operações Essenciais (100% funcionais)
 - **Telas:** 1/4 implementadas (25%)
-- **APIs:** 3/25 integradas (12%) — transacoes, ativos, cotacoes
+- **APIs:** 4/25 integradas (16%) — transacoes, ativos, cotacoes, posicoes
 - **Tecnologia:** Alpine.js + Fetch API + API REST
-- **Concluído:** Tela de compra com autocomplete, validações e melhorias UX
-- **Próxima:** Tela de venda com mesmas melhorias
+- **Concluído:** 
+  - ✅ Tela Operações com toggle Compra/Venda unificado
+  - ✅ Sincronização Transações-Posições (bug crítico corrigido)
+  - ✅ Renomeio tela "compra" → "operacoes"
+  - ✅ Modo VENDA 100% funcional (30 posições)
+  - ✅ Compra/Venda de ativos BR e internacionais
+- **Próxima:** Importação B3, Histórico Transações
 
-### Sprint 1 — Operações Essenciais
-- ✅ **Tela Compra:** Alpine.js, autocomplete, API REST + Melhorias UX (28/03/2026)
+### Sprint 1 — Operações Essenciais (CONCLUÍDO ✅)
+- ✅ **Tela Operações:** Toggle Compra/Venda unificado (29/03/2026)
   - Autocomplete de ativos com API `/api/ativos?search=`
   - Binding reativo com Alpine.js
   - POST `/api/transacoes` via AJAX
@@ -53,7 +58,15 @@
   - **Novo:** Integração API cotações (`GET /api/cotacoes/<ticker>`)
   - **Novo:** Quantidade restrita a inteiros (`step=1`, `min=0`)
   - **Novo:** Corretoras dinâmicas via `GET /api/corretoras`
-- ⏳ **Tela Venda:** Similar à compra com mesmas melhorias
+- ✅ **Sincronização Transações-Posições:** Bug crítico corrigido (02/04/2026)
+  - Compras não atualizavam posições
+  - Multi-tenancy bloqueava posições sem assessora_id
+  - Modo VENDA não funcional
+- ✅ **Renomeio Tela:** "compra" → "operacoes" (02/04/2026)
+  - Nova rota `/operacoes/`
+  - Rota legada `/compra` redireciona
+  - Dashboard atualizado para "Nova Operação"
+- ✅ **Tela Venda:** Integrada com toggle (30 posições visíveis)
 - ⏳ **Importação B3:** Upload drag & drop
 - ⏳ **Histórico Transações:** Tabela paginada
 
