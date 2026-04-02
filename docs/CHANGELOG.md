@@ -36,6 +36,7 @@ e este projeto adere semanticamente à versão v0.8.0.
 - ✅ Venda PETR4 (10 unid, R$ 48,22) - Posição reduzida
 - ✅ 30 posições visíveis no modo VENDA
 - ✅ Dashboard atualizado automaticamente
+- ⚠️ Testes Python diretos dos 4 services: Código correto, mas requer contexto HTTP/JWT para validação completa
 
 **Status:** GAP EXITUS-TRANS-001 - Sincronização transações-posições concluída
 
