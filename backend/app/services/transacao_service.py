@@ -179,6 +179,14 @@ class TransacaoService:
             db.session.commit()
             db.session.refresh(transacao)
             
+            # Atualizar posições após criar transação
+            from app.services.posicao_service import PosicaoService
+            try:
+                resultado_posicoes = PosicaoService.calcular_posicoes(usuario_id)
+                logger.info(f"Posições atualizadas após criar transação: {resultado_posicoes}")
+            except Exception as e:
+                logger.warning(f"Erro ao atualizar posições: {e}")
+            
             # Auditoria
             AuditoriaService.registrar_create(
                 usuario_id=usuario_id,
@@ -248,6 +256,14 @@ class TransacaoService:
             db.session.commit()
             db.session.refresh(transacao)
             
+            # Atualizar posições após modificar transação
+            from app.services.posicao_service import PosicaoService
+            try:
+                resultado_posicoes = PosicaoService.calcular_posicoes(usuario_id)
+                logger.info(f"Posições atualizadas após modificar transação: {resultado_posicoes}")
+            except Exception as e:
+                logger.warning(f"Erro ao atualizar posições: {e}")
+            
             # Auditoria
             AuditoriaService.registrar_update(
                 usuario_id=usuario_id,
@@ -287,6 +303,14 @@ class TransacaoService:
         
         db.session.delete(transacao)
         db.session.commit()
+        
+        # Atualizar posições após deletar transação
+        from app.services.posicao_service import PosicaoService
+        try:
+            resultado_posicoes = PosicaoService.calcular_posicoes(usuario_id)
+            logger.info(f"Posições atualizadas após deletar transação: {resultado_posicoes}")
+        except Exception as e:
+            logger.warning(f"Erro ao atualizar posições: {e}")
         
         # Auditoria
         AuditoriaService.registrar_delete(

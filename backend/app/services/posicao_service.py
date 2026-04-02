@@ -174,11 +174,15 @@ class PosicaoService:
                 return 'zerada'
             return 'nenhuma'
         
+        # Obter assessora_id da primeira transação (todas devem ter o mesmo)
+        assessora_id = transacoes[0].assessora_id if transacoes else None
+        
         if not posicao:
             posicao = Posicao(
                 usuario_id=usuario_id,
                 ativo_id=ativo_id,
-                corretora_id=corretora_id
+                corretora_id=corretora_id,
+                assessora_id=assessora_id
             )
             db.session.add(posicao)
             resultado = 'criada'
@@ -193,6 +197,7 @@ class PosicaoService:
         posicao.lucro_prejuizo_realizado = lucro_realizado
         posicao.data_primeira_compra = data_primeira_compra
         posicao.data_ultima_atualizacao = datetime.utcnow()
+        posicao.assessora_id = assessora_id
         
         return resultado
 
