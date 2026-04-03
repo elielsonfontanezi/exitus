@@ -57,7 +57,7 @@ class PlanoVenda(db.Model):
     preco_alvo = Column(Numeric(18, 6), nullable=True)  # Preço alvo
     
     # Gatilhos de venda
-    tipo_gatilho = Column(Enum(TipoGatilho), nullable=False)
+    tipo_gatilho = Column(Enum(TipoGatilho, values_callable=lambda x: [e.value for e in x]), nullable=False)
     gatilho_valor = Column(Numeric(18, 6), nullable=True)  # Valor do gatilho (preço ou %)
     data_limite = Column(Date, nullable=True)  # Para gatilho por data
     
