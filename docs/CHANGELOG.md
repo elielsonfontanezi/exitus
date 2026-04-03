@@ -8,6 +8,49 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Dashboard Admin para Gestão de Assessoras (03/04/2026)
+
+**GAPs:** MULTICLIENTE-001 Parte 6 - Dashboard Admin
+
+**Artefatos criados:**
+- `backend/app/services/assessora_service.py` - Service CRUD completo (257 linhas)
+- `backend/app/schemas/assessora_schema.py` - Validação Marshmallow (127 linhas)
+- `backend/app/blueprints/assessora_blueprint.py` - Endpoints REST (282 linhas)
+- `backend/tests/test_assessora_crud.py` - Suite de testes (224 linhas, 11 testes)
+- `docs/ADMIN_DASHBOARD.md` - Documentação completa do dashboard admin
+
+**Artefatos modificados:**
+- `backend/app/__init__.py` - Registro do assessora_blueprint
+
+**Endpoints implementados (7):**
+- `GET /api/assessoras` - Listar todas (paginado, filtros)
+- `GET /api/assessoras/:id` - Buscar por ID
+- `POST /api/assessoras` - Criar nova assessora
+- `PUT /api/assessoras/:id` - Atualizar assessora
+- `DELETE /api/assessoras/:id` - Deletar (soft/hard)
+- `GET /api/assessoras/:id/stats` - Métricas da assessora
+- `POST /api/assessoras/:id/toggle` - Ativar/desativar
+
+**Funcionalidades:**
+- ✅ CRUD completo de assessoras (admin only)
+- ✅ Validação de CNPJ e email únicos
+- ✅ Soft delete por padrão (ativo=false)
+- ✅ Hard delete apenas se sem usuários ativos
+- ✅ Métricas por assessora (usuários, portfolios, transações, volume)
+- ✅ Gestão de limites (max_usuarios, max_portfolios)
+- ✅ 3 planos disponíveis (basico, profissional, enterprise)
+- ✅ 11 testes de validação (100%)
+
+**Segurança:**
+- Acesso restrito a usuários com `role=admin`
+- Validação de campos obrigatórios
+- Validação de formato (CNPJ 14 dígitos, email válido)
+- Proteção contra deleção com usuários ativos
+
+**Total:** 898 linhas de código + testes
+
+---
+
 ### Added — Row-Level Security (RLS) PostgreSQL (03/04/2026)
 
 **GAPs:** MULTICLIENTE-001 Parte 5 - Row-Level Security

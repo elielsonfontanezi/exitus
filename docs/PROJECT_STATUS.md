@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 03/04/2026  
-> **Status:** ✅ **MULTICLIENTE-001 Parte 5 Concluída — Row-Level Security Implementado**  
-> **Versão:** v0.9.12
+> **Status:** ✅ **MULTICLIENTE-001 Concluído — Dashboard Admin + RLS + Testes**  
+> **Versão:** v0.9.13
 
 ---
 

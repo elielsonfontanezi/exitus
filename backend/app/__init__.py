@@ -321,6 +321,16 @@ def create_app(testing=False):
         print(f"⚠️  Calendário de Dividendos blueprint não encontrado: {e}")
 
     # ============================================
+    # MULTICLIENTE-001 - Gestão de Assessoras (Admin)
+    # ============================================
+    try:
+        from .blueprints.assessora_blueprint import assessora_bp
+        app.register_blueprint(assessora_bp)
+        print("✅ Assessoras blueprint registrado: /api/assessoras (admin only)")
+    except ImportError as e:
+        print(f"⚠️  Assessoras blueprint não encontrado: {e}")
+
+    # ============================================
     # SWAGGER / OpenAPI (EXITUS-SWAGGER-001)
     # ============================================
     if not testing:

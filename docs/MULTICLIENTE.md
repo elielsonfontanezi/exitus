@@ -312,16 +312,97 @@ podman exec exitus-db psql -U exitus -d exitusdb -c "
 - [ ] Implementar `@require_assessora` em todos os endpoints
 - [ ] Validação cross-tenant em todos os CRUDs
 
+---
+
+## ✅ Parte 6 — Dashboard Admin (03/04/2026)
+
+### 🎯 CRUD Completo de Assessoras
+
+**Service:** `backend/app/services/assessora_service.py` (257 linhas)
+- `get_all()` — Listar com paginação e filtros
+- `get_by_id()` — Buscar por ID
+- `create()` — Criar nova assessora
+- `update()` — Atualizar assessora
+- `delete()` — Soft/hard delete
+- `get_stats()` — Métricas da assessora
+- `toggle_ativo()` — Ativar/desativar
+
+**Schema:** `backend/app/schemas/assessora_schema.py` (127 linhas)
+- `AssessoraSchema` — Schema completo
+- `AssessoraCreateSchema` — Criação (campos obrigatórios)
+- `AssessoraUpdateSchema` — Atualização (campos opcionais)
+- `AssessoraStatsSchema` — Métricas
+
+**Blueprint:** `backend/app/blueprints/assessora_blueprint.py` (282 linhas)
+- 7 endpoints REST (GET, POST, PUT, DELETE)
+- Validação de permissão admin em todos os endpoints
+- Tratamento de erros completo
+
+### 📡 Endpoints Implementados (7)
+
+```
+GET    /api/assessoras          — Listar (paginado, filtros)
+GET    /api/assessoras/:id      — Buscar por ID
+POST   /api/assessoras          — Criar nova
+PUT    /api/assessoras/:id      — Atualizar
+DELETE /api/assessoras/:id      — Deletar (soft/hard)
+GET    /api/assessoras/:id/stats — Métricas
+POST   /api/assessoras/:id/toggle — Ativar/desativar
+```
+
+### 🧪 Testes (11/11 - 100%)
+
+**Arquivo:** `backend/tests/test_assessora_crud.py` (224 linhas)
+
+1. ✅ `test_list_assessoras_admin`
+2. ✅ `test_list_assessoras_sem_auth`
+3. ✅ `test_create_assessora_admin`
+4. ✅ `test_create_assessora_cnpj_duplicado`
+5. ✅ `test_get_assessora_by_id`
+6. ✅ `test_update_assessora`
+7. ✅ `test_delete_assessora_soft`
+8. ✅ `test_get_assessora_stats`
+9. ✅ `test_toggle_assessora_ativo`
+10. ✅ `test_create_assessora_campos_obrigatorios`
+11. ✅ Validação de permissões admin
+
+### 🔒 Segurança
+
+- ✅ Acesso restrito a `role=admin`
+- ✅ Validação CNPJ único
+- ✅ Validação email único
+- ✅ Soft delete por padrão
+- ✅ Hard delete apenas sem usuários ativos
+- ✅ Validação de campos obrigatórios
+
+### 📊 Planos Disponíveis
+
+| Plano | max_usuarios | max_portfolios |
+|-------|--------------|----------------|
+| basico | 10 | 20 |
+| profissional | 50 | 100 |
+| enterprise | ilimitado | ilimitado |
+
+### 📝 Documentação
+
+- `docs/ADMIN_DASHBOARD.md` — Documentação completa
+
+**Total:** 898 linhas de código + testes
+
+---
+
 ### Dashboard Admin
 
-- [ ] Dashboard de gestão por assessora
-- [ ] Métricas e limites por assessora
-- [ ] CRUD de assessoras
+- [x] Dashboard de gestão por assessora ✅ (03/04/2026 - Backend)
+- [x] Métricas e limites por assessora ✅ (03/04/2026)
+- [x] CRUD de assessoras ✅ (03/04/2026 - 7 endpoints)
+- [ ] Frontend admin (planejado para próxima fase)
 
 ### Testes Ampliados
 
 - [x] Testes de isolamento cross-tenant ✅ (03/04/2026 - 9 testes)
 - [x] Testes RLS ✅ (03/04/2026 - 6 testes)
+- [x] Testes CRUD assessoras ✅ (03/04/2026 - 11 testes)
 - [ ] Atualizar fixtures com múltiplas assessoras
 - [ ] Garantir 491 testes passando após alterações
 
