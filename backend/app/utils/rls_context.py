@@ -11,6 +11,7 @@ os dados no nível do banco de dados.
 from functools import wraps
 from flask import g
 from flask_jwt_extended import get_jwt
+from sqlalchemy import text
 from app.database import db
 from app.utils.tenant import get_current_assessora_id
 
@@ -31,7 +32,7 @@ def set_rls_context(assessora_id: str = None):
     if assessora_id:
         # Setar variável de sessão PostgreSQL
         db.session.execute(
-            "SELECT set_config('app.current_assessora_id', :assessora_id, false)",
+            text("SELECT set_config('app.current_assessora_id', :assessora_id, false)"),
             {'assessora_id': str(assessora_id)}
         )
         # Armazenar no contexto Flask para referência
@@ -45,7 +46,7 @@ def clear_rls_context():
     Example:
         clear_rls_context()
     """
-    db.session.execute("SELECT set_config('app.current_assessora_id', NULL, false)")
+    db.session.execute(text("SELECT set_config('app.current_assessora_id', NULL, false)"))
     if hasattr(g, 'rls_assessora_id'):
         delattr(g, 'rls_assessora_id')
 
