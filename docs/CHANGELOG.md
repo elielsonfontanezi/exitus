@@ -8,6 +8,56 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Frontend Admin para Gestão de Assessoras (03/04/2026)
+
+**GAPs:** MULTICLIENTE-001 Parte 7 - Frontend Admin
+
+**Artefatos criados:**
+- `frontend/app/routes/admin.py` - Rotas Flask admin (4 rotas)
+- `frontend/app/templates/admin/assessoras_list.html` - Listagem de assessoras (paginada, filtros)
+- `frontend/app/templates/admin/assessoras_form.html` - Formulário CRUD (criar/editar)
+- `frontend/app/templates/admin/assessoras_stats.html` - Dashboard de métricas
+
+**Artefatos modificados:**
+- `frontend/app/__init__.py` - Registro do admin_bp
+
+**Funcionalidades:**
+- ✅ Listagem de assessoras (paginada, filtros por status e plano)
+- ✅ Formulário de criação de assessora (validação CNPJ, email)
+- ✅ Formulário de edição de assessora
+- ✅ Dashboard de métricas (usuários, portfolios, volume)
+- ✅ Ações rápidas (ativar/desativar, deletar)
+- ✅ Indicadores de uso (progress bars, alertas de limite)
+- ✅ Integração completa com 7 endpoints REST do backend
+- ✅ Alpine.js + Fetch API (consistente com Sprint 1)
+- ✅ Design consistente com UX_DESIGN_SYSTEM.md (Nunito, #A38C65)
+
+**Rotas implementadas (4):**
+- `/admin/assessoras` - Listagem
+- `/admin/assessoras/nova` - Criar
+- `/admin/assessoras/:id/editar` - Editar
+- `/admin/assessoras/:id/metricas` - Dashboard
+
+**Integração com Backend:**
+- GET /api/assessoras - Listar
+- GET /api/assessoras/:id - Buscar
+- POST /api/assessoras - Criar
+- PUT /api/assessoras/:id - Atualizar
+- DELETE /api/assessoras/:id - Deletar
+- GET /api/assessoras/:id/stats - Métricas
+- POST /api/assessoras/:id/toggle - Ativar/desativar
+
+**Stack:**
+- Alpine.js (reatividade)
+- Fetch API (requisições)
+- Bootstrap 5 (layout)
+- Font Nunito (tipografia)
+- Cores #A38C65 (primária)
+
+**Total:** 3 templates + 1 rota + integração completa
+
+---
+
 ### Added — Dashboard Admin para Gestão de Assessoras (03/04/2026)
 
 **GAPs:** MULTICLIENTE-001 Parte 6 - Dashboard Admin

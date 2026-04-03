@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 03/04/2026  
-> **Status:** ✅ **MULTICLIENTE-001 Concluído — Dashboard Admin + RLS + Testes**  
-> **Versão:** v0.9.13
+> **Status:** ✅ **MULTICLIENTE-001 100% Concluído — Backend + Frontend + RLS + Testes**  
+> **Versão:** v0.9.14
 
 ---
 

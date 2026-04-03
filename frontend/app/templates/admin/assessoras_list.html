@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}Gestão de Assessoras - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" x-data="assessorasListApp()">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Gestão de Assessoras</h2>
+            <p class="text-muted mb-0">Administração de assessoras e planos</p>
+        </div>
+        <a href="/admin/assessoras/nova" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nova Assessora
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Buscar</label>
+                    <input type="text" class="form-control" placeholder="Nome, CNPJ ou email..." 
+                           x-model="filters.search" @input.debounce.500ms="loadAssessoras()">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" x-model="filters.ativo" @change="loadAssessoras()">
+                        <option value="">Todos</option>
+                        <option value="true">Ativos</option>
+                        <option value="false">Inativos</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Plano</label>
+                    <select class="form-select" x-model="filters.plano" @change="loadAssessoras()">
+                        <option value="">Todos</option>
+                        <option value="basico">Básico</option>
+                        <option value="profissional">Profissional</option>
+                        <option value="enterprise">Enterprise</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-outline-secondary w-100" @click="resetFilters()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Limpar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div x-show="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+
+    <!-- Tabela de Assessoras -->
+    <div x-show="!loading" class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>CNPJ</th>
+                            <th>Email</th>
+                            <th>Plano</th>
+                            <th>Usuários</th>
+                            <th>Portfolios</th>
+                            <th>Status</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="assessora in assessoras" :key="assessora.id">
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-2" 
+                                             :style="`background-color: ${assessora.cor_primaria || '#A38C65'}`">
+                                            <span x-text="assessora.nome.charAt(0)"></span>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold" x-text="assessora.nome"></div>
+                                            <small class="text-muted" x-text="assessora.razao_social"></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="font-monospace" x-text="formatCNPJ(assessora.cnpj)"></span>
+                                </td>
+                                <td>
+                                    <span x-text="assessora.email"></span>
+                                </td>
+                                <td>
+                                    <span class="badge" 
+                                          :class="getPlanoBadgeClass(assessora.plano)"
+                                          x-text="getPlanoLabel(assessora.plano)"></span>
+                                </td>
+                                <td>
+                                    <span x-text="assessora.total_usuarios || 0"></span>
+                                    <span x-show="assessora.max_usuarios" class="text-muted">
+                                        / <span x-text="assessora.max_usuarios"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span x-text="assessora.total_portfolios || 0"></span>
+                                    <span x-show="assessora.max_portfolios" class="text-muted">
+                                        / <span x-text="assessora.max_portfolios"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge" 
+                                          :class="assessora.ativo ? 'bg-success' : 'bg-secondary'"
+                                          x-text="assessora.ativo ? 'Ativo' : 'Inativo'"></span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a :href="`/admin/assessoras/${assessora.id}/metricas`" 
+                                           class="btn btn-outline-primary" title="Métricas">
+                                            <i class="bi bi-graph-up"></i>
+                                        </a>
+                                        <a :href="`/admin/assessoras/${assessora.id}/editar`" 
+                                           class="btn btn-outline-secondary" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button @click="toggleAtivo(assessora)" 
+                                                class="btn btn-outline-warning" 
+                                                :title="assessora.ativo ? 'Desativar' : 'Ativar'">
+                                            <i :class="assessora.ativo ? 'bi bi-pause' : 'bi bi-play'"></i>
+                                        </button>
+                                        <button @click="confirmDelete(assessora)" 
+                                                class="btn btn-outline-danger" title="Deletar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div x-show="assessoras.length === 0 && !loading" class="text-center py-5">
+                <i class="bi bi-building text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-3">Nenhuma assessora encontrada</p>
+            </div>
+        </div>
+
+        <!-- Paginação -->
+        <div x-show="pagination.total > pagination.per_page" class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted">
+                    Mostrando <span x-text="(pagination.page - 1) * pagination.per_page + 1"></span>
+                    até <span x-text="Math.min(pagination.page * pagination.per_page, pagination.total)"></span>
+                    de <span x-text="pagination.total"></span> assessoras
+                </div>
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item" :class="{ 'disabled': pagination.page === 1 }">
+                            <button class="page-link" @click="changePage(pagination.page - 1)">Anterior</button>
+                        </li>
+                        <template x-for="page in getPageNumbers()" :key="page">
+                            <li class="page-item" :class="{ 'active': page === pagination.page }">
+                                <button class="page-link" @click="changePage(page)" x-text="page"></button>
+                            </li>
+                        </template>
+                        <li class="page-item" :class="{ 'disabled': pagination.page >= Math.ceil(pagination.total / pagination.per_page) }">
+                            <button class="page-link" @click="changePage(pagination.page + 1)">Próxima</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+}
+</style>
+
+<script>
+function assessorasListApp() {
+    return {
+        assessoras: [],
+        loading: true,
+        filters: {
+            search: '',
+            ativo: '',
+            plano: ''
+        },
+        pagination: {
+            page: 1,
+            per_page: 20,
+            total: 0
+        },
+
+        init() {
+            this.loadAssessoras();
+        },
+
+        async loadAssessoras() {
+            this.loading = true;
+            try {
+                const params = new URLSearchParams({
+                    page: this.pagination.page,
+                    per_page: this.pagination.per_page
+                });
+
+                if (this.filters.ativo) params.append('ativo', this.filters.ativo);
+                if (this.filters.plano) params.append('plano', this.filters.plano);
+
+                const response = await fetch(`http://localhost:5000/api/assessoras?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao carregar assessoras');
+
+                const data = await response.json();
+                this.assessoras = data.data.items;
+                this.pagination.total = data.data.total;
+                this.pagination.page = data.data.page;
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar assessoras');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async toggleAtivo(assessora) {
+            if (!confirm(`Deseja ${assessora.ativo ? 'desativar' : 'ativar'} a assessora ${assessora.nome}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/assessoras/${assessora.id}/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao alterar status');
+
+                await this.loadAssessoras();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao alterar status da assessora');
+            }
+        },
+
+        async confirmDelete(assessora) {
+            if (!confirm(`Deseja realmente deletar a assessora ${assessora.nome}?\n\nEsta ação irá desativar a assessora (soft delete).`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/assessoras/${assessora.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao deletar');
+
+                await this.loadAssessoras();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao deletar assessora');
+            }
+        },
+
+        changePage(page) {
+            if (page < 1 || page > Math.ceil(this.pagination.total / this.pagination.per_page)) {
+                return;
+            }
+            this.pagination.page = page;
+            this.loadAssessoras();
+        },
+
+        getPageNumbers() {
+            const total = Math.ceil(this.pagination.total / this.pagination.per_page);
+            const current = this.pagination.page;
+            const pages = [];
+            
+            for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) {
+                pages.push(i);
+            }
+            
+            return pages;
+        },
+
+        resetFilters() {
+            this.filters = { search: '', ativo: '', plano: '' };
+            this.pagination.page = 1;
+            this.loadAssessoras();
+        },
+
+        formatCNPJ(cnpj) {
+            if (!cnpj) return '';
+            return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        },
+
+        getPlanoLabel(plano) {
+            const labels = {
+                'basico': 'Básico',
+                'profissional': 'Profissional',
+                'enterprise': 'Enterprise'
+            };
+            return labels[plano] || plano;
+        },
+
+        getPlanoBadgeClass(plano) {
+            const classes = {
+                'basico': 'bg-secondary',
+                'profissional': 'bg-primary',
+                'enterprise': 'bg-warning text-dark'
+            };
+            return classes[plano] || 'bg-secondary';
+        }
+    }
+}
+</script>
+{% endblock %}
