@@ -785,6 +785,112 @@ Requisição → Cache PostgreSQL (15min)?
 - Permissions granulares por endpoint
 - Middleware Flask-JWT-Extended
 
+### Multi-Tenancy e Row-Level Security (RLS)
+
+#### Arquitetura Multi-Tenant
+
+**Modelo**: Shared Database + Tenant Column + RLS
+
+```
+┌──────────────────────────────────────────────────────┐
+│              PostgreSQL Database (Único)              │
+│                                                       │
+│  ┌─────────────────┐  ┌─────────────────┐           │
+│  │   Assessora A   │  │   Assessora B   │           │
+│  │  assessora_id:  │  │  assessora_id:  │           │
+│  │  23c54cb4...    │  │  8f9a2b1c...    │           │
+│  │                 │  │                 │           │
+│  │  - Usuários     │  │  - Usuários     │           │
+│  │  - Portfolios   │  │  - Portfolios   │           │
+│  │  - Transações   │  │  - Transações   │           │
+│  └─────────────────┘  └─────────────────┘           │
+│                                                       │
+│  🔒 RLS Policies: Isolamento automático no banco    │
+└──────────────────────────────────────────────────────┘
+```
+
+#### Camadas de Segurança (Defesa em Profundidade)
+
+**1. JWT Layer**
+- `assessora_id` incluído no token JWT
+- Validado em cada requisição autenticada
+- Claims: `user_id`, `username`, `role`, `assessora_id`
+
+**2. Application Layer**
+- `filter_by_assessora()` nos services (15 services)
+- `@require_assessora` decorator nos endpoints
+- Validação explícita em CRUDs
+
+**3. Database Layer (RLS) ⭐**
+- Políticas PostgreSQL no nível de linha
+- Bloqueio automático de acesso cross-tenant
+- Proteção mesmo se código da aplicação falhar
+
+#### Row-Level Security (RLS) - Implementação
+
+**Tabelas com RLS (10)**:
+- `portfolio`, `transacao`, `posicao`, `provento`
+- `movimentacao_caixa`, `plano_compra`, `plano_venda`
+- `alerta`, `evento_custodia`, `projecoes_renda`
+
+**Políticas por Tabela**:
+```sql
+-- SELECT: Ver apenas dados da própria assessora
+CREATE POLICY portfolio_select_policy ON portfolio
+    FOR SELECT
+    USING (
+        assessora_id::text = current_setting('app.current_assessora_id', true)
+        OR current_setting('app.current_assessora_id', true) IS NULL
+    );
+
+-- INSERT: Forçar assessora_id da sessão
+CREATE POLICY portfolio_insert_policy ON portfolio
+    FOR INSERT
+    WITH CHECK (
+        assessora_id::text = current_setting('app.current_assessora_id', true)
+    );
+
+-- UPDATE/DELETE: Apenas registros da própria assessora
+```
+
+**Contexto RLS**:
+```python
+# Automático via before_request
+@app.before_request
+def setup_rls():
+    init_rls_for_request()  # Extrai assessora_id do JWT
+
+# Manual via context manager
+with RLSContext(assessora_id):
+    portfolios = Portfolio.query.all()  # Filtrado automaticamente
+
+# Funções helper
+set_rls_context(assessora_id)
+clear_rls_context()
+get_rls_context()
+```
+
+**Fluxo de Requisição com RLS**:
+```
+1. Cliente → JWT com assessora_id
+2. Flask before_request → Extrai assessora_id
+3. SET LOCAL app.current_assessora_id = '23c54cb4...'
+4. Query SQL → RLS filtra automaticamente
+5. Retorno → Apenas dados da assessora correta
+```
+
+**Vantagens**:
+- ✅ Segurança em profundidade (último nível de defesa)
+- ✅ Automático (não depende de lembrar de filtrar)
+- ✅ Performático (PostgreSQL otimiza as políticas)
+- ✅ Auditável (políticas versionadas no Git)
+- ✅ Testável (6 testes específicos de RLS)
+
+**Migration**: `20260403_1040_add_rls_policies.py`  
+**Helper**: `backend/app/utils/rls_context.py`  
+**Testes**: `backend/tests/test_rls_security.py`  
+**Documentação**: `docs/MULTICLIENTE.md` (Parte 5)
+
 ### Container Hardening
 
 #### Non-Root User

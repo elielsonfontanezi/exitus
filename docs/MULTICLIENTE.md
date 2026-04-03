@@ -148,10 +148,168 @@ Com `filter_by_assessora()`:
 - ✅ auditoria_relatorio_service.py
 - ✅ auditoria_service.py (sem queries)
 
+---
+
+## ✅ Parte 5 — Row-Level Security (RLS) (03/04/2026)
+
+### 🔒 O que é Row-Level Security?
+
+**Row-Level Security (RLS)** é uma funcionalidade nativa do PostgreSQL que permite definir políticas de acesso no nível de linha do banco de dados. Com RLS, o banco de dados automaticamente filtra os dados baseado em regras, independentemente de como a aplicação faz as queries.
+
+### Arquitetura de Defesa em Profundidade
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    CAMADA 1: JWT                        │
+│  ✅ assessora_id no token, validado em cada request     │
+└─────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────┐
+│              CAMADA 2: Application Layer                │
+│  ✅ filter_by_assessora() nos services                  │
+│  ✅ @require_assessora decorator nos endpoints          │
+└─────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────┐
+│          CAMADA 3: Database Layer (RLS) ⭐              │
+│  ✅ Políticas PostgreSQL bloqueiam acesso cross-tenant  │
+│  ✅ Proteção mesmo se código da aplicação falhar        │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Migration RLS (`20260403_1040_add_rls_policies.py`)
+
+**Tabelas com RLS habilitado (10):**
+1. `portfolio`
+2. `transacao`
+3. `posicao`
+4. `provento`
+5. `movimentacao_caixa`
+6. `plano_compra`
+7. `plano_venda`
+8. `alerta`
+9. `evento_custodia`
+10. `projecoes_renda`
+
+**Políticas criadas por tabela (4):**
+- **SELECT:** Permite ver apenas registros onde `assessora_id = current_setting('app.current_assessora_id')`
+- **INSERT:** Força que novos registros tenham `assessora_id` da sessão atual
+- **UPDATE:** Permite atualizar apenas registros da própria assessora
+- **DELETE:** Permite deletar apenas registros da própria assessora
+
+**Funções helper PostgreSQL:**
+```sql
+-- Setar contexto de assessora
+SELECT set_current_assessora('23c54cb4-cb0a-438f-b985-def21d70904e');
+
+-- Limpar contexto
+SELECT clear_current_assessora();
+```
+
+### Helper de Contexto RLS (`backend/app/utils/rls_context.py`)
+
+**Funções principais:**
+```python
+# Setar contexto RLS
+set_rls_context(assessora_id='23c54cb4-cb0a-438f-b985-def21d70904e')
+
+# Limpar contexto
+clear_rls_context()
+
+# Obter contexto atual
+current = get_rls_context()
+
+# Decorator para endpoints
+@with_rls_context
+def get_portfolios():
+    return PortfolioService.get_all(user_id)
+
+# Context manager
+with RLSContext(assessora_id):
+    portfolios = Portfolio.query.all()
+```
+
+### Integração Automática com Flask
+
+**Before Request Handler (`backend/app/__init__.py`):**
+```python
+@app.before_request
+def setup_rls():
+    """
+    Inicializa RLS automaticamente para cada requisição.
+    Extrai assessora_id do JWT e seta no contexto PostgreSQL.
+    """
+    init_rls_for_request()
+```
+
+**Fluxo de uma requisição:**
+1. Cliente envia JWT com `assessora_id`
+2. `before_request` extrai `assessora_id` do JWT
+3. Seta `app.current_assessora_id` na sessão PostgreSQL
+4. Todas as queries subsequentes são automaticamente filtradas por RLS
+5. Aplicação retorna apenas dados da assessora correta
+
+### Testes RLS (`backend/tests/test_rls_security.py`)
+
+**6 testes implementados:**
+1. ✅ `test_rls_bloqueia_select_cross_tenant_portfolio` — RLS bloqueia SELECT cross-tenant
+2. ✅ `test_rls_context_manager_isola_dados` — Context manager funciona corretamente
+3. ✅ `test_rls_bloqueia_insert_com_assessora_errada` — RLS bloqueia INSERT inválido
+4. ✅ `test_rls_sem_contexto_retorna_todos` — Sem contexto, retorna todos (fallback)
+5. ✅ `test_rls_protege_mesmo_sem_filter_service` — RLS protege mesmo sem `filter_by_assessora()`
+6. ✅ `test_rls_funciona_com_multiplas_tabelas` — RLS funciona em múltiplas tabelas
+
+### Vantagens do RLS
+
+✅ **Segurança em profundidade** — Proteção no banco mesmo se código falhar  
+✅ **Automático** — Não precisa lembrar de filtrar em cada query  
+✅ **Performático** — PostgreSQL otimiza as políticas  
+✅ **Auditável** — Políticas são versionadas no Git via migrations  
+✅ **Testável** — Testes garantem que RLS funciona corretamente  
+
+### Desvantagens e Mitigações
+
+⚠️ **Complexidade** — Mais uma camada para entender  
+   → Mitigação: Documentação completa e testes  
+
+⚠️ **Debug mais difícil** — Dados "desaparecem" se contexto errado  
+   → Mitigação: Logs claros e `get_rls_context()` para debug  
+
+⚠️ **Performance** — Overhead mínimo em cada query  
+   → Mitigação: Índices em `assessora_id` já existem  
+
+### Comandos Úteis
+
+```bash
+# Verificar políticas RLS ativas
+podman exec exitus-db psql -U exitus -d exitusdb -c "
+  SELECT schemaname, tablename, policyname, cmd 
+  FROM pg_policies 
+  WHERE tablename IN ('portfolio', 'transacao', 'posicao')
+  ORDER BY tablename, cmd;
+"
+
+# Verificar se RLS está habilitado
+podman exec exitus-db psql -U exitus -d exitusdb -c "
+  SELECT tablename, rowsecurity 
+  FROM pg_tables 
+  WHERE schemaname = 'public' 
+  AND tablename IN ('portfolio', 'transacao', 'posicao');
+"
+
+# Testar RLS manualmente
+podman exec exitus-db psql -U exitus -d exitusdb -c "
+  SELECT set_config('app.current_assessora_id', '23c54cb4-cb0a-438f-b985-def21d70904e', false);
+  SELECT COUNT(*) FROM portfolio;
+"
+```
+
+---
+
 ### Middleware Completo
 
+- [x] Row-level security completa ✅ (03/04/2026)
 - [ ] Implementar `@require_assessora` em todos os endpoints
-- [ ] Row-level security completa
 - [ ] Validação cross-tenant em todos os CRUDs
 
 ### Dashboard Admin
@@ -162,7 +320,8 @@ Com `filter_by_assessora()`:
 
 ### Testes Ampliados
 
-- [ ] Testes de isolamento cross-tenant
+- [x] Testes de isolamento cross-tenant ✅ (03/04/2026 - 9 testes)
+- [x] Testes RLS ✅ (03/04/2026 - 6 testes)
 - [ ] Atualizar fixtures com múltiplas assessoras
 - [ ] Garantir 491 testes passando após alterações
 

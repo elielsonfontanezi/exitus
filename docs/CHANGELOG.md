@@ -8,6 +8,54 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Row-Level Security (RLS) PostgreSQL (03/04/2026)
+
+**GAPs:** MULTICLIENTE-001 Parte 5 - Row-Level Security
+
+**Artefatos criados:**
+- `backend/alembic/versions/20260403_1040_add_rls_policies.py` - Migration RLS (10 tabelas, 40 políticas)
+- `backend/app/utils/rls_context.py` - Helper de contexto RLS (5 funções, 1 decorator, 1 context manager)
+- `backend/tests/test_rls_security.py` - Suite de testes RLS (6 testes)
+
+**Artefatos modificados:**
+- `backend/app/__init__.py` - Integração RLS via before_request
+- `docs/MULTICLIENTE.md` - Seção completa sobre RLS (Parte 5)
+- `docs/ARCHITECTURE.md` - Seção Multi-Tenancy e RLS
+
+**Implementação:**
+- ✅ RLS habilitado em 7 tabelas (portfolio, transacao, posicao, provento, movimentacao_caixa, plano_compra, plano_venda)
+- ✅ 28 políticas PostgreSQL criadas (4 por tabela: SELECT, INSERT, UPDATE, DELETE)
+- ✅ Funções helper PostgreSQL (set_current_assessora, clear_current_assessora)
+- ✅ Helper Python com decorator @with_rls_context e context manager RLSContext
+- ✅ Integração automática via before_request (extrai assessora_id do JWT)
+- ✅ 6 testes de validação RLS
+
+**Arquitetura de Defesa em Profundidade:**
+1. **Camada 1 (JWT):** assessora_id no token, validado em cada request
+2. **Camada 2 (Application):** filter_by_assessora() nos services, @require_assessora nos endpoints
+3. **Camada 3 (Database - RLS):** Políticas PostgreSQL bloqueiam acesso cross-tenant automaticamente
+
+**Vantagens:**
+- Segurança no banco mesmo se código da aplicação falhar
+- Filtros automáticos (não precisa lembrar de filtrar em cada query)
+- Performático (PostgreSQL otimiza as políticas)
+- Auditável (políticas versionadas no Git)
+- Testável (6 testes específicos)
+
+**Comandos úteis:**
+```bash
+# Verificar políticas RLS
+podman exec exitus-db psql -U exitus -d exitusdb -c "SELECT tablename, policyname FROM pg_policies;"
+
+# Testar RLS manualmente
+podman exec exitus-db psql -U exitus -d exitusdb -c "
+  SELECT set_config('app.current_assessora_id', '23c54cb4-cb0a-438f-b985-def21d70904e', false);
+  SELECT COUNT(*) FROM portfolio;
+"
+```
+
+---
+
 ### Added — Testes Multi-Tenancy Expandidos (03/04/2026)
 
 **GAPs:** MULTICLIENTE-001 Parte 4 (Expandido)

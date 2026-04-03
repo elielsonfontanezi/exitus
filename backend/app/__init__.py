@@ -76,6 +76,21 @@ def create_app(testing=False):
     init_db(app)
 
     # ============================================
+    # ROW-LEVEL SECURITY (RLS) - MULTICLIENTE-001
+    # ============================================
+    from .utils.rls_context import init_rls_for_request
+    
+    @app.before_request
+    def setup_rls():
+        """
+        Inicializa Row-Level Security (RLS) para cada requisição.
+        
+        Extrai assessora_id do JWT e seta no contexto PostgreSQL,
+        ativando automaticamente as políticas RLS no banco de dados.
+        """
+        init_rls_for_request()
+
+    # ============================================
     # HEALTH CHECK
     # ============================================
     @app.route('/health')
