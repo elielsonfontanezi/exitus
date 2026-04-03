@@ -293,7 +293,6 @@ class IRService:
                 Transacao.usuario_id == usuario_id,
                 Transacao.tipo.in_([
                     TipoTransacao.COMPRA, TipoTransacao.VENDA,
-                    TipoTransacao.DIVIDENDO, TipoTransacao.JCP, TipoTransacao.ALUGUEL,
                 ]),
                 cast(Transacao.data_transacao, Date) >= dt_ini,
                 cast(Transacao.data_transacao, Date) <= dt_fim,
