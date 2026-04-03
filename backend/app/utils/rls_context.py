@@ -30,9 +30,9 @@ def set_rls_context(assessora_id: str = None):
         assessora_id = get_current_assessora_id()
     
     if assessora_id:
-        # Setar variável de sessão PostgreSQL usando SET LOCAL
-        # SET LOCAL garante que a configuração dure até o fim da transação
-        db.session.execute(
+        # Usar connection.execute() direto para garantir mesma conexão
+        connection = db.session.connection()
+        connection.execute(
             text("SET LOCAL app.current_assessora_id = :assessora_id"),
             {'assessora_id': str(assessora_id)}
         )
