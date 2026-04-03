@@ -16,7 +16,7 @@
 | **Testes Backend** | 🟡 87.7% | 436/497 passando (61 failed, 35 errors) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
 | **Frontend API-Driven** | ✅ 25% | Sprint 1 Operações 100% funcionais, 1/4 telas, 4/25 APIs integradas |
-| **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + 5 testes isolamento (100%) |
+| **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + 9 testes isolamento (100%) |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
 ---
@@ -26,7 +26,7 @@
 - **GAPs:** 48/54 implementados (Fases 1-6 ✅, MULTICLIENTE-001 ✅, HistoricoPatrimonio ✅)
 - **Testes:** 436/497 passando (87.7%)
 - **Endpoints:** 156 funcionais (/api/portfolios/evolucao)
-- **Multi-tenancy:** ✅ Concluído — 10 services com `filter_by_assessora()` + 5 testes isolamento (100%)
+- **Multi-tenancy:** ✅ Concluído — 10 services com `filter_by_assessora()` + 9 testes isolamento (100%)
 - **Motor Fiscal:** IR completo, IOF, DARF, compensação
 - **Importação:** B3 Excel/CSV, 56 ativos seed
 - **APIs:** Cotações multi-provider, cache, circuit breaker

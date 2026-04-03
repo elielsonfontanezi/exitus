@@ -38,12 +38,13 @@ from app.database import db
 @pytest.fixture
 def assessora_a(app):
     """Assessora A para testes cross-tenant"""
-    suffix = uuid.uuid4().hex[:8]
+    import time
+    suffix = str(int(time.time() * 1000000))[-8:]  # Timestamp único
     assessora = Assessora(
         id=uuid.uuid4(),
         nome=f'Assessora A Teste {suffix}',
         razao_social=f'Assessora A Ltda {suffix}',
-        cnpj=f'111111110001{suffix[:2]}',
+        cnpj=f'11{suffix}0001',  # CNPJ único baseado em timestamp
         email=f'assessora_a_{suffix}@teste.com',
         ativo=True
     )
@@ -56,12 +57,13 @@ def assessora_a(app):
 @pytest.fixture
 def assessora_b(app):
     """Assessora B para testes cross-tenant"""
-    suffix = uuid.uuid4().hex[:8]
+    import time
+    suffix = str(int(time.time() * 1000000))[-8:]  # Timestamp único
     assessora = Assessora(
         id=uuid.uuid4(),
         nome=f'Assessora B Teste {suffix}',
         razao_social=f'Assessora B Ltda {suffix}',
-        cnpj=f'222222220002{suffix[:2]}',
+        cnpj=f'22{suffix}0002',  # CNPJ único baseado em timestamp
         email=f'assessora_b_{suffix}@teste.com',
         ativo=True
     )
@@ -179,13 +181,177 @@ class TestIsolamentoCrossTenant:
             assert portfolios[0].nome == 'Portfolio A'
             assert portfolios[0].assessora_id == assessora_a.id
 
-    # Teste removido - Transacao tem estrutura complexa (preco_unitario vs preco)
+    def test_usuario_nao_ve_transacoes_de_outra_assessora(
+        self, app, usuario_a, usuario_b, assessora_a, assessora_b, 
+        ativo_teste, corretora_teste
+    ):
+        """Usuário A não deve ver transações da Assessora B"""
+        from datetime import datetime
+        
+        # Criar transação para Assessora A
+        transacao_a = Transacao(
+            id=uuid.uuid4(),
+            usuario_id=usuario_a.id,
+            assessora_id=assessora_a.id,
+            ativo_id=ativo_teste.id,
+            corretora_id=corretora_teste.id,
+            tipo=TipoTransacao.COMPRA,
+            quantidade=Decimal('100'),
+            preco_unitario=Decimal('50.00'),
+            valor_total=Decimal('5000.00'),
+            valor_liquido=Decimal('5000.00'),
+            data_transacao=datetime.now()
+        )
+        db.session.add(transacao_a)
+        
+        # Criar transação para Assessora B
+        transacao_b = Transacao(
+            id=uuid.uuid4(),
+            usuario_id=usuario_b.id,
+            assessora_id=assessora_b.id,
+            ativo_id=ativo_teste.id,
+            corretora_id=corretora_teste.id,
+            tipo=TipoTransacao.COMPRA,
+            quantidade=Decimal('200'),
+            preco_unitario=Decimal('60.00'),
+            valor_total=Decimal('12000.00'),
+            valor_liquido=Decimal('12000.00'),
+            data_transacao=datetime.now()
+        )
+        db.session.add(transacao_b)
+        db.session.commit()
+        
+        # Simular JWT com assessora_id de A
+        with patch('app.utils.tenant.get_current_assessora_id', return_value=str(assessora_a.id)):
+            result = TransacaoService.get_all(usuario_a.id)
+            transacoes = result.items if hasattr(result, 'items') else result['items']
+            
+            assert len(transacoes) == 1
+            assert transacoes[0].quantidade == Decimal('100')
+            assert transacoes[0].assessora_id == assessora_a.id
 
-    # Teste removido - PosicaoService.get_all retorna paginação
+    def test_usuario_nao_ve_posicoes_de_outra_assessora(
+        self, app, usuario_a, usuario_b, assessora_a, assessora_b, 
+        ativo_teste, corretora_teste
+    ):
+        """Usuário A não deve ver posições da Assessora B"""
+        # Criar posição para Assessora A
+        posicao_a = Posicao(
+            id=uuid.uuid4(),
+            usuario_id=usuario_a.id,
+            assessora_id=assessora_a.id,
+            ativo_id=ativo_teste.id,
+            corretora_id=corretora_teste.id,
+            quantidade=Decimal('100'),
+            preco_medio=Decimal('50.00')
+        )
+        db.session.add(posicao_a)
+        
+        # Criar posição para Assessora B
+        posicao_b = Posicao(
+            id=uuid.uuid4(),
+            usuario_id=usuario_b.id,
+            assessora_id=assessora_b.id,
+            ativo_id=ativo_teste.id,
+            corretora_id=corretora_teste.id,
+            quantidade=Decimal('200'),
+            preco_medio=Decimal('60.00')
+        )
+        db.session.add(posicao_b)
+        db.session.commit()
+        
+        # Simular JWT com assessora_id de A
+        with patch('app.utils.tenant.get_current_assessora_id', return_value=str(assessora_a.id)):
+            result = PosicaoService.get_all(usuario_a.id)
+            posicoes = result.items if hasattr(result, 'items') else result
+            
+            assert len(posicoes) == 1
+            assert posicoes[0].quantidade == Decimal('100')
+            assert posicoes[0].assessora_id == assessora_a.id
 
-    # Teste removido - Provento não tem usuario_id, filtro não funciona como esperado
+    def test_query_direta_posicao_filtra_por_assessora(
+        self, app, usuario_a, usuario_b, assessora_a, assessora_b, 
+        ativo_teste, corretora_teste
+    ):
+        """Query direta em Posicao deve filtrar por assessora_id"""
+        # Criar posições para ambas assessoras
+        posicao_a = Posicao(
+            id=uuid.uuid4(),
+            usuario_id=usuario_a.id,
+            assessora_id=assessora_a.id,
+            ativo_id=ativo_teste.id,
+            corretora_id=corretora_teste.id,
+            quantidade=Decimal('100'),
+            preco_medio=Decimal('50.00')
+        )
+        posicao_b = Posicao(
+            id=uuid.uuid4(),
+            usuario_id=usuario_b.id,
+            assessora_id=assessora_b.id,
+            ativo_id=ativo_teste.id,
+            corretora_id=corretora_teste.id,
+            quantidade=Decimal('200'),
+            preco_medio=Decimal('60.00')
+        )
+        db.session.add_all([posicao_a, posicao_b])
+        db.session.commit()
+        
+        # Filtrar por assessora A usando query direta
+        with patch('app.utils.tenant.get_current_assessora_id', return_value=str(assessora_a.id)):
+            query = Posicao.query
+            query_filtrada = filter_by_assessora(query, Posicao)
+            posicoes = query_filtrada.all()
+            
+            assert len(posicoes) == 1
+            assert posicoes[0].quantidade == Decimal('100')
+            assert posicoes[0].assessora_id == assessora_a.id
 
-    # Teste removido - MovimentacaoCaixaService.get_all retorna paginação
+    def test_query_direta_transacao_filtra_por_assessora(
+        self, app, usuario_a, usuario_b, assessora_a, assessora_b, 
+        ativo_teste, corretora_teste
+    ):
+        """Query direta em Transacao deve filtrar por assessora_id"""
+        from datetime import datetime
+        
+        # Criar transações para ambas assessoras
+        transacao_a = Transacao(
+            id=uuid.uuid4(),
+            usuario_id=usuario_a.id,
+            assessora_id=assessora_a.id,
+            ativo_id=ativo_teste.id,
+            corretora_id=corretora_teste.id,
+            tipo=TipoTransacao.COMPRA,
+            quantidade=Decimal('100'),
+            preco_unitario=Decimal('50.00'),
+            valor_total=Decimal('5000.00'),
+            valor_liquido=Decimal('5000.00'),
+            data_transacao=datetime.now()
+        )
+        transacao_b = Transacao(
+            id=uuid.uuid4(),
+            usuario_id=usuario_b.id,
+            assessora_id=assessora_b.id,
+            ativo_id=ativo_teste.id,
+            corretora_id=corretora_teste.id,
+            tipo=TipoTransacao.COMPRA,
+            quantidade=Decimal('200'),
+            preco_unitario=Decimal('60.00'),
+            valor_total=Decimal('12000.00'),
+            valor_liquido=Decimal('12000.00'),
+            data_transacao=datetime.now()
+        )
+        db.session.add_all([transacao_a, transacao_b])
+        db.session.commit()
+        
+        # Filtrar por assessora A usando query direta
+        with patch('app.utils.tenant.get_current_assessora_id', return_value=str(assessora_a.id)):
+            query = Transacao.query
+            query_filtrada = filter_by_assessora(query, Transacao)
+            transacoes = query_filtrada.all()
+            
+            assert len(transacoes) == 1
+            assert transacoes[0].quantidade == Decimal('100')
+            assert transacoes[0].assessora_id == assessora_a.id
 
     # Teste removido - PlanoCompra tem estrutura complexa que requer análise detalhada
 

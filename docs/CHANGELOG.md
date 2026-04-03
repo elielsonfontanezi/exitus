@@ -8,31 +8,36 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
-### Added — Testes Multi-Tenancy (03/04/2026)
+### Added — Testes Multi-Tenancy Expandidos (03/04/2026)
 
-**GAPs:** MULTICLIENTE-001 Parte 4
+**GAPs:** MULTICLIENTE-001 Parte 4 (Expandido)
 
 **Artefatos criados:**
 - `docs/PLANO_TESTE_MULTITENANCY.md` - Estratégia completa de testes multi-tenant (38 casos planejados)
-- `backend/tests/test_multitenancy.py` - Suite de testes de isolamento cross-tenant (5 testes, 100% passando)
+- `backend/tests/test_multitenancy.py` - Suite de testes de isolamento cross-tenant (9 testes, 100% passando)
 
 **Artefatos modificados:**
 - Nenhum
 
 **Testes implementados:**
-- ✅ `test_usuario_nao_ve_portfolios_de_outra_assessora` - Valida isolamento de portfolios
-- ✅ `test_filter_by_assessora_em_query` - Valida filtro automático em queries
-- ✅ `test_get_current_assessora_id_retorna_none_se_sem_assessora` - Valida JWT sem assessora_id
-- ✅ `test_assessora_padrao_existe` - Valida migração de dados
-- ✅ `test_usuarios_tem_assessora_id` - Valida integridade de dados
+- ✅ `test_usuario_nao_ve_portfolios_de_outra_assessora` - Isolamento de portfolios
+- ✅ `test_usuario_nao_ve_transacoes_de_outra_assessora` - Isolamento de transações
+- ✅ `test_usuario_nao_ve_posicoes_de_outra_assessora` - Isolamento de posições
+- ✅ `test_query_direta_posicao_filtra_por_assessora` - Filtro direto em Posicao
+- ✅ `test_query_direta_transacao_filtra_por_assessora` - Filtro direto em Transacao
+- ✅ `test_filter_by_assessora_em_query` - Filtro automático em queries
+- ✅ `test_get_current_assessora_id_retorna_none_se_sem_assessora` - JWT sem assessora_id
+- ✅ `test_assessora_padrao_existe` - Migração de dados
+- ✅ `test_usuarios_tem_assessora_id` - Integridade de dados
 
 **Cobertura:**
-- Isolamento de portfolios entre assessoras
-- Filtros automáticos `filter_by_assessora()`
+- Isolamento de portfolios, transações e posições entre assessoras
+- Filtros automáticos `filter_by_assessora()` em queries diretas
 - Validação de JWT com `assessora_id`
 - Migração de dados existentes
+- Fixtures com CNPJs únicos baseados em timestamp
 
-**Suite:** 5/5 testes passando (100%)
+**Suite:** 9/9 testes passando (100%)
 
 ---
 
