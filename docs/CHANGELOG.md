@@ -8,6 +8,34 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Testes Multi-Tenancy (03/04/2026)
+
+**GAPs:** MULTICLIENTE-001 Parte 4
+
+**Artefatos criados:**
+- `docs/PLANO_TESTE_MULTITENANCY.md` - Estratégia completa de testes multi-tenant (38 casos planejados)
+- `backend/tests/test_multitenancy.py` - Suite de testes de isolamento cross-tenant (5 testes, 100% passando)
+
+**Artefatos modificados:**
+- Nenhum
+
+**Testes implementados:**
+- ✅ `test_usuario_nao_ve_portfolios_de_outra_assessora` - Valida isolamento de portfolios
+- ✅ `test_filter_by_assessora_em_query` - Valida filtro automático em queries
+- ✅ `test_get_current_assessora_id_retorna_none_se_sem_assessora` - Valida JWT sem assessora_id
+- ✅ `test_assessora_padrao_existe` - Valida migração de dados
+- ✅ `test_usuarios_tem_assessora_id` - Valida integridade de dados
+
+**Cobertura:**
+- Isolamento de portfolios entre assessoras
+- Filtros automáticos `filter_by_assessora()`
+- Validação de JWT com `assessora_id`
+- Migração de dados existentes
+
+**Suite:** 5/5 testes passando (100%)
+
+---
+
 ### Fixed — Sincronização Transações-Posições (02/04/2026)
 
 **Artefatos modificados:**

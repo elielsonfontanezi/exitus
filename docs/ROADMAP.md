@@ -55,12 +55,12 @@
 
 | GAP ID | Funcionalidade | Prioridade | Status | Detalhe |
 |--------|---------------|------------|--------|---------|
-| **MULTICLIENTE-001** | Multi-tenancy para assessoras | 🔴 Alta | ✅ Concluído (19/03/2026) | 10 services com `filter_by_assessora()`. Ver [MULTICLIENTE.md](MULTICLIENTE.md) |
+| **MULTICLIENTE-001** | Multi-tenancy para assessoras | 🔴 Alta | ✅ Concluído (03/04/2026) | 10 services + testes de isolamento. Ver [MULTICLIENTE.md](MULTICLIENTE.md) |
 | **MONITOR-001** | Monitoramento e alertas | 🟡 Média | 📋 Planejado | Prometheus + Grafana vs DataDog |
 | **RATELIMIT-001** | Rate limiting | 🟡 Média | 📋 Planejado | — |
 | **CICD-001** | CI/CD + deploy | 🟡 Média | 📋 Planejado | GitHub Actions vs GitLab CI |
 
-### MULTICLIENTE-001 — Concluído (19/03/2026)
+### MULTICLIENTE-001 — Concluído (03/04/2026)
 
 - [x] Model Assessora (23 campos, 15 relacionamentos)
 - [x] 20 models com `assessora_id` (100%)
@@ -71,12 +71,16 @@
 - [x] 10 services com `filter_by_assessora()` (100%)
 - [x] Banco de testes recriado com schema multi-tenant
 - [x] Fixtures atualizados para testes multi-tenant
-- [x] 436/497 testes passando (87.7%)
+- [x] **Parte 4: Testes Multi-Tenancy (03/04/2026)**
+  - [x] Plano de testes completo (38 casos planejados)
+  - [x] Suite de testes de isolamento (5 testes, 100% passando)
+  - [x] Validação de filtros automáticos
+  - [x] Validação de JWT com assessora_id
 
 **Pendências futuras (outros GAPs):**
 - [ ] Implementar row-level security completa
 - [ ] Dashboard admin por assessora
-- [ ] Testes de isolamento cross-tenant ampliados
+- [ ] Testes de isolamento ampliados (transações, posições, proventos)
 
 ### Timeline Estimada Fase 7
 
