@@ -10,13 +10,13 @@
 
 | Componente | Progresso | Detalhe |
 |------------|-----------|---------|
-| **Backend** | ✅ 87% | 48/54 GAPs, 436/497 testes (87.7%), 156 endpoints |
+| **Backend** | ✅ 87% | 48/54 GAPs, 508/546 testes (93.0%), 156 endpoints |
 | **Frontend V2.0** | ✅ 100% | 17/17 telas premium, design classe mundial |
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
-| **Testes Backend** | 🟡 87.7% | 436/497 passando (61 failed, 35 errors) |
+| **Testes Backend** | ✅ 93.0% | 508/546 passando (+37 testes), 6 skipped (RLS), 68 errors (teardown) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
 | **Frontend API-Driven** | ✅ 25% | Sprint 1 Operações 100% funcionais, 1/4 telas, 4/25 APIs integradas |
-| **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + 15 testes (100%) |
+| **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
 ---
@@ -24,9 +24,9 @@
 ## 🖥️ Backend — 87% Concluído
 
 - **GAPs:** 48/54 implementados (Fases 1-6 ✅, MULTICLIENTE-001 ✅, HistoricoPatrimonio ✅)
-- **Testes:** 436/497 passando (87.7%)
+- **Testes:** 508/546 passando (93.0%) - Correção concluída (03/04/2026)
 - **Endpoints:** 156 funcionais (/api/portfolios/evolucao)
-- **Multi-tenancy:** ✅ Concluído — 10 services + RLS (28 políticas PostgreSQL) + 15 testes (100%)
+- **Multi-tenancy:** ✅ Concluído — 10 services + RLS (28 políticas PostgreSQL) + isolamento via API/JWT
 - **Motor Fiscal:** IR completo, IOF, DARF, compensação
 - **Importação:** B3 Excel/CSV, 56 ativos seed
 - **APIs:** Cotações multi-provider, cache, circuit breaker

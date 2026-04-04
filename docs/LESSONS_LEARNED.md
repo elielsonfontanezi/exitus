@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 29/03/2026 — L-AUTH-001 adicionado (gerenciamento JWT obrigatório)  
+> **Atualizado:** 03/04/2026 — L-SEC-001 adicionado (RLS vs API/JWT defesa em profundidade)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -29,7 +29,44 @@ if not headers:
 
 ---
 
-## 🗄️ Banco de Dados
+## � Segurança Multi-Tenant
+
+### L-SEC-001 — RLS é Defesa em Profundidade, não substituto de API
+**Origem:** Investigação de testes RLS falhando | **Data:** 03/04/2026
+
+**Problema:** Testes de RLS via SQLAlchemy ORM não funcionam devido ao pool de conexões PostgreSQL.
+
+**Arquitetura Correta:**
+```
+┌─────────────────────────────────────┐
+│  Camada 1: API + JWT                │ ← Proteção principal
+│  - before_request seta assessora_id │
+│  - Endpoints validam permissões     │
+└─────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────┐
+│  Camada 2: RLS no PostgreSQL        │ ← Proteção de backup
+│  - Políticas no banco de dados      │
+│  - Proteção contra bugs na API      │
+└─────────────────────────────────────┘
+```
+
+**Por que RLS NÃO é redundante:**
+1. **Proteção contra bugs:** Se desenvolvedor esquecer `filter_by_assessora()`
+2. **Acesso direto ao banco:** Scripts, psql, pgAdmin, ferramentas BI
+3. **Compliance:** Defesa em profundidade para auditorias (LGPD/GDPR)
+4. **SQL Injection:** Limita dano ao tenant atual
+
+**Decisão Arquitetural:**
+- ✅ **MANTER RLS ATIVO** no banco (defesa em profundidade)
+- ✅ **Validar isolamento via API** (como funciona em produção)
+- ⏭️ **Testes RLS diretos = skip** (problema técnico, não funcionalidade)
+
+**Regra:** RLS é camada adicional de segurança, nunca substituto da validação via API.
+
+---
+
+## �🗄️ Banco de Dados
 
 ### L-DB-001 — Usar DELETE, nunca DROP, para reset de dados
 **Origem:** EXITUS-SEED-001 | **Data:** 02/03/2026

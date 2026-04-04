@@ -5,12 +5,13 @@ import pytest
 from datetime import date
 from decimal import Decimal
 from app.models.taxa_cambio import TaxaCambio
+from app.database import db
 
 
 class TestCambioEndpoints:
     """Testes para /api/cambio/*"""
     
-    def test_taxa_atual_sucesso(self, client, db_session):
+    def test_taxa_atual_sucesso(self, client, app):
         """Deve retornar taxa de câmbio atual entre duas moedas"""
         # Criar taxa no banco
         taxa = TaxaCambio(
@@ -19,8 +20,8 @@ class TestCambioEndpoints:
             data_referencia=date.today(),
             fonte='teste'
         )
-        db_session.add(taxa)
-        db_session.commit()
+        db.session.add(taxa)
+        db.session.commit()
         
         response = client.get('/api/cambio/taxa-atual?de=USD&para=BRL')
         
@@ -52,7 +53,7 @@ class TestCambioEndpoints:
         assert data['success'] is False
         assert '3 caracteres' in data['message']
     
-    def test_taxa_atual_case_insensitive(self, client, db_session):
+    def test_taxa_atual_case_insensitive(self, client, app):
         """Deve aceitar moedas em minúsculas"""
         taxa = TaxaCambio(
             par_moeda='USD/BRL',
@@ -60,8 +61,8 @@ class TestCambioEndpoints:
             data_referencia=date.today(),
             fonte='teste'
         )
-        db_session.add(taxa)
-        db_session.commit()
+        db.session.add(taxa)
+        db.session.commit()
         
         response = client.get('/api/cambio/taxa-atual?de=usd&para=brl')
         
@@ -92,7 +93,7 @@ class TestCambioEndpoints:
         assert data['data']['taxa'] == 1.0
         assert data['data']['fonte'] == 'identidade'
     
-    def test_taxa_atual_multiplas_moedas(self, client, db_session):
+    def test_taxa_atual_multiplas_moedas(self, client, app):
         """Deve funcionar para diferentes pares de moedas"""
         pares = [
             ('USD/BRL', Decimal('5.00')),
@@ -107,8 +108,8 @@ class TestCambioEndpoints:
                 data_referencia=date.today(),
                 fonte='teste'
             )
-            db_session.add(taxa)
-        db_session.commit()
+            db.session.add(taxa)
+        db.session.commit()
         
         # Testar USD -> BRL
         response = client.get('/api/cambio/taxa-atual?de=USD&para=BRL')
@@ -140,7 +141,7 @@ class TestCambioEndpoints:
 class TestCambioIntegration:
     """Testes de integração para câmbio"""
     
-    def test_taxa_atual_com_frontend_format(self, client, db_session):
+    def test_taxa_atual_com_frontend_format(self, client, app):
         """Deve retornar formato esperado pelo frontend"""
         taxa = TaxaCambio(
             par_moeda='USD/BRL',
@@ -148,8 +149,8 @@ class TestCambioIntegration:
             data_referencia=date.today(),
             fonte='teste'
         )
-        db_session.add(taxa)
-        db_session.commit()
+        db.session.add(taxa)
+        db.session.commit()
         
         response = client.get('/api/cambio/taxa-atual?de=USD&para=BRL')
         

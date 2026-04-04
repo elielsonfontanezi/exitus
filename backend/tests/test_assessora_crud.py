@@ -14,14 +14,21 @@ from app.database import db
 @pytest.fixture
 def admin_user(app):
     """Usuário admin para testes"""
-    assessora = Assessora.query.first()
+    from app.models.usuario import Usuario, UserRole
+    
+    # Usar UUID para garantir unicidade
+    suffix = str(uuid.uuid4())[:8]
+    
+    # Criar assessora se não existir
+    from app.models.assessora import Assessora
+    assessora = Assessora.query.filter_by(email=f'admin_{suffix}@teste.com').first()
     if not assessora:
         assessora = Assessora(
             id=uuid.uuid4(),
-            nome='Assessora Teste Admin',
-            razao_social='Assessora Teste Admin Ltda',
-            cnpj='12345678000199',
-            email='admin@teste.com',
+            nome=f'Assessora Teste Admin {suffix}',
+            razao_social=f'Assessora Teste Admin Ltda {suffix}',
+            cnpj=f'12{suffix[:12]}91',  # 14 caracteres total
+            email=f'admin_{suffix}@teste.com',
             ativo=True
         )
         db.session.add(assessora)
@@ -30,8 +37,8 @@ def admin_user(app):
     admin = Usuario(
         id=uuid.uuid4(),
         assessora_id=assessora.id,
-        username='admin_test',
-        email='admin_test@teste.com',
+        username=f'admin_test_{suffix}',
+        email=f'admin_test_{suffix}@teste.com',
         role=UserRole.ADMIN,
         ativo=True
     )
@@ -39,15 +46,23 @@ def admin_user(app):
     db.session.add(admin)
     db.session.commit()
     
+    # Armazenar IDs para cleanup
+    admin_id = admin.id
+    assessora_id = assessora.id
+    
     yield admin
-    db.session.rollback()
+    
+    # Cleanup
+    Usuario.query.filter_by(id=admin_id).delete()
+    Assessora.query.filter_by(id=assessora_id).delete()
+    db.session.commit()
 
 
 @pytest.fixture
 def admin_token(client, admin_user):
     """Token JWT de admin"""
     response = client.post('/api/auth/login', json={
-        'username': 'admin_test',
+        'username': admin_user.username,
         'password': 'senha123'
     })
     return response.json['data']['access_token']
@@ -151,8 +166,9 @@ class TestAssessoraCRUD:
         )
         assessora_id = create_response.json['data']['id']
         
-        # Atualizar
-        update_data = {'nome': 'Nome Atualizado', 'plano': 'enterprise'}
+        # Atualizar com nome único
+        suffix = str(uuid.uuid4())[:8]
+        update_data = {'nome': f'Nome Atualizado {suffix}', 'plano': 'enterprise'}
         response = client.put(
             f'/api/assessoras/{assessora_id}',
             headers={'Authorization': f'Bearer {admin_token}'},
@@ -160,7 +176,7 @@ class TestAssessoraCRUD:
         )
         
         assert response.status_code == 200
-        assert response.json['data']['nome'] == 'Nome Atualizado'
+        assert response.json['data']['nome'] == f'Nome Atualizado {suffix}'
         assert response.json['data']['plano'] == 'enterprise'
 
     def test_delete_assessora_soft(self, client, admin_token, assessora_data):

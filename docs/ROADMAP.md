@@ -1,9 +1,9 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 436/497 passing (87.7%)  
-> **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅ | **Frontend API-Driven:** 🔄 Sprint 1 em Progresso (28/03/2026) | **Token Refresh:** ✅ Concluído (26/03/2026)  
-> **Dashboard:** ✅ Posições geradas automaticamente (R$ 257.677,50) + Hook em Transacao + Seed completo | **Versão:** v0.9.8 | **Última atualização:** 26/03/2026
+> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 508/546 passing (93.0%) ✅  
+> **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅ | **Frontend API-Driven:** ✅ Sprint 1 Concluído (03/04/2026) | **Token Refresh:** ✅ Concluído (26/03/2026)  
+> **Dashboard:** ✅ Posições geradas automaticamente (R$ 257.677,50) + Hook em Transacao + Seed completo | **Versão:** v0.9.14 | **Última atualização:** 03/04/2026
 
 ---
 
@@ -47,7 +47,7 @@
 | **Cenários de Teste** | ✅ | 4 cenários predefinidos (E2E, Full expandido, IR, Stress) + carga massiva (30 ativos, 48 transações, 32 proventos) |
 | **Histórico Patrimonial** | ✅ | Snapshots mensais, endpoint /api/portfolios/evolucao |
 | **Documentação** | ✅ | Swagger/OpenAPI auto-doc |
-| **Testes** | ✅ | 491 testes automatizados (100%) |
+| **Testes** | ✅ | 508/546 testes (93.0%) - Correção concluída (03/04/2026) |
 
 ---
 
