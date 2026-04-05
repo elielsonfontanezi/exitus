@@ -8,6 +8,41 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Importação B3 com Detecção Automática (05/04/2026)
+
+**GAPs:** Frontend API-Driven Integration - Importação B3
+
+**Artefatos modificados:**
+- `backend/app/blueprints/import_b3_blueprint.py` - Endpoint POST /api/import/b3 com JWT
+- `backend/app/services/import_b3_service.py` - Método processar_arquivo() + detecção inteligente
+
+**Funcionalidades:**
+- ✅ Endpoint POST `/api/import/b3` com autenticação JWT (@jwt_required)
+- ✅ Método `processar_arquivo()` com detecção automática de tipo
+- ✅ Suporte a arquivos CSV/Excel mistos (Compra/Venda + Dividendos)
+- ✅ Parser `_parse_negociacoes_formato_movimentacoes()` para arquivos híbridos
+- ✅ Detecção inteligente: transações vs proventos baseado em conteúdo
+- ✅ Frontend drag & drop já implementado em operacoes.html
+
+**Detecção automática:**
+- Arquivo com "Compra/Venda" → Importa como Transações
+- Arquivo com "Dividendo/Rendimento/JCP" → Importa como Proventos
+- Arquivo com "Código de Negociação" → Importa como Transações (formato alternativo)
+
+**Teste realizado:**
+- Arquivo: `backend/tests/fixtures/b3_movimentacoes_exemplo.csv`
+- Resultado: 6 transações criadas, 0 erros
+- Usuário: e2e_user (autenticação JWT validada)
+
+**Integração:**
+- Frontend: UI drag & drop em `/operacoes/` (linha 238-330)
+- Backend: Service reutiliza código existente e testado
+- API: Retorno consolidado com transacoes_criadas, proventos_criados, eventos_criados
+
+**Próximo:** Histórico de Transações (tabela paginada)
+
+---
+
 ### Fixed — Correção de Testes Backend - 93.0% de Aprovação (03/04/2026)
 
 **GAPs:** Correção de Testes Backend - Fases 1-4

@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 03/04/2026  
-> **Status:** ✅ **MULTICLIENTE-001 100% Concluído — Backend + Frontend + RLS + Testes**  
-> **Versão:** v0.9.14
+> **Data:** 05/04/2026  
+> **Status:** ✅ **Frontend API-Driven — Importação B3 Concluída**  
+> **Versão:** v0.9.15
 
 ---
 
@@ -15,7 +15,7 @@
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | ✅ 93.0% | 508/546 passando (+37 testes), 6 skipped (RLS), 68 errors (teardown) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
-| **Frontend API-Driven** | ✅ 25% | Sprint 1 Operações 100% funcionais, 1/4 telas, 4/25 APIs integradas |
+| **Frontend API-Driven** | ✅ 30% | Sprint 1 Operações + Importação B3 ✅, 1/4 telas, 5/25 APIs integradas |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
@@ -39,7 +39,7 @@
 
 - **Sprint 1:** Operações Essenciais (100% funcionais)
 - **Telas:** 1/4 implementadas (25%)
-- **APIs:** 4/25 integradas (16%) — transacoes, ativos, cotacoes, posicoes
+- **APIs:** 5/25 integradas (20%) — transacoes, ativos, cotacoes, posicoes, import/b3
 - **Tecnologia:** Alpine.js + Fetch API + API REST
 - **Concluído:** 
   - ✅ Tela Operações com toggle Compra/Venda unificado
@@ -47,7 +47,8 @@
   - ✅ Renomeio tela "compra" → "operacoes"
   - ✅ Modo VENDA 100% funcional (30 posições)
   - ✅ Compra/Venda de ativos BR e internacionais
-- **Próxima:** Importação B3, Histórico Transações
+  - ✅ Importação B3 com detecção automática de tipo (05/04/2026)
+- **Próxima:** Histórico Transações, Painel de Planos
 
 ### Sprint 1 — Operações Essenciais (CONCLUÍDO ✅)
 - ✅ **Tela Operações:** Toggle Compra/Venda unificado (29/03/2026)
@@ -67,8 +68,13 @@
   - Rota legada `/compra` redireciona
   - Dashboard atualizado para "Nova Operação"
 - ✅ **Tela Venda:** Integrada com toggle (30 posições visíveis)
-- ⏳ **Importação B3:** Upload drag & drop
+- ✅ **Importação B3:** Upload drag & drop + API (05/04/2026)
+  - Endpoint POST `/api/import/b3` com autenticação JWT
+  - Detecção automática: transações vs proventos
+  - Suporte CSV/Excel mistos (Compra/Venda + Dividendos)
+  - Teste: 6 transações importadas com sucesso
 - ⏳ **Histórico Transações:** Tabela paginada
+- ⏳ **Painel de Planos:** Compra/Venda disciplinada
 
 ---
 
