@@ -1,7 +1,7 @@
 {
-  "version": "1.0",
-  "description": "Cenário COMPLETO para TODAS as telas - cobertura 100% do sistema",
-  "timestamp": "2026-03-22T00:00:00Z",
+  "version": "2.0",
+  "description": "Cenário COMPLETO para TODAS as telas - cobertura 100% do sistema E2E. Inclui: 3 usuários, 7 ativos (BR+US), 10 transações, 10 proventos (6 meses), 3 portfolios, 5 planos, 3 alertas, 8 taxas câmbio. Pronto para testes completos de frontend.",
+  "timestamp": "2026-04-05T00:00:00Z",
   "usuarios": [
     {
       "username": "e2e_admin",
@@ -196,6 +196,17 @@
     },
     {
       "usuario": "e2e_user",
+      "ativo": "ITUB4",
+      "corretora": "XP INVESTIMENTOS",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-02-28",
+      "quantidade": 150,
+      "preco_unitario": 31.50,
+      "taxa_corretagem": 6.00,
+      "custos_totais": 10.00
+    },
+    {
+      "usuario": "e2e_user",
       "ativo": "HGLG11",
       "corretora": "INTER BANCO",
       "tipo": "COMPRA",
@@ -207,6 +218,17 @@
     },
     {
       "usuario": "e2e_user",
+      "ativo": "KNRI11",
+      "corretora": "INTER BANCO",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-03-15",
+      "quantidade": 30,
+      "preco_unitario": 142.00,
+      "taxa_corretagem": 5.00,
+      "custos_totais": 7.50
+    },
+    {
+      "usuario": "e2e_user",
       "ativo": "PETR4",
       "corretora": "ITAU CV S/A",
       "tipo": "VENDA",
@@ -215,16 +237,92 @@
       "preco_unitario": 39.80,
       "taxa_corretagem": 5.00,
       "custos_totais": 7.50
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "AAPL",
+      "corretora": "XP INVESTIMENTOS",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-04-10",
+      "quantidade": 10,
+      "preco_unitario": 175.00,
+      "taxa_corretagem": 8.00,
+      "custos_totais": 12.00
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "MSFT",
+      "corretora": "XP INVESTIMENTOS",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-04-12",
+      "quantidade": 5,
+      "preco_unitario": 410.00,
+      "taxa_corretagem": 8.00,
+      "custos_totais": 12.00
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "VALE3",
+      "corretora": "XP INVESTIMENTOS",
+      "tipo": "VENDA",
+      "data_transacao": "2024-05-15",
+      "quantidade": 100,
+      "preco_unitario": 72.50,
+      "taxa_corretagem": 8.00,
+      "custos_totais": 10.00
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo": "ITUB4",
+      "corretora": "XP INVESTIMENTOS",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-05-20",
+      "quantidade": 100,
+      "preco_unitario": 30.00,
+      "taxa_corretagem": 6.00,
+      "custos_totais": 9.00
     }
   ],
   "proventos": [
     {
       "ativo": "PETR4",
       "tipo_provento": "DIVIDENDO",
+      "data_com": "2024-01-15",
+      "data_pagamento": "2024-02-01",
+      "valor_unitario": 2.20,
+      "observacoes": "Dividendo 1T 2024"
+    },
+    {
+      "ativo": "VALE3",
+      "tipo_provento": "DIVIDENDO",
+      "data_com": "2024-01-20",
+      "data_pagamento": "2024-02-05",
+      "valor_unitario": 3.50,
+      "observacoes": "Dividendo 1T 2024"
+    },
+    {
+      "ativo": "HGLG11",
+      "tipo_provento": "RENDIMENTO",
+      "data_com": "2024-01-25",
+      "data_pagamento": "2024-02-10",
+      "valor_unitario": 1.15,
+      "observacoes": "Rendimento Janeiro 2024"
+    },
+    {
+      "ativo": "KNRI11",
+      "tipo_provento": "RENDIMENTO",
+      "data_com": "2024-02-25",
+      "data_pagamento": "2024-03-10",
+      "valor_unitario": 0.95,
+      "observacoes": "Rendimento Fevereiro 2024"
+    },
+    {
+      "ativo": "PETR4",
+      "tipo_provento": "DIVIDENDO",
       "data_com": "2024-03-20",
       "data_pagamento": "2024-04-05",
       "valor_unitario": 2.50,
-      "observacoes": "Dividendo ordinário"
+      "observacoes": "Dividendo 2T 2024"
     },
     {
       "ativo": "HGLG11",
@@ -232,7 +330,39 @@
       "data_com": "2024-03-25",
       "data_pagamento": "2024-04-10",
       "valor_unitario": 1.20,
-      "observacoes": "Rendimento mensal FII"
+      "observacoes": "Rendimento Março 2024"
+    },
+    {
+      "ativo": "ITUB4",
+      "tipo_provento": "JCP",
+      "data_com": "2024-04-15",
+      "data_pagamento": "2024-05-01",
+      "valor_unitario": 0.85,
+      "observacoes": "JCP 1T 2024"
+    },
+    {
+      "ativo": "VALE3",
+      "tipo_provento": "DIVIDENDO",
+      "data_com": "2024-04-20",
+      "data_pagamento": "2024-05-05",
+      "valor_unitario": 4.20,
+      "observacoes": "Dividendo 2T 2024"
+    },
+    {
+      "ativo": "HGLG11",
+      "tipo_provento": "RENDIMENTO",
+      "data_com": "2024-05-25",
+      "data_pagamento": "2024-06-10",
+      "valor_unitario": 1.25,
+      "observacoes": "Rendimento Maio 2024"
+    },
+    {
+      "ativo": "KNRI11",
+      "tipo_provento": "RENDIMENTO",
+      "data_com": "2024-06-25",
+      "data_pagamento": "2024-07-10",
+      "valor_unitario": 1.00,
+      "observacoes": "Rendimento Junho 2024"
     }
   ],
   "movimentacoes_caixa": [
@@ -364,6 +494,72 @@
       "data_limite": "2024-12-31",
       "status": "ATIVO",
       "observacoes": "Vender tudo se atingir teto"
+    }
+  ],
+  "taxas_cambio": [
+    {
+      "par_moeda": "USD/BRL",
+      "moeda_base": "USD",
+      "moeda_cotacao": "BRL",
+      "taxa": 5.60,
+      "data_referencia": "2024-01-15",
+      "fonte": "BCB"
+    },
+    {
+      "par_moeda": "USD/BRL",
+      "moeda_base": "USD",
+      "moeda_cotacao": "BRL",
+      "taxa": 5.55,
+      "data_referencia": "2024-02-20",
+      "fonte": "BCB"
+    },
+    {
+      "par_moeda": "USD/BRL",
+      "moeda_base": "USD",
+      "moeda_cotacao": "BRL",
+      "taxa": 5.50,
+      "data_referencia": "2024-03-15",
+      "fonte": "BCB"
+    },
+    {
+      "par_moeda": "USD/BRL",
+      "moeda_base": "USD",
+      "moeda_cotacao": "BRL",
+      "taxa": 5.45,
+      "data_referencia": "2024-04-10",
+      "fonte": "BCB"
+    },
+    {
+      "par_moeda": "USD/BRL",
+      "moeda_base": "USD",
+      "moeda_cotacao": "BRL",
+      "taxa": 5.40,
+      "data_referencia": "2024-05-15",
+      "fonte": "BCB"
+    },
+    {
+      "par_moeda": "BRL/USD",
+      "moeda_base": "BRL",
+      "moeda_cotacao": "USD",
+      "taxa": 0.18,
+      "data_referencia": "2024-04-10",
+      "fonte": "BCB"
+    },
+    {
+      "par_moeda": "EUR/BRL",
+      "moeda_base": "EUR",
+      "moeda_cotacao": "BRL",
+      "taxa": 6.00,
+      "data_referencia": "2024-04-10",
+      "fonte": "BCB"
+    },
+    {
+      "par_moeda": "BRL/EUR",
+      "moeda_base": "BRL",
+      "moeda_cotacao": "EUR",
+      "taxa": 0.17,
+      "data_referencia": "2024-04-10",
+      "fonte": "BCB"
     }
   ]
 }
