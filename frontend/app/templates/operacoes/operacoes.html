@@ -239,14 +239,93 @@
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold flex items-center gap-3" style="color: #735c43;">
-                <span class="text-3xl" x-text="isCompra ? '➕' : '💰'"></span>
-                <span x-text="isCompra ? 'Nova Operação' : 'Nova Operação'"></span>
+                <span class="text-3xl">💼</span>
+                <span>Operações</span>
             </h1>
-            <p class="text-gray-500 mt-1" x-text="isCompra ? 'Registre a aquisição de um novo ativo' : 'Registre a venda de um ativo da sua carteira'"></p>
+            <p class="text-gray-500 mt-1">Registre operações manualmente ou importe do Portal B3</p>
         </div>
         <a href="{{ url_for('dashboard.index') }}" class="flex items-center gap-2 text-[#a38c65] font-semibold hover:underline">
             <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
         </a>
+    </div>
+
+    <!-- Importação B3 -->
+    <div class="compra-card mb-6" x-data="importB3()">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">📥</span>
+            <div>
+                <h2 class="text-lg font-bold" style="color: #735c43;">Importação B3</h2>
+                <p class="text-sm text-gray-500">Arraste ou clique para enviar arquivo CSV/Excel do Portal B3</p>
+            </div>
+        </div>
+
+        <!-- Dropzone -->
+        <div 
+            @drop.prevent="handleDrop($event)"
+            @dragover.prevent="dragover = true"
+            @dragleave.prevent="dragover = false"
+            @click="$refs.fileInput.click()"
+            :class="{'border-[#a38c65] bg-[#fef9f3]': dragover}"
+            class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-all hover:border-[#a38c65] hover:bg-[#fef9f3]">
+            
+            <input type="file" x-ref="fileInput" @change="handleFileSelect($event)" accept=".csv,.xlsx,.xls" class="hidden">
+            
+            <template x-if="!uploading && !resultado">
+                <div>
+                    <i class="fas fa-cloud-upload-alt text-5xl text-gray-400 mb-3"></i>
+                    <p class="text-gray-600 font-semibold mb-1">Arraste o arquivo aqui ou clique para selecionar</p>
+                    <p class="text-sm text-gray-500">Formatos: CSV, Excel (.xlsx, .xls)</p>
+                </div>
+            </template>
+
+            <template x-if="uploading">
+                <div>
+                    <i class="fas fa-spinner fa-spin text-4xl text-[#a38c65] mb-3"></i>
+                    <p class="text-gray-600 font-semibold">Processando arquivo...</p>
+                    <p class="text-sm text-gray-500" x-text="uploadProgress"></p>
+                </div>
+            </template>
+
+            <template x-if="resultado && !uploading">
+                <div>
+                    <i class="fas fa-check-circle text-5xl text-green-500 mb-3"></i>
+                    <p class="text-gray-800 font-bold mb-2">Importação concluída!</p>
+                    <div class="text-left bg-white rounded-lg p-4 mt-4 border border-gray-200">
+                        <div class="grid grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <p class="text-gray-500">Transações</p>
+                                <p class="text-xl font-bold text-[#a38c65]" x-text="resultado.transacoes_criadas"></p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Proventos</p>
+                                <p class="text-xl font-bold text-[#a38c65]" x-text="resultado.proventos_criados"></p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Total Linhas</p>
+                                <p class="text-xl font-bold text-gray-600" x-text="resultado.resumo.total_linhas"></p>
+                            </div>
+                        </div>
+                        <template x-if="resultado.avisos && resultado.avisos.length > 0">
+                            <div class="mt-3 pt-3 border-t border-gray-200">
+                                <p class="text-xs font-semibold text-gray-600 mb-2">⚠️ Avisos:</p>
+                                <template x-for="aviso in resultado.avisos" :key="aviso">
+                                    <p class="text-xs text-gray-600" x-text="aviso"></p>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                    <button @click="resetImport()" class="mt-4 text-sm text-[#a38c65] font-semibold hover:underline">
+                        Importar outro arquivo
+                    </button>
+                </div>
+            </template>
+        </div>
+
+        <template x-if="erro">
+            <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p class="text-sm text-red-600" x-text="erro"></p>
+            </div>
+        </template>
     </div>
 
     <!-- Toggle Compra/Venda -->
@@ -784,6 +863,81 @@ function operacaoForm() {
             } finally {
                 this.loading = false;
             }
+        }
+    };
+}
+
+function importB3() {
+    return {
+        dragover: false,
+        uploading: false,
+        uploadProgress: '',
+        resultado: null,
+        erro: null,
+
+        handleDrop(event) {
+            this.dragover = false;
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                this.uploadFile(files[0]);
+            }
+        },
+
+        handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                this.uploadFile(files[0]);
+            }
+        },
+
+        async uploadFile(file) {
+            // Validar extensão
+            const validExtensions = ['csv', 'xlsx', 'xls'];
+            const extension = file.name.split('.').pop().toLowerCase();
+            
+            if (!validExtensions.includes(extension)) {
+                this.erro = 'Formato não suportado. Use CSV ou Excel (.xlsx, .xls)';
+                return;
+            }
+
+            this.uploading = true;
+            this.erro = null;
+            this.resultado = null;
+            this.uploadProgress = 'Enviando arquivo...';
+
+            const token = localStorage.getItem('access_token');
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('http://localhost:5000/api/import/b3', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.resultado = data.data;
+                    this.uploadProgress = 'Concluído!';
+                } else {
+                    this.erro = data.error || 'Erro ao processar arquivo';
+                }
+            } catch (error) {
+                console.error('Erro ao importar:', error);
+                this.erro = 'Erro de conexão com o servidor';
+            } finally {
+                this.uploading = false;
+            }
+        },
+
+        resetImport() {
+            this.resultado = null;
+            this.erro = null;
+            this.uploadProgress = '';
         }
     };
 }

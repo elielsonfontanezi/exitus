@@ -232,6 +232,14 @@ def create_app(testing=False):
     except ImportError as e:
         print(f"⚠️  Export blueprint não encontrado: {e}")
 
+    # M4.8 - Import B3 (Importação Portal B3 — EXITUS-IMPORT-001)
+    try:
+        from .blueprints.import_b3_blueprint import bp as import_b3_bp
+        app.register_blueprint(import_b3_bp)
+        print("✅ Import B3 blueprint registrado: /api/import/*")
+    except ImportError as e:
+        print(f"⚠️  Import B3 blueprint não encontrado: {e}")
+
     # ============================================
     # M7.4 - ALERTAS (NOVO!)
     # ============================================
