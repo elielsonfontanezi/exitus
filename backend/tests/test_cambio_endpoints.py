@@ -13,9 +13,15 @@ class TestCambioEndpoints:
     
     def test_taxa_atual_sucesso(self, client, app):
         """Deve retornar taxa de câmbio atual entre duas moedas"""
+        # Cleanup de taxas existentes
+        TaxaCambio.query.filter_by(par_moeda='USD/BRL').delete()
+        db.session.commit()
+        
         # Criar taxa no banco
         taxa = TaxaCambio(
             par_moeda='USD/BRL',
+            moeda_base='USD',
+            moeda_cotacao='BRL',
             taxa=Decimal('5.00'),
             data_referencia=date.today(),
             fonte='teste'
@@ -55,8 +61,14 @@ class TestCambioEndpoints:
     
     def test_taxa_atual_case_insensitive(self, client, app):
         """Deve aceitar moedas em minúsculas"""
+        # Cleanup de taxas existentes
+        TaxaCambio.query.filter_by(par_moeda='USD/BRL').delete()
+        db.session.commit()
+        
         taxa = TaxaCambio(
             par_moeda='USD/BRL',
+            moeda_base='USD',
+            moeda_cotacao='BRL',
             taxa=Decimal('5.00'),
             data_referencia=date.today(),
             fonte='teste'
@@ -95,19 +107,38 @@ class TestCambioEndpoints:
     
     def test_taxa_atual_multiplas_moedas(self, client, app):
         """Deve funcionar para diferentes pares de moedas"""
-        pares = [
-            ('USD/BRL', Decimal('5.00')),
-            ('EUR/BRL', Decimal('5.50')),
-            ('BRL/USD', Decimal('0.20')),
-        ]
+        # Cleanup de taxas existentes
+        TaxaCambio.query.delete()
+        db.session.commit()
         
-        for par, taxa_valor in pares:
-            taxa = TaxaCambio(
-                par_moeda=par,
-                taxa=taxa_valor,
+        taxas = [
+            TaxaCambio(
+                par_moeda='USD/BRL',
+                moeda_base='USD',
+                moeda_cotacao='BRL',
+                taxa=Decimal('5.00'),
+                data_referencia=date.today(),
+                fonte='teste'
+            ),
+            TaxaCambio(
+                par_moeda='EUR/BRL',
+                moeda_base='EUR',
+                moeda_cotacao='BRL',
+                taxa=Decimal('5.50'),
+                data_referencia=date.today(),
+                fonte='teste'
+            ),
+            TaxaCambio(
+                par_moeda='BRL/USD',
+                moeda_base='BRL',
+                moeda_cotacao='USD',
+                taxa=Decimal('0.20'),
                 data_referencia=date.today(),
                 fonte='teste'
             )
+        ]
+        
+        for taxa in taxas:
             db.session.add(taxa)
         db.session.commit()
         
@@ -143,8 +174,14 @@ class TestCambioIntegration:
     
     def test_taxa_atual_com_frontend_format(self, client, app):
         """Deve retornar formato esperado pelo frontend"""
+        # Cleanup de taxas existentes
+        TaxaCambio.query.filter_by(par_moeda='USD/BRL').delete()
+        db.session.commit()
+        
         taxa = TaxaCambio(
             par_moeda='USD/BRL',
+            moeda_base='USD',
+            moeda_cotacao='BRL',
             taxa=Decimal('5.25'),
             data_referencia=date.today(),
             fonte='teste'

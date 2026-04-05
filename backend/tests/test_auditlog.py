@@ -6,6 +6,7 @@ GAP: EXITUS-AUDITLOG-001
 
 import pytest
 from datetime import datetime
+import uuid
 from app.database import db
 from app.models import LogAuditoria, Usuario, Ativo, Transacao, Provento, MovimentacaoCaixa, TipoAtivo
 from app.services.auditoria_service import AuditoriaService
@@ -199,7 +200,7 @@ class TestAuditoriaIntegracaoAtivo:
             
             # Criar ativo
             data = {
-                'ticker': 'TEST4',
+                'ticker': f'TEST4{uuid.uuid4().hex[:6]}',
                 'nome': 'Teste Ativo Auditoria',
                 'tipo': 'ACAO',
                 'classe': 'RENDA_VARIAVEL',
