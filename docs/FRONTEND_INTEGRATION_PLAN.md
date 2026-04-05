@@ -1,6 +1,6 @@
 # 🚀 Plano de Integração Frontend-Backend — Exitus
 
-**Data:** 26/03/2026 | **Versão:** v1.1 | **Status:** � Em andamento  
+**Data:** 05/04/2026 | **Versão:** v1.2 | **Status:** ✅ Sprint 1 Concluído  
 **Modelo IA:** Claude Sonnet 4.6 Thinking
 
 ---
@@ -11,10 +11,11 @@
 Integrar **156 APIs do backend** com frontend de forma estruturada.
 
 ### Contexto
-- ✅ Backend: 48 GAPs, 156 endpoints, 87.7% testes
+- ✅ Backend: 48 GAPs, 156 endpoints, 93.0% testes
 - ✅ Dashboard: Implementado (R$ 257.677,50)
-- ⚠️ Gap: APIs sem telas correspondentes
-- ⚠️ Problema: Navegação duplicada
+- ✅ Frontend API-Driven: 5/25 APIs integradas (20%)
+- ✅ Sprint 1: Operações Essenciais 100% funcional
+- ⏳ Sprint 2: Histórico Transações, Planos, Alertas
 
 ---
 
@@ -44,7 +45,7 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 
 | Categoria | APIs | Telas | Prioridade |
 |-----------|------|-------|------------|
-| Operações | 25 | Compra, Venda, Import | 🚀 P0 |
+| Operações | 25 | Compra, Venda, Import | ✅ P0 Concluído |
 | Análises | 30 | Dashboard, Gráficos | 🚀 P0 |
 | Rendimentos | 15 | Proventos, Calendário | 🔥 P1 |
 | Fiscal | 20 | IR, DARF, Relatórios | 🔥 P1 |
@@ -52,14 +53,31 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 | Ativos | 15 | Catálogo, Detalhes | 📊 P2 |
 | Config | 10 | Alertas, Preferências | 📉 P3 |
 
+### ✅ APIs Integradas (5/25)
+
+**Operações (5 APIs):**
+- ✅ POST `/api/transacoes` - Criar transação
+- ✅ GET `/api/ativos?search=` - Buscar ativos
+- ✅ GET `/api/cotacoes/<ticker>` - Cotações em tempo real
+- ✅ GET `/api/posicoes` - Posições do usuário
+- ✅ POST `/api/import/b3` - Importação B3 (novo!)
+
 ---
 
 ## 📅 Roadmap (8 semanas)
 
-### Sprint 1-2: Operações (P0)
-- Compra/Venda/Importação
-- APIs: POST /api/transacoes, /api/import/b3
-- Critério: Usuário registra investimentos
+### ✅ Sprint 1: Operações (P0) - CONCLUÍDO 05/04/2026
+- ✅ Compra/Venda unificada com toggle
+- ✅ Importação B3 com detecção automática
+- APIs: POST /api/transacoes, POST /api/import/b3
+- Resultado: 5/25 APIs integradas (20%)
+
+### 🎯 Sprint 2: Operações Complementares (Próximo)
+- Histórico de Transações (tabela paginada)
+- Painel de Planos (compra/venda disciplinada)
+- Alertas pós-transação
+- APIs: GET /api/transacoes, /api/plano-*/*, /api/alertas/recentes
+- Estimativa: 6-8 horas
 
 ### Sprint 3-4: Análises (P0)
 - Gráficos, Evolução, Setores
@@ -256,8 +274,11 @@ O dashboard atual (`/dashboard`) está **100% funcional** com dados reais (R$ 25
 2. ✅ Criar API_FRONTEND_MAPPING.md detalhado
 3. ✅ Documentar estratégia de dashboard
 4. ✅ Sprint 1: Tela Compra refatorada (Tailwind/API REST) - 28/03/2026
-5. ⏳ Implementar tela de venda com estilo consistente (Próximo)
-6. ⏳ Implementar Importação B3 (upload drag & drop)
+5. ✅ Implementar tela de venda com estilo consistente - 02/04/2026
+6. ✅ Implementar Importação B3 (upload drag & drop) - 05/04/2026
+7. ⏳ Sprint 2: Histórico de Transações (tabela paginada)
+8. ⏳ Sprint 2: Painel de Planos (compra/venda disciplinada)
+9. ⏳ Sprint 2: Alertas pós-transação
 
 ---
 
