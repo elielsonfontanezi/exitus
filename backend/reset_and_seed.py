@@ -10,7 +10,6 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
-from decimal import Decimal
 
 # Adicionar path do backend
 sys.path.append('./backend')
@@ -57,7 +56,6 @@ class SeedManager:
             # Ordem de DELETE respeitando dependências FK
             # (dependentes primeiro, pais depois)
             ordered_tables = [
-                'calendario_dividendo',
                 'evento_custodia',
                 'evento_corporativo',
                 'movimentacao_caixa',
@@ -67,21 +65,14 @@ class SeedManager:
                 'alertas',
                 'configuracoes_alertas',
                 'projecoes_renda',
-                'plano_compra',
-                'plano_venda',
                 'relatorios_performance',
                 'auditoria_relatorios',
                 'log_auditoria',
                 'historico_preco',
-                'historico_patrimonio',
                 'portfolio',
-                'saldo_darf_acumulado',
-                'saldo_prejuizo',
-                'taxa_cambio',
                 'corretora',
                 'ativo',
                 'usuario',
-                'assessora',
                 'feriado_mercado',
                 'fonte_dados',
                 'regra_fiscal',
@@ -317,66 +308,6 @@ class SeedManager:
             db.session.add(corretora)
             print(f"✅ Corretora criada: {corretora_data['nome']}")
     
-    def _seed_transacoes(self, transacoes_data):
-        """Seed de transações"""
-        print(f"💼 Criando {len(transacoes_data)} transações...")
-        
-        from app.models.transacao import Transacao, TipoTransacao
-        from datetime import datetime
-        
-        for trans_data in transacoes_data:
-            # Buscar usuário
-            usuario = Usuario.query.filter_by(username=trans_data['usuario']).first()
-            if not usuario:
-                print(f"⚠️  Usuário {trans_data['usuario']} não encontrado, pulando transação...")
-                continue
-            
-            # Buscar ativo
-            ativo = Ativo.query.filter_by(ticker=trans_data['ativo']).first()
-            if not ativo:
-                print(f"⚠️  Ativo {trans_data['ativo']} não encontrado, pulando transação...")
-                continue
-            
-            # Buscar corretora
-            corretora = Corretora.query.filter_by(nome=trans_data['corretora']).first()
-            if not corretora:
-                print(f"⚠️  Corretora {trans_data['corretora']} não encontrada, pulando transação...")
-                continue
-            
-            # Mapear tipo
-            tipo_map = {
-                'COMPRA': TipoTransacao.COMPRA,
-                'VENDA': TipoTransacao.VENDA,
-                'DIVIDENDO': TipoTransacao.DIVIDENDO,
-                'JCP': TipoTransacao.JCP,
-                'ALUGUEL': TipoTransacao.ALUGUEL,
-                'BONIFICACAO': TipoTransacao.BONIFICACAO,
-                'SPLIT': TipoTransacao.SPLIT,
-                'GRUPAMENTO': TipoTransacao.GRUPAMENTO,
-                'SUBSCRICAO': TipoTransacao.SUBSCRICAO,
-                'AMORTIZACAO': TipoTransacao.AMORTIZACAO
-            }
-            
-            transacao = Transacao(
-                usuario_id=usuario.id,
-                ativo_id=ativo.id,
-                corretora_id=corretora.id,
-                assessora_id=usuario.assessora_id,
-                tipo=tipo_map.get(trans_data['tipo'], TipoTransacao.COMPRA),
-                data_transacao=datetime.strptime(trans_data['data_transacao'], '%Y-%m-%d'),
-                quantidade=Decimal(str(trans_data['quantidade'])),
-                preco_unitario=Decimal(str(trans_data['preco_unitario'])),
-                taxa_corretagem=Decimal(str(trans_data.get('taxa_corretagem', 0))),
-                taxa_liquidacao=Decimal(str(trans_data.get('taxa_liquidacao', 0))),
-                emolumentos=Decimal(str(trans_data.get('emolumentos', 0))),
-                imposto=Decimal(str(trans_data.get('imposto', 0))),
-                outros_custos=Decimal(str(trans_data.get('outros_custos', 0))),
-                observacoes=trans_data.get('observacoes', '')
-            )
-            
-            db.session.add(transacao)
-            print(f"✅ Transação criada: {trans_data['tipo']} {trans_data['ativo']}")
-    
     def backup_scenario(self, scenario_name):
         """Backup do cenário atual"""
         print(f"💾 Criando backup do cenário: {scenario_name}")
@@ -425,6 +356,7 @@ class SeedManager:
                 'tipo': a.tipo.value,
                 'classe': a.classe.value,
                 'moeda': a.moeda,
+                'pais': a.pais,
                 'ativo': a.ativo
             }
             for a in ativos
@@ -436,6 +368,7 @@ class SeedManager:
         return [
             {
                 'nome': c.nome,
+                'cnpj': c.cnpj,
                 'ativa': c.ativa
             }
             for c in corretoras
@@ -458,34 +391,6 @@ class SeedManager:
         print(f"📋 {len(regras_data)} regras fiscais (não implementado ainda)")
         # TODO: Implementar quando tiver modelo RegraFiscal
         pass
-    
-    def _processar_posicoes_apos_transacoes(self, transacoes_data):
-        """Processa posições após criar transações"""
-        try:
-            from app.services.posicao_service import PosicaoService
-            from app.models.usuario import Usuario
-            
-            # Obter usuários únicos das transações
-            usuarios_transacoes = {}
-            for t in transacoes_data:
-                username = t.get('usuario')
-                if username and username not in usuarios_transacoes:
-                    usuarios_transacoes[username] = None
-            
-            # Buscar usuários no banco
-            for username in usuarios_transacoes:
-                usuario = Usuario.query.filter_by(username=username).first()
-                if usuario:
-                    usuarios_transacoes[username] = usuario.id
-                    print(f"📊 Processando posições para {username}...")
-                    
-                    # Calcular posições
-                    resultado = PosicaoService.calcular_posicoes(usuario.id)
-                    print(f"  ✅ {resultado['posicoes_criadas']} criadas, {resultado['posicoes_atualizadas']} atualizadas, {resultado['posicoes_zeradas']} zeradas")
-            
-        except Exception as e:
-            print(f"⚠️  Erro ao processar posições: {e}")
-            # Não falhar completamente se posições não forem processadas
     
     def restore_scenario(self, scenario_name):
         """Restaurar cenário salvo"""
@@ -513,14 +418,6 @@ class SeedManager:
                     self._seed_ativos(data['ativos'])
                 if 'corretoras' in data:
                     self._seed_corretoras(data['corretoras'])
-                
-                # Seed de transações se existir no cenário
-                if 'transacoes' in data:
-                    self._seed_transacoes(data['transacoes'])
-                
-                # Processar posições após criar transações
-                if 'transacoes' in data:
-                    self._processar_posicoes_apos_transacoes(data['transacoes'])
                 
                 db.session.commit()
                 print(f"✅ Cenário {scenario_name} restaurado com sucesso")

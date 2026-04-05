@@ -30,7 +30,7 @@ def operacoes():
         # A API retorna {data: {corretoras: [...], total: n}, success: true}
         corretoras = result.get('data', {}).get('corretoras', [])
     
-    return render_template('operacoes/compra.html', corretoras=corretoras)
+    return render_template('operacoes/operacoes.html', corretoras=corretoras)
 
 @bp.route('/compra', methods=['GET'])
 @login_required
