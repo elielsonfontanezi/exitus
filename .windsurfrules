@@ -1,6 +1,6 @@
 # .windsurfrules — Sistema Exitus
 ## Arquivo de regras para Cascade (Windsurf AI Assistant)
-### Versão: 2.5 — 19/03/2026 (guia docs + MCPs, MULTI-CLIENTE concluído)
+### Versão: 2.6 — 05/04/2026 (tabela modelos IA + otimização custos)
 
 ---
 
@@ -51,13 +51,69 @@ Fluxo obrigatório em toda atividade:
 Ao iniciar qualquer GAP, indicar obrigatoriamente:
 
 ```
-Modelo recomendado: [MODELO] — [justificativa em 1 linha]
+Modelo recomendado (menor custo): [MODELO] ($/$$/$$$)
+Modelo ideal (melhor resultado): [MODELO] ($/$$/$$$)
+Justificativa: [1 linha]
 ```
 
-Critérios:
-- **SWE-1.5** — CRUD simples, refatorações pontuais, ajustes de docs, endpoints com padrão já estabelecido
-- **Claude Sonnet** — lógica de negócio moderada, integração de múltiplos arquivos, testes de integração, schemas com validações
-- **Claude Opus** — design de novos subsistemas, decisões de modelagem, análise de segurança/compliance, refatorações profundas
+### 📊 Tabela de Modelos Disponíveis
+
+**FREE (Custo Zero):**
+- SWE, Kimi K.2.5
+
+**$ (Baixo Custo):**
+- SWE Fast, GLM 4.7 Beta, GLM-5, GPT 5.1 Codex Medium, GPT OSS 120B Medium Thinking, Grok Code fast 1, Minimax M2.5, Gemini 3 Flash High, GPT 5.1 Codex Mini Low
+
+**$$ (Custo Médio):**
+- GPT 5.3 Codex Medium, Gemini 2.5 Pro, GPT 4.1, GPT 4o, GPT 5 High/Low/Medium Thinking, GPT 5.1 Codex/Mini/High/Low/Max High, GPT 5.2 High Thinking, GPT 5.2 Codex High
+
+**$$$ (Alto Custo):**
+- Claude Opus 4.6 Thinking, GPT 5.4 Low Thinking, Claude Sonnet 4.6 Thinking, Opus 4.5, Sonnet 4.5, Gemini 3 Pro High Thinking, Gemini 3.1 Pro High Thinking
+
+### 🎯 Recomendações por Tipo de Tarefa
+
+**1. Correções Simples / CRUD / Refatoração Pontual:**
+- Menor custo: SWE (Free) ou SWE Fast ($)
+- Modelo ideal: GPT 5.1 Codex Medium ($)
+- Justificativa: Tarefas mecânicas não precisam de reasoning profundo
+
+**2. Lógica de Negócio / Integração / Testes:**
+- Menor custo: GPT 5.1 Codex Medium ($) ou Gemini 3 Flash High ($)
+- Modelo ideal: Claude Sonnet 4.6 Thinking ($$$)
+- Justificativa: Precisa de raciocínio moderado e consistência
+
+**3. Arquitetura / Design / Decisões Críticas:**
+- Menor custo: GPT 5 Medium Thinking ($$) ou Gemini 2.5 Pro ($$)
+- Modelo ideal: Claude Opus 4.6 Thinking ($$$)
+- Justificativa: Requer raciocínio profundo e análise multidimensional
+
+**4. Análise de Código / Code Review / Segurança:**
+- Menor custo: GPT 5.1 Codex Low ($$)
+- Modelo ideal: Claude Sonnet 4.6 Thinking ($$$)
+- Justificativa: Precisa de atenção a detalhes e padrões
+
+**5. Debugging Complexo / Root Cause Analysis:**
+- Menor custo: GPT 5.2 High Thinking ($$)
+- Modelo ideal: Claude Opus 4.6 Thinking ($$$)
+- Justificativa: Requer raciocínio profundo e investigação
+
+**6. Documentação / Explicações / Tutoriais:**
+- Menor custo: SWE Fast ($) ou Kimi K.2.5 (Free)
+- Modelo ideal: GPT 4o ($$)
+- Justificativa: Comunicação clara, não precisa de reasoning profundo
+
+### 💡 Estratégia de Uso Otimizada
+
+**Regra de Ouro:** Sempre começar com o modelo de menor custo adequado, escalar apenas se necessário.
+
+**Fluxo Recomendado:**
+1. Tarefa simples? → SWE (Free) ou SWE Fast ($)
+2. Precisa de código? → GPT 5.1 Codex Medium ($)
+3. Precisa de raciocínio? → GPT 5 Medium Thinking ($$)
+4. Crítico/Complexo? → Claude Sonnet 4.6 ($$$)
+5. Arquitetura/Design? → Claude Opus 4.6 ($$$)
+
+**Referência completa:** docs/AI_MODELS_COST_GUIDE.md
 
 ---
 
