@@ -57,6 +57,88 @@ class ImportB3Service:
             'Venda': TipoTransacao.VENDA
         }
 
+    def processar_arquivo(self, file_path: str, usuario_id: str) -> Dict:
+        """
+        Método unificado que detecta o tipo de arquivo B3 e processa automaticamente.
+        
+        Args:
+            file_path: Caminho do arquivo CSV/Excel
+            usuario_id: ID do usuário que está importando
+            
+        Returns:
+            Dict com resultado consolidado da importação
+        """
+        self.usuario_id = usuario_id
+        
+        try:
+            # Detectar formato e ler arquivo
+            if file_path.endswith('.xlsx') or file_path.endswith('.xls'):
+                df = pd.read_excel(file_path)
+            else:
+                df = pd.read_csv(file_path, encoding='utf-8')
+            
+            colunas = list(df.columns)
+            logger.info(f"Colunas detectadas: {colunas}")
+            
+            # Detectar tipo de arquivo baseado nas colunas E conteúdo
+            if 'Movimentação' in colunas:
+                # Verificar se tem Compra/Venda (negociações) ou Dividendo/Rendimento (proventos)
+                tipos_movimentacao = df['Movimentação'].unique()
+                tem_negociacoes = any(t in ['Compra', 'Venda'] for t in tipos_movimentacao)
+                
+                if tem_negociacoes:
+                    # Arquivo de Negociações (mesmo com coluna "Movimentação")
+                    logger.info("Tipo detectado: Negociações (Transações) - formato movimentações")
+                    negociacoes = self._parse_negociacoes_formato_movimentacoes(file_path)
+                    resultado = self.importar_negociacoes(negociacoes, sobrescrever=True, dry_run=False)
+                    
+                    return {
+                        'transacoes_criadas': resultado['sucesso'],
+                        'proventos_criados': 0,
+                        'eventos_criados': 0,
+                        'erros': resultado.get('erros_lista', []),
+                        'avisos': resultado.get('duplicatas_lista', [])[:5],
+                        'processadas': resultado['sucesso'],
+                        'ignoradas': resultado.get('duplicatas_ignoradas', 0)
+                    }
+                else:
+                    # Arquivo de Movimentações (Proventos)
+                    logger.info("Tipo detectado: Movimentações (Proventos)")
+                    movimentacoes = self.parse_movimentacoes(file_path)
+                    resultado = self.importar_movimentacoes(movimentacoes, sobrescrever=True, dry_run=False)
+                
+                return {
+                    'transacoes_criadas': 0,
+                    'proventos_criados': resultado['proventos']['sucesso'],
+                    'eventos_criados': resultado['eventos_custodia']['sucesso'],
+                    'erros': resultado.get('erros_lista', []),
+                    'avisos': resultado.get('duplicatas_lista', [])[:5],  # Limitar avisos
+                    'processadas': resultado['sucesso'],
+                    'ignoradas': resultado.get('duplicatas_ignoradas', 0)
+                }
+                
+            elif 'Tipo de Movimentação' in colunas or 'Código de Negociação' in colunas:
+                # Arquivo de Negociações (Transações)
+                logger.info("Tipo detectado: Negociações (Transações)")
+                negociacoes = self.parse_negociacoes(file_path)
+                resultado = self.importar_negociacoes(negociacoes, sobrescrever=True, dry_run=False)
+                
+                return {
+                    'transacoes_criadas': resultado['sucesso'],
+                    'proventos_criados': 0,
+                    'eventos_criados': 0,
+                    'erros': resultado.get('erros_lista', []),
+                    'avisos': resultado.get('duplicatas_lista', [])[:5],
+                    'processadas': resultado['sucesso'],
+                    'ignoradas': resultado.get('duplicatas_ignoradas', 0)
+                }
+            else:
+                raise ValueError(f"Tipo de arquivo não reconhecido. Colunas encontradas: {colunas}")
+                
+        except Exception as e:
+            logger.error(f"Erro ao processar arquivo: {e}")
+            raise
+
     def parse_movimentacoes(self, file_path: str) -> List[Dict]:
         """
         Parse arquivo de movimentações (CSV ou Excel)
@@ -121,6 +203,55 @@ class ImportB3Service:
             
             logger.info(f"{len(movimentacoes)} movimentações válidas processadas")
             return movimentacoes
+            
+        except Exception as e:
+            logger.error(f"Erro ao ler arquivo {file_path}: {e}")
+            raise
+
+    def _parse_negociacoes_formato_movimentacoes(self, file_path: str) -> List[Dict]:
+        """
+        Parse negociações que vêm no formato de movimentações (arquivo misto)
+        Converte formato: Data, Movimentação, Produto → Data, Tipo de Movimentação, Código de Negociação
+        """
+        try:
+            if file_path.endswith('.xlsx') or file_path.endswith('.xls'):
+                df = pd.read_excel(file_path)
+            else:
+                df = pd.read_csv(file_path, encoding='utf-8')
+            
+            # Filtrar apenas Compra/Venda
+            df_negociacoes = df[df['Movimentação'].isin(['Compra', 'Venda'])].copy()
+            
+            negociacoes = []
+            for _, row in df_negociacoes.iterrows():
+                try:
+                    data = self._parse_data(row.get('Data'))
+                    if not data:
+                        continue
+                    
+                    negociacao = {
+                        'data': data,
+                        'tipo_movimentacao': str(row.get('Movimentação', '')).strip(),
+                        'mercado': 'BR',  # Padrão
+                        'prazo_vencimento': '',
+                        'instituicao': str(row.get('Instituição', '')).strip(),
+                        'codigo_negociacao': str(row.get('Produto', '')).strip(),
+                        'quantidade': self._parse_quantidade(row.get('Quantidade', 0)),
+                        'preco': self._parse_monetario(row.get('Preço unitário', 0)),
+                        'valor': self._parse_monetario(row.get('Valor da Operação', 0))
+                    }
+                    
+                    if not negociacao['tipo_movimentacao'] or not negociacao['codigo_negociacao']:
+                        continue
+                    
+                    negociacoes.append(negociacao)
+                    
+                except Exception as e:
+                    logger.warning(f"Erro ao processar linha {_}: {e}")
+                    continue
+            
+            logger.info(f"{len(negociacoes)} negociações válidas processadas (formato movimentações)")
+            return negociacoes
             
         except Exception as e:
             logger.error(f"Erro ao ler arquivo {file_path}: {e}")

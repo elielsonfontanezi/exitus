@@ -9,8 +9,8 @@ import os
 import tempfile
 from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.import_b3_service import ImportB3Service
-from app.utils.auth import token_required
 import logging
 
 logger = logging.getLogger(__name__)
@@ -25,8 +25,8 @@ def allowed_file(filename):
 
 
 @bp.route('/b3', methods=['POST'])
-@token_required
-def importar_b3(current_user):
+@jwt_required()
+def importar_b3():
     """
     Importa arquivo de movimentações do Portal B3
     
@@ -81,21 +81,11 @@ def importar_b3(current_user):
         
         # Processar importação
         service = ImportB3Service()
-        service.usuario_id = current_user.id
         service.arquivo_origem = filename
+        usuario_id = get_jwt_identity()
         
-        # Parse movimentações
-        movimentacoes = service.parse_movimentacoes(temp_path)
-        
-        if not movimentacoes:
-            os.remove(temp_path)
-            return jsonify({
-                'success': False,
-                'error': 'Nenhuma movimentação válida encontrada no arquivo'
-            }), 400
-        
-        # Processar movimentações
-        resultado = service.processar_movimentacoes(movimentacoes, current_user.id)
+        # Processar arquivo (detecta automaticamente o tipo)
+        resultado = service.processar_arquivo(temp_path, usuario_id)
         
         # Remover arquivo temporário
         os.remove(temp_path)
@@ -110,7 +100,6 @@ def importar_b3(current_user):
                 'erros': resultado.get('erros', []),
                 'avisos': resultado.get('avisos', []),
                 'resumo': {
-                    'total_linhas': len(movimentacoes),
                     'processadas': resultado.get('processadas', 0),
                     'ignoradas': resultado.get('ignoradas', 0)
                 }
