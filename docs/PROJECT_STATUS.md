@@ -15,7 +15,7 @@
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | ✅ 93.0% | 508/546 passando (+37 testes), 6 skipped (RLS), 68 errors (teardown) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
-| **Frontend API-Driven** | ✅ 30% | Sprint 1 Operações + Importação B3 ✅, 1/4 telas, 5/25 APIs integradas |
+| **Frontend API-Driven** | ✅ 35% | Sprint 1 ✅ + Sprint 2 Proventos ✅, 4 telas, 8 APIs integradas |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
@@ -48,7 +48,15 @@
   - ✅ Modo VENDA 100% funcional (30 posições)
   - ✅ Compra/Venda de ativos BR e internacionais
   - ✅ Importação B3 com detecção automática de tipo (05/04/2026)
-- **Próxima:** Histórico Transações, Painel de Planos
+- **Próxima:** Sprint 3 — Catálogo de Ativos (Jul/2026)
+
+### Sprint 2 — Proventos e Rendimentos (CONCLUÍDO ✅ — 09/06/2026)
+- ✅ `/proventos/recebidos` — Proventos pagos com stats e gráfico de barras
+- ✅ `/proventos/projetados` — Proventos previstos com gráfico de projeção
+- ✅ `/proventos/calendario` — Visão mensal agrupada com totais por mês
+- ✅ Blueprint `proventos.py` registrado em `__init__.py`
+- ✅ Integração via `GET /api/proventos` com `get_api_headers()`
+- ✅ Links Análises → Proventos no menu agora funcionais (eram 404)
 
 ### Sprint 1 — Operações Essenciais (CONCLUÍDO ✅)
 - ✅ **Tela Operações:** Toggle Compra/Venda unificado (29/03/2026)

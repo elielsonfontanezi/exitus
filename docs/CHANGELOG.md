@@ -8,6 +8,33 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Sprint 2 Frontend: Módulo Proventos (09/06/2026)
+
+**GAPs:** Frontend API-Driven — Sprint 2 Proventos e Rendimentos
+
+**Artefatos criados:**
+- `frontend/app/routes/proventos.py` — Blueprint com 3 rotas (`/proventos/recebidos`, `/proventos/projetados`, `/proventos/calendario`)
+- `frontend/app/templates/proventos/recebidos.html` — Histórico de proventos pagos com gráfico de barras
+- `frontend/app/templates/proventos/projetados.html` — Proventos previstos com gráfico de projeção
+- `frontend/app/templates/proventos/calendario.html` — Visão mensal agrupada por mês com gráfico de linha
+- `docs/FRONTEND_IMPLEMENTATION_PLAN.md` — Plano de 8 sprints completo (novo)
+
+**Artefatos modificados:**
+- `frontend/app/__init__.py` — Registro do blueprint proventos
+- `docs/ROADMAP.md` — Seção Frontend atualizada com tabela de 8 sprints
+- `docs/FRONTEND_INTEGRATION_PLAN.md` — v1.3, próximos passos atualizados
+
+**Funcionalidades:**
+- ✅ `/proventos/recebidos` — Lista proventos com status PAGO, 4 cards de stats, gráfico barras mensal
+- ✅ `/proventos/projetados` — Lista proventos previstos, gráfico projeção laranja
+- ✅ `/proventos/calendario` — Visão agrupada por mês, PAGO vs PREVISTO, gráfico linha total
+- ✅ Integração com API `GET /api/proventos` via `get_api_headers()` (L-AUTH-001 respeitada)
+- ✅ Normalização robusta do campo `tipo_provento` (formato `TipoProvento.DIVIDENDO` → `DIVIDENDO`)
+- ✅ Determinação automática de status PAGO/PREVISTO pela `data_pagamento`
+- ✅ Links no menu horizontal Análises → Proventos agora funcionais (eram 404)
+
+---
+
 ### Added — Importação B3 com Detecção Automática (05/04/2026)
 
 **GAPs:** Frontend API-Driven Integration - Importação B3
