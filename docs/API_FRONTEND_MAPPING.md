@@ -1,6 +1,6 @@
 # 🗺️ Mapeamento API ↔ Frontend — Exitus
 
-**Data:** 09/06/2026 | **Versão:** v1.3 — atualizado após Sprints 2-6
+**Data:** 09/06/2026 | **Versão:** v1.4 — atualizado após Sprints 2-7
 
 ---
 
@@ -16,8 +16,9 @@
 | Alertas | 10 | 1 | 10% | ✅ Sprint 4 |
 | Fiscal/IR | 20 | 4 | 20% | ✅ Sprint 5 |
 | Análises | 30 | 5 | 17% | ✅ Sprint 6 |
+| Relatórios | 10 | 6 | 60% | ✅ Sprint 7 |
 | Config | 10 | 0 | 0% | 📋 Sprint 8 |
-| **TOTAL** | **143** | **28** | **20%** | — |
+| **TOTAL** | **153** | **34** | **22%** | — |
 
 ---
 
@@ -86,9 +87,19 @@
 
 ---
 
-## 💼 P1 — Portfolio (Sprint 7)
+## 💼 P1 — Relatórios (✅ Sprint 7)
 
-- `GET /api/posicoes` → Posições ⏳
+- `GET /api/transacoes` → Extrato + Relatório Mensal ✅ (Sprint 7)
+- `GET /api/proventos` → Proventos Mensais ✅ (Sprint 7)
+- `GET /api/ir/apuracao` → Apuração IR Corrente ✅ (Sprint 7 / reusado Sprint 5)
+- `GET /api/ir/historico` → Histórico IR Anual ✅ (Sprint 7 / reusado Sprint 5)
+- `GET /api/ir/dirpf` → DIRPF Bens e Direitos ✅ (Sprint 7 / reusado Sprint 5)
+- `GET /api/posicoes` → Posições (Export CSV) ✅ (Sprint 7 / reusado Sprint 6)
+
+---
+
+## 💼 P1 — Portfolio (pendente)
+
 - `GET /api/portfolios` → Carteiras ⏳
 - `POST /api/portfolios` → Criar Carteira ⏳
 

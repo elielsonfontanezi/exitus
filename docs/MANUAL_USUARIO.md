@@ -508,6 +508,80 @@ GET /api/buy-signals/buy-score/PETR4
 
 ---
 
+### 10. Relatórios e Exportação
+
+**Sprint 7** — Implementado em 09/06/2026
+
+#### 10.1 Relatório Mensal
+**URL:** `/relatorios/mensal`
+
+**Descrição:** Resumo consolidado do mês com operações, proventos recebidos e resumo de IR.
+
+**Funcionalidades:**
+- Filtro por mês e ano
+- Tabela de operações (compra/venda) com preço, quantidade e total
+- Tabela de proventos recebidos
+- Cards de resumo: IR devido, proventos isentos, total de operações
+
+**Como usar:**
+1. Acesse "Relatórios > Relatório Mensal"
+2. Selecione mês e ano desejados
+3. Clique em "Filtrar"
+4. Use "⬇ Exportar CSV" para download
+
+#### 10.2 Relatório Anual
+**URL:** `/relatorios/anual`
+
+**Descrição:** Visão consolidada do ano com histórico de IR mensal e totais.
+
+**Funcionalidades:**
+- Filtro por ano-calendário
+- Histórico IR por mês (Day Trade, Swing, FII)
+- Total anual de IR com indicação de DARF obrigatório (≥ R$10)
+- Totais de operações e proventos do ano
+
+#### 10.3 Extrato Completo
+**URL:** `/relatorios/extrato`
+
+**Descrição:** Histórico completo de operações com filtros avançados.
+
+**Funcionalidades:**
+- Filtro por tipo (Compra, Venda, Dividendo, Bonificação)
+- Filtro por período (data início / data fim)
+- Resumo: total de operações, compras e vendas
+- Link direto para exportação CSV
+
+#### 10.4 IR Completo
+**URL:** `/relatorios/ir`
+
+**Descrição:** Visão consolidada de Imposto de Renda: apuração corrente, histórico mensal e DIRPF.
+
+**Funcionalidades:**
+- Apuração do mês atual (Day Trade, Swing, FII, Total)
+- Histórico mensal de IR para o ano selecionado
+- Bens e Direitos para preenchimento do DIRPF
+- Link direto para o módulo de IR (`/imposto-renda/mensal`)
+
+#### 10.5 Exportar CSV
+**URL:** `/relatorios/exportar/csv`
+
+**Descrição:** Export de dados brutos em formato CSV, gerado diretamente no navegador.
+
+**Tipos de export:**
+- **Transações** — data, tipo, ticker, quantidade, preço unitário, total (com filtros de data)
+- **Proventos** — data pagamento, ticker, tipo, valor/cota, total
+- **Posições** — ticker, nome, tipo, quantidade, preço médio, custo total
+
+**Como usar:**
+1. Acesse "Relatórios > Exportar Dados > [tipo] CSV"
+2. Selecione o tipo de dado clicando no cartão
+3. Para transações, aplique filtros de data opcionais
+4. Clique em "⬇ Baixar CSV"
+
+> O arquivo é gerado 100% no navegador — nenhum dado é enviado para servidor externo.
+
+---
+
 ### 7. Alertas — Monitoramento de Preços
 
 **URL:** `/dashboard/alerts`
