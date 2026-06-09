@@ -1,7 +1,8 @@
 # 🚀 Plano de Integração Frontend-Backend — Exitus
 
-**Data:** 05/04/2026 | **Versão:** v1.2 | **Status:** ✅ Sprint 1 Concluído  
-**Modelo IA:** Claude Sonnet 4.6 Thinking
+**Data:** 09/06/2026 | **Versão:** v1.3 | **Status:** ✅ Sprint 1 Concluído | 📋 Sprint 2 Planejado  
+**Modelo IA:** GPT 5.1 Codex Medium ($) para CRUD | Claude Sonnet 4.6 Thinking ($$$) para lógica complexa  
+**Plano detalhado:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md` ⭐
 
 ---
 
@@ -13,9 +14,11 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 ### Contexto
 - ✅ Backend: 48 GAPs, 156 endpoints, 93.0% testes
 - ✅ Dashboard: Implementado (R$ 257.677,50)
-- ✅ Frontend API-Driven: 5/25 APIs integradas (20%)
-- ✅ Sprint 1: Operações Essenciais 100% funcional
-- ⏳ Sprint 2: Histórico Transações, Planos, Alertas
+- ✅ Frontend API-Driven: 5 APIs integradas, Sprint 1 completo
+- ✅ Sprint 1: Operações Essenciais 100% funcional (05/04/2026)
+- 📋 Sprint 2: Proventos e Rendimentos (próximo — Jun/2026)
+- 📋 Sprints 3-8: Planeados — ver `FRONTEND_IMPLEMENTATION_PLAN.md`
+- ⚠️ Menu horizontal: ~50 links, ~35 ainda retornam 404
 
 ---
 
@@ -276,17 +279,23 @@ O dashboard atual (`/dashboard`) está **100% funcional** com dados reais (R$ 25
 4. ✅ Sprint 1: Tela Compra refatorada (Tailwind/API REST) - 28/03/2026
 5. ✅ Implementar tela de venda com estilo consistente - 02/04/2026
 6. ✅ Implementar Importação B3 (upload drag & drop) - 05/04/2026
-7. ⏳ Sprint 2: Histórico de Transações (tabela paginada)
-8. ⏳ Sprint 2: Painel de Planos (compra/venda disciplinada)
-9. ⏳ Sprint 2: Alertas pós-transação
+7. ⏳ Sprint 2: Proventos Recebidos (`/proventos/recebidos`)
+8. ⏳ Sprint 2: Proventos Projetados (`/proventos/projetados`)
+9. ⏳ Sprint 2: Calendário de Dividendos (`/proventos/calendario`)
+10. ⏳ Sprint 3: Catálogo de Ativos (Ações, FIIs, ETFs, Renda Fixa, Cripto)
+11. ⏳ Sprint 4: Planos de Compra e Venda Disciplinados
+12. ⏳ Sprint 5: Imposto de Renda / DARFs
+13. ⏳ Sprint 6: Rentabilidade e Análises
+14. ⏳ Sprint 7: Relatórios e Exportação
+
+**Ver plano completo:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md`
 
 ---
 
 ## 📚 Documentação de Referência
 
-- **`FRONTEND_INTEGRATION_PLAN.md`** (este documento) — Estratégia geral
+- **`FRONTEND_IMPLEMENTATION_PLAN.md`** ⭐ — Plano de sprints detalhado (NOVO 09/06/2026)
+- **`FRONTEND_INTEGRATION_PLAN.md`** (este documento) — Estratégia e padrões de integração
 - **`API_FRONTEND_MAPPING.md`** — Mapeamento API ↔ Tela
-- **`DASHBOARD_EVOLUTION.md`** — Evolução do dashboard
-- **`FRONTEND_WIREFRAMES.md`** — Wireframes completos
 - **`API_REFERENCE.md`** — Contratos das APIs
 - **`UX_DESIGN_SYSTEM.md`** — Componentes visuais

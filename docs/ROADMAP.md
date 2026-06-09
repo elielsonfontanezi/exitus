@@ -101,47 +101,43 @@ Maio 2026:
 
 ## 🎨 Frontend — Integração API-Driven (Em Progresso)
 
-**Status:** � Sprint 1 em Progresso | **Início:** 27/03/2026 | **Duração:** 8 semanas
+**Status:** ✅ Sprint 1 Concluído | **Revisão Estratégica:** 09/06/2026 | **Plano:** 8 Sprints  
+**Referência completa:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md`
 
-### Sprint 1: Operações Essenciais (P0)
-- ✅ **Tela Operações:** Toggle Compra/Venda unificado (UI dinâmica, busca ativos, posições usuário, validação venda, resumo 4 colunas) - 29/03/2026
-- ✅ **Sincronização Transações-Posições:** Corrigido bug onde compras não atualizavam posições; modo VENDA 100% funcional - 02/04/2026
-- ✅ **Renomeio Tela:** "compra" → "operacoes" (rota /operacoes/, legado /compra redireciona) - 02/04/2026
-- ⏳ **Importação B3:** Upload drag & drop
-- ⏳ **Histórico Transações:** Tabela paginada
-- ⏳ **Dashboard:** Carteiras e posições API-driven
+### Roadmap de Sprints (Revisado 09/06/2026)
 
-**Progresso:** 1/4 telas (25%) | **APIs Integradas:** 4/25 (transacoes, ativos, cotacoes, posicoes)
+| Sprint | Foco | Telas | APIs | Status | Prazo Est. |
+|--------|------|-------|------|--------|------------|
+| **1** | Operações Essenciais | 2 | 5 | ✅ Concluído (05/04/2026) | — |
+| **2** | Proventos e Rendimentos | 3 | 3 | 📋 Próximo | Jun/2026 |
+| **3** | Catálogo de Ativos | 6 | 2 | 📋 Planejado | Jul/2026 |
+| **4** | Planos Disciplinados | 7 | 9 | 📋 Planejado | Jul/2026 |
+| **5** | Imposto de Renda / DARF | 3 | 6 | 📋 Planejado | Ago/2026 |
+| **6** | Rentabilidade e Análises | 4 | 5 | 📋 Planejado | Ago/2026 |
+| **7** | Relatórios e Exportação | 5 | 4 | 📋 Planejado | Set/2026 |
+| **8** | Ferramentas (opcional) | 4 | 4 | 📋 Opcional | Set/2026 |
+
+**Meta:** ~34 telas integradas com APIs reais | ~38 APIs integradas de 156
 
 ### Objetivo
-Integrar sistematicamente as **156 APIs do backend** com o frontend, criando jornadas completas de usuário.
+Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 APIs do backend.
 
 ### Estratégia
-- **API-Driven Development:** Cada tela consome APIs existentes
-- **User-Centric:** Priorização por valor ao usuário
-- **Progressive:** Implementação incremental (8 sprints)
-
-### Roadmap de Sprints
-
-| Sprint | Foco | APIs | Telas | Status |
-|--------|------|------|-------|--------|
-| **1-2** | Operações | 25 | Compra, Venda, Import | 📋 |
-| **3-4** | Análises | 30 | Gráficos, Evolução | 📋 |
-| **5** | Rendimentos | 15 | Proventos, Calendário | 📋 |
-| **6** | Fiscal | 20 | IR, DARF | 📋 |
-| **7** | Portfolio | 20 | Carteiras, Posições | 📋 |
-| **8** | Config | 10 | Alertas, Preferências | 📋 |
+- **Uma tela por vez** — completo e testado antes de avançar
+- **API-Driven Development:** cada tela consome APIs existentes
+- **Reutilizar componentes** — `components/` já tem 44 arquivos prontos
+- **Menu honesto** — link só vai ao menu quando a tela existir
 
 ### Documentação
-- **FRONTEND_INTEGRATION_PLAN.md** — Estratégia completa
-- **API_FRONTEND_MAPPING.md** — Mapeamento API ↔ Tela
+- **FRONTEND_IMPLEMENTATION_PLAN.md** — Plano detalhado por sprint ⭐ NOVO
+- **FRONTEND_INTEGRATION_PLAN.md** — Estratégia de integração API
+- **API_REFERENCE.md** — Contratos das 156 APIs
 - **UX_DESIGN_SYSTEM.md** — Componentes visuais
 
 ### Progresso Atual
-- ✅ Dashboard: 8/8 APIs integradas (100%)
-- ⏳ Operações: 2/25 APIs integradas (8%)
-- ⏳ Análises: 1/30 APIs integradas (3%)
-- **Total:** 12/143 APIs integradas (8%)
+- ✅ Sprint 1: 2 telas, 5 APIs integradas
+- **Total APIs:** 5/156 (3%)
+- **Total Telas com rota real:** ~15 de ~50 prometidas no menu
 
 ---
 
@@ -308,6 +304,6 @@ Documentos históricos de roadmaps anteriores estão em `docs/archive/`:
 
 ---
 
-*Última atualização: 19/03/2026*  
-*Próxima revisão: Após conclusão Fase 7*  
+*Última atualização: 09/06/2026*  
+*Próxima revisão: Após conclusão Sprint 2 (Proventos)*  
 *Responsável: Elielson Fontanezi + Cascade AI*
