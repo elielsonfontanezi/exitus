@@ -1,6 +1,6 @@
 # 🗺️ Mapeamento API ↔ Frontend — Exitus
 
-**Data:** 09/06/2026 | **Versão:** v1.4 — atualizado após Sprints 2-7
+**Data:** 09/06/2026 | **Versão:** v1.5 — atualizado após Sprints 2-8 (TODOS CONCLUÍDOS)
 
 ---
 
@@ -17,8 +17,9 @@
 | Fiscal/IR | 20 | 4 | 20% | ✅ Sprint 5 |
 | Análises | 30 | 5 | 17% | ✅ Sprint 6 |
 | Relatórios | 10 | 6 | 60% | ✅ Sprint 7 |
-| Config | 10 | 0 | 0% | 📋 Sprint 8 |
-| **TOTAL** | **153** | **34** | **22%** | — |
+| Ferramentas | 8 | 3 | 38% | ✅ Sprint 8 |
+| Config | 10 | 0 | 0% | 📋 Futuro |
+| **TOTAL** | **161** | **37** | **23%** | — |
 
 ---
 
@@ -95,6 +96,14 @@
 - `GET /api/ir/historico` → Histórico IR Anual ✅ (Sprint 7 / reusado Sprint 5)
 - `GET /api/ir/dirpf` → DIRPF Bens e Direitos ✅ (Sprint 7 / reusado Sprint 5)
 - `GET /api/posicoes` → Posições (Export CSV) ✅ (Sprint 7 / reusado Sprint 6)
+
+---
+
+## 🛠️ P1 — Ferramentas (✅ Sprint 8)
+
+- `GET /api/ativos` → Screener (filtros DY/P/VP/P/L/tipo) ✅ (Sprint 8)
+- `GET /api/cotacoes/<ticker>` → Cotacao em Tempo Real (Comparador) ✅ (Sprint 8)
+- `GET /api/posicoes` → Posições (Calculadora IR) ✅ (Sprint 8 / reusado Sprint 6)
 
 ---
 

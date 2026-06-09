@@ -582,6 +582,60 @@ GET /api/buy-signals/buy-score/PETR4
 
 ---
 
+### 11. Ferramentas
+
+**Sprint 8** — Implementado em 09/06/2026
+
+#### 11.1 Screener de Ativos
+**URL:** `/ferramentas/screener`
+
+**Descrição:** Filtre ativos por fundamentos — Dividend Yield, P/VP, P/L e tipo.
+
+**Funcionalidades:**
+- Filtro por tipo: Ações, FIIs, ETFs, Internacionais, Renda Fixa
+- Filtro DY mínimo (%), P/VP máximo, P/L máximo
+- Coloração semântica: verde (atrativo), vermelho (caro), amarelo (atenção)
+- Link direto para o Comparador
+- Ordenado por Dividend Yield (maior primeiro)
+
+#### 11.2 Comparador de Ativos
+**URL:** `/ferramentas/comparador`
+
+**Descrição:** Compare até 3 ativos lado a lado com dados fundamentalistas e cotação em tempo real.
+
+**Indicadores comparados:** Preço Atual, Variação Dia, Dividend Yield, P/VP, P/L, ROE, Beta, Market Cap.
+
+**Como usar:**
+1. Selecione 1 a 3 ativos nos dropdowns
+2. Clique em "Comparar"
+3. O melhor valor em cada indicador é marcado com ★
+
+#### 11.3 Calculadora de IR
+**URL:** `/ferramentas/calculadora-ir`
+
+**Descrição:** Simule o ganho/perda e imposto de renda antes de vender, usando suas posições reais.
+
+**Funcionalidades:**
+- Preencher automaticamente a partir de uma posição real (dropdown)
+- Tipos: Swing Trade (15%), Day Trade (20%), FII (20%)
+- Isenção automática para Swing Trade com venda ≤ R$20.000
+- Calcula: custo, receita, lucro, rentabilidade, IR, lucro líquido
+
+#### 11.4 Simulador de Aportes
+**URL:** `/ferramentas/simulador`
+
+**Descrição:** Projete o crescimento do patrimônio com juros compostos e aportes mensais.
+
+**Funcionalidades:**
+- Capital inicial + aporte mensal configurável
+- Atalhos de rentabilidade: SELIC 10,5%, CDI 10,4%, IBOV 12%
+- Período de 1 a 40 anos (slider)
+- Correção pela inflação (valor real)
+- Tabela de marcos: 1, 2, 3, 5, 10, 15, 20, 25, 30, 40 anos
+- Renda passiva mensal estimada (regra dos 4% a.a.)
+
+---
+
 ### 7. Alertas — Monitoramento de Preços
 
 **URL:** `/dashboard/alerts`

@@ -2,8 +2,28 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 09/06/2026 — L-FE-007 adicionado (verificar nomes reais de endpoints antes de planejar)  
+> **Atualizado:** 09/06/2026 — L-FE-008 adicionado (ternário Jinja2 em atributo HTML)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
+
+---
+
+## 🖥️ Frontend Jinja2
+
+### L-FE-008 — Ternário Jinja2 dentro de atributo HTML causa `TemplateSyntaxError`
+**Origem:** Sprint 8 Comparador — select `selected` | **Data:** 09/06/2026
+
+**Padrão com erro:**
+```html
+<option {% if a.ticker == tickers[i] if tickers|length > i else '' %}selected{% endif %}>
+```
+
+**Correto — extrair para `{% set %}` antes:**
+```html
+{% set sel = tickers[i] if tickers|length > i else '' %}
+<option {% if a.ticker == sel %}selected{% endif %}>
+```
+
+**Regra:** Ternários Jinja2 (`X if COND else Y`) dentro de atributos HTML devem sempre ser extraídos para uma variável `{% set %}` antes.
 
 ---
 

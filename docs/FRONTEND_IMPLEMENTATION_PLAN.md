@@ -205,15 +205,36 @@ Export CSV é gerado 100% client-side via JavaScript `Blob` + `URL.createObjectU
 
 ---
 
-### 📋 Sprint 8 — Ferramentas (Opcional/Futuro)
-**Valor:** Médio-Baixo | **Esforço estimado:** 5–6 dias
+### ✅ Sprint 8 — Ferramentas (CONCLUÍDO 09/06/2026)
+**Valor:** Médio | **APIs reais verificadas antes da implementação**
 
-| Tela | Rota Frontend | APIs Backend | Observação |
-|------|--------------|-------------|-----------|
-| Comparador de Ativos | `/comparador` | GET /api/ativos (múltiplos) | Lógica frontend-heavy |
-| Calculadora IR | `/calculadora-ir` | GET /api/ir/* | Simulação local |
-| Simulador de Investimentos | `/simulador` | GET /api/projecoes/* | Pode ser sem API |
-| Screeners | `/screeners` | GET /api/ativos + filtros avançados | |
+| Tela | Rota Frontend | APIs Usadas | Status |
+|------|--------------|-------------|--------|
+| Screener de Ativos | `/ferramentas/screener` | GET /api/ativos (filtros DY, P/VP, P/L, tipo) | ✅ 200 OK |
+| Comparador de Ativos | `/ferramentas/comparador` | GET /api/ativos + GET /api/cotacoes/<ticker> | ✅ 200 OK |
+| Calculadora IR | `/ferramentas/calculadora-ir` | GET /api/posicoes | ✅ 200 OK |
+| Simulador de Aportes | `/ferramentas/simulador` | sem API (client-side JS) | ✅ 200 OK |
+
+**Artefatos criados:**
+- `frontend/app/routes/ferramentas.py` — Blueprint com 4 rotas
+- `frontend/app/templates/ferramentas/screener.html`
+- `frontend/app/templates/ferramentas/comparador.html`
+- `frontend/app/templates/ferramentas/calculadora_ir.html`
+- `frontend/app/templates/ferramentas/simulador.html`
+
+**Artefatos modificados:**
+- `frontend/app/__init__.py` — Blueprint registrado
+- `menu_horizontal.html` — 5 links mortos substituídos por 4 rotas reais
+
+**Nota:** `/api/projecoes/*`, `/api/portfolios/simulacao`, `/api/metas` — todos 404.
+Simulador usa juros compostos client-side puro. Calculadora IR usa posições reais + alíquotas vigentes.
+Corrigido: `TemplateSyntaxError` — ternário Jinja2 em atributo HTML extraído para `{% set %}`.
+
+**APIs integradas:** 3 endpoints (ativos, cotacoes, posicoes)
+
+---
+
+**🎉 FRONTEND API-DRIVEN: 8/8 SPRINTS CONCLUÍDOS (09/06/2026)**
 
 ---
 

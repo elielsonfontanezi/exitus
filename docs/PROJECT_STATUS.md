@@ -15,7 +15,7 @@
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | ✅ 93.0% | 508/546 passando (+37 testes), 6 skipped (RLS), 68 errors (teardown) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
-| **Frontend API-Driven** | ✅ 79% | Sprint 1–7 ✅, 29 telas, 24 APIs integradas |
+| **Frontend API-Driven** | ✅ 86% | Sprint 1–8 ✅, 33 telas, 27 APIs integradas |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
@@ -48,7 +48,14 @@
   - ✅ Modo VENDA 100% funcional (30 posições)
   - ✅ Compra/Venda de ativos BR e internacionais
   - ✅ Importação B3 com detecção automática de tipo (05/04/2026)
-- **Próxima:** Sprint 8 — Ferramentas (opcional, Set/2026)
+- **Status:** ✅ Todos os 8 Sprints concluídos (09/06/2026)
+
+### Sprint 8 — Ferramentas (CONCLUÍDO ✅ — 09/06/2026)
+- ✅ `/ferramentas/screener` — Screener: filtra ativos por DY, P/VP, P/L, tipo; coloração semântica
+- ✅ `/ferramentas/comparador` — Compara até 3 ativos lado a lado (fundamentos + cotação real)
+- ✅ `/ferramentas/calculadora-ir` — Simula ganho/perda e IR client-side com posições reais
+- ✅ `/ferramentas/simulador` — Simulador de aportes: juros compostos, inflação, tabela de marcos
+- ✅ Menu `/ferramentas/*` com 4 links reais (5 links mortos removidos)
 
 ### Sprint 7 — Relatórios e Exportação (CONCLUÍDO ✅ — 09/06/2026)
 - ✅ `/relatorios/mensal` — Relatório mensal: transações + proventos + resumo IR

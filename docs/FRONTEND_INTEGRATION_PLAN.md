@@ -1,6 +1,6 @@
 # 🚀 Plano de Integração Frontend-Backend — Exitus
 
-**Data:** 09/06/2026 | **Versão:** v1.7 | **Status:** ✅ Sprints 1–7 Concluídos | 🎯 Sprint 8 Próximo  
+**Data:** 09/06/2026 | **Versão:** v1.8 | **Status:** ✅ TODOS OS 8 SPRINTS CONCLUÍDOS  
 **Modelo IA:** GPT 5.1 Codex Medium ($) para CRUD | Claude Sonnet 4.6 Thinking ($$$) para lógica complexa  
 **Plano detalhado:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md` ⭐
 
@@ -22,8 +22,8 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 - ✅ Sprint 5: Imposto de Renda e DARF (09/06/2026)
 - ✅ Sprint 6: Rentabilidade e Análises (09/06/2026)
 - ✅ Sprint 7: Relatórios e Exportação (09/06/2026)
-- 🎯 Sprint 8: Ferramentas (opcional, Set/2026)
-- ⚠️ Menu horizontal: ~50 links, ~8 ainda retornam 404
+- ✅ Sprint 8: Ferramentas (09/06/2026)
+- ⚠️ Menu horizontal: ~50 links, ~4 ainda retornam 404 (perfil, configurações, admin restrito)
 
 ---
 

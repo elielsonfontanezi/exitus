@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Sprint 8 Frontend: Ferramentas (09/06/2026)
+
+**GAPs:** Frontend API-Driven — Sprint 8
+
+**Artefatos criados:**
+- `frontend/app/routes/ferramentas.py` — Blueprint Sprint 8 (4 rotas: screener, comparador, calculadora-ir, simulador)
+- `frontend/app/templates/ferramentas/screener.html` — Filtra ativos por DY, P/VP, P/L, tipo; coloração semântica por valor
+- `frontend/app/templates/ferramentas/comparador.html` — Comparação lado a lado de até 3 ativos (fundamentos + cotação real)
+- `frontend/app/templates/ferramentas/calculadora_ir.html` — Simula ganho/perda e IR client-side com posições reais; alíquotas Swing/DayTrade/FII; isenção ≤R$20k
+- `frontend/app/templates/ferramentas/simulador.html` — Simulador de aportes 100% client-side: juros compostos, inflação, tabela de marcos, renda passiva 4%
+
+**Artefatos modificados:**
+- `frontend/app/__init__.py` — Blueprint `ferramentas` registrado
+- `menu_horizontal.html` — 5 links mortos substituídos por 4 rotas reais `/ferramentas/*`
+
+**APIs integradas:** `GET /api/ativos`, `GET /api/posicoes`, `GET /api/cotacoes/<ticker>`
+
+**Corrigido:** `TemplateSyntaxError` — ternário Jinja2 em atributo HTML extraído para `{% set %}`
+
+---
+
 ### Added — Sprint 7 Frontend: Relatórios e Exportação (09/06/2026)
 
 **GAPs:** Frontend API-Driven — Sprint 7

@@ -101,7 +101,7 @@ Maio 2026:
 
 ## 🎨 Frontend — Integração API-Driven (Em Progresso)
 
-**Status:** ✅ Sprint 7 Concluído | **Última atualização:** 09/06/2026 | **Plano:** 8 Sprints  
+**Status:** ✅ TODOS OS 8 SPRINTS CONCLUÍDOS | **Última atualização:** 09/06/2026  
 **Referência completa:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md`
 
 ### Roadmap de Sprints (Revisado 09/06/2026)
@@ -115,7 +115,7 @@ Maio 2026:
 | **5** | Imposto de Renda / DARF | 4 | 4 | ✅ Concluído (09/06/2026) | — |
 | **6** | Rentabilidade e Análises | 5 | 5 | ✅ Concluído (09/06/2026) | — |
 | **7** | Relatórios e Exportação | 5 | 6 | ✅ Concluído (09/06/2026) | — |
-| **8** | Ferramentas (opcional) | 4 | 4 | 🎯 Próximo | Set/2026 |
+| **8** | Ferramentas | 4 | 3 | ✅ Concluído (09/06/2026) | — |
 
 **Meta:** ~34 telas integradas com APIs reais | ~38 APIs integradas de 156
 
@@ -144,8 +144,10 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 - ✅ Sprint 5: 4 telas, 4 APIs integradas (IR real: apuração, DARF, histórico, DIRPF)
 - ✅ Sprint 6: 5 telas, 5 APIs integradas (TWR/MWR, alocação, evolução, Sharpe, Buy Score)
 - ✅ Sprint 7: 5 telas, 6 APIs integradas (mensal, anual, extrato, IR, CSV export)
-- **Total APIs:** 24/156 (15.4%)
-- **Total Telas com rota real:** ~42 de ~50 prometidas no menu
+- ✅ Sprint 8: 4 telas, 3 APIs integradas (screener, comparador, calculadora IR, simulador)
+- **Total APIs:** 27/156 (17.3%)
+- **Total Telas com rota real:** ~46 de ~50 prometidas no menu
+- **Status Final:** Frontend API-Driven 8/8 Sprints ✅ (09/06/2026)
 
 ---
 
