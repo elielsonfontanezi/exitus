@@ -1,7 +1,7 @@
-# Manual do Usuário — Sistema Exitus v0.9.2
+# Manual do Usuário — Sistema Exitus v0.9.x
 
-> **Versão:** v0.9.2  
-> **Data:** 19/03/2026  
+> **Versão:** v0.9.x  
+> **Data:** 09/06/2026 (atualizado Sprint 4)  
 > **Objetivo:** Guia completo de navegação e uso do sistema  
 > **Público:** Investidores e assessoras de investimento
 
@@ -48,8 +48,8 @@
 **URL:** `http://localhost:8080/auth/login`
 
 **Para ambiente de desenvolvimento, use:**
-- **Usuário:** `admin`
-- **Senha:** `senha123`
+- **Usuário:** `e2e_user`
+- **Senha:** `e2e_senha_123`
 
 **Funcionalidades:**
 - Login com usuário/senha
@@ -295,63 +295,52 @@ Content-Type: application/json
 
 ---
 
-### 4. Ativos — Análise e Cotações
+### 4. Ativos — Catálogo de Ativos
 
-**URL:** `/dashboard/assets`
-
-**Descrição:** Visualize e analise todos os ativos disponíveis no sistema.
+**URLs:**
+- `/ativos/acoes` — Minhas Ações
+- `/ativos/fiis` — Meus FIIs
+- `/ativos/etfs` — ETFs
+- `/ativos/renda-fixa` — Renda Fixa
+- `/ativos/cripto` — Criptoativos
+- `/ativos/<ticker>` — Detalhe do Ativo
 
 **Funcionalidades:**
-- Lista de ativos com cotações atualizadas
-- Busca por ticker ou nome
-- Filtros por mercado, classe, setor
-- Análise fundamentalista detalhada
+- Lista de ativos com cotações atualizadas por categoria
+- Busca por ticker dentro de cada categoria
+- Stats: total, com preço, DY médio
+- Detalhe do ativo: fundamentos (P/L, P/VP, ROE, DY) e ações rápidas
 
 **Como usar:**
-1. Acesse "Ativos" no menu
-2. Use a busca para encontrar um ativo
-3. Clique no ativo para ver análise completa
-4. Visualize: cotação, indicadores, histórico
+1. Clique em "Ativos" no menu
+2. Escolha a categoria (Ações, FIIs, ETFs, etc.)
+3. Use a busca para filtrar por ticker
+4. Clique em qualquer linha para ver o detalhe completo
 
-**Dados disponíveis:**
-- Cotação atual e histórico
-- Indicadores fundamentalistas (P/L, P/VP, ROE, etc.)
-- Dividendos históricos
-- Eventos corporativos
-- Buy Score e análise de valuation
-
-**APIs:**
-```bash
-# Listar ativos
-GET /api/ativos?mercado=BR&classe=ACAO
-Authorization: Bearer <token>
-
-# Obter ativo específico
-GET /api/ativos/{id}
-
-# Cotação atual
-GET /api/cotacoes/ativo/{ticker}
-```
+**Sprint 3** — Implementado em 09/06/2026
 
 ---
 
 ### 5. Proventos — Dividendos e JCP
 
-**URL:** `/dashboard/dividends`
-
-**Descrição:** Acompanhe dividendos, JCP e eventos corporativos.
+**URLs:**
+- `/proventos/recebidos` — Proventos Recebidos
+- `/proventos/projetados` — Proventos Projetados
+- `/proventos/calendario` — Calendário de Dividendos
 
 **Funcionalidades:**
-- Histórico de proventos recebidos
-- Calendário de pagamentos futuros
-- Filtros por ativo, tipo, data
-- Projeção de renda passiva
+- Histórico de proventos recebidos (100+ reais)
+- Proventos projetados (PREVISTO)
+- Calendário agrupado por mês
+- Stats: total recebido, valor unitário médio, quantidade
 
 **Como usar:**
-1. Acesse "Proventos" no menu
-2. Visualize histórico de recebimentos
+1. Acesse "Análises" → "Proventos" no menu
+2. Escolha: Recebidos, Projetados ou Calendário
 3. Confira calendário de próximos pagamentos
 4. Filtre por ativo ou período
+
+**Sprint 2** — Implementado em 09/06/2026
 
 **Tipos de provento:**
 - Dividendos (isentos de IR)
@@ -371,9 +360,52 @@ GET /api/calendario-dividendos
 
 ---
 
-### 6. Imposto de Renda — Calculadora e DARFs
+### 6. Planos de Compra — Acumulação Disciplinada
 
-**URL:** `/dashboard/imposto-renda`
+**URLs:**
+- `/planos-compra/` — Dashboard de Planos
+- `/planos-compra/<id>` — Detalhe do Plano
+- `/planos-venda/` — Planos de Venda (em desenvolvimento)
+
+**Funcionalidades:**
+- Lista de planos de acumulação por ativo
+- Barra de progresso: qtd acumulada vs. meta
+- Progresso médio, ativos em andamento, concluídos
+- Detalhe: meta, aporte mensal, prazo, ativo alvo
+- Ações rápidas: registrar aporte, ver ativo
+
+**Como usar:**
+1. Acesse "Planos" no menu
+2. Visualize todos os planos de acumulação ativos
+3. Clique em "Detalhes" para ver progresso individual
+4. Use "Registrar Aporte" para avançar no plano
+
+**Sprint 4** — Implementado em 09/06/2026
+
+---
+
+### 7. Alertas — Monitoramento de Preços
+
+**URL:** `/alertas/`
+
+**Funcionalidades:**
+- Lista de todos os alertas configurados
+- Distribuição por tipo: Preço Alvo, Dividendo, Stop Loss
+- Status ativo/inativo e total de acionamentos
+- Condição: operador e valor de referência
+
+**Como usar:**
+1. Acesse "Alertas" no menu
+2. Visualize alertas ativos e seu status
+3. Identifique alertas já acionados
+
+**Sprint 4** — Implementado em 09/06/2026
+
+---
+
+### 8. Imposto de Renda — Calculadora e DARFs (Em Desenvolvimento)
+
+**URL:** `/imposto-renda/mensal` (em breve — Sprint 5)
 
 **Descrição:** Calcule IR devido, gere DARFs e acompanhe compensação de prejuízos.
 

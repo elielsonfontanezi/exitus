@@ -1,6 +1,6 @@
 # 🚀 Plano de Integração Frontend-Backend — Exitus
 
-**Data:** 09/06/2026 | **Versão:** v1.3 | **Status:** ✅ Sprint 1 Concluído | 📋 Sprint 2 Planejado  
+**Data:** 09/06/2026 | **Versão:** v1.4 | **Status:** ✅ Sprints 1–4 Concluídos | 🎯 Sprint 5 Próximo  
 **Modelo IA:** GPT 5.1 Codex Medium ($) para CRUD | Claude Sonnet 4.6 Thinking ($$$) para lógica complexa  
 **Plano detalhado:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md` ⭐
 
@@ -14,11 +14,13 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 ### Contexto
 - ✅ Backend: 48 GAPs, 156 endpoints, 93.0% testes
 - ✅ Dashboard: Implementado (R$ 257.677,50)
-- ✅ Frontend API-Driven: 5 APIs integradas, Sprint 1 completo
+- ✅ Frontend API-Driven: 9 APIs integradas, Sprints 1–4 completos
 - ✅ Sprint 1: Operações Essenciais 100% funcional (05/04/2026)
-- 📋 Sprint 2: Proventos e Rendimentos (próximo — Jun/2026)
-- 📋 Sprints 3-8: Planeados — ver `FRONTEND_IMPLEMENTATION_PLAN.md`
-- ⚠️ Menu horizontal: ~50 links, ~35 ainda retornam 404
+- ✅ Sprint 2: Proventos e Rendimentos (09/06/2026)
+- ✅ Sprint 3: Catálogo de Ativos (09/06/2026)
+- ✅ Sprint 4: Planos Disciplinados e Alertas (09/06/2026)
+- 🎯 Sprint 5: Imposto de Renda / DARF (próximo — Jul/2026)
+- ⚠️ Menu horizontal: ~50 links, ~22 ainda retornam 404
 
 ---
 
@@ -56,51 +58,60 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 | Ativos | 15 | Catálogo, Detalhes | 📊 P2 |
 | Config | 10 | Alertas, Preferências | 📉 P3 |
 
-### ✅ APIs Integradas (5/25)
+### ✅ APIs Integradas (9/156)
 
-**Operações (5 APIs):**
+**Sprint 1 — Operações (5 APIs):**
 - ✅ POST `/api/transacoes` - Criar transação
 - ✅ GET `/api/ativos?search=` - Buscar ativos
 - ✅ GET `/api/cotacoes/<ticker>` - Cotações em tempo real
 - ✅ GET `/api/posicoes` - Posições do usuário
-- ✅ POST `/api/import/b3` - Importação B3 (novo!)
+- ✅ POST `/api/import/b3` - Importação B3
+
+**Sprint 2 — Proventos (1 API):**
+- ✅ GET `/api/proventos` - Lista, projetação e calendário
+
+**Sprint 3 — Catálogo Ativos (1 API):**
+- ✅ GET `/api/ativos?tipo=X` - Filtro por categoria
+
+**Sprint 4 — Planos e Alertas (2 APIs):**
+- ✅ GET `/api/plano-compra/` - Planos de acumulação
+- ✅ GET `/api/alertas/` - Alertas de preço e dividendos
 
 ---
 
 ## 📅 Roadmap (8 semanas)
 
-### ✅ Sprint 1: Operações (P0) - CONCLUÍDO 05/04/2026
+### ✅ Sprint 1: Operações (CONCLUÍDO 05/04/2026)
 - ✅ Compra/Venda unificada com toggle
 - ✅ Importação B3 com detecção automática
-- APIs: POST /api/transacoes, POST /api/import/b3
-- Resultado: 5/25 APIs integradas (20%)
+- Resultado: 5 APIs integradas
 
-### 🎯 Sprint 2: Operações Complementares (Próximo)
-- Histórico de Transações (tabela paginada)
-- Painel de Planos (compra/venda disciplinada)
-- Alertas pós-transação
-- APIs: GET /api/transacoes, /api/plano-*/*, /api/alertas/recentes
-- Estimativa: 6-8 horas
+### ✅ Sprint 2: Proventos e Rendimentos (CONCLUÍDO 09/06/2026)
+- ✅ Recebidos, Projetados, Calendário
+- Resultado: 1 API integrada, 100 proventos reais
 
-### Sprint 3-4: Análises (P0)
-- Gráficos, Evolução, Setores
-- APIs: GET /api/analises/*, /api/portfolios/evolucao
-- Critério: Usuário vê insights
+### ✅ Sprint 3: Catálogo de Ativos (CONCLUÍDO 09/06/2026)
+- ✅ Ações, FIIs, ETFs, RF, Cripto, Detalhe
+- Resultado: 1 API integrada, 73 ativos reais
 
-### Sprint 5-6: Rendimentos + Fiscal (P1)
-- Proventos, IR, DARF
-- APIs: GET /api/proventos/*, /api/ir/*
-- Critério: Usuário gerencia proventos e IR
+### ✅ Sprint 4: Planos e Alertas (CONCLUÍDO 09/06/2026)
+- ✅ Planos Compra (lista/detalhe), Alertas, stub Planos Venda
+- Resultado: 2 APIs integradas, 12 planos + 15 alertas reais
 
-### Sprint 7: Portfolio (P1)
-- Carteiras, Posições
-- APIs: CRUD /api/portfolios, /api/posicoes
-- Critério: Usuário organiza carteiras
+### 🎯 Sprint 5: Imposto de Renda / DARF (PRÓXIMO)
+- Cálculo Mensal IR, DARFs Pendentes, Declaração Anual
+- APIs: GET /api/ir/*, /api/darfs-pendentes
 
-### Sprint 8: Config (P3)
-- Alertas, Preferências
-- APIs: CRUD /api/alertas, /api/usuarios/*
-- Critério: Usuário personaliza sistema
+### Sprint 6: Rentabilidade e Análises
+- Por Período, Por Ativo, Comparativo
+- APIs: GET /api/rentabilidade/*
+
+### Sprint 7: Relatórios e Exportação
+- Mensais, Anuais, Excel/PDF/CSV
+- APIs: GET /api/relatorios/*, /api/export/*
+
+### Sprint 8: Ferramentas (Opcional)
+- Comparador, Calculadora IR, Simulador, Screeners
 
 ---
 

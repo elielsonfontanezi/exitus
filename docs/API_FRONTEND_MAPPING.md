@@ -1,22 +1,23 @@
 # 🗺️ Mapeamento API ↔ Frontend — Exitus
 
-**Data:** 26/03/2026 | **Versão:** v1.0
+**Data:** 09/06/2026 | **Versão:** v1.1 — atualizado após Sprints 2-4
 
 ---
 
 ## 📊 Status Geral
 
-| Categoria | APIs | Integradas | % |
-|-----------|------|------------|---|
-| Dashboard | 8 | 8 | 100% |
-| Operações | 25 | 2 | 8% |
-| Análises | 30 | 1 | 3% |
-| Rendimentos | 15 | 0 | 0% |
-| Fiscal | 20 | 0 | 0% |
-| Portfolio | 20 | 1 | 5% |
-| Ativos | 15 | 0 | 0% |
-| Config | 10 | 0 | 0% |
-| **TOTAL** | **143** | **12** | **8%** |
+| Categoria | APIs | Integradas | % | Sprint |
+|-----------|------|------------|---|--------|
+| Dashboard | 8 | 8 | 100% | ✅ base |
+| Operações | 25 | 5 | 20% | ✅ Sprint 1 |
+| Proventos | 15 | 2 | 13% | ✅ Sprint 2 |
+| Ativos | 15 | 2 | 13% | ✅ Sprint 3 |
+| Planos | 10 | 1 | 10% | ✅ Sprint 4 |
+| Alertas | 10 | 1 | 10% | ✅ Sprint 4 |
+| Fiscal/IR | 20 | 0 | 0% | 🎯 Sprint 5 |
+| Análises | 30 | 0 | 0% | 📋 Sprint 6 |
+| Config | 10 | 0 | 0% | 📋 Sprint 8 |
+| **TOTAL** | **143** | **19** | **13%** | — |
 
 ---
 
@@ -34,8 +35,8 @@
 - `POST /api/import/b3/confirm` → Confirmar ⏳
 
 ### Ativos
-- `GET /api/ativos` → Catálogo ⏳
-- `GET /api/ativos/search` → Busca ⏳
+- `GET /api/ativos` → Catálogo ✅ (Sprint 3)
+- `GET /api/ativos?tipo=X` → Filtro por categoria ✅ (Sprint 3)
 
 ---
 
@@ -56,8 +57,8 @@
 
 ## 💰 P1 — Rendimentos (Sprint 5)
 
-- `GET /api/proventos` → Lista ⏳
-- `GET /api/proventos/calendario` → Calendário ⏳
+- `GET /api/proventos` → Lista ✅ (Sprint 2)
+- `GET /api/proventos/calendario` → Calendário ✅ (Sprint 2)
 - `GET /api/proventos/timeline` → Timeline ⏳
 
 ---
@@ -80,8 +81,10 @@
 
 ## ⚙️ P3 — Config (Sprint 8)
 
-- `GET /api/alertas` → Alertas ⏳
+- `GET /api/alertas` → Alertas ✅ (Sprint 4)
 - `POST /api/alertas` → Criar Alerta ⏳
+- `GET /api/plano-compra/` → Planos de Compra ✅ (Sprint 4)
+- `GET /api/plano-venda/` → Planos de Venda ⏳ (backend 404)
 - `GET /api/usuarios/me` → Perfil ⏳
 
 ---
