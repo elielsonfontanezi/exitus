@@ -222,18 +222,19 @@ e `IncidenciaImposto`.
 
 **Objetivo:** Implementar frontend SSR com Flask, Jinja2, HTMX e Alpine.js.
 
-**Status:** PRODUCTION READY — Data: 04 Dez 2025 | **Frontend API-Driven:** Sprint 4/8 concluídos (09/06/2026)
+**Status:** PRODUCTION READY — Data: 04 Dez 2025 | **Frontend API-Driven:** Sprint 5/8 concluídos (09/06/2026)
 
-- 35+ rotas frontend (Sprint 1–4 API-Driven concluídos)
-- 22+ templates Jinja2
+- 40+ rotas frontend (Sprint 1–5 API-Driven concluídos)
+- 26+ templates Jinja2
 - Integração com JWT mantido em sessão via `get_api_headers()`
-- **Blueprints ativos:** auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, planos_venda, alertas
+- **Blueprints ativos:** auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, planos_venda, alertas, fiscal
 
 **Sprints API-Driven concluídos:**
 - Sprint 1: Operações (compra/venda, importação B3)
 - Sprint 2: Proventos e Rendimentos (recebidos, projetados, calendário)
 - Sprint 3: Catálogo de Ativos (ações, FIIs, ETFs, RF, cripto, detalhe)
 - Sprint 4: Planos Disciplinados e Alertas (12 planos reais, 15 alertas reais)
+- Sprint 5: Imposto de Renda e DARF (apuração, DARFs, histórico 12 meses, DIRPF bens e direitos)
 
 ---
 
@@ -293,7 +294,7 @@ Tabela `historico_preco`, script `popular_historico_inicial.py` e integração c
 ### M8 — Analytics Avançados (registrado para avaliação futura)
 Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md v3.0 §9.
 
-> **Nota:** Frontend em integração API-Driven ativa (Sprint 4/8 concluídos). 28/50 telas prometidas no menu já funcionais.
+> **Nota:** Frontend em integração API-Driven ativa (Sprint 5/8 concluídos). 32/50 telas prometidas no menu já funcionais.
 
 ---
 
@@ -305,8 +306,8 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 | Tabelas | Database | 23 |
 | Índices | PostgreSQL | 86+ |
 | Blueprints | Flask backend | 17 |
-| Blueprints | Flask frontend | 10 |
-| Templates | Frontend | 22+ |
+| Blueprints | Flask frontend | 11 |
+| Templates | Frontend | 26+ |
 | Gráficos | Chart.js | 5 |
 | Providers | Cotações | 5 |
 | Cache Hit Rate | Cotações | 85-95% |

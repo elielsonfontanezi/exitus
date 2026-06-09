@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Histórico IR {{ ano_atual }} — Exitus{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">📅 Histórico de IR</h1>
+        <p class="text-green-200 mt-1">Apuração anual — {{ ano_atual }}</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="{{ url_for('fiscal.ir_mensal') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+          🧾 Apuração Mensal
+        </a>
+        <a href="{{ url_for('fiscal.declaracao') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+          📋 Declaração DIRPF
+        </a>
+        <a href="{{ url_for('dashboard.index') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+          ← Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {% if erro %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700">
+    ⚠️ Erro ao carregar histórico: {{ erro }}
+  </div>
+  {% endif %}
+
+  {% if dados and dados.meses %}
+
+  <!-- Stats anuais -->
+  {% set total_ir = dados.meses | sum(attribute='ir_total') %}
+  {% set total_ops = dados.meses | sum(attribute='operacoes') %}
+  {% set meses_com_ir = dados.meses | selectattr('ir_total', 'gt', 0) | list | length %}
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-calculator text-red-600"></i>
+      </div>
+      <div class="text-2xl font-bold text-red-600">R$ {{ '%.2f'|format(total_ir) | replace('.', ',') }}</div>
+      <div class="text-xs text-gray-500 mt-1">IR Total {{ ano_atual }}</div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-exchange-alt text-blue-600"></i>
+      </div>
+      <div class="text-2xl font-bold text-blue-600">{{ total_ops }}</div>
+      <div class="text-xs text-gray-500 mt-1">Total de Operações</div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-calendar-times text-orange-600"></i>
+      </div>
+      <div class="text-2xl font-bold text-orange-600">{{ meses_com_ir }}</div>
+      <div class="text-xs text-gray-500 mt-1">Meses com IR Devido</div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-calendar-check text-green-600"></i>
+      </div>
+      <div class="text-2xl font-bold text-green-600">{{ dados.meses | length }}</div>
+      <div class="text-xs text-gray-500 mt-1">Meses Apurados</div>
+    </div>
+  </div>
+
+  <!-- Timeline mensal -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-chart-bar text-green-500"></i> Apuração Mês a Mês — {{ ano_atual }}
+      </h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+          <tr>
+            <th class="text-left px-5 py-3">Mês</th>
+            <th class="text-right px-5 py-3">Operações</th>
+            <th class="text-right px-5 py-3">IR Devido</th>
+            <th class="text-left px-5 py-3">Alertas</th>
+            <th class="text-center px-5 py-3">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% set meses_pt = {
+            '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março',
+            '04': 'Abril', '05': 'Maio', '06': 'Junho',
+            '07': 'Julho', '08': 'Agosto', '09': 'Setembro',
+            '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'
+          } %}
+          {% for m in dados.meses %}
+          {% set num_mes = m.mes.split('-')[1] %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-5 py-4 font-medium text-gray-800">
+              {{ meses_pt.get(num_mes, m.mes) }} / {{ m.mes.split('-')[0] }}
+            </td>
+            <td class="px-5 py-4 text-right text-gray-600">{{ m.operacoes or 0 }}</td>
+            <td class="px-5 py-4 text-right font-bold {% if (m.ir_total or 0) > 0 %}text-red-600{% else %}text-gray-400{% endif %}">
+              R$ {{ '%.2f'|format(m.ir_total or 0) | replace('.', ',') }}
+            </td>
+            <td class="px-5 py-4 text-sm text-gray-500 max-w-xs truncate">
+              {% if m.alertas %}{{ m.alertas[0] }}{% else %}—{% endif %}
+            </td>
+            <td class="px-5 py-4 text-center">
+              {% if (m.ir_total or 0) > 0 %}
+              <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">IR Devido</span>
+              {% elif m.operacoes and m.operacoes > 0 %}
+              <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">Isento</span>
+              {% else %}
+              <span class="bg-gray-100 text-gray-400 text-xs px-2 py-1 rounded-full">Sem operações</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot class="border-t-2 border-gray-200 bg-gray-50">
+          <tr>
+            <td class="px-5 py-3 font-bold text-gray-700">Total {{ ano_atual }}</td>
+            <td class="px-5 py-3 text-right font-bold text-gray-700">{{ total_ops }}</td>
+            <td class="px-5 py-3 text-right font-bold text-red-600">R$ {{ '%.2f'|format(total_ir) | replace('.', ',') }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center text-gray-400">
+    <i class="fas fa-calendar text-5xl mb-4 text-gray-200"></i>
+    <p class="text-lg font-medium">Nenhum histórico disponível para {{ ano_atual }}</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

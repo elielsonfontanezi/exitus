@@ -120,26 +120,32 @@ Testado: 12 planos reais, 15 alertas reais, 0 erros de console
 
 ---
 
-### 🎯 Sprint 5 — Imposto de Renda e DARF (PRÓXIMO)
-**Valor:** Crítico (obrigação fiscal) | **Esforço estimado:** 3–4 dias
+### ✅ Sprint 5 — Imposto de Renda e DARF (CONCLUÍDO — 09/06/2026)
+**Valor:** Crítico (obrigação fiscal) | **Esforço real:** 1 sessão
 
-| Tela | Rota Frontend | APIs Backend |
-|------|--------------|-------------|
-| Cálculo Mensal IR | `/imposto-renda/mensal` | GET /api/ir/calculo-mensal |
-| DARFs Pendentes | `/imposto-renda/darfs` | GET /api/ir/darfs-pendentes |
-| Declaração Anual | `/imposto-renda/declaracao` | GET /api/ir/declaracao-anual |
+| Tela | Rota Frontend | APIs Backend | Status |
+|------|--------------|-------------|--------|
+| Apuração Mensal IR | `/imposto-renda/mensal` | GET /api/ir/apuracao | ✅ |
+| DARFs do Mês | `/imposto-renda/darfs` | GET /api/ir/darf | ✅ |
+| Histórico Anual | `/imposto-renda/historico` | GET /api/ir/historico | ✅ (extra) |
+| Declaração DIRPF | `/imposto-renda/declaracao` | GET /api/ir/dirpf | ✅ |
 
-**Artefatos a criar:**
-- `frontend/app/routes/fiscal.py` — 3 rotas
-- `frontend/app/templates/fiscal/ir_mensal.html`
-- `frontend/app/templates/fiscal/darfs.html`
-- `frontend/app/templates/fiscal/declaracao.html`
+**Artefatos criados:**
+- `frontend/app/routes/fiscal.py` — 4 rotas
+- `frontend/app/templates/fiscal/ir_mensal.html` — categorias + proventos + alertas
+- `frontend/app/templates/fiscal/darfs.html` — DARFs geradas + total IR
+- `frontend/app/templates/fiscal/historico.html` — 12 meses anuais (extra)
+- `frontend/app/templates/fiscal/declaracao.html` — bens e direitos DIRPF
 
-**APIs a integrar:** ~6 endpoints (IR + DARF)
+**Nota:** APIs reais no backend: `/api/ir/apuracao`, `/api/ir/darf`, `/api/ir/historico`, `/api/ir/dirpf`.
+As rotas planejadas (`/ir/calculo-mensal`, `/ir/darfs-pendentes`) retornavam 404; usados os endpoints reais.
+Testado: Custo total carteira R$ 642.084,51 real, apuração com 4 categorias + proventos, 0 erros console.
+
+**APIs integradas:** 4 endpoints (`GET /api/ir/apuracao`, `/api/ir/darf`, `/api/ir/historico`, `/api/ir/dirpf`)
 
 ---
 
-### 📋 Sprint 6 — Rentabilidade e Análises
+### 🎯 Sprint 6 — Rentabilidade e Análises (PRÓXIMO)
 **Valor:** Alto (tomada de decisão) | **Esforço estimado:** 3–4 dias
 
 | Tela | Rota Frontend | APIs Backend |

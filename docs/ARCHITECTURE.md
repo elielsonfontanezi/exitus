@@ -162,10 +162,10 @@ User: non-root (exitus:1000)
 ```
 
 **Características**:
-- 35+ rotas principais (Sprint 1–4 concluídos)
-- 22+ templates Jinja2
+- 40+ rotas principais (Sprint 1–5 concluídos)
+- 26+ templates Jinja2
 - Session management (JWT)
-- Blueprints: auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, planos_venda, alertas
+- Blueprints: auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, planos_venda, alertas, fiscal
 - Fallback para mock data
 - HTMX para updates parciais (sem reload)
 
@@ -1188,9 +1188,9 @@ Para multi-instância futura, substituir pelo Redis (CIRCUITBREAKER-002 potencia
 
 ### Nota sobre Frontend (atualizado 09/06/2026)
 
-O frontend (Flask + Jinja2 + Tailwind + Alpine.js + Chart.js, container `exitus-frontend:8080`) está em **integração API-Driven ativa**. Sprint 4/8 concluídos: Operações, Proventos, Catálogo de Ativos, Planos e Alertas. 28/50 telas prometidas no menu já funcionais com dados reais. Ver `FRONTEND_IMPLEMENTATION_PLAN.md` e `ROADMAP.md`.
+O frontend (Flask + Jinja2 + Tailwind + Alpine.js + Chart.js, container `exitus-frontend:8080`) está em **integração API-Driven ativa**. Sprint 5/8 concluídos: Operações, Proventos, Catálogo de Ativos, Planos, Alertas e IR/DARF. 32/50 telas prometidas no menu já funcionais com dados reais. Ver `FRONTEND_IMPLEMENTATION_PLAN.md` e `ROADMAP.md`.
 
 ---
 
 **Documento atualizado**: 09/06/2026  
-**Versão arquitetural**: v0.8.0-dev (48 GAPs implementados, 508 testes passed, Frontend Sprint 4/8 — ver ROADMAP.md)
+**Versão arquitetural**: v0.8.0-dev (48 GAPs implementados, 508 testes passed, Frontend Sprint 5/8 — ver ROADMAP.md)

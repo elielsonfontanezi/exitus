@@ -1,6 +1,6 @@
 # 🚀 Plano de Integração Frontend-Backend — Exitus
 
-**Data:** 09/06/2026 | **Versão:** v1.4 | **Status:** ✅ Sprints 1–4 Concluídos | 🎯 Sprint 5 Próximo  
+**Data:** 09/06/2026 | **Versão:** v1.5 | **Status:** ✅ Sprints 1–5 Concluídos | 🎯 Sprint 6 Próximo  
 **Modelo IA:** GPT 5.1 Codex Medium ($) para CRUD | Claude Sonnet 4.6 Thinking ($$$) para lógica complexa  
 **Plano detalhado:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md` ⭐
 
@@ -19,8 +19,9 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 - ✅ Sprint 2: Proventos e Rendimentos (09/06/2026)
 - ✅ Sprint 3: Catálogo de Ativos (09/06/2026)
 - ✅ Sprint 4: Planos Disciplinados e Alertas (09/06/2026)
-- 🎯 Sprint 5: Imposto de Renda / DARF (próximo — Jul/2026)
-- ⚠️ Menu horizontal: ~50 links, ~22 ainda retornam 404
+- ✅ Sprint 5: Imposto de Renda e DARF (09/06/2026)
+- 🎯 Sprint 6: Rentabilidade e Análises (próximo — Jul/2026)
+- ⚠️ Menu horizontal: ~50 links, ~18 ainda retornam 404
 
 ---
 
@@ -58,7 +59,7 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 | Ativos | 15 | Catálogo, Detalhes | 📊 P2 |
 | Config | 10 | Alertas, Preferências | 📉 P3 |
 
-### ✅ APIs Integradas (9/156)
+### ✅ APIs Integradas (13/156)
 
 **Sprint 1 — Operações (5 APIs):**
 - ✅ POST `/api/transacoes` - Criar transação
@@ -76,6 +77,12 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 **Sprint 4 — Planos e Alertas (2 APIs):**
 - ✅ GET `/api/plano-compra/` - Planos de acumulação
 - ✅ GET `/api/alertas/` - Alertas de preço e dividendos
+
+**Sprint 5 — IR e DARF (4 APIs):**
+- ✅ GET `/api/ir/apuracao` - Apuração mensal por categoria
+- ✅ GET `/api/ir/darf` - DARFs geradas no mês
+- ✅ GET `/api/ir/historico` - Histórico anual 12 meses
+- ✅ GET `/api/ir/dirpf` - Bens e direitos DIRPF
 
 ---
 
@@ -98,11 +105,11 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 - ✅ Planos Compra (lista/detalhe), Alertas, stub Planos Venda
 - Resultado: 2 APIs integradas, 12 planos + 15 alertas reais
 
-### 🎯 Sprint 5: Imposto de Renda / DARF (PRÓXIMO)
-- Cálculo Mensal IR, DARFs Pendentes, Declaração Anual
-- APIs: GET /api/ir/*, /api/darfs-pendentes
+### ✅ Sprint 5: Imposto de Renda e DARF (CONCLUÍDO 09/06/2026)
+- ✅ Apuração Mensal, DARFs, Histórico Anual, Declaração DIRPF
+- Resultado: 4 APIs integradas, custo total carteira R$ 642k real
 
-### Sprint 6: Rentabilidade e Análises
+### 🎯 Sprint 6: Rentabilidade e Análises (PRÓXIMO)
 - Por Período, Por Ativo, Comparativo
 - APIs: GET /api/rentabilidade/*
 

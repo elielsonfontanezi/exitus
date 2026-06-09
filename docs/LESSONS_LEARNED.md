@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 09/06/2026 — L-FE-006 adicionado (stub para APIs ausentes no backend)  
+> **Atualizado:** 09/06/2026 — L-FE-007 adicionado (verificar nomes reais de endpoints antes de planejar)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -157,6 +157,30 @@ toggleModo(modo) {
 ```
 
 **Regra:** Sempre que precisar de Compra/Venda do mesmo ativo, usar toggle em vez de telas separadas.
+
+---
+
+### L-FE-007 — Verificar nomes reais dos endpoints antes de planejar o sprint
+**Origem:** Sprint 5 — `/api/ir/calculo-mensal` e `/api/ir/darfs-pendentes` planejados retornaram 404 | **Data:** 09/06/2026
+
+Ao planejar um sprint, o `FRONTEND_IMPLEMENTATION_PLAN.md` pode ter nomes de endpoints desatualizados ou hipotéticos. **Sempre verificar** os endpoints reais do backend antes de implementar:
+
+```bash
+# ✅ CORRETO — validar endpoints reais ANTES de escrever o blueprint
+TOKEN=$(curl -s -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"e2e_user","password":"e2e_senha_123"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['access_token'])")
+
+# Checar status real
+for ep in "ir/calculo-mensal" "ir/apuracao" "ir/darf" "ir/historico" "ir/dirpf"; do
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $TOKEN" \
+    "http://localhost:5000/api/$ep")
+  echo "$STATUS  /api/$ep"
+done
+```
+
+**Regra:** Sprint 5 mostrou que `/api/ir/apuracao`, `/api/ir/darf`, `/api/ir/historico` e `/api/ir/dirpf` eram os endpoints reais — os nomes planejados (`calculo-mensal`, `darfs-pendentes`) não existiam. Validar antes evita retrabalho.
 
 ---
 

@@ -1,6 +1,6 @@
 # 🗺️ Mapeamento API ↔ Frontend — Exitus
 
-**Data:** 09/06/2026 | **Versão:** v1.1 — atualizado após Sprints 2-4
+**Data:** 09/06/2026 | **Versão:** v1.2 — atualizado após Sprints 2-5
 
 ---
 
@@ -14,10 +14,10 @@
 | Ativos | 15 | 2 | 13% | ✅ Sprint 3 |
 | Planos | 10 | 1 | 10% | ✅ Sprint 4 |
 | Alertas | 10 | 1 | 10% | ✅ Sprint 4 |
-| Fiscal/IR | 20 | 0 | 0% | 🎯 Sprint 5 |
-| Análises | 30 | 0 | 0% | 📋 Sprint 6 |
+| Fiscal/IR | 20 | 4 | 20% | ✅ Sprint 5 |
+| Análises | 30 | 0 | 0% | 🎯 Sprint 6 |
 | Config | 10 | 0 | 0% | 📋 Sprint 8 |
-| **TOTAL** | **143** | **19** | **13%** | — |
+| **TOTAL** | **143** | **23** | **16%** | — |
 
 ---
 
@@ -55,7 +55,7 @@
 
 ---
 
-## 💰 P1 — Rendimentos (Sprint 5)
+## 💰 P1 — Rendimentos (Sprint 2)
 
 - `GET /api/proventos` → Lista ✅ (Sprint 2)
 - `GET /api/proventos/calendario` → Calendário ✅ (Sprint 2)
@@ -63,10 +63,13 @@
 
 ---
 
-## 📋 P1 — Fiscal (Sprint 6)
+## 📋 P1 — Fiscal (✅ Sprint 5)
 
+- `GET /api/ir/apuracao` → Apuração Mensal ✅ (Sprint 5)
+- `GET /api/ir/darf` → DARFs do Mês ✅ (Sprint 5)
+- `GET /api/ir/historico` → Histórico Anual ✅ (Sprint 5)
+- `GET /api/ir/dirpf` → DIRPF / Bens e Direitos ✅ (Sprint 5)
 - `POST /api/ir/calcular` → Calculadora ⏳
-- `GET /api/ir/darf` → DARF ⏳
 - `GET /api/ir/consolidado` → Consolidado ⏳
 
 ---

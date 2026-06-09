@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Declaração DIRPF {{ ano_atual }} — Exitus{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">📋 Declaração DIRPF</h1>
+        <p class="text-blue-200 mt-1">Relatório para Declaração de Imposto de Renda — {{ ano_atual }}</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="{{ url_for('fiscal.ir_mensal') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+          🧾 Apuração Mensal
+        </a>
+        <a href="{{ url_for('fiscal.historico') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+          📅 Histórico
+        </a>
+        <a href="{{ url_for('dashboard.index') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+          ← Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {% if erro %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700">
+    ⚠️ Erro ao carregar DIRPF: {{ erro }}
+  </div>
+  {% endif %}
+
+  {% if dados %}
+
+  <!-- Stats gerais -->
+  {% set bens = dados.bens_e_direitos %}
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-landmark text-blue-600"></i>
+      </div>
+      <div class="text-2xl font-bold text-blue-600">
+        R$ {{ '%.0f'|format(bens.custo_total_carteira or 0) | replace('.', ',') if bens else '—' }}
+      </div>
+      <div class="text-xs text-gray-500 mt-1">Custo Total da Carteira</div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-briefcase text-green-600"></i>
+      </div>
+      <div class="text-2xl font-bold text-green-600">
+        {{ bens.posicoes | length if bens and bens.posicoes else 0 }}
+      </div>
+      <div class="text-xs text-gray-500 mt-1">Ativos na Carteira</div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-calendar-alt text-purple-600"></i>
+      </div>
+      <div class="text-2xl font-bold text-purple-600">{{ bens.data_referencia if bens and bens.data_referencia else '—' }}</div>
+      <div class="text-xs text-gray-500 mt-1">Data de Referência</div>
+    </div>
+  </div>
+
+  <!-- Bens e Direitos (Grupo 3 — Renda Variável) -->
+  {% if bens and bens.posicoes %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-file-alt text-blue-500"></i>
+        Grupo 3 — Participações Societárias / Renda Variável
+      </h2>
+      <p class="text-sm text-gray-500 mt-1">Informar na ficha "Bens e Direitos" da DIRPF {{ ano_atual }}</p>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+          <tr>
+            <th class="text-left px-5 py-3">Ticker</th>
+            <th class="text-left px-5 py-3">Nome</th>
+            <th class="text-center px-5 py-3">Tipo</th>
+            <th class="text-center px-5 py-3">Mercado</th>
+            <th class="text-right px-5 py-3">Quantidade</th>
+            <th class="text-right px-5 py-3">Preço Médio</th>
+            <th class="text-right px-5 py-3">Custo Total</th>
+            <th class="text-right px-5 py-3">1ª Compra</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for pos in bens.posicoes %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-5 py-4">
+              <span class="bg-blue-50 text-blue-700 font-mono text-sm px-2 py-1 rounded">{{ pos.ticker }}</span>
+            </td>
+            <td class="px-5 py-4 text-gray-800 text-sm">{{ pos.nome or '—' }}</td>
+            <td class="px-5 py-4 text-center">
+              <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full capitalize">{{ pos.tipo or '—' }}</span>
+            </td>
+            <td class="px-5 py-4 text-center">
+              {% if pos.mercado == 'BR' %}
+              <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">🇧🇷 BR</span>
+              {% elif pos.mercado == 'US' %}
+              <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">🇺🇸 US</span>
+              {% else %}
+              <span class="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full">🌍 {{ pos.mercado }}</span>
+              {% endif %}
+            </td>
+            <td class="px-5 py-4 text-right text-gray-700">{{ '%.4f'|format(pos.quantidade or 0) | replace('.', ',') }}</td>
+            <td class="px-5 py-4 text-right text-gray-700">R$ {{ '%.4f'|format(pos.preco_medio or 0) | replace('.', ',') }}</td>
+            <td class="px-5 py-4 text-right font-bold text-gray-800">R$ {{ '%.2f'|format(pos.custo_total or 0) | replace('.', ',') }}</td>
+            <td class="px-5 py-4 text-right text-gray-500 text-sm">{{ pos.data_primeira_compra or '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot class="border-t-2 border-gray-200 bg-gray-50">
+          <tr>
+            <td colspan="6" class="px-5 py-3 font-bold text-gray-700">Custo Total da Carteira</td>
+            <td class="px-5 py-3 text-right font-bold text-blue-700 text-lg">
+              R$ {{ '%.2f'|format(bens.custo_total_carteira or 0) | replace('.', ',') }}
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Rendimentos -->
+  {% if dados.rendimentos %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-coins text-yellow-500"></i>
+        Rendimentos — Proventos Recebidos
+      </h2>
+    </div>
+    <div class="p-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+      {% for key, val in dados.rendimentos.items() %}
+      <div class="bg-gray-50 rounded-xl p-4">
+        <div class="text-xs text-gray-500 uppercase mb-1">{{ key | replace('_', ' ') }}</div>
+        <div class="font-bold text-gray-800">R$ {{ '%.2f'|format(val or 0) | replace('.', ',') }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Observações DIRPF -->
+  <div class="bg-blue-50 border border-blue-100 rounded-xl p-5">
+    <h3 class="font-bold text-blue-800 mb-3 flex items-center gap-2">
+      <i class="fas fa-info-circle"></i> Instruções para DIRPF {{ ano_atual }}
+    </h3>
+    <ul class="text-sm text-blue-700 space-y-2">
+      <li>• <strong>Bens e Direitos:</strong> Informar custo de aquisição de cada ativo (não valor de mercado)</li>
+      <li>• <strong>Renda Variável:</strong> Preencher o demonstrativo mês a mês com apuração separada por categoria</li>
+      <li>• <strong>Isenções:</strong> Vendas de ações abaixo de R$20.000/mês são isentas (Swing Trade)</li>
+      <li>• <strong>FIIs:</strong> 20% sobre ganho de capital nas vendas. Rendimentos mensais isentos.</li>
+      <li>• <strong>Exterior:</strong> 15% sobre ganho de capital. Converter para BRL pela PTAX do dia</li>
+      <li>• <strong>Prazo declaração:</strong> Até 30 de abril do ano seguinte ao exercício</li>
+    </ul>
+  </div>
+
+  {% else %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center text-gray-400">
+    <i class="fas fa-file-alt text-5xl mb-4 text-gray-200"></i>
+    <p class="text-lg font-medium">Nenhum dado DIRPF disponível para {{ ano_atual }}</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

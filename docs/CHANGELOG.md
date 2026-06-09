@@ -8,6 +8,31 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Sprint 5 Frontend: Imposto de Renda e DARF (09/06/2026)
+
+**GAPs:** Frontend API-Driven — Sprint 5
+
+**Artefatos criados:**
+- `frontend/app/routes/fiscal.py` — blueprint com 4 rotas
+- `frontend/app/templates/fiscal/ir_mensal.html` — Apuração Mensal IR (categorias, proventos, alertas)
+- `frontend/app/templates/fiscal/darfs.html` — DARFs do Mês
+- `frontend/app/templates/fiscal/historico.html` — Histórico Anual (12 meses)
+- `frontend/app/templates/fiscal/declaracao.html` — Declaração DIRPF (bens e direitos)
+
+**Artefatos modificados:**
+- `frontend/app/__init__.py` — registro blueprint `fiscal`
+- `frontend/app/templates/components/menu_horizontal.html` — links IR com ícones + Histórico Anual
+
+**APIs integradas:** 4 endpoints IR reais
+- `GET /api/ir/apuracao` → Apuração por categoria (Day Trade, Swing, FII, Exterior, RF, Proventos)
+- `GET /api/ir/darf` → DARFs geradas no mês
+- `GET /api/ir/historico` → 12 meses anuais
+- `GET /api/ir/dirpf` → Bens e direitos, custo total R$ 642k real
+
+**Resultado:** 4 novas telas funcionais com dados reais, 0 erros no browser
+
+---
+
 ### Added — Sprint 4 Frontend: Planos Disciplinados e Alertas (09/06/2026)
 
 **GAPs:** Frontend API-Driven — Sprint 4

@@ -403,25 +403,27 @@ GET /api/calendario-dividendos
 
 ---
 
-### 8. Imposto de Renda — Calculadora e DARFs (Em Desenvolvimento)
+### 8. Imposto de Renda — IR e DARF
 
-**URL:** `/imposto-renda/mensal` (em breve — Sprint 5)
-
-**Descrição:** Calcule IR devido, gere DARFs e acompanhe compensação de prejuízos.
+**URLs:**
+- `/imposto-renda/mensal` — Apuração Mensal IR
+- `/imposto-renda/darfs` — DARFs do Mês
+- `/imposto-renda/historico` — Histórico Anual
+- `/imposto-renda/declaracao` — Declaração DIRPF
 
 **Funcionalidades:**
-- Calculadora de IR por mês
-- Geração de DARFs automática
-- Compensação de prejuízos
-- Relatório anual para declaração
-- Acúmulo de DARF < R$ 10,00
+- Apuração mensal por categoria: Day Trade (20%), Swing Trade (15%), FIIs (20%), Exterior (15%), Renda Fixa
+- Proventos: Dividendos BR/EUA, JCP, Aluguel de Ações com IR retido na fonte
+- DARFs geradas no mês com total de IR devido
+- Histórico de 12 meses com operações e alertas
+- DIRPF: bens e direitos por ativo (custo de aquisição real para declaração)
 
 **Como usar:**
-1. Acesse "Imposto de Renda"
-2. Selecione mês/ano para cálculo
-3. Visualize IR devido por categoria
-4. Gere DARF se valor >= R$ 10,00
-5. Acompanhe saldo de prejuízos
+1. Acesse "Análises" → "Imposto de Renda" no menu
+2. Veja a apuração do mês atual com todas as categorias
+3. Verifique DARFs pendentes para pagamento
+4. Consulte o histórico anual para acompanhar evolução
+5. Use a Declaração DIRPF para dados de bens e direitos
 
 **Regras de Negócio:**
 - Day Trade: 20% sobre lucro
@@ -433,13 +435,13 @@ GET /api/calendario-dividendos
 
 **APIs:**
 ```bash
-# Calcular IR do mês
-GET /api/ir/calcular?ano=2026&mes=3
+# Apuração do mês
+GET /api/ir/apuracao?ano=2026&mes=2026-06
 Authorization: Bearer <token>
 
-# Gerar DARF
-POST /api/ir/gerar-darf
-Content-Type: application/json
+# DARFs do mês
+GET /api/ir/darf?ano=2026&mes=2026-06
+Authorization: Bearer <token>
 
 {
   "ano": 2026,
@@ -450,6 +452,8 @@ Content-Type: application/json
 # Consultar saldo de prejuízos
 GET /api/ir/saldo-prejuizo
 ```
+
+**Sprint 5** — Implementado em 09/06/2026
 
 ---
 
