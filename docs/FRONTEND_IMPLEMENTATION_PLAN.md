@@ -175,20 +175,33 @@ Testado: TWR 81.14%, R$795k patrimônio, evolução 30 meses, 0 erros console.
 
 ---
 
-### 📋 Sprint 7 — Relatórios e Exportação
-**Valor:** Médio | **Esforço estimado:** 2–3 dias
+### ✅ Sprint 7 — Relatórios e Exportação (CONCLUÍDO 09/06/2026)
+**Valor:** Médio | **APIs reais verificadas antes da implementação**
 
-| Tela | Rota Frontend | APIs Backend |
-|------|--------------|-------------|
-| Relatórios Mensais | `/relatorios/mensal` | GET /api/relatorios/lista?tipo=MENSAL |
-| Relatórios Anuais | `/relatorios/anual` | GET /api/relatorios/lista?tipo=ANUAL |
-| Exportar Excel | `/relatorios/exportar/excel` | POST /api/relatorios/gerar?formato=excel |
-| Exportar PDF | `/relatorios/exportar/pdf` | POST /api/relatorios/gerar?formato=pdf |
-| Exportar CSV | `/relatorios/exportar/csv` | POST /api/relatorios/gerar?formato=csv |
+| Tela | Rota Frontend | APIs Usadas | Status |
+|------|--------------|-------------|--------|
+| Relatório Mensal | `/relatorios/mensal` | GET /api/transacoes + /api/proventos + /api/ir/apuracao | ✅ 200 OK |
+| Relatório Anual | `/relatorios/anual` | GET /api/ir/historico + /api/transacoes + /api/proventos | ✅ 200 OK |
+| Extrato Completo | `/relatorios/extrato` | GET /api/transacoes (paginado, filtros tipo/data) | ✅ 200 OK |
+| IR Completo | `/relatorios/ir` | GET /api/ir/historico + /api/ir/dirpf + /api/ir/apuracao | ✅ 200 OK |
+| Exportar CSV | `/relatorios/exportar/csv` | GET /api/transacoes | /api/proventos | /api/posicoes | ✅ 200 OK |
 
-**Nota:** A rota `/dashboard/reports` já existe — refatorar para servir estas sub-rotas.
+**Artefatos criados:**
+- `frontend/app/routes/relatorios.py` — Blueprint com 5 rotas
+- `frontend/app/templates/relatorios/mensal.html`
+- `frontend/app/templates/relatorios/anual.html`
+- `frontend/app/templates/relatorios/extrato.html`
+- `frontend/app/templates/relatorios/ir_completo.html`
+- `frontend/app/templates/relatorios/exportar_csv.html`
 
-**APIs a integrar:** 3–4 endpoints (reaproveitam backend existente)
+**Artefatos modificados:**
+- `frontend/app/__init__.py` — Blueprint registrado
+- `menu_horizontal.html` — 7 links mortos substituídos
+
+**Nota:** `/api/relatorios/gerar` (404) e `/api/transacoes/export` (retorna null) não usados.
+Export CSV é gerado 100% client-side via JavaScript `Blob` + `URL.createObjectURL`.
+
+**APIs integradas:** 6 endpoints (transacoes, proventos, ir/apuracao, ir/historico, ir/dirpf, posicoes)
 
 ---
 

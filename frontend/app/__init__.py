@@ -16,7 +16,7 @@ def create_app():
     app.config.from_object(Config)
 
     # Registrar blueprints
-    from .routes import auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, alertas, fiscal
+    from .routes import auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, alertas, fiscal, relatorios
     app.register_blueprint(auth.bp)
     app.register_blueprint(dashboard.bp)
     app.register_blueprint(operacoes.bp)
@@ -28,6 +28,7 @@ def create_app():
     app.register_blueprint(planos.bp_venda)
     app.register_blueprint(alertas.bp)
     app.register_blueprint(fiscal.bp)
+    app.register_blueprint(relatorios.bp)
 
     # Health check
     @app.route('/health')

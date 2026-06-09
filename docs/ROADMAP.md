@@ -101,7 +101,7 @@ Maio 2026:
 
 ## 🎨 Frontend — Integração API-Driven (Em Progresso)
 
-**Status:** ✅ Sprint 6 Concluído | **Última atualização:** 09/06/2026 | **Plano:** 8 Sprints  
+**Status:** ✅ Sprint 7 Concluído | **Última atualização:** 09/06/2026 | **Plano:** 8 Sprints  
 **Referência completa:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md`
 
 ### Roadmap de Sprints (Revisado 09/06/2026)
@@ -114,10 +114,12 @@ Maio 2026:
 | **4** | Planos + Alertas | 4 | 2 | ✅ Concluído (09/06/2026) | — |
 | **5** | Imposto de Renda / DARF | 4 | 4 | ✅ Concluído (09/06/2026) | — |
 | **6** | Rentabilidade e Análises | 5 | 5 | ✅ Concluído (09/06/2026) | — |
-| **7** | Relatórios e Exportação | 5 | 4 | 🎯 Próximo | Jul/2026 |
-| **8** | Ferramentas (opcional) | 4 | 4 | 📋 Opcional | Set/2026 |
+| **7** | Relatórios e Exportação | 5 | 6 | ✅ Concluído (09/06/2026) | — |
+| **8** | Ferramentas (opcional) | 4 | 4 | 🎯 Próximo | Set/2026 |
 
 **Meta:** ~34 telas integradas com APIs reais | ~38 APIs integradas de 156
+
+> **Sprint 7 concluído (09/06/2026):** `/relatorios/mensal`, `/anual`, `/extrato`, `/ir`, `/exportar/csv` — export CSV client-side (Blob/JS), 6 APIs integradas, menu `/relatórios/*` com 7 rotas reais.
 
 ### Objetivo
 Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 APIs do backend.
@@ -141,8 +143,9 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 - ✅ Sprint 4: 4 telas, 2 APIs integradas (12 planos, 15 alertas)
 - ✅ Sprint 5: 4 telas, 4 APIs integradas (IR real: apuração, DARF, histórico, DIRPF)
 - ✅ Sprint 6: 5 telas, 5 APIs integradas (TWR/MWR, alocação, evolução, Sharpe, Buy Score)
-- **Total APIs:** 18/156 (11.5%)
-- **Total Telas com rota real:** ~37 de ~50 prometidas no menu
+- ✅ Sprint 7: 5 telas, 6 APIs integradas (mensal, anual, extrato, IR, CSV export)
+- **Total APIs:** 24/156 (15.4%)
+- **Total Telas com rota real:** ~42 de ~50 prometidas no menu
 
 ---
 

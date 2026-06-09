@@ -8,6 +8,28 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Sprint 7 Frontend: Relatórios e Exportação (09/06/2026)
+
+**GAPs:** Frontend API-Driven — Sprint 7
+
+**Artefatos criados:**
+- `frontend/app/routes/relatorios.py` — Blueprint Sprint 7 (5 rotas: mensal, anual, extrato, ir, exportar/csv)
+- `frontend/app/templates/relatorios/mensal.html` — Relatório mensal: transações + proventos + resumo IR
+- `frontend/app/templates/relatorios/anual.html` — Relatório anual: histórico IR 12 meses + stats
+- `frontend/app/templates/relatorios/extrato.html` — Extrato paginado com filtros tipo/data
+- `frontend/app/templates/relatorios/ir_completo.html` — IR: apuração + histórico + DIRPF bens e direitos
+- `frontend/app/templates/relatorios/exportar_csv.html` — Export CSV client-side (Blob/JS) para transações, proventos e posições
+
+**Artefatos modificados:**
+- `frontend/app/__init__.py` — Blueprint `relatorios` registrado
+- `frontend/app/templates/components/menu_horizontal.html` — 7 links mortos substituídos por rotas reais Sprint 7
+
+**APIs integradas:** `/api/transacoes`, `/api/proventos`, `/api/ir/apuracao`, `/api/ir/historico`, `/api/ir/dirpf`, `/api/posicoes`
+
+**Corrigido:** `TypeError: must be real number, not str` — campos numéricos da API usam filtro `|float`
+
+---
+
 ### Added — Sprint 6 Frontend: Rentabilidade e Análises (09/06/2026)
 
 **GAPs:** Frontend API-Driven — Sprint 6
