@@ -16,13 +16,14 @@ def create_app():
     app.config.from_object(Config)
 
     # Registrar blueprints
-    from .routes import auth, dashboard, operacoes, analises, admin, proventos
+    from .routes import auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo
     app.register_blueprint(auth.bp)
     app.register_blueprint(dashboard.bp)
     app.register_blueprint(operacoes.bp)
     app.register_blueprint(analises.bp)
     app.register_blueprint(admin.admin_bp)
     app.register_blueprint(proventos.bp)
+    app.register_blueprint(ativos_catalogo.bp)
 
     # Health check
     @app.route('/health')

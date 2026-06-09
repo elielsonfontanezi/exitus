@@ -8,6 +8,31 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Sprint 3 Frontend: Catálogo de Ativos (09/06/2026)
+
+**GAPs:** Frontend API-Driven — Sprint 3 Catálogo de Ativos
+
+**Artefatos criados:**
+- `frontend/app/routes/ativos_catalogo.py` — Blueprint com 6 rotas (`/ativos/acoes`, `/fiis`, `/etfs`, `/renda-fixa`, `/cripto`, `/<ticker>`)
+- `frontend/app/templates/ativos/lista.html` — Template genérico reutilizado por todas as categorias (colunas adaptadas por tipo)
+- `frontend/app/templates/ativos/detalhe.html` — Página de detalhe completa com fundamentos e ações rápidas
+
+**Artefatos modificados:**
+- `frontend/app/__init__.py` — Registro do blueprint ativos_catalogo
+
+**Funcionalidades:**
+- ✅ `/ativos/acoes` — Ações BR + stocks US com P/L, P/VP, ROE, DY
+- ✅ `/ativos/fiis` — FIIs + REITs com P/VP, Cap Rate, DY
+- ✅ `/ativos/etfs` — ETFs BR + internacionais
+- ✅ `/ativos/renda-fixa` — CDB, LCI/LCA, Tesouro Direto, Debêntures com taxa e vencimento
+- ✅ `/ativos/cripto` — Criptoativos
+- ✅ `/ativos/<ticker>` — Detalhe com todos os fundamentos + ações rápidas (compra/venda/proventos)
+- ✅ Busca por ticker em todas as listas
+- ✅ Navegação cruzada entre categorias no header
+- ✅ Links menu Ativos → agora funcionais (eram 404)
+
+---
+
 ### Added — Sprint 2 Frontend: Módulo Proventos (09/06/2026)
 
 **GAPs:** Frontend API-Driven — Sprint 2 Proventos e Rendimentos
