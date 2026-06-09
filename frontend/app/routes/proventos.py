@@ -56,10 +56,11 @@ def _fetch_proventos(headers, status_filter=None, page=1, per_page=100):
 
         valor = float(item.get('valor_liquido') or item.get('valor_bruto') or 0.0)
         valor_unitario = float(item.get('valor_por_acao') or 0.0)
-        quantidade = item.get('quantidade', 0)
+        quantidade = float(item.get('quantidade_ativos') or 0)
 
-        ticker_label = item.get('ticker') or f"ID {str(item.get('ativo_id', ''))[:4]}"
-        ativo_obj = {'ticker': ticker_label, 'nome': ticker_label}
+        ativo_info = item.get('ativo') or {}
+        ticker_label = ativo_info.get('ticker') or item.get('ticker') or f"ID {str(item.get('ativo_id', ''))[:4]}"
+        ativo_obj = {'ticker': ticker_label, 'nome': ativo_info.get('nome', ticker_label)}
 
         status = 'PREVISTO'
         if data_pag:
