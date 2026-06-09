@@ -15,7 +15,7 @@
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | ✅ 93.0% | 508/546 passando (+37 testes), 6 skipped (RLS), 68 errors (teardown) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
-| **Frontend API-Driven** | ✅ 62% | Sprint 1–5 ✅, 19 telas, 13 APIs integradas |
+| **Frontend API-Driven** | ✅ 72% | Sprint 1–6 ✅, 24 telas, 18 APIs integradas |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
@@ -48,7 +48,15 @@
   - ✅ Modo VENDA 100% funcional (30 posições)
   - ✅ Compra/Venda de ativos BR e internacionais
   - ✅ Importação B3 com detecção automática de tipo (05/04/2026)
-- **Próxima:** Sprint 6 — Rentabilidade e Análises (Jul/2026)
+- **Próxima:** Sprint 7 — Relatórios e Exportação (Jul/2026)
+
+### Sprint 6 — Rentabilidade e Análises (CONCLUÍDO ✅ — 09/06/2026)
+- ✅ `/analises/rentabilidade/periodo` — TWR 81.14%, MWR -65.4%, benchmark CDI, alpha
+- ✅ `/analises/alocacao` — Alocação RF 61.6%/RV 38.4% com barras e tabela
+- ✅ `/analises/evolucao` — Série histórica 2024–2026 (R$119k → R$795k)
+- ✅ `/analises/performance` — Sharpe 1.45, Drawdown -8.3%, top ativos
+- ✅ `/analises/buy-signals` — Buy Score por ticker + tabela de posições
+- ✅ Menu Rentabilidade corrigido (rotas /rentabilidade/* fixadas para /analises/*)
 
 ### Sprint 5 — Imposto de Renda e DARF (CONCLUÍDO ✅ — 09/06/2026)
 - ✅ `/imposto-renda/mensal` — Apuração por categoria (Day Trade, Swing, FII, Exterior, RF, Proventos)

@@ -1,6 +1,6 @@
 # 🚀 Plano de Integração Frontend-Backend — Exitus
 
-**Data:** 09/06/2026 | **Versão:** v1.5 | **Status:** ✅ Sprints 1–5 Concluídos | 🎯 Sprint 6 Próximo  
+**Data:** 09/06/2026 | **Versão:** v1.6 | **Status:** ✅ Sprints 1–6 Concluídos | 🎯 Sprint 7 Próximo  
 **Modelo IA:** GPT 5.1 Codex Medium ($) para CRUD | Claude Sonnet 4.6 Thinking ($$$) para lógica complexa  
 **Plano detalhado:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md` ⭐
 
@@ -20,8 +20,9 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 - ✅ Sprint 3: Catálogo de Ativos (09/06/2026)
 - ✅ Sprint 4: Planos Disciplinados e Alertas (09/06/2026)
 - ✅ Sprint 5: Imposto de Renda e DARF (09/06/2026)
-- 🎯 Sprint 6: Rentabilidade e Análises (próximo — Jul/2026)
-- ⚠️ Menu horizontal: ~50 links, ~18 ainda retornam 404
+- ✅ Sprint 6: Rentabilidade e Análises (09/06/2026)
+- 🎯 Sprint 7: Relatórios e Exportação (Jul/2026)
+- ⚠️ Menu horizontal: ~50 links, ~13 ainda retornam 404
 
 ---
 
@@ -59,7 +60,7 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 | Ativos | 15 | Catálogo, Detalhes | 📊 P2 |
 | Config | 10 | Alertas, Preferências | 📉 P3 |
 
-### ✅ APIs Integradas (13/156)
+### ✅ APIs Integradas (18/156)
 
 **Sprint 1 — Operações (5 APIs):**
 - ✅ POST `/api/transacoes` - Criar transação
@@ -83,6 +84,13 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 - ✅ GET `/api/ir/darf` - DARFs geradas no mês
 - ✅ GET `/api/ir/historico` - Histórico anual 12 meses
 - ✅ GET `/api/ir/dirpf` - Bens e direitos DIRPF
+
+**Sprint 6 — Rentabilidade e Análises (5 APIs):**
+- ✅ GET `/api/portfolios/rentabilidade` - TWR 81.14%, MWR -65.4%, benchmark CDI
+- ✅ GET `/api/portfolios/alocacao` - RF 61.6% / RV 38.4% / Cripto
+- ✅ GET `/api/portfolios/evolucao` - Série histórica 30 meses (R$119k → R$795k)
+- ✅ GET `/api/performance/performance` - Sharpe 1.45, Drawdown -8.3%, top ativos
+- ✅ GET `/api/buy-signals/buy-score/<ticker>` - Buy Score por ticker
 
 ---
 
@@ -109,11 +117,11 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 - ✅ Apuração Mensal, DARFs, Histórico Anual, Declaração DIRPF
 - Resultado: 4 APIs integradas, custo total carteira R$ 642k real
 
-### 🎯 Sprint 6: Rentabilidade e Análises (PRÓXIMO)
-- Por Período, Por Ativo, Comparativo
-- APIs: GET /api/rentabilidade/*
+### ✅ Sprint 6: Rentabilidade e Análises (CONCLUÍDO 09/06/2026)
+- ✅ Rentabilidade TWR/MWR, Alocação, Evolução Patrimonial, Performance (Sharpe), Buy Signals
+- Resultado: 5 APIs integradas, patrimônio R$795k real
 
-### Sprint 7: Relatórios e Exportação
+### 🎯 Sprint 7: Relatórios e Exportação (PRÓXIMO)
 - Mensais, Anuais, Excel/PDF/CSV
 - APIs: GET /api/relatorios/*, /api/export/*
 

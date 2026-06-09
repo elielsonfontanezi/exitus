@@ -145,23 +145,33 @@ Testado: Custo total carteira R$ 642.084,51 real, apuração com 4 categorias + 
 
 ---
 
-### 🎯 Sprint 6 — Rentabilidade e Análises (PRÓXIMO)
-**Valor:** Alto (tomada de decisão) | **Esforço estimado:** 3–4 dias
+### ✅ Sprint 6 — Rentabilidade e Análises (CONCLUÍDO — 09/06/2026)
+**Valor:** Alto (tomada de decisão) | **Esforço real:** 1 sessão
 
-| Tela | Rota Frontend | APIs Backend |
-|------|--------------|-------------|
-| Rentabilidade por Período | `/rentabilidade/periodo` | GET /api/portfolio/performance |
-| Rentabilidade por Ativo | `/rentabilidade/ativo` | GET /api/posicoes + cálculo |
-| Alocação de Ativos | `/alocacao` | GET /api/portfolio/alocacao |
-| Buy Signals | `/analises/buy-signals` | GET /api/buy-signals/watchlist-top |
+| Tela | Rota Frontend | APIs Backend | Status |
+|------|--------------|-------------|--------|
+| Rentabilidade por Período | `/analises/rentabilidade/periodo` | GET /api/portfolios/rentabilidade | ✅ |
+| Alocação de Ativos | `/analises/alocacao` | GET /api/portfolios/alocacao + /performance/desvio-alocacao | ✅ |
+| Evolução Patrimonial | `/analises/evolucao` | GET /api/portfolios/evolucao | ✅ (extra) |
+| Performance (Sharpe) | `/analises/performance` | GET /api/performance/performance | ✅ |
+| Buy Signals | `/analises/buy-signals` | GET /api/buy-signals/buy-score/<ticker> | ✅ |
 
-**Artefatos a criar:**
-- `frontend/app/routes/analises.py` — substituir stub atual (4 rotas)
-- `frontend/app/templates/analises/rentabilidade_periodo.html`
-- `frontend/app/templates/analises/rentabilidade_ativo.html`
-- `frontend/app/templates/analises/alocacao.html`
+**Artefatos criados:**
+- `frontend/app/templates/analises/rentabilidade_periodo.html` — TWR, MWR, benchmark, alpha
+- `frontend/app/templates/analises/alocacao.html` — RF/RV/Cripto com barras + tabela
+- `frontend/app/templates/analises/evolucao.html` — série 2024-2026 + gráfico (extra)
+- `frontend/app/templates/analises/performance.html` — Sharpe, drawdown, top ativos
+- `frontend/app/templates/analises/buy_signals.html` — score gauge + posições
 
-**APIs a integrar:** ~5 endpoints
+**Artefatos modificados:**
+- `frontend/app/routes/analises.py` — 5 novas rotas adicionadas ao stub existente
+- `menu_horizontal.html` — prefixos /rentabilidade/* corrigidos para /analises/*
+
+**Nota:** `/api/portfolio/performance` (404), `/api/buy-signals/watchlist-top` (200 mas corpo vazio — backend sem dados).
+Usados `/api/portfolios/rentabilidade`, `/api/performance/performance`, `/api/buy-signals/buy-score/<ticker>`.
+Testado: TWR 81.14%, R$795k patrimônio, evolução 30 meses, 0 erros console.
+
+**APIs integradas:** 5 endpoints (rentabilidade, alocacao, evolucao, performance, buy-score)
 
 ---
 

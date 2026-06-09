@@ -1,6 +1,6 @@
 # 🗺️ Mapeamento API ↔ Frontend — Exitus
 
-**Data:** 09/06/2026 | **Versão:** v1.2 — atualizado após Sprints 2-5
+**Data:** 09/06/2026 | **Versão:** v1.3 — atualizado após Sprints 2-6
 
 ---
 
@@ -15,9 +15,9 @@
 | Planos | 10 | 1 | 10% | ✅ Sprint 4 |
 | Alertas | 10 | 1 | 10% | ✅ Sprint 4 |
 | Fiscal/IR | 20 | 4 | 20% | ✅ Sprint 5 |
-| Análises | 30 | 0 | 0% | 🎯 Sprint 6 |
+| Análises | 30 | 5 | 17% | ✅ Sprint 6 |
 | Config | 10 | 0 | 0% | 📋 Sprint 8 |
-| **TOTAL** | **143** | **23** | **16%** | — |
+| **TOTAL** | **143** | **28** | **20%** | — |
 
 ---
 
@@ -71,6 +71,18 @@
 - `GET /api/ir/dirpf` → DIRPF / Bens e Direitos ✅ (Sprint 5)
 - `POST /api/ir/calcular` → Calculadora ⏳
 - `GET /api/ir/consolidado` → Consolidado ⏳
+
+---
+
+## 📊 P1 — Análises (✅ Sprint 6)
+
+- `GET /api/portfolios/rentabilidade` → Rentabilidade TWR/MWR ✅ (Sprint 6)
+- `GET /api/portfolios/alocacao` → Alocação de Ativos ✅ (Sprint 6)
+- `GET /api/portfolios/evolucao` → Evolução Patrimonial ✅ (Sprint 6)
+- `GET /api/performance/performance` → Performance Sharpe/Drawdown ✅ (Sprint 6)
+- `GET /api/buy-signals/buy-score/<ticker>` → Buy Score por Ticker ✅ (Sprint 6)
+- `GET /api/performance/desvio-alocacao` → Desvio de Alocação ✅ (Sprint 6)
+- `GET /api/posicoes` → Posições ✅ (Sprint 6 / usado em Buy Signals)
 
 ---
 

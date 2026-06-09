@@ -162,8 +162,8 @@ User: non-root (exitus:1000)
 ```
 
 **Características**:
-- 40+ rotas principais (Sprint 1–5 concluídos)
-- 26+ templates Jinja2
+- 47+ rotas principais (Sprint 1–6 concluídos)
+- 47+ templates Jinja2
 - Session management (JWT)
 - Blueprints: auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, planos_venda, alertas, fiscal
 - Fallback para mock data

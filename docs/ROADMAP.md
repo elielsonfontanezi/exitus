@@ -101,7 +101,7 @@ Maio 2026:
 
 ## 🎨 Frontend — Integração API-Driven (Em Progresso)
 
-**Status:** ✅ Sprint 5 Concluído | **Última atualização:** 09/06/2026 | **Plano:** 8 Sprints  
+**Status:** ✅ Sprint 6 Concluído | **Última atualização:** 09/06/2026 | **Plano:** 8 Sprints  
 **Referência completa:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md`
 
 ### Roadmap de Sprints (Revisado 09/06/2026)
@@ -113,8 +113,8 @@ Maio 2026:
 | **3** | Catálogo de Ativos | 6 | 2 | ✅ Concluído (09/06/2026) | — |
 | **4** | Planos + Alertas | 4 | 2 | ✅ Concluído (09/06/2026) | — |
 | **5** | Imposto de Renda / DARF | 4 | 4 | ✅ Concluído (09/06/2026) | — |
-| **6** | Rentabilidade e Análises | 4 | 5 | 🎯 Próximo | Jul/2026 |
-| **7** | Relatórios e Exportação | 5 | 4 | 📋 Planejado | Set/2026 |
+| **6** | Rentabilidade e Análises | 5 | 5 | ✅ Concluído (09/06/2026) | — |
+| **7** | Relatórios e Exportação | 5 | 4 | 🎯 Próximo | Jul/2026 |
 | **8** | Ferramentas (opcional) | 4 | 4 | 📋 Opcional | Set/2026 |
 
 **Meta:** ~34 telas integradas com APIs reais | ~38 APIs integradas de 156
@@ -140,8 +140,9 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 - ✅ Sprint 3: 6 telas, 1 API integrada (73 ativos, 5 categorias)
 - ✅ Sprint 4: 4 telas, 2 APIs integradas (12 planos, 15 alertas)
 - ✅ Sprint 5: 4 telas, 4 APIs integradas (IR real: apuração, DARF, histórico, DIRPF)
-- **Total APIs:** 13/156 (8.3%)
-- **Total Telas com rota real:** ~32 de ~50 prometidas no menu
+- ✅ Sprint 6: 5 telas, 5 APIs integradas (TWR/MWR, alocação, evolução, Sharpe, Buy Score)
+- **Total APIs:** 18/156 (11.5%)
+- **Total Telas com rota real:** ~37 de ~50 prometidas no menu
 
 ---
 

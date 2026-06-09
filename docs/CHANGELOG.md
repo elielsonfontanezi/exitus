@@ -8,6 +8,32 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Sprint 6 Frontend: Rentabilidade e Análises (09/06/2026)
+
+**GAPs:** Frontend API-Driven — Sprint 6
+
+**Artefatos modificados:**
+- `frontend/app/routes/analises.py` — 5 novas rotas (rentabilidade/periodo, alocacao, evolucao, performance, buy-signals)
+- `frontend/app/templates/components/menu_horizontal.html` — links Rentabilidade/Alocação corrigidos + Evolução/Performance/Buy Signals
+
+**Artefatos criados:**
+- `frontend/app/templates/analises/rentabilidade_periodo.html` — TWR, MWR, benchmark, alpha, período
+- `frontend/app/templates/analises/alocacao.html` — RF 61.6%/RV 38.4%, barras + tabela + desvio
+- `frontend/app/templates/analises/evolucao.html` — série histórica + gráfico de barras manual
+- `frontend/app/templates/analises/performance.html` — Sharpe 1.45, Drawdown -8.3%, top ativos
+- `frontend/app/templates/analises/buy_signals.html` — score por ticker + tabela posicoes
+
+**APIs integradas:** 5 endpoints reais
+- `GET /api/portfolios/rentabilidade` → TWR 81.14%, MWR -65.4%
+- `GET /api/portfolios/alocacao` → RF/RV/Cripto com valores reais
+- `GET /api/portfolios/evolucao` → série desde 2024 (R$119k → R$795k)
+- `GET /api/performance/performance` → Sharpe, drawdown, top ativos
+- `GET /api/buy-signals/buy-score/<ticker>` → score PETR4=50
+
+**Resultado:** 5 novas telas funcionais com dados reais, 0 erros no browser
+
+---
+
 ### Added — Sprint 5 Frontend: Imposto de Renda e DARF (09/06/2026)
 
 **GAPs:** Frontend API-Driven — Sprint 5

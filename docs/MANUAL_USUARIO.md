@@ -457,6 +457,57 @@ GET /api/ir/saldo-prejuizo
 
 ---
 
+### 9. Rentabilidade e Análises — Sprint 6
+
+**URLs:**
+- `/analises/rentabilidade/periodo` — Rentabilidade TWR/MWR por Período
+- `/analises/alocacao` — Alocação de Ativos por Classe
+- `/analises/evolucao` — Evolução Patrimonial (série histórica)
+- `/analises/performance` — Performance: Sharpe, Drawdown, Top Ativos
+- `/analises/buy-signals` — Buy Score por Ticker
+
+**Funcionalidades:**
+- TWR (Time-Weighted Return) e MWR (Money-Weighted Return) com benchmark CDI e alpha
+- Alocação RF/RV/Cripto com barras de progresso e tabela de desvio vs. target
+- Evolução patrimonial mês a mês de 2024 a 2026 (R$119k → R$795k)
+- Sharpe Ratio, Max Drawdown, rentabilidade bruta e líquida
+- Buy Score 0–100 por ticker com gauge visual e tabela de posições
+
+**Como usar:**
+1. Acesse "Análises" → "Rentabilidade" no menu
+2. Use os filtros de período (3m, 6m, 12m, ytd) para ajustar o intervalo
+3. Confira a Alocação para ver distribuição da carteira
+4. Veja a Evolução para série histórica completa
+5. Em Buy Signals, digite qualquer ticker para ver o score
+
+**Dados reais exibidos:**
+- TWR: 81.14% | MWR: -65.4% (12 meses)
+- Patrimônio total: R$ 795.720,82 | RF: 61.6% | RV: 38.4%
+- Sharpe: 1.45 | Drawdown: -8.3% | Rent. Líquida: 10.2%
+
+**APIs:**
+```bash
+# Rentabilidade
+GET /api/portfolios/rentabilidade?periodo=12m
+Authorization: Bearer <token>
+
+# Alocação
+GET /api/portfolios/alocacao
+
+# Evolução
+GET /api/portfolios/evolucao
+
+# Performance
+GET /api/performance/performance
+
+# Buy Score
+GET /api/buy-signals/buy-score/PETR4
+```
+
+**Sprint 6** — Implementado em 09/06/2026
+
+---
+
 ### 7. Alertas — Monitoramento de Preços
 
 **URL:** `/dashboard/alerts`

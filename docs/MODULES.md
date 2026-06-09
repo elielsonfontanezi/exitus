@@ -222,10 +222,10 @@ e `IncidenciaImposto`.
 
 **Objetivo:** Implementar frontend SSR com Flask, Jinja2, HTMX e Alpine.js.
 
-**Status:** PRODUCTION READY — Data: 04 Dez 2025 | **Frontend API-Driven:** Sprint 5/8 concluídos (09/06/2026)
+**Status:** PRODUCTION READY — Data: 04 Dez 2025 | **Frontend API-Driven:** Sprint 6/8 concluídos (09/06/2026)
 
-- 40+ rotas frontend (Sprint 1–5 API-Driven concluídos)
-- 26+ templates Jinja2
+- 47+ rotas frontend (Sprint 1–6 API-Driven concluídos)
+- 47+ templates Jinja2
 - Integração com JWT mantido em sessão via `get_api_headers()`
 - **Blueprints ativos:** auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, planos_venda, alertas, fiscal
 
@@ -235,6 +235,7 @@ e `IncidenciaImposto`.
 - Sprint 3: Catálogo de Ativos (ações, FIIs, ETFs, RF, cripto, detalhe)
 - Sprint 4: Planos Disciplinados e Alertas (12 planos reais, 15 alertas reais)
 - Sprint 5: Imposto de Renda e DARF (apuração, DARFs, histórico 12 meses, DIRPF bens e direitos)
+- Sprint 6: Rentabilidade e Análises (TWR/MWR, alocação, evolução patrimonial, Sharpe, Buy Signals)
 
 ---
 

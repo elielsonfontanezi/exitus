@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Evolução Patrimonial — Exitus{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">📊 Evolução Patrimonial</h1>
+        <p class="text-blue-200 mt-1">Série histórica do patrimônio mês a mês</p>
+      </div>
+      <div class="flex gap-3">
+        <a href="{{ url_for('analises.alocacao') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">🥧 Alocação</a>
+        <a href="{{ url_for('analises.performance') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">⚡ Performance</a>
+        <a href="{{ url_for('dashboard.index') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">← Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  {% if erro %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700">
+    ⚠️ Erro ao carregar evolução: {{ erro }}
+  </div>
+  {% endif %}
+
+  {% set serie = dados.evolucao if dados.evolucao is defined else [] %}
+
+  {% if serie %}
+
+  {% set primeiro = serie[0].valor %}
+  {% set ultimo = serie[-1].valor %}
+  {% set variacao = ((ultimo - primeiro) / primeiro * 100) if primeiro else 0 %}
+  {% set max_val = namespace(v=0) %}
+  {% for item in serie %}{% if item.valor > max_val.v %}{% set max_val.v = item.valor %}{% endif %}{% endfor %}
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-play text-blue-600 text-xs"></i>
+      </div>
+      <div class="text-lg font-bold text-gray-800">R$ {{ '{:,.0f}'.format(primeiro) | replace(',', '.') }}</div>
+      <div class="text-xs text-gray-500 mt-1">Patrimônio Inicial</div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-flag-checkered text-green-600 text-xs"></i>
+      </div>
+      <div class="text-lg font-bold text-gray-800">R$ {{ '{:,.0f}'.format(ultimo) | replace(',', '.') }}</div>
+      <div class="text-xs text-gray-500 mt-1">Patrimônio Atual</div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 {% if variacao >= 0 %}bg-green-100{% else %}bg-red-100{% endif %} rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-percent {% if variacao >= 0 %}text-green-600{% else %}text-red-500{% endif %} text-xs"></i>
+      </div>
+      <div class="text-lg font-bold {% if variacao >= 0 %}text-green-600{% else %}text-red-500{% endif %}">
+        {{ '+' if variacao >= 0 else '' }}{{ '%.1f'|format(variacao) | replace('.', ',') }}%
+      </div>
+      <div class="text-xs text-gray-500 mt-1">Variação Total</div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-calendar text-purple-600 text-xs"></i>
+      </div>
+      <div class="text-lg font-bold text-purple-600">{{ serie | length }}</div>
+      <div class="text-xs text-gray-500 mt-1">Meses Registrados</div>
+    </div>
+  </div>
+
+  <!-- Gráfico de barras manual -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-chart-bar text-blue-500"></i> Evolução Mês a Mês
+      </h2>
+    </div>
+    <div class="p-5 overflow-x-auto">
+      <div class="flex items-end gap-1.5 min-w-max" style="height: 160px;">
+        {% for item in serie %}
+        {% set pct = (item.valor / max_val.v * 100) if max_val.v else 0 %}
+        <div class="flex flex-col items-center gap-1 group" style="min-width: 40px;">
+          <div class="relative">
+            <div class="text-xs text-gray-500 absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition">
+              R$ {{ '{:,.0f}'.format(item.valor) | replace(',', '.') }}
+            </div>
+          </div>
+          <div class="w-8 rounded-t-md bg-blue-500 hover:bg-blue-400 transition cursor-pointer"
+               style="height: {{ pct * 1.4 | int }}px; min-height: 4px;"></div>
+          <div class="text-xs text-gray-400 rotate-45 origin-left whitespace-nowrap" style="font-size: 10px;">
+            {{ item.data[2:7] if item.data else '' }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabela série histórica -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-table text-gray-400"></i> Série Histórica
+      </h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+          <tr>
+            <th class="text-left px-5 py-3">Data</th>
+            <th class="text-right px-5 py-3">Patrimônio</th>
+            <th class="text-right px-5 py-3">Variação</th>
+            <th class="text-right px-5 py-3">% Acumulado</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for i in range(serie | length) %}
+          {% set item = serie[i] %}
+          {% set prev = serie[i-1].valor if i > 0 else item.valor %}
+          {% set var_val = item.valor - prev %}
+          {% set var_pct = (var_val / prev * 100) if prev else 0 %}
+          {% set acum_pct = ((item.valor - primeiro) / primeiro * 100) if primeiro else 0 %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-5 py-3 font-medium text-gray-700">{{ item.data or '—' }}</td>
+            <td class="px-5 py-3 text-right font-bold text-gray-800">
+              R$ {{ '{:,.2f}'.format(item.valor) | replace(',', '.') }}
+            </td>
+            <td class="px-5 py-3 text-right text-sm {% if var_val > 0 %}text-green-600{% elif var_val < 0 %}text-red-500{% else %}text-gray-400{% endif %}">
+              {% if i > 0 %}
+              {{ '+' if var_val >= 0 else '' }}R$ {{ '{:,.0f}'.format(var_val) | replace(',', '.') }}
+              {% else %}—{% endif %}
+            </td>
+            <td class="px-5 py-3 text-right text-sm {% if acum_pct >= 0 %}text-green-600{% else %}text-red-500{% endif %}">
+              {{ '+' if acum_pct >= 0 else '' }}{{ '%.1f'|format(acum_pct) | replace('.', ',') }}%
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center text-gray-400">
+    <i class="fas fa-chart-area text-5xl mb-4 text-gray-200"></i>
+    <p class="text-lg font-medium">Nenhum dado de evolução patrimonial disponível</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

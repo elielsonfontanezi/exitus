@@ -137,6 +137,138 @@ def rentabilidade():
                          dashboard=dashboard_data,
                          evolucao=evolucao)
 
+@bp.route('/rentabilidade/periodo', methods=['GET'])
+@login_required
+def rentabilidade_periodo():
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
+
+    periodo = request.args.get('periodo', '12m')
+    dados = {}
+    erro = None
+    try:
+        resp = requests.get(
+            f"{Config.BACKEND_API_URL}/api/portfolios/rentabilidade",
+            headers=headers,
+            params={'periodo': periodo},
+            timeout=10
+        )
+        if resp.status_code == 200:
+            dados = resp.json().get('data', {})
+        else:
+            erro = f'API retornou {resp.status_code}'
+    except Exception as e:
+        erro = str(e)
+
+    return render_template('analises/rentabilidade_periodo.html',
+                           dados=dados, periodo=periodo, erro=erro)
+
+
+@bp.route('/alocacao', methods=['GET'])
+@login_required
+def alocacao():
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
+
+    alocacao_data = {}
+    desvio_data = {}
+    erro = None
+    try:
+        r1 = requests.get(f"{Config.BACKEND_API_URL}/api/portfolios/alocacao",
+                          headers=headers, timeout=10)
+        r2 = requests.get(f"{Config.BACKEND_API_URL}/api/performance/desvio-alocacao",
+                          headers=headers, timeout=10)
+        if r1.status_code == 200:
+            alocacao_data = r1.json()
+        if r2.status_code == 200:
+            desvio_data = r2.json()
+    except Exception as e:
+        erro = str(e)
+
+    return render_template('analises/alocacao.html',
+                           alocacao=alocacao_data, desvio=desvio_data, erro=erro)
+
+
+@bp.route('/evolucao', methods=['GET'])
+@login_required
+def evolucao():
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
+
+    dados = {}
+    erro = None
+    try:
+        resp = requests.get(f"{Config.BACKEND_API_URL}/api/portfolios/evolucao",
+                            headers=headers, timeout=10)
+        if resp.status_code == 200:
+            dados = resp.json().get('data', {})
+        else:
+            erro = f'API retornou {resp.status_code}'
+    except Exception as e:
+        erro = str(e)
+
+    return render_template('analises/evolucao.html', dados=dados, erro=erro)
+
+
+@bp.route('/performance', methods=['GET'])
+@login_required
+def performance():
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
+
+    dados = {}
+    erro = None
+    try:
+        resp = requests.get(f"{Config.BACKEND_API_URL}/api/performance/performance",
+                            headers=headers, timeout=10)
+        if resp.status_code == 200:
+            dados = resp.json()
+        else:
+            erro = f'API retornou {resp.status_code}'
+    except Exception as e:
+        erro = str(e)
+
+    resultado = dados.get('resultado_json', {}) if dados else {}
+    return render_template('analises/performance.html',
+                           dados=dados, resultado=resultado, erro=erro)
+
+
+@bp.route('/buy-signals', methods=['GET'])
+@login_required
+def buy_signals():
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
+
+    ticker = request.args.get('ticker', 'PETR4').upper()
+    score_data = {}
+    posicoes = []
+    erro = None
+    try:
+        r1 = requests.get(
+            f"{Config.BACKEND_API_URL}/api/buy-signals/buy-score/{ticker}",
+            headers=headers, timeout=10
+        )
+        r2 = requests.get(
+            f"{Config.BACKEND_API_URL}/api/posicoes",
+            headers=headers, timeout=10
+        )
+        if r1.status_code == 200:
+            score_data = r1.json().get('data', {})
+        if r2.status_code == 200:
+            posicoes = r2.json().get('data', {}).get('posicoes', [])
+    except Exception as e:
+        erro = str(e)
+
+    return render_template('analises/buy_signals.html',
+                           score=score_data, ticker=ticker,
+                           posicoes=posicoes, erro=erro)
+
+
 @bp.route('/impostos', methods=['GET'])
 @login_required
 def impostos():
