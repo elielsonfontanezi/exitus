@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 03/04/2026 — L-SEC-001 adicionado (RLS vs API/JWT defesa em profundidade)  
+> **Atualizado:** 09/06/2026 — L-FE-006 adicionado (stub para APIs ausentes no backend)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -157,6 +157,30 @@ toggleModo(modo) {
 ```
 
 **Regra:** Sempre que precisar de Compra/Venda do mesmo ativo, usar toggle em vez de telas separadas.
+
+---
+
+### L-FE-006 — Quando a API backend não existe, criar stub informativo (não ignorar)
+**Origem:** Sprint 4 — `GET /api/plano-venda` retorna 404 | **Data:** 09/06/2026
+
+Quando um endpoint backend ainda não existe, a tela frontend **não deve** ser omitida nem gerar erro 500. Criar um stub com:
+1. **Mensagem clara** ao usuário ("Em desenvolvimento")
+2. **Código do endpoint** ausente visível (`/api/plano-venda`)
+3. **Ações alternativas** (ir para tela correlata que funciona)
+4. **Registro no FRONTEND_IMPLEMENTATION_PLAN.md** com ⚠️ e nota explicativa
+
+```python
+# ❌ ERRADO — omitir a rota ou deixar cair em erro 500
+# (rota não registrada → menu quebrado)
+
+# ✅ CORRETO — stub informativo com redirecionamento
+@bp.route('/')
+@login_required
+def venda_lista():
+    return render_template('planos/venda_lista.html')  # template com aviso
+```
+
+**Regra:** Toda rota do menu deve existir. Se a API não existe, a tela existe com stub. Nunca 404 no frontend.
 
 ---
 

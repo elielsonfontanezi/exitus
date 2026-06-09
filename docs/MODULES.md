@@ -222,11 +222,18 @@ e `IncidenciaImposto`.
 
 **Objetivo:** Implementar frontend SSR com Flask, Jinja2, HTMX e Alpine.js.
 
-**Status:** PRODUCTION READY — Data: 04 Dez 2025
+**Status:** PRODUCTION READY — Data: 04 Dez 2025 | **Frontend API-Driven:** Sprint 4/8 concluídos (09/06/2026)
 
-- 15 rotas frontend
-- Templates base `base.html` e telas de login/registro/dashboard
-- Integração com JWT mantido em sessão
+- 35+ rotas frontend (Sprint 1–4 API-Driven concluídos)
+- 22+ templates Jinja2
+- Integração com JWT mantido em sessão via `get_api_headers()`
+- **Blueprints ativos:** auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, planos_venda, alertas
+
+**Sprints API-Driven concluídos:**
+- Sprint 1: Operações (compra/venda, importação B3)
+- Sprint 2: Proventos e Rendimentos (recebidos, projetados, calendário)
+- Sprint 3: Catálogo de Ativos (ações, FIIs, ETFs, RF, cripto, detalhe)
+- Sprint 4: Planos Disciplinados e Alertas (12 planos reais, 15 alertas reais)
 
 ---
 
@@ -286,7 +293,7 @@ Tabela `historico_preco`, script `popular_historico_inicial.py` e integração c
 ### M8 — Analytics Avançados (registrado para avaliação futura)
 Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md v3.0 §9.
 
-> **Nota:** Frontend pode ser refeito do zero. Foco atual: backend + banco de dados.
+> **Nota:** Frontend em integração API-Driven ativa (Sprint 4/8 concluídos). 28/50 telas prometidas no menu já funcionais.
 
 ---
 
@@ -297,8 +304,9 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 | Endpoints | Rotas totais | **67+** |
 | Tabelas | Database | 23 |
 | Índices | PostgreSQL | 86+ |
-| Blueprints | Flask | 17 |
-| Templates | Frontend | 7 |
+| Blueprints | Flask backend | 17 |
+| Blueprints | Flask frontend | 10 |
+| Templates | Frontend | 22+ |
 | Gráficos | Chart.js | 5 |
 | Providers | Cotações | 5 |
 | Cache Hit Rate | Cotações | 85-95% |
@@ -323,6 +331,6 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 
 ---
 
-*Documento atualizado: 09 de Março de 2026*
+*Documento atualizado: 09/06/2026*
 *Versão: v0.8.0-dev*
-*56 ativos com dados fundamentalistas — 37 GAPs concluídos (Fases 2-5 + 2 da Fase 6) — ver ROADMAP.md v3.0*
+*56 ativos com dados fundamentalistas — 48 GAPs concluídos — Frontend Sprint 4/8 — ver ROADMAP.md*

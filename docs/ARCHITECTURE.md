@@ -1186,11 +1186,11 @@ Para multi-instância futura, substituir pelo Redis (CIRCUITBREAKER-002 potencia
 
 ---
 
-### Nota sobre Frontend (05/03/2026)
+### Nota sobre Frontend (atualizado 09/06/2026)
 
-O frontend atual (Flask + HTMX + Tailwind, container `exitus-frontend:8080`) é funcional mas **não consome** as APIs implementadas nas Fases 3-4 (IR, Export, Câmbio, Anomaly, RFCALC, Swagger). **Poderá ser refeito do zero** em framework moderno (React/Next.js ou similar) quando o backend estiver estabilizado. O foco atual de desenvolvimento é exclusivamente **backend + banco de dados**. Ver `ROADMAP.md` v3.0.
+O frontend (Flask + Jinja2 + Tailwind + Alpine.js + Chart.js, container `exitus-frontend:8080`) está em **integração API-Driven ativa**. Sprint 4/8 concluídos: Operações, Proventos, Catálogo de Ativos, Planos e Alertas. 28/50 telas prometidas no menu já funcionais com dados reais. Ver `FRONTEND_IMPLEMENTATION_PLAN.md` e `ROADMAP.md`.
 
 ---
 
-**Documento atualizado**: 09 de Março de 2026  
-**Versão arquitetural**: v0.8.0-dev (Fases 2-5 concluídas + 2 da Fase 6 — 37 GAPs implementados, 371 testes passed, ver ROADMAP.md v3.0)
+**Documento atualizado**: 09/06/2026  
+**Versão arquitetural**: v0.8.0-dev (48 GAPs implementados, 508 testes passed, Frontend Sprint 4/8 — ver ROADMAP.md)
