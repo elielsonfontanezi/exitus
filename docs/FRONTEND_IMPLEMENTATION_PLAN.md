@@ -47,28 +47,29 @@ A maioria retorna 404.
 
 ---
 
-### 🎯 Sprint 2 — Proventos e Rendimentos (PRÓXIMO)
-**Valor:** Alto (investidores querem ver dividendos) | **Esforço estimado:** 3–4 dias
+### ✅ Sprint 2 — Proventos e Rendimentos (CONCLUÍDO — 09/06/2026)
+**Valor:** Alto | **Esforço real:** 1 sessão
 
-| Tela | Rota Frontend | APIs Backend | Blueprint |
-|------|--------------|-------------|-----------|
-| Proventos Recebidos | `/proventos/recebidos` | GET /api/proventos | `proventos.py` (novo) |
-| Proventos Projetados | `/proventos/projetados` | GET /api/proventos?status=PREVISTO | `proventos.py` |
-| Calendário de Dividendos | `/proventos/calendario` | GET /api/calendario-dividendos | `proventos.py` |
+| Tela | Rota Frontend | APIs Backend | Status |
+|------|--------------|-------------|--------|
+| Proventos Recebidos | `/proventos/recebidos` | GET /api/proventos | ✅ |
+| Proventos Projetados | `/proventos/projetados` | GET /api/proventos | ✅ |
+| Calendário de Dividendos | `/proventos/calendario` | GET /api/proventos | ✅ |
 
-**Artefatos a criar:**
+**Artefatos criados:**
 - `frontend/app/routes/proventos.py` — 3 rotas
 - `frontend/app/templates/proventos/recebidos.html`
 - `frontend/app/templates/proventos/projetados.html`
 - `frontend/app/templates/proventos/calendario.html`
-- Registrar blueprint em `__init__.py`
-- Atualizar links do menu para rotas reais
+- `frontend/app/__init__.py` — blueprint registrado
+- Fix: `quantidade_ativos` (campo real da API) + `ativo.ticker` mapeado
+- Testado com `e2e_user`: 100 proventos reais, 0 erros de console
 
-**APIs a integrar:** 3 novos endpoints
+**APIs integradas:** 1 endpoint (`GET /api/proventos`)
 
 ---
 
-### 📋 Sprint 3 — Catálogo de Ativos
+### 🎯 Sprint 3 — Catálogo de Ativos (PRÓXIMO)
 **Valor:** Médio-Alto | **Esforço estimado:** 2–3 dias
 
 | Tela | Rota Frontend | APIs Backend | Filtro |
