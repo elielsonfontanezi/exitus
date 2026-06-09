@@ -149,6 +149,16 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 - **Total Telas com rota real:** ~46 de ~50 prometidas no menu
 - **Status Final:** Frontend API-Driven 8/8 Sprints ✅ (09/06/2026)
 
+### 🎯 Próximos Passos Frontend (pós Sprint 8)
+
+| Prioridade | Item | Detalhe |
+|------------|------|---------|
+| 🔴 Alta | **Testes E2E Sprints 5–8** | Adicionar cenários formais para `/relatorios/*` e `/ferramentas/*` — hoje só Fase 1 tem cobertura (108 testes) |
+| 🔴 Alta | **Corrigir ~4 links 404 restantes** | `/perfil`, `/configuracoes` e sub-rotas órfãs de alertas no menu horizontal |
+| 🟡 Média | **Dados fundamentalistas nulos no Screener** | Muitos ativos têm `dividend_yield=null`, `p_vp=null` — verificar pipeline de importação de dados fundamentalistas |
+| 🟡 Média | **Calculadora IR: cotação automática** | Integrar `GET /api/cotacoes/<ticker>` para pré-preencher preço de venda sugerido |
+| 🟢 Baixa | **Merge feature → main** | Branch `feature/frontend-api-integration` com 8 sprints — revisar e fazer merge após aprovação |
+
 ---
 
 ## 🔮 Backend — Fase 8: Futuro
