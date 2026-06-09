@@ -8,6 +8,33 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Added — Sprint 4 Frontend: Planos Disciplinados e Alertas (09/06/2026)
+
+**GAPs:** Frontend API-Driven — Sprint 4
+
+**Artefatos criados:**
+- `frontend/app/routes/planos.py` — blueprints `planos` (`/planos-compra/`) e `planos_venda` (`/planos-venda/`)
+- `frontend/app/routes/alertas.py` — blueprint `alertas` (`/alertas/`)
+- `frontend/app/templates/planos/compra_lista.html` — 12 planos reais com barras de progresso
+- `frontend/app/templates/planos/compra_detalhe.html` — detalhe completo com ativo e ações rápidas
+- `frontend/app/templates/planos/venda_lista.html` — stub informativo (API backend pendente)
+- `frontend/app/templates/alertas/lista.html` — 15 alertas com tipo, condição, status e acionamentos
+
+**Artefatos modificados:**
+- `frontend/app/__init__.py` — 3 blueprints registrados
+- `frontend/app/templates/components/menu_horizontal.html` — novo dropdown "Planos" + links Alertas funcionais
+
+**Funcionalidades:**
+- ✅ `/planos-compra/` — lista com progresso visual, stats e barra por plano
+- ✅ `/planos-compra/<id>` — detalhe com barra de progresso, dados e ações rápidas
+- ✅ `/planos-venda/` — stub com aviso de API pendente
+- ✅ `/alertas/` — lista completa com filtro por tipo, status e acionamentos
+- ✅ `/alertas/preco`, `/alertas/dividendos`, `/alertas/personalizados` → redirect para `/alertas/`
+- ✅ Menu "Planos" adicionado (novo dropdown)
+- ✅ Links Alertas no menu agora funcionais
+
+---
+
 ### Added — Sprint 3 Frontend: Catálogo de Ativos (09/06/2026)
 
 **GAPs:** Frontend API-Driven — Sprint 3 Catálogo de Ativos

@@ -94,38 +94,33 @@ Testado: 73 ativos reais, 0 erros de console, menu Ativos 404 → funcionais
 
 ---
 
-### 🎯 Sprint 4 — Planos Disciplinados (PRÓXIMO)
-**Valor:** Alto (diferencial do produto) | **Esforço estimado:** 4–5 dias
+### ✅ Sprint 4 — Planos Disciplinados e Alertas (CONCLUÍDO — 09/06/2026)
+**Valor:** Alto | **Esforço real:** 1 sessão
 
-#### Planos de Compra
-| Tela | Rota Frontend | APIs Backend |
-|------|--------------|-------------|
-| Dashboard Planos Compra | `/planos-compra/` | GET /api/plano-compra |
-| Novo Plano Compra | `/planos-compra/novo` | POST /api/plano-compra |
-| Detalhe Plano | `/planos-compra/<id>` | GET /api/plano-compra/<id> |
-| Registrar Aporte | `/planos-compra/<id>/aporte` | POST /api/plano-compra/<id>/aporte |
+| Tela | Rota Frontend | APIs Backend | Status |
+|------|--------------|-------------|--------|
+| Dashboard Planos Compra | `/planos-compra/` | GET /api/plano-compra/ | ✅ |
+| Detalhe Plano Compra | `/planos-compra/<id>` | GET /api/plano-compra/<id> | ✅ |
+| Planos de Venda | `/planos-venda/` | API 404 (backend pendente) | ⚠️ stub |
+| Alertas | `/alertas/` | GET /api/alertas/ | ✅ |
 
-#### Planos de Venda
-| Tela | Rota Frontend | APIs Backend |
-|------|--------------|-------------|
-| Dashboard Planos Venda | `/planos-venda/` | GET /api/plano-venda |
-| Novo Plano Venda | `/planos-venda/novo` | POST /api/plano-venda |
-| Detalhe Plano Venda | `/planos-venda/<id>` | GET /api/plano-venda/<id> |
+**Artefatos criados:**
+- `frontend/app/routes/planos.py` — blueprints `planos` + `planos_venda`
+- `frontend/app/routes/alertas.py` — blueprint `alertas`
+- `frontend/app/templates/planos/compra_lista.html` — barras de progresso, stats
+- `frontend/app/templates/planos/compra_detalhe.html` — detalhe completo
+- `frontend/app/templates/planos/venda_lista.html` — stub com aviso de API pendente
+- `frontend/app/templates/alertas/lista.html` — 15 alertas reais
+- `menu_horizontal.html` — dropdown "Planos" + links Alertas funcionais
 
-**Artefatos a criar:**
-- `frontend/app/routes/planos.py` — 7 rotas
-- `frontend/app/templates/planos/compra_lista.html`
-- `frontend/app/templates/planos/compra_novo.html`
-- `frontend/app/templates/planos/compra_detalhe.html`
-- `frontend/app/templates/planos/venda_lista.html`
-- `frontend/app/templates/planos/venda_novo.html`
-- `frontend/app/templates/planos/venda_detalhe.html`
+**Nota:** `GET /api/plano-venda` retorna 404. Tela de venda ficou como stub até o backend implementar o endpoint.
+Testado: 12 planos reais, 15 alertas reais, 0 erros de console
 
-**APIs a integrar:** ~9 endpoints (CRUD + ações pausar/reativar/cancelar)
+**APIs integradas:** 2 endpoints (`GET /api/plano-compra/`, `GET /api/alertas/`)
 
 ---
 
-### 📋 Sprint 5 — Imposto de Renda e DARF
+### 🎯 Sprint 5 — Imposto de Renda e DARF (PRÓXIMO)
 **Valor:** Crítico (obrigação fiscal) | **Esforço estimado:** 3–4 dias
 
 | Tela | Rota Frontend | APIs Backend |

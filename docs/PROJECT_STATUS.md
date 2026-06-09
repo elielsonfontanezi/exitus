@@ -15,7 +15,7 @@
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | ✅ 93.0% | 508/546 passando (+37 testes), 6 skipped (RLS), 68 errors (teardown) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
-| **Frontend API-Driven** | ✅ 42% | Sprint 1 ✅ + Sprint 2 ✅ + Sprint 3 ✅, 10 telas, 8 APIs integradas |
+| **Frontend API-Driven** | ✅ 52% | Sprint 1–4 ✅, 15 telas, 9 APIs integradas |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
@@ -48,7 +48,14 @@
   - ✅ Modo VENDA 100% funcional (30 posições)
   - ✅ Compra/Venda de ativos BR e internacionais
   - ✅ Importação B3 com detecção automática de tipo (05/04/2026)
-- **Próxima:** Sprint 4 — Planos Disciplinados (Jul/2026)
+- **Próxima:** Sprint 5 — Imposto de Renda e DARF (Jul/2026)
+
+### Sprint 4 — Planos Disciplinados e Alertas (CONCLUÍDO ✅ — 09/06/2026)
+- ✅ `/planos-compra/` — 12 planos reais com barras de progresso animadas
+- ✅ `/planos-compra/<id>` — detalhe completo: progresso, meta, ativo, ações rápidas
+- ✅ `/planos-venda/` — stub informativo (API backend 404)
+- ✅ `/alertas/` — 15 alertas reais com tipo, condição, status, acionamentos
+- ✅ Menu "Planos" adicionado + links Alertas funcionais
 
 ### Sprint 3 — Catálogo de Ativos (CONCLUÍDO ✅ — 09/06/2026)
 - ✅ `/ativos/acoes` — Ações + stocks com fundamentos (P/L, ROE, DY)

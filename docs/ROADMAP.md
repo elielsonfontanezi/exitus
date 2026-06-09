@@ -101,7 +101,7 @@ Maio 2026:
 
 ## 🎨 Frontend — Integração API-Driven (Em Progresso)
 
-**Status:** ✅ Sprint 3 Concluído | **Última atualização:** 09/06/2026 | **Plano:** 8 Sprints  
+**Status:** ✅ Sprint 4 Concluído | **Última atualização:** 09/06/2026 | **Plano:** 8 Sprints  
 **Referência completa:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md`
 
 ### Roadmap de Sprints (Revisado 09/06/2026)
@@ -111,8 +111,8 @@ Maio 2026:
 | **1** | Operações Essenciais | 2 | 5 | ✅ Concluído (05/04/2026) | — |
 | **2** | Proventos e Rendimentos | 3 | 1 | ✅ Concluído (09/06/2026) | — |
 | **3** | Catálogo de Ativos | 6 | 2 | ✅ Concluído (09/06/2026) | — |
-| **4** | Planos Disciplinados | 7 | 9 | 🎯 Próximo | Jul/2026 |
-| **5** | Imposto de Renda / DARF | 3 | 6 | 📋 Planejado | Ago/2026 |
+| **4** | Planos + Alertas | 4 | 2 | ✅ Concluído (09/06/2026) | — |
+| **5** | Imposto de Renda / DARF | 3 | 6 | 🎯 Próximo | Jul/2026 |
 | **6** | Rentabilidade e Análises | 4 | 5 | 📋 Planejado | Ago/2026 |
 | **7** | Relatórios e Exportação | 5 | 4 | 📋 Planejado | Set/2026 |
 | **8** | Ferramentas (opcional) | 4 | 4 | 📋 Opcional | Set/2026 |
@@ -138,8 +138,9 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 - ✅ Sprint 1: 2 telas, 5 APIs integradas
 - ✅ Sprint 2: 3 telas, 1 API integrada (100 proventos reais validados)
 - ✅ Sprint 3: 6 telas, 1 API integrada (73 ativos, 5 categorias)
-- **Total APIs:** 7/156 (4.5%)
-- **Total Telas com rota real:** ~24 de ~50 prometidas no menu
+- ✅ Sprint 4: 4 telas, 2 APIs integradas (12 planos, 15 alertas)
+- **Total APIs:** 9/156 (5.8%)
+- **Total Telas com rota real:** ~28 de ~50 prometidas no menu
 
 ---
 
@@ -307,5 +308,5 @@ Documentos históricos de roadmaps anteriores estão em `docs/archive/`:
 ---
 
 *Última atualização: 09/06/2026*  
-*Próxima revisão: Após conclusão Sprint 4 (Planos Disciplinados)*  
+*Próxima revisão: Após conclusão Sprint 5 (Imposto de Renda / DARF)*  
 *Responsável: Elielson Fontanezi + Cascade AI*

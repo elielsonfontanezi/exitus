@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Planos de Venda — Exitus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+
+  <!-- Header -->
+  <div class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-6 py-10">
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <i class="fas fa-hand-holding-usd text-3xl" style="color:#a38c65;"></i>
+            <h1 class="text-3xl font-bold">Planos de Venda</h1>
+          </div>
+          <p class="opacity-80">Stops e metas de saída disciplinados</p>
+        </div>
+        <div class="flex gap-3">
+          <a href="/planos-compra/" class="btn btn-outline text-white border-white hover:bg-white/10 text-sm">
+            <i class="fas fa-bullseye mr-1"></i>Planos de Compra
+          </a>
+          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10 text-sm">
+            <i class="fas fa-arrow-left mr-1"></i>Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-6 py-12">
+    <div class="card p-12 text-center max-w-lg mx-auto">
+      <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <i class="fas fa-tools text-amber-600 text-3xl"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-3">Em desenvolvimento</h2>
+      <p class="text-gray-500 mb-2">
+        A API de Planos de Venda (<code class="bg-gray-100 px-1 rounded">/api/plano-venda</code>)
+        ainda não está disponível no backend.
+      </p>
+      <p class="text-gray-400 text-sm mb-8">
+        Esta tela estará funcional assim que o endpoint for implementado.
+      </p>
+      <div class="flex gap-3 justify-center flex-wrap">
+        <a href="/planos-compra/" class="btn btn-primary">
+          <i class="fas fa-bullseye mr-2"></i>Ver Planos de Compra
+        </a>
+        <a href="/operacoes/" class="btn btn-outline">
+          <i class="fas fa-exchange-alt mr-2"></i>Registrar Venda
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
