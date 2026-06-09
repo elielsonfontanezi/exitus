@@ -69,31 +69,32 @@ A maioria retorna 404.
 
 ---
 
-### 🎯 Sprint 3 — Catálogo de Ativos (PRÓXIMO)
-**Valor:** Médio-Alto | **Esforço estimado:** 2–3 dias
+### ✅ Sprint 3 — Catálogo de Ativos (CONCLUÍDO — 09/06/2026)
+**Valor:** Médio-Alto | **Esforço real:** 1 sessão
 
-| Tela | Rota Frontend | APIs Backend | Filtro |
+| Tela | Rota Frontend | APIs Backend | Status |
 |------|--------------|-------------|--------|
-| Minhas Ações | `/ativos/acoes` | GET /api/ativos?tipo=ACAO | tipo=ACAO |
-| Meus FIIs | `/ativos/fiis` | GET /api/ativos?tipo=FII | tipo=FII |
-| ETFs | `/ativos/etfs` | GET /api/ativos?tipo=ETF | tipo=ETF |
-| Renda Fixa | `/ativos/renda-fixa` | GET /api/ativos?tipo=CDB,LCI_LCA,TESOURO,DEBENTURE | tipo multi |
-| Criptoativos | `/ativos/cripto` | GET /api/ativos?tipo=CRIPTO | tipo=CRIPTO |
-| Detalhe do Ativo | `/ativos/<ticker>` | GET /api/ativos/ticker/<ticker> | — |
+| Minhas Ações | `/ativos/acoes` | GET /api/ativos?tipo=acao,stock | ✅ |
+| Meus FIIs | `/ativos/fiis` | GET /api/ativos?tipo=fii,reit | ✅ |
+| ETFs | `/ativos/etfs` | GET /api/ativos?tipo=etf,etf_intl | ✅ |
+| Renda Fixa | `/ativos/renda-fixa` | GET /api/ativos (multi-tipo) | ✅ |
+| Criptoativos | `/ativos/cripto` | GET /api/ativos?tipo=cripto | ✅ |
+| Detalhe do Ativo | `/ativos/<ticker>` | GET /api/ativos?ticker=X | ✅ |
 
-**Artefatos a criar:**
-- `frontend/app/routes/ativos.py` — 6 rotas
-- `frontend/app/templates/ativos/lista.html` (componente genérico com filtro por tipo)
-- `frontend/app/templates/ativos/detalhe.html`
-- Registrar blueprint em `__init__.py`
+**Artefatos criados:**
+- `frontend/app/routes/ativos_catalogo.py` — 6 rotas
+- `frontend/app/templates/ativos/lista.html` — template genérico (1 arquivo para 5 categorias)
+- `frontend/app/templates/ativos/detalhe.html` — fundamentos + ações rápidas
+- `frontend/app/__init__.py` — blueprint registrado
 
-**Nota:** As telas de lista podem compartilhar um único template com parâmetro de tipo — economiza esforço.
+**Lição registrada:** L-FE-005 — validar campos reais da API antes de mapear (`quantidade_ativos`, `ativo.ticker`)
+Testado: 73 ativos reais, 0 erros de console, menu Ativos 404 → funcionais
 
-**APIs a integrar:** 2 novos endpoints
+**APIs integradas:** 1 endpoint (`GET /api/ativos`)
 
 ---
 
-### 📋 Sprint 4 — Planos Disciplinados
+### 🎯 Sprint 4 — Planos Disciplinados (PRÓXIMO)
 **Valor:** Alto (diferencial do produto) | **Esforço estimado:** 4–5 dias
 
 #### Planos de Compra

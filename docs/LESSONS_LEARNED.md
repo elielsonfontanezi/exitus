@@ -160,6 +160,30 @@ toggleModo(modo) {
 
 ---
 
+### L-FE-005 — Sempre validar campos reais da API antes de mapear no blueprint
+**Origem:** Sprint 2 — campo `quantidade` → `quantidade_ativos` | **Data:** 09/06/2026
+
+Ao integrar uma API no frontend, nunca assumir nomes de campos pelo nome intuitivo. Sempre verificar a resposta real com curl antes de codificar o blueprint.
+
+```bash
+# Padrão de validação — executar antes de cada blueprint novo
+TOKEN=$(curl -s -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"e2e_user","password":"e2e_senha_123"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['access_token'])")
+curl -s -H "Authorization: Bearer $TOKEN" "http://localhost:5000/api/ENDPOINT?per_page=1" \
+  | python3 -c "import sys,json; p=json.load(sys.stdin)['data']['items'][0]; print(list(p.keys()))"
+```
+
+**Erros encontrados em Sprint 2 (proventos):**
+- `quantidade` → nome real: `quantidade_ativos`
+- `ticker` → nome real: `ativo.ticker` (objeto aninhado)
+- `tipo` → nome real: `tipo_provento`
+
+**Regra:** Usar `e2e_user` para validar campos reais antes de qualquer mapeamento de blueprint.
+
+---
+
 ### L-FE-002 — SEMPRE usar máscara DD/MM/AAAA para campos de data
 **Origem:** Ajuste tela compra formato americano | **Data:** 29/03/2026
 
