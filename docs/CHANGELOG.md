@@ -18,13 +18,15 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Operações → Transferências, Rebalanceamento, Histórico
   - Ativos → Buscar Ações, Setores, Buscar FIIs, Tipos de Imóveis
   - Análises → Análise de Riscos
-- `frontend/app/templates/proventos/recebidos.html` — Header com `rounded-2xl` + gradient
-- `frontend/app/templates/proventos/projetados.html` — Header com `rounded-2xl` + gradient
-- `frontend/app/templates/proventos/calendario.html` — Header com `rounded-2xl` + gradient
-- `frontend/app/templates/ativos/lista.html` — Header com `rounded-2xl` + gradient
-- `frontend/app/templates/operacoes/operacoes.html` — Adicionado header hero com cantos arredondados
+- Headers padronizados (padrão Screener: `max-w-* mx-auto` + `rounded-2xl`):
+  - `proventos/recebidos.html`, `proventos/projetados.html`, `proventos/calendario.html`
+  - `ativos/lista.html`
+  - `operacoes/operacoes.html`
+  - `dashboard/transactions.html`
+  - `alertas/lista.html`
+  - `planos/compra_lista.html`, `planos/compra_detalhe.html`, `planos/venda_lista.html`
 
-**Resultado:** Menu mais limpo (apenas links funcionais), headers padronizados com cantos arredondados
+**Resultado:** Menu mais limpo (apenas links funcionais), todos os headers agora seguem o padrão do Screener com cantos arredondados e largura consistente
 
 ---
 
