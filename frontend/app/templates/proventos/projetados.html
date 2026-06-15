@@ -6,35 +6,22 @@
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
+<div class="max-w-6xl mx-auto px-4 py-6">
 
   <!-- Header -->
-  <div class="rounded-2xl p-6 mb-6 text-white mx-4 mt-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-    <div class="container mx-auto px-6 py-6">
-      <div class="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <div class="flex items-center gap-3 mb-2">
-            <i class="fas fa-clock text-3xl" style="color:#a38c65;"></i>
-            <h1 class="text-3xl font-bold">Proventos Projetados</h1>
-          </div>
-          <p class="opacity-80">Dividendos, JCP e Rendimentos previstos a receber</p>
-        </div>
-        <div class="flex gap-3">
-          <a href="/proventos/recebidos" class="btn btn-outline text-white border-white hover:bg-white/10">
-            <i class="fas fa-check-circle mr-2"></i>Ver Recebidos
-          </a>
-          <a href="/proventos/calendario" class="btn btn-outline text-white border-white hover:bg-white/10">
-            <i class="fas fa-calendar mr-2"></i>Calendário
-          </a>
-          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10">
-            <i class="fas fa-arrow-left mr-2"></i>Dashboard
-          </a>
-        </div>
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">⏱ Proventos Projetados</h1>
+        <p class="text-purple-100 mt-1">Dividendos, JCP e Rendimentos previstos a receber</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="/proventos/recebidos" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">✓ Recebidos</a>
+        <a href="/proventos/calendario" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">📅 Calendário</a>
+        <a href="/dashboard/" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">← Dashboard</a>
       </div>
     </div>
   </div>
-
-  <div class="container mx-auto px-6 py-8 space-y-6">
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

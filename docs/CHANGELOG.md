@@ -18,16 +18,21 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Operações → Transferências, Rebalanceamento, Histórico
   - Ativos → Buscar Ações, Setores, Buscar FIIs, Tipos de Imóveis
   - Análises → Análise de Riscos
-- Headers padronizados (padrão Screener: `max-w-* mx-auto` + `rounded-2xl`):
-  - `proventos/recebidos.html`, `proventos/projetados.html`, `proventos/calendario.html`
-  - `ativos/lista.html`, `ativos/detalhe.html`
-  - `operacoes/operacoes.html`
-  - `dashboard/transactions.html`
-  - `dashboard/analytics.html`, `dashboard/alertas.html`, `dashboard/alocacao.html`, `dashboard/ativo_detalhes.html`, `dashboard/buy_signals.html`, `dashboard/comparador.html`, `dashboard/dividends.html`, `dashboard/fluxo_caixa.html`, `dashboard/planos_compra.html`, `dashboard/planos_venda.html`, `dashboard/proventos_calendario.html`
+- Headers padronizados (padrão Screener: UM container `max-w-* mx-auto` + header `rounded-2xl`):
+  - `proventos/recebidos.html`, `proventos/projetados.html`, `proventos/calendario.html` ✅ Reestruturados
+  - `ativos/lista.html`, `ativos/detalhe.html` ✅ Reestruturados
+  - `operacoes/operacoes.html` ✅ Reestruturado (max-w-4xl)
+  - `dashboard/transactions.html`, `dashboard/analytics.html`, `dashboard/alertas.html`, `dashboard/alocacao.html`, `dashboard/ativo_detalhes.html`, `dashboard/buy_signals.html`, `dashboard/comparador.html`, `dashboard/dividends.html`, `dashboard/fluxo_caixa.html`, `dashboard/planos_compra.html`, `dashboard/planos_venda.html`, `dashboard/proventos_calendario.html`
   - `alertas/lista.html`
   - `planos/compra_lista.html`, `planos/compra_detalhe.html`, `planos/venda_lista.html`
 
-**Resultado:** Todos os 24+ templates reestruturados com **UM** container `max-w-6xl mx-auto px-4 py-6` envolvendo header + conteúdo (igual ao Screener), garantindo alinhamento perfeito entre header e objetos abaixo
+**Resultado:** Todos os 24+ templates reestruturados com **UM** container envolvendo header + conteúdo (igual ao Screener), garantindo alinhamento perfeito entre header e objetos abaixo. Estrutura padronizada:
+```html
+<div class="max-w-6xl mx-auto px-4 py-6">  <!-- OU max-w-4xl -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="gradient">...</div>  <!-- Header -->
+  <!-- Conteúdo segue aqui -->
+</div>
+```
 
 ---
 

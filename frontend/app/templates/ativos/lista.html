@@ -15,32 +15,25 @@
 } %}
 {% set c = cor_map[config.cor] %}
 
-<div class="min-h-screen bg-gray-50">
+<div class="max-w-6xl mx-auto px-4 py-6">
 
   <!-- Header -->
-  <div class="rounded-2xl p-6 mb-6 text-white mx-4 mt-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-    <div class="container mx-auto px-6 py-6">
-      <div class="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <div class="flex items-center gap-3 mb-2">
-            <i class="{{ config.icone }} text-3xl" style="color:#a38c65;"></i>
-            <h1 class="text-3xl font-bold">{{ config.titulo }}</h1>
-          </div>
-          <p class="opacity-80">{{ config.subtitulo }}</p>
-        </div>
-        <div class="flex gap-3 flex-wrap">
-          <a href="/ativos/acoes" class="btn btn-outline text-white border-white hover:bg-white/10 text-sm {% if categoria == 'acoes' %}bg-white/20{% endif %}">Ações</a>
-          <a href="/ativos/fiis" class="btn btn-outline text-white border-white hover:bg-white/10 text-sm {% if categoria == 'fiis' %}bg-white/20{% endif %}">FIIs</a>
-          <a href="/ativos/etfs" class="btn btn-outline text-white border-white hover:bg-white/10 text-sm {% if categoria == 'etfs' %}bg-white/20{% endif %}">ETFs</a>
-          <a href="/ativos/renda-fixa" class="btn btn-outline text-white border-white hover:bg-white/10 text-sm {% if categoria == 'renda-fixa' %}bg-white/20{% endif %}">Renda Fixa</a>
-          <a href="/ativos/cripto" class="btn btn-outline text-white border-white hover:bg-white/10 text-sm {% if categoria == 'cripto' %}bg-white/20{% endif %}">Cripto</a>
-          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10 text-sm"><i class="fas fa-arrow-left mr-1"></i>Dashboard</a>
-        </div>
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">📊 {{ config.titulo }}</h1>
+        <p class="text-purple-100 mt-1">{{ config.subtitulo }}</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="/ativos/acoes" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition {% if categoria == 'acoes' %}bg-white/20{% endif %}">Ações</a>
+        <a href="/ativos/fiis" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition {% if categoria == 'fiis' %}bg-white/20{% endif %}">FIIs</a>
+        <a href="/ativos/etfs" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition {% if categoria == 'etfs' %}bg-white/20{% endif %}">ETFs</a>
+        <a href="/ativos/renda-fixa" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition {% if categoria == 'renda-fixa' %}bg-white/20{% endif %}">Renda Fixa</a>
+        <a href="/ativos/cripto" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition {% if categoria == 'cripto' %}bg-white/20{% endif %}">Cripto</a>
+        <a href="/dashboard/" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">← Dashboard</a>
       </div>
     </div>
   </div>
-
-  <div class="container mx-auto px-6 py-8 space-y-6">
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
