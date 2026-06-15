@@ -20,13 +20,14 @@ e este projeto adere semanticamente à versão v0.8.0.
   - Análises → Análise de Riscos
 - Headers padronizados (padrão Screener: `max-w-* mx-auto` + `rounded-2xl`):
   - `proventos/recebidos.html`, `proventos/projetados.html`, `proventos/calendario.html`
-  - `ativos/lista.html`
+  - `ativos/lista.html`, `ativos/detalhe.html`
   - `operacoes/operacoes.html`
   - `dashboard/transactions.html`
+  - `dashboard/analytics.html`, `dashboard/alertas.html`, `dashboard/alocacao.html`, `dashboard/ativo_detalhes.html`, `dashboard/buy_signals.html`, `dashboard/comparador.html`, `dashboard/dividends.html`, `dashboard/fluxo_caixa.html`, `dashboard/planos_compra.html`, `dashboard/planos_venda.html`, `dashboard/proventos_calendario.html`
   - `alertas/lista.html`
   - `planos/compra_lista.html`, `planos/compra_detalhe.html`, `planos/venda_lista.html`
 
-**Resultado:** Menu mais limpo (apenas links funcionais), todos os headers agora seguem o padrão do Screener com cantos arredondados e largura consistente
+**Resultado:** Todos os 24+ templates agora seguem o padrão do Screener com cantos arredondados, gradientes inline e largura consistente (`max-w-6xl` ou `max-w-5xl`)
 
 ---
 

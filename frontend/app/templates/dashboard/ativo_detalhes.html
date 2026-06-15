@@ -6,38 +6,34 @@
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50" 
-     x-data="ativoData()" 
+<div class="min-h-screen bg-gray-50"
+     x-data="ativoData()"
      @currency-changed.window="handleCurrencyChange($event.detail)">
-  
+
   <!-- Header do Ativo -->
-  <div class="bg-gradient-primary text-white">
-    <div class="container mx-auto px-6 py-8">
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-4">
-          <a href="/dashboard/" class="btn btn-outline text-white border-white hover:bg-white/10 hover:border-white/50">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Voltar
-          </a>
-          <div>
-            <h1 class="display-2" x-text="ativo.ticker || 'CARREGANDO...'"></h1>
-            <p class="text-xl opacity-90" x-text="ativo.nome || ''"></p>
-          </div>
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 class="text-2xl font-bold flex items-center gap-2">📊 <span x-text="ativo.ticker || 'CARREGANDO...'"></span></h1>
+          <p class="text-purple-100 mt-1" x-text="ativo.nome || ''"></p>
         </div>
         <div class="flex items-center gap-4">
           <div class="text-right">
             <p class="text-3xl font-bold" x-text="formatCurrency(ativo.preco_atual, currentCurrency)"></p>
             <div class="flex items-center gap-2">
-              <span class="text-lg" :class="ativo.variacao_dia >= 0 ? 'text-green-300' : 'text-red-300'" 
+              <span class="text-lg" :class="ativo.variacao_dia >= 0 ? 'text-green-300' : 'text-red-300'"
                     x-text="ativo.variacao_dia >= 0 ? '+' + ativo.variacao_dia.toFixed(2) + '%' : ativo.variacao_dia.toFixed(2) + '%'"></span>
               <span class="text-sm opacity-75">hoje</span>
             </div>
           </div>
+          <a href="/dashboard/" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+            ← Voltar
+          </a>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- Main Content -->
