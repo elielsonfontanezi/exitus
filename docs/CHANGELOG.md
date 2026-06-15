@@ -27,7 +27,7 @@ e este projeto adere semanticamente à versão v0.8.0.
   - `alertas/lista.html`
   - `planos/compra_lista.html`, `planos/compra_detalhe.html`, `planos/venda_lista.html`
 
-**Resultado:** Todos os 24+ templates agora seguem o padrão do Screener com cantos arredondados, gradientes inline e largura consistente (`max-w-6xl` ou `max-w-5xl`)
+**Resultado:** Todos os 24+ templates reestruturados com **UM** container `max-w-6xl mx-auto px-4 py-6` envolvendo header + conteúdo (igual ao Screener), garantindo alinhamento perfeito entre header e objetos abaixo
 
 ---
 

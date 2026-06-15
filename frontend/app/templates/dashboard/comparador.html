@@ -6,28 +6,24 @@
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50"
+<div class="max-w-6xl mx-auto px-4 py-6"
      x-data="comparadorData()"
      @currency-changed.window="handleCurrencyChange($event.detail)">
 
   <!-- Header -->
-  <div class="max-w-6xl mx-auto px-4 py-6">
-    <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
-      <div class="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h1 class="text-2xl font-bold flex items-center gap-2">⚖️ Comparador de Ativos</h1>
-          <p class="text-blue-200 mt-1">Compare múltiplos ativos lado a lado</p>
-        </div>
-        <div class="flex gap-3 flex-wrap">
-          <a href="/dashboard/" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
-            ← Dashboard
-          </a>
-        </div>
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">⚖️ Comparador de Ativos</h1>
+        <p class="text-blue-200 mt-1">Compare múltiplos ativos lado a lado</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="/dashboard/" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+          ← Dashboard
+        </a>
       </div>
     </div>
   </div>
-
-  <div class="max-w-6xl mx-auto px-4 pb-8">
     
     <!-- Seleção de Ativos -->
     <div class="card card-elevated mb-8">
