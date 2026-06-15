@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 05/04/2026  
-> **Status:** ✅ **Frontend API-Driven — Importação B3 Concluída**  
-> **Versão:** v0.9.15
+> **Data:** 15/06/2026  
+> **Status:** ✅ **Frontend UI Consistency — Menu Cleanup + Headers**  
+> **Versão:** v0.9.16
 
 ---
 
@@ -15,7 +15,7 @@
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | ✅ 93.0% | 508/546 passando (+37 testes), 6 skipped (RLS), 68 errors (teardown) |
 | **Testes E2E** | 🟡 33% | Fase 1 concluída (108 testes), Fases 2-3 pendentes |
-| **Frontend API-Driven** | ✅ 86% | Sprint 1–8 ✅, 33 telas, 27 APIs integradas |
+| **Frontend API-Driven** | ✅ 87% | Sprint 1–8 ✅, 33 telas, 27 APIs integradas, menu limpo |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 

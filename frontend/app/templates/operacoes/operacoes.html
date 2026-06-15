@@ -233,21 +233,27 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto max-w-4xl py-8" x-data="operacaoForm()">
-    
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
+<div class="min-h-screen bg-gray-50">
+
+  <!-- Header Hero -->
+  <div class="rounded-2xl p-6 mb-6 text-white mx-4 mt-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container mx-auto max-w-4xl px-6 py-4">
+      <div class="flex items-center justify-between flex-wrap gap-4">
         <div>
-            <h1 class="text-2xl font-bold flex items-center gap-3" style="color: #735c43;">
-                <span class="text-3xl">💼</span>
-                <span>Operações</span>
-            </h1>
-            <p class="text-gray-500 mt-1">Registre operações manualmente ou importe do Portal B3</p>
+          <h1 class="text-2xl font-bold flex items-center gap-3">
+            <span class="text-3xl">💼</span>
+            <span>Operações</span>
+          </h1>
+          <p class="text-white/80 mt-1">Registre operações manualmente ou importe do Portal B3</p>
         </div>
-        <a href="{{ url_for('dashboard.index') }}" class="flex items-center gap-2 text-[#a38c65] font-semibold hover:underline">
-            <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+        <a href="{{ url_for('dashboard.index') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition flex items-center gap-2">
+          <i class="fas fa-arrow-left"></i> Dashboard
         </a>
+      </div>
     </div>
+  </div>
+
+  <div class="container mx-auto max-w-4xl px-4 pb-8" x-data="operacaoForm()">
 
     <!-- Importação B3 -->
     <div class="compra-card mb-6" x-data="importB3()">
@@ -942,4 +948,5 @@ function importB3() {
     };
 }
 </script>
+</div></div>
 {% endblock %}

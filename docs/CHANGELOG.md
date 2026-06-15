@@ -8,6 +8,26 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fixed — Menu e Headers Frontend (15/06/2026)
+
+**GAPs:** Frontend UI Consistency — Menu Cleanup + Header Standardization
+
+**Artefatos modificados:**
+- `frontend/app/templates/components/menu_horizontal.html` — Removidos 9 links 404:
+  - Geral → Patrimônio (redundante, já no Dashboard)
+  - Operações → Transferências, Rebalanceamento, Histórico
+  - Ativos → Buscar Ações, Setores, Buscar FIIs, Tipos de Imóveis
+  - Análises → Análise de Riscos
+- `frontend/app/templates/proventos/recebidos.html` — Header com `rounded-2xl` + gradient
+- `frontend/app/templates/proventos/projetados.html` — Header com `rounded-2xl` + gradient
+- `frontend/app/templates/proventos/calendario.html` — Header com `rounded-2xl` + gradient
+- `frontend/app/templates/ativos/lista.html` — Header com `rounded-2xl` + gradient
+- `frontend/app/templates/operacoes/operacoes.html` — Adicionado header hero com cantos arredondados
+
+**Resultado:** Menu mais limpo (apenas links funcionais), headers padronizados com cantos arredondados
+
+---
+
 ### Added — Sprint 8 Frontend: Ferramentas (09/06/2026)
 
 **GAPs:** Frontend API-Driven — Sprint 8
