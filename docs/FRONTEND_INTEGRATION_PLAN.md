@@ -318,9 +318,18 @@ Para eliminar manutenção duplicada e UX fragmentada:
 | `/proventos/calendario` | `/dashboard/proventos-calendario` | `dashboard/proventos_calendario.html` | ✅ Redirect implementado |
 | `/ativos/<ticker>` | `/dashboard/ativo/<ticker>` | `dashboard/ativo_detalhes.html` | ✅ Redirect implementado |
 
-### Templates Preservados (Funcionalidades Distintas)
+### Templates Arquivados (Movidos para `templates/archive/`)
+| Template | Destino | Motivo |
+|----------|---------|--------|
+| `planos/compra_lista.html` | `archive/planos/` | Substituído por `dashboard/planos_compra.html` |
+| `planos/compra_detalhe.html` | `archive/planos/` | Substituído por `dashboard/planos_compra_detalhes.html` |
+| `proventos/recebidos.html` | `archive/proventos/` | Consolidado em `dashboard/proventos_calendario.html` |
+| `proventos/projetados.html` | `archive/proventos/` | Consolidado em `dashboard/proventos_calendario.html` |
+| `proventos/calendario.html` | `archive/proventos/` | Substituído por `dashboard/proventos_calendario.html` |
+| `ativos/detalhe.html` | `archive/ativos/` | Substituído por `dashboard/ativo_detalhes.html` |
+
+### Templates Ativos (Preservados em `templates/`)
 - `ativos/lista.html` — Catálogo por categoria (Ações, FIIs, ETFs, etc.)
-- `ativos/detalhe.html` — Detalhe simplificado (fallback opcional)
 - `planos/venda_lista.html` — Stub até API backend pronta
 
 ### Arquivos Modificados
