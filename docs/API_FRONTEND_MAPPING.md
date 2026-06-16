@@ -26,15 +26,15 @@
 ## 🚀 P0 — Operações (Sprint 1-2)
 
 ### Transações
-- `GET /api/transacoes` → Histórico ⏳
-- `POST /api/transacoes` → Nova Compra ⏳
-- `PUT /api/transacoes/{id}` → Editar ⏳
-- `DELETE /api/transacoes/{id}` → Excluir ⏳
+- `GET /api/transacoes` → Histórico ✅ (Sprint 1 + Sprint 7 extrato/relatórios)
+- `POST /api/transacoes` → Nova Compra ✅ (Sprint 1)
+- `PUT /api/transacoes/{id}` → Editar ⏳ (tela não implementada)
+- `DELETE /api/transacoes/{id}` → Excluir ⏳ (tela não implementada)
 
 ### Importação B3
-- `POST /api/import/b3/upload` → Upload ⏳
-- `POST /api/import/b3/preview` → Preview ⏳
-- `POST /api/import/b3/confirm` → Confirmar ⏳
+- `POST /api/import/b3/upload` → Upload ✅ (Sprint 1)
+- `POST /api/import/b3/preview` → Preview ✅ (Sprint 1)
+- `POST /api/import/b3/confirm` → Confirmar ✅ (Sprint 1)
 
 ### Ativos
 - `GET /api/ativos` → Catálogo ✅ (Sprint 3)
@@ -47,13 +47,14 @@
 ### Dashboard
 - `GET /api/portfolios/dashboard` → Dashboard ✅
 - `GET /api/carteira/saldo-caixa` → Saldo ✅
-- `GET /api/portfolios/evolucao` → Evolução ⏳
-- `GET /api/portfolios/alocacao` → Alocação ⏳
+- `GET /api/portfolios/evolucao` → Evolução ✅ (Sprint 6)
+- `GET /api/portfolios/alocacao` → Alocação ✅ (Sprint 6)
 
 ### Análises
-- `GET /api/analises/rentabilidade` → Rentabilidade ⏳
-- `GET /api/analises/setores` → Setores ⏳
-- `GET /api/analises/comparacao` → Benchmarks ⏳
+- `GET /api/portfolios/rentabilidade` → Rentabilidade TWR/MWR ✅ (Sprint 6)
+- `GET /api/performance/performance` → Sharpe/Drawdown ✅ (Sprint 6)
+- `GET /api/analises/setores` → Setores ⏳ (API não implementada)
+- `GET /api/analises/comparacao` → Benchmarks ⏳ (API não implementada)
 
 ---
 

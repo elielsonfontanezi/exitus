@@ -8,6 +8,41 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Testes E2E v3: Lógica de Negócio (16/06/2026)
+
+**GAP:** EXITUS-TESTS-E2E-V3 — Specs de lógica de negócio + plano de testes completo
+
+**Branch:** `feature/testes-e2e-v3`
+
+**Artefatos criados:**
+- `tests/e2e/docs/PLANO_TESTES_LOGICA.md` — catálogo completo de 50 CTs com pré-condição, ação e resultado esperado
+- `specs/operacoes/08-compra-logica.spec.js` — CT-001 a CT-008 (seleção tipo, busca ativo, cálculo total, toggle)
+- `specs/operacoes/09-venda-logica.spec.js` — CT-009 a CT-013 (posições, busca, qtd máx, resumo)
+- `specs/operacoes/10-importacao-b3.spec.js` — CT-014 a CT-016 (área upload, formato aceito, B3)
+- `specs/fiscal/11-ir-calculo.spec.js` — CT-017 a CT-022 (apuração, DARF, histórico 12m, DIRPF)
+- `specs/portfolio/12-rentabilidade.spec.js` — CT-023 a CT-026 (TWR/MWR, alocação, evolução, Sharpe)
+- `specs/ferramentas/13-calculadora-ir.spec.js` — CT-027 a CT-031 (alíquotas, isenção, compensação)
+- `specs/ferramentas/14-screener-filtros.spec.js` — CT-032 a CT-037 (filtros DY, P/VP, tipo, limpar)
+- `specs/ferramentas/15-simulador.spec.js` — CT-038 a CT-041 (juros compostos, marcos, reatividade)
+- `specs/relatorios/16-exportacao-csv.spec.js` — CT-042 a CT-045 (mensal, extrato, CSV download)
+- `specs/regressao/17-fluxo-completo.spec.js` — CT-046 a CT-050 (ponta-a-ponta, sessão, logout, comparador)
+
+**Pendente (em andamento nesta branch):**
+- Specs de lógica para: Ativos (Ações/FIIs/ETFs/RF/Cripto), Planos (Compra/Venda), Alertas
+- 3 rotas de alertas adicionadas ao smoke: `/alertas/preco`, `/alertas/dividendos`, `/alertas/personalizados`
+
+**Total planejado:** 50+ CTs de lógica de negócio (vs 127 smoke/UX no v2)
+
+---
+
+### Merge — feature/testes-e2e-v2 → main (16/06/2026)
+
+- 127/127 testes passando no Chromium, 0 flaky
+- 8 specs por contexto cobrindo 47+ rotas reais
+- Seletores Alpine.js corrigidos, race conditions resolvidas via `networkidle`
+
+---
+
 ### Refactor — Testes E2E v2: Replanejamento Completo (16/06/2026)
 
 **GAP:** EXITUS-TESTS-E2E-V2 — Replanejamento e reescrita dos specs E2E por contexto

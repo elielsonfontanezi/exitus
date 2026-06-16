@@ -211,13 +211,21 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 **Resultado:** 127/127 passando, 0 flaky (Chromium) — branch `feature/testes-e2e-v2`
 
-### 🎯 Próximo: Multi-browser + Merge (pendente)
+### ✅ Merge + Multi-browser (16/06/2026)
 
-- [ ] Firefox: `npx playwright test --project=firefox`
-- [ ] Mobile Chrome: `npx playwright test --project="Mobile Chrome"`
-- [ ] Merge `feature/testes-e2e-v2` → `main`
-- [ ] Performance audit (Lighthouse)
-- [ ] Testes de acessibilidade (axe-core)
+- [x] Merge `feature/testes-e2e-v2` → `main` ✅
+- [ ] Firefox: `npx playwright test --project=firefox` — pendente
+- [ ] Mobile Chrome: `npx playwright test --project="Mobile Chrome"` — pendente
+- [ ] Performance audit (Lighthouse) — futuro
+- [ ] Testes de acessibilidade (axe-core) — futuro
+
+### 🟡 v3: Lógica de Negócio (em andamento — branch `feature/testes-e2e-v3`)
+
+- [x] `PLANO_TESTES_LOGICA.md` — 73 CTs catalogados
+- [x] 13 specs criados: ops (08-10), fiscal (11), portfolio (12), ferramentas (13-15), relatorios (16), regressao (17), ativos (18), planos (19), alertas (20)
+- [x] Smoke: +3 rotas alertas (`/alertas/preco`, `/alertas/dividendos`, `/alertas/personalizados`)
+- [ ] Execução e validação dos 73 CTs
+- [ ] Merge `feature/testes-e2e-v3` → `main`
 
 ### ⏳ Fase 3: Validação Final e Go-Live (futuro)
 

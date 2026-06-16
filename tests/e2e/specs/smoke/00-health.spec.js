@@ -42,7 +42,10 @@ const ROTAS = [
   { url: '/planos-compra/',        desc: 'Lista planos compra' },
   { url: '/planos-venda/',         desc: 'Lista planos venda' },
   // Alertas
-  { url: '/alertas/',              desc: 'Alertas' },
+  { url: '/alertas/',              desc: 'Alertas — todos' },
+  { url: '/alertas/preco',         desc: 'Alertas de Preço' },
+  { url: '/alertas/dividendos',    desc: 'Alertas de Dividendos' },
+  { url: '/alertas/personalizados', desc: 'Alertas Personalizados' },
   // Fiscal
   { url: '/imposto-renda/mensal',  desc: 'IR Mensal' },
   { url: '/imposto-renda/darfs',   desc: 'DARFs' },

@@ -122,12 +122,13 @@ Integrar **156 APIs do backend** com frontend de forma estruturada.
 - ✅ Rentabilidade TWR/MWR, Alocação, Evolução Patrimonial, Performance (Sharpe), Buy Signals
 - Resultado: 5 APIs integradas, patrimônio R$795k real
 
-### 🎯 Sprint 7: Relatórios e Exportação (PRÓXIMO)
-- Mensais, Anuais, Excel/PDF/CSV
-- APIs: GET /api/relatorios/*, /api/export/*
+### ✅ Sprint 7: Relatórios e Exportação (CONCLUÍDO 09/06/2026)
+- ✅ Mensais, Anuais, Extrato, IR, CSV export (Blob/JS client-side)
+- Resultado: 5 telas, 6 APIs integradas
 
-### Sprint 8: Ferramentas (Opcional)
-- Comparador, Calculadora IR, Simulador, Screeners
+### ✅ Sprint 8: Ferramentas (CONCLUÍDO 09/06/2026)
+- ✅ Screener, Comparador, Calculadora IR, Simulador de Aportes
+- Resultado: 4 telas, 3 APIs integradas
 
 ---
 

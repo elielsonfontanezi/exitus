@@ -1186,11 +1186,11 @@ Para multi-instância futura, substituir pelo Redis (CIRCUITBREAKER-002 potencia
 
 ---
 
-### Nota sobre Frontend (atualizado 09/06/2026)
+### Nota sobre Frontend (atualizado 16/06/2026)
 
-O frontend (Flask + Jinja2 + Tailwind + Alpine.js + Chart.js, container `exitus-frontend:8080`) está em **integração API-Driven ativa**. Sprint 5/8 concluídos: Operações, Proventos, Catálogo de Ativos, Planos, Alertas e IR/DARF. 32/50 telas prometidas no menu já funcionais com dados reais. Ver `FRONTEND_IMPLEMENTATION_PLAN.md` e `ROADMAP.md`.
+O frontend (Flask + Jinja2 + Tailwind + Alpine.js + Chart.js, container `exitus-frontend:8080`) está em **integração API-Driven ativa**. 8/8 Sprints concluídos (09/06/2026): Operações, Proventos, Catálogo de Ativos, Planos, Alertas, IR/DARF, Relatórios, Ferramentas. 33+ telas funcionais com dados reais. Ver `FRONTEND_IMPLEMENTATION_PLAN.md` e `ROADMAP.md`.
 
 ---
 
-**Documento atualizado**: 09/06/2026  
-**Versão arquitetural**: v0.8.0-dev (48 GAPs implementados, 508 testes passed, Frontend Sprint 5/8 — ver ROADMAP.md)
+**Documento atualizado**: 16/06/2026  
+**Versão arquitetural**: v0.9.16 (48 GAPs implementados, 508 testes passed, Frontend 8/8 Sprints API-Driven ✅ — ver ROADMAP.md)

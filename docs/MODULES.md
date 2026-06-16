@@ -297,7 +297,7 @@ Tabela `historico_preco`, script `popular_historico_inicial.py` e integração c
 ### M8 — Analytics Avançados (registrado para avaliação futura)
 Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md v3.0 §9.
 
-> **Nota:** Frontend em integração API-Driven ativa (Sprint 5/8 concluídos). 32/50 telas prometidas no menu já funcionais.
+> **Nota:** Frontend API-Driven 8/8 Sprints ✅ (09/06/2026). 33+ telas funcionais, menu limpo (15/06/2026). Testes E2E v2: 127/127 Chromium. Ver `FRONTEND_IMPLEMENTATION_PLAN.md`.
 
 ---
 
@@ -335,6 +335,6 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 
 ---
 
-*Documento atualizado: 09/06/2026*
-*Versão: v0.8.0-dev*
-*56 ativos com dados fundamentalistas — 48 GAPs concluídos — Frontend Sprint 4/8 — ver ROADMAP.md*
+*Documento atualizado: 16/06/2026*
+*Versão: v0.9.16*
+*56 ativos com dados fundamentalistas — 48 GAPs concluídos — Frontend 8/8 Sprints API-Driven ✅ — ver ROADMAP.md*

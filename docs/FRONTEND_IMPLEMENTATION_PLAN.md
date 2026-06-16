@@ -1,7 +1,7 @@
 # 🖥️ Plano de Implementação Frontend — Exitus
 
-**Data:** 09/06/2026 | **Versão:** v1.0 | **Status:** 📋 Planejado  
-**Objetivo:** Implementar todas as telas prometidas no menu horizontal, integrando as 156 APIs do backend.
+**Data:** 16/06/2026 | **Versão:** v2.0 | **Status:** ✅ 8/8 Sprints Concluídos (09/06/2026)  
+**Objetivo:** ✅ CONCLUÍDO — 33+ telas implementadas, 27 APIs integradas, menu sem links 404.
 
 ---
 
@@ -16,9 +16,8 @@
 | **Admin** | `admin.py` | `/admin/assessoras` | ✅ Implementado |
 | **Análises** | `analises.py` | `/analises/` | ⚠️ Stub (sem conteúdo) |
 
-### O que o menu promete (não implementado)
-O `menu_horizontal.html` possui ~50 links, dos quais apenas ~15 têm rota real.  
-A maioria retorna 404.
+### ✅ Estado Final (16/06/2026)
+O `menu_horizontal.html` foi limpo: 9 links 404 removidos. Todas as rotas dos 8 Sprints estão funcionais.
 
 ---
 
@@ -238,26 +237,17 @@ Corrigido: `TemplateSyntaxError` — ternário Jinja2 em atributo HTML extraído
 
 ---
 
-## 📅 Timeline Estimada
+## 📅 Timeline Real (Concluída)
 
 ```
-Junho 2026:
-├── Sprint 2: Proventos e Rendimentos (3–4 dias)
-│
-Julho 2026:
-├── Sprint 3: Catálogo de Ativos (2–3 dias)
-├── Sprint 4: Planos Disciplinados (4–5 dias)
-│
-Agosto 2026:
-├── Sprint 5: Imposto de Renda (3–4 dias)
-├── Sprint 6: Rentabilidade e Análises (3–4 dias)
-│
-Setembro 2026:
-├── Sprint 7: Relatórios e Exportação (2–3 dias)
-└── Sprint 8: Ferramentas (5–6 dias) — opcional
+28/03/2026: Sprint 1 — Operações (compra/venda, B3)
+09/06/2026: Sprints 2–8 — Proventos, Ativos, Planos/Alertas,
+            IR/DARF, Análises, Relatórios, Ferramentas
+15/06/2026: Menu cleanup — 9 links 404 removidos
+16/06/2026: E2E v2 — 127/127 testes Chromium ✅
 ```
 
-**Total estimado:** 22–30 dias para ~35 telas novas
+**Total real:** 33+ telas novas em 8 sprints
 
 ---
 
@@ -267,26 +257,28 @@ Setembro 2026:
 2. **Criar rota** no blueprint correspondente usando `get_api_headers()`
 3. **Criar template** seguindo `docs/UX_DESIGN_SYSTEM.md` (Nunito, #A38C65)
 4. **Integrar Alpine.js** para interatividade e Fetch API para dados
-5. **Testar** em `localhost:8080` com usuário `admin/senha123`
+5. **Testar** em `localhost:8080` com usuário `e2e_user/e2e_senha_123`
 6. **Atualizar menu** — substituir link morto pela rota real
 7. **Documentar** — CHANGELOG.md + PROJECT_STATUS.md no mesmo commit
 
 ---
 
-## 📐 Estrutura de Blueprints a Criar
+## 📐 Estrutura de Blueprints — Estado Final
 
 ```
 frontend/app/routes/
-├── operacoes.py   ✅ (existente)
-├── dashboard.py   ✅ (existente)
-├── auth.py        ✅ (existente)
-├── admin.py       ✅ (existente)
-├── analises.py    ⚠️ (stub — refatorar)
-├── proventos.py   📋 Sprint 2 (novo)
-├── ativos.py      📋 Sprint 3 (novo)
-├── planos.py      📋 Sprint 4 (novo)
-├── fiscal.py      📋 Sprint 5 (novo)
-└── ferramentas.py 📋 Sprint 8 (novo, opcional)
+├── operacoes.py        ✅ Sprint 1 — compra/venda/B3
+├── dashboard.py        ✅ existente
+├── auth.py             ✅ existente
+├── admin.py            ✅ existente
+├── analises.py         ✅ Sprint 6 — rentabilidade, alocação, performance
+├── proventos.py        ✅ Sprint 2 — recebidos, projetados, calendário
+├── ativos_catalogo.py  ✅ Sprint 3 — ações, FIIs, ETFs, RF, cripto, detalhe
+├── planos.py           ✅ Sprint 4 — planos compra (lista/detalhe)
+├── alertas.py          ✅ Sprint 4 — lista de alertas
+├── fiscal.py           ✅ Sprint 5 — IR mensal, DARFs, histórico, DIRPF
+├── relatorios.py       ✅ Sprint 7 — mensal, anual, extrato, IR, CSV
+└── ferramentas.py      ✅ Sprint 8 — screener, comparador, calculadora, simulador
 ```
 
 ---
@@ -296,15 +288,15 @@ frontend/app/routes/
 | Sprint | Telas | APIs | Acumulado Telas | Acumulado APIs |
 |--------|-------|------|-----------------|---------------|
 | 1 ✅ | 2 | 5 | 2 | 5 |
-| 2 📋 | 3 | 3 | 5 | 8 |
-| 3 📋 | 6 | 2 | 11 | 10 |
-| 4 📋 | 7 | 9 | 18 | 19 |
-| 5 📋 | 3 | 6 | 21 | 25 |
-| 6 📋 | 4 | 5 | 25 | 30 |
-| 7 📋 | 5 | 4 | 30 | 34 |
-| 8 📋 | 4 | 4 | 34 | 38 |
+| 2 ✅ | 3 | 1 | 5 | 6 |
+| 3 ✅ | 6 | 1 | 11 | 7 |
+| 4 ✅ | 4 | 2 | 15 | 9 |
+| 5 ✅ | 4 | 4 | 19 | 13 |
+| 6 ✅ | 5 | 5 | 24 | 18 |
+| 7 ✅ | 5 | 6 | 29 | 24 |
+| 8 ✅ | 4 | 3 | 33 | 27 |
 
-**Meta final:** ~34 telas integradas com APIs reais
+**Resultado real:** 33 telas integradas, 27 APIs reais utilizadas ✅
 
 ---
 
