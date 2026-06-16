@@ -22,9 +22,10 @@ e este projeto adere semanticamente à versão v0.8.0.
   - `proventos/recebidos.html`, `proventos/projetados.html`, `proventos/calendario.html` ✅ Reestruturados
   - `ativos/lista.html`, `ativos/detalhe.html` ✅ Reestruturados
   - `operacoes/operacoes.html` ✅ Reestruturado (max-w-4xl)
+  - `planos/compra_lista.html`, `planos/compra_detalhe.html`, `planos/venda_lista.html` ✅ Reestruturados
   - `dashboard/transactions.html`, `dashboard/analytics.html`, `dashboard/alertas.html`, `dashboard/alocacao.html`, `dashboard/ativo_detalhes.html`, `dashboard/buy_signals.html`, `dashboard/comparador.html`, `dashboard/dividends.html`, `dashboard/fluxo_caixa.html`, `dashboard/planos_compra.html`, `dashboard/planos_venda.html`, `dashboard/proventos_calendario.html`
   - `alertas/lista.html`
-  - `planos/compra_lista.html`, `planos/compra_detalhe.html`, `planos/venda_lista.html`
+  - `analises/alocacao.html`, `fiscal/ir_mensal.html`, `fiscal/darfs.html`, `fiscal/historico.html`, `fiscal/declaracao.html`, `relatorios/mensal.html` (já estavam no padrão)
 
 **Resultado:** Todos os 24+ templates reestruturados com **UM** container envolvendo header + conteúdo (igual ao Screener), garantindo alinhamento perfeito entre header e objetos abaixo. Estrutura padronizada:
 ```html
