@@ -298,6 +298,38 @@ O dashboard atual (`/dashboard`) está **100% funcional** com dados reais (R$ 25
 
 ---
 
+## 🧹 Consolidação de Templates (Jun/2026)
+
+### Contexto
+Durante o desenvolvimento dos Sprints 1–4, templates duplicados foram criados:
+- **Versão Jinja2 tradicional** (`planos/`, `proventos/`, `ativos/`)
+- **Versão Alpine.js** (`dashboard/`)
+
+### Estratégia de Consolidação
+Para eliminar manutenção duplicada e UX fragmentada:
+
+| Rota Original | Redirect Para | Template Consolidado | Status |
+|--------------|---------------|---------------------|--------|
+| `/planos-compra/` | `/dashboard/planos-compra` | `dashboard/planos_compra.html` | ✅ Redirect implementado |
+| `/planos-compra/<id>` | `/dashboard/planos-compra/<id>` | `dashboard/planos_compra_detalhes.html` | ✅ Redirect implementado |
+| `/planos-venda/` | `/dashboard/planos-venda` | `dashboard/planos_venda.html` | ✅ Redirect implementado |
+| `/proventos/recebidos` | `/dashboard/proventos-calendario` | `dashboard/proventos_calendario.html` | ✅ Redirect implementado |
+| `/proventos/projetados` | `/dashboard/proventos-calendario` | `dashboard/proventos_calendario.html` | ✅ Redirect implementado |
+| `/proventos/calendario` | `/dashboard/proventos-calendario` | `dashboard/proventos_calendario.html` | ✅ Redirect implementado |
+| `/ativos/<ticker>` | `/dashboard/ativo/<ticker>` | `dashboard/ativo_detalhes.html` | ✅ Redirect implementado |
+
+### Templates Preservados (Funcionalidades Distintas)
+- `ativos/lista.html` — Catálogo por categoria (Ações, FIIs, ETFs, etc.)
+- `ativos/detalhe.html` — Detalhe simplificado (fallback opcional)
+- `planos/venda_lista.html` — Stub até API backend pronta
+
+### Arquivos Modificados
+- `frontend/app/routes/planos.py` — Redirects para dashboard
+- `frontend/app/routes/proventos.py` — Redirects para dashboard
+- `frontend/app/routes/ativos_catalogo.py` — Redirect detalhe para dashboard
+
+---
+
 ## 🔄 Próximos Passos
 
 1. ✅ Arquivar docs UX obsoletos

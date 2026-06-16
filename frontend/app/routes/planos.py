@@ -44,38 +44,15 @@ def _fetch_plano_detalhe(headers, plano_id):
 @bp.route('/')
 @login_required
 def compra_lista():
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    planos = _fetch_planos_compra(headers)
-
-    stats = {
-        'total': len(planos),
-        'ativos': sum(1 for p in planos if p.get('status') == 'ativo'),
-        'concluidos': sum(1 for p in planos if p.get('status') == 'concluido'),
-        'progresso_medio': 0.0,
-    }
-    progressos = [float(p.get('progresso_percentual') or 0) for p in planos]
-    if progressos:
-        stats['progresso_medio'] = sum(progressos) / len(progressos)
-
-    return render_template(
-        'planos/compra_lista.html',
-        planos=planos,
-        stats=stats,
-    )
+    """Redirect para versão Alpine.js do dashboard."""
+    return redirect(url_for('dashboard.planos_compra'))
 
 
 @bp.route('/<plano_id>')
 @login_required
 def compra_detalhe(plano_id):
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    plano = _fetch_plano_detalhe(headers, plano_id)
-    return render_template('planos/compra_detalhe.html', plano=plano, plano_id=plano_id)
+    """Redirect para versão Alpine.js do dashboard."""
+    return redirect(url_for('dashboard.planos_compra_detalhes', plano_id=plano_id))
 
 
 # Blueprint separado para planos de venda (API pendente no backend)
@@ -85,4 +62,5 @@ bp_venda = Blueprint('planos_venda', __name__, url_prefix='/planos-venda')
 @bp_venda.route('/')
 @login_required
 def venda_lista():
-    return render_template('planos/venda_lista.html')
+    """Redirect para versão Alpine.js do dashboard."""
+    return redirect(url_for('dashboard.planos_venda'))

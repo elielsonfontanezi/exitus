@@ -100,108 +100,19 @@ def _fetch_proventos(headers, status_filter=None, page=1, per_page=100):
 @bp.route('/recebidos')
 @login_required
 def recebidos():
-    """Proventos já pagos."""
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    page = request.args.get('page', 1, type=int)
-    proventos_todos, stats, timeline = _fetch_proventos(headers, page=page)
-    proventos = [p for p in proventos_todos if p['status'] == 'PAGO']
-
-    stats_recebidos = {
-        'total': len(proventos),
-        'recebido': sum(p['valor_total'] for p in proventos),
-        'previsto': 0.0,
-        'total_geral': sum(p['valor_total'] for p in proventos),
-    }
-    timeline_recebidos = []
-    acc = defaultdict(float)
-    for p in proventos:
-        ref = p['data_pagamento'] or p['data_com']
-        if ref:
-            acc[ref[:7]] += p['valor_total']
-    timeline_recebidos = [{'mes': k, 'valor': v} for k, v in sorted(acc.items())]
-
-    return render_template(
-        'proventos/recebidos.html',
-        proventos=proventos,
-        stats=stats_recebidos,
-        timeline=timeline_recebidos,
-        page=page,
-    )
+    """Redirect para versão Alpine.js do dashboard."""
+    return redirect(url_for('dashboard.proventos_calendario'))
 
 
 @bp.route('/projetados')
 @login_required
 def projetados():
-    """Proventos previstos (ainda não pagos)."""
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    page = request.args.get('page', 1, type=int)
-    proventos_todos, stats, timeline = _fetch_proventos(headers, page=page)
-    proventos = [p for p in proventos_todos if p['status'] == 'PREVISTO']
-
-    stats_projetados = {
-        'total': len(proventos),
-        'recebido': 0.0,
-        'previsto': sum(p['valor_total'] for p in proventos),
-        'total_geral': sum(p['valor_total'] for p in proventos),
-    }
-    acc = defaultdict(float)
-    for p in proventos:
-        ref = p['data_pagamento'] or p['data_com']
-        if ref:
-            acc[ref[:7]] += p['valor_total']
-    timeline_projetados = [{'mes': k, 'valor': v} for k, v in sorted(acc.items())]
-
-    return render_template(
-        'proventos/projetados.html',
-        proventos=proventos,
-        stats=stats_projetados,
-        timeline=timeline_projetados,
-        page=page,
-    )
+    """Redirect para versão Alpine.js do dashboard."""
+    return redirect(url_for('dashboard.proventos_calendario'))
 
 
 @bp.route('/calendario')
 @login_required
 def calendario():
-    """Calendário de dividendos — visão mensal de todos os proventos."""
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    proventos_todos, stats, timeline = _fetch_proventos(headers)
-
-    meses = defaultdict(list)
-    for p in proventos_todos:
-        ref = p['data_pagamento'] or p['data_com']
-        if ref:
-            meses[ref[:7]].append(p)
-
-    calendario_data = []
-    for mes_key in sorted(meses.keys(), reverse=True):
-        itens = meses[mes_key]
-        total_mes = sum(i['valor_total'] for i in itens)
-        try:
-            dt = datetime.strptime(mes_key, '%Y-%m')
-            label = dt.strftime('%B %Y').capitalize()
-        except Exception:
-            label = mes_key
-        calendario_data.append({
-            'mes_key': mes_key,
-            'label': label,
-            'itens': itens,
-            'total': total_mes,
-            'count': len(itens),
-        })
-
-    return render_template(
-        'proventos/calendario.html',
-        calendario=calendario_data,
-        stats=stats,
-        timeline=timeline,
-    )
+    """Redirect para versão Alpine.js do dashboard."""
+    return redirect(url_for('dashboard.proventos_calendario'))

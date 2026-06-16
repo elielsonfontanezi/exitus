@@ -159,12 +159,5 @@ def cripto():
 @bp.route('/<ticker>')
 @login_required
 def detalhe(ticker):
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    ativo = _fetch_ativo_detalhe(headers, ticker.upper())
-    if not ativo:
-        return render_template('ativos/detalhe.html', ativo=None, ticker=ticker.upper())
-
-    return render_template('ativos/detalhe.html', ativo=ativo, ticker=ticker.upper())
+    """Redirect para versão Alpine.js do dashboard."""
+    return redirect(url_for('dashboard.ativo_detalhes', ticker=ticker.upper()))
