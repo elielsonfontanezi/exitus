@@ -348,14 +348,16 @@ Para eliminar manutenção duplicada e UX fragmentada:
 4. ✅ Sprint 1: Tela Compra refatorada (Tailwind/API REST) - 28/03/2026
 5. ✅ Implementar tela de venda com estilo consistente - 02/04/2026
 6. ✅ Implementar Importação B3 (upload drag & drop) - 05/04/2026
-7. ⏳ Sprint 2: Proventos Recebidos (`/proventos/recebidos`)
-8. ⏳ Sprint 2: Proventos Projetados (`/proventos/projetados`)
-9. ⏳ Sprint 2: Calendário de Dividendos (`/proventos/calendario`)
-10. ⏳ Sprint 3: Catálogo de Ativos (Ações, FIIs, ETFs, Renda Fixa, Cripto)
-11. ⏳ Sprint 4: Planos de Compra e Venda Disciplinados
-12. ⏳ Sprint 5: Imposto de Renda / DARFs
-13. ⏳ Sprint 6: Rentabilidade e Análises
-14. ⏳ Sprint 7: Relatórios e Exportação
+7. ✅ Sprint 2: Proventos Recebidos, Projetados, Calendário - 09/06/2026
+8. ✅ Sprint 3: Catálogo de Ativos (Ações, FIIs, ETFs, Renda Fixa, Cripto) - 09/06/2026
+9. ✅ Sprint 4: Planos de Compra e Alertas - 09/06/2026
+10. ✅ Sprint 5: Imposto de Renda / DARFs - 09/06/2026
+11. ✅ Sprint 6: Rentabilidade e Análises - 09/06/2026
+12. ✅ Sprint 7: Relatórios e Exportação - 09/06/2026
+13. ✅ Sprint 8: Ferramentas (Screener, Comparador, Calculadora, Simulador) - 09/06/2026
+14. ✅ Menu cleanup: 9 links 404 removidos - 15/06/2026
+15. ✅ Testes E2E v2: 127/127 Chromium (branch mergeado) - 16/06/2026
+16. 🟡 Testes E2E v3: 73 CTs lógica de negócio (branch `feature/testes-e2e-v3` em andamento)
 
 **Ver plano completo:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md`
 
