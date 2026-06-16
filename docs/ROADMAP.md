@@ -2,8 +2,8 @@
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
 > **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 508/546 passing (93.0%) ✅  
-> **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅ | **Frontend API-Driven:** ✅ Sprint 1 Concluído (03/04/2026) | **Token Refresh:** ✅ Concluído (26/03/2026)  
-> **Dashboard:** ✅ Posições geradas automaticamente (R$ 257.677,50) + Hook em Transacao + Seed completo | **Versão:** v0.9.14 | **Última atualização:** 03/04/2026
+> **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅ | **Frontend API-Driven:** ✅ 8/8 Sprints Concluídos (09/06/2026) | **UI Consistency:** ✅ Menu limpo (15/06/2026)  
+> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.16 | **Última atualização:** 16/06/2026
 
 ---
 
@@ -14,10 +14,10 @@
  Backend Fase 7: Produção 🎯 (próxima)
  Backend Fase 8: Futuro 📋
  Frontend V2.0: 17/17 telas ✅
- Frontend UX Evolution: 4 semanas 🎨 (incremental)
- Testes E2E Fase 1: Setup + Smoke ✅
- Testes E2E Fase 2: Funcionais + UX ⏳
- Testes E2E Fase 3: Go-Live ⏳
+ Frontend UX Evolution: 4 semanas ✅ (concluído)
+ Frontend API-Driven: 8/8 Sprints ✅ (09/06/2026) — 33 telas, 27 APIs
+ Testes E2E v2: 127/127 Chromium ✅ — Firefox/Mobile 🎯 (próximo)
+ Backend Fase 7: MONITOR-001, RATELIMIT-001, CICD-001 📋
 ```
 
 ---
@@ -153,11 +153,13 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 | Prioridade | Item | Detalhe |
 |------------|------|---------|
-| 🔴 Alta | **Testes E2E Sprints 5–8** | Adicionar cenários formais para `/relatorios/*` e `/ferramentas/*` — hoje só Fase 1 tem cobertura (108 testes) |
-| 🔴 Alta | **Corrigir ~4 links 404 restantes** | `/perfil`, `/configuracoes` e sub-rotas órfãs de alertas no menu horizontal |
-| 🟡 Média | **Dados fundamentalistas nulos no Screener** | Muitos ativos têm `dividend_yield=null`, `p_vp=null` — verificar pipeline de importação de dados fundamentalistas |
+| ✅ Concluído | **Testes E2E v2 — Chromium** | 127/127 passando, branch `feature/testes-e2e-v2` (16/06/2026) |
+| ✅ Concluído | **Merge feature/frontend-api-integration → main** | Concluído antes de criar branch E2E v2 |
+| ✅ Concluído | **Menu limpo (UI Consistency)** | 9 links 404 removidos, headers padronizados (15/06/2026) |
+| 🔴 Alta | **E2E multi-browser** | Firefox + Mobile Chrome: `npx playwright test --project=firefox` |
+| 🔴 Alta | **Merge feature/testes-e2e-v2 → main** | Após validação multi-browser |
+| 🟡 Média | **Dados fundamentalistas nulos no Screener** | Muitos ativos têm `dividend_yield=null`, `p_vp=null` — verificar pipeline |
 | 🟡 Média | **Calculadora IR: cotação automática** | Integrar `GET /api/cotacoes/<ticker>` para pré-preencher preço de venda sugerido |
-| 🟢 Baixa | **Merge feature → main** | Branch `feature/frontend-api-integration` com 8 sprints — revisar e fazer merge após aprovação |
 
 ---
 
@@ -192,30 +194,36 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 ### ✅ Fase 1: Setup + Testes de Fumaça (17/03/2026) — CONCLUÍDA
 
 - [x] Configurar Playwright + dependências
-- [x] 17 specs criados (1 por tela)
+- [x] 17 specs criados (1 por tela do Frontend V2.0)
 - [x] 108 testes de fumaça implementados
-- [x] Console errors: 0 (antes: 9)
-- [x] URLs 404: 0 (antes: 8)
 
-**Resultado:** 104/108 passando (96% sucesso)
+**Resultado:** 104/108 passando (96% sucesso) — specs obsoletos (Frontend V2.0 mock data)
 
-### ⏳ Fase 2: Testes Funcionais e UX (31/03-04/04/2026)
+### ✅ v2: Replanejamento Completo por Contexto (16/06/2026) — CONCLUÍDA
 
-- [ ] CRUD operations (Planos, Portfolios, Alertas)
-- [ ] Cálculos matemáticos (IR, performance, yield)
-- [ ] Integrações com APIs (mock + real)
-- [ ] Validações de formulários
-- [ ] Fluxos completos do usuário
+- [x] 17 specs V2.0 obsoletos removidos (seletores incompatíveis com API-Driven)
+- [x] 8 novos specs criados por contexto: smoke, auth, operacoes, portfolio, fiscal, relatorios, ferramentas, regressao
+- [x] 127 testes cobrindo 47 rotas reais do frontend API-Driven
+- [x] Credenciais corrigidas: `e2e_user`/`e2e_senha_123`
+- [x] Seletores Alpine.js corrigidos (`x-model`, `x-show`, `.tipo-card`)
+- [x] Race conditions resolvidas (`networkidle`, filtros `Failed to fetch`)
+- [x] `playwright.config.js` atualizado — Chromium, Firefox, Mobile Chrome
+
+**Resultado:** 127/127 passando, 0 flaky (Chromium) — branch `feature/testes-e2e-v2`
+
+### 🎯 Próximo: Multi-browser + Merge (pendente)
+
+- [ ] Firefox: `npx playwright test --project=firefox`
+- [ ] Mobile Chrome: `npx playwright test --project="Mobile Chrome"`
+- [ ] Merge `feature/testes-e2e-v2` → `main`
 - [ ] Performance audit (Lighthouse)
 - [ ] Testes de acessibilidade (axe-core)
-- [ ] Cross-browser testing
 
-### ⏳ Fase 3: Validação Final e Go-Live (07-11/04/2026)
+### ⏳ Fase 3: Validação Final e Go-Live (futuro)
 
 - [ ] Múltiplos usuários simultâneos
 - [ ] Grandes volumes de dados
 - [ ] Condições de rede adversas
-- [ ] Execução completa da suíte
 - [ ] Revisão de segurança
 - [ ] Checklist de produção
 - [ ] Go/No-Go decision
@@ -289,11 +297,11 @@ Transações | Movimentações | Proventos | Relatórios | Análises |
 
 | Métrica | Atual | Meta | Status |
 |---------|-------|------|--------|
-| **GAPs Backend** | 46/54 (85%) | 54/54 | ✅ Em dia |
-| **Testes Backend** | 491 (100%) | 500+ | ✅ |
-| **Endpoints** | 155 | 160 | ✅ |
-| **Telas Frontend** | 17/17 (100%) | 17 | ✅ |
-| **Testes E2E** | 108 (Fase 1) | 170+ | 🟡 63% |
+| **GAPs Backend** | 48/54 (87%) | 54/54 | 🟡 Em andamento |
+| **Testes Backend** | 508/546 (93%) | 546 | ✅ |
+| **Endpoints** | 156 | 160 | ✅ |
+| **Telas Frontend API-Driven** | 33/~46 (87%) | 46 | 🟡 |
+| **Testes E2E (Chromium)** | 127/127 (100%) | 127+ multi-browser | 🟡 Multi-browser pendente |
 | **Cobertura** | 85%+ | 90% | 🟡 Medir |
 
 ---
@@ -324,6 +332,6 @@ Documentos históricos de roadmaps anteriores estão em `docs/archive/`:
 
 ---
 
-*Última atualização: 09/06/2026*  
-*Próxima revisão: Após conclusão Sprint 5 (Imposto de Renda / DARF)*  
+*Última atualização: 16/06/2026*  
+*Próxima revisão: Após validação E2E multi-browser e merge para main*  
 *Responsável: Elielson Fontanezi + Cascade AI*
