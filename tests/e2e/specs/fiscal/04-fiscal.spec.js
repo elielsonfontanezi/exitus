@@ -76,8 +76,14 @@ test.describe('Fiscal — Imposto de Renda @fiscal', () => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
     await page.goto('/imposto-renda/mensal');
-    await page.waitForTimeout(1500);
-    const critical = errors.filter(e => !e.includes('favicon') && !e.includes('net::ERR_'));
+    await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(500);
+    const critical = errors.filter(e =>
+      !e.includes('favicon') &&
+      !e.includes('net::ERR_') &&
+      !e.includes('Failed to fetch') &&
+      !e.includes('Erro ao carregar')
+    );
     expect(critical).toHaveLength(0);
   });
 

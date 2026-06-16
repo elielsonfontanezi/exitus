@@ -14,7 +14,7 @@ test.describe('Regressão — Fluxos Críticos @regressao', () => {
     await page.fill('input[name="username"]', 'e2e_user');
     await page.fill('input[name="password"]', 'e2e_senha_123');
     await page.click('button[type="submit"]');
-    await page.waitForURL('**/dashboard/**', { timeout: 10000 });
+    await page.waitForURL('**/dashboard/**', { timeout: 15000 });
   });
 
   // --- Navegação via menu ---

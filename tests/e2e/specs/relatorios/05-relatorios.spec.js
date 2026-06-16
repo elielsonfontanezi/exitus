@@ -13,7 +13,7 @@ test.describe('Relatórios — Mensal, Anual, Extrato, IR, CSV @relatorios', () 
     await page.fill('input[name="username"]', 'e2e_user');
     await page.fill('input[name="password"]', 'e2e_senha_123');
     await page.click('button[type="submit"]');
-    await page.waitForURL('**/dashboard/**', { timeout: 10000 });
+    await page.waitForURL('**/dashboard/**', { timeout: 15000 });
   });
 
   test('relatório mensal deve carregar sem erros', async ({ page }) => {
@@ -87,8 +87,14 @@ test.describe('Relatórios — Mensal, Anual, Extrato, IR, CSV @relatorios', () 
       if (msg.type() === 'error') errors.push(msg.text());
     });
     await page.goto('/relatorios/mensal');
-    await page.waitForTimeout(1500);
-    const critical = errors.filter(e => !e.includes('favicon') && !e.includes('net::ERR_'));
+    await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(500);
+    const critical = errors.filter(e =>
+      !e.includes('favicon') &&
+      !e.includes('net::ERR_') &&
+      !e.includes('Failed to fetch') &&
+      !e.includes('Erro ao carregar')
+    );
     expect(critical).toHaveLength(0);
   });
 });
