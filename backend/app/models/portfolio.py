@@ -57,6 +57,14 @@ class Portfolio(db.Model):
         index=True,
         comment='ID do usuário proprietário'
     )
+    
+    assessora_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment='ID da assessora (multi-tenancy)'
+    )
 
     # ========================================
     # DADOS DO PORTFOLIO
@@ -123,6 +131,7 @@ class Portfolio(db.Model):
     # ========================================
     # RELACIONAMENTOS
     # ========================================
+    assessora = relationship('Assessora', back_populates='portfolios')
     usuario = relationship('Usuario', back_populates='portfolios', lazy='joined')
     # posicoes = relationship('Posicao', back_populates='portfolio', lazy='dynamic')  # Descomentar quando Posicao tiver portfolio_id
     alertas = relationship('ConfiguracaoAlerta', back_populates='portfolio', lazy='dynamic')

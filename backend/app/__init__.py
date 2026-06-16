@@ -76,6 +76,21 @@ def create_app(testing=False):
     init_db(app)
 
     # ============================================
+    # ROW-LEVEL SECURITY (RLS) - MULTICLIENTE-001
+    # ============================================
+    from .utils.rls_context import init_rls_for_request
+    
+    @app.before_request
+    def setup_rls():
+        """
+        Inicializa Row-Level Security (RLS) para cada requisição.
+        
+        Extrai assessora_id do JWT e seta no contexto PostgreSQL,
+        ativando automaticamente as políticas RLS no banco de dados.
+        """
+        init_rls_for_request()
+
+    # ============================================
     # HEALTH CHECK
     # ============================================
     @app.route('/health')
@@ -119,11 +134,19 @@ def create_app(testing=False):
     from .blueprints.provento_blueprint import provento_bp
     app.register_blueprint(provento_bp)
 
-    from .blueprints.movimentacao_blueprint import movimentacao_bp
-    app.register_blueprint(movimentacao_bp)
+    from .blueprints.movimentacao_caixa_blueprint import movimentacao_caixa_bp
+    app.register_blueprint(movimentacao_caixa_bp)
 
     from .blueprints.evento_corporativo_blueprint import evento_bp
     app.register_blueprint(evento_bp)
+
+    # 🆕 Carteira (Dashboard v2 - UX)
+    try:
+        from .blueprints.carteira_blueprint import carteira_bp
+        app.register_blueprint(carteira_bp)
+        print("✅ Carteira blueprint registrado: /api/carteira/*")
+    except ImportError as e:
+        print(f"⚠️  Carteira blueprint não encontrado: {e}")
 
     # 🆕 Portfolio consolidado (M7)
     # 🆕 Portfolio consolidado (M7)
@@ -151,13 +174,7 @@ def create_app(testing=False):
     except ImportError as e:
         print(f"⚠️  Feriados blueprint não encontrado: {e}")
 
-    # M4.2 - Fontes de Dados
-    try:
-        from .blueprints.fontesblueprint import fontesbp
-        app.register_blueprint(fontesbp)
-        print("✅ Fontes blueprint registrado: /api/fontes")
-    except ImportError as e:
-        print(f"⚠️  Fontes blueprint não encontrado: {e}")
+    # M4.2 - Fontes de Dados (removido fontesblueprint mock - CLEANUP-001)
 
     # M4.3 - Regras Fiscais
     try:
@@ -183,6 +200,22 @@ def create_app(testing=False):
     except ImportError as e:
         print(f"⚠️  Buy Signals blueprint não encontrado: {e}")
 
+    # Fase 3 - Planos de Compra
+    try:
+        from .blueprints.plano_compra_blueprint import bp as plano_compra_bp
+        app.register_blueprint(plano_compra_bp)
+        print("✅ Planos de Compra blueprint registrado: /api/plano-compra/*")
+    except ImportError as e:
+        print(f"⚠️  Planos de Compra blueprint não encontrado: {e}")
+
+    # Planos de Venda
+    try:
+        from .blueprints.plano_venda_blueprint import plano_venda_bp
+        app.register_blueprint(plano_venda_bp)
+        print("✅ Planos de Venda blueprint registrado: /api/plano-venda/*")
+    except ImportError as e:
+        print(f"⚠️  Planos de Venda blueprint não encontrado: {e}")
+
     # M4.6 - IR (Imposto de Renda — EXITUS-IR-001)
     try:
         from .blueprints.ir_blueprint import ir_bp
@@ -198,6 +231,14 @@ def create_app(testing=False):
         print("✅ Export blueprint registrado: /api/export/*")
     except ImportError as e:
         print(f"⚠️  Export blueprint não encontrado: {e}")
+
+    # M4.8 - Import B3 (Importação Portal B3 — EXITUS-IMPORT-001)
+    try:
+        from .blueprints.import_b3_blueprint import bp as import_b3_bp
+        app.register_blueprint(import_b3_bp)
+        print("✅ Import B3 blueprint registrado: /api/import/*")
+    except ImportError as e:
+        print(f"⚠️  Import B3 blueprint não encontrado: {e}")
 
     # ============================================
     # M7.4 - ALERTAS (NOVO!)
@@ -266,6 +307,36 @@ def create_app(testing=False):
         print("✅ Câmbio blueprint registrado: /api/cambio/*")
     except ImportError as e:
         print(f"⚠️  Câmbio blueprint não encontrado: {e}")
+
+    # ============================================
+    # M6 - Reconciliação (EXITUS-RECONCILIACAO-001)
+    # ============================================
+    try:
+        from .blueprints.reconciliacao_blueprint import reconciliacaobp
+        app.register_blueprint(reconciliacaobp)
+        print("✅ Reconciliação blueprint registrado: /api/reconciliacao/*")
+    except ImportError as e:
+        print(f"⚠️  Reconciliação blueprint não encontrado: {e}")
+
+    # ============================================
+    # DIVCALENDAR-001 - Calendário de Dividendos
+    # ============================================
+    try:
+        from .blueprints.calendario_dividendo_blueprint import calendario_dividendo_bp
+        app.register_blueprint(calendario_dividendo_bp)
+        print("✅ Calendário de Dividendos blueprint registrado: /api/calendario-dividendos/*")
+    except ImportError as e:
+        print(f"⚠️  Calendário de Dividendos blueprint não encontrado: {e}")
+
+    # ============================================
+    # MULTICLIENTE-001 - Gestão de Assessoras (Admin)
+    # ============================================
+    try:
+        from .blueprints.assessora_blueprint import assessora_bp
+        app.register_blueprint(assessora_bp)
+        print("✅ Assessoras blueprint registrado: /api/assessoras (admin only)")
+    except ImportError as e:
+        print(f"⚠️  Assessoras blueprint não encontrado: {e}")
 
     # ============================================
     # SWAGGER / OpenAPI (EXITUS-SWAGGER-001)

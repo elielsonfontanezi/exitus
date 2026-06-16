@@ -1,0 +1,29 @@
+{# 
+  Componente: Signal Badge
+  Descrição: Badge visual para sinal de compra/venda
+  Props:
+    - signal: string (COMPRAR, AGUARDAR, VENDER)
+    - size: string (sm, md, lg) - opcional, padrão 'md'
+  Uso:
+    {% include 'components/badges/signal_badge.html' with signal='COMPRAR' size='md' %}
+#}
+
+{% set badge_classes = {
+  'sm': 'px-2 py-0.5 text-xs',
+  'md': 'px-2.5 py-1 text-sm',
+  'lg': 'px-3 py-1.5 text-base'
+} %}
+
+{% set signal_config = {
+  'COMPRAR': {'icon': '📈', 'label': 'COMPRAR', 'color': 'bg-green-100 text-green-800 border-green-300'},
+  'AGUARDAR': {'icon': '⏸️', 'label': 'AGUARDAR', 'color': 'bg-yellow-100 text-yellow-800 border-yellow-300'},
+  'VENDER': {'icon': '📉', 'label': 'VENDER', 'color': 'bg-red-100 text-red-800 border-red-300'}
+} %}
+
+{% set size_class = badge_classes.get(size, badge_classes['md']) %}
+{% set config = signal_config.get(signal, signal_config['AGUARDAR']) %}
+
+<span class="inline-flex items-center gap-1.5 font-semibold rounded-md border {{ size_class }} {{ config.color }}">
+  <span>{{ config.icon }}</span>
+  <span>{{ config.label }}</span>
+</span>

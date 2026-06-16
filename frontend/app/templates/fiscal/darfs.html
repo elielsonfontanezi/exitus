@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}DARFs — Exitus{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #0f3460 0%, #533483 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">📄 DARFs</h1>
+        <p class="text-blue-200 mt-1">Documento de Arrecadação de Receitas Federais — {{ mes_atual }}</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="{{ url_for('fiscal.ir_mensal') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+          🧾 Apuração IR
+        </a>
+        <a href="{{ url_for('fiscal.historico') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+          📅 Histórico
+        </a>
+        <a href="{{ url_for('dashboard.index') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">
+          ← Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {% if erro %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700">
+    ⚠️ Erro ao carregar DARFs: {{ erro }}
+  </div>
+  {% endif %}
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-receipt text-purple-600"></i>
+      </div>
+      <div class="text-2xl font-bold text-purple-600">{{ dados.darfs | length if dados.darfs else 0 }}</div>
+      <div class="text-xs text-gray-500 mt-1">DARFs do Mês</div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas fa-money-bill-wave text-red-600"></i>
+      </div>
+      <div class="text-2xl font-bold text-red-600">R$ {{ '%.2f'|format(dados.ir_total or 0) | replace('.', ',') }}</div>
+      <div class="text-xs text-gray-500 mt-1">IR Total Devido</div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
+      <div class="w-10 h-10 {% if dados.darfs and dados.darfs | length > 0 %}bg-red-100{% else %}bg-green-100{% endif %} rounded-full flex items-center justify-center mx-auto mb-2">
+        <i class="fas {% if dados.darfs and dados.darfs | length > 0 %}fa-exclamation-circle text-red-600{% else %}fa-check-circle text-green-600{% endif %}"></i>
+      </div>
+      <div class="text-2xl font-bold {% if dados.darfs and dados.darfs | length > 0 %}text-red-600{% else %}text-green-600{% endif %}">
+        {% if dados.darfs and dados.darfs | length > 0 %}Pendente{% else %}OK{% endif %}
+      </div>
+      <div class="text-xs text-gray-500 mt-1">Status</div>
+    </div>
+  </div>
+
+  <!-- Alertas -->
+  {% if dados.alertas %}
+  <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+    <h3 class="font-semibold text-yellow-800 mb-2 flex items-center gap-2">
+      <i class="fas fa-exclamation-triangle"></i> Alertas
+    </h3>
+    <ul class="space-y-1">
+      {% for alerta in dados.alertas %}
+      <li class="text-yellow-700 text-sm">• {{ alerta }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Lista de DARFs -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-list text-purple-500"></i>
+        DARFs — {{ mes_atual }}
+      </h2>
+    </div>
+
+    {% if dados.darfs and dados.darfs | length > 0 %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+          <tr>
+            <th class="text-left px-5 py-3">Código Receita</th>
+            <th class="text-left px-5 py-3">Descrição</th>
+            <th class="text-right px-5 py-3">Competência</th>
+            <th class="text-right px-5 py-3">Vencimento</th>
+            <th class="text-right px-5 py-3">Valor</th>
+            <th class="text-center px-5 py-3">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for darf in dados.darfs %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-5 py-4 font-mono text-gray-700">{{ darf.codigo_receita or '—' }}</td>
+            <td class="px-5 py-4 text-gray-800">{{ darf.descricao or darf.categoria or '—' }}</td>
+            <td class="px-5 py-4 text-right text-gray-600">{{ darf.competencia or mes_atual }}</td>
+            <td class="px-5 py-4 text-right text-gray-600">{{ darf.vencimento or '—' }}</td>
+            <td class="px-5 py-4 text-right font-bold text-red-600">
+              R$ {{ '%.2f'|format(darf.valor or 0) | replace('.', ',') }}
+            </td>
+            <td class="px-5 py-4 text-center">
+              <span class="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full">Pendente</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot class="border-t-2 border-gray-200 bg-gray-50">
+          <tr>
+            <td colspan="4" class="px-5 py-3 font-bold text-gray-700">Total</td>
+            <td class="px-5 py-3 text-right font-bold text-red-600">
+              R$ {{ '%.2f'|format(dados.ir_total or 0) | replace('.', ',') }}
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    {% else %}
+    <div class="p-12 text-center text-gray-400">
+      <i class="fas fa-check-circle text-5xl mb-4 text-green-300"></i>
+      <p class="text-lg font-medium text-green-600">Nenhuma DARF pendente em {{ mes_atual }}</p>
+      <p class="text-sm mt-1">IR total apurado: R$ {{ '%.2f'|format(dados.ir_total or 0) | replace('.', ',') }}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Info -->
+  <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mt-6 text-blue-700 text-sm">
+    <i class="fas fa-info-circle mr-2"></i>
+    DARFs com valor inferior a R$ 10,00 são acumuladas para o mês seguinte. Vencimento: último dia útil do mês seguinte à apuração.
+  </div>
+
+</div>
+{% endblock %}

@@ -7,10 +7,14 @@ def float_safe(value):
         return 0.0
     return float(value)
 
-def calcular_margem_seguranca(ticker):
-    ativo = Ativo.query.filter_by(ticker=ticker).first()
-    if not ativo:
-        raise ValueError("Ativo não encontrado.")
+def calcular_margem_seguranca(ticker_or_ativo):
+    """Calcula margem de segurança. Aceita ticker (str) ou objeto Ativo."""
+    if isinstance(ticker_or_ativo, str):
+        ativo = Ativo.query.filter_by(ticker=ticker_or_ativo.upper()).first()
+        if not ativo:
+            raise ValueError("Ativo não encontrado.")
+    else:
+        ativo = ticker_or_ativo
     
     preco_atual = float_safe(ativo.preco_atual)
     preco_teto = float_safe(ativo.preco_teto)
@@ -21,15 +25,23 @@ def calcular_margem_seguranca(ticker):
     margem = (preco_teto - preco_atual) / preco_teto * 100
     return margem, preco_teto
 
-def calcular_buy_score(ticker):
+def calcular_buy_score(ticker_or_ativo):
+    """Calcula buy score. Aceita ticker (str) ou objeto Ativo."""
+    if isinstance(ticker_or_ativo, str):
+        ativo = Ativo.query.filter_by(ticker=ticker_or_ativo.upper()).first()
+        if not ativo:
+            raise ValueError("Ativo não encontrado.")
+    else:
+        ativo = ticker_or_ativo
+    
     try:
-        margem, _ = calcular_margem_seguranca(ticker)
-        zscore = calcular_zscore(ticker)
+        margem, _ = calcular_margem_seguranca(ativo)
+        zscore = calcular_zscore(ativo)
     except:
         margem, zscore = 0, 0
     
-    dy = float_safe(Ativo.query.filter_by(ticker=ticker).first().dividend_yield) if Ativo.query.filter_by(ticker=ticker).first() else 4.0
-    beta = float_safe(Ativo.query.filter_by(ticker=ticker).first().beta) if Ativo.query.filter_by(ticker=ticker).first() else 1.0
+    dy = float_safe(ativo.dividend_yield) if ativo.dividend_yield else 4.0
+    beta = float_safe(ativo.beta) if ativo.beta else 1.0
     
     # Buy Score 0-100 otimizado
     margem_pts = np.clip(margem * 3, 0, 30)
@@ -41,12 +53,12 @@ def calcular_buy_score(ticker):
     return round(min(score, 100))
 
 
-def calcular_zscore(ticker: str, dias: int = 252) -> float:
+def calcular_zscore(ticker_or_ativo, dias: int = 252) -> float:
     """
     Calcula Z-Score baseado em histórico real de preços.
     
     Args:
-        ticker: Código do ativo
+        ticker_or_ativo: Código do ativo (str) ou objeto Ativo
         dias: Janela de dias úteis (padrão: 252 = 1 ano)
         
     Returns:
@@ -59,9 +71,12 @@ def calcular_zscore(ticker: str, dias: int = 252) -> float:
     from app.services.historico_service import HistoricoService
     
     # Buscar ativo
-    ativo = Ativo.query.filter_by(ticker=ticker.upper()).first()
-    if not ativo:
-        raise ValueError(f"Ativo {ticker} não encontrado")
+    if isinstance(ticker_or_ativo, str):
+        ativo = Ativo.query.filter_by(ticker=ticker_or_ativo.upper()).first()
+        if not ativo:
+            raise ValueError(f"Ativo {ticker_or_ativo} não encontrado")
+    else:
+        ativo = ticker_or_ativo
     
     preco_atual = float(ativo.preco_atual)
     

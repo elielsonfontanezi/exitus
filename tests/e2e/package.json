@@ -1,0 +1,31 @@
+{
+  "name": "exitus-frontend-e2e-tests",
+  "version": "1.0.0",
+  "description": "Testes E2E do Frontend V2.0 - Exitus",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:mobile": "playwright test --project='Mobile Chrome' --project='Mobile Safari'",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:critical": "playwright test --grep @critical",
+    "report": "playwright show-report reports/html",
+    "install-browsers": "playwright install --with-deps"
+  },
+  "keywords": [
+    "e2e",
+    "playwright",
+    "testing",
+    "frontend"
+  ],
+  "author": "Exitus Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0",
+    "allure-playwright": "^2.15.0"
+  }
+}

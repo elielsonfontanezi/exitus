@@ -38,15 +38,15 @@ entregando funcionalidades completas e testadas.
 | M9 | Deploy & Monitoramento | PLAN | Q1 2026 | — |
 | TESTS | Testes Automatizados | PROD | 03 Mar 2026 | — |
 
-**Total de Endpoints: 67+ rotas RESTful validadas.**  
-**Suite de testes: 255+ passed, 0 failed** (`pytest` contra `exitusdb_test` no container).
+**Total de Endpoints: 72+ rotas RESTful validadas.**  
+**Suite de testes: 371 passed, 82 errors** (`pytest` contra `exitusdb_test` no container).
 
 > v0.7.10: Validação completa de APIs — 16 GAPs corrigidos, envelope {success,data}
 > padronizado, strict_slashes aplicado, documentação atualizada. Ver CHANGELOG.md.
 >
-> v0.8.0-dev: **30 GAPs concluídos** (Fases 2, 3, 4 completas). Engine de IR completo,
-> multi-moeda, exportação, Swagger, detecção de anomalias, cálculos RF/FII.
-> Suite de testes verde: 255+ passed, 0 failed. Ver CHANGELOG.md e ROADMAP.md v3.0.
+> v0.8.0-dev: **32 GAPs concluídos** (Fases 2-5 completas + 2 da Fase 6). Engine de IR completo,
+> multi-moeda, exportação, Swagger, detecção de anomalias, cálculos RF/FII, auditoria CRUD,
+> reconciliação de dados. Suite: 371 passed, 82 errors. Ver CHANGELOG.md e ROADMAP.md v3.0.
 
 ---
 
@@ -211,6 +211,7 @@ Preço Teto (4 métodos), Z-Score com histórico real e regras fiscais configur�
 - `GET /api/calculos/preco-teto/{ticker}` — 4 métodos de preço teto
 - `GET /api/buy-signals/zscore/{ticker}` — Z-Score usando `historico_preco`
 - `GET /api/regras-fiscais` — regras por país/tipo de ativo
+- `GET /api/portfolios/evolucao?meses=N` — Evolução patrimonial (snapshots mensais)
 
 Regras fiscais incluem IR para ACAO, FII, REIT, etc., usando `regra_fiscal`
 e `IncidenciaImposto`.
@@ -221,11 +222,22 @@ e `IncidenciaImposto`.
 
 **Objetivo:** Implementar frontend SSR com Flask, Jinja2, HTMX e Alpine.js.
 
-**Status:** PRODUCTION READY — Data: 04 Dez 2025
+**Status:** PRODUCTION READY — Data: 04 Dez 2025 | **Frontend API-Driven:** 8/8 SPRINTS CONCLUÍDOS (09/06/2026)
 
-- 15 rotas frontend
-- Templates base `base.html` e telas de login/registro/dashboard
-- Integração com JWT mantido em sessão
+- 56+ rotas frontend (Sprint 1–8 API-Driven concluídos)
+- 56+ templates Jinja2
+- Integração com JWT mantido em sessão via `get_api_headers()`
+- **Blueprints ativos:** auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, planos_venda, alertas, fiscal, relatorios, ferramentas
+
+**Sprints API-Driven concluídos:**
+- Sprint 1: Operações (compra/venda, importação B3)
+- Sprint 2: Proventos e Rendimentos (recebidos, projetados, calendário)
+- Sprint 3: Catálogo de Ativos (ações, FIIs, ETFs, RF, cripto, detalhe)
+- Sprint 4: Planos Disciplinados e Alertas (12 planos reais, 15 alertas reais)
+- Sprint 5: Imposto de Renda e DARF (apuração, DARFs, histórico 12 meses, DIRPF bens e direitos)
+- Sprint 6: Rentabilidade e Análises (TWR/MWR, alocação, evolução patrimonial, Sharpe, Buy Signals)
+- Sprint 7: Relatórios e Exportação (mensal, anual, extrato, IR completo, CSV client-side)
+- Sprint 8: Ferramentas (screener, comparador, calculadora IR, simulador de aportes)
 
 ---
 
@@ -265,11 +277,13 @@ Tabela `historico_preco`, script `popular_historico_inicial.py` e integração c
 
 ## Roadmap Futuro
 
-### Fase 5 — Robustez, Qualidade e Rentabilidade (Alta Prioridade)
-- **EXITUS-RENTABILIDADE-001** — TWR + MWR (XIRR) + benchmarks (CDI, IBOV, IFIX, S&P500)
-- **EXITUS-VALIDATION-001** — Idempotência na importação B3 (dedup, dry-run, sanitização)
-- **EXITUS-SERVICE-REVIEW-001** — Implementar 4 services stub com lógica real
-- **EXITUS-COVERAGE-001** — Medir cobertura + testes para import_b3_service.py
+### Fase 5 — Robustez, Qualidade e Rentabilidade (✅ Concluída 08/03/2026)
+- **EXITUS-VALIDATION-001** ✅ — Idempotência importação B3 (hash MD5, dry-run, sanitização)
+- **EXITUS-CLEANUP-001** ✅ — Higiene do codebase (13 arquivos deletados, blueprint mock removido)
+- **EXITUS-RENTABILIDADE-001** ✅ — TWR + MWR/XIRR + benchmarks (CDI, IBOV, IFIX, IPCA6, S&P500)
+- **EXITUS-SERVICE-REVIEW-001** ✅ — 4 services stub com lógica real (Sharpe, DY, correlação, fix bug)
+- **EXITUS-COVERAGE-001** ✅ — 59 testes para import_b3_service.py (parsers, edge cases, dry-run)
+- **EXITUS-DOCS-SYNC-001** ✅ — Sincronização de documentação (MODULES, API_REFERENCE, LESSONS_LEARNED)
 
 ### Fase 6 — Integridade e Infraestrutura (Média Prioridade)
 - CLEANUP-001, AUDITLOG-001, CIRCUITBREAKER-001, DARF-ACUMULADO-001, RECONCILIACAO-001, IOF-001, CONSTRAINT-001
@@ -283,7 +297,7 @@ Tabela `historico_preco`, script `popular_historico_inicial.py` e integração c
 ### M8 — Analytics Avançados (registrado para avaliação futura)
 Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md v3.0 §9.
 
-> **Nota:** Frontend pode ser refeito do zero. Foco atual: backend + banco de dados.
+> **Nota:** Frontend em integração API-Driven ativa (Sprint 5/8 concluídos). 32/50 telas prometidas no menu já funcionais.
 
 ---
 
@@ -292,10 +306,11 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 | Categoria | Métrica | Valor |
 |---|---|---|
 | Endpoints | Rotas totais | **67+** |
-| Tabelas | Database | 21 |
+| Tabelas | Database | 23 |
 | Índices | PostgreSQL | 86+ |
-| Blueprints | Flask | 16 |
-| Templates | Frontend | 7 |
+| Blueprints | Flask backend | 17 |
+| Blueprints | Flask frontend | 11 |
+| Templates | Frontend | 26+ |
 | Gráficos | Chart.js | 5 |
 | Providers | Cotações | 5 |
 | Cache Hit Rate | Cotações | 85-95% |
@@ -303,8 +318,9 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 | Usuários Teste | Concorrentes | 20-40 |
 | Ativos Seedados | — | 56 (15 ações BR, 10 FIIs, 6 US, 2 REITs, 8 ETFs, 5 RF, 10 EU) |
 | Cobertura ENUMs | — | 15/15 tipos implementados (inclui UNIT) |
-| GAPs Concluídos | — | 30 (Fases 2, 3, 4) |
-| GAPs Planejados | — | 23 + 1 proposta (Fases 5-8) |
+| Testes | Suite pytest | **376 passed, 16 errors** |
+| GAPs Concluídos | — | 35 (Fases 2, 3, 4, 5) |
+| GAPs Planejados | — | 19 + 1 proposta (Fases 6-8) |
 
 ---
 
@@ -319,6 +335,6 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 
 ---
 
-*Documento atualizado: 05 de Março de 2026*
+*Documento atualizado: 09/06/2026*
 *Versão: v0.8.0-dev*
-*56 ativos com dados fundamentalistas — 30 GAPs concluídos (Fases 2-4) — ver ROADMAP.md v3.0*
+*56 ativos com dados fundamentalistas — 48 GAPs concluídos — Frontend Sprint 4/8 — ver ROADMAP.md*

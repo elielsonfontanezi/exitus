@@ -97,7 +97,7 @@ Configurações:
 - Persistência via volume mapeado
 - Backup automático configurável
 - Migrations gerenciadas por Alembic
-- 22 tabelas + 86+ índices otimizados
+- 23 tabelas + 86+ índices otimizados
 
 ### Container 2: Flask Backend API
 
@@ -128,11 +128,12 @@ Healthcheck: /health (30s interval)
 ```
 
 **Características**:
-- 16 blueprints registrados
-- 67 rotas RESTful
+- 17 blueprints registrados (incluindo reconciliação)
+- 72+ rotas RESTful
 - Autenticação JWT (1h expiry)
 - Rate limiting configurável
 - Logs estruturados (INFO/WARNING/ERROR)
+- Auditoria automática de operações CRUD
 
 ### Container 3: Flask Frontend
 
@@ -161,9 +162,10 @@ User: non-root (exitus:1000)
 ```
 
 **Características**:
-- 15 rotas principais
-- 7+ templates Jinja2
+- 56+ rotas principais (Sprint 1–8 concluídos — 8/8 Sprints)
+- 56+ templates Jinja2
 - Session management (JWT)
+- Blueprints: auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, planos_venda, alertas, fiscal, relatorios, ferramentas
 - Fallback para mock data
 - HTMX para updates parciais (sem reload)
 
@@ -356,7 +358,7 @@ ativo = db.session.get(Ativo, id)
 
 ## Modelo de Dados
 
-### Entidades Principais (22 Tabelas)
+### Entidades Principais (23 Tabelas)
 
 #### Core Tables
 
@@ -597,7 +599,21 @@ ativo = db.session.get(Ativo, id)
 
 21. **projecaorenda** / **relatoriosperformance** — tabelas auxiliares de analytics (detalhadas em `MODULES.md`).[file:10]
 
-22. **outros metadados** (ex.: tabelas auxiliares futuras para monitoramento/parametrização).
+22. **calendario_dividendo** — calendário de proventos futuros para planejamento (DIVCALENDAR-001):
+    - `usuario_id` (FK)
+    - `ativo_id` (FK)
+    - `data_esperada` (Date)
+    - `tipo_provento` (String)
+    - `yield_estimado` (Numeric)
+    - `valor_estimado` (Numeric)
+    - `quantidade` (Integer)
+    - `status` (String: previsto/confirmado/atrasado/pago)
+    - `data_pagamento` (Date, opcional)
+    - `valor_real` (Numeric, opcional)
+    - `observacoes` (Text)
+    - `created_at`, `updated_at`
+
+23. **outros metadados** (ex.: tabelas auxiliares futuras para monitoramento/parametrização).
 
 ### Relacionamentos Chave
 
@@ -608,12 +624,14 @@ usuario (1) ─────> (N) saldo_prejuizo
 usuario (1) ─────> (N) transacao
 usuario (1) ─────> (N) alerta
 usuario (1) ─────> (N) portfolio
+usuario (1) ─────> (N) calendario_dividendo
 
 ativo (1) ─────> (N) posicao
 ativo (1) ─────> (N) transacao
 ativo (1) ─────> (N) provento
 ativo (1) ─────> (N) evento_corporativo
 ativo (1) ─────> (N) historico_preco
+ativo (1) ─────> (N) calendario_dividendo
 
 corretora (1) ─────> (N) posicao
 corretora (1) ─────> (N) transacao
@@ -767,6 +785,112 @@ Requisição → Cache PostgreSQL (15min)?
 - Roles: `admin`, `user`, `readonly`
 - Permissions granulares por endpoint
 - Middleware Flask-JWT-Extended
+
+### Multi-Tenancy e Row-Level Security (RLS)
+
+#### Arquitetura Multi-Tenant
+
+**Modelo**: Shared Database + Tenant Column + RLS
+
+```
+┌──────────────────────────────────────────────────────┐
+│              PostgreSQL Database (Único)              │
+│                                                       │
+│  ┌─────────────────┐  ┌─────────────────┐           │
+│  │   Assessora A   │  │   Assessora B   │           │
+│  │  assessora_id:  │  │  assessora_id:  │           │
+│  │  23c54cb4...    │  │  8f9a2b1c...    │           │
+│  │                 │  │                 │           │
+│  │  - Usuários     │  │  - Usuários     │           │
+│  │  - Portfolios   │  │  - Portfolios   │           │
+│  │  - Transações   │  │  - Transações   │           │
+│  └─────────────────┘  └─────────────────┘           │
+│                                                       │
+│  🔒 RLS Policies: Isolamento automático no banco    │
+└──────────────────────────────────────────────────────┘
+```
+
+#### Camadas de Segurança (Defesa em Profundidade)
+
+**1. JWT Layer**
+- `assessora_id` incluído no token JWT
+- Validado em cada requisição autenticada
+- Claims: `user_id`, `username`, `role`, `assessora_id`
+
+**2. Application Layer**
+- `filter_by_assessora()` nos services (15 services)
+- `@require_assessora` decorator nos endpoints
+- Validação explícita em CRUDs
+
+**3. Database Layer (RLS) ⭐**
+- Políticas PostgreSQL no nível de linha
+- Bloqueio automático de acesso cross-tenant
+- Proteção mesmo se código da aplicação falhar
+
+#### Row-Level Security (RLS) - Implementação
+
+**Tabelas com RLS (10)**:
+- `portfolio`, `transacao`, `posicao`, `provento`
+- `movimentacao_caixa`, `plano_compra`, `plano_venda`
+- `alerta`, `evento_custodia`, `projecoes_renda`
+
+**Políticas por Tabela**:
+```sql
+-- SELECT: Ver apenas dados da própria assessora
+CREATE POLICY portfolio_select_policy ON portfolio
+    FOR SELECT
+    USING (
+        assessora_id::text = current_setting('app.current_assessora_id', true)
+        OR current_setting('app.current_assessora_id', true) IS NULL
+    );
+
+-- INSERT: Forçar assessora_id da sessão
+CREATE POLICY portfolio_insert_policy ON portfolio
+    FOR INSERT
+    WITH CHECK (
+        assessora_id::text = current_setting('app.current_assessora_id', true)
+    );
+
+-- UPDATE/DELETE: Apenas registros da própria assessora
+```
+
+**Contexto RLS**:
+```python
+# Automático via before_request
+@app.before_request
+def setup_rls():
+    init_rls_for_request()  # Extrai assessora_id do JWT
+
+# Manual via context manager
+with RLSContext(assessora_id):
+    portfolios = Portfolio.query.all()  # Filtrado automaticamente
+
+# Funções helper
+set_rls_context(assessora_id)
+clear_rls_context()
+get_rls_context()
+```
+
+**Fluxo de Requisição com RLS**:
+```
+1. Cliente → JWT com assessora_id
+2. Flask before_request → Extrai assessora_id
+3. SET LOCAL app.current_assessora_id = '23c54cb4...'
+4. Query SQL → RLS filtra automaticamente
+5. Retorno → Apenas dados da assessora correta
+```
+
+**Vantagens**:
+- ✅ Segurança em profundidade (último nível de defesa)
+- ✅ Automático (não depende de lembrar de filtrar)
+- ✅ Performático (PostgreSQL otimiza as políticas)
+- ✅ Auditável (políticas versionadas no Git)
+- ✅ Testável (6 testes específicos de RLS)
+
+**Migration**: `20260403_1040_add_rls_policies.py`  
+**Helper**: `backend/app/utils/rls_context.py`  
+**Testes**: `backend/tests/test_rls_security.py`  
+**Documentação**: `docs/MULTICLIENTE.md` (Parte 5)
 
 ### Container Hardening
 
@@ -997,20 +1121,76 @@ Cloud Provider
 
 ---
 
+## Novos Componentes (Dashboard v2 - 21/03/2026)
+
+### Backend - Blueprints Adicionados:
+- **carteira_blueprint.py** - `/api/carteira/*`
+  - GET `/saldo-caixa` - Saldo disponível em BRL/USD com toggle
+
+### Backend - Services Adicionados:
+- **carteira_service.py** - Lógica de negócio para saldo em caixa
+  - `get_saldo_caixa(usuario_id, moeda_exibicao)` - Calcula saldo por moeda
+
+### Backend - Endpoints Modificados:
+- **alertas.py** - Adicionado GET `/recentes?limit=N`
+- **transacoes/routes.py** - Adicionado GET `/recentes?limit=N`
+
+### Frontend - Templates Modificados:
+- **dashboard/index.html** - Reescrito completo para Dashboard v2
+  - Integração com 4 APIs via Alpine.js
+  - 2 gráficos Chart.js (evolução + alocação)
+  - Toggle BRL/USD dinâmico
+  - Visão multi-mercado (BR/US/INTL)
+
+---
+
 ## Referências
 
 - [MODULES.md](MODULES.md) - Detalhes de cada módulo M0-M7
-- [API_REFERENCE.md](API_REFERENCE.md) - Endpoints completos
+- [API_REFERENCE.md](API_REFERENCE.md) - Endpoints completos (23 seções)
 - [OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md) - Deploy e troubleshooting
 - [ENUMS.md](ENUMS.md) - Documentação completa de ENUMs
 
 ---
 
-### Nota sobre Frontend (05/03/2026)
+### Circuit Breaker — Resiliência de APIs Externas (08/03/2026)
 
-O frontend atual (Flask + HTMX + Tailwind, container `exitus-frontend:8080`) é funcional mas **não consome** as APIs implementadas nas Fases 3-4 (IR, Export, Câmbio, Anomaly, RFCALC, Swagger). **Poderá ser refeito do zero** em framework moderno (React/Next.js ou similar) quando o backend estiver estabilizado. O foco atual de desenvolvimento é exclusivamente **backend + banco de dados**. Ver `ROADMAP.md` v3.0.
+Implementado em `backend/app/utils/circuit_breaker.py` — EXITUS-CIRCUITBREAKER-001.
+
+**Componentes:**
+
+| Classe/Função | Responsabilidade |
+|---|---|
+| `CircuitBreaker` | Estados CLOSED/OPEN/HALF_OPEN por provider |
+| `get_circuit_breaker(name)` | Registry global — singleton por provider no processo |
+| `with_retry(func, ...)` | Retry + backoff exponencial integrado ao breaker |
+| `reset_all()` | Limpa todos os breakers (uso em testes) |
+
+**Integração no `CotacoesService`:**
+
+```
+Providers BR:  brapi.dev → hgfinance → yfinance.BR → twelvedata
+Providers US:  finnhub → alphavantage → twelvedata → yfinance.US
+
+failure_threshold = 3  (3 falhas consecutivas → OPEN)
+recovery_timeout  = 60s (brapi, hgfinance, twelve, finnhub, alpha)
+recovery_timeout  = 120s (yfinance.BR, yfinance.US — cold start lento)
+
+Provider OPEN → pula imediatamente para o próximo (sem aguardar timeout HTTP)
+Provider volta a HALF_OPEN após recovery_timeout → tenta 1 request
+Sucesso em HALF_OPEN → fecha circuito (CLOSED)
+```
+
+**Estado:** em memória de processo (single-instance). Não persiste entre restarts.
+Para multi-instância futura, substituir pelo Redis (CIRCUITBREAKER-002 potencial).
 
 ---
 
-**Documento atualizado**: 05 de Março de 2026  
-**Versão arquitetural**: v0.8.0-dev (Fases 2-4 concluídas — 30 GAPs implementados, 255+ testes, ver ROADMAP.md v3.0)
+### Nota sobre Frontend (atualizado 09/06/2026)
+
+O frontend (Flask + Jinja2 + Tailwind + Alpine.js + Chart.js, container `exitus-frontend:8080`) está em **integração API-Driven ativa**. Sprint 5/8 concluídos: Operações, Proventos, Catálogo de Ativos, Planos, Alertas e IR/DARF. 32/50 telas prometidas no menu já funcionais com dados reais. Ver `FRONTEND_IMPLEMENTATION_PLAN.md` e `ROADMAP.md`.
+
+---
+
+**Documento atualizado**: 09/06/2026  
+**Versão arquitetural**: v0.8.0-dev (48 GAPs implementados, 508 testes passed, Frontend Sprint 5/8 — ver ROADMAP.md)

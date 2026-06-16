@@ -228,6 +228,10 @@ sleep 10
 #### 5. Iniciar Backend
 
 ```bash
+# Obter UID/GID do usuário (importante para permissões)
+USER_UID=$(id -u)
+USER_GID=$(id -g)
+
 podman run -d \
   --name exitus-backend \
   --network exitus-net \
@@ -235,6 +239,8 @@ podman run -d \
   -v ./backend:/app:Z \
   -v exitus-backend-logs:/app/logs:Z \
   -p 5000:5000 \
+  -e USER_UID=$USER_UID \
+  -e USER_GID=$USER_GID \
   exitus-backend:latest
 ```
 
@@ -248,6 +254,8 @@ podman run -d \
   -v ./frontend:/app:Z \
   -v exitus-frontend-logs:/app/logs:Z \
   -p 8080:8080 \
+  -e USER_UID=$USER_UID \
+  -e USER_GID=$USER_GID \
   exitus-frontend:latest
 ```
 
@@ -505,6 +513,49 @@ podman exec exitus-backend python3 -c "print('Hello')"
 ---
 
 ## Manutenção do Database
+
+### Carregamento de Cenários de Teste JSON
+
+**Novo comando disponível (22/03/2026):**
+
+```bash
+# Carregar cenário de teste E2E
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_e2e
+
+# Carregar cenário completo (test_full)
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_full
+
+# Carregar cenário para testes de IR
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_ir
+
+# Carregar cenário de stress (volume alto)
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_stress
+```
+
+**Cenários disponíveis:**
+- `test_e2e` - Dados realistas para testes E2E (3 usuários, 7 ativos, 4 transações, 2 proventos, 2 movimentações, 3 alertas)
+- `test_full` - Cenário completo para todas as telas (cobertura 100% do sistema)
+- `test_ir` - Dados específicos para cálculo de Imposto de Renda
+- `test_stress` - Volume alto para testes de performance (6 usuários, 13 transações)
+
+**O que é carregado:**
+- Assessoras
+- Usuários
+- Ativos (BR, US, EU)
+- Corretoras
+- Transações (compra/venda)
+- Proventos (dividendos, JCP, rendimentos)
+- Movimentações de caixa (depósitos, saques)
+- Alertas de preço
+- Portfolios
+- Planos de compra/venda
+
+**Resultado esperado:**
+- Dashboard com saldo de caixa != 0
+- Alertas ativos e funcionais
+- Portfolios criados
+- Planos de compra/venda ativos
+- Todas as telas com dados completos
 
 ### Executar Migrations
 
@@ -1782,6 +1833,73 @@ GROUP BY tipo
 ORDER BY total DESC;
 "
 ```
+
+---
+
+## 🔧 Correção de Permissões (Windows WSL)
+
+### Problema Comum
+
+Ao editar arquivos no Windsurf (Windows) através do WSL, os arquivos são criados com UID/GID diferentes do usuário dentro dos containers Podman.
+
+### Sintomas
+- Erros: "Permission denied", "Operation not permitted"
+- Containers não conseguem ler/escrever arquivos montados
+- Arquivos com owner `100999` (Windows) vs `exitus` (container)
+
+### Solução Automática
+
+#### Método 1: Script Fix (Recomendado)
+```bash
+# Corrige instalação existente
+./scripts/fix_permissions.sh
+```
+
+#### Método 2: Setup com UID/GID
+```bash
+# Para nova instalação
+./scripts/setup_containers.sh
+```
+
+### Verificação
+```bash
+# Verificar UID/GID no host
+id -u && id -g
+
+# Verificar UID/GID no container
+podman exec exitus-backend id -u exitus
+podman exec exitus-backend id -g exitus
+
+# Deve ser igual!
+```
+
+### Manual (se necessário)
+```bash
+# Parar containers
+podman stop exitus-backend exitus-frontend
+
+# Reconstruir imagem com UID/GID
+cd backend
+podman build -t exitus-backend:latest .
+cd ../frontend
+podman build -t exitus-frontend:latest .
+cd ..
+
+# Criar com UID/GID correto
+USER_UID=$(id -u)
+USER_GID=$(id -g)
+
+podman run -d --name exitus-backend \
+  --network exitus-net \
+  -p 5000:5000 \
+  -v ./backend:/app:Z \
+  --env-file ./backend/.env \
+  -e USER_UID=$USER_UID \
+  -e USER_GID=$USER_GID \
+  exitus-backend:latest
+```
+
+**Documentação completa**: [PERMISSIONS_FIX.md](PERMISSIONS_FIX.md)
 
 ---
 

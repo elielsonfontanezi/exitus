@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from uuid import UUID
 from app.services.alerta_service import AlertaService
-from app.models.configuracao_alerta import ConfiguracaoAlerta
+from app.models.alerta import Alerta
 from app.database import db
 
 # Prefixo definido. Rotas abaixo serão relativas a /api/alertas
@@ -16,8 +16,8 @@ def listar_alertas():
     try:
         usuario_id = UUID(get_jwt_identity())
         # Busca alertas e ordena por criação
-        alertas = ConfiguracaoAlerta.query.filter_by(usuario_id=usuario_id)\
-            .order_by(ConfiguracaoAlerta.timestamp_criacao.desc()).all()
+        alertas = Alerta.query.filter_by(usuario_id=usuario_id)\
+            .order_by(Alerta.created_at.desc()).all()
         
         result = [a.to_dict() for a in alertas]
         return jsonify({"success": True, "data": result, "message": f"{len(result)} alerta(s) encontrado(s)"}), 200
@@ -46,6 +46,48 @@ def criar_alerta():
     except Exception as e:
         print(f"Erro criar alerta: {e}")
         return jsonify({"success": False, "message": str(e)}), 500
+
+@bp.route('/recentes', methods=['GET'])
+@jwt_required()
+def listar_alertas_recentes():
+    """
+    Retorna alertas disparados recentemente.
+    
+    Query params:
+        - limit: Número máximo de alertas (default: 5)
+    
+    Returns:
+        Lista de alertas disparados ordenados por data
+    """
+    try:
+        usuario_id = UUID(get_jwt_identity())
+        limit = request.args.get('limit', 5, type=int)
+        
+        # Buscar alertas ativos ordenados por data de criação
+        alertas = Alerta.query.filter_by(
+            usuario_id=usuario_id,
+            ativo=True
+        ).order_by(
+            Alerta.created_at.desc()
+        ).limit(limit).all()
+        
+        result = [{
+            'id': str(a.id),
+            'nome': a.nome,
+            'tipo': a.tipo_alerta,
+            'mensagem': f"Alerta {a.tipo_alerta} - {a.ticker}" if a.ticker else f"Alerta {a.tipo_alerta}",
+            'data': a.created_at.isoformat() if a.created_at else None
+        } for a in alertas]
+        
+        return jsonify({
+            "success": True,
+            "data": result,
+            "message": f"{len(result)} alerta(s) recente(s)"
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
 
 @bp.route('/<alerta_id>/toggle', methods=['PATCH'])
 @jwt_required()

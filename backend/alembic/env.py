@@ -27,7 +27,7 @@ with app.app_context():
         Usuario, Corretora, Ativo, Posicao, Transacao,
         Provento, MovimentacaoCaixa, EventoCorporativo,
         FonteDados, RegraFiscal, FeriadoMercado, LogAuditoria,
-        SaldoPrejuizo,
+        SaldoPrejuizo, SaldoDarfAcumulado,
     )
     target_metadata = db.metadata
     

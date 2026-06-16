@@ -9,7 +9,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.movimentacao_caixa_service import MovimentacaoCaixaService
 from app.schemas.movimentacao_caixa_schema import (
     MovimentacaoCaixaCreateSchema,
-    MovimentacaoCaixaUpdateSchema,
     MovimentacaoCaixaResponseSchema
 )
 from app.utils.responses import success_response, error_response
@@ -24,7 +23,6 @@ movimentacao_caixa_bp = Blueprint('movimentacao_caixa', __name__, url_prefix='/a
 
 # Schemas
 movimentacao_create_schema = MovimentacaoCaixaCreateSchema()
-movimentacao_update_schema = MovimentacaoCaixaUpdateSchema()
 movimentacao_schema = MovimentacaoCaixaResponseSchema()
 movimentacoes_schema = MovimentacaoCaixaResponseSchema(many=True)
 
@@ -114,28 +112,6 @@ def criar_movimentacao():
         return error_response(str(e), 500)
 
 
-@movimentacao_caixa_bp.route('/<uuid:movimentacao_id>', methods=['PUT'])
-@jwt_required()
-def atualizar_movimentacao(movimentacao_id):
-    """Atualiza movimentação de caixa"""
-    try:
-        usuario_id = get_jwt_identity()
-        data = movimentacao_update_schema.load(request.get_json())
-        
-        movimentacao = MovimentacaoCaixaService.update(movimentacao_id, usuario_id, data)
-        
-        return success_response(
-            data=movimentacao_schema.dump(movimentacao),
-            message="Movimentação atualizada com sucesso"
-        )
-        
-    except ValidationError as e:
-        return error_response(e.messages, 400)
-    except ExitusError as e:
-        return error_response(str(e), e.http_status)
-    except Exception as e:
-        logger.error(f"Erro ao atualizar movimentação: {e}")
-        return error_response(str(e), 500)
 
 
 @movimentacao_caixa_bp.route('/<uuid:movimentacao_id>', methods=['DELETE'])

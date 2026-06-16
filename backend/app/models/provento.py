@@ -6,7 +6,7 @@ Entidade para registro de proventos (dividendos, JCP, rendimentos)
 
 from datetime import datetime
 from app.database import db
-from sqlalchemy import String, DateTime, Enum, Numeric, Text, Date, ForeignKey
+from sqlalchemy import String, DateTime, Enum, Numeric, Text, Date, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -56,13 +56,21 @@ class Provento(db.Model):
         comment="Identificador único do provento"
     )
     
-    # Foreign key
+    # Foreign keys
     ativo_id = db.Column(
         UUID(as_uuid=True),
         ForeignKey('ativo.id', ondelete='RESTRICT'),
         nullable=False,
         index=True,
         comment="ID do ativo que pagou o provento"
+    )
+    
+    assessora_id = db.Column(
+        UUID(as_uuid=True),
+        ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID da assessora (multi-tenancy)"
     )
     
     # Tipo de provento
@@ -126,6 +134,19 @@ class Provento(db.Model):
         nullable=True,
         comment="Observações sobre o provento"
     )
+
+    hash_importacao = db.Column(
+        String(64),
+        nullable=True,
+        index=True,
+        comment="Hash MD5 da linha original do arquivo B3 para deduplicação"
+    )
+
+    arquivo_origem = db.Column(
+        String(255),
+        nullable=True,
+        comment="Nome do arquivo B3 de origem da importação"
+    )
     
     # Timestamps
     created_at = db.Column(
@@ -144,6 +165,7 @@ class Provento(db.Model):
     )
     
     # Relacionamentos
+    assessora = relationship('Assessora', back_populates='proventos')
     ativo = relationship('Ativo', backref='proventos', lazy='joined')
     
     # Constraints de tabela

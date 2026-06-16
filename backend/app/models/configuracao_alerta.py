@@ -75,6 +75,14 @@ class ConfiguracaoAlerta(db.Model):
         index=True,
         comment="ID do portfolio (opcional)"
     )
+    
+    assessora_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID da assessora (multi-tenancy)"
+    )
 
     # Dados do alerta
     nome = Column(
@@ -168,10 +176,11 @@ class ConfiguracaoAlerta(db.Model):
     )
 
     # Relacionamentos
-    usuario = relationship("Usuario", backref="alertas", lazy="joined")
+    assessora = relationship("Assessora", back_populates="configuracoes_alertas")
+    usuario = relationship("Usuario", backref="configuracoes_alertas", lazy="joined")
 #    ativo = relationship("Ativo", backref="alertas", lazy="joined")
     ativo_rel = relationship("Ativo", backref="alertas", lazy="joined")
-    portfolio = relationship("Portfolio", back_populates="alertas", lazy="joined")  # ✅ DESCOMENTADO
+    portfolio = relationship("Portfolio", back_populates="alertas", lazy="joined")  # DESCOMENTADO
 
     # Constraints de tabela
     __table_args__ = (

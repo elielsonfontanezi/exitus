@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Vender Ativos - Exitus{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h4 mb-1">💰 Vender Ativos</h2>
+                    <p class="text-muted mb-0">Vender ativos de sua carteira</p>
+                </div>
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                    ← Voltar
+                </a>
+            </div>
+
+            <!-- Formulário -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="formVenda">
+                        <!-- Seleção de Ativo -->
+                        <div class="mb-4">
+                            <label for="posicao_id" class="form-label fw-semibold">
+                                📈 Ativo <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="posicao_id" name="ativo_id" required>
+                                <option value="">Selecione um ativo...</option>
+                                {% for posicao in posicoes %}
+                                <option value="{{ posicao.ativo.id }}" 
+                                        data-ticker="{{ posicao.ativo.ticker }}"
+                                        data-nome="{{ posicao.ativo.nome }}"
+                                        data-quantidade="{{ posicao.quantidade }}"
+                                        data-preco-medio="{{ posicao.preco_medio }}">
+                                    {{ posicao.ativo.ticker }} - {{ posicao.ativo.nome }} 
+                                    (Qtd: {{ posicao.quantidade }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                Selecione o ativo que deseja vender
+                            </div>
+                        </div>
+
+                        <!-- Quantidade e Preço -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="quantidade" class="form-label fw-semibold">
+                                    📊 Quantidade <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="quantidade" 
+                                       name="quantidade" 
+                                       min="1" 
+                                       step="0.01"
+                                       required>
+                                <div class="form-text">
+                                    Quantidade a vender (máx: <span id="max-quantidade">-</span>)
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="preco" class="form-label fw-semibold">
+                                    💰 Preço Unitário <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="preco" 
+                                       name="preco" 
+                                       min="0.01" 
+                                       step="0.01"
+                                       required>
+                                <div class="form-text">
+                                    Preço de venda
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Corretora -->
+                        <div class="mb-4">
+                            <label for="corretora_id" class="form-label fw-semibold">
+                                🏢 Corretora <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="corretora_id" name="corretora_id" required>
+                                <option value="">Selecione a corretora...</option>
+                                {% for corretora in corretoras %}
+                                <option value="{{ corretora.id }}">
+                                    {{ corretora.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Resultado da Operação -->
+                        <div class="alert alert-light">
+                            <h6 class="alert-heading">📋 Resultado da Operação</h6>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <strong>Ativo:</strong> <span id="resumo-ativo">-</span><br>
+                                    <strong>Quantidade:</strong> <span id="resumo-quantidade">-</span><br>
+                                    <strong>Preço Venda:</strong> R$ <span id="resumo-preco">-</span><br>
+                                    <strong>Preço Médio:</strong> R$ <span id="resumo-preco-medio">-</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Total Venda:</strong> R$ <span id="resumo-total" class="fs-5 text-primary">0,00</span><br>
+                                    <strong>Custo Total:</strong> R$ <span id="resumo-custo">0,00</span><br>
+                                    <strong>Resultado:</strong> <span id="resumo-resultado" class="fw-bold">R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                💸 Confirmar Venda
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formVenda');
+    const posicaoSelect = document.getElementById('posicao_id');
+    const quantidadeInput = document.getElementById('quantidade');
+    const precoInput = document.getElementById('preco');
+    const corretoraSelect = document.getElementById('corretora_id');
+    
+    let posicaoSelecionada = null;
+    
+    // Quando seleciona uma posição
+    posicaoSelect.addEventListener('change', function() {
+        const option = this.options[this.selectedIndex];
+        posicaoSelecionada = {
+            ticker: option.dataset.ticker,
+            nome: option.dataset.nome,
+            quantidade: parseFloat(option.dataset.quantidade),
+            precoMedio: parseFloat(option.dataset.preco_medio)
+        };
+        
+        // Atualizar limite de quantidade
+        quantidadeInput.max = posicaoSelecionada.quantidade;
+        document.getElementById('max-quantidade').textContent = 
+            posicaoSelecionada.quantidade.toLocaleString('pt-BR');
+        
+        // Sugerir preço atual (poderia vir de API)
+        precoInput.value = posicaoSelecionada.precoMedio;
+        
+        atualizarResumo();
+    });
+    
+    // Atualizar resumo em tempo real
+    function atualizarResumo() {
+        if (!posicaoSelecionada) return;
+        
+        const quantidade = parseFloat(quantidadeInput.value) || 0;
+        const preco = parseFloat(precoInput.value) || 0;
+        const total = quantidade * preco;
+        const custo = quantidade * posicaoSelecionada.precoMedio;
+        const resultado = total - custo;
+        
+        // Atualizar texto do resumo
+        document.getElementById('resumo-ativo').textContent = 
+            `${posicaoSelecionada.ticker} - ${posicaoSelecionada.nome}`;
+        document.getElementById('resumo-quantidade').textContent = quantidade ? quantidade.toLocaleString('pt-BR') : '-';
+        document.getElementById('resumo-preco').textContent = preco ? preco.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : '-';
+        document.getElementById('resumo-preco-medio').textContent = posicaoSelecionada.precoMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('resumo-total').textContent = total.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('resumo-custo').textContent = custo.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        
+        // Destacar resultado
+        const resultadoElement = document.getElementById('resumo-resultado');
+        resultadoElement.textContent = `R$ ${Math.abs(resultado).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        resultadoElement.className = resultado >= 0 ? 'fw-bold text-success' : 'fw-bold text-danger';
+        resultadoElement.textContent = (resultado >= 0 ? 'R$ ' : '-R$ ') + Math.abs(resultado).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    }
+    
+    // Adicionar event listeners
+    quantidadeInput.addEventListener('input', atualizarResumo);
+    precoInput.addEventListener('input', atualizarResumo);
+    corretoraSelect.addEventListener('change', atualizarResumo);
+    
+    // Validação do formulário
+    form.addEventListener('submit', function(e) {
+        const quantidade = parseFloat(quantidadeInput.value);
+        const preco = parseFloat(precoInput.value);
+        
+        if (!posicaoSelecionada) {
+            e.preventDefault();
+            alert('Por favor, selecione um ativo.');
+            return;
+        }
+        
+        if (!quantidade || quantidade <= 0) {
+            e.preventDefault();
+            alert('Por favor, informe uma quantidade válida.');
+            return;
+        }
+        
+        if (quantidade > posicaoSelecionada.quantidade) {
+            e.preventDefault();
+            alert(`Quantidade máxima disponível: ${posicaoSelecionada.quantidade}`);
+            return;
+        }
+        
+        if (!preco || preco <= 0) {
+            e.preventDefault();
+            alert('Por favor, informe um preço válido.');
+            return;
+        }
+        
+        const total = quantidade * preco;
+        const resultado = total - (quantidade * posicaoSelecionada.precoMedio);
+        const resultadoTexto = resultado >= 0 ? 'lucro' : 'prejuízo';
+        
+        if (confirm(`Confirmar venda de ${quantidade} ${posicaoSelecionada.ticker} no valor total de R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}?`)) {
+            // Submit
+        } else {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

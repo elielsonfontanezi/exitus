@@ -34,3 +34,8 @@ class ForbiddenError(ExitusError):
 class BusinessRuleError(ExitusError):
     """Violação de regra de negócio — HTTP 422."""
     http_status = 422
+
+
+class ValidationError(ExitusError):
+    """Erro de validação de dados — HTTP 400."""
+    http_status = 400

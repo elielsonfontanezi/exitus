@@ -3,47 +3,116 @@
 {% block title %}Alertas - Exitus{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6 space-y-6">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">
-                <i class="fas fa-bell text-yellow-500 mr-3"></i>Alertas e Notificações
-            </h1>
-            <p class="text-gray-600 mt-1">Monitore seus ativos e portfólios com alertas personalizados</p>
+<div class="min-h-screen bg-gray-50" x-data="{ modalAberto: false, abrirModal() { this.modalAberto = true }, fecharModal() { this.modalAberto = false } }">
+  
+  <!-- Hero Section Ultra-Moderna -->
+  <section class="bg-gradient-hero rounded-3xl mx-6 mt-6 p-8 text-white shadow-large animate-fade-in relative overflow-hidden">
+    <!-- Elementos Decorativos -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
+    
+    <div class="relative z-10">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse-slow">
+              <span class="text-3xl">🔔</span>
+            </div>
+            <div>
+              <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                Alertas
+              </h1>
+              <p class="text-xl text-white/80">Monitore seus ativos e portfólios com alertas personalizados</p>
+            </div>
+          </div>
         </div>
-        <!-- ✅ BOTÃO VERMELHO - JS PURO -->
-        <button id="btn-novo-alerta" 
-                class="btn btn-primary flex items-center space-x-2 !border-4 !border-red-500 shadow-lg"
-                onclick="abrirModal()">
-            <i class="fas fa-plus"></i><span>Novo Alerta</span>
-        </button>
+        
+        <div class="mt-8 lg:mt-0 lg:ml-8">
+          <div class="flex flex-wrap gap-3">
+            <button @click="abrirModal()" class="btn-primario">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Novo Alerta
+            </button>
+            <a href="/dashboard/" class="btn-secundario">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Voltar
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <!-- Stats Cards (Dinâmicos) -->
+  <div class="container mx-auto px-6 py-8">
+
+    <!-- Stats Cards Ultra-Modernos -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <!-- Total -->
-        <div class="card bg-white p-6 rounded-lg shadow-sm text-center border-l-4 border-blue-500">
-            <div class="text-3xl font-bold text-gray-800">{{ stats.total }}</div>
-            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1">Total Alertas</div>
+        <div class="card-moderno p-6 animate-scale-in hover-lift group cursor-pointer">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">🔔</span>
+                </div>
+                <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                    <span class="text-primary-600 font-bold text-sm">{{ stats.total }}</span>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-3xl font-bold text-gray-900">{{ stats.total }}</p>
+                <p class="text-sm text-gray-600">Total Alertas</p>
+            </div>
         </div>
 
         <!-- Ativos -->
-        <div class="card bg-white p-6 rounded-lg shadow-sm text-center border-l-4 border-green-500">
-            <div class="text-3xl font-bold text-green-600">{{ stats.ativos }}</div>
-            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1">Ativos</div>
+        <div class="card-moderno p-6 animate-scale-in animate-delay-100 hover-lift group cursor-pointer">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-success-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">✅</span>
+                </div>
+                <div class="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center">
+                    <span class="text-success-600 font-bold text-sm">{{ stats.ativos }}</span>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-3xl font-bold text-gray-900">{{ stats.ativos }}</p>
+                <p class="text-sm text-gray-600">Ativos</p>
+            </div>
         </div>
 
         <!-- Alta Preço -->
-        <div class="card bg-white p-6 rounded-lg shadow-sm text-center border-l-4 border-orange-500">
-            <div class="text-3xl font-bold text-orange-600">{{ stats.alta_preco }}</div>
-            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1">Alta Preço</div>
+        <div class="card-moderno p-6 animate-scale-in animate-delay-200 hover-lift group cursor-pointer">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-warning-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">📈</span>
+                </div>
+                <div class="w-8 h-8 bg-warning-100 rounded-full flex items-center justify-center">
+                    <span class="text-warning-600 font-bold text-sm">{{ stats.alta_preco }}</span>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-3xl font-bold text-gray-900">{{ stats.alta_preco }}</p>
+                <p class="text-sm text-gray-600">Alta Preço</p>
+            </div>
         </div>
 
         <!-- Acionados -->
-        <div class="card bg-white p-6 rounded-lg shadow-sm text-center border-l-4 border-purple-500">
-            <div class="text-3xl font-bold text-purple-600">{{ stats.acionados }}</div>
-            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1">Acionados</div>
+        <div class="card-moderno p-6 animate-scale-in animate-delay-300 hover-lift group cursor-pointer">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">⚡</span>
+                </div>
+                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <span class="text-purple-600 font-bold text-sm">{{ stats.acionados }}</span>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-3xl font-bold text-gray-900">{{ stats.acionados }}</p>
+                <p class="text-sm text-gray-600">Acionados</p>
+            </div>
         </div>
     </div>
 
@@ -80,8 +149,17 @@
     </div>
 </div>
 
-<!-- MODAL JS PURO -->
-<div id="modal-alerta" class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden flex items-center justify-center p-4">
+<!-- MODAL ALPINE.JS -->
+<div x-show="modalAberto" 
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     @click.away="fecharModal()" 
+     class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4" 
+     style="display: none;">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200">
         <div class="flex items-center justify-between p-6 border-b bg-gradient-to-r from-yellow-50 to-orange-50 rounded-t-2xl">
             <div class="flex items-center space-x-3">
@@ -91,7 +169,7 @@
                 <h2 class="text-2xl font-bold text-gray-900">Novo Alerta</h2>
                 <p class="text-sm text-gray-600 ml-1">Configure notificações personalizadas</p>
             </div>
-            <button onclick="fecharModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-xl transition-all">
+            <button @click="fecharModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-xl transition-all">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
@@ -141,7 +219,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between p-4 bg-blue-50 rounded-xl border-2 border-blue-100">
+            <div class="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-100">
                 <div>
                     <label class="font-semibold"><i class="fas fa-power-off text-green-500 mr-2"></i>Ativar imediatamente</label>
                     <p class="text-xs text-gray-600">Começar monitoramento após criar</p>
@@ -153,10 +231,10 @@
             </div>
 
             <div class="flex justify-end space-x-3 pt-4 border-t bg-gray-50 rounded-b-2xl p-4">
-                <button type="button" onclick="fecharModal()" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-medium transition-all">
+                <button type="button" @click="fecharModal()" class="btn-secundario">
                     <i class="fas fa-times mr-2"></i>Cancelar
                 </button>
-                <button type="submit" class="px-8 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all">
+                <button type="submit" class="btn-primario">
                     <i class="fas fa-bell mr-2"></i>Criar Alerta
                 </button>
             </div>
@@ -168,20 +246,8 @@
 
 {% block extra_scripts %}
 <script>
-console.log("✅ M7.3 Alerts - 100% SEM ERROS JINJA2");
-function abrirModal() {
-    console.log("🔔 BOTÃO NOVO ALERTA CLICADO!");
-    document.getElementById('modal-alerta').classList.remove('hidden');
-    document.getElementById('modal-alerta').classList.add('flex');
-}
-function fecharModal() {
-    document.getElementById('modal-alerta').classList.add('hidden');
-    document.getElementById('modal-alerta').classList.remove('flex');
-}
-document.addEventListener('click', function(e) {
-    if (e.target.id === 'modal-alerta') fecharModal();
-});
-// Hora dinâmica JS puro
+console.log("✅ M7.3 Alerts - Modal migrado para Alpine.js - 100% SEM ERROS");
+// Hora dinâmica JS puro (mantido)
 document.addEventListener('DOMContentLoaded', function() {
     const horaSpan = document.getElementById('hora-atual');
     if (horaSpan) {
@@ -195,7 +261,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <style>
-#btn-novo-alerta, button { z-index: 9999 !important; cursor: pointer !important; }
-#modal-alerta { z-index: 9999 !important; transition: all 0.3s ease; }
+button { z-index: 9999 !important; cursor: pointer !important; }
 </style>
 {% endblock %}

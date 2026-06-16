@@ -1,0 +1,25 @@
+{# 
+  Componente: Loading Spinner
+  Descrição: Spinner de carregamento para indicar processamento
+  Props:
+    - size: string (sm, md, lg) - opcional, padrão 'md'
+    - text: string - opcional, texto de carregamento
+  Uso:
+    {% include 'components/utils/loading_spinner.html' with size='md' text='Carregando...' %}
+#}
+
+{% set spinner_sizes = {
+  'sm': 'w-4 h-4',
+  'md': 'w-8 h-8',
+  'lg': 'w-12 h-12'
+} %}
+
+{% set size_class = spinner_sizes.get(size, spinner_sizes['md']) %}
+{% set loading_text = text|default('Carregando...') %}
+
+<div class="flex flex-col items-center justify-center gap-3">
+  <div class="animate-spin rounded-full border-4 border-gray-200 border-t-blue-600 {{ size_class }}"></div>
+  {% if loading_text %}
+    <p class="text-sm text-gray-600">{{ loading_text }}</p>
+  {% endif %}
+</div>

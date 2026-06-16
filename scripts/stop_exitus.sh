@@ -8,10 +8,12 @@ echo ""
 
 # Parar Frontend
 echo "[1/3] Parando Frontend..."
+fuser -k 8080/tcp 2>/dev/null || true
 podman stop exitus-frontend 2>/dev/null || echo "  ! Frontend já estava parado"
 
 # Parar Backend
 echo "[2/3] Parando Backend..."
+fuser -k 5000/tcp 2>/dev/null || true
 podman stop exitus-backend 2>/dev/null || echo "  ! Backend já estava parado"
 
 # Parar PostgreSQL

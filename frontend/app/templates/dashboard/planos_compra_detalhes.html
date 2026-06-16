@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}{{ plano.nome }} - Detalhes do Plano - Exitus{% endblock %}
+
+{% block extra_css %}
+<style>
+  .detail-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="detail-header text-white px-6 py-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-4 mb-2">
+            <a href="/dashboard/planos-compra" 
+               class="text-purple-100 hover:text-white transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </a>
+            <h1 class="text-3xl font-bold">{{ plano.nome }}</h1>
+          </div>
+          <p class="text-purple-100">{{ plano.descricao or 'Sem descrição' }}</p>
+          <div class="flex items-center gap-4 mt-3">
+            {% include 'components/badges/status_badge.html' with status=plano.status %}
+            <span class="text-purple-100">Criado em {{ plano.created_at[:10] }}</span>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-purple-100 text-sm">Progresso</p>
+          <p class="text-4xl font-bold">{{ "%.1f"|format(plano.progresso_percentual) }}%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Coluna Principal -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Gráfico de Progresso -->
+        {% include 'components/charts/plano_progress_chart.html' with plano=plano width=500 height=350 show_details=true %}
+        
+        <!-- Informações do Plano -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Informações do Plano</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm text-gray-500">Quantidade Alvo</p>
+              <p class="text-lg font-semibold text-gray-900">{{ "%.2f"|format(plano.quantidade_alvo) }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Quantidade Acumulada</p>
+              <p class="text-lg font-semibold text-gray-900">{{ "%.2f"|format(plano.quantidade_acumulada) }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Aporte Mensal</p>
+              <p class="text-lg font-semibold text-gray-900">R$ {{ "%.2f"|format(plano.valor_aporte_mensal) }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Valor Total Estimado</p>
+              <p class="text-lg font-semibold text-gray-900">R$ {{ "%.2f"|format(plano.quantidade_alvo * plano.ativo.preco_atual) }}</p>
+            </div>
+            {% if plano.data_inicio %}
+            <div>
+              <p class="text-sm text-gray-500">Data de Início</p>
+              <p class="text-lg font-semibold text-gray-900">{{ plano.data_inicio[:10] }}</p>
+            </div>
+            {% endif %}
+            {% if plano.data_fim_prevista and plano.status != 'concluido' %}
+            <div>
+              <p class="text-sm text-gray-500">Previsão de Conclusão</p>
+              <p class="text-lg font-semibold text-gray-900">{{ plano.data_fim_prevista[:10] }}</p>
+            </div>
+            {% endif %}
+            {% if plano.data_conclusao %}
+            <div>
+              <p class="text-sm text-gray-500">Data de Conclusão</p>
+              <p class="text-lg font-semibold text-green-600">{{ plano.data_conclusao[:10] }}</p>
+            </div>
+            {% endif %}
+            {% if plano.proximo_aporte and plano.status == 'ativo' %}
+            <div>
+              <p class="text-sm text-gray-500">Próximo Aporte</p>
+              <p class="text-lg font-semibold text-blue-600">{{ plano.proximo_aporte[:10] }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Histórico de Aportes -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Histórico de Aportes</h3>
+          <div id="historico-aportes" class="space-y-3">
+            <p class="text-gray-500 text-center py-4">Carregando histórico...</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Coluna Lateral -->
+      <div class="space-y-8">
+        <!-- Informações do Ativo -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Ativo</h3>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">Ticker</span>
+              <span class="font-semibold text-gray-900">{{ plano.ativo.ticker }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">Nome</span>
+              <span class="font-semibold text-gray-900">{{ plano.ativo.nome[:20] }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">Preço Atual</span>
+              <span class="font-semibold text-gray-900">R$ {{ "%.2f"|format(plano.ativo.preco_atual) }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">Tipo</span>
+              <span class="font-semibold text-gray-900">{{ plano.ativo.tipo }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">Mercado</span>
+              {% include 'components/badges/market_badge.html' with mercado=plano.ativo.mercado size='sm' %}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Ações Rápidas -->
+        {% if plano.status != 'concluido' and plano.status != 'cancelado' %}
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h3>
+          <div class="space-y-3">
+            {% if plano.status == 'ativo' %}
+            <button onclick="pausarPlano('{{ plano.id }}')" 
+                    class="w-full px-4 py-2 bg-yellow-100 text-yellow-700 rounded-md hover:bg-yellow-200 transition-colors">
+              Pausar Plano
+            </button>
+            {% elif plano.status == 'pausado' %}
+            <button onclick="reativarPlano('{{ plano.id }}')" 
+                    class="w-full px-4 py-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors">
+              Reativar Plano
+            </button>
+            {% endif %}
+            
+            <button onclick="registrarAporte('{{ plano.id }}')" 
+                    class="w-full px-4 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors">
+              Registrar Aporte
+            </button>
+            
+            <a href="/dashboard/planos-compra/{{ plano.id }}/editar" 
+               class="block w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-center">
+              Editar Plano
+            </a>
+            
+            <button onclick="cancelarPlano('{{ plano.id }}')" 
+                    class="w-full px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors">
+              Cancelar Plano
+            </button>
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Estatísticas -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Estatísticas</h3>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">Meses Ativo</span>
+              <span class="font-semibold text-gray-900">{{ plano.meses_ativo or 0 }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">Aportes Realizados</span>
+              <span class="font-semibold text-gray-900">{{ plano.aportes_realizados or 0 }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">Valor Total Investido</span>
+              <span class="font-semibold text-gray-900">R$ {{ "%.2f"|format(plano.quantidade_acumulada * plano.ativo.preco_atual) }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">Custo Médio</span>
+              <span class="font-semibold text-gray-900">R$ {{ "%.2f"|format(plano.custo_medio or plano.ativo.preco_atual) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let planoId = '{{ plano.id }}';
+
+// Funções de ação (reutilizadas do card)
+function pausarPlano(planoId) {
+  if (confirm('Deseja pausar este plano de compra?')) {
+    fetch(`/api/plano-compra/${planoId}/pausar`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.data) {
+        location.reload();
+      } else {
+        alert('Erro ao pausar plano: ' + (data.message || 'Erro desconhecido'));
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Erro ao pausar plano');
+    });
+  }
+}
+
+function reativarPlano(planoId) {
+  if (confirm('Deseja reativar este plano de compra?')) {
+    fetch(`/api/plano-compra/${planoId}/reativar`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.data) {
+        location.reload();
+      } else {
+        alert('Erro ao reativar plano: ' + (data.message || 'Erro desconhecido'));
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Erro ao reativar plano');
+    });
+  }
+}
+
+function registrarAporte(planoId) {
+  const quantidade = prompt('Digite a quantidade adquirida:');
+  if (quantidade && parseFloat(quantidade) > 0) {
+    fetch(`/api/plano-compra/${planoId}/aporte`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ quantidade: parseFloat(quantidade) })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.data) {
+        alert('Aporte registrado com sucesso!');
+        location.reload();
+      } else {
+        alert('Erro ao registrar aporte: ' + (data.message || 'Erro desconhecido'));
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Erro ao registrar aporte');
+    });
+  }
+}
+
+function cancelarPlano(planoId) {
+  if (confirm('Tem certeza que deseja cancelar este plano? Esta ação não pode ser desfeita.')) {
+    fetch(`/api/plano-compra/${planoId}/cancelar`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.data) {
+        alert('Plano cancelado com sucesso!');
+        window.location.href = '/dashboard/planos-compra';
+      } else {
+        alert('Erro ao cancelar plano: ' + (data.message || 'Erro desconhecido'));
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Erro ao cancelar plano');
+    });
+  }
+}
+
+// Carregar histórico de aportes (simulado - implementar backend quando disponível)
+document.addEventListener('DOMContentLoaded', function() {
+  // Simulação de histórico
+  const historicoSimulado = [
+    { data: '2024-01-15', quantidade: 10, preco: 25.50, valor: 255.00 },
+    { data: '2024-02-15', quantidade: 12, preco: 26.00, valor: 312.00 },
+    { data: '2024-03-15', quantidade: 11, preco: 24.80, valor: 272.80 }
+  ];
+  
+  const historicoHtml = historicoSimulado.map(aporte => `
+    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+      <div>
+        <p class="font-medium text-gray-900">${aporte.data}</p>
+        <p class="text-sm text-gray-500">${aporte.quantidade} cotas</p>
+      </div>
+      <div class="text-right">
+        <p class="font-semibold text-gray-900">R$ ${aporte.valor.toFixed(2)}</p>
+        <p class="text-sm text-gray-500">R$ ${aporte.preco.toFixed(2)/cota}</p>
+      </div>
+    </div>
+  `).join('');
+  
+  document.getElementById('historico-aportes').innerHTML = historicoHtml || 
+    '<p class="text-gray-500 text-center py-4">Nenhum aporte registrado ainda</p>';
+});
+</script>
+{% endblock %}

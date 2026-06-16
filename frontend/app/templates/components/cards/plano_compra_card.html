@@ -1,0 +1,181 @@
+{# 
+  Componente: Plano Compra Card
+  Descrição: Card para exibir informações de um plano de compra programada
+  Props:
+    - plano: object - dados do plano de compra
+    - show_actions: boolean - exibe botões de ação (default: true)
+    - compact: boolean - modo compacto (default: false)
+  Uso:
+    {% include 'components/cards/plano_compra_card.html' with plano=plano_data show_actions=true %}
+#}
+
+<div class="{% if compact %}bg-gray-50{% else %}bg-white{% endif %} rounded-lg {% if compact %}border border-gray-200{% else %}shadow-sm border border-gray-200{% endif %} p-4 {% if not compact %}hover:shadow-md{% endif %} transition-shadow">
+  <div class="flex items-start justify-between mb-3">
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 mb-1">
+        <h3 class="text-lg font-bold text-gray-900 truncate">{{ plano.nome }}</h3>
+        {% include 'components/badges/status_badge.html' with status=plano.status size='sm' %}
+      </div>
+      <p class="text-sm text-gray-600 truncate">{{ plano.descricao or 'Sem descrição' }}</p>
+    </div>
+    <div class="text-right">
+      {% include 'components/badges/market_badge.html' with mercado=plano.ativo.mercado size='sm' %}
+    </div>
+  </div>
+  
+  <!-- Informações do Ativo -->
+  <div class="mb-3 p-2 bg-gray-50 rounded-lg">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium text-gray-700">{{ plano.ativo.ticker }}</span>
+      <span class="text-xs text-gray-500">{{ plano.ativo.nome }}</span>
+    </div>
+  </div>
+  
+  <!-- Progresso -->
+  <div class="mb-3">
+    <div class="flex justify-between items-center mb-1">
+      <span class="text-sm text-gray-600">Progresso</span>
+      <span class="text-sm font-semibold {% if plano.progresso_percentual >= 100 %}text-green-600{% elif plano.progresso_percentual >= 50 %}text-blue-600{% else %}text-gray-600{% endif %}">
+        {{ "%.1f"|format(plano.progresso_percentual) }}%
+      </span>
+    </div>
+    <div class="w-full bg-gray-200 rounded-full h-2">
+      <div class="bg-gradient-to-r {% if plano.progresso_percentual >= 100 %}from-green-500 to-green-600{% elif plano.progresso_percentual >= 50 %}from-blue-500 to-blue-600{% else %}from-gray-400 to-gray-500{% endif %} h-2 rounded-full transition-all duration-300" 
+         style="width: {{ [plano.progresso_percentual, 100]|min }}%"></div>
+    </div>
+  </div>
+  
+  <!-- Métricas -->
+  <div class="grid grid-cols-2 gap-3 mb-3">
+    <div class="text-center p-2 bg-gray-50 rounded">
+      <p class="text-xs text-gray-500">Meta</p>
+      <p class="text-sm font-semibold text-gray-900">{{ "%.2f"|format(plano.quantidade_alvo) }}</p>
+    </div>
+    <div class="text-center p-2 bg-gray-50 rounded">
+      <p class="text-xs text-gray-500">Acumulado</p>
+      <p class="text-sm font-semibold text-gray-900">{{ "%.2f"|format(plano.quantidade_acumulada) }}</p>
+    </div>
+  </div>
+  
+  <!-- Informações Financeiras -->
+  <div class="space-y-2 mb-3">
+    <div class="flex justify-between items-center">
+      <span class="text-sm text-gray-500">Aporte Mensal</span>
+      <span class="text-sm font-semibold text-gray-900">R$ {{ "%.2f"|format(plano.valor_aporte_mensal) }}</span>
+    </div>
+    {% if plano.proximo_aporte %}
+    <div class="flex justify-between items-center">
+      <span class="text-sm text-gray-500">Próximo Aporte</span>
+      <span class="text-sm font-semibold text-blue-600">{{ plano.proximo_aporte[:10] }}</span>
+    </div>
+    {% endif %}
+  </div>
+  
+  <!-- Ações -->
+  {% if show_actions and plano.status != 'concluido' and plano.status != 'cancelado' %}
+  <div class="flex gap-2 pt-3 border-t border-gray-200">
+    {% if plano.status == 'ativo' %}
+    <button onclick="pausarPlano('{{ plano.id }}')" 
+            class="flex-1 px-3 py-2 text-sm bg-yellow-100 text-yellow-700 rounded-md hover:bg-yellow-200 transition-colors">
+      Pausar
+    </button>
+    {% elif plano.status == 'pausado' %}
+    <button onclick="reativarPlano('{{ plano.id }}')" 
+            class="flex-1 px-3 py-2 text-sm bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors">
+      Reativar
+    </button>
+    {% endif %}
+    
+    <button onclick="registrarAporte('{{ plano.id }}')" 
+            class="flex-1 px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors">
+      Aporte
+    </button>
+    
+    <button onclick="verDetalhes('{{ plano.id }}')" 
+            class="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+      Detalhes
+    </button>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+function pausarPlano(planoId) {
+  if (confirm('Deseja pausar este plano de compra?')) {
+    fetch(`/api/plano-compra/${planoId}/pausar`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.data) {
+        location.reload();
+      } else {
+        alert('Erro ao pausar plano: ' + (data.message || 'Erro desconhecido'));
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Erro ao pausar plano');
+    });
+  }
+}
+
+function reativarPlano(planoId) {
+  if (confirm('Deseja reativar este plano de compra?')) {
+    fetch(`/api/plano-compra/${planoId}/reativar`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.data) {
+        location.reload();
+      } else {
+        alert('Erro ao reativar plano: ' + (data.message || 'Erro desconhecido'));
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Erro ao reativar plano');
+    });
+  }
+}
+
+function registrarAporte(planoId) {
+  const quantidade = prompt('Digite a quantidade adquirida:');
+  if (quantidade && parseFloat(quantidade) > 0) {
+    fetch(`/api/plano-compra/${planoId}/aporte`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ quantidade: parseFloat(quantidade) })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.data) {
+        alert('Aporte registrado com sucesso!');
+        location.reload();
+      } else {
+        alert('Erro ao registrar aporte: ' + (data.message || 'Erro desconhecido'));
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Erro ao registrar aporte');
+    });
+  }
+}
+
+function verDetalhes(planoId) {
+  window.location.href = `/dashboard/planos-compra/${planoId}`;
+}
+</script>

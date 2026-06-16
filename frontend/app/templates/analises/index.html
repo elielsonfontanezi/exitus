@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Análises - Exitus{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h4 mb-1">📊 Análises</h2>
+            <p class="text-muted mb-0">Relatórios e insights da sua carteira</p>
+        </div>
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+            ← Voltar
+        </a>
+    </div>
+
+    <!-- Resumo Geral -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Patrimônio Total</h6>
+                    <h3 class="text-primary">R$ {{ "%.2f"|format(dashboard.get('resumo', {}).get('patrimonio_total', 0)) }}</h3>
+                    <small class="text-success">▲ {{ "%.2f"|format(dashboard.get('resumo', {}).get('rentabilidade_geral', 0)) }}%</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Rentabilidade Total</h6>
+                    <h3 class="text-success">{{ "%.2f"|format(dashboard.resumo.rentabilidade_total) }}%</h3>
+                    <small class="text-muted">Inclui proventos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Proventos 12M</h6>
+                    <h3 class="text-info">R$ {{ "%.2f"|format(dashboard.resumo.proventos_12m) }}</h3>
+                    <small class="text-muted">Recebidos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Ativos</h6>
+                    <h3 class="text-warning">{{ dashboard.resumo.total_posicoes }}</h3>
+                    <small class="text-muted">Em carteira</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegação por Abas -->
+    <ul class="nav nav-tabs mb-4" id="analisesTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="visao-geral-tab" data-bs-toggle="tab" data-bs-target="#visao-geral" type="button" role="tab">
+                📈 Visão Geral
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="proventos-tab" data-bs-toggle="tab" data-bs-target="#proventos" type="button" role="tab">
+                💰 Proventos
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rentabilidade-tab" data-bs-toggle="tab" data-bs-target="#rentabilidade" type="button" role="tab">
+                📊 Rentabilidade
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="impostos-tab" data-bs-toggle="tab" data-bs-target="#impostos" type="button" role="tab">
+                📋 Impostos
+            </button>
+        </li>
+    </ul>
+
+    <!-- Conteúdo das Abas -->
+    <div class="tab-content" id="analisesTabsContent">
+        <!-- Visão Geral -->
+        <div class="tab-pane fade show active" id="visao-geral" role="tabpanel">
+            <div class="row">
+                <!-- Alocação por Mercado -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">🌍 Alocação por Mercado</h6>
+                        </div>
+                        <div class="card-body">
+                            {% for mercado, dados in dashboard.por_mercado.items() %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>
+                                    {% if mercado == 'BR' %}🇧🇷 Brasil
+                                    {% elif mercado == 'US' %}🇺🇸 EUA
+                                    {% else %}🌍 Internacional{% endif %}
+                                </span>
+                                <div>
+                                    <strong>R$ {{ "%.2f"|format(dados.patrimonio) }}</strong>
+                                    <span class="badge bg-secondary ms-2">{{ "%.1f"|format(dados.percentual) }}%</span>
+                                </div>
+                            </div>
+                            <div class="progress mb-3" style="height: 8px;">
+                                <div class="progress-bar" style="width: {{ '%.1f'|format(dados.percentual) }}%;"></div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Ativos -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">🏆 Top 5 Ativos - Brasil</h6>
+                        </div>
+                        <div class="card-body">
+                            {% for ativo in dashboard.por_mercado.BR.top_ativos[:5] %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <strong>{{ ativo.ticker }}</strong>
+                                    <small class="text-muted d-block">{{ ativo.nome[:30] }}...</small>
+                                </div>
+                                <div class="text-end">
+                                    <div>R$ {{ "%.2f"|format(ativo.valor) }}</div>
+                                    <small class="{{ 'text-success' if ativo.rentabilidade > 0 else 'text-danger' }}">
+                                        {{ '▲' if ativo.rentabilidade > 0 else '▼' }} {{ "%.2f"|format(ativo.rentabilidade) }}%
+                                    </small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Últimas Transações -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">📝 Últimas Transações</h6>
+                        </div>
+                        <div class="card-body">
+                            {% if transacoes %}
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Ativo</th>
+                                            <th>Tipo</th>
+                                            <th>Quantidade</th>
+                                            <th>Preço</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for tx in transacoes %}
+                                        <tr>
+                                            <td>{{ tx.data if tx.data is defined else '' }}</td>
+                                            <td>{{ tx.ativo.ticker if tx.ativo is defined else '-' }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ 'success' if tx.tipo == 'COMPRA' else 'danger' }}">
+                                                    {{ tx.tipo if tx.tipo is defined else '-' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ tx.quantidade if tx.quantidade is defined else '-' }}</td>
+                                            <td>R$ {{ "%.2f"|format(tx.preco if tx.preco is defined else 0) }}</td>
+                                            <td>R$ {{ "%.2f"|format(tx.total if tx.total is defined else 0) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">Nenhuma transação encontrada.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proventos -->
+        <div class="tab-pane fade" id="proventos" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">💰 Histórico de Proventos</h6>
+                </div>
+                <div class="card-body">
+                    {% if proventos %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Data Pagamento</th>
+                                    <th>Ativo</th>
+                                    <th>Tipo</th>
+                                    <th>Valor Bruto</th>
+                                    <th>IR Retido</th>
+                                    <th>Valor Líquido</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for provento in proventos[:20] %}
+                                <tr>
+                                    <td>{{ provento.data_pagamento.strftime('%d/%m/%Y') }}</td>
+                                    <td>{{ provento.ativo.ticker if provento.ativo else '-' }}</td>
+                                    <td>{{ provento.tipo_provento.value }}</td>
+                                    <td>R$ {{ "%.2f"|format(provento.valor_bruto) }}</td>
+                                    <td>R$ {{ "%.2f"|format(provento.imposto_retido) }}</td>
+                                    <td class="fw-bold">R$ {{ "%.2f"|format(provento.valor_liquido) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Nenhum provento encontrado.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Rentabilidade -->
+        <div class="tab-pane fade" id="rentabilidade" role="tabpanel">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">📈 Análise de Rentabilidade</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <h4 class="text-primary">{{ "%.2f"|format(dashboard.resumo.rentabilidade_geral) }}%</h4>
+                                        <p class="text-muted">Rentabilidade Geral</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <h4 class="text-success">{{ "%.2f"|format(dashboard.resumo.rentabilidade_total) }}%</h4>
+                                        <p class="text-muted">Rentabilidade Total (c/ Proventos)</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <h4 class="text-info">R$ {{ "%.2f"|format(dashboard.resumo.proventos_12m) }}</h4>
+                                        <p class="text-muted">Proventos 12 Meses</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Impostos -->
+        <div class="tab-pane fade" id="impostos" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">📋 Resumo Fiscal</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>DARF Acumulado</h6>
+                            <p class="text-muted">Valores acumulados para pagamento</p>
+                            <div class="alert alert-warning">
+                                <strong>R$ 0,00</strong> - Sem DARFs pendentes
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>IR a Pagar</h6>
+                            <p class="text-muted">Imposto de renda do mês atual</p>
+                            <div class="alert alert-info">
+                                <strong>R$ 168,75</strong> - Vencer em 20/04/2026
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Bootstrap tabs já funcionam com data-bs-toggle
+    // Adicionar interações adicionais se necessário
+});
+</script>
+{% endblock %}

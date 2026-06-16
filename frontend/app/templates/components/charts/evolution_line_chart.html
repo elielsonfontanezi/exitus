@@ -1,0 +1,59 @@
+{# 
+  Componente: Evolution Line Chart
+  Descrição: Gráfico de linha para evolução patrimonial
+  Props:
+    - data: list - dados [{data, valor}]
+    - chart_id: string - ID único do canvas
+  Uso:
+    {% include 'components/charts/evolution_line_chart.html' with data=[...] chart_id='evolution-chart' %}
+#}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">Evolução Patrimonial</h3>
+  <div class="relative h-64">
+    <canvas id="{{ chart_id|default('evolution-chart') }}"></canvas>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('{{ chart_id|default('evolution-chart') }}').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [{% for item in data %}'{{ item.data }}'{% if not loop.last %},{% endif %}{% endfor %}],
+          datasets: [{
+            label: 'Patrimônio',
+            data: [{% for item in data %}{{ item.valor }}{% if not loop.last %},{% endif %}{% endfor %}],
+            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              ticks: {
+                callback: function(value) {
+                  return 'R$ ' + value.toLocaleString('pt-BR');
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</div>

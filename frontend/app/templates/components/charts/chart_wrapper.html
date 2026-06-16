@@ -1,0 +1,19 @@
+{# 
+  Componente: Chart Wrapper
+  Descrição: Wrapper genérico para gráficos Chart.js
+  Props:
+    - chart_id: string - ID único do canvas
+    - title: string - título do gráfico
+    - height: string - altura (opcional, padrão '64')
+  Uso:
+    {% include 'components/charts/chart_wrapper.html' with chart_id='my-chart' title='Meu Gráfico' height='80' %}
+#}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+  {% if title %}
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ title }}</h3>
+  {% endif %}
+  <div class="relative h-{{ height|default('64') }}">
+    <canvas id="{{ chart_id }}"></canvas>
+  </div>
+</div>

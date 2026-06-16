@@ -13,6 +13,8 @@ from app.database import db
 from app.models import Transacao, Ativo, Corretora
 from app.utils.business_rules import validar_transacao
 from app.utils.exceptions import NotFoundError
+from app.services.auditoria_service import AuditoriaService
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +36,10 @@ class TransacaoService:
                          joinedload(Transacao.ativo),
                          joinedload(Transacao.corretora),
                      ))
+            
+            # Filtro por assessora (multi-tenancy)
+            query = filter_by_assessora(query, Transacao)
+            
             if tipo:
                 query = query.filter(Transacao.tipo.in_(tipo.upper()))
             if ativo_id:
@@ -172,6 +178,23 @@ class TransacaoService:
             db.session.add(transacao)
             db.session.commit()
             db.session.refresh(transacao)
+            
+            # Atualizar posições após criar transação
+            from app.services.posicao_service import PosicaoService
+            try:
+                resultado_posicoes = PosicaoService.calcular_posicoes(usuario_id)
+                logger.info(f"Posições atualizadas após criar transação: {resultado_posicoes}")
+            except Exception as e:
+                logger.warning(f"Erro ao atualizar posições: {e}")
+            
+            # Auditoria
+            AuditoriaService.registrar_create(
+                usuario_id=usuario_id,
+                entidade='Transacao',
+                entidade_id=transacao.id,
+                dados_depois=transacao.to_dict()
+            )
+            
             return {
                 'transacao': transacao,
                 'warnings': regras.get('warnings', []),
@@ -204,6 +227,9 @@ class TransacaoService:
             raise PermissionError('Acesso negado: transação pertence a outro usuário')  # TRX-002
 
         try:
+            # Capturar estado antes das modificações
+            dados_antes = transacao.to_dict()
+
             if 'quantidade'      in data: transacao.quantidade      = Decimal(str(data['quantidade']))
             if 'preco_unitario'  in data: transacao.preco_unitario  = Decimal(str(data['preco_unitario']))
             if 'taxa_corretagem' in data: transacao.taxa_corretagem = Decimal(str(data['taxa_corretagem']))
@@ -229,6 +255,24 @@ class TransacaoService:
             transacao.updated_at = datetime.utcnow()
             db.session.commit()
             db.session.refresh(transacao)
+            
+            # Atualizar posições após modificar transação
+            from app.services.posicao_service import PosicaoService
+            try:
+                resultado_posicoes = PosicaoService.calcular_posicoes(usuario_id)
+                logger.info(f"Posições atualizadas após modificar transação: {resultado_posicoes}")
+            except Exception as e:
+                logger.warning(f"Erro ao atualizar posições: {e}")
+            
+            # Auditoria
+            AuditoriaService.registrar_update(
+                usuario_id=usuario_id,
+                entidade='Transacao',
+                entidade_id=transacao.id,
+                dados_antes=dados_antes,
+                dados_depois=transacao.to_dict()
+            )
+            
             return transacao
         except Exception as e:
             db.session.rollback()
@@ -252,13 +296,31 @@ class TransacaoService:
             raise NotFoundError(f'Transação {transacao_id} não encontrada')
         if str(transacao.usuario_id) != str(usuario_id):
             raise PermissionError('Acesso negado: transação pertence a outro usuário')  # TRX-004
+        
+        # Capturar estado antes de deletar
+        dados_antes = transacao.to_dict()
+        transacao_id = transacao.id
+        
+        db.session.delete(transacao)
+        db.session.commit()
+        
+        # Atualizar posições após deletar transação
+        from app.services.posicao_service import PosicaoService
         try:
-            db.session.delete(transacao)
-            db.session.commit()
+            resultado_posicoes = PosicaoService.calcular_posicoes(usuario_id)
+            logger.info(f"Posições atualizadas após deletar transação: {resultado_posicoes}")
         except Exception as e:
-            db.session.rollback()
-            logger.error(f'Erro ao deletar transação: {e}')
-            raise
+            logger.warning(f"Erro ao atualizar posições: {e}")
+        
+        # Auditoria
+        AuditoriaService.registrar_delete(
+            usuario_id=usuario_id,
+            entidade='Transacao',
+            entidade_id=transacao_id,
+            dados_antes=dados_antes
+        )
+        
+        return True
 
     # -----------------------------------------------------------------------
     # GET RESUMO POR ATIVO  (TRX-007)

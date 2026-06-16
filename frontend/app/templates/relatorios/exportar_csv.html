@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Exportar CSV — Exitus{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">⬇ Exportar CSV</h1>
+        <p class="text-green-100 mt-1">Download dos seus dados em formato CSV</p>
+      </div>
+      <div class="flex gap-3">
+        <a href="{{ url_for('relatorios.extrato') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">📋 Extrato</a>
+        <a href="{{ url_for('dashboard.index') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">← Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  {% if erro %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700 text-sm">⚠️ {{ erro }}</div>
+  {% endif %}
+
+  <!-- Seletor de tipo -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+    <h2 class="font-bold text-gray-800 mb-4">Selecionar Dados para Exportar</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+      {% for t, lbl, icon, color in [('transacoes','Transações','fas fa-exchange-alt','blue'), ('proventos','Proventos','fas fa-coins','yellow'), ('posicoes','Posições','fas fa-briefcase','purple')] %}
+      <a href="{{ url_for('relatorios.exportar_csv') }}?tipo={{ t }}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}"
+         class="p-4 rounded-xl border-2 text-center transition
+                {% if tipo == t %}border-{{ color }}-500 bg-{{ color }}-50{% else %}border-gray-200 hover:border-{{ color }}-300 hover:bg-{{ color }}-50{% endif %}">
+        <i class="{{ icon }} text-2xl mb-2 text-{{ color }}-500"></i>
+        <div class="font-medium text-gray-800">{{ lbl }}</div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <!-- Filtros de data (só para transacoes) -->
+    {% if tipo == 'transacoes' %}
+    <form method="GET" class="flex flex-wrap gap-3 items-end border-t border-gray-100 pt-4">
+      <input type="hidden" name="tipo" value="transacoes">
+      <div>
+        <label class="block text-xs text-gray-500 mb-1">Data Início</label>
+        <input type="date" name="data_inicio" value="{{ data_inicio }}"
+               class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400">
+      </div>
+      <div>
+        <label class="block text-xs text-gray-500 mb-1">Data Fim</label>
+        <input type="date" name="data_fim" value="{{ data_fim }}"
+               class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400">
+      </div>
+      <button type="submit" class="bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-800 transition">Filtrar</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <!-- Preview e Botão Download -->
+  {% if dados %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+      <h2 class="font-bold text-gray-800">Preview — {{ dados | length }} registros</h2>
+      <!-- Botão de download via JS -->
+      <button onclick="downloadCSV()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2">
+        <i class="fas fa-download"></i> Baixar CSV
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs" id="csv-table">
+        <thead class="bg-gray-50 text-gray-500 uppercase">
+          <tr>
+            {% for col in colunas %}
+            <th class="text-left px-4 py-2">{{ col | replace('_', ' ') }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for row in dados[:50] %}
+          <tr class="hover:bg-gray-50">
+            {% for col in colunas %}
+            <td class="px-4 py-2 text-gray-700">{{ row.get(col, '') }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if dados | length > 50 %}
+    <div class="p-3 text-center text-xs text-gray-400">
+      Preview: 50 de {{ dados | length }} registros. O CSV incluirá todos.
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- JS para download CSV client-side -->
+  <script>
+  const csvData = {{ dados | tojson }};
+  const csvCols = {{ colunas | tojson }};
+
+  function downloadCSV() {
+    const rows = [csvCols.join(',')];
+    csvData.forEach(row => {
+      const values = csvCols.map(col => {
+        const v = row[col] !== undefined && row[col] !== null ? String(row[col]) : '';
+        return '"' + v.replace(/"/g, '""') + '"';
+      });
+      rows.push(values.join(','));
+    });
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'exitus_{{ tipo }}_{{ data_inicio or "all" }}.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  </script>
+
+  {% else %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center text-gray-400">
+    <i class="fas fa-file-csv text-5xl mb-3 text-gray-200"></i>
+    <p class="font-medium">Selecione um tipo de dado acima para gerar o CSV</p>
+    <p class="text-xs mt-1">Transações, Proventos ou Posições</p>
+  </div>
+  {% endif %}
+
+  <!-- Nota -->
+  <div class="bg-green-50 border border-green-100 rounded-xl p-4 text-sm text-green-700 mt-4">
+    <i class="fas fa-info-circle mr-1"></i>
+    O download é gerado diretamente no seu navegador a partir dos dados da API — sem envio para servidor externo.
+  </div>
+
+</div>
+{% endblock %}

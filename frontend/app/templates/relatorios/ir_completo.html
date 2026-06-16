@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}IR Completo — Exitus{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #8e0000 0%, #b71c1c 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">💰 IR Completo</h1>
+        <p class="text-red-200 mt-1">Apuração, histórico mensal e DIRPF consolidado</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="{{ url_for('analises.rentabilidade_periodo') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">📈 Rentabilidade</a>
+        <a href="{{ url_for('relatorios.anual') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">📅 Relatório Anual</a>
+        <a href="{{ url_for('dashboard.index') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">← Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtro -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+    <form method="GET" class="flex gap-3 items-end">
+      <div>
+        <label class="block text-xs text-gray-500 mb-1">Ano-Calendário</label>
+        <select name="ano" class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-400">
+          <option value="">Todos</option>
+          {% for a in [2026, 2025, 2024, 2023] %}
+          <option value="{{ a }}" {% if ano == a|string %}selected{% endif %}>{{ a }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-800 transition">Filtrar</button>
+    </form>
+  </div>
+
+  {% if erro %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700 text-sm">⚠️ {{ erro }}</div>
+  {% endif %}
+
+  <!-- Apuração do Mês Atual -->
+  {% if apuracao %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-calculator text-red-500"></i> Apuração Corrente
+      </h2>
+    </div>
+    <div class="p-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-red-50 rounded-xl p-4 text-center">
+        <div class="text-xs text-gray-400 mb-1">Day Trade</div>
+        <div class="text-xl font-bold text-red-700">R$ {{ '%.2f'|format(apuracao.ir_day_trade or 0) | replace('.', ',') }}</div>
+      </div>
+      <div class="bg-orange-50 rounded-xl p-4 text-center">
+        <div class="text-xs text-gray-400 mb-1">Swing Trade</div>
+        <div class="text-xl font-bold text-orange-700">R$ {{ '%.2f'|format(apuracao.ir_swing_trade or 0) | replace('.', ',') }}</div>
+      </div>
+      <div class="bg-yellow-50 rounded-xl p-4 text-center">
+        <div class="text-xs text-gray-400 mb-1">FII</div>
+        <div class="text-xl font-bold text-yellow-700">R$ {{ '%.2f'|format(apuracao.ir_fii or 0) | replace('.', ',') }}</div>
+      </div>
+      <div class="bg-red-100 rounded-xl p-4 text-center">
+        <div class="text-xs text-gray-500 mb-1">Total IR</div>
+        <div class="text-xl font-bold text-red-800">R$ {{ '%.2f'|format(apuracao.total_ir or 0) | replace('.', ',') }}</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Histórico Mensal -->
+  {% if historico %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-history text-blue-500"></i> Histórico Mensal ({{ historico | length }} meses)
+      </h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+          <tr>
+            <th class="text-left px-5 py-3">Período</th>
+            <th class="text-right px-5 py-3">Day Trade</th>
+            <th class="text-right px-5 py-3">Swing</th>
+            <th class="text-right px-5 py-3">FII</th>
+            <th class="text-right px-5 py-3">Proventos</th>
+            <th class="text-right px-5 py-3">Total IR</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for m in historico %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-5 py-3 font-medium text-gray-800">{{ m.mes_ano or m.periodo or '—' }}</td>
+            <td class="px-5 py-3 text-right text-gray-700">R$ {{ '%.2f'|format(m.ir_day_trade or 0) | replace('.', ',') }}</td>
+            <td class="px-5 py-3 text-right text-gray-700">R$ {{ '%.2f'|format(m.ir_swing_trade or 0) | replace('.', ',') }}</td>
+            <td class="px-5 py-3 text-right text-gray-700">R$ {{ '%.2f'|format(m.ir_fii or 0) | replace('.', ',') }}</td>
+            <td class="px-5 py-3 text-right text-green-600">R$ {{ '%.2f'|format(m.total_proventos or 0) | replace('.', ',') }}</td>
+            <td class="px-5 py-3 text-right font-bold text-red-600">R$ {{ '%.2f'|format(m.total_ir or 0) | replace('.', ',') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- DIRPF Bens e Direitos -->
+  {% if dirpf %}
+  {% set bens = dirpf.get('bens_e_direitos', []) %}
+  {% if bens %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-file-alt text-blue-500"></i> Bens e Direitos — DIRPF ({{ bens | length }} ativos)
+      </h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+          <tr>
+            <th class="text-left px-5 py-3">Cód.</th>
+            <th class="text-left px-5 py-3">Discriminação</th>
+            <th class="text-right px-5 py-3">Valor Ano Anterior</th>
+            <th class="text-right px-5 py-3">Valor Atual</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for b in bens[:20] %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-5 py-3 text-gray-500 font-mono">{{ b.codigo or '31' }}</td>
+            <td class="px-5 py-3 text-gray-800">{{ b.discriminacao or '—' }}</td>
+            <td class="px-5 py-3 text-right text-gray-600">
+              R$ {{ '%.2f'|format(b.valor_ano_anterior or 0) | replace('.', ',') }}
+            </td>
+            <td class="px-5 py-3 text-right font-semibold text-gray-800">
+              R$ {{ '%.2f'|format(b.valor_atual or b.custo_total or 0) | replace('.', ',') }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot class="bg-gray-50 font-bold">
+          <tr>
+            <td colspan="3" class="px-5 py-3 text-gray-700">Total Bens e Direitos</td>
+            <td class="px-5 py-3 text-right text-gray-800">
+              R$ {{ '{:,.2f}'.format(bens | sum(attribute='valor_atual') or bens | sum(attribute='custo_total') or 0) | replace(',', '.') }}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+
+  <!-- Link para Fiscal -->
+  <div class="bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-700 flex items-center gap-3">
+    <i class="fas fa-info-circle"></i>
+    <span>Para detalhes completos de DARFs e apuração, acesse o módulo de
+      <a href="{{ url_for('fiscal.ir_mensal') }}" class="font-bold underline">Imposto de Renda</a>.
+    </span>
+  </div>
+
+</div>
+{% endblock %}

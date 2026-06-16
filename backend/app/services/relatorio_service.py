@@ -7,13 +7,15 @@ from uuid import UUID
 from app.database import db
 from app.models.auditoria_relatorio import AuditoriaRelatorio
 from app.utils.exceptions import NotFoundError
+from app.utils.tenant import filter_by_assessora
 
 class RelatorioService:
     @staticmethod
     def listar_relatorios(usuario_id: UUID, page: int = 1, per_page: int = 10):
         """M7.3 - Lista relatórios paginados"""
-        query = AuditoriaRelatorio.query.filter_by(usuario_id=usuario_id)\
-            .order_by(AuditoriaRelatorio.timestamp_criacao.desc())
+        query = AuditoriaRelatorio.query.filter_by(usuario_id=usuario_id)
+        query = filter_by_assessora(query, AuditoriaRelatorio)
+        query = query.order_by(AuditoriaRelatorio.timestamp_criacao.desc())
         total = query.count()
         relatorios = query.offset((page - 1) * per_page).limit(per_page).all()
         return {
@@ -55,9 +57,11 @@ class RelatorioService:
     @staticmethod
     def obter_relatorio(usuario_id: UUID, relatorio_id: UUID):
         """M7.3 - Obtém relatório específico"""
-        relatorio = AuditoriaRelatorio.query.filter_by(
+        query = AuditoriaRelatorio.query.filter_by(
             id=relatorio_id, usuario_id=usuario_id
-        ).first()
+        )
+        query = filter_by_assessora(query, AuditoriaRelatorio)
+        relatorio = query.first()
         if not relatorio:
             raise NotFoundError("Relatório não encontrado")
         return relatorio.to_dict()
@@ -65,9 +69,11 @@ class RelatorioService:
     @staticmethod
     def deletar_relatorio(usuario_id: UUID, relatorio_id: UUID):
         """M7.3 - Deleta relatório"""
-        relatorio = AuditoriaRelatorio.query.filter_by(
+        query = AuditoriaRelatorio.query.filter_by(
             id=relatorio_id, usuario_id=usuario_id
-        ).first()
+        )
+        query = filter_by_assessora(query, AuditoriaRelatorio)
+        relatorio = query.first()
         if not relatorio:
             raise NotFoundError("Relatório não encontrado")
         db.session.delete(relatorio)

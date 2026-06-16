@@ -1,0 +1,224 @@
+{
+  "version": "1.0",
+  "description": "Cenário específico para testes de Imposto de Renda - operações com diferentes faixas de lucro/prejuízo",
+  "timestamp": "2026-03-22T00:00:00Z",
+  "usuarios": [
+    {
+      "username": "ir_test_user",
+      "email": "ir@test.exitus",
+      "password": "ir_senha_123",
+      "role": "USER",
+      "nome_completo": "Usuário Teste IR",
+      "ativo": true
+    }
+  ],
+  "assessoras": [
+    {
+      "nome": "Assessora IR Teste",
+      "razao_social": "Assessora IR LTDA",
+      "cnpj": "98765432109876",
+      "email": "ir@assessora.exitus",
+      "telefone": "11888888888",
+      "ativo": true
+    }
+  ],
+  "ativos": [
+    {
+      "ticker": "IRACAO1",
+      "nome": "Ação Teste IR 1",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 25.00,
+      "preco_teto": 30.00,
+      "dividend_yield": 5.0,
+      "p_l": 8.0,
+      "p_vp": 1.1,
+      "observacoes": "Ação para testes de IR",
+      "ativo": true
+    },
+    {
+      "ticker": "IRACAO2",
+      "nome": "Ação Teste IR 2",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 50.00,
+      "preco_teto": 55.00,
+      "dividend_yield": 4.0,
+      "p_l": 12.0,
+      "p_vp": 1.2,
+      "observacoes": "Ação para testes de IR - preço alto",
+      "ativo": true
+    },
+    {
+      "ticker": "IRFII1",
+      "nome": "FII Teste IR 1",
+      "tipo": "FII",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 100.00,
+      "preco_teto": 110.00,
+      "dividend_yield": 8.0,
+      "p_vp": 0.9,
+      "observacoes": "FII para testes de IR",
+      "ativo": true
+    },
+    {
+      "ticker": "IRFIXA1",
+      "nome": "CDB Teste IR 1",
+      "tipo": "CDB",
+      "classe": "RENDA_FIXA",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 1000.00,
+      "preco_teto": 1050.00,
+      "taxa": 102.5,
+      "vencimento": "2025-12-31",
+      "observacoes": "CDB para testes de IR - renda fixa",
+      "ativo": true
+    }
+  ],
+  "corretoras": [
+    {
+      "nome": "CORRETORA IR TESTE",
+      "cnpj": "11111111111111",
+      "tipo": "CORRETORA",
+      "pais": "BR",
+      "ativa": true
+    }
+  ],
+  "transacoes": [
+    {
+      "usuario": "ir_test_user",
+      "ativo": "IRACAO1",
+      "corretora": "CORRETORA IR TESTE",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-01-15",
+      "quantidade": 1000,
+      "preco_unitario": 20.00,
+      "taxa_corretagem": 5.00,
+      "custos_totais": 10.00
+    },
+    {
+      "usuario": "ir_test_user",
+      "ativo": "IRACAO1",
+      "corretora": "CORRETORA IR TESTE",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-02-15",
+      "quantidade": 500,
+      "preco_unitario": 22.00,
+      "taxa_corretagem": 3.00,
+      "custos_totais": 6.00
+    },
+    {
+      "usuario": "ir_test_user",
+      "ativo": "IRACAO1",
+      "corretora": "CORRETORA IR TESTE",
+      "tipo": "VENDA",
+      "data_transacao": "2024-03-15",
+      "quantidade": 800,
+      "preco_unitario": 28.00,
+      "taxa_corretagem": 5.00,
+      "custos_totais": 8.00
+    },
+    {
+      "usuario": "ir_test_user",
+      "ativo": "IRACAO2",
+      "corretora": "CORRETORA IR TESTE",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-01-20",
+      "quantidade": 200,
+      "preco_unitario": 45.00,
+      "taxa_corretagem": 5.00,
+      "custos_totais": 7.00
+    },
+    {
+      "usuario": "ir_test_user",
+      "ativo": "IRACAO2",
+      "corretora": "CORRETORA IR TESTE",
+      "tipo": "VENDA",
+      "data_transacao": "2024-04-20",
+      "quantidade": 200,
+      "preco_unitario": 52.00,
+      "taxa_corretagem": 5.00,
+      "custos_totais": 7.00
+    },
+    {
+      "usuario": "ir_test_user",
+      "ativo": "IRFII1",
+      "corretora": "CORRETORA IR TESTE",
+      "tipo": "COMPRA",
+      "data_transacao": "2024-01-10",
+      "quantidade": 100,
+      "preco_unitario": 95.00,
+      "taxa_corretagem": 5.00,
+      "custos_totais": 8.00
+    },
+    {
+      "usuario": "ir_test_user",
+      "ativo": "IRFII1",
+      "corretora": "CORRETORA IR TESTE",
+      "tipo": "VENDA",
+      "data_transacao": "2024-07-10",
+      "quantidade": 50,
+      "preco_unitario": 105.00,
+      "taxa_corretagem": 3.00,
+      "custos_totais": 5.00
+    },
+    {
+      "usuario": "ir_test_user",
+      "ativo": "IRACAO1",
+      "corretora": "CORRETORA IR TESTE",
+      "tipo": "VENDA",
+      "data_transacao": "2024-08-15",
+      "quantidade": 700,
+      "preco_unitario": 26.00,
+      "taxa_corretagem": 5.00,
+      "custos_totais": 8.00
+    }
+  ],
+  "proventos": [
+    {
+      "ativo": "IRACAO1",
+      "tipo_provento": "DIVIDENDO",
+      "data_com": "2024-03-20",
+      "data_pagamento": "2024-04-05",
+      "valor_unitario": 1.50,
+      "observacoes": "Dividendo para teste de IR - isento"
+    },
+    {
+      "ativo": "IRACAO1",
+      "tipo_provento": "JCP",
+      "data_com": "2024-06-20",
+      "data_pagamento": "2024-07-05",
+      "valor_unitario": 0.80,
+      "observacoes": "JCP para teste de IR - tributável 15%"
+    },
+    {
+      "ativo": "IRFII1",
+      "tipo_provento": "RENDIMENTO",
+      "data_com": "2024-07-25",
+      "data_pagamento": "2024-08-10",
+      "valor_unitario": 0.90,
+      "observacoes": "Rendimento FII para teste de IR - isento"
+    }
+  ],
+  "movimentacoes_caixa": [
+    {
+      "usuario": "ir_test_user",
+      "corretora": "CORRETORA IR TESTE",
+      "tipo": "DEPOSITO",
+      "data_movimentacao": "2024-01-05",
+      "valor": 50000.00,
+      "observacoes": "Depósito para testes de IR"
+    }
+  ]
+}

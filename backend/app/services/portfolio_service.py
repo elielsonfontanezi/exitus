@@ -7,6 +7,9 @@ from app.database import db
 from app.models.portfolio import Portfolio
 from app.models.posicao import Posicao
 from app.models.ativo import Ativo
+from app.models.historico_patrimonio import HistoricoPatrimonio
+from app.services.cache_service import cache
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +41,9 @@ class PortfolioService:
         """
         query = Portfolio.query.filter_by(usuario_id=usuario_id)
         
+        # Filtro por assessora (multi-tenancy)
+        query = filter_by_assessora(query, Portfolio)
+        
         # Filtrar por status se especificado
         if ativo is not None:
             query = query.filter_by(ativo=ativo)
@@ -49,6 +55,9 @@ class PortfolioService:
     def create(data: Dict, usuario_id: UUID) -> Portfolio:
         """Cria um novo portfolio."""
         try:
+            # Obter assessora_id do JWT ou dos dados
+            assessora_id = data.get('assessora_id') or get_current_assessora_id()
+            
             novo_portfolio = Portfolio(
                 usuario_id=usuario_id,
                 nome=data['nome'],
@@ -56,7 +65,8 @@ class PortfolioService:
                 objetivo=data.get('objetivo'),
                 ativo=data.get('ativo', True),
                 valor_inicial=data.get('valor_inicial'),
-                percentual_alocacao_target=data.get('percentual_alocacao_target')
+                percentual_alocacao_target=data.get('percentual_alocacao_target'),
+                assessora_id=assessora_id
             )
             db.session.add(novo_portfolio)
             db.session.commit()
@@ -106,19 +116,162 @@ class PortfolioService:
     
     @staticmethod
     def get_dashboard(usuario_id: UUID) -> Dict:
-        """Gera dados consolidados para o dashboard."""
-        # Implementação simplificada para validar a rota
-        total_portfolios = Portfolio.query.filter_by(usuario_id=usuario_id, ativo=True).count()
-        total_posicoes = Posicao.query.filter_by(usuario_id=usuario_id).count()
+        """
+        Gera dados consolidados para o dashboard com agrupamento por mercado.
+        Cache por 5 minutos para melhorar performance.
+        """
+        # Tentar obter do cache
+        cache_key = f"dashboard:{usuario_id}"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            logger.debug(f"Dashboard cache HIT para usuário {usuario_id}")
+            return cached_data
         
-        return {
+        logger.debug(f"Dashboard cache MISS para usuário {usuario_id}")
+        
+        from app.models import Posicao, Ativo, Provento, HistoricoPatrimonio
+        from app.services.cambio_service import CambioService
+        from decimal import Decimal
+        from collections import defaultdict
+        from datetime import datetime, timedelta
+        
+        # Data limite para proventos (últimos 12 meses)
+        data_limite_12m = datetime.now().date() - timedelta(days=365)
+        
+        # Obter posições do usuário (sem filtro de assessora para mostrar todas)
+        posicoes_usuario = Posicao.query.filter_by(usuario_id=usuario_id).all()
+        ativos_usuario_ids = [p.ativo_id for p in posicoes_usuario]
+
+        if ativos_usuario_ids:
+            # Proventos 12 meses (Liquido)
+            proventos_12m_raw = db.session.query(db.func.sum(Provento.valor_liquido))\
+                .filter(Provento.ativo_id.in_(ativos_usuario_ids))\
+                .filter(Provento.data_pagamento >= data_limite_12m).scalar() or 0.0
+            
+            # Proventos totais (histórico completo) para cálculo de rentabilidade real
+            proventos_totais_raw = db.session.query(db.func.sum(Provento.valor_liquido))\
+                .filter(Provento.ativo_id.in_(ativos_usuario_ids)).scalar() or 0.0
+        else:
+            proventos_12m_raw = 0.0
+            proventos_totais_raw = 0.0
+
+        proventos_12m = float(proventos_12m_raw)
+        proventos_totais = float(proventos_totais_raw)
+
+        total_portfolios = Portfolio.query.filter_by(usuario_id=usuario_id, ativo=True).count()
+        total_posicoes = len(posicoes_usuario)
+        posicoes = posicoes_usuario
+        
+        if not posicoes:
+            return {
+                "resumo": {
+                    "total_portfolios": total_portfolios,
+                    "total_posicoes": 0,
+                    "patrimonio_total": 0.0,
+                    "rentabilidade_geral": 0.0,
+                    "rentabilidade_total": 0.0,
+                    "proventos_12m": 0.0
+                },
+                "por_mercado": {
+                    "BR": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
+                    "US": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
+                    "INTL": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []}
+                },
+                "alocacao_geografica": {"BR": 0.0, "US": 0.0, "INTL": 0.0},
+                "evolucao": []
+            }
+        
+        patrimonio_por_mercado = defaultdict(float)
+        custo_por_mercado = defaultdict(float)
+        ativos_por_mercado = defaultdict(list)
+        patrimonio_total = 0.0
+        custo_total = 0.0
+        
+        for posicao in posicoes:
+            ativo = posicao.ativo
+            if not ativo:
+                continue
+            
+            preco = Decimal(str(ativo.preco_atual)) if ativo.preco_atual else Decimal(str(posicao.preco_medio))
+            valor_posicao_moeda = Decimal(str(posicao.quantidade)) * preco
+            custo_posicao_moeda = Decimal(str(posicao.custo_total)) if posicao.custo_total else Decimal('0')
+            
+            moeda = getattr(ativo, 'moeda', 'BRL') or 'BRL'
+            if moeda.upper() != 'BRL':
+                valor_brl = CambioService.converter_para_brl(valor_posicao_moeda, moeda)
+                custo_brl = CambioService.converter_para_brl(custo_posicao_moeda, moeda)
+                valor_posicao = float(valor_brl) if valor_brl is not None else float(valor_posicao_moeda)
+                custo_posicao = float(custo_brl) if custo_brl is not None else float(custo_posicao_moeda)
+            else:
+                valor_posicao = float(valor_posicao_moeda)
+                custo_posicao = float(custo_posicao_moeda)
+            
+            mercado = ativo.mercado.upper()
+            if mercado not in ['BR', 'US']:
+                mercado = 'INTL'
+            
+            patrimonio_por_mercado[mercado] += valor_posicao
+            custo_por_mercado[mercado] += custo_posicao
+            patrimonio_total += valor_posicao
+            custo_total += custo_posicao
+            
+            ativos_por_mercado[mercado].append({
+                'ticker': ativo.ticker,
+                'nome': ativo.nome,
+                'tipo': ativo.tipo.value if ativo.tipo else None,
+                'valor': valor_posicao,
+                'rentabilidade': ((valor_posicao - custo_posicao) / custo_posicao * 100) if custo_posicao > 0 else 0.0
+            })
+        
+        rentabilidade_geral = ((patrimonio_total - custo_total) / custo_total * 100) if custo_total > 0 else 0.0
+        
+        # Rentabilidade Total (incluindo proventos)
+        rentabilidade_total = ((patrimonio_total + proventos_totais - custo_total) / custo_total * 100) if custo_total > 0 else 0.0
+        
+        por_mercado = {}
+        for mercado in ['BR', 'US', 'INTL']:
+            patrimonio = patrimonio_por_mercado.get(mercado, 0.0)
+            custo = custo_por_mercado.get(mercado, 0.0)
+            percentual = (patrimonio / patrimonio_total * 100) if patrimonio_total > 0 else 0.0
+            rentabilidade = ((patrimonio - custo) / custo * 100) if custo > 0 else 0.0
+            
+            top_ativos = sorted(
+                ativos_por_mercado.get(mercado, []),
+                key=lambda x: x['valor'],
+                reverse=True
+            )[:5]
+            
+            por_mercado[mercado] = {
+                'patrimonio': round(patrimonio, 2),
+                'percentual': round(percentual, 2),
+                'rentabilidade': round(rentabilidade, 2),
+                'top_ativos': top_ativos
+            }
+        
+        alocacao_geografica = {
+            'BR': round(por_mercado['BR']['percentual'], 2),
+            'US': round(por_mercado['US']['percentual'], 2),
+            'INTL': round(por_mercado['INTL']['percentual'], 2)
+        }
+        
+        result = {
             "resumo": {
                 "total_portfolios": total_portfolios,
                 "total_posicoes": total_posicoes,
-                "patrimonio_total": 0.0,  # TODO: Calcular soma das posições
-                "rentabilidade_geral": 0.0
-            }
+                "patrimonio_total": round(patrimonio_total, 2),
+                "rentabilidade_geral": round(rentabilidade_geral, 2),
+                "rentabilidade_total": round(rentabilidade_total, 2),
+                "proventos_12m": round(proventos_12m, 2)
+            },
+            "por_mercado": por_mercado,
+            "alocacao_geografica": alocacao_geografica,
+            "evolucao": PortfolioService.get_evolucao_patrimonio(usuario_id, meses=0)
         }
+        
+        # Salvar no cache por 5 minutos
+        cache.set(cache_key, result, ttl=300)
+        
+        return result
 
     # --- MÉTODOS DE COMPATIBILIDADE (M4) ---
     @staticmethod
@@ -228,4 +381,42 @@ class PortfolioService:
                 resultado[classe] = {"valor": 0.0, "percentual": 0.0}
         
         return resultado
+    
+    @staticmethod
+    def get_evolucao_patrimonio(usuario_id: UUID, meses: int = 0) -> List[Dict]:
+        """
+        Retorna evolução do patrimônio ao longo do tempo usando histórico armazenado.
+        
+        Args:
+            usuario_id: UUID do usuário
+            meses: Número de meses a retornar (default: 0 = todo histórico)
+                   0 = todo histórico disponível
+                   N > 0 = últimos N meses
+            
+        Returns:
+            Lista de dicts com 'data' e 'valor'
+        """
+        from datetime import datetime, timedelta
+        
+        # Construir query base
+        query = HistoricoPatrimonio.query.filter(
+            HistoricoPatrimonio.usuario_id == usuario_id
+        )
+        
+        # Aplicar filtro de período se meses > 0
+        if meses > 0:
+            data_limite = datetime.now().date() - timedelta(days=meses * 30)
+            query = query.filter(HistoricoPatrimonio.data >= data_limite)
+        
+        # Buscar histórico ordenado
+        historico = query.order_by(HistoricoPatrimonio.data).all()
+        
+        # Formatar resposta
+        return [
+            {
+                'data': h.data.isoformat(),
+                'valor': float(h.patrimonio_total)
+            }
+            for h in historico
+        ]
 

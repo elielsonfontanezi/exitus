@@ -8,6 +8,7 @@ from app.database import db
 from app.models import Usuario, UserRole
 from app.utils.db_utils import safe_commit, safe_delete_commit
 from app.utils.exceptions import NotFoundError, ConflictError, ForbiddenError
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
 
 class UsuarioService:
@@ -26,6 +27,9 @@ class UsuarioService:
             search: Busca em username e nome_completo
         """
         query = Usuario.query
+        
+        # Filtro por assessora (multi-tenancy)
+        query = filter_by_assessora(query, Usuario)
         
         # FIX GAP-001: Aplicar filtro ativo EXPLICITAMENTE
         if ativo is not None:
@@ -58,12 +62,16 @@ class UsuarioService:
     @staticmethod
     def create(data):
         """Cria novo usuário."""
+        # Obter assessora_id do JWT ou dos dados
+        assessora_id = data.get('assessora_id') or get_current_assessora_id()
+        
         user = Usuario(
             username=data['username'],
             email=data['email'],
             password_hash=generate_password_hash(data['password']),
             nome_completo=data.get('nome_completo'),
-            role=UserRole[data.get('role', 'user').upper()]
+            role=UserRole[data.get('role', 'user').upper()],
+            assessora_id=assessora_id
         )
         db.session.add(user)
         safe_commit()

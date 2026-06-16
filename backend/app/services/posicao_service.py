@@ -11,6 +11,7 @@ from sqlalchemy.orm import joinedload
 from decimal import Decimal
 from datetime import datetime
 import logging
+from app.utils.tenant import filter_by_assessora, get_current_assessora_id
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,9 @@ class PosicaoService:
                 joinedload(Posicao.ativo),
                 joinedload(Posicao.corretora)
             )
+            
+            # Filtro por assessora (multi-tenancy)
+            query = filter_by_assessora(query, Posicao)
             
             if filters:
                 if filters.get('ativo_id'):
@@ -170,11 +174,15 @@ class PosicaoService:
                 return 'zerada'
             return 'nenhuma'
         
+        # Obter assessora_id da primeira transação (todas devem ter o mesmo)
+        assessora_id = transacoes[0].assessora_id if transacoes else None
+        
         if not posicao:
             posicao = Posicao(
                 usuario_id=usuario_id,
                 ativo_id=ativo_id,
-                corretora_id=corretora_id
+                corretora_id=corretora_id,
+                assessora_id=assessora_id
             )
             db.session.add(posicao)
             resultado = 'criada'
@@ -189,6 +197,7 @@ class PosicaoService:
         posicao.lucro_prejuizo_realizado = lucro_realizado
         posicao.data_primeira_compra = data_primeira_compra
         posicao.data_ultima_atualizacao = datetime.utcnow()
+        posicao.assessora_id = assessora_id
         
         return resultado
 

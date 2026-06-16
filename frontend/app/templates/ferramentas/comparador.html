@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Comparador de Ativos — Exitus{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">⚖️ Comparador de Ativos</h1>
+        <p class="text-blue-200 mt-1">Compare até 3 ativos lado a lado — fundamentos, DY, P/VP, Beta</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="{{ url_for('ferramentas.screener') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">🔍 Screener</a>
+        <a href="{{ url_for('dashboard.index') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">← Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seleção de Tickers -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+    <form method="GET" class="flex flex-wrap gap-3 items-end">
+      {% for i in range(3) %}
+      <div>
+        <label class="block text-xs text-gray-500 mb-1">Ativo {{ i+1 }}{% if i == 0 %} *{% endif %}</label>
+        <select name="ticker" class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400 w-40">
+          <option value="">Selecionar...</option>
+          {% for a in ativos_lista | sort(attribute='ticker') %}
+          {% set sel_ticker = tickers[i] if tickers|length > i else '' %}
+          <option value="{{ a.ticker }}" {% if a.ticker == sel_ticker %}selected{% endif %}>
+            {{ a.ticker }} — {{ (a.nome or '')[:20] }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endfor %}
+      <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition">
+        Comparar
+      </button>
+      {% if tickers %}
+      <a href="{{ url_for('ferramentas.comparador') }}" class="text-gray-400 text-sm px-2 py-2 hover:text-gray-600">✕ Limpar</a>
+      {% endif %}
+    </form>
+  </div>
+
+  {% if erro %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700 text-sm">⚠️ {{ erro }}</div>
+  {% endif %}
+
+  {% if comparacao %}
+  <!-- Tabela Comparativa -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800">Comparação — {{ comparacao | length }} ativo(s)</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="text-left px-5 py-3 text-xs text-gray-500 uppercase">Indicador</th>
+            {% for c in comparacao %}
+            <th class="text-center px-5 py-3">
+              <div class="font-bold text-blue-700 font-mono text-base">{{ c.ticker }}</div>
+              <div class="text-xs text-gray-400 font-normal">{{ (c.nome or '')[:22] }}</div>
+              <div class="mt-1">
+                <span class="px-2 py-0.5 rounded-full text-xs
+                  {% if c.tipo == 'fii' %}bg-yellow-100 text-yellow-700
+                  {% elif c.tipo == 'acao' %}bg-blue-100 text-blue-700
+                  {% else %}bg-gray-100 text-gray-600{% endif %}">
+                  {{ (c.tipo or '').replace('_',' ') }}
+                </span>
+              </div>
+            </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+
+          {% set rows = [
+            ('Preço Atual', 'preco', 'R$', 2, 'higher'),
+            ('Variação Dia', 'variacao', '%', 2, 'higher'),
+            ('Dividend Yield', 'dividend_yield', '%', 2, 'higher'),
+            ('P/VP', 'p_vp', '', 2, 'lower'),
+            ('P/L', 'p_l', '', 1, 'lower'),
+            ('ROE', 'roe', '%', 1, 'higher'),
+            ('Beta', 'beta', '', 2, 'neutral'),
+            ('Market Cap', 'market_cap', 'R$', 0, 'higher'),
+          ] %}
+
+          {% for label, field, prefix, decimals, better in rows %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wide">{{ label }}</td>
+            {% set values = [] %}
+            {% for c in comparacao %}
+              {% set v = (c[field] or 0)|float %}
+              {% set _ = values.append(v) %}
+            {% endfor %}
+            {% set best = values|max if better == 'higher' else (values|min if better == 'lower' else -1) %}
+            {% for c in comparacao %}
+            {% set v = (c[field] or 0)|float %}
+            <td class="px-5 py-3 text-center font-medium
+              {% if v == best and better != 'neutral' and v != 0 %}text-green-600 bg-green-50{% else %}text-gray-700{% endif %}">
+              {% if v != 0 %}
+                {% if prefix == 'R$' and field == 'market_cap' %}
+                  R$ {{ '{:,.0f}'.format(v) | replace(',', '.') }}
+                {% elif prefix == 'R$' %}
+                  R$ {{ '%.2f'|format(v) | replace('.', ',') }}
+                {% elif prefix == '%' %}
+                  {{ '%.2f'|format(v) }}%
+                {% else %}
+                  {{ ('%.'+decimals|string+'f')|format(v) }}
+                {% endif %}
+                {% if v == best and better != 'neutral' %}
+                  <span class="ml-1 text-xs">★</span>
+                {% endif %}
+              {% else %}
+                <span class="text-gray-300">—</span>
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="text-xs text-gray-400 text-center">★ = melhor valor entre os ativos comparados</div>
+
+  {% elif tickers %}
+  <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-yellow-700 text-sm">
+    Nenhum dado encontrado para os tickers selecionados. Verifique se os ativos estão cadastrados.
+  </div>
+  {% else %}
+  <div class="bg-blue-50 border border-blue-100 rounded-xl p-8 text-center text-blue-600">
+    <i class="fas fa-balance-scale text-5xl mb-3 text-blue-200"></i>
+    <p class="font-medium">Selecione 2 ou 3 ativos acima para iniciar a comparação</p>
+    <p class="text-xs mt-1 text-blue-400">Ou use o <a href="{{ url_for('ferramentas.screener') }}" class="underline">Screener</a> para encontrar ativos por fundamentos</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

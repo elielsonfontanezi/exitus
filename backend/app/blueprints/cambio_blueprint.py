@@ -12,6 +12,36 @@ from app.services.cambio_service import CambioService
 cambio_bp = Blueprint('cambio', __name__, url_prefix='/api/cambio')
 
 
+@cambio_bp.route('/taxa-atual', methods=['GET'])
+def get_taxa_atual():
+    """
+    GET /api/cambio/taxa-atual?de=USD&para=BRL
+    Retorna a taxa de câmbio atual entre duas moedas (sem autenticação).
+    Endpoint público para uso no frontend.
+    """
+    moeda_origem = request.args.get('de', '').strip().upper()
+    moeda_destino = request.args.get('para', '').strip().upper()
+    
+    if not moeda_origem or not moeda_destino:
+        return jsonify({
+            'success': False, 
+            'message': 'Parâmetros obrigatórios: de e para (ex: ?de=USD&para=BRL)'
+        }), 400
+    
+    if len(moeda_origem) != 3 or len(moeda_destino) != 3:
+        return jsonify({
+            'success': False,
+            'message': 'Moedas devem ter 3 caracteres ISO 4217 (ex: BRL, USD, EUR)'
+        }), 400
+    
+    resultado = CambioService.get_taxa(moeda_origem, moeda_destino)
+    
+    if resultado.get('erro'):
+        return jsonify({'success': False, 'message': resultado['erro']}), 404
+    
+    return jsonify({'success': True, 'data': resultado}), 200
+
+
 @cambio_bp.route('/taxa/<par_moeda>', methods=['GET'])
 @jwt_required()
 def get_taxa(par_moeda):

@@ -339,8 +339,12 @@ class TestDarf:
         """Sem lucro tributável → nenhum DARF."""
         rv = auth_client.get('/api/ir/darf?mes=2000-02', headers=auth_client._auth_headers)
         assert rv.status_code == 200
-        data = rv.get_json()['data']
-        assert data['darfs'] == []
+        response = rv.get_json()
+        assert 'data' in response
+        data = response['data']
+        assert 'darfs' in data
+        assert isinstance(data['darfs'], list)
+        assert len(data['darfs']) == 0
         assert data['ir_total'] == 0.0
 
     def test_darf_retorna_mes_correto(self, auth_client):
@@ -676,25 +680,23 @@ class TestRegrasFiscais2026:
         db.session.add(corretora)
         db.session.flush()
 
+        from app.models.provento import Provento, TipoProvento
+        from datetime import date
+        
         val = Decimal('30000.00')
-        t = Transacao(
-            usuario_id=usuario_id,
+        p = Provento(
             ativo_id=ativo_seed.id,
-            corretora_id=corretora.id,
-            tipo=TipoTransacao.DIVIDENDO,
-            data_transacao=__import__('datetime').datetime(2026, 3, 20, 10, 0),
-            quantidade=Decimal('1'),
-            preco_unitario=val,
-            valor_total=val,
-            taxa_corretagem=Decimal('0'),
-            taxa_liquidacao=Decimal('0'),
-            emolumentos=Decimal('0'),
-            imposto=Decimal('0'),
-            outros_custos=Decimal('0'),
-            custos_totais=Decimal('0'),
+            assessora_id=auth_client._auth_headers.get('assessora_id'),
+            tipo_provento=TipoProvento.DIVIDENDO,
+            valor_por_acao=val,
+            quantidade_ativos=Decimal('1'),
+            valor_bruto=val,
+            imposto_retido=Decimal('0'),
             valor_liquido=val,
+            data_com=date(2026, 3, 15),
+            data_pagamento=date(2026, 3, 20),
         )
-        db.session.add(t)
+        db.session.add(p)
         db.session.commit()
 
         try:
@@ -703,7 +705,7 @@ class TestRegrasFiscais2026:
             assert div_br['isento'] is True
             assert div_br['ir_esperado'] == 0.0
         finally:
-            Transacao.query.filter_by(id=t.id).delete()
+            Provento.query.filter_by(id=p.id).delete()
             Corretora.query.filter_by(id=corretora.id).delete()
             db.session.commit()
 
@@ -954,10 +956,13 @@ class TestRendaFixa:
         try:
             rv = auth_client.get('/api/ir/apuracao?mes=2025-04', headers=auth_client._auth_headers)
             assert rv.status_code == 200
-            darf = rv.get_json()['data']['darf']
-            rf_darfs = [d for d in darf if 'renda fixa' in d.get('descricao', '').lower()]
-            assert len(rf_darfs) >= 1
-            assert rf_darfs[0]['pagar'] is False
+            data = rv.get_json()['data']
+            # Verificar que RF foi processada
+            assert 'categorias' in data
+            assert 'renda_fixa' in data['categorias']
+            rf_cat = data['categorias']['renda_fixa']
+            assert rf_cat['operacoes'] >= 1
+            assert rf_cat['ir_retido'] > 0
         finally:
             self._teardown(ids)
 

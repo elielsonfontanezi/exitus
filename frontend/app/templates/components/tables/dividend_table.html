@@ -1,0 +1,50 @@
+{# 
+  Componente: Dividend Table
+  Descrição: Tabela específica para proventos
+  Props:
+    - proventos: list - lista de proventos
+  Uso:
+    {% include 'components/tables/dividend_table.html' with proventos=[...] %}
+#}
+
+<div class="overflow-x-auto">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ativo</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Valor/Cota</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      {% for prov in proventos %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ prov.data }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ prov.ativo }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs font-medium rounded-full 
+              {% if prov.tipo == 'DIVIDENDO' %}bg-green-100 text-green-800
+              {% elif prov.tipo == 'JCP' %}bg-blue-100 text-blue-800
+              {% else %}bg-purple-100 text-purple-800{% endif %}">
+              {{ prov.tipo }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ prov.valor_cota }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ prov.quantidade }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">{{ prov.total }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-center">
+            {% if prov.status == 'CONFIRMADO' %}
+              <span class="text-green-600">🟢</span>
+            {% else %}
+              <span class="text-yellow-600">🟡</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

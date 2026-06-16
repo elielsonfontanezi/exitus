@@ -132,6 +132,7 @@ cmd_start() {
     esac
     
     show_status
+    sleep 5
 }
 
 # Comando STOP
@@ -145,9 +146,11 @@ cmd_stop() {
     case $target in
         "all")
             echo -e "${YELLOW}[1/3]${NC} Parando Frontend..."
+            fuser -k 8080/tcp 2>/dev/null || true
             podman stop exitus-frontend 2>/dev/null || echo "  ✓ Frontend já estava parado"
             
             echo -e "${YELLOW}[2/3]${NC} Parando Backend..."
+            fuser -k 5000/tcp 2>/dev/null || true
             podman stop exitus-backend 2>/dev/null || echo "  ✓ Backend já estava parado"
             
             echo -e "${YELLOW}[3/3]${NC} Parando PostgreSQL..."
@@ -183,7 +186,6 @@ cmd_restart() {
     echo ""
     
     cmd_stop $target
-    sleep 2
     cmd_start $target
 }
 
@@ -214,10 +216,11 @@ cmd_rebuild() {
               --env-file backend/.env \
               exitus-backend:latest
               
-            sleep 15
+            sleep 5
             ;;
         "frontend")
             echo -e "${YELLOW}[1/3]${NC} Parando container antigo..."
+            sudo fuser -k 8080/tcp 2>/dev/null || true
             podman stop exitus-frontend 2>/dev/null || true
             podman rm exitus-frontend 2>/dev/null || true
             

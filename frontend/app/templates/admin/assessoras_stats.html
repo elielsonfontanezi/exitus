@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% block title %}Métricas da Assessora - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" x-data="assessorasStatsApp('{{ assessora_id }}')">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1" x-text="assessora.nome || 'Carregando...'"></h2>
+            <p class="text-muted mb-0">Dashboard de métricas e uso</p>
+        </div>
+        <div>
+            <a :href="`/admin/assessoras/${assessoraId}/editar`" class="btn btn-outline-primary me-2">
+                <i class="bi bi-pencil me-2"></i>Editar
+            </a>
+            <a href="/admin/assessoras" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div x-show="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div x-show="!loading">
+        <!-- Cards de Resumo -->
+        <div class="row g-4 mb-4">
+            <!-- Plano -->
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <p class="text-muted mb-1">Plano Atual</p>
+                                <h3 class="mb-0" x-text="getPlanoLabel(stats.plano)"></h3>
+                            </div>
+                            <div class="avatar-circle-lg" 
+                                 :style="`background-color: ${assessora.cor_primaria || '#A38C65'}`">
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                        </div>
+                        <span class="badge" 
+                              :class="getPlanoBadgeClass(stats.plano)"
+                              x-text="stats.ativo ? 'Ativo' : 'Inativo'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usuários -->
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <p class="text-muted mb-1">Usuários</p>
+                                <h3 class="mb-0">
+                                    <span x-text="stats.usuarios_ativos"></span>
+                                    <span x-show="stats.max_usuarios" class="text-muted fs-5">
+                                        / <span x-text="stats.max_usuarios"></span>
+                                    </span>
+                                </h3>
+                            </div>
+                            <div class="avatar-circle-lg bg-primary">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                        </div>
+                        <div class="progress" style="height: 8px;" x-show="stats.max_usuarios">
+                            <div class="progress-bar" 
+                                 :class="getProgressClass(stats.usuarios_ativos, stats.max_usuarios)"
+                                 :style="`width: ${getProgressPercent(stats.usuarios_ativos, stats.max_usuarios)}%`"></div>
+                        </div>
+                        <small class="text-muted" x-show="stats.max_usuarios">
+                            <span x-text="getProgressPercent(stats.usuarios_ativos, stats.max_usuarios)"></span>% ocupado
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolios -->
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <p class="text-muted mb-1">Portfolios</p>
+                                <h3 class="mb-0">
+                                    <span x-text="stats.portfolios_ativos"></span>
+                                    <span x-show="stats.max_portfolios" class="text-muted fs-5">
+                                        / <span x-text="stats.max_portfolios"></span>
+                                    </span>
+                                </h3>
+                            </div>
+                            <div class="avatar-circle-lg bg-success">
+                                <i class="bi bi-briefcase-fill"></i>
+                            </div>
+                        </div>
+                        <div class="progress" style="height: 8px;" x-show="stats.max_portfolios">
+                            <div class="progress-bar bg-success" 
+                                 :class="getProgressClass(stats.portfolios_ativos, stats.max_portfolios)"
+                                 :style="`width: ${getProgressPercent(stats.portfolios_ativos, stats.max_portfolios)}%`"></div>
+                        </div>
+                        <small class="text-muted" x-show="stats.max_portfolios">
+                            <span x-text="getProgressPercent(stats.portfolios_ativos, stats.max_portfolios)"></span>% ocupado
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Volume Total -->
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <p class="text-muted mb-1">Volume Total</p>
+                                <h3 class="mb-0" x-text="formatCurrency(stats.volume_total)"></h3>
+                            </div>
+                            <div class="avatar-circle-lg bg-warning">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <span x-text="stats.total_transacoes"></span> transações
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalhes -->
+        <div class="row g-4">
+            <!-- Informações da Assessora -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Informações da Assessora</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted">Razão Social:</td>
+                                    <td class="fw-semibold" x-text="assessora.razao_social"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">CNPJ:</td>
+                                    <td class="font-monospace" x-text="formatCNPJ(assessora.cnpj)"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Email:</td>
+                                    <td x-text="assessora.email"></td>
+                                </tr>
+                                <tr x-show="assessora.telefone">
+                                    <td class="text-muted">Telefone:</td>
+                                    <td x-text="assessora.telefone"></td>
+                                </tr>
+                                <tr x-show="assessora.site">
+                                    <td class="text-muted">Site:</td>
+                                    <td>
+                                        <a :href="assessora.site" target="_blank" x-text="assessora.site"></a>
+                                    </td>
+                                </tr>
+                                <tr x-show="assessora.numero_cvm">
+                                    <td class="text-muted">Número CVM:</td>
+                                    <td x-text="assessora.numero_cvm"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">ANBIMA:</td>
+                                    <td>
+                                        <span class="badge" 
+                                              :class="assessora.anbima ? 'bg-success' : 'bg-secondary'"
+                                              x-text="assessora.anbima ? 'Certificada' : 'Não certificada'"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estatísticas de Uso -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Estatísticas de Uso</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Usuários Totais</span>
+                                <span class="fw-semibold" x-text="stats.total_usuarios"></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Usuários Ativos</span>
+                                <span class="fw-semibold text-success" x-text="stats.usuarios_ativos"></span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Usuários Inativos</span>
+                                <span class="fw-semibold text-secondary" 
+                                      x-text="stats.total_usuarios - stats.usuarios_ativos"></span>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Portfolios Totais</span>
+                                <span class="fw-semibold" x-text="stats.total_portfolios"></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Portfolios Ativos</span>
+                                <span class="fw-semibold text-success" x-text="stats.portfolios_ativos"></span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Portfolios Inativos</span>
+                                <span class="fw-semibold text-secondary" 
+                                      x-text="stats.total_portfolios - stats.portfolios_ativos"></span>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Pode adicionar usuário?</span>
+                                <span class="badge" 
+                                      :class="stats.pode_adicionar_usuario ? 'bg-success' : 'bg-danger'"
+                                      x-text="stats.pode_adicionar_usuario ? 'Sim' : 'Não'"></span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Pode adicionar portfolio?</span>
+                                <span class="badge" 
+                                      :class="stats.pode_adicionar_portfolio ? 'bg-success' : 'bg-danger'"
+                                      x-text="stats.pode_adicionar_portfolio ? 'Sim' : 'Não'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerta de Upgrade -->
+        <div class="alert alert-warning mt-4" 
+             x-show="needsUpgrade()"
+             role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Atenção!</strong> Esta assessora está próxima do limite do plano atual.
+            Considere fazer upgrade para evitar bloqueios.
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle-lg {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+}
+</style>
+
+<script>
+function assessorasStatsApp(assessoraId) {
+    return {
+        assessoraId: assessoraId,
+        loading: true,
+        assessora: {},
+        stats: {},
+
+        init() {
+            this.loadStats();
+        },
+
+        async loadStats() {
+            this.loading = true;
+            try {
+                const [assessoraRes, statsRes] = await Promise.all([
+                    fetch(`http://localhost:5000/api/assessoras/${this.assessoraId}`, {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    }),
+                    fetch(`http://localhost:5000/api/assessoras/${this.assessoraId}/stats`, {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    })
+                ]);
+
+                if (!assessoraRes.ok || !statsRes.ok) throw new Error('Erro ao carregar dados');
+
+                const assessoraData = await assessoraRes.json();
+                const statsData = await statsRes.json();
+
+                this.assessora = assessoraData.data;
+                this.stats = statsData.data;
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar métricas');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        getProgressPercent(current, max) {
+            if (!max) return 0;
+            return Math.round((current / max) * 100);
+        },
+
+        getProgressClass(current, max) {
+            const percent = this.getProgressPercent(current, max);
+            if (percent >= 90) return 'bg-danger';
+            if (percent >= 80) return 'bg-warning';
+            return '';
+        },
+
+        needsUpgrade() {
+            if (!this.stats.max_usuarios && !this.stats.max_portfolios) return false;
+            
+            const userPercent = this.getProgressPercent(this.stats.usuarios_ativos, this.stats.max_usuarios);
+            const portfolioPercent = this.getProgressPercent(this.stats.portfolios_ativos, this.stats.max_portfolios);
+            
+            return userPercent >= 80 || portfolioPercent >= 80;
+        },
+
+        formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value || 0);
+        },
+
+        formatCNPJ(cnpj) {
+            if (!cnpj) return '';
+            return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        },
+
+        getPlanoLabel(plano) {
+            const labels = {
+                'basico': 'Básico',
+                'profissional': 'Profissional',
+                'enterprise': 'Enterprise'
+            };
+            return labels[plano] || plano;
+        },
+
+        getPlanoBadgeClass(plano) {
+            const classes = {
+                'basico': 'bg-secondary',
+                'profissional': 'bg-primary',
+                'enterprise': 'bg-warning text-dark'
+            };
+            return classes[plano] || 'bg-secondary';
+        }
+    }
+}
+</script>
+{% endblock %}

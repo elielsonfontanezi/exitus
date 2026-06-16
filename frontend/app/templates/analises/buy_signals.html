@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Buy Signals — Exitus{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">🎯 Buy Signals</h1>
+        <p class="text-green-100 mt-1">Score de compra por ativo — análise quantitativa</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="{{ url_for('analises.alocacao') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">🥧 Alocação</a>
+        <a href="{{ url_for('analises.rentabilidade_periodo') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">📈 Rentabilidade</a>
+        <a href="{{ url_for('dashboard.index') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">← Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  {% if erro %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700">
+    ⚠️ Erro: {{ erro }}
+  </div>
+  {% endif %}
+
+  <!-- Busca de ticker -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+    <h2 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+      <i class="fas fa-search text-green-500"></i> Consultar Score por Ticker
+    </h2>
+    <form method="GET" action="{{ url_for('analises.buy_signals') }}" class="flex gap-3">
+      <input type="text" name="ticker" value="{{ ticker }}"
+             placeholder="Ex: PETR4, VALE3, AAPL..."
+             class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 uppercase">
+      <button type="submit"
+              class="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">
+        Analisar
+      </button>
+    </form>
+  </div>
+
+  <!-- Score do ticker consultado -->
+  {% if score %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-bullseye text-green-500"></i> Score de Compra — {{ score.ticker or ticker }}
+      </h2>
+    </div>
+    <div class="p-6">
+      {% set s = score.buy_score or 0 %}
+      <div class="flex items-center gap-8">
+        <!-- Score gauge -->
+        <div class="text-center">
+          <div class="relative w-32 h-32 mx-auto">
+            <div class="w-32 h-32 rounded-full flex items-center justify-center border-8
+                        {% if s >= 70 %}border-green-400 bg-green-50
+                        {% elif s >= 40 %}border-yellow-400 bg-yellow-50
+                        {% else %}border-red-400 bg-red-50{% endif %}">
+              <div>
+                <div class="text-3xl font-black
+                            {% if s >= 70 %}text-green-600
+                            {% elif s >= 40 %}text-yellow-600
+                            {% else %}text-red-600{% endif %}">
+                  {{ s }}
+                </div>
+                <div class="text-xs text-gray-500">/100</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 text-sm font-bold
+                      {% if s >= 70 %}text-green-600
+                      {% elif s >= 40 %}text-yellow-600
+                      {% else %}text-red-600{% endif %}">
+            {% if s >= 70 %}FORTE COMPRA
+            {% elif s >= 55 %}COMPRA
+            {% elif s >= 40 %}NEUTRO
+            {% elif s >= 25 %}VENDA
+            {% else %}FORTE VENDA{% endif %}
+          </div>
+        </div>
+
+        <!-- Barra de score -->
+        <div class="flex-1">
+          <div class="mb-2 flex justify-between text-xs text-gray-500">
+            <span>Forte Venda</span><span>Neutro</span><span>Forte Compra</span>
+          </div>
+          <div class="w-full bg-gray-100 rounded-full h-4 relative">
+            <div class="h-4 rounded-full transition-all duration-700
+                        {% if s >= 70 %}bg-green-400
+                        {% elif s >= 40 %}bg-yellow-400
+                        {% else %}bg-red-400{% endif %}"
+                 style="width: {{ s }}%"></div>
+            <div class="absolute top-0 h-4 w-0.5 bg-gray-400" style="left: 50%"></div>
+          </div>
+          <div class="mt-4 p-4 rounded-xl
+                      {% if s >= 70 %}bg-green-50 text-green-700
+                      {% elif s >= 40 %}bg-yellow-50 text-yellow-700
+                      {% else %}bg-red-50 text-red-700{% endif %}">
+            <i class="fas fa-info-circle mr-1"></i>
+            {% if s >= 70 %}
+              Score alto indica oportunidade de compra baseada em critérios quantitativos: preço/valor, momentum e fundamentos.
+            {% elif s >= 40 %}
+              Score moderado — ativo dentro da faixa de neutralidade. Avaliar contexto e horizonte de investimento.
+            {% else %}
+              Score baixo indica ausência de sinal de compra no momento. Monitorar para entrada futura.
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Carteira — Buy Scores das posições atuais -->
+  {% if posicoes %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-list text-blue-500"></i> Minhas Posições ({{ posicoes | length }})
+      </h2>
+      <p class="text-xs text-gray-400 mt-1">Clique em qualquer ticker para consultar o score</p>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+          <tr>
+            <th class="text-left px-5 py-3">Ativo</th>
+            <th class="text-left px-5 py-3">Tipo</th>
+            <th class="text-right px-5 py-3">Quantidade</th>
+            <th class="text-right px-5 py-3">Custo Total</th>
+            <th class="text-right px-5 py-3">Preço Médio</th>
+            <th class="text-center px-5 py-3">Score</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for pos in posicoes[:20] %}
+          {% set atv = pos.ativo if pos.ativo is defined else {} %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-5 py-3">
+              <a href="?ticker={{ atv.ticker or '' }}"
+                 class="font-bold text-blue-600 hover:underline">
+                {{ atv.ticker or '—' }}
+              </a>
+              <div class="text-xs text-gray-400">{{ (atv.nome or '')[:30] }}</div>
+            </td>
+            <td class="px-5 py-3 text-sm text-gray-600 capitalize">
+              {{ (atv.tipo or '').replace('_', ' ') }}
+            </td>
+            <td class="px-5 py-3 text-right text-gray-700">{{ pos.quantidade or 0 }}</td>
+            <td class="px-5 py-3 text-right font-medium text-gray-800">
+              R$ {{ '{:,.2f}'.format(pos.custo_total or 0) | replace(',', '.') }}
+            </td>
+            <td class="px-5 py-3 text-right text-gray-600">
+              R$ {{ '%.2f'|format(pos.preco_medio or 0) | replace('.', ',') }}
+            </td>
+            <td class="px-5 py-3 text-center">
+              <a href="?ticker={{ atv.ticker or '' }}"
+                 class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full hover:bg-blue-200 transition">
+                Consultar
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if posicoes | length > 20 %}
+    <div class="p-4 text-center text-xs text-gray-400">
+      Exibindo 20 de {{ posicoes | length }} posições
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Aviso metodológico -->
+  <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-700">
+    <i class="fas fa-info-circle mr-1"></i>
+    <strong>Metodologia:</strong> O Buy Score é calculado com base em critérios quantitativos (preço vs. valor justo, momentum, fundamentos). Não constitui recomendação de investimento. Decisão final é sempre do investidor.
+  </div>
+
+</div>
+{% endblock %}

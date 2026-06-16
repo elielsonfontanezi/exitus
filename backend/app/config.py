@@ -2,6 +2,7 @@
 """Exitus Backend - Configuration"""
 
 import os
+from datetime import timedelta
 from dotenv import load_dotenv
 
 # Carrega .env se existir
@@ -27,6 +28,10 @@ class Config:
         f"{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # JWT
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
 
 
 class TestingConfig(Config):

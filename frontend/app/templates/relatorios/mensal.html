@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Relatório Mensal — Exitus{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">📄 Relatório Mensal</h1>
+        <p class="text-blue-200 mt-1">Resumo consolidado: operações, proventos e IR</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="{{ url_for('relatorios.anual') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">📅 Relatório Anual</a>
+        <a href="{{ url_for('relatorios.extrato') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">📋 Extrato</a>
+        <a href="{{ url_for('dashboard.index') }}" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">← Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+    <form method="GET" class="flex flex-wrap gap-3 items-end">
+      <div>
+        <label class="block text-xs text-gray-500 mb-1">Mês</label>
+        <select name="mes" class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400">
+          <option value="">Todos</option>
+          {% for m in range(1, 13) %}
+          <option value="{{ '%02d'|format(m) }}" {% if mes == '%02d'|format(m) %}selected{% endif %}>
+            {{ ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][m-1] }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs text-gray-500 mb-1">Ano</label>
+        <select name="ano" class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400">
+          <option value="">Todos</option>
+          {% for a in [2026, 2025, 2024] %}
+          <option value="{{ a }}" {% if ano == a|string %}selected{% endif %}>{{ a }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition">
+        Filtrar
+      </button>
+      <a href="{{ url_for('relatorios.exportar_csv') }}?tipo=transacoes{% if mes %}&mes={{ mes }}{% endif %}{% if ano %}&ano={{ ano }}{% endif %}"
+         class="border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm hover:bg-gray-50 transition">
+        ⬇ Exportar CSV
+      </a>
+    </form>
+  </div>
+
+  {% if erro %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700 text-sm">⚠️ {{ erro }}</div>
+  {% endif %}
+
+  <!-- Resumo IR -->
+  {% if resumo_ir %}
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    {% set cats = resumo_ir.get('categorias', []) %}
+    {% set total_ir = resumo_ir.get('total_ir', 0) %}
+    {% set total_proventos = resumo_ir.get('total_proventos', 0) %}
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center">
+      <div class="text-xs text-gray-400 mb-1">IR Devido</div>
+      <div class="text-xl font-bold text-red-600">R$ {{ '%.2f'|format((total_ir or 0)|float) | replace('.', ',') }}</div>
+    </div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center">
+      <div class="text-xs text-gray-400 mb-1">Proventos Isentos</div>
+      <div class="text-xl font-bold text-green-600">R$ {{ '%.2f'|format((total_proventos or 0)|float) | replace('.', ',') }}</div>
+    </div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center">
+      <div class="text-xs text-gray-400 mb-1">Operações</div>
+      <div class="text-xl font-bold text-blue-600">{{ transacoes | length }}</div>
+    </div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center">
+      <div class="text-xs text-gray-400 mb-1">Proventos</div>
+      <div class="text-xl font-bold text-purple-600">{{ proventos | length }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Operações do Mês -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-exchange-alt text-blue-500"></i> Operações ({{ transacoes | length }})
+      </h2>
+    </div>
+    {% if transacoes %}
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+          <tr>
+            <th class="text-left px-5 py-3">Data</th>
+            <th class="text-left px-5 py-3">Tipo</th>
+            <th class="text-left px-5 py-3">Ativo</th>
+            <th class="text-right px-5 py-3">Qtd</th>
+            <th class="text-right px-5 py-3">Preço</th>
+            <th class="text-right px-5 py-3">Total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for t in transacoes[:30] %}
+          {% set atv = t.ativo if t.ativo is defined else {} %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-5 py-3 text-gray-500">{{ (t.data_operacao or t.data or '')[:10] }}</td>
+            <td class="px-5 py-3">
+              <span class="px-2 py-0.5 rounded-full text-xs font-medium
+                {% if (t.tipo or '') in ['COMPRA','BUY'] %}bg-green-100 text-green-700
+                {% else %}bg-red-100 text-red-700{% endif %}">
+                {{ t.tipo or '—' }}
+              </span>
+            </td>
+            <td class="px-5 py-3 font-medium text-gray-800">{{ atv.get('ticker', t.get('ticker', '—')) }}</td>
+            <td class="px-5 py-3 text-right text-gray-700">{{ t.quantidade or 0 }}</td>
+            <td class="px-5 py-3 text-right text-gray-700">R$ {{ '%.4f'|format((t.preco_unitario or 0)|float) }}</td>
+            <td class="px-5 py-3 text-right font-medium text-gray-800">R$ {{ '%.2f'|format((t.valor_total or 0)|float) | replace('.', ',') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if transacoes | length > 30 %}
+    <div class="p-4 text-center text-xs text-gray-400">Exibindo 30 de {{ transacoes | length }} operações</div>
+    {% endif %}
+    {% else %}
+    <div class="p-10 text-center text-gray-400">
+      <i class="fas fa-inbox text-4xl mb-2 text-gray-200"></i>
+      <p>Nenhuma operação no período</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Proventos do Mês -->
+  {% if proventos %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <div class="p-5 border-b border-gray-100">
+      <h2 class="font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-coins text-yellow-500"></i> Proventos Recebidos ({{ proventos | length }})
+      </h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+          <tr>
+            <th class="text-left px-5 py-3">Data</th>
+            <th class="text-left px-5 py-3">Ativo</th>
+            <th class="text-left px-5 py-3">Tipo</th>
+            <th class="text-right px-5 py-3">Valor/Cota</th>
+            <th class="text-right px-5 py-3">Total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for p in proventos[:20] %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-5 py-3 text-gray-500">{{ (p.data_pagamento or p.data or '')[:10] }}</td>
+            <td class="px-5 py-3 font-medium text-blue-600">{{ p.ticker or '—' }}</td>
+            <td class="px-5 py-3 text-gray-600 capitalize">{{ (p.tipo or '').replace('_', ' ') }}</td>
+            <td class="px-5 py-3 text-right text-gray-700">R$ {{ '%.4f'|format((p.valor_por_cota or 0)|float) }}</td>
+            <td class="px-5 py-3 text-right font-medium text-green-700">R$ {{ '%.2f'|format((p.valor_total or 0)|float) | replace('.', ',') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

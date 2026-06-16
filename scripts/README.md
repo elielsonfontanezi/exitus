@@ -23,7 +23,7 @@ scripts/
 ├── rebuild_restart_exitus-frontend.sh   # Rebuild + restart frontend
 ├── restart_backend.sh               # Restart rápido backend
 ├── restart_exitus.sh               # Restart todos serviços
-├── restart_frontend.sh              # Restart rápido frontend
+├── reset_and_seed.sh              # Reset e seed controlado (wrapper para reset_and_seed.py)
 ├── restore_db.sh                    # Restore do banco
 ├── setup_containers.sh              # Setup inicial containers
 ├── setup_env.sh                     # Configura ambiente
@@ -254,15 +254,6 @@ scripts/
 - ✅ Gera documentação
 - ✅ Formato estruturado
 
-### `cleanup_duplicates.sh`
-**Remove duplicatas do DB**
-```bash
-./scripts/cleanup_duplicates.sh
-```
-- ⚠️ **Cuidado:** Operação destrutiva
-- ✅ Remove registros duplicados
-- ✅ Mantém mais recente
-
 ---
 
 ## 📊 Scripts de Manutenção
@@ -275,15 +266,6 @@ scripts/
 - ✅ Remove containers parados
 - ✅ Limpa imagens órfãs
 - ✅ Libera espaço
-
-### `validate_docs.sh`
-**Valida documentação**
-```bash
-./scripts/validate_docs.sh
-```
-- ✅ Verifica links
-- ✅ Valida estrutura
-- ✅ Reporta erros
 
 ---
 

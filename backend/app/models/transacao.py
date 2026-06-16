@@ -5,6 +5,7 @@
 import enum
 from datetime import datetime
 from decimal import Decimal
+import sqlalchemy as sa
 from sqlalchemy import Column, String, Numeric, DateTime, Enum, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -46,6 +47,7 @@ class Transacao(db.Model):
     # --- Relacionamentos ---
     ativo_id    = Column(UUID(as_uuid=True), ForeignKey('ativo.id'), nullable=False)
     corretora_id = Column(UUID(as_uuid=True), ForeignKey('corretora.id'), nullable=False)
+    assessora_id = Column(UUID(as_uuid=True), ForeignKey('assessora.id', ondelete='CASCADE'), nullable=True, index=True)
 
     # --- Dados da transação ---
     data_transacao  = Column(DateTime(timezone=True), nullable=False)
@@ -65,12 +67,17 @@ class Transacao(db.Model):
     valor_liquido   = Column(Numeric(18, 2), nullable=False)  # valor_total ± custos
 
     # --- Metadados ---
-    observacoes = Column(Text, nullable=True)
+    observacoes      = Column(Text, nullable=True)
+    hash_importacao  = Column(sa.String(64), nullable=True, index=True,
+                              comment="Hash MD5 da linha original do arquivo B3 para deduplicação")
+    arquivo_origem   = Column(sa.String(255), nullable=True,
+                              comment="Nome do arquivo B3 de origem da importação")
     created_at  = Column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     updated_at  = Column(DateTime(timezone=True), nullable=False,
                          default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # --- ORM relationships ---
+    assessora = relationship('Assessora', back_populates='transacoes')
     usuario  = relationship('Usuario', backref='transacoes', lazy=True)
     ativo    = relationship('Ativo', backref='transacoes',
                             primaryjoin='Transacao.ativo_id == Ativo.id', lazy=True)
@@ -98,6 +105,22 @@ class Transacao(db.Model):
                 f'{self.ativo.ticker if self.ativo else "?"} '
                 f'{self.data_transacao.date()}>')
 
+    def save(self):
+        """Salva transação e atualiza posições automaticamente"""
+        from app.services.posicao_service import PosicaoService
+        
+        # Salvar transação
+        db.session.add(self)
+        db.session.commit()
+        
+        # Atualizar posições do usuário
+        try:
+            resultado = PosicaoService.calcular_posicoes(self.usuario_id)
+            print(f"✅ Posições atualizadas: {resultado}")
+        except Exception as e:
+            print(f"⚠️  Erro ao atualizar posições: {e}")
+            # Não falhar se posições não puderem ser atualizadas
+    
     def to_dict(self):
         """Serializa transação para dict."""
         return {

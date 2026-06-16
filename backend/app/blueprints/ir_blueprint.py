@@ -57,7 +57,7 @@ def darf():
         apuracao = IRService.apurar_mes(usuario_id, mes)
         resultado = {
             'mes':   mes,
-            'darfs': apuracao['darf'],
+            'darfs': apuracao['darf']['darfs'],  # darf retorna {'darfs': [...]}
             'ir_total': apuracao['ir_total'],
             'alertas': apuracao['alertas'],
         }

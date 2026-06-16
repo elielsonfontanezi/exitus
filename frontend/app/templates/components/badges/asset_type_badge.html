@@ -1,0 +1,33 @@
+{# 
+  Componente: Asset Type Badge
+  Descrição: Badge visual para tipo de ativo
+  Props:
+    - tipo: string (ACAO, FII, STOCK, REIT, ETF, etc.)
+    - size: string (sm, md, lg) - opcional, padrão 'md'
+  Uso:
+    {% include 'components/badges/asset_type_badge.html' with tipo='ACAO' size='md' %}
+#}
+
+{% set badge_classes = {
+  'sm': 'px-2 py-0.5 text-xs',
+  'md': 'px-2.5 py-1 text-sm',
+  'lg': 'px-3 py-1.5 text-base'
+} %}
+
+{% set type_config = {
+  'ACAO': {'label': 'AÇÃO', 'color': 'bg-blue-100 text-blue-800 border-blue-300'},
+  'FII': {'label': 'FII', 'color': 'bg-orange-100 text-orange-800 border-orange-300'},
+  'STOCK': {'label': 'STOCK', 'color': 'bg-indigo-100 text-indigo-800 border-indigo-300'},
+  'REIT': {'label': 'REIT', 'color': 'bg-amber-100 text-amber-800 border-amber-300'},
+  'ETF': {'label': 'ETF', 'color': 'bg-teal-100 text-teal-800 border-teal-300'},
+  'BDR': {'label': 'BDR', 'color': 'bg-cyan-100 text-cyan-800 border-cyan-300'},
+  'CRIPTO': {'label': 'CRIPTO', 'color': 'bg-violet-100 text-violet-800 border-violet-300'},
+  'UNIT': {'label': 'UNIT', 'color': 'bg-pink-100 text-pink-800 border-pink-300'}
+} %}
+
+{% set size_class = badge_classes.get(size, badge_classes['md']) %}
+{% set config = type_config.get(tipo, {'label': tipo, 'color': 'bg-gray-100 text-gray-800 border-gray-300'}) %}
+
+<span class="inline-flex items-center font-medium rounded-md border {{ size_class }} {{ config.color }}">
+  {{ config.label }}
+</span>

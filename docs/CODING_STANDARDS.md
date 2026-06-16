@@ -111,6 +111,14 @@ proventos = Provento.query.filter(
     Provento.data_pagamento >= data_inicio,
     Provento.tipo_provento == TipoProvento.DIVIDENDO
 ).all()
+
+# ✅ MULTI-TENANT QUERIES (MULTICLIENTE-001)
+from app.utils.tenant import filter_by_assessora
+
+# Aplicar filtro de tenant em TODAS as queries
+query = Transacao.query.filter_by(usuario_id=usuario_id)
+query = filter_by_assessora(query, Transacao)
+transacoes = query.all()
 ```
 
 ---
@@ -436,9 +444,118 @@ tipo = Column(Enum(TipoAtivo), nullable=False)
 
 ---
 
+## � **Frontend — Padrões de Design Moderno (UX Evolution)**
+
+### **Hero Section Padrão**
+```html
+<!-- ✅ PADRÃO OBRIGATÓRIO para todas as páginas -->
+<section class="bg-gradient-hero rounded-3xl mx-6 mt-6 p-8 text-white shadow-large animate-fade-in relative overflow-hidden">
+  <!-- Elementos Decorativos -->
+  <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+  <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
+  
+  <div class="relative z-10">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse-slow">
+            <span class="text-3xl">[EMOJI]</span>
+          </div>
+          <div>
+            <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+              [TÍTULO]
+            </h1>
+            <p class="text-xl text-white/80">[DESCRIÇÃO]</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-8 lg:mt-0 lg:ml-8">
+        <div class="flex flex-wrap gap-3">
+          <!-- BOTÕES AQUI -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+```
+
+### **Cards Modernos Padrão**
+```html
+<!-- ✅ PADRÃO OBRIGATÓRIO para cards de estatísticas -->
+<div class="card-moderno p-6 animate-scale-in hover-lift group cursor-pointer">
+  <div class="flex items-center justify-between mb-4">
+    <div class="w-12 h-12 bg-[COR]-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+      <span class="text-2xl">[EMOJI]</span>
+    </div>
+    <div class="w-8 h-8 bg-[COR]-100 rounded-full flex items-center justify-center">
+      <span class="text-[COR]-600 font-bold text-sm">[VALOR]</span>
+    </div>
+  </div>
+  <div class="space-y-2">
+    <p class="text-3xl font-bold text-gray-900">[VALOR PRINCIPAL]</p>
+    <p class="text-sm text-gray-600">[DESCRIÇÃO]</p>
+  </div>
+</div>
+```
+
+### **Botões Padrão**
+```html
+<!-- ✅ BOTÃO PRIMÁRIO -->
+<button class="btn-primario">
+  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    [ÍCONE SVG]
+  </svg>
+  [TEXTO]
+</button>
+
+<!-- ✅ BOTÃO SECUNDÁRIO -->
+<a href="[URL]" class="btn-secundario">
+  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    [ÍCONE SVG]
+  </svg>
+  [TEXTO]
+</a>
+```
+
+### **Emojis por Página (Obrigatório)**
+| Página | Emoji | Cor |
+|--------|-------|-----|
+| Dashboard | 📊 | primary |
+| Carteiras | 📁 | primary |
+| Ativos | �🎯 | primary |
+| Performance | 📈 | success |
+| Movimentações | 💳 | primary |
+| Alertas | 🔔 | warning |
+| Relatórios | 📄 | primary |
+| Imposto de Renda | 🧾 | danger |
+| Educação | 🎓 | primary |
+| Configurações | ⚙️ | gray |
+
+### **Cores Semânticas**
+- **primary:** azul principal
+- **success:** verde para positivos
+- **warning:** laranja para alertas
+- **danger:** vermelho para negativos
+- **purple:** roxo para especiais
+
+### **Animações Padrão**
+- **animate-fade-in:** para hero sections
+- **animate-scale-in:** para cards
+- **animate-delay-100/200/300:** delays progressivos
+- **animate-pulse-slow:** para emojis principais
+- **hover-lift:** elevação no hover
+- **group-hover:scale-110:** escala nos ícones
+
+---
+
 ## 🎯 **Regras de Ouro**
 
 1. **🔍 SEMPRE validar** enums antes de usar
+2. **🎨 USAR SEMPRE** hero section padrão em novas páginas
+3. **📊 MANTER** consistência de emojis e cores
+4. **⚡ APLICAR** animações com delays progressivos
+5. **🔧 USAR** btn-primario/btn-secundario para ações principais
 2. **✅ SEMPRE validar** constraints antes de inserir  
 3. **🔄 SEMPRE fazer** rollback após erros
 4. **📝 SEMPRE documentar** problemas recorrentes
@@ -446,5 +563,90 @@ tipo = Column(Enum(TipoAtivo), nullable=False)
 
 ---
 
-*Atualizado: 04 de Março de 2026*  
-*Versão: 3.1 - Padrão _setup/_teardown com decode_token adicionado (EXITUS-IR-005)*
+---
+
+## 🔐 Padrão Obrigatório — Autenticação JWT no Frontend
+
+### Regra: Toda rota Flask que chama a API backend deve usar `get_api_headers()`
+
+```python
+# ✅ PADRÃO OBRIGATÓRIO — frontend/app/routes/*.py
+from .auth import login_required, get_api_headers
+
+@bp.route('/minha-rota')
+@login_required
+def minha_rota():
+    headers = get_api_headers()
+    if not headers:
+        return redirect(url_for('auth.login'))
+    
+    response = requests.get(f"{Config.BACKEND_API_URL}/api/...", headers=headers)
+```
+
+**Por que?**
+- `session.get('access_token')` diretamente **ignora a expiração** do token
+- `get_api_headers()` verifica expiração, tenta renovar silenciosamente via refresh token
+- Se renovação falhar → redireciona para login (nunca silencia o erro)
+
+### Configuração JWT (backend/app/config.py)
+```python
+JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)   # Access token: 30 min
+JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)       # Refresh token: 7 dias
+```
+
+### Inatividade do usuário (frontend/templates/base.html)
+- Timer de **15 minutos** de inatividade → modal "Sessão Expirada"
+- Eventos que resetam o timer: `click`, `keypress`, `scroll`, `mousemove`, `touchstart`
+- Verificação de sessão a cada **1 minuto** via `/auth/check-session`
+
+---
+
+## 🌍 Padrão Europeu — Datas e Valores Monetários
+
+O sistema Exitus segue o **padrão Europeu** para formatação de datas e valores:
+
+| Tipo | Formato | Exemplo |
+|------|---------|---------|
+| **Data** | DD/MM/AAAA | `29/03/2026` |
+| **Data/Hora** | DD/MM/AAAA HH:MM:SS | `29/03/2026 14:30:00` |
+| **Valor Monetário** | R$ 9.999,99 (ponto milhar, vírgula decimal) | `R$ 1.234,56` |
+| **Percentual** | 99,99% (vírgula decimal) | `12,34%` |
+| **Quantidade** | 9.999,99 (ponto milhar, vírgula decimal) | `1.000,50` |
+
+### Implementação Frontend
+
+```javascript
+// Data para display (DD/MM/AAAA)
+new Date().toLocaleDateString('pt-BR')  // "29/03/2026"
+
+// Data para API (ISO 8601)
+new Date().toISOString().split('T')[0]  // "2026-03-29"
+
+// Valor monetário para display
+new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+}).format(1234.56)  // "R$ 1.234,56"
+
+// Valor percentual
+new Intl.NumberFormat('pt-BR', {
+    style: 'percent',
+    minimumFractionDigits: 2
+}).format(0.1234)  // "12,34%"
+```
+
+### Regras Obrigatórias
+
+1. **Campos de input de data** devem usar máscara `DD/MM/AAAA` com `type="text"`
+2. **Campos hidden** devem conter o valor em formato ISO para envio à API
+3. **Display de valores** deve sempre usar `Intl.NumberFormat('pt-BR', ...)`
+4. **API backend** sempre recebe e retorna datas em ISO 8601 (YYYY-MM-DD)
+
+### Exceções
+
+- Input `type="date"` nativo HTML5 deve ser evitado (mostra formato americano)
+- Exportações para CSV/Excel devem usar formato local do usuário quando possível
+
+---
+
+*Adicionado: 29/03/2026*

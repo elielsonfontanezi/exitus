@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}{{ plano.nome if plano else 'Plano' }} — Exitus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/design-system.css">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <div class="rounded-2xl p-6 mb-6 text-white" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">🎯 {{ plano.nome if plano else 'Plano não encontrado' }}</h1>
+        <p class="text-green-100 mt-1">
+          {% if plano and plano.ativo %}{{ plano.ativo.nome }} — {{ plano.ativo.ticker }}{% endif %}
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <a href="/planos-compra/" class="border border-white/30 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition">← Todos os Planos</a>
+      </div>
+    </div>
+  </div>
+
+    {% if not plano %}
+    <div class="card p-16 text-center text-gray-400">
+      <i class="fas fa-search text-5xl mb-4 block"></i>
+      <p class="text-xl font-semibold mb-2">Plano não encontrado</p>
+      <a href="/planos-compra/" class="btn btn-primary mt-4">Voltar aos Planos</a>
+    </div>
+
+    {% else %}
+    {% set progresso = plano.progresso_percentual | float %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Coluna principal -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- Progresso geral -->
+        <div class="card p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold"><i class="fas fa-chart-line text-blue-600 mr-2"></i>Progresso da Acumulação</h3>
+            <span class="text-2xl font-bold {{ 'text-green-600' if progresso >= 100 else 'text-blue-600' }}">
+              {{ "%.1f"|format(progresso) }}%
+            </span>
+          </div>
+
+          <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+            <div class="h-4 rounded-full {{ 'bg-green-500' if progresso >= 100 else 'bg-blue-500' }} transition-all"
+                 style="width: {{ [progresso, 100]|min }}%"></div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-6 text-center">
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="text-2xl font-bold text-blue-700">
+                {{ plano.quantidade_acumulada | float | round(0) | int }}
+              </div>
+              <div class="text-xs text-gray-500 mt-1">Cotas Acumuladas</div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="text-2xl font-bold text-gray-700">
+                {{ plano.quantidade_alvo | float | round(0) | int }}
+              </div>
+              <div class="text-xs text-gray-500 mt-1">Meta (Qtd Alvo)</div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="text-2xl font-bold text-amber-700">
+                {{ ([plano.quantidade_alvo | float - plano.quantidade_acumulada | float, 0] | max) | round(0) | int }}
+              </div>
+              <div class="text-xs text-gray-500 mt-1">Faltam</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dados do plano -->
+        <div class="card p-6">
+          <h3 class="text-lg font-bold mb-4"><i class="fas fa-info-circle text-gray-500 mr-2"></i>Dados do Plano</h3>
+          <dl class="grid grid-cols-2 gap-x-8 gap-y-4">
+            <div>
+              <dt class="text-xs text-gray-500 uppercase font-semibold mb-1">Status</dt>
+              <dd>
+                <span class="inline-flex px-2 py-1 rounded-full text-xs font-bold
+                  {% if plano.status == 'ativo' %}bg-green-100 text-green-700
+                  {% elif plano.status == 'pausado' %}bg-yellow-100 text-yellow-700
+                  {% elif plano.status == 'concluido' %}bg-blue-100 text-blue-700
+                  {% else %}bg-red-100 text-red-700{% endif %}">
+                  {{ plano.status | upper }}
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-xs text-gray-500 uppercase font-semibold mb-1">Aporte Mensal</dt>
+              <dd class="font-bold text-amber-700">
+                {% if plano.valor_aporte_mensal %}R$ {{ "%.2f"|format(plano.valor_aporte_mensal | float) }}{% else %}—{% endif %}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-xs text-gray-500 uppercase font-semibold mb-1">Data Início</dt>
+              <dd class="text-gray-800">{{ plano.data_inicio[:10] if plano.data_inicio else '—' }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs text-gray-500 uppercase font-semibold mb-1">Prazo Previsto</dt>
+              <dd class="text-gray-800">{{ plano.data_fim_prevista[:10] if plano.data_fim_prevista else '—' }}</dd>
+            </div>
+            {% if plano.data_conclusao %}
+            <div>
+              <dt class="text-xs text-gray-500 uppercase font-semibold mb-1">Data Conclusão</dt>
+              <dd class="text-green-700 font-semibold">{{ plano.data_conclusao[:10] }}</dd>
+            </div>
+            {% endif %}
+            {% if plano.proximo_aporte %}
+            <div>
+              <dt class="text-xs text-gray-500 uppercase font-semibold mb-1">Próximo Aporte</dt>
+              <dd class="text-gray-800">{{ plano.proximo_aporte[:10] }}</dd>
+            </div>
+            {% endif %}
+            {% if plano.descricao %}
+            <div class="col-span-2">
+              <dt class="text-xs text-gray-500 uppercase font-semibold mb-1">Descrição</dt>
+              <dd class="text-gray-700">{{ plano.descricao }}</dd>
+            </div>
+            {% endif %}
+          </dl>
+        </div>
+
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+
+        <!-- Ativo -->
+        {% if plano.ativo %}
+        <div class="card p-6">
+          <h3 class="text-lg font-bold mb-4"><i class="fas fa-chart-bar text-blue-500 mr-2"></i>Ativo Alvo</h3>
+          <div class="text-center mb-4">
+            <span class="text-2xl font-bold font-mono" style="color:#a38c65;">{{ plano.ativo.ticker }}</span>
+            <p class="text-gray-600 text-sm mt-1">{{ plano.ativo.nome }}</p>
+            <span class="inline-flex px-2 py-1 rounded text-xs bg-blue-100 text-blue-700 mt-2">
+              {{ plano.ativo.tipo | upper }} — {{ plano.ativo.mercado }}
+            </span>
+          </div>
+          {% if plano.ativo.preco_atual %}
+          <div class="text-center border-t pt-4">
+            <div class="text-xl font-bold text-gray-900">R$ {{ "%.2f"|format(plano.ativo.preco_atual | float) }}</div>
+            <div class="text-xs text-gray-500">Preço Atual</div>
+          </div>
+          {% endif %}
+          <a href="/ativos/{{ plano.ativo.ticker }}"
+             class="btn btn-outline w-full mt-4 text-sm">
+            <i class="fas fa-external-link-alt mr-1"></i>Ver Detalhe do Ativo
+          </a>
+        </div>
+        {% endif %}
+
+        <!-- Ações rápidas -->
+        <div class="card p-6">
+          <h3 class="text-lg font-bold mb-4"><i class="fas fa-bolt text-amber-500 mr-2"></i>Ações</h3>
+          <div class="space-y-3">
+            <a href="/operacoes/?ticker={{ plano.ativo.ticker if plano.ativo else '' }}"
+               class="flex items-center gap-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors text-green-700 text-sm font-semibold">
+              <i class="fas fa-plus-circle text-lg"></i>
+              <span>Registrar Aporte</span>
+            </a>
+            <a href="/planos-compra/"
+               class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors text-gray-700 text-sm font-semibold">
+              <i class="fas fa-list text-lg"></i>
+              <span>Todos os Planos</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

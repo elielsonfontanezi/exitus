@@ -1,0 +1,674 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Exitus{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #F5F5F4 !important;
+    }
+    
+    /* Loading Skeleton Animation */
+    @keyframes shimmer {
+        0% { background-position: -1000px 0; }
+        100% { background-position: 1000px 0; }
+    }
+    
+    .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 1000px 100%;
+        animation: shimmer 2s infinite linear;
+        border-radius: 4px;
+    }
+    
+    .skeleton-text {
+        height: 1em;
+        margin-bottom: 0.5em;
+    }
+    
+    .skeleton-title {
+        height: 1.5em;
+        width: 60%;
+        margin-bottom: 1em;
+    }
+    
+    .skeleton-value {
+        height: 2em;
+        width: 80%;
+    }
+    
+    /* Tooltip styles */
+    .tooltip-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .tooltip-icon {
+        cursor: help;
+        color: #a38c65;
+        font-size: 0.875rem;
+        margin-left: 0.5rem;
+    }
+    
+    .tooltip-text {
+        visibility: hidden;
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        white-space: nowrap;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .tooltip-container:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
+    
+    /* Quick Action Cards */
+    .quick-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .quick-action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: linear-gradient(135deg, #a38c65 0%, #8b7355 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(163, 140, 101, 0.4);
+    }
+    
+    /* Educational hint */
+    .edu-hint {
+        background: linear-gradient(135deg, #f8f6f3 0%, #f0ebe3 100%);
+        border-left: 4px solid #a38c65;
+        padding: 12px 16px;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 1rem;
+    }
+    
+    .edu-hint-title {
+        font-weight: 600;
+        color: #735c43;
+        margin-bottom: 4px;
+    }
+    
+    .edu-hint-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    /* Cards no estilo Investidor10 */
+    .card, .resumo-item, .card-metrica, .card-ativo, .card-dashboard, .chart-container, .section-box {
+        background: #FFFFFF !important;
+        border: 1px solid #E3E6ED !important;
+        border-radius: 8px !important;
+        box-shadow: rgb(230, 230, 229) 0px 0px 12px 0px !important;
+        padding: 8px 16px !important;
+    }
+    
+    /* Padding específico para cards de mercado */
+    .card-dashboard {
+        padding: 16px !important;
+    }
+    
+    /* Padding específico para containers */
+    .chart-container, .section-box {
+        padding: 20px !important;
+    }
+    
+    /* Ajustes específicos para diferentes tipos de cards */
+    .resumo-patrimonio {
+        gap: 1rem;
+    }
+    
+    .resumo-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto max-w-7xl py-6" x-data="dashboardV2()" x-init="init()">
+    
+    <!-- LOADING SKELETON (mostrado enquanto carrega) -->
+    <div x-show="!dadosCarregados" class="resumo-patrimonio mb-6">
+        <div class="resumo-item">
+            <div class="skeleton skeleton-text" style="width: 60%;"></div>
+            <div class="skeleton skeleton-value"></div>
+            <div class="skeleton skeleton-text" style="width: 40%;"></div>
+        </div>
+        <div class="resumo-item">
+            <div class="skeleton skeleton-text" style="width: 60%;"></div>
+            <div class="skeleton skeleton-value"></div>
+            <div class="skeleton skeleton-text" style="width: 40%;"></div>
+        </div>
+        <div class="resumo-item">
+            <div class="skeleton skeleton-text" style="width: 60%;"></div>
+            <div class="skeleton skeleton-value"></div>
+            <div class="skeleton skeleton-text" style="width: 40%;"></div>
+        </div>
+        <div class="resumo-item">
+            <div class="skeleton skeleton-text" style="width: 60%;"></div>
+            <div class="skeleton skeleton-value"></div>
+            <div class="skeleton skeleton-text" style="width: 40%;"></div>
+        </div>
+    </div>
+
+    <!-- 1. RESUMO DO PATRIMÔNIO + SALDO CAIXA (mostrado após carregar) -->
+    <div x-show="dadosCarregados" class="resumo-patrimonio mb-6">
+        <div class="resumo-item">
+            <div class="label">Patrimônio Total</div>
+            <div class="valor" x-text="formatMoney(dados.resumo.patrimonio_total)">R$ 0,00</div>
+            <div class="variacao positiva" x-show="dados.resumo.rentabilidade_geral > 0">
+                ▲ <span x-text="dados.resumo.rentabilidade_geral.toFixed(2)">0</span>%
+            </div>
+        </div>
+        
+        <div class="resumo-item">
+            <div class="label">Rentabilidade</div>
+            <div class="valor" x-text="dados.resumo.rentabilidade_geral.toFixed(2) + '%'">0%</div>
+            <div class="variacao">Geral</div>
+        </div>
+        
+        <div class="resumo-item">
+            <div class="label">Ativos</div>
+            <div class="valor" x-text="dados.resumo.total_posicoes">0</div>
+            <div class="variacao" x-text="dados.resumo.total_portfolios + ' carteiras'">0 carteiras</div>
+        </div>
+        
+        <div class="resumo-item">
+            <div class="label">Saldo em Caixa</div>
+            <div class="valor" x-text="moedaAtual === 'BRL' ? formatMoney(saldoCaixa.saldo_total_brl) : '$' + saldoCaixa.saldo_usd.toFixed(2)">R$ 0,00</div>
+            <div class="variacao">
+                <button @click="toggleMoeda()" class="px-3 py-1 rounded" style="background: #a38c65; color: white; font-weight: 600;">
+                    <span x-text="moedaAtual">BRL</span> ⇄ <span x-text="moedaAtual === 'BRL' ? 'USD' : 'BRL'">USD</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 2. CARDS DE AÇÃO RÁPIDA -->
+    <div class="mb-6">
+        <div class="quick-actions">
+            <a href="/operacoes/compra" class="quick-action-btn">
+                <span>➕</span>
+                <span>Nova Compra</span>
+            </a>
+            <a href="/operacoes/venda" class="quick-action-btn">
+                <span>💰</span>
+                <span>Vender</span>
+            </a>
+            <a href="/operacoes/deposito" class="quick-action-btn">
+                <span>💵</span>
+                <span>Depositar</span>
+            </a>
+            <a href="/analises" class="quick-action-btn">
+                <span>📊</span>
+                <span>Ver Análises</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- 3. VISÃO MULTI-MERCADO -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="card-dashboard">
+            <h3 class="text-lg font-semibold mb-3" style="color: #a38c65;">🇧🇷 Brasil</h3>
+            <div class="text-2xl font-bold mb-2" x-text="formatMoney(dados.por_mercado.BR.patrimonio)">R$ 0,00</div>
+            <div class="text-sm text-gray-600 mb-1" x-text="dados.por_mercado.BR.percentual.toFixed(1) + '% do total'">0%</div>
+            <div class="text-sm" :class="dados.por_mercado.BR.rentabilidade >= 0 ? 'text-green-600' : 'text-red-600'">
+                <span x-text="dados.por_mercado.BR.rentabilidade >= 0 ? '▲' : '▼'"></span>
+                <span x-text="Math.abs(dados.por_mercado.BR.rentabilidade).toFixed(2)">0</span>%
+            </div>
+        </div>
+        
+        <div class="card-dashboard">
+            <h3 class="text-lg font-semibold mb-3" style="color: #a38c65;">🇺🇸 EUA</h3>
+            <div class="text-2xl font-bold mb-2" x-text="formatMoney(dados.por_mercado.US.patrimonio)">R$ 0,00</div>
+            <div class="text-sm text-gray-600 mb-1" x-text="dados.por_mercado.US.percentual.toFixed(1) + '% do total'">0%</div>
+            <div class="text-sm" :class="dados.por_mercado.US.rentabilidade >= 0 ? 'text-green-600' : 'text-red-600'">
+                <span x-text="dados.por_mercado.US.rentabilidade >= 0 ? '▲' : '▼'"></span>
+                <span x-text="Math.abs(dados.por_mercado.US.rentabilidade).toFixed(2)">0</span>%
+            </div>
+        </div>
+        
+        <div class="card-dashboard">
+            <h3 class="text-lg font-semibold mb-3" style="color: #a38c65;">🌍 Internacional</h3>
+            <div class="text-2xl font-bold mb-2" x-text="formatMoney(dados.por_mercado.INTL.patrimonio)">R$ 0,00</div>
+            <div class="text-sm text-gray-600 mb-1" x-text="dados.por_mercado.INTL.percentual.toFixed(1) + '% do total'">0%</div>
+            <div class="text-sm" :class="dados.por_mercado.INTL.rentabilidade >= 0 ? 'text-green-600' : 'text-red-600'">
+                <span x-text="dados.por_mercado.INTL.rentabilidade >= 0 ? '▲' : '▼'"></span>
+                <span x-text="Math.abs(dados.por_mercado.INTL.rentabilidade).toFixed(2)">0</span>%
+            </div>
+        </div>
+    </div>
+    
+    <!-- 2. LAYOUT PRINCIPAL: 2/3 + 1/3 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- COLUNA PRINCIPAL (2/3) -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- GRÁFICO DE EVOLUÇÃO -->
+            <div class="chart-container">
+                <h3 class="chart-title flex items-center">
+                    Evolução do Patrimônio - Histórico Completo
+                    <span class="tooltip-container">
+                        <span class="tooltip-icon">ℹ️</span>
+                        <span class="tooltip-text">Acompanhe como seu patrimônio evoluiu ao longo do tempo</span>
+                    </span>
+                </h3>
+                <canvas id="chartEvolucao" height="80"></canvas>
+            </div>
+            
+            <!-- TOP 5 ATIVOS - BRASIL -->
+            <div class="section-box">
+                <h2>Top 5 Ativos - Brasil</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <td><strong>Ativo</strong></td>
+                            <td><strong>Tipo</strong></td>
+                            <td><strong>Valor</strong></td>
+                            <td><strong>Rentabilidade</strong></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="ativo in dados.por_mercado.BR.top_ativos.slice(0, 5)" :key="ativo.ticker">
+                            <tr>
+                                <td><strong x-text="ativo.ticker"></strong></td>
+                                <td x-text="ativo.tipo"></td>
+                                <td x-text="formatMoney(ativo.valor)"></td>
+                                <td :style="ativo.rentabilidade >= 0 ? 'color: #10b981;' : 'color: #ef4444;'">
+                                    <span x-text="ativo.rentabilidade >= 0 ? '▲' : '▼'"></span>
+                                    <span x-text="Math.abs(ativo.rentabilidade).toFixed(2) + '%'"></span>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- ÚLTIMAS TRANSAÇÕES -->
+            <div class="section-box">
+                <h2>Últimas Transações</h2>
+                <div class="space-y-2">
+                    <template x-for="trx in transacoes" :key="trx.id">
+                        <div class="flex justify-between items-center p-3 rounded" style="background: #f8f9fa;">
+                            <div>
+                                <span class="font-semibold" x-text="trx.ativo_ticker"></span>
+                                <span class="text-sm text-gray-600 ml-2" x-text="trx.tipo"></span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold" x-text="formatMoney(trx.valor_total)"></div>
+                                <div class="text-xs text-gray-600" x-text="formatDate(trx.data_operacao)"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- COLUNA LATERAL (1/3) -->
+        <div class="space-y-6">
+            
+            <!-- META DE PATRIMÔNIO -->
+            <div class="card-dashboard">
+                <h3 class="text-lg font-semibold mb-3 flex items-center" style="color: #a38c65;">
+                    🎯 Meta de Patrimônio
+                    <span class="tooltip-container">
+                        <span class="tooltip-icon">ℹ️</span>
+                        <span class="tooltip-text">Acompanhe seu progresso em relação à meta definida</span>
+                    </span>
+                </h3>
+                <div class="mb-2">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>Atual: <strong x-text="formatMoney(dados.resumo.patrimonio_total)">R$ 0,00</strong></span>
+                        <span>Meta: <strong>R$ 500.000,00</strong></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="bg-gradient-to-r from-amber-600 to-amber-400 h-3 rounded-full transition-all duration-500" 
+                             :style="'width: ' + Math.min((dados.resumo.patrimonio_total / 500000) * 100, 100) + '%'"
+                             style="width: 0%"></div>
+                    </div>
+                    <div class="text-center mt-2 text-sm font-semibold" style="color: #a38c65;"
+                         x-text="((dados.resumo.patrimonio_total / 500000) * 100).toFixed(1) + '% alcançado'">
+                        0% alcançado
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BENCHMARK VS CDI -->
+            <div class="card-dashboard">
+                <h3 class="text-lg font-semibold mb-3 flex items-center" style="color: #a38c65;">
+                    📊 Benchmark
+                    <span class="tooltip-container">
+                        <span class="tooltip-icon">ℹ️</span>
+                        <span class="tooltip-text">Comparativo da sua rentabilidade vs CDI e Ibovespa</span>
+                    </span>
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">Sua Carteira</span>
+                        <span class="font-semibold text-green-600" x-text="'▲ ' + dados.resumo.rentabilidade_geral.toFixed(2) + '%'">▲ 0.00%</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">CDI (12m)</span>
+                        <span class="font-semibold text-gray-600">▲ 11.75%</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">Ibovespa (12m)</span>
+                        <span class="font-semibold text-gray-600">▲ 8.32%</span>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-gray-200">
+                        <div class="text-sm text-center" :class="dados.resumo.rentabilidade_geral > 11.75 ? 'text-green-600 font-semibold' : 'text-gray-500'">
+                            <span x-show="dados.resumo.rentabilidade_geral > 11.75">🎉 Você está acima do CDI!</span>
+                            <span x-show="dados.resumo.rentabilidade_geral <= 11.75">📈 Continue investindo para superar o CDI</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PRÓXIMOS PROVENTOS (30 DIAS) -->
+            <div class="card-dashboard">
+                <h3 class="text-lg font-semibold mb-3 flex items-center" style="color: #a38c65;">
+                    💰 Próximos Proventos
+                    <span class="tooltip-container">
+                        <span class="tooltip-icon">ℹ️</span>
+                        <span class="tooltip-text">Dividendos e rendimentos esperados nos próximos 30 dias</span>
+                    </span>
+                </h3>
+                <div class="space-y-2" x-show="proximosProventos.length > 0">
+                    <template x-for="provento in proximosProventos" :key="provento.id">
+                        <div class="flex justify-between items-center p-2 rounded" style="background: #f8f6f3;">
+                            <div>
+                                <div class="font-semibold text-sm" x-text="provento.ativo_ticker"></div>
+                                <div class="text-xs text-gray-500" x-text="provento.data_pagamento"></div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-sm" style="color: #a38c65;" x-text="'R$ ' + provento.valor_total.toFixed(2)"></div>
+                                <div class="text-xs text-gray-500" x-text="provento.tipo"></div>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="mt-3 pt-2 border-t border-gray-200 text-center">
+                        <div class="text-sm font-semibold" style="color: #735c43;">
+                            Total esperado: <span x-text="'R$ ' + totalProventos.toFixed(2)">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+                <div x-show="proximosProventos.length === 0" class="text-center text-gray-500 py-4 text-sm">
+                    Nenhum provento previsto para os próximos 30 dias
+                </div>
+            </div>
+            
+            <!-- ALOCAÇÃO GRÁFICA -->
+            <div class="chart-container">
+                <h3 class="text-lg font-semibold mb-4 flex items-center" style="color: #a38c65;">
+                    Alocação por Mercado
+                    <span class="tooltip-container">
+                        <span class="tooltip-icon">ℹ️</span>
+                        <span class="tooltip-text">Distribuição do seu patrimônio entre Brasil, EUA e Internacional</span>
+                    </span>
+                </h3>
+                <canvas id="alocacaoChart" height="150"></canvas>
+            </div>
+            
+            <!-- ALERTAS RECENTES -->
+            <div class="notification-panel">
+                <h3>Alertas Recentes</h3>
+                
+                <template x-for="alerta in alertas" :key="alerta.id">
+                    <div class="notification-card">
+                        <div class="notification-title" x-text="alerta.nome"></div>
+                        <p class="text-sm" style="color: #6c757d;" x-text="alerta.mensagem"></p>
+                        <div class="notification-time" x-text="formatDate(alerta.data)"></div>
+                    </div>
+                </template>
+                
+                <div x-show="alertas.length === 0" class="text-center text-gray-500 py-4">
+                    Nenhum alerta recente
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+</div>
+
+<!-- SCRIPTS DASHBOARD V2 -->
+<script>
+function dashboardV2() {
+    return {
+        dados: {
+            resumo: { patrimonio_total: 0, rentabilidade_geral: 0, total_portfolios: 0, total_posicoes: 0 },
+            por_mercado: {
+                BR: { patrimonio: 0, percentual: 0, rentabilidade: 0, top_ativos: [] },
+                US: { patrimonio: 0, percentual: 0, rentabilidade: 0, top_ativos: [] },
+                INTL: { patrimonio: 0, percentual: 0, rentabilidade: 0, top_ativos: [] }
+            },
+            alocacao_geografica: { BR: 0, US: 0, INTL: 0 },
+            evolucao: []
+        },
+        saldoCaixa: { saldo_brl: 0, saldo_usd: 0, saldo_total_brl: 0, taxa_cambio: 5.46 },
+        moedaAtual: 'BRL',
+        alertas: [],
+        transacoes: [],
+        proximosProventos: [],
+        totalProventos: 0,
+        chartEvolucao: null,
+        chartAlocacao: null,
+        dadosCarregados: false,
+        
+        async init() {
+            await this.carregarDados();
+            this.$nextTick(() => this.renderizarGraficos());
+        },
+        
+        async carregarDados() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                console.warn('Token não encontrado');
+                return;
+            }
+            
+            try {
+                const baseUrl = 'http://localhost:5000';
+                
+                // Dashboard principal (obrigatório)
+                const resDash = await fetch(`${baseUrl}/api/portfolios/dashboard`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                const dataDash = await resDash.json();
+                if (dataDash.success) this.dados = dataDash.data;
+                
+                // Dados secundários (não bloqueantes)
+                try {
+                    const resCaixa = await fetch(`${baseUrl}/api/carteira/saldo-caixa`, { 
+                        headers: { 'Authorization': `Bearer ${token}` } 
+                    });
+                    const dataCaixa = await resCaixa.json();
+                    if (dataCaixa.success) this.saldoCaixa = dataCaixa.data;
+                } catch (e) { console.warn('Erro ao carregar saldo caixa:', e); }
+                
+                try {
+                    const resAlertas = await fetch(`${baseUrl}/api/alertas/recentes?limit=3`, { 
+                        headers: { 'Authorization': `Bearer ${token}` } 
+                    });
+                    const dataAlertas = await resAlertas.json();
+                    if (dataAlertas.success) this.alertas = dataAlertas.data;
+                } catch (e) { console.warn('Erro ao carregar alertas:', e); }
+                
+                try {
+                    const resTrx = await fetch(`${baseUrl}/api/transacoes/recentes?limit=5`, { 
+                        headers: { 'Authorization': `Bearer ${token}` } 
+                    });
+                    const dataTrx = await resTrx.json();
+                    if (dataTrx.success) this.transacoes = dataTrx.data.items || [];
+                } catch (e) { console.warn('Erro ao carregar transações:', e); }
+                
+                // Proventos (opcional - pode não existir endpoint)
+                try {
+                    const resProventos = await fetch(`${baseUrl}/api/calendario-dividendos/?dias=30&limit=5`, { 
+                        headers: { 'Authorization': `Bearer ${token}` } 
+                    });
+                    if (resProventos.ok) {
+                        const dataProventos = await resProventos.json();
+                        if (dataProventos.success) {
+                            this.proximosProventos = dataProventos.data || [];
+                            this.totalProventos = this.proximosProventos.reduce((sum, p) => sum + (p.valor_total || 0), 0);
+                        }
+                    }
+                } catch (e) { console.warn('API de proventos não disponível:', e); }
+                
+                this.dadosCarregados = true;
+            } catch (e) {
+                console.error('Erro ao carregar dados:', e);
+            }
+        },
+        
+        renderizarGraficos() {
+            this.renderizarEvolucao();
+            this.renderizarAlocacao();
+        },
+        
+        renderizarEvolucao() {
+            const ctx = document.getElementById('chartEvolucao');
+            if (!ctx) {
+                console.error('Canvas chartEvolucao não encontrado!');
+                return;
+            }
+            
+            if (this.chartEvolucao) { this.chartEvolucao.destroy(); this.chartEvolucao = null; }
+            
+            // Se não há dados históricos, mostrar mensagem
+            if (!this.dados.evolucao || this.dados.evolucao.length === 0) {
+                const c = ctx.getContext('2d');
+                c.font = '14px Arial';
+                c.fillStyle = '#6c757d';
+                c.textAlign = 'center';
+                c.fillText('Dados históricos não disponíveis', ctx.width / 2, ctx.height / 2);
+                return;
+            }
+            
+            // Extrair labels (Mês/Ano) e valores dos dados da API
+            const labels = this.dados.evolucao.map(e => {
+                const date = new Date(e.data);
+                return date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+            });
+            const valores = this.dados.evolucao.map(e => e.valor);
+            
+            this.chartEvolucao = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Patrimônio',
+                        data: valores,
+                        borderColor: '#a38c65',
+                        backgroundColor: 'rgba(163, 140, 101, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    animation: false,
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: (v) => 'R$ ' + (v/1000).toFixed(0) + 'k' }
+                        }
+                    }
+                }
+            });
+        },
+        
+        renderizarAlocacao() {
+            const ctx = document.getElementById('alocacaoChart');
+            if (!ctx) {
+                console.error('Canvas alocacaoChart não encontrado!');
+                return;
+            }
+            
+            if (this.chartAlocacao) { this.chartAlocacao.destroy(); this.chartAlocacao = null; }
+            
+            // Verificar se dados existem
+            if (!this.dados.alocacao_geografica) {
+                const c = ctx.getContext('2d');
+                c.font = '14px Arial';
+                c.fillStyle = '#6c757d';
+                c.textAlign = 'center';
+                c.fillText('Dados de alocação não disponíveis', ctx.width / 2, ctx.height / 2);
+                return;
+            }
+            
+            this.chartAlocacao = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Brasil', 'EUA', 'Internacional'],
+                    datasets: [{
+                        data: [
+                            this.dados.alocacao_geografica.BR || 0,
+                            this.dados.alocacao_geografica.US || 0,
+                            this.dados.alocacao_geografica.INTL || 0
+                        ],
+                        backgroundColor: ['#a38c65', '#6c757d', '#495057'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    animation: false,
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        },
+        
+        toggleMoeda() {
+            this.moedaAtual = this.moedaAtual === 'BRL' ? 'USD' : 'BRL';
+        },
+        
+        formatMoney(value) {
+            return 'R$ ' + (value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+        
+        formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('pt-BR');
+        }
+    };
+}
+</script>
+
+{% endblock %}

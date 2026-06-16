@@ -38,6 +38,20 @@ def not_found(message="Recurso não encontrado"):
         "message": message
     }), 404
 
+def paginated_response(items, total, page, per_page, message="Sucesso"):
+    """Resposta paginada padronizada."""
+    return jsonify({
+        "success": True,
+        "message": message,
+        "data": {
+            "items": items,
+            "total": total,
+            "page": page,
+            "per_page": per_page,
+            "total_pages": (total + per_page - 1) // per_page if per_page > 0 else 0
+        }
+    }), 200
+
 # ============================================
 # ALIASES para retrocompatibilidade
 # ============================================

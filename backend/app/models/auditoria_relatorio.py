@@ -54,6 +54,14 @@ class AuditoriaRelatorio(db.Model):
         index=True,
         comment="ID do usuário proprietário"
     )
+    
+    assessora_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey('assessora.id', ondelete='CASCADE'),
+        nullable=True,
+        index=True,
+        comment="ID da assessora (multi-tenancy)"
+    )
 
     # Dados do relatório
     tipo_relatorio = Column(
@@ -137,6 +145,7 @@ class AuditoriaRelatorio(db.Model):
     )
 
     # Relacionamentos
+    assessora = relationship("Assessora", back_populates="auditorias_relatorios")
     usuario = relationship("Usuario", backref="relatorios_auditoria", lazy="joined")
 
     # Constraints de tabela

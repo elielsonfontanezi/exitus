@@ -1,0 +1,28 @@
+{# 
+  Componente: Empty State
+  Descrição: Estado vazio quando não há dados
+  Props:
+    - title: string - título
+    - message: string - mensagem
+    - icon: string - emoji/ícone (opcional)
+    - action_text: string - texto do botão de ação (opcional)
+    - action_url: string - URL da ação (opcional)
+  Uso:
+    {% include 'components/layout/empty_state.html' with title='Nenhum ativo encontrado' message='Adicione seu primeiro ativo' icon='📊' action_text='Adicionar Ativo' action_url='/dashboard/assets/new' %}
+#}
+
+<div class="text-center py-12">
+  {% if icon %}
+    <span class="text-6xl mb-4 block">{{ icon }}</span>
+  {% endif %}
+  <h3 class="text-lg font-medium text-gray-900 mb-2">{{ title }}</h3>
+  <p class="text-sm text-gray-500 mb-6">{{ message }}</p>
+  {% if action_text and action_url %}
+    <a 
+      href="{{ action_url }}"
+      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    >
+      {{ action_text }}
+    </a>
+  {% endif %}
+</div>
