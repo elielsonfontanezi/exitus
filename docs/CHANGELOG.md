@@ -8,6 +8,53 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Refactor — Testes E2E v2: Replanejamento Completo (16/06/2026)
+
+**GAP:** EXITUS-TESTS-E2E-V2 — Replanejamento e reescrita dos specs E2E por contexto
+
+**Motivação:** Specs anteriores (Fase 1) cobriam telas do Frontend V2.0 (mock data) com seletores
+CSS obsoletos e credenciais inexistentes (`admin`/`senha123`). O frontend API-Driven (Sprints 1–8)
+não tinha cobertura. Reescrita completa para refletir arquitetura atual.
+
+**Artefatos criados:**
+- `tests/e2e/specs/smoke/00-health.spec.js` — 47 rotas reais testadas (sem 404, sem console errors)
+- `tests/e2e/specs/auth/01-auth.spec.js` — 9 testes: login, logout, sessão, redirect
+- `tests/e2e/specs/operacoes/02-operacoes.spec.js` — 11 testes: compra/venda, depósito, B3
+- `tests/e2e/specs/portfolio/03-portfolio.spec.js` — 14 testes: dashboard, portfólios, proventos
+- `tests/e2e/specs/fiscal/04-fiscal.spec.js` — 10 testes: IR mensal, DARFs, histórico, DIRPF
+- `tests/e2e/specs/relatorios/05-relatorios.spec.js` — 11 testes: mensal, anual, extrato, CSV
+- `tests/e2e/specs/ferramentas/06-ferramentas.spec.js` — 13 testes: screener, comparador, calculadora, simulador
+- `tests/e2e/specs/regressao/07-regressao.spec.js` — 12 testes: fluxos ponta-a-ponta, menu, responsividade
+- `tests/e2e/jsconfig.json` — suprime lints TS (node_modules ausentes)
+
+**Artefatos modificados:**
+- `tests/e2e/specs/smoke/` — specs V2.0 removidos (17 arquivos obsoletos)
+- `tests/e2e/playwright.config.js` — credenciais corretas, nova estrutura, timeouts ajustados
+
+**Artefatos excluídos (obsoletos):**
+- `tests/e2e/specs/smoke/01-dashboard.spec.js` até `17-buy-signals.spec.js` — seletores V2.0 incompatíveis
+
+**Credenciais atualizadas:** `e2e_user` / `e2e_senha_123` (antes: `admin`/`senha123`)
+
+**Total de testes:** ~127 testes em 8 contextos (vs 108 em 1 diretório antes)
+
+**Estrutura nova:**
+```
+specs/
+├── smoke/      → 47 rotas (carregamento + sem 404)
+├── auth/       → login, logout, sessão
+├── operacoes/  → compra, venda, B3
+├── portfolio/  → dashboard, posições, proventos
+├── fiscal/     → IR, DARFs, declaração
+├── relatorios/ → relatórios e exportação
+├── ferramentas/→ screener, comparador, calculadora, simulador
+└── regressao/  → fluxos ponta-a-ponta
+```
+
+**Branch:** `feature/testes-e2e-v2` (criada a partir de `main` após merge Sprints 1–8)
+
+---
+
 ### Fixed — Menu e Headers Frontend (15/06/2026)
 
 **GAPs:** Frontend UI Consistency — Menu Cleanup + Header Standardization
