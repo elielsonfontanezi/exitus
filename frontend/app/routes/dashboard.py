@@ -20,13 +20,6 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# --- Rota de Teste - Novo Dashboard UX ---
-@bp.route('/novo', methods=['GET'])
-@login_required
-def dashboard_novo():
-    """Dashboard Novo - Estilo Investidor10"""
-    return render_template('dashboard/dashboard_novo.html')
-
 # --- Rota Principal (Home) ---
 @bp.route('/', methods=['GET'])
 @login_required
@@ -1201,11 +1194,3 @@ def configuracoes():
     token = session.get('access_token')
     
     return render_template('dashboard/configuracoes.html')
-
-
-# --- UX Test - Design System (TEMPORÁRIO) ---
-@bp.route('/ux-test')
-@login_required
-def ux_test():
-    """Página de teste do Design System Moderno - Week 1"""
-    return render_template('dashboard/ux_test.html')
