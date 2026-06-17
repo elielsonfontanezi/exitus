@@ -70,11 +70,12 @@
 {% block extra_scripts %}
     {{ super() }}
     <script>
+    const API_BASE_URL = '{{ config.get("FRONTEND_API_URL", "http://localhost:5000") }}';
+
     function pageData() {
-        return {
+        const base = {
             loading: true,
             error: null,
-            ...pageDataExtend(),
 
             async init() {
                 try {
@@ -88,7 +89,7 @@
             },
 
             async loadData() {
-                // Override em cada página
+                // Override em cada página via pageDataExtend()
             },
 
             getToken() {
@@ -97,7 +98,8 @@
 
             async apiFetch(url, options = {}) {
                 const token = this.getToken();
-                const response = await fetch(url, {
+                const fullUrl = url.startsWith('http') ? url : API_BASE_URL + url;
+                const response = await fetch(fullUrl, {
                     ...options,
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -137,6 +139,9 @@
                 return d.toLocaleDateString('pt-BR');
             }
         };
+
+        // Merge: propriedades da página sobrescrevem as do base
+        return { ...base, ...pageDataExtend() };
     }
 
     // Extensão por página — cada template override esta função

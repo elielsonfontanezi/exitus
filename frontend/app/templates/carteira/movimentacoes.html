@@ -1,0 +1,217 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Carteira{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Depósitos, saques e transferências entre corretoras</p>{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Saldo BRL</div>
+        <div class="kpi-card-value" x-text="formatMoney(saldo.saldo_brl)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Saldo USD</div>
+        <div class="kpi-card-value" x-text="formatMoney(saldo.saldo_usd, 'USD')"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Saldo Total (BRL)</div>
+        <div class="kpi-card-value" x-text="formatMoney(saldo.saldo_total_brl)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Movimentações</div>
+        <div class="kpi-card-value" x-text="totalMovimentacoes"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tabs %}
+<div class="tab-bar">
+    <a href="/carteira/posicoes" class="tab-item">Posições</a>
+    <a href="/carteira/movimentacoes" class="tab-item active">Movimentações de Caixa</a>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar" x-show="!loading">
+    <span class="filter-label">Filtrar:</span>
+    <select class="filter-select" x-model="filtroTipo" @change="filtrar()">
+        <option value="">Todos os tipos</option>
+        <option value="deposito">Depósitos</option>
+        <option value="saque">Saques</option>
+        <option value="aporte">Aportes</option>
+        <option value="transferencia">Transferências</option>
+        <option value="pagamento_imposto">Pgto Imposto</option>
+        <option value="rendimento">Rendimentos</option>
+    </select>
+    <input type="date" class="filter-input" x-model="filtroDataInicio" @change="carregarComFiltro()">
+    <span class="filter-label">até</span>
+    <input type="date" class="filter-input" x-model="filtroDataFim" @change="carregarComFiltro()">
+    <span class="filter-label" style="margin-left:auto;" x-show="movimentacoesFiltradas.length !== movimentacoes.length"
+          x-text="movimentacoesFiltradas.length + ' de ' + movimentacoes.length"></span>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Tabela de Movimentações -->
+<div class="section-box" x-show="movimentacoesFiltradas.length > 0">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="sortable" @click="ordenar('data')">Data</th>
+                <th>Tipo</th>
+                <th>Corretora</th>
+                <th>Descrição</th>
+                <th class="col-right sortable" @click="ordenar('valor')">Valor</th>
+                <th class="col-center">Moeda</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="mov in movimentacoesFiltradas" :key="mov.id">
+                <tr>
+                    <td x-text="formatDate(mov.data_movimentacao)"></td>
+                    <td>
+                        <span class="badge" :class="badgeTipo(parseTipo(mov.tipo_movimentacao))" x-text="tipoLabel(parseTipo(mov.tipo_movimentacao))"></span>
+                    </td>
+                    <td x-text="mov.corretora?.nome || '-'"></td>
+                    <td x-text="mov.descricao || '-'"></td>
+                    <td class="col-right cell-money"
+                        :class="parseTipo(mov.tipo_movimentacao) === 'deposito' ? 'badge-positivo' : parseTipo(mov.tipo_movimentacao) === 'saque' ? 'badge-negativo' : ''"
+                        x-text="formatMoney(mov.valor)"></td>
+                    <td class="col-center" x-text="mov.moeda || 'BRL'"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<!-- Empty State -->
+<div class="section-box" x-show="!loading && movimentacoesFiltradas.length === 0">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exchange-alt"></i></div>
+        <div class="empty-state-title">Nenhuma movimentação encontrada</div>
+        <div class="empty-state-text">
+            Registre depósitos e saques para acompanhar o fluxo de caixa da sua carteira.
+        </div>
+    </div>
+</div>
+
+<!-- Error State -->
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle text-red-500"></i></div>
+        <div class="empty-state-title">Erro ao carregar dados</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadData()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        movimentacoes: [],
+        movimentacoesFiltradas: [],
+        saldo: {},
+        totalMovimentacoes: 0,
+        filtroTipo: '',
+        filtroDataInicio: '',
+        filtroDataFim: '',
+        ordenarPor: 'data',
+        ordenarDir: 'desc',
+
+        async loadData() {
+            const [movRes, saldoRes] = await Promise.all([
+                this.apiFetch('/api/movimentacoes-caixa?per_page=100'),
+                this.apiFetch('/api/carteira/saldo-caixa')
+            ]);
+            this.movimentacoes = movRes?.data?.movimentacoes || [];
+            this.totalMovimentacoes = movRes?.data?.total || this.movimentacoes.length;
+            this.saldo = saldoRes?.data || {};
+            this.filtrar();
+        },
+
+        async carregarComFiltro() {
+            let url = '/api/movimentacoes-caixa?per_page=100';
+            if (this.filtroDataInicio) url += '&data_inicio=' + this.filtroDataInicio;
+            if (this.filtroDataFim) url += '&data_fim=' + this.filtroDataFim;
+            
+            this.loading = true;
+            try {
+                const movRes = await this.apiFetch(url);
+                this.movimentacoes = movRes?.data?.movimentacoes || [];
+                this.totalMovimentacoes = movRes?.data?.total || this.movimentacoes.length;
+                this.filtrar();
+            } catch (e) {
+                this.error = e.message;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        parseTipo(raw) {
+            if (!raw) return '';
+            // API retorna "TipoMovimentacao.DEPOSITO" — extrair parte depois do ponto
+            const parts = raw.split('.');
+            return (parts[parts.length - 1] || '').toLowerCase();
+        },
+
+        filtrar() {
+            let result = [...this.movimentacoes];
+
+            if (this.filtroTipo) {
+                result = result.filter(m => this.parseTipo(m.tipo_movimentacao) === this.filtroTipo);
+            }
+
+            // Ordenar
+            result.sort((a, b) => {
+                let va, vb;
+                if (this.ordenarPor === 'data') {
+                    va = a.data_movimentacao || '';
+                    vb = b.data_movimentacao || '';
+                } else {
+                    va = a[this.ordenarPor] || '';
+                    vb = b[this.ordenarPor] || '';
+                }
+                if (this.ordenarPor === 'valor') { va = Number(va); vb = Number(vb); }
+                if (va < vb) return this.ordenarDir === 'asc' ? -1 : 1;
+                if (va > vb) return this.ordenarDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            this.movimentacoesFiltradas = result;
+        },
+
+        ordenar(campo) {
+            if (this.ordenarPor === campo) {
+                this.ordenarDir = this.ordenarDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.ordenarPor = campo;
+                this.ordenarDir = campo === 'data' ? 'desc' : 'asc';
+            }
+            this.filtrar();
+        },
+
+        tipoLabel(tipo) {
+            const map = {
+                'deposito': 'Depósito', 'saque': 'Saque',
+                'transferencia': 'Transferência', 'rendimento': 'Rendimento',
+                'pagamento_imposto': 'Pgto Imposto', 'aporte': 'Aporte'
+            };
+            return map[tipo] || tipo || '-';
+        },
+
+        badgeTipo(tipo) {
+            const map = {
+                'deposito': 'badge-success', 'saque': 'badge-danger',
+                'transferencia': 'badge-primary', 'rendimento': 'badge-warning',
+                'pagamento_imposto': 'badge-danger', 'aporte': 'badge-success'
+            };
+            return map[tipo] || 'badge-primary';
+        }
+    };
+}
+</script>
+{% endblock %}

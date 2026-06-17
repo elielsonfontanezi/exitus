@@ -1,0 +1,255 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Carteira{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Posições abertas e resumo consolidado</p>{% endblock %}
+
+{% block page_actions %}
+<button class="btn-exitus btn-exitus-outline" @click="recalcular()" :disabled="recalculando">
+    <i class="fas fa-sync-alt" :class="{'fa-spin': recalculando}"></i>
+    Recalcular
+</button>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Posições</div>
+        <div class="kpi-card-value" x-text="resumo.quantidade_posicoes || 0"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Total Investido</div>
+        <div class="kpi-card-value" x-text="formatMoney(resumo.total_investido)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Valor Atual</div>
+        <div class="kpi-card-value" x-text="formatMoney(resumo.total_valor_atual)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Lucro Realizado</div>
+        <div class="kpi-card-value" :class="resumo.total_lucro_realizado >= 0 ? 'positivo' : 'negativo'"
+             x-text="formatMoney(resumo.total_lucro_realizado)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">ROI</div>
+        <div class="kpi-card-value" :class="resumo.roi_percentual >= 0 ? 'positivo' : 'negativo'"
+             x-text="formatPercent(resumo.roi_percentual)"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tabs %}
+<div class="tab-bar">
+    <a href="/carteira/posicoes" class="tab-item active">Posições</a>
+    <a href="/carteira/movimentacoes" class="tab-item">Movimentações de Caixa</a>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar" x-show="!loading">
+    <span class="filter-label">Filtrar:</span>
+    <input type="text" class="filter-input" placeholder="Buscar ticker..." 
+           x-model="filtroTicker" @input.debounce.300ms="filtrar()">
+    <select class="filter-select" x-model="filtroTipo" @change="filtrar()">
+        <option value="">Todos os tipos</option>
+        <option value="acao">Ações</option>
+        <option value="fii">FIIs</option>
+        <option value="etf">ETFs</option>
+        <option value="stock">Stocks (US)</option>
+        <option value="reit">REITs</option>
+        <option value="bdr">BDRs</option>
+        <option value="renda_fixa">Renda Fixa</option>
+        <option value="cripto">Cripto</option>
+    </select>
+    <select class="filter-select" x-model="filtroMercado" @change="filtrar()">
+        <option value="">Todos os mercados</option>
+        <option value="BR">Brasil</option>
+        <option value="US">EUA</option>
+        <option value="INTL">Internacional</option>
+    </select>
+    <span class="filter-label" style="margin-left:auto;" x-show="posicoesFiltradas.length !== posicoes.length"
+          x-text="posicoesFiltradas.length + ' de ' + posicoes.length + ' posições'"></span>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Tabela de Posições -->
+<div class="section-box" x-show="posicoesFiltradas.length > 0">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="sortable" @click="ordenar('ticker')">Ativo</th>
+                <th>Tipo</th>
+                <th>Mercado</th>
+                <th class="col-right sortable" @click="ordenar('quantidade')">Qtd</th>
+                <th class="col-right sortable" @click="ordenar('preco_medio')">Preço Médio</th>
+                <th class="col-right sortable" @click="ordenar('custo_total')">Custo Total</th>
+                <th class="col-right">Preço Atual</th>
+                <th class="col-right sortable" @click="ordenar('valor_atual')">Valor Atual</th>
+                <th class="col-right">L/P</th>
+                <th class="col-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="pos in posicoesFiltradas" :key="pos.id">
+                <tr>
+                    <td>
+                        <span class="cell-ticker" x-text="pos.ativo?.ticker || '-'"></span>
+                        <br><small class="text-gray-500" x-text="pos.ativo?.nome || ''"></small>
+                    </td>
+                    <td><span class="badge badge-primary" x-text="tipoLabel(pos.ativo?.tipo)"></span></td>
+                    <td x-text="pos.ativo?.mercado || '-'"></td>
+                    <td class="col-right cell-money" x-text="pos.quantidade"></td>
+                    <td class="col-right cell-money" x-text="formatMoney(pos.preco_medio)"></td>
+                    <td class="col-right cell-money" x-text="formatMoney(pos.custo_total)"></td>
+                    <td class="col-right cell-money" x-text="formatMoney(pos.ativo?.preco_atual)"></td>
+                    <td class="col-right cell-money" x-text="formatMoney(pos.valor_atual)"></td>
+                    <td class="col-right">
+                        <span :class="lucroPrejuizo(pos) >= 0 ? 'badge-positivo' : 'badge-negativo'"
+                              x-text="formatMoney(lucroPrejuizo(pos))"></span>
+                    </td>
+                    <td class="col-center">
+                        <div class="action-menu" x-data="{ open: false }">
+                            <button class="action-menu-btn" @click="open = !open" @click.away="open = false">⋯</button>
+                            <div class="action-menu-dropdown" :class="{ show: open }">
+                                <a class="action-menu-item" :href="'/dashboard/ativo/' + pos.ativo?.ticker">
+                                    <i class="fas fa-chart-line"></i> Ver Detalhes
+                                </a>
+                                <a class="action-menu-item" :href="'/operacoes/?ticker=' + pos.ativo?.ticker">
+                                    <i class="fas fa-plus"></i> Nova Operação
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<!-- Empty State -->
+<div class="section-box" x-show="!loading && posicoesFiltradas.length === 0">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-wallet"></i></div>
+        <div class="empty-state-title">Nenhuma posição encontrada</div>
+        <div class="empty-state-text" x-show="filtroTicker || filtroTipo || filtroMercado">
+            Tente ajustar os filtros acima.
+        </div>
+        <div class="empty-state-text" x-show="!filtroTicker && !filtroTipo && !filtroMercado">
+            Registre sua primeira operação para ver suas posições aqui.
+        </div>
+    </div>
+</div>
+
+<!-- Error State -->
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle text-red-500"></i></div>
+        <div class="empty-state-title">Erro ao carregar dados</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadData()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        posicoes: [],
+        posicoesFiltradas: [],
+        resumo: {},
+        filtroTicker: '',
+        filtroTipo: '',
+        filtroMercado: '',
+        ordenarPor: 'ticker',
+        ordenarDir: 'asc',
+        recalculando: false,
+
+        async loadData() {
+            const [posRes, resumoRes] = await Promise.all([
+                this.apiFetch('/api/posicoes?per_page=100'),
+                this.apiFetch('/api/posicoes/resumo')
+            ]);
+            this.posicoes = posRes?.data?.posicoes || [];
+            this.resumo = resumoRes?.data || {};
+            this.filtrar();
+        },
+
+        filtrar() {
+            let result = [...this.posicoes];
+            
+            if (this.filtroTicker) {
+                const q = this.filtroTicker.toLowerCase();
+                result = result.filter(p => 
+                    (p.ativo?.ticker || '').toLowerCase().includes(q) ||
+                    (p.ativo?.nome || '').toLowerCase().includes(q)
+                );
+            }
+            if (this.filtroTipo) {
+                result = result.filter(p => p.ativo?.tipo === this.filtroTipo);
+            }
+            if (this.filtroMercado) {
+                result = result.filter(p => p.ativo?.mercado === this.filtroMercado);
+            }
+
+            // Ordenar
+            result.sort((a, b) => {
+                let va, vb;
+                if (this.ordenarPor === 'ticker') {
+                    va = a.ativo?.ticker || '';
+                    vb = b.ativo?.ticker || '';
+                } else {
+                    va = a[this.ordenarPor] || 0;
+                    vb = b[this.ordenarPor] || 0;
+                }
+                if (va < vb) return this.ordenarDir === 'asc' ? -1 : 1;
+                if (va > vb) return this.ordenarDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            this.posicoesFiltradas = result;
+        },
+
+        ordenar(campo) {
+            if (this.ordenarPor === campo) {
+                this.ordenarDir = this.ordenarDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.ordenarPor = campo;
+                this.ordenarDir = 'asc';
+            }
+            this.filtrar();
+        },
+
+        lucroPrejuizo(pos) {
+            if (pos.valor_atual && pos.custo_total) {
+                return pos.valor_atual - pos.custo_total;
+            }
+            return pos.lucro_prejuizo_nao_realizado || 0;
+        },
+
+        tipoLabel(tipo) {
+            const map = {
+                'acao': 'Ação', 'fii': 'FII', 'etf': 'ETF', 'stock': 'Stock',
+                'reit': 'REIT', 'bdr': 'BDR', 'renda_fixa': 'RF', 'cripto': 'Cripto',
+                'etf_internacional': 'ETF Intl'
+            };
+            return map[tipo] || tipo || '-';
+        },
+
+        async recalcular() {
+            this.recalculando = true;
+            try {
+                await this.apiFetch('/api/posicoes/calcular', { method: 'POST' });
+                await this.loadData();
+            } catch (e) {
+                this.error = 'Erro ao recalcular: ' + e.message;
+            } finally {
+                this.recalculando = false;
+            }
+        }
+    };
+}
+</script>
+{% endblock %}

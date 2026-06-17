@@ -95,7 +95,7 @@
 ### 🎯 Fase 3 — Telas novas (PRÓXIMA)
 *APIs prontas no backend, telas inexistentes no frontend. Usar `base_interna.html`.*
 
-- [ ] **`carteira.py`** → `/carteira/posicoes` (G4) + `/carteira/movimentacoes` (G6)
+- [x] **`carteira.py`** → `/carteira/posicoes` (G4) + `/carteira/movimentacoes` (G6) ✅ 17/06/2026
 - [ ] **`configuracoes.py`** → `/configuracoes/perfil` (G1) + `/configuracoes/corretoras` (G1)
 - [ ] **`/operacoes/historico`** → histórico de transações com filtros (G5)
 - [ ] **`/ferramentas/reconciliacao`** → painel diagnóstico de integridade (G14)
