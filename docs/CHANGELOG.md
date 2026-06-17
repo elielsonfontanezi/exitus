@@ -8,6 +8,33 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Frontend Fase 5: Melhorias e Correções Finais (17/06/2026)
+
+**GAPs:** G3, G10, G11, G15
+
+**Artefatos criados:**
+- `frontend/app/templates/dashboard/ativo_detalhes_v2.html` — Detalhe ativo: fundamentalistas, buy score, margem, cotação real-time, eventos
+- `frontend/app/templates/estrategia/planos_v2.html` — Planos disciplinados unificados (compra + venda) com filtro e KPIs
+- `frontend/app/templates/ativos/eventos_corporativos.html` — Tela de eventos corporativos com filtros
+- `frontend/app/templates/fiscal/declaracao_v2.html` — DIRPF Alpine.js: 39 posições reais, filtros por mercado/ticker
+
+**Artefatos modificados:**
+- `frontend/app/routes/dashboard.py` — rota ativo_detalhes usando v2
+- `frontend/app/routes/planos.py` — rota unificada compra+venda via Alpine.js
+- `frontend/app/routes/ativos_catalogo.py` — nova rota /ativos/eventos-corporativos
+- `frontend/app/routes/fiscal.py` — rota declaracao usando declaracao_v2.html
+
+**Backend fix:**
+- Corrigido enum `tipo_gatilho` no banco (PRECO_ALVO → preco_alvo) para 3 registros com case inconsistente
+
+**APIs integradas (4 novos):**
+- `/api/ativos/ticker/{t}` + `/api/cotacoes/{t}` + `/api/buy-signals/buy-score/{t}` + `/api/buy-signals/margem-seguranca/{t}` (detalhe ativo)
+- `/api/plano-venda` (lista planos de venda — 9 planos reais)
+- `/api/eventos-corporativos/` (listagem paginada)
+- `/api/ir/dirpf?ano=2025` (39 posições com bens e direitos reais)
+
+---
+
 ### Feat — Frontend Fase 4: Expansões de Telas Existentes (17/06/2026)
 
 **GAPs:** G7, G8, G9, G12, G13, G16

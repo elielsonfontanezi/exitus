@@ -1,0 +1,148 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Declaração DIRPF{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Bens e Direitos para Declaração de Imposto de Renda — <span x-text="anoAtual"></span></p>{% endblock %}
+
+{% block page_actions %}
+<a href="/imposto-renda/mensal" class="btn-exitus btn-exitus-ghost"><i class="fas fa-receipt"></i> Apuração</a>
+<a href="/imposto-renda/historico" class="btn-exitus btn-exitus-ghost"><i class="fas fa-calendar-alt"></i> Histórico</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="dados">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Custo Total Carteira</div>
+        <div class="kpi-card-value" x-text="formatMoney(dados?.bens_e_direitos?.custo_total_carteira || 0)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos na Carteira</div>
+        <div class="kpi-card-value" x-text="posicoes.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Data Referência</div>
+        <div class="kpi-card-value" style="font-size:0.85rem;" x-text="dados?.bens_e_direitos?.data_referencia || '-'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">IR Total Ano</div>
+        <div class="kpi-card-value" x-text="formatMoney(dados?.ir_total_ano || 0)"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <span class="filter-label">Ano:</span>
+    <select class="filter-input" x-model="anoAtual" @change="loadData()" style="max-width:100px;">
+        <option value="2025">2025</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+    </select>
+    <span class="filter-label" style="margin-left:1rem;">Filtro:</span>
+    <input type="text" class="filter-input" placeholder="Buscar ticker..." x-model="filtro">
+    <select class="filter-input" x-model="mercadoFiltro" style="max-width:130px;">
+        <option value="">Todos</option>
+        <option value="BR">BR</option>
+        <option value="US">US</option>
+        <option value="INTL">Internacional</option>
+        <option value="GLOBAL">Global</option>
+    </select>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Tabela Bens e Direitos -->
+<div class="section-box" x-show="posicoesFiltradas().length > 0">
+    <div class="section-box-title"><i class="fas fa-file-alt"></i> Grupo 3 — Bens e Direitos (Renda Variável)</div>
+    <p style="font-size:0.8rem; color:#6b7280; margin-top:0.25rem;">Informar na ficha "Bens e Direitos" da DIRPF <span x-text="anoAtual"></span></p>
+    <table class="data-table" style="margin-top:0.75rem;">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Nome</th>
+                <th class="col-center">Tipo</th>
+                <th class="col-center">Mercado</th>
+                <th class="col-right">Qtd</th>
+                <th class="col-right">Preço Médio</th>
+                <th class="col-right">Custo Total</th>
+                <th class="col-right">1ª Compra</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="pos in posicoesFiltradas()" :key="pos.ticker">
+                <tr>
+                    <td><span style="background:#eff6ff; color:#1d4ed8; font-family:monospace; font-size:0.8rem; padding:0.2rem 0.5rem; border-radius:4px;" x-text="pos.ticker"></span></td>
+                    <td style="font-size:0.85rem;" x-text="pos.nome || '-'"></td>
+                    <td class="col-center"><span class="badge badge-neutro" style="text-transform:capitalize; font-size:0.7rem;" x-text="(pos.tipo || '').replace('_', ' ')"></span></td>
+                    <td class="col-center">
+                        <span class="badge" :class="pos.mercado === 'BR' ? 'badge-success' : pos.mercado === 'US' ? 'badge-info' : 'badge-neutro'" x-text="pos.mercado"></span>
+                    </td>
+                    <td class="col-right" x-text="pos.quantidade?.toFixed(pos.quantidade % 1 ? 4 : 0)"></td>
+                    <td class="col-right" x-text="formatMoney(pos.preco_medio || 0)"></td>
+                    <td class="col-right" style="font-weight:700;" x-text="formatMoney(pos.custo_total || 0)"></td>
+                    <td class="col-right" style="font-size:0.8rem; color:#6b7280;" x-text="formatDate(pos.data_primeira_compra)"></td>
+                </tr>
+            </template>
+        </tbody>
+        <tfoot>
+            <tr style="border-top:2px solid #e2e8f0; background:#f8fafc;">
+                <td colspan="6" style="font-weight:700; padding:0.75rem;">Custo Total da Carteira</td>
+                <td class="col-right" style="font-weight:700; color:#1d4ed8; font-size:1.1rem;" x-text="formatMoney(dados?.bens_e_direitos?.custo_total_carteira || 0)"></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- Instruções DIRPF -->
+<div class="section-box" x-show="dados" style="background:#eff6ff; border:1px solid #bfdbfe;">
+    <div class="section-box-title" style="color:#1e40af;"><i class="fas fa-info-circle"></i> Instruções para DIRPF <span x-text="anoAtual"></span></div>
+    <ul style="font-size:0.85rem; color:#1e40af; margin-top:0.5rem; list-style:none; padding:0;">
+        <li style="margin-bottom:0.4rem;"><strong>Bens e Direitos:</strong> Informar custo de aquisição de cada ativo (não valor de mercado)</li>
+        <li style="margin-bottom:0.4rem;"><strong>Renda Variável:</strong> Preencher demonstrativo mês a mês com apuração separada por categoria</li>
+        <li style="margin-bottom:0.4rem;"><strong>Isenções:</strong> Vendas de ações abaixo de R$20.000/mês são isentas (Swing Trade)</li>
+        <li style="margin-bottom:0.4rem;"><strong>FIIs:</strong> 20% sobre ganho de capital. Rendimentos mensais isentos</li>
+        <li style="margin-bottom:0.4rem;"><strong>Exterior:</strong> 15% sobre ganho de capital. Converter pela PTAX do dia</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        anoAtual: '2025',
+        dados: null,
+        posicoes: [],
+        filtro: '',
+        mercadoFiltro: '',
+
+        posicoesFiltradas() {
+            let list = this.posicoes;
+            if (this.filtro) {
+                const q = this.filtro.toUpperCase();
+                list = list.filter(p => p.ticker.toUpperCase().includes(q) || (p.nome || '').toUpperCase().includes(q));
+            }
+            if (this.mercadoFiltro) {
+                list = list.filter(p => p.mercado === this.mercadoFiltro);
+            }
+            return list;
+        },
+
+        async loadData() {
+            const res = await this.apiFetch('/api/ir/dirpf?ano=' + this.anoAtual);
+            if (res?.data) {
+                this.dados = res.data;
+                this.posicoes = res.data.bens_e_direitos?.posicoes || [];
+            }
+        },
+
+        formatDate(d) {
+            if (!d) return '-';
+            const parts = d.split('T')[0].split('-');
+            if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+            return d;
+        }
+    };
+}
+</script>
+{% endblock %}

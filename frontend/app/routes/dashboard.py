@@ -1091,7 +1091,7 @@ def ativo_detalhes(ticker):
         flash('Ativo não encontrado.', 'error')
         return redirect(url_for('dashboard.index'))
     
-    return render_template('dashboard/ativo_detalhes.html', ativo=ativo)
+    return render_template('dashboard/ativo_detalhes_v2.html', ativo=ativo)
 
 
 # --- Performance e Rentabilidade (NOVO) ---

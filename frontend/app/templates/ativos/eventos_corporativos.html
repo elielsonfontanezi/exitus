@@ -1,0 +1,115 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Eventos Corporativos{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Desdobramentos, grupamentos, bonificações e outros eventos dos seus ativos</p>{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Total de Eventos</div>
+        <div class="kpi-card-value" x-text="eventos.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos Impactados</div>
+        <div class="kpi-card-value" x-text="[...new Set(eventos.map(e => e.ativo_ticker || e.ticker))].length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Último Evento</div>
+        <div class="kpi-card-value" style="font-size:0.85rem;" x-text="eventos.length ? formatDate(eventos[0].data_evento || eventos[0].data) : '-'"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <span class="filter-label">Filtro:</span>
+    <input type="text" class="filter-input" placeholder="Buscar por ticker..." x-model="filtro">
+    <select class="filter-input" x-model="tipoFiltro" style="max-width:180px;">
+        <option value="">Todos os tipos</option>
+        <option value="desdobramento">Desdobramento</option>
+        <option value="grupamento">Grupamento</option>
+        <option value="bonificacao">Bonificação</option>
+        <option value="incorporacao">Incorporação</option>
+        <option value="cisao">Cisão</option>
+        <option value="subscricao">Subscrição</option>
+    </select>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="eventosFiltrados().length > 0">
+    <div class="section-box-title"><i class="fas fa-flag"></i> Eventos Registrados</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Ativo</th>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th class="col-right">Fator</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="ev in eventosFiltrados()" :key="ev.id">
+                <tr>
+                    <td x-text="formatDate(ev.data_evento || ev.data)"></td>
+                    <td>
+                        <a :href="'/dashboard/ativo/' + (ev.ativo_ticker || ev.ticker)" style="font-weight:700; color:#a38c65; text-decoration:none;" x-text="ev.ativo_ticker || ev.ticker || '-'"></a>
+                    </td>
+                    <td>
+                        <span class="badge badge-neutro" style="text-transform:capitalize;" x-text="(ev.tipo_evento || ev.tipo || '').replace('_', ' ')"></span>
+                    </td>
+                    <td x-text="ev.descricao || '-'"></td>
+                    <td class="col-right" x-text="ev.fator ? ev.fator + 'x' : '-'"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="eventos.length === 0 && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-flag"></i></div>
+        <div class="empty-state-title">Nenhum evento corporativo registrado</div>
+        <div class="empty-state-text">Eventos como desdobramentos, grupamentos e bonificações aparecerão aqui quando registrados pelo sistema.</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        eventos: [],
+        filtro: '',
+        tipoFiltro: '',
+
+        eventosFiltrados() {
+            let list = this.eventos;
+            if (this.filtro) {
+                const q = this.filtro.toUpperCase();
+                list = list.filter(e => (e.ativo_ticker || e.ticker || '').toUpperCase().includes(q));
+            }
+            if (this.tipoFiltro) {
+                list = list.filter(e => (e.tipo_evento || e.tipo) === this.tipoFiltro);
+            }
+            return list;
+        },
+
+        async loadData() {
+            const res = await this.apiFetch('/api/eventos-corporativos/?per_page=100');
+            if (res?.data) {
+                this.eventos = res.data.eventos || res.data || [];
+            }
+        },
+
+        formatDate(d) {
+            if (!d) return '-';
+            const parts = d.split('T')[0].split('-');
+            if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+            return d;
+        }
+    };
+}
+</script>
+{% endblock %}

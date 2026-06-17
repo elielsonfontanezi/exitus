@@ -44,8 +44,8 @@ def _fetch_plano_detalhe(headers, plano_id):
 @bp.route('/')
 @login_required
 def compra_lista():
-    """Redirect para versão Alpine.js do dashboard."""
-    return redirect(url_for('dashboard.planos_compra'))
+    """Planos disciplinados — compra e venda unificados via Alpine.js"""
+    return render_template('estrategia/planos_v2.html')
 
 
 @bp.route('/<plano_id>')
@@ -62,5 +62,5 @@ bp_venda = Blueprint('planos_venda', __name__, url_prefix='/planos-venda')
 @bp_venda.route('/')
 @login_required
 def venda_lista():
-    """Redirect para versão Alpine.js do dashboard."""
-    return redirect(url_for('dashboard.planos_venda'))
+    """Planos disciplinados — aba venda via Alpine.js"""
+    return render_template('estrategia/planos_v2.html')

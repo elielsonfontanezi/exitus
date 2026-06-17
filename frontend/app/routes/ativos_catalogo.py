@@ -156,6 +156,13 @@ def cripto():
     return _lista_view('cripto')
 
 
+@bp.route('/eventos-corporativos')
+@login_required
+def eventos_corporativos():
+    """Tela de eventos corporativos (Alpine.js API-driven)."""
+    return render_template('ativos/eventos_corporativos.html')
+
+
 @bp.route('/<ticker>')
 @login_required
 def detalhe(ticker):

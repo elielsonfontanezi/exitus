@@ -1,0 +1,197 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Planos Disciplinados{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Planos de compra e venda programados — gestão disciplinada</p>{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="planosCompra.length > 0 || planosVenda.length > 0">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Planos de Compra</div>
+        <div class="kpi-card-value" x-text="planosCompra.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Planos de Venda</div>
+        <div class="kpi-card-value" x-text="planosVenda.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos (Compra)</div>
+        <div class="kpi-card-value positivo" x-text="planosCompra.filter(p => p.status === 'ativo').length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos (Venda)</div>
+        <div class="kpi-card-value positivo" x-text="planosVenda.filter(p => p.status === 'ativo').length"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <span class="filter-label">Visualizar:</span>
+    <button class="btn-exitus" :class="tab === 'compra' ? 'btn-exitus-primary' : 'btn-exitus-ghost'" @click="tab='compra'">
+        <i class="fas fa-arrow-down"></i> Compra (<span x-text="planosCompra.length"></span>)
+    </button>
+    <button class="btn-exitus" :class="tab === 'venda' ? 'btn-exitus-primary' : 'btn-exitus-ghost'" @click="tab='venda'">
+        <i class="fas fa-arrow-up"></i> Venda (<span x-text="planosVenda.length"></span>)
+    </button>
+    <input type="text" class="filter-input" placeholder="Buscar ticker..." x-model="filtro" style="margin-left:auto;">
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- PLANOS DE COMPRA -->
+<div x-show="tab === 'compra'" x-cloak>
+    <div class="section-box" x-show="compraFiltrados().length > 0">
+        <div class="section-box-title"><i class="fas fa-shopping-cart"></i> Planos de Compra</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ativo</th>
+                    <th class="col-center">Status</th>
+                    <th class="col-right">Meta (qtd)</th>
+                    <th class="col-right">Acumulado</th>
+                    <th class="col-right">Progresso</th>
+                    <th class="col-right">Aporte/mês</th>
+                    <th class="col-right">Preço Atual</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="p in compraFiltrados()" :key="p.id">
+                    <tr>
+                        <td>
+                            <a :href="'/dashboard/ativo/' + p.ativo?.ticker" style="text-decoration:none; font-weight:700; color:#a38c65;" x-text="p.ativo?.ticker || '-'"></a>
+                            <div style="font-size:0.75rem; color:#6b7280;" x-text="p.ativo?.nome || p.nome"></div>
+                        </td>
+                        <td class="col-center">
+                            <span class="badge" :class="p.status === 'ativo' ? 'badge-success' : p.status === 'concluido' ? 'badge-neutro' : 'badge-warning'"
+                                  x-text="p.status"></span>
+                        </td>
+                        <td class="col-right" x-text="p.quantidade_alvo?.toFixed(0) || '-'"></td>
+                        <td class="col-right" x-text="p.quantidade_acumulada?.toFixed(0) || '0'"></td>
+                        <td class="col-right">
+                            <div style="display:flex; align-items:center; gap:0.5rem; justify-content:flex-end;">
+                                <div style="width:60px; height:6px; background:#e2e8f0; border-radius:99px;">
+                                    <div style="height:6px; border-radius:99px; background:#22c55e; transition:width 0.3s;"
+                                         :style="{ width: Math.min(p.progresso_percentual || 0, 100) + '%' }"></div>
+                                </div>
+                                <span style="font-size:0.8rem; font-weight:600;" x-text="(p.progresso_percentual || 0).toFixed(0) + '%'"></span>
+                            </div>
+                        </td>
+                        <td class="col-right" x-text="formatMoney(p.valor_aporte_mensal || 0)"></td>
+                        <td class="col-right" x-text="formatMoney(p.ativo?.preco_atual || 0)"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+    <div class="section-box" x-show="planosCompra.length === 0 && !loading && !error">
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-shopping-cart"></i></div>
+            <div class="empty-state-title">Nenhum plano de compra</div>
+            <div class="empty-state-text">Planos de compra ajudam a acumular ativos de forma disciplinada com aportes mensais.</div>
+        </div>
+    </div>
+</div>
+
+<!-- PLANOS DE VENDA -->
+<div x-show="tab === 'venda'" x-cloak>
+    <div class="section-box" x-show="vendaFiltrados().length > 0">
+        <div class="section-box-title"><i class="fas fa-hand-holding-usd"></i> Planos de Venda</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ativo</th>
+                    <th class="col-center">Gatilho</th>
+                    <th class="col-center">Status</th>
+                    <th class="col-right">Qtd Total</th>
+                    <th class="col-right">Vendido</th>
+                    <th class="col-right">Progresso</th>
+                    <th class="col-right">Preço Alvo</th>
+                    <th class="col-right">Data Limite</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="p in vendaFiltrados()" :key="p.id">
+                    <tr>
+                        <td>
+                            <a :href="'/dashboard/ativo/' + p.ativo_ticker" style="text-decoration:none; font-weight:700; color:#a38c65;" x-text="p.ativo_ticker || '-'"></a>
+                            <div style="font-size:0.75rem; color:#6b7280;" x-text="p.nome"></div>
+                        </td>
+                        <td class="col-center">
+                            <span class="badge badge-neutro" style="text-transform:capitalize; font-size:0.7rem;" x-text="(p.tipo_gatilho || '').replace('_', ' ')"></span>
+                        </td>
+                        <td class="col-center">
+                            <span class="badge" :class="p.status === 'ativo' ? 'badge-success' : p.status === 'concluido' ? 'badge-neutro' : 'badge-warning'"
+                                  x-text="p.status"></span>
+                        </td>
+                        <td class="col-right" x-text="p.quantidade_total?.toFixed(0) || '-'"></td>
+                        <td class="col-right" x-text="p.quantidade_vendida?.toFixed(0) || '0'"></td>
+                        <td class="col-right">
+                            <div style="display:flex; align-items:center; gap:0.5rem; justify-content:flex-end;">
+                                <div style="width:60px; height:6px; background:#e2e8f0; border-radius:99px;">
+                                    <div style="height:6px; border-radius:99px; background:#3b82f6; transition:width 0.3s;"
+                                         :style="{ width: Math.min(p.progresso_percentual || 0, 100) + '%' }"></div>
+                                </div>
+                                <span style="font-size:0.8rem; font-weight:600;" x-text="(p.progresso_percentual || 0).toFixed(0) + '%'"></span>
+                            </div>
+                        </td>
+                        <td class="col-right" x-text="p.preco_alvo ? formatMoney(p.preco_alvo) : '-'"></td>
+                        <td class="col-right" x-text="p.data_limite ? formatDate(p.data_limite) : '-'"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+    <div class="section-box" x-show="planosVenda.length === 0 && !loading && !error">
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-hand-holding-usd"></i></div>
+            <div class="empty-state-title">Nenhum plano de venda</div>
+            <div class="empty-state-text">Planos de venda ajudam a realizar lucros de forma disciplinada com gatilhos programados.</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        tab: 'compra',
+        planosCompra: [],
+        planosVenda: [],
+        filtro: '',
+
+        compraFiltrados() {
+            if (!this.filtro) return this.planosCompra;
+            const q = this.filtro.toUpperCase();
+            return this.planosCompra.filter(p => (p.ativo?.ticker || '').includes(q) || (p.nome || '').toUpperCase().includes(q));
+        },
+
+        vendaFiltrados() {
+            if (!this.filtro) return this.planosVenda;
+            const q = this.filtro.toUpperCase();
+            return this.planosVenda.filter(p => (p.ativo_ticker || '').includes(q) || (p.nome || '').toUpperCase().includes(q));
+        },
+
+        async loadData() {
+            const [compraRes, vendaRes] = await Promise.allSettled([
+                this.apiFetch('/api/plano-compra/'),
+                this.apiFetch('/api/plano-venda')
+            ]);
+            if (compraRes.status === 'fulfilled' && compraRes.value?.data) {
+                this.planosCompra = Array.isArray(compraRes.value.data) ? compraRes.value.data : compraRes.value.data.planos || [];
+            }
+            if (vendaRes.status === 'fulfilled' && vendaRes.value?.data) {
+                this.planosVenda = Array.isArray(vendaRes.value.data) ? vendaRes.value.data : vendaRes.value.data.planos || [];
+            }
+        },
+
+        formatDate(d) {
+            if (!d) return '-';
+            const parts = d.split('T')[0].split('-');
+            if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+            return d;
+        }
+    };
+}
+</script>
+{% endblock %}

@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 17/06/2026  
-> **Status:** 🟡 **Frontend GAP Analysis — Fases 3 e 4 Concluídas**  
-> **Versão:** v0.9.17
+> **Status:** ✅ **Frontend GAP Analysis — TODAS AS FASES CONCLUÍDAS (1-5)**  
+> **Versão:** v0.9.18
 
 ---
 
@@ -35,14 +35,15 @@
 
 ---
 
-## ✅ Frontend API-Driven Integration — 90% Concluído
+## ✅ Frontend API-Driven Integration — 100% Concluído
 
 - **Sprints 1-8:** ✅ Todos concluídos (09/06/2026)
 - **GAP Analysis Fase 3:** ✅ 4 telas novas (17/06/2026) — posicoes, movimentacoes, perfil, corretoras, historico, reconciliacao
 - **GAP Analysis Fase 4:** ✅ 5 expansões (17/06/2026) — alertas CRUD, exportação multi-formato, buy signals top10, calendario proventos, rentabilidade benchmark
-- **APIs integradas:** 32+ endpoints (alertas, export, buy-signals, calendario-dividendos, portfolios/rentabilidade)
+- **GAP Analysis Fase 5:** ✅ 4 melhorias (17/06/2026) — detalhe ativo fundamentalistas, DIRPF bens reais, eventos corporativos, planos compra/venda unificados
+- **APIs integradas:** 36+ endpoints (todos os 16 GAPs do GAP Analysis cobertos)
 - **Tecnologia:** Alpine.js + Fetch API + API REST + base_interna.html
-- **Pendente (Fase 5):** Detalhe ativo fundamentalistas, DIRPF bens reais, eventos corporativos, planos compra/venda
+- **Status:** ✅ COMPLETO — Todas as fases (1-5) finalizadas
 
 ### Sprint 8 — Ferramentas (CONCLUÍDO ✅ — 09/06/2026)
 - ✅ `/ferramentas/screener` — Screener: filtra ativos por DY, P/VP, P/L, tipo; coloração semântica

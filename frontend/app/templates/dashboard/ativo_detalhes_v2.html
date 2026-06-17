@@ -1,0 +1,221 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}<span x-text="ativo?.ticker || '...'"></span> — Detalhe{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle" x-text="ativo?.nome || 'Carregando...'"></p>{% endblock %}
+
+{% block page_actions %}
+<a href="/analises/buy-signals" class="btn-exitus btn-exitus-ghost"><i class="fas fa-bullseye"></i> Buy Signals</a>
+<a href="/carteira/posicoes" class="btn-exitus btn-exitus-ghost"><i class="fas fa-wallet"></i> Posições</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="ativo">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Preço Atual</div>
+        <div class="kpi-card-value" x-text="formatMoney(parseFloat(ativo?.preco_atual || 0))"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Variação</div>
+        <div class="kpi-card-value" :class="(cotacao?.variacao_percentual || 0) >= 0 ? 'positivo' : 'negativo'"
+             x-text="cotacao?.variacao_percentual != null ? (cotacao.variacao_percentual >= 0 ? '+' : '') + cotacao.variacao_percentual.toFixed(2) + '%' : '-'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Preço Teto</div>
+        <div class="kpi-card-value" x-text="ativo?.preco_teto ? formatMoney(parseFloat(ativo.preco_teto)) : 'N/D'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Buy Score</div>
+        <div class="kpi-card-value" :class="(buyScore || 0) >= 60 ? 'positivo' : (buyScore || 0) < 40 ? 'negativo' : ''"
+             x-text="buyScore != null ? buyScore + '/100' : 'N/D'"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Fundamentalistas -->
+<div class="section-box" x-show="ativo">
+    <div class="section-box-title"><i class="fas fa-chart-bar"></i> Indicadores Fundamentalistas</div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:1rem; margin-top:1rem;">
+        <template x-for="ind in indicadores" :key="ind.label">
+            <div style="text-align:center; padding:1rem; background:#f8fafc; border-radius:0.5rem;">
+                <div style="font-size:0.75rem; color:#6b7280; margin-bottom:0.25rem;" x-text="ind.label"></div>
+                <div style="font-size:1.25rem; font-weight:700;" :class="ind.class" x-text="ind.value"></div>
+            </div>
+        </template>
+    </div>
+</div>
+
+<!-- Informações do Ativo -->
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+    <!-- Dados Gerais -->
+    <div class="section-box" x-show="ativo">
+        <div class="section-box-title"><i class="fas fa-info-circle"></i> Dados Gerais</div>
+        <div style="display:grid; gap:0.5rem; margin-top:0.75rem;">
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:0.5rem 0; border-bottom:1px solid #f1f5f9;">
+                <span style="color:#6b7280;">Ticker</span>
+                <span style="font-weight:700;" x-text="ativo?.ticker"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:0.5rem 0; border-bottom:1px solid #f1f5f9;">
+                <span style="color:#6b7280;">Tipo</span>
+                <span style="font-weight:600; text-transform:capitalize;" x-text="(ativo?.tipo || '').replace('_', ' ')"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:0.5rem 0; border-bottom:1px solid #f1f5f9;">
+                <span style="color:#6b7280;">Classe</span>
+                <span style="font-weight:600; text-transform:capitalize;" x-text="(ativo?.classe || '').replace('_', ' ')"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:0.5rem 0; border-bottom:1px solid #f1f5f9;">
+                <span style="color:#6b7280;">Mercado</span>
+                <span class="badge badge-neutro" x-text="ativo?.mercado"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:0.5rem 0; border-bottom:1px solid #f1f5f9;">
+                <span style="color:#6b7280;">Moeda</span>
+                <span x-text="ativo?.moeda || 'BRL'"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:0.5rem 0;" x-show="ativo?.observacoes">
+                <span style="color:#6b7280;">Setor</span>
+                <span x-text="(ativo?.observacoes || '').replace('Setor: ', '')"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buy Signal e Margem -->
+    <div class="section-box" x-show="ativo">
+        <div class="section-box-title"><i class="fas fa-bullseye"></i> Análise de Compra</div>
+        <div style="margin-top:0.75rem;">
+            <!-- Score gauge -->
+            <div style="display:flex; align-items:center; gap:1.5rem; margin-bottom:1rem;">
+                <div style="width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:5px solid; flex-shrink:0;"
+                     :style="{ borderColor: (buyScore||0) >= 60 ? '#22c55e' : (buyScore||0) >= 40 ? '#eab308' : '#ef4444', background: (buyScore||0) >= 60 ? '#f0fdf4' : (buyScore||0) >= 40 ? '#fefce8' : '#fef2f2' }">
+                    <div style="text-align:center;">
+                        <div style="font-size:1.5rem; font-weight:900;" x-text="buyScore ?? '-'"></div>
+                        <div style="font-size:0.6rem; color:#9ca3af;">/100</div>
+                    </div>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-size:0.8rem; font-weight:700; margin-bottom:0.5rem;"
+                         :style="{ color: (buyScore||0) >= 60 ? '#16a34a' : (buyScore||0) >= 40 ? '#ca8a04' : '#dc2626' }"
+                         x-text="(buyScore||0) >= 70 ? 'FORTE COMPRA' : (buyScore||0) >= 55 ? 'COMPRA' : (buyScore||0) >= 40 ? 'NEUTRO' : (buyScore||0) >= 25 ? 'VENDA' : 'FORTE VENDA'"></div>
+                    <!-- Margem de Segurança -->
+                    <div x-show="margem != null" style="font-size:0.85rem;">
+                        <span style="color:#6b7280;">Margem Seg.:</span>
+                        <strong :class="margem >= 0 ? 'positivo' : 'negativo'" x-text="margem?.toFixed(2) + '%'"></strong>
+                    </div>
+                    <!-- Preço Teto vs Atual -->
+                    <div style="font-size:0.85rem; margin-top:0.25rem;" x-show="ativo?.preco_teto">
+                        <span style="color:#6b7280;">Teto:</span>
+                        <span x-text="formatMoney(parseFloat(ativo?.preco_teto || 0))"></span>
+                        <span style="margin-left:0.5rem; color:#6b7280;">Atual:</span>
+                        <span x-text="formatMoney(parseFloat(ativo?.preco_atual || 0))"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cotação em tempo real -->
+<div class="section-box" x-show="cotacao" x-cloak>
+    <div class="section-box-title"><i class="fas fa-chart-line"></i> Cotação em Tempo Real</div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:1rem; margin-top:0.75rem;">
+        <div style="text-align:center; padding:0.75rem; background:#f8fafc; border-radius:0.5rem;">
+            <div style="font-size:0.7rem; color:#6b7280;">Preço</div>
+            <div style="font-size:1.1rem; font-weight:700;" x-text="formatMoney(cotacao?.preco_atual || 0)"></div>
+        </div>
+        <div style="text-align:center; padding:0.75rem; background:#f8fafc; border-radius:0.5rem;">
+            <div style="font-size:0.7rem; color:#6b7280;">Variação</div>
+            <div style="font-size:1.1rem; font-weight:700;" :class="(cotacao?.variacao_percentual||0) >= 0 ? 'positivo' : 'negativo'"
+                 x-text="(cotacao?.variacao_percentual >= 0 ? '+' : '') + (cotacao?.variacao_percentual?.toFixed(2) || '0') + '%'"></div>
+        </div>
+        <div style="text-align:center; padding:0.75rem; background:#f8fafc; border-radius:0.5rem;">
+            <div style="font-size:0.7rem; color:#6b7280;">Volume</div>
+            <div style="font-size:1.1rem; font-weight:700;" x-text="cotacao?.volume ? (cotacao.volume / 1000000).toFixed(1) + 'M' : '-'"></div>
+        </div>
+        <div style="text-align:center; padding:0.75rem; background:#f8fafc; border-radius:0.5rem;">
+            <div style="font-size:0.7rem; color:#6b7280;">Provider</div>
+            <div style="font-size:0.85rem; font-weight:600;" x-text="cotacao?.provider || '-'"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Eventos Corporativos -->
+<div class="section-box" x-show="eventos.length > 0" x-cloak>
+    <div class="section-box-title"><i class="fas fa-flag"></i> Eventos Corporativos</div>
+    <table class="data-table" style="margin-top:0.75rem;">
+        <thead>
+            <tr><th>Data</th><th>Tipo</th><th>Descrição</th></tr>
+        </thead>
+        <tbody>
+            <template x-for="ev in eventos" :key="ev.id">
+                <tr>
+                    <td x-text="formatDate(ev.data_evento || ev.data)"></td>
+                    <td><span class="badge badge-neutro" style="text-transform:capitalize;" x-text="ev.tipo_evento || ev.tipo"></span></td>
+                    <td x-text="ev.descricao || '-'"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        ativo: {{ ativo | tojson if ativo else 'null' }},
+        cotacao: null,
+        buyScore: null,
+        margem: null,
+        eventos: [],
+        indicadores: [],
+
+        async loadData() {
+            if (!this.ativo) return;
+            const ticker = this.ativo.ticker;
+
+            // Carregar cotação, buy-score, margem e eventos em paralelo
+            const [cotRes, scoreRes, margemRes, eventosRes] = await Promise.allSettled([
+                this.apiFetch('/api/cotacoes/' + ticker),
+                this.apiFetch('/api/buy-signals/buy-score/' + ticker),
+                this.apiFetch('/api/buy-signals/margem-seguranca/' + ticker),
+                this.apiFetch('/api/eventos-corporativos/?ativo_id=' + this.ativo.id)
+            ]);
+
+            if (cotRes.status === 'fulfilled' && cotRes.value?.data) {
+                this.cotacao = cotRes.value.data;
+            }
+            if (scoreRes.status === 'fulfilled' && scoreRes.value?.data) {
+                this.buyScore = scoreRes.value.data.buy_score;
+            }
+            if (margemRes.status === 'fulfilled' && margemRes.value?.data) {
+                this.margem = margemRes.value.data.margem_seguranca;
+            }
+            if (eventosRes.status === 'fulfilled' && eventosRes.value?.data) {
+                this.eventos = eventosRes.value.data.eventos || eventosRes.value.data || [];
+            }
+
+            this.buildIndicadores();
+        },
+
+        buildIndicadores() {
+            const a = this.ativo;
+            const c = this.cotacao;
+            this.indicadores = [
+                { label: 'P/L', value: parseFloat(a?.p_l) ? parseFloat(a.p_l).toFixed(2) : 'N/D', class: '' },
+                { label: 'P/VP', value: parseFloat(a?.p_vp) ? parseFloat(a.p_vp).toFixed(2) : 'N/D', class: '' },
+                { label: 'DY 12m', value: parseFloat(a?.dividend_yield) ? parseFloat(a.dividend_yield).toFixed(2) + '%' : (c?.dy_12m ? c.dy_12m.toFixed(2) + '%' : 'N/D'), class: parseFloat(a?.dividend_yield) > 5 ? 'positivo' : '' },
+                { label: 'Beta', value: a?.beta ? a.beta.toFixed(2) : 'N/D', class: '' },
+                { label: 'ROE', value: a?.roe ? (a.roe * 100).toFixed(1) + '%' : 'N/D', class: '' },
+                { label: 'Cap Rate', value: a?.cap_rate ? a.cap_rate.toFixed(2) + '%' : 'N/D', class: '' }
+            ].filter(i => i.value !== 'N/D' || this.indicadores.length < 4);
+        },
+
+        formatDate(d) {
+            if (!d) return '-';
+            const parts = d.split('T')[0].split('-');
+            if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+            return d;
+        }
+    };
+}
+</script>
+{% endblock %}

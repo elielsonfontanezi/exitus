@@ -113,13 +113,13 @@
 
 ---
 
-### ⚪ Fase 5 — Melhorias de menor prioridade
-*Bom ter, mas sem urgência.*
+### ✅ Fase 5 — Melhorias de menor prioridade (CONCLUÍDA)
+*Todas implementadas com APIs reais.*
 
-- [ ] Detalhe de ativo com fundamentalistas (G3)
-- [ ] DIRPF — bens e direitos com dados reais (G11)
-- [ ] Eventos corporativos no detalhe do ativo (G15)
-- [ ] Planos de compra/venda — aguardando APIs backend (G10)
+- [x] Detalhe de ativo com fundamentalistas (G3) ✅ 17/06/2026
+- [x] DIRPF — bens e direitos com dados reais (G11) ✅ 17/06/2026
+- [x] Eventos corporativos no detalhe do ativo (G15) ✅ 17/06/2026
+- [x] Planos de compra/venda — APIs corrigidas + tela unificada (G10) ✅ 17/06/2026
 
 ---
 
