@@ -83,6 +83,13 @@ def venda():
                          posicoes=posicoes, 
                          corretoras=corretoras)
 
+@bp.route('/historico')
+@login_required
+def historico():
+    """Histórico de transações — API: GET /api/transacoes (client-side via Alpine.js)"""
+    return render_template('operacoes/historico.html')
+
+
 @bp.route('/deposito', methods=['GET', 'POST'])
 @login_required
 def deposito():
