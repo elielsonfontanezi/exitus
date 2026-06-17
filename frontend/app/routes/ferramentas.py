@@ -106,6 +106,13 @@ def simulador():
     return render_template('ferramentas/simulador.html')
 
 
+@bp.route('/reconciliacao')
+@login_required
+def reconciliacao():
+    """Painel de Reconciliação — APIs: GET /api/reconciliacao/* (client-side via Alpine.js)"""
+    return render_template('ferramentas/reconciliacao.html')
+
+
 @bp.route('/screener', methods=['GET'])
 @login_required
 def screener():

@@ -1,0 +1,233 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Reconciliação{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Diagnóstico de integridade — posições, saldos e transações</p>{% endblock %}
+
+{% block page_actions %}
+<button class="btn-exitus btn-exitus-primary" @click="executarVerificacao()" :disabled="verificando">
+    <i class="fas fa-search" :class="{'fa-spin': verificando}"></i>
+    <span x-text="verificando ? 'Verificando...' : 'Executar Verificação'"></span>
+</button>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading && jaVerificou">
+    <div class="kpi-card" :style="statusGeral === 'OK' ? 'border-left: 3px solid var(--exitus-success)' : statusGeral === 'WARNING' ? 'border-left: 3px solid var(--exitus-warning)' : 'border-left: 3px solid var(--exitus-danger)'">
+        <div class="kpi-card-label">Status Geral</div>
+        <div class="kpi-card-value" :class="statusGeral === 'OK' ? 'positivo' : statusGeral === 'WARNING' ? '' : 'negativo'"
+             x-text="statusGeral"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Divergências</div>
+        <div class="kpi-card-value" :class="totalDivergencias > 0 ? 'negativo' : 'positivo'"
+             x-text="totalDivergencias"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Erros</div>
+        <div class="kpi-card-value negativo" x-text="totalErros"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Avisos</div>
+        <div class="kpi-card-value" x-text="totalAvisos"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tabs %}
+<div class="tab-bar" x-show="jaVerificou">
+    <button class="tab-item" :class="{'active': abaAtiva === 'todos'}" @click="abaAtiva = 'todos'">
+        Todos <span x-show="totalDivergencias > 0" x-text="'(' + totalDivergencias + ')'" class="text-sm"></span>
+    </button>
+    <button class="tab-item" :class="{'active': abaAtiva === 'posicoes'}" @click="abaAtiva = 'posicoes'">
+        Posições <span x-show="divPosicoes.length > 0" x-text="'(' + divPosicoes.length + ')'" class="text-sm"></span>
+    </button>
+    <button class="tab-item" :class="{'active': abaAtiva === 'saldos'}" @click="abaAtiva = 'saldos'">
+        Saldos <span x-show="divSaldos.length > 0" x-text="'(' + divSaldos.length + ')'" class="text-sm"></span>
+    </button>
+    <button class="tab-item" :class="{'active': abaAtiva === 'integridade'}" @click="abaAtiva = 'integridade'">
+        Integridade <span x-show="divIntegridade.length > 0" x-text="'(' + divIntegridade.length + ')'" class="text-sm"></span>
+    </button>
+</div>
+{% endblock %}
+
+{% block loading_state %}
+<div class="section-box" style="text-align:center; padding:3rem;">
+    <div class="skeleton-line medium" style="margin:0 auto;"></div>
+    <div class="skeleton-line" style="margin:0 auto;"></div>
+    <div class="skeleton-line short" style="margin:0 auto;"></div>
+    <p style="margin-top:1rem; color:var(--exitus-text-muted);">Executando verificação de integridade...</p>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div x-effect="filtrarDivergencias()"></div>
+<!-- Mensagem inicial (antes da primeira verificação) -->
+<div class="section-box" x-show="!jaVerificou && !error" style="text-align:center; padding:3rem;">
+    <div style="font-size:3rem; opacity:0.5; margin-bottom:1rem;"><i class="fas fa-shield-alt"></i></div>
+    <div style="font-size:1.125rem; font-weight:600; margin-bottom:0.5rem;">Painel de Reconciliação</div>
+    <p style="color:var(--exitus-text-muted); max-width:28rem; margin:0 auto;">
+        Clique em <strong>"Executar Verificação"</strong> para comparar posições, saldos e transações
+        e identificar divergências.
+    </p>
+</div>
+
+<!-- Status OK -->
+<div class="section-box" x-show="jaVerificou && totalDivergencias === 0 && !error" style="text-align:center; padding:3rem;">
+    <div style="font-size:3rem; color:var(--exitus-success); margin-bottom:1rem;"><i class="fas fa-check-circle"></i></div>
+    <div style="font-size:1.125rem; font-weight:600; margin-bottom:0.5rem;">Tudo certo!</div>
+    <p style="color:var(--exitus-text-muted);">Nenhuma divergência encontrada. Seus dados estão consistentes.</p>
+</div>
+
+<!-- Tabela de Divergências -->
+<div class="section-box" x-show="jaVerificou && divergenciasFiltradas.length > 0">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Severidade</th>
+                <th>Tipo</th>
+                <th>Ativo / Corretora</th>
+                <th>Mensagem</th>
+                <th class="col-right">Esperado</th>
+                <th class="col-right">Encontrado</th>
+                <th class="col-right">Diferença</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="div in divergenciasFiltradas" :key="div.mensagem + div.tipo">
+                <tr>
+                    <td>
+                        <span class="badge" :class="div.severidade === 'ERROR' ? 'badge-danger' : 'badge-warning'"
+                              x-text="div.severidade === 'ERROR' ? 'Erro' : 'Aviso'"></span>
+                    </td>
+                    <td>
+                        <span style="font-size:0.8rem;" x-text="tipoLabel(div.tipo)"></span>
+                    </td>
+                    <td>
+                        <span class="cell-ticker" x-text="div.ativo_ticker || div.corretora_nome || '-'"></span>
+                        <template x-if="div.corretora_nome && div.ativo_ticker">
+                            <br><small class="text-gray-500" x-text="div.corretora_nome"></small>
+                        </template>
+                    </td>
+                    <td style="max-width:300px;" x-text="div.mensagem"></td>
+                    <td class="col-right cell-money" x-text="valorEsperado(div)"></td>
+                    <td class="col-right cell-money" x-text="valorEncontrado(div)"></td>
+                    <td class="col-right">
+                        <span class="badge-negativo" x-text="formatDiferenca(div)"></span>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<!-- Error State -->
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle text-red-500"></i></div>
+        <div class="empty-state-title">Erro ao executar verificação</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="executarVerificacao()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        jaVerificou: false,
+        verificando: false,
+        statusGeral: '',
+        totalDivergencias: 0,
+        totalErros: 0,
+        totalAvisos: 0,
+        divPosicoes: [],
+        divSaldos: [],
+        divIntegridade: [],
+        divergenciasFiltradas: [],
+        abaAtiva: 'todos',
+
+        async loadData() {
+            // Não executa automaticamente — espera o botão
+            this.loading = false;
+        },
+
+        async executarVerificacao() {
+            this.verificando = true;
+            this.error = null;
+            try {
+                const [geral, posicoes, saldos, integridade] = await Promise.all([
+                    this.apiFetch('/api/reconciliacao/verificar'),
+                    this.apiFetch('/api/reconciliacao/posicoes'),
+                    this.apiFetch('/api/reconciliacao/saldos'),
+                    this.apiFetch('/api/reconciliacao/integridade')
+                ]);
+
+                this.statusGeral = geral?.status || 'OK';
+                this.totalDivergencias = geral?.resumo?.total_divergencias || 0;
+                this.totalErros = geral?.resumo?.erros || 0;
+                this.totalAvisos = geral?.resumo?.avisos || 0;
+
+                this.divPosicoes = posicoes?.divergencias || [];
+                this.divSaldos = saldos?.divergencias || [];
+                this.divIntegridade = integridade?.divergencias || [];
+
+                this.jaVerificou = true;
+                this.filtrarDivergencias();
+            } catch (e) {
+                this.error = e.message || 'Erro ao executar verificação';
+            } finally {
+                this.verificando = false;
+            }
+        },
+
+        filtrarDivergencias() {
+            if (this.abaAtiva === 'posicoes') {
+                this.divergenciasFiltradas = this.divPosicoes;
+            } else if (this.abaAtiva === 'saldos') {
+                this.divergenciasFiltradas = this.divSaldos;
+            } else if (this.abaAtiva === 'integridade') {
+                this.divergenciasFiltradas = this.divIntegridade;
+            } else {
+                this.divergenciasFiltradas = [...this.divPosicoes, ...this.divSaldos, ...this.divIntegridade];
+            }
+        },
+
+        tipoLabel(tipo) {
+            const map = {
+                'POSICAO_QUANTIDADE': 'Qtd Posição',
+                'POSICAO_CUSTO': 'Custo Posição',
+                'SALDO_CORRETORA': 'Saldo Corretora',
+                'TRANSACAO_DUPLICADA': 'Trx Duplicada',
+                'TRANSACAO_SEM_ATIVO': 'Trx sem Ativo',
+                'TRANSACAO_QUANTIDADE_ZERO': 'Qtd Zero'
+            };
+            return map[tipo] || tipo || '-';
+        },
+
+        valorEsperado(div) {
+            if (div.quantidade_calculada != null) return div.quantidade_calculada;
+            if (div.custo_calculado != null) return this.formatMoney(div.custo_calculado);
+            if (div.saldo_calculado != null) return this.formatMoney(div.saldo_calculado);
+            return '-';
+        },
+
+        valorEncontrado(div) {
+            if (div.quantidade_posicao != null) return div.quantidade_posicao;
+            if (div.custo_posicao != null) return this.formatMoney(div.custo_posicao);
+            if (div.saldo_registrado != null) return this.formatMoney(div.saldo_registrado);
+            return '-';
+        },
+
+        formatDiferenca(div) {
+            if (div.diferenca == null) return '-';
+            if (div.tipo === 'POSICAO_QUANTIDADE') return div.diferenca;
+            return this.formatMoney(div.diferenca);
+        }
+    };
+}
+
+</script>
+{% endblock %}
