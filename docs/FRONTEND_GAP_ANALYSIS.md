@@ -525,6 +525,205 @@ Expansão do Dashboard  → + seção "Top 5 por Mercado" (BR / US / INTL)
 
 ---
 
+---
+
+## 🏗️ Rearquitetura do Menu e Dashboard
+
+### Problemas Identificados no Menu Atual
+
+#### 1. "Análises" está sobrecarregado — 3 domínios sem relação
+O menu agrupa sob "Análises":
+- **Proventos** (renda passiva recebida — domínio próprio)
+- **Rentabilidade** (performance da carteira)
+- **Imposto de Renda** (obrigação fiscal — domínio próprio)
+- **Alocação + Buy Signals** (estratégia)
+
+Esses domínios têm intenções de uso completamente diferentes. Um usuário que quer ver seus DARFs não está "analisando" — está cumprindo obrigação fiscal.
+
+#### 2. "Operações" tem só 1 item
+Um dropdown para abrir 1 link é desperdício de clique. Compra/Venda deveria ser acesso direto ou o dropdown expandido com Histórico e Importação B3.
+
+#### 3. "Planos" aponta para rotas 404
+`/planos-compra/` e `/planos-venda/` — rotas do blueprint antigo `estrategia.py` que não existem mais. Links mortos no menu.
+
+#### 4. "Carteira" não existe como conceito no menu
+O centro do sistema (posições, movimentações de caixa, saldo por corretora) não tem representação no menu. O usuário não encontra "onde estou com minha carteira".
+
+#### 5. "Alertas" como item de nível 1 do menu
+Alertas é funcionalidade de configuração/monitoramento, não de navegação primária. Ocupa espaço nobre do menu horizontal.
+
+#### 6. `/perfil` e `/configuracoes` são links mortos
+Existem no dropdown do usuário (header) mas não têm blueprint nem rota correspondente.
+
+#### 7. Dashboard descarta dados que chegam da API
+`GET /api/portfolios/dashboard` retorna `top_ativos` por mercado e `alocacao_geografica` BR/US/INTL. O template `dashboard/index.html` recebe esses dados mas não os renderiza — seções do wireframe Tela 1 nunca implementadas.
+
+---
+
+### Menu Proposto — Rearquitetura Completa
+
+```
+Exitus
+│
+├── Dashboard                    ← reformulado (ver seção abaixo)
+│
+├── Carteira                     ← NOVO nível 1 — centro do sistema
+│   ├── Minhas Posições          /carteira/posicoes      (G4 — nova)
+│   ├── Movimentações de Caixa   /carteira/movimentacoes (G6 — nova)
+│   └── Saldo por Corretora      (widget em Movimentações)
+│
+├── Operações                    ← expandido
+│   ├── Compra / Venda           /operacoes/
+│   ├── Histórico                /operacoes/historico    (G5 — nova)
+│   └── Importar B3              /operacoes/ (aba já existe, destacar)
+│
+├── Proventos                    ← elevado de sub-item para nível 1
+│   ├── Recebidos                /proventos/recebidos
+│   ├── Projetados               /proventos/projetados
+│   └── Calendário               /proventos/calendario   (+ gerar auto)
+│
+├── Análises                     ← apenas performance e estratégia
+│   ├── Rentabilidade            /analises/rentabilidade (+ benchmark/período)
+│   ├── Evolução Patrimonial     /analises/evolucao
+│   ├── Performance (Sharpe)     /analises/performance
+│   ├── Alocação de Ativos       /analises/alocacao
+│   └── Buy Signals              /analises/buy-signals   (+ Watchlist Top 10)
+│
+├── Fiscal                       ← elevado de sub-item de Análises para nível 1
+│   ├── Apuração Mensal          /imposto-renda/mensal
+│   ├── DARFs                    /imposto-renda/darfs
+│   ├── Histórico Anual          /imposto-renda/historico
+│   └── Declaração DIRPF         /imposto-renda/declaracao
+│
+├── Relatórios                   ← exportação unificada
+│   ├── Relatório Mensal         /relatorios/mensal
+│   ├── Relatório Anual          /relatorios/anual
+│   ├── Extrato Completo         /relatorios/extrato
+│   ├── IR Completo              /relatorios/ir
+│   └── Exportar Dados           /relatorios/exportar    (CSV/Excel/PDF unificado)
+│
+├── Ferramentas                  ← expandido com novas capacidades
+│   ├── Screener de Ativos       /ferramentas/screener
+│   ├── Comparador               /ferramentas/comparador
+│   ├── Calculadora IR           /ferramentas/calculadora-ir
+│   ├── Simulador de Aportes     /ferramentas/simulador
+│   └── Reconciliação            /ferramentas/reconciliacao  (G14 — nova)
+│
+└── [🔔 sino]  ← Alertas saem do menu e vão para o sino no header
+    └── Painel de Alertas        /alertas/  (slide-over ou dropdown rico)
+        ├── Feed de alertas recentes
+        ├── Criar novo alerta
+        └── Gerenciar todos → /alertas/gerenciar
+│
+└── [👤 usuário]
+    ├── Meu Perfil               /configuracoes/perfil       (G1 — nova)
+    ├── Minhas Corretoras        /configuracoes/corretoras   (G1 — nova)
+    └── Sair                     /logout
+```
+
+### O que muda nos blueprints
+
+| Blueprint | Situação Atual | Situação Proposta |
+|-----------|---------------|-------------------|
+| `dashboard.py` | `/dashboard/` + múltiplas rotas legadas | `/dashboard/` reformulado |
+| `operacoes.py` | Compra/venda | + `/historico` |
+| `analises.py` | Proventos + Rentabilidade + IR + Buy Signals | Apenas Rentabilidade + Buy Signals |
+| `proventos.py` | `/proventos/*` | Sem alteração de rota, sai de sub-item de Análises |
+| `fiscal.py` | `/imposto-renda/*` | Sem alteração de rota, sai de sub-item de Análises |
+| `relatorios.py` | `/relatorios/*` | + exportação unificada |
+| `ferramentas.py` | Screener, comparador, calculadora, simulador | + `/reconciliacao` |
+| `alertas.py` | Lista de alertas | + criar/toggle/deletar + feed recente |
+| `planos.py` | Redirects para dashboard (broken) | Remover do menu até APIs estarem prontas |
+| `configuracoes.py` | **Não existe** | Criar: perfil + corretoras |
+| `carteira.py` | **Não existe** | Criar: posições + movimentações |
+
+---
+
+### Reformulação do Dashboard Principal
+
+O dashboard atual (`/dashboard/`) usa `GET /api/portfolios/dashboard` mas renderiza apenas o resumo numérico. Os dados `top_ativos` e `alocacao_geografica` chegam e são descartados.
+
+#### Dashboard Proposto — Seções
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ 🏠 Exitus Dashboard                    [BRL ⇄ USD] [🔔] [👤]  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ROW 1 — Cards de Resumo (4 cards)                              │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+│  │Patrimônio│ │Rentab.   │ │Saldo     │ │Posições  │           │
+│  │Total     │ │Geral     │ │Caixa     │ │Ativas    │           │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘           │
+│                                                                  │
+│  ROW 2 — Por Mercado (dados de por_mercado da API)              │
+│  ┌────────────────┐ ┌────────────────┐ ┌────────────────┐       │
+│  │ 🇧🇷 Brasil     │ │ 🇺🇸 EUA        │ │ 🌍 INTL        │      │
+│  │ R$ 50k  73%   │ │ $10k   22%    │ │ €2k     5%    │       │
+│  │ Top: PETR4    │ │ Top: AAPL     │ │ Top: —        │       │
+│  └────────────────┘ └────────────────┘ └────────────────┘       │
+│                                                                  │
+│  ROW 3 — Gráficos                                               │
+│  ┌──────────────────────┐ ┌────────────────────────────┐        │
+│  │ 🍕 Alocação Geo      │ │ 📈 Evolução Patrimonial    │        │
+│  │ (alocacao_geografica)│ │ (portfolios/evolucao)       │        │
+│  └──────────────────────┘ └────────────────────────────┘        │
+│                                                                  │
+│  ROW 4 — Últimas Transações + Alertas Recentes                  │
+│  ┌──────────────────────┐ ┌────────────────────────────┐        │
+│  │ 🔄 Transações        │ │ 🔔 Alertas Recentes        │        │
+│  │ (transacoes/recentes)│ │ (alertas/recentes)          │        │
+│  └──────────────────────┘ └────────────────────────────┘        │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**APIs envolvidas no Dashboard reformulado:**
+- `GET /api/portfolios/dashboard` — resumo + por_mercado + alocacao_geografica *(já chamado, dados ignorados)*
+- `GET /api/portfolios/evolucao` — gráfico de linha *(já chamado)*
+- `GET /api/carteira/saldo-caixa` — saldo caixa card *(já chamado)*
+- `GET /api/transacoes/recentes` — últimas transações *(já chamado)*
+- `GET /api/alertas/recentes` — alertas recentes *(não chamado)*
+
+**Alterações no template `dashboard/index.html`:**
+- Renderizar `dados.por_mercado` nos 3 cards de mercado
+- Renderizar `dados.alocacao_geografica` no gráfico pizza
+- Adicionar seção alertas recentes
+- Adicionar toggle BRL/USD (chama `/api/carteira/saldo-caixa?moeda=USD`)
+
+---
+
+### Ordem de Execução Proposta
+
+A rearquitetura deve ser incremental para não quebrar o que funciona:
+
+**Fase 1 — Correções urgentes (sem novas telas)**
+1. Remover "Planos" do menu (links 404)
+2. Mover "Alertas" para o sino do header
+3. Separar "Fiscal" de "Análises" no menu (só reorganização HTML)
+4. Separar "Proventos" de "Análises" no menu
+5. Corrigir `/perfil` e `/configuracoes` no dropdown do usuário
+
+**Fase 2 — Dashboard reformulado**
+6. Renderizar `top_ativos` por mercado nos cards
+7. Renderizar `alocacao_geografica` no gráfico pizza
+8. Adicionar alertas recentes (Row 4)
+9. Toggle BRL/USD
+
+**Fase 3 — Telas novas (alta prioridade)**
+10. `carteira.py` — `/carteira/posicoes` + `/carteira/movimentacoes`
+11. `configuracoes.py` — `/configuracoes/perfil` + `/configuracoes/corretoras`
+12. `/operacoes/historico`
+13. `/ferramentas/reconciliacao`
+
+**Fase 4 — Expansões de telas existentes**
+14. Alertas — criar/toggle/deletar
+15. Exportação unificada
+16. Buy Signals + Watchlist Top 10
+17. Calendário + gerar auto + confirmar pagamento
+18. Rentabilidade + seletor benchmark/período
+
+---
+
 ## 📋 Próximos Passos
 
 1. **Validar esta análise** com o usuário tela a tela
