@@ -30,30 +30,8 @@ def _fetch_alertas(headers):
 @bp.route('/')
 @login_required
 def lista():
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    alertas = _fetch_alertas(headers)
-
-    stats = {
-        'total': len(alertas),
-        'ativos': sum(1 for a in alertas if a.get('ativo')),
-        'inativos': sum(1 for a in alertas if not a.get('ativo')),
-        'acionados': sum(1 for a in alertas if a.get('total_acionamentos', 0) > 0),
-    }
-
-    por_tipo = {}
-    for a in alertas:
-        tipo = a.get('tipo_alerta', 'OUTRO')
-        por_tipo[tipo] = por_tipo.get(tipo, 0) + 1
-
-    return render_template(
-        'alertas/lista.html',
-        alertas=alertas,
-        stats=stats,
-        por_tipo=por_tipo,
-    )
+    """Alertas — CRUD completo via Alpine.js client-side"""
+    return render_template('alertas/lista_v2.html')
 
 
 @bp.route('/preco')

@@ -105,11 +105,11 @@
 ### 🟡 Fase 4 — Expansões de telas existentes
 *Telas existem, mas usam parcialmente as APIs disponíveis.*
 
-- [ ] **Alertas** → adicionar criar / toggle ativo-inativo / excluir (G9)
-- [ ] **Exportação** → seletor formato + entidades (CSV/Excel/PDF) (G13)
-- [ ] **Buy Signals** → adicionar Watchlist Top 10 + Z-Score (G8)
-- [ ] **Calendário de Proventos** → botão gerar automático + confirmar pagamento (G7/G16)
-- [ ] **Rentabilidade** → seletor de período + seletor de benchmark (G12)
+- [x] **Alertas** → criar / toggle ativo-inativo / excluir (G9) ✅ 17/06/2026
+- [x] **Exportação** → seletor formato + entidades (CSV/Excel/PDF) (G13) ✅ 17/06/2026
+- [x] **Buy Signals** → Watchlist Top 10 + Z-Score + Margem Segurança (G8) ✅ 17/06/2026
+- [x] **Calendário de Proventos** → botão gerar automático + confirmar pagamento (G7/G16) ✅ 17/06/2026
+- [x] **Rentabilidade** → seletor de período + seletor de benchmark (G12) ✅ 17/06/2026
 
 ---
 

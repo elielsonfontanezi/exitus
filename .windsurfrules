@@ -170,7 +170,29 @@ Ao fechar qualquer GAP, os seguintes docs DEVEM ser atualizados **no mesmo commi
 
 ---
 
-## 🔧 REGRA #9 — FERRAMENTAS E MCPs DISPONÍVEIS
+## �️ REGRA #7 — REMOVER ARQUIVOS OBSOLETOS
+
+Ao substituir um arquivo por nova versão (ex: `lista.html` → `lista_v2.html`):
+
+1. **Verificar** se o arquivo antigo ainda é referenciado por alguma rota, template ou import
+2. **Se não for referenciado** → remover do projeto no mesmo commit
+3. **Se for referenciado** por outra rota ativa → manter (documentar motivo se necessário)
+
+**Regra:** Nunca deixar templates, scripts ou módulos órfãos no projeto. Código morto gera confusão e aumenta superfície de manutenção.
+
+**Checklist antes do commit:**
+- [ ] Busquei referências ao arquivo antigo em `routes/`, `templates/`, `imports`?
+- [ ] Arquivo não referenciado foi removido?
+- [ ] Arquivo de archive/ foi preservado (histórico, não operacional)?
+
+**Exceções — NUNCA remover:**
+- Arquivos em `backend/tests/` (testes formais são patrimônio)
+- Arquivos em `docs/` (documentação histórica)
+- Arquivos em `archive/` (referência histórica intencional)
+
+---
+
+## �🔧 REGRA #9 — FERRAMENTAS E MCPs DISPONÍVEIS
 
 ### MCPs (Model Context Protocol)
 Usar MCPs para acesso direto a dados e sistemas:

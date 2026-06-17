@@ -114,5 +114,5 @@ def projetados():
 @bp.route('/calendario')
 @login_required
 def calendario():
-    """Redirect para versão Alpine.js do dashboard."""
-    return redirect(url_for('dashboard.proventos_calendario'))
+    """Calendário de Proventos — gerar automático + confirmar pagamento via Alpine.js"""
+    return render_template('proventos/calendario_v2.html')

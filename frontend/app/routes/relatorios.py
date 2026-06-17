@@ -187,6 +187,13 @@ def ir_completo():
                            apuracao=apuracao, ano=ano, erro=erro)
 
 
+@bp.route('/exportar', methods=['GET'])
+@login_required
+def exportar():
+    """Exportação multi-formato (CSV/Excel/PDF) via API backend — Alpine.js client-side"""
+    return render_template('relatorios/exportar_v2.html')
+
+
 @bp.route('/exportar/csv', methods=['GET'])
 @login_required
 def exportar_csv():

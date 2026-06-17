@@ -101,9 +101,7 @@
                     <a href="/relatorios/ir" class="dropdown-item"><i class="fas fa-calculator"></i> IR Completo</a>
                     <div class="dropdown-section">
                         <h3>Exportar Dados</h3>
-                        <a href="/relatorios/exportar/csv?tipo=transacoes" class="dropdown-item"><i class="fas fa-file-csv"></i> Transações CSV</a>
-                        <a href="/relatorios/exportar/csv?tipo=proventos" class="dropdown-item"><i class="fas fa-file-csv"></i> Proventos CSV</a>
-                        <a href="/relatorios/exportar/csv?tipo=posicoes" class="dropdown-item"><i class="fas fa-file-csv"></i> Posições CSV</a>
+                        <a href="/relatorios/exportar" class="dropdown-item"><i class="fas fa-download"></i> Exportar (CSV/Excel/PDF)</a>
                     </div>
                 </div>
             </div>
@@ -128,11 +126,11 @@
                 <i class="fas fa-search"></i>
             </button>
 
-            <!-- Sino de Alertas (substituiu o item de menu Alertas) -->
+            <!-- Sino de Alertas -->
             <div class="dropdown">
-                <button class="text-white hover:bg-white/10 px-3 py-2 rounded relative" title="Alertas">
+                <button class="dropdown-toggle no-arrow" title="Alertas" style="position:relative;">
                     <i class="fas fa-bell"></i>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    <span style="position:absolute; top:4px; right:4px; width:8px; height:8px; background:#ef4444; border-radius:50%;"></span>
                 </button>
                 <div class="dropdown-menu" style="right: 0; left: auto; min-width: 220px;">
                     <div class="dropdown-section">

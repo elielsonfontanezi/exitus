@@ -140,29 +140,8 @@ def rentabilidade():
 @bp.route('/rentabilidade/periodo', methods=['GET'])
 @login_required
 def rentabilidade_periodo():
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    periodo = request.args.get('periodo', '12m')
-    dados = {}
-    erro = None
-    try:
-        resp = requests.get(
-            f"{Config.BACKEND_API_URL}/api/portfolios/rentabilidade",
-            headers=headers,
-            params={'periodo': periodo},
-            timeout=10
-        )
-        if resp.status_code == 200:
-            dados = resp.json().get('data', {})
-        else:
-            erro = f'API retornou {resp.status_code}'
-    except Exception as e:
-        erro = str(e)
-
-    return render_template('analises/rentabilidade_periodo.html',
-                           dados=dados, periodo=periodo, erro=erro)
+    """Rentabilidade com seletor de período e benchmark via Alpine.js"""
+    return render_template('analises/rentabilidade_v2.html')
 
 
 @bp.route('/alocacao', methods=['GET'])
@@ -240,33 +219,8 @@ def performance():
 @bp.route('/buy-signals', methods=['GET'])
 @login_required
 def buy_signals():
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    ticker = request.args.get('ticker', 'PETR4').upper()
-    score_data = {}
-    posicoes = []
-    erro = None
-    try:
-        r1 = requests.get(
-            f"{Config.BACKEND_API_URL}/api/buy-signals/buy-score/{ticker}",
-            headers=headers, timeout=10
-        )
-        r2 = requests.get(
-            f"{Config.BACKEND_API_URL}/api/posicoes",
-            headers=headers, timeout=10
-        )
-        if r1.status_code == 200:
-            score_data = r1.json().get('data', {})
-        if r2.status_code == 200:
-            posicoes = r2.json().get('data', {}).get('posicoes', [])
-    except Exception as e:
-        erro = str(e)
-
-    return render_template('analises/buy_signals.html',
-                           score=score_data, ticker=ticker,
-                           posicoes=posicoes, erro=erro)
+    """Buy Signals — Watchlist Top 10, Score, Margem, Z-Score via Alpine.js"""
+    return render_template('analises/buy_signals_v2.html')
 
 
 @bp.route('/impostos', methods=['GET'])

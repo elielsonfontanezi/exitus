@@ -1,0 +1,276 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Calendário de Proventos{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Proventos previstos e confirmados — geração automática e confirmação de pagamento</p>{% endblock %}
+
+{% block page_actions %}
+<button class="btn-exitus btn-exitus-primary" @click="gerarCalendario()" :disabled="gerando">
+    <i class="fas" :class="gerando ? 'fa-spinner fa-spin' : 'fa-magic'"></i>
+    <span x-text="gerando ? 'Gerando...' : 'Gerar Automático'"></span>
+</button>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="itens.length > 0 || resumo">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Total de Itens</div>
+        <div class="kpi-card-value" x-text="resumo?.total_itens || itens.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Valor Estimado</div>
+        <div class="kpi-card-value positivo" x-text="formatMoney(resumo?.valor_total_estimado || totalEstimado())"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Confirmados</div>
+        <div class="kpi-card-value" x-text="itens.filter(i => i.status === 'confirmado').length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Previstos</div>
+        <div class="kpi-card-value" x-text="itens.filter(i => i.status === 'previsto').length"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar" x-show="itens.length > 0">
+    <span class="filter-label">Filtrar:</span>
+    <input type="text" class="filter-input" placeholder="Buscar ticker..."
+           x-model="filtroTicker" @input.debounce.300ms="filtrar()">
+    <select class="filter-select" x-model="filtroStatus" @change="filtrar()">
+        <option value="">Todos</option>
+        <option value="previsto">Previstos</option>
+        <option value="confirmado">Confirmados</option>
+    </select>
+    <select class="filter-select" x-model="filtroTipo" @change="filtrar()">
+        <option value="">Todos os tipos</option>
+        <option value="dividendo">Dividendo</option>
+        <option value="jcp">JCP</option>
+        <option value="rendimento">Rendimento</option>
+    </select>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Tabela de Proventos -->
+<div class="section-box" x-show="itensFiltrados.length > 0">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="sortable" @click="ordenar('data_esperada')">Data Esperada</th>
+                <th>Ativo</th>
+                <th>Tipo</th>
+                <th class="col-right">Qtd</th>
+                <th class="col-right sortable" @click="ordenar('valor_estimado')">Valor Est.</th>
+                <th class="col-right">Valor Real</th>
+                <th class="col-center">Status</th>
+                <th class="col-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="item in itensFiltrados" :key="item.id">
+                <tr>
+                    <td x-text="formatDate(item.data_esperada)"></td>
+                    <td>
+                        <a :href="'/dashboard/ativo/' + (item.ativo?.ticker || '')" class="badge badge-neutro"
+                           x-text="item.ativo?.ticker || '-'" style="text-decoration:none; font-weight:700;"></a>
+                        <div style="font-size:0.75rem; color:#6b7280;" x-text="item.ativo?.nome || ''"></div>
+                    </td>
+                    <td>
+                        <span style="font-size:0.8rem; text-transform:capitalize;" x-text="item.tipo_provento || '-'"></span>
+                    </td>
+                    <td class="col-right" x-text="item.quantidade || '-'"></td>
+                    <td class="col-right" x-text="formatMoney(item.valor_estimado)"></td>
+                    <td class="col-right">
+                        <span x-show="item.valor_real" class="positivo" x-text="formatMoney(item.valor_real)"></span>
+                        <span x-show="!item.valor_real" style="color:#9ca3af;">—</span>
+                    </td>
+                    <td class="col-center">
+                        <span class="badge"
+                              :class="item.status === 'confirmado' ? 'badge-success' : item.status === 'previsto' ? 'badge-warning' : 'badge-neutro'"
+                              x-text="item.status"></span>
+                    </td>
+                    <td class="col-center">
+                        <button x-show="item.status === 'previsto'"
+                                class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                @click="confirmarPagamento(item)">
+                            <i class="fas fa-check"></i> Confirmar
+                        </button>
+                        <span x-show="item.status === 'confirmado'" style="color:#16a34a; font-size:0.8rem;">
+                            <i class="fas fa-check-circle"></i>
+                        </span>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<!-- Empty State -->
+<div class="section-box" x-show="!loading && itens.length === 0 && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-calendar-alt"></i></div>
+        <div class="empty-state-title">Nenhum provento no calendário</div>
+        <div class="empty-state-text">
+            Clique em <strong>"Gerar Automático"</strong> para criar o calendário baseado nas suas posições e histórico de proventos.
+        </div>
+    </div>
+</div>
+
+<!-- Error State -->
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar dados</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadData()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+
+<!-- Feedback messages -->
+<div x-show="feedbackMsg" x-cloak
+     style="position:fixed; bottom:2rem; right:2rem; padding:1rem 1.5rem; border-radius:0.5rem; z-index:9999; font-size:0.9rem; box-shadow:0 4px 12px rgba(0,0,0,0.15);"
+     :style="{ background: feedbackType === 'success' ? '#f0fdf4' : '#fef2f2', color: feedbackType === 'success' ? '#16a34a' : '#dc2626', border: feedbackType === 'success' ? '1px solid #bbf7d0' : '1px solid #fecaca' }"
+     x-transition>
+    <i class="fas" :class="feedbackType === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'"></i>
+    <span x-text="feedbackMsg"></span>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        itens: [],
+        itensFiltrados: [],
+        resumo: null,
+        filtroTicker: '',
+        filtroStatus: '',
+        filtroTipo: '',
+        ordenarPor: 'data_esperada',
+        ordenarDir: 'asc',
+        gerando: false,
+        feedbackMsg: '',
+        feedbackType: 'success',
+
+        async loadData() {
+            try {
+                const [listRes, resumoRes] = await Promise.allSettled([
+                    this.apiFetch('/api/calendario-dividendos/'),
+                    this.apiFetch('/api/calendario-dividendos/resumo')
+                ]);
+                if (listRes.status === 'fulfilled' && listRes.value?.data) {
+                    this.itens = listRes.value.data.calendario || listRes.value.data || [];
+                }
+                if (resumoRes.status === 'fulfilled' && resumoRes.value?.data) {
+                    this.resumo = resumoRes.value.data;
+                }
+                this.filtrar();
+            } catch (e) {
+                this.error = e.message;
+            }
+        },
+
+        totalEstimado() {
+            return this.itens.reduce((sum, i) => sum + (i.valor_estimado || 0), 0);
+        },
+
+        filtrar() {
+            let result = [...this.itens];
+
+            if (this.filtroTicker) {
+                const q = this.filtroTicker.toUpperCase();
+                result = result.filter(i => (i.ativo?.ticker || '').includes(q));
+            }
+            if (this.filtroStatus) {
+                result = result.filter(i => i.status === this.filtroStatus);
+            }
+            if (this.filtroTipo) {
+                result = result.filter(i => i.tipo_provento === this.filtroTipo);
+            }
+
+            result.sort((a, b) => {
+                let va = a[this.ordenarPor] || '';
+                let vb = b[this.ordenarPor] || '';
+                if (typeof va === 'string') { va = va.toLowerCase(); vb = (vb || '').toLowerCase(); }
+                if (va < vb) return this.ordenarDir === 'asc' ? -1 : 1;
+                if (va > vb) return this.ordenarDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            this.itensFiltrados = result;
+        },
+
+        ordenar(campo) {
+            if (this.ordenarPor === campo) {
+                this.ordenarDir = this.ordenarDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.ordenarPor = campo;
+                this.ordenarDir = 'asc';
+            }
+            this.filtrar();
+        },
+
+        async gerarCalendario() {
+            this.gerando = true;
+            this.feedbackMsg = '';
+            try {
+                const res = await this.apiFetch('/api/calendario-dividendos/gerar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                if (res?.success !== false) {
+                    const total = res?.data?.total || 0;
+                    this.showFeedback('Calendário gerado: ' + total + ' itens!', 'success');
+                    await this.loadData();
+                } else {
+                    this.showFeedback(res?.error || res?.message || 'Erro ao gerar', 'error');
+                }
+            } catch (e) {
+                this.showFeedback(e.message || 'Erro de conexão', 'error');
+            } finally {
+                this.gerando = false;
+            }
+        },
+
+        async confirmarPagamento(item) {
+            const valor = prompt('Valor real recebido (R$):', item.valor_estimado?.toFixed(2) || '0.00');
+            if (valor === null) return;
+
+            try {
+                const res = await this.apiFetch('/api/calendario-dividendos/' + item.id + '/confirmar-pagamento', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ valor_real: parseFloat(valor) })
+                });
+                if (res?.success !== false) {
+                    item.status = 'confirmado';
+                    item.valor_real = parseFloat(valor);
+                    this.showFeedback('Pagamento confirmado: ' + item.ativo?.ticker, 'success');
+                    this.filtrar();
+                } else {
+                    this.showFeedback(res?.error || res?.message || 'Erro ao confirmar', 'error');
+                }
+            } catch (e) {
+                this.showFeedback(e.message || 'Erro de conexão', 'error');
+            }
+        },
+
+        showFeedback(msg, type) {
+            this.feedbackMsg = msg;
+            this.feedbackType = type;
+            setTimeout(() => { this.feedbackMsg = ''; }, 4000);
+        },
+
+        formatDate(d) {
+            if (!d) return '-';
+            const parts = d.split('-');
+            if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+            return d;
+        }
+    };
+}
+</script>
+{% endblock %}

@@ -1,0 +1,252 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Buy Signals{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Score de compra, margem de segurança e watchlist — análise quantitativa</p>{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="watchlist.length > 0">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Top Score</div>
+        <div class="kpi-card-value positivo" x-text="watchlist.length > 0 ? watchlist[0].buy_score : '-'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos Analisados</div>
+        <div class="kpi-card-value" x-text="watchlist.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Score ≥ 60</div>
+        <div class="kpi-card-value positivo" x-text="watchlist.filter(w => w.buy_score >= 60).length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Score &lt; 40</div>
+        <div class="kpi-card-value negativo" x-text="watchlist.filter(w => w.buy_score < 40).length"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Consulta individual -->
+<div class="section-box" style="max-width:700px;">
+    <div class="section-box-title"><i class="fas fa-search"></i> Consultar Score por Ticker</div>
+    <div style="display:flex; gap:0.75rem; margin-top:0.75rem;">
+        <input type="text" class="filter-input" style="flex:1; text-transform:uppercase;"
+               placeholder="Ex: PETR4, VALE3, AAPL..."
+               x-model="tickerConsulta"
+               @keydown.enter="consultarScore()"
+               @input="tickerConsulta = tickerConsulta.toUpperCase()">
+        <button class="btn-exitus btn-exitus-primary" @click="consultarScore()" :disabled="consultando">
+            <i class="fas" :class="consultando ? 'fa-spinner fa-spin' : 'fa-chart-line'"></i>
+            <span x-text="consultando ? 'Analisando...' : 'Analisar'"></span>
+        </button>
+    </div>
+</div>
+
+<!-- Resultado da consulta -->
+<div class="section-box" x-show="scoreResultado" x-cloak style="max-width:700px;">
+    <div class="section-box-title">
+        <i class="fas fa-bullseye"></i> Score de Compra — <span x-text="scoreResultado?.ticker"></span>
+    </div>
+    <div style="display:grid; grid-template-columns:auto 1fr; gap:2rem; align-items:center; margin-top:1rem;">
+        <!-- Gauge circular -->
+        <div style="text-align:center;">
+            <div style="width:120px; height:120px; border-radius:50%; display:flex; align-items:center; justify-content:center; border-width:6px; border-style:solid;"
+                 :style="{
+                    borderColor: scoreResultado?.buy_score >= 70 ? '#22c55e' : scoreResultado?.buy_score >= 40 ? '#eab308' : '#ef4444',
+                    background: scoreResultado?.buy_score >= 70 ? '#f0fdf4' : scoreResultado?.buy_score >= 40 ? '#fefce8' : '#fef2f2'
+                 }">
+                <div>
+                    <div style="font-size:2rem; font-weight:900;" x-text="scoreResultado?.buy_score || 0"
+                         :style="{ color: scoreResultado?.buy_score >= 70 ? '#16a34a' : scoreResultado?.buy_score >= 40 ? '#ca8a04' : '#dc2626' }"></div>
+                    <div style="font-size:0.7rem; color:#9ca3af;">/100</div>
+                </div>
+            </div>
+            <div style="margin-top:0.5rem; font-size:0.8rem; font-weight:700;"
+                 :style="{ color: scoreResultado?.buy_score >= 70 ? '#16a34a' : scoreResultado?.buy_score >= 40 ? '#ca8a04' : '#dc2626' }"
+                 x-text="scoreResultado?.buy_score >= 70 ? 'FORTE COMPRA' : scoreResultado?.buy_score >= 55 ? 'COMPRA' : scoreResultado?.buy_score >= 40 ? 'NEUTRO' : scoreResultado?.buy_score >= 25 ? 'VENDA' : 'FORTE VENDA'">
+            </div>
+        </div>
+
+        <!-- Detalhes -->
+        <div>
+            <!-- Barra de progresso -->
+            <div style="margin-bottom:0.5rem; display:flex; justify-content:space-between; font-size:0.7rem; color:#9ca3af;">
+                <span>Forte Venda</span><span>Neutro</span><span>Forte Compra</span>
+            </div>
+            <div style="width:100%; background:#f3f4f6; border-radius:9999px; height:12px; position:relative;">
+                <div style="height:12px; border-radius:9999px; transition:width 0.7s;"
+                     :style="{
+                        width: (scoreResultado?.buy_score || 0) + '%',
+                        background: scoreResultado?.buy_score >= 70 ? '#22c55e' : scoreResultado?.buy_score >= 40 ? '#eab308' : '#ef4444'
+                     }"></div>
+                <div style="position:absolute; top:0; height:12px; width:2px; background:#9ca3af; left:50%;"></div>
+            </div>
+
+            <!-- Margem de segurança -->
+            <div style="margin-top:1rem;" x-show="margemResultado">
+                <div style="font-size:0.85rem; font-weight:600; margin-bottom:0.25rem;">Margem de Segurança</div>
+                <div style="display:flex; gap:1rem; font-size:0.85rem;">
+                    <span>Margem: <strong x-text="margemResultado?.margem_seguranca?.toFixed(2) + '%'"></strong></span>
+                    <span x-text="margemResultado?.sinal"></span>
+                </div>
+            </div>
+
+            <!-- Z-Score -->
+            <div style="margin-top:0.75rem;" x-show="zscoreResultado">
+                <div style="font-size:0.85rem; font-weight:600; margin-bottom:0.25rem;">Z-Score</div>
+                <div style="display:flex; gap:1rem; font-size:0.85rem;">
+                    <span>Z: <strong x-text="zscoreResultado?.zscore?.toFixed(2)"></strong></span>
+                    <span x-text="zscoreResultado?.interpretacao || ''"></span>
+                </div>
+            </div>
+
+            <div style="margin-top:0.75rem;" x-show="zscoreError">
+                <div style="font-size:0.8rem; color:#9ca3af;" x-text="zscoreError"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Erro consulta -->
+<div class="section-box" x-show="consultaError" style="max-width:700px;">
+    <div style="padding:1rem; background:#fef2f2; border-radius:0.5rem; color:#dc2626; font-size:0.85rem;">
+        <i class="fas fa-exclamation-circle"></i> <span x-text="consultaError"></span>
+    </div>
+</div>
+
+<!-- Watchlist Top 10 -->
+<div class="section-box">
+    <div class="section-box-title"><i class="fas fa-star"></i> Watchlist Top 10 — Melhores Scores</div>
+    <div x-show="watchlist.length > 0">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Ticker</th>
+                    <th class="col-right">Preço Atual</th>
+                    <th class="col-right">Preço Teto</th>
+                    <th class="col-right">Margem</th>
+                    <th class="col-center">Buy Score</th>
+                    <th class="col-center">Sinal</th>
+                    <th class="col-center">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="(item, idx) in watchlist" :key="item.ticker">
+                    <tr>
+                        <td style="color:#9ca3af;" x-text="idx + 1"></td>
+                        <td>
+                            <a :href="'/dashboard/ativo/' + item.ticker" class="badge badge-neutro"
+                               x-text="item.ticker" style="text-decoration:none; font-weight:700;"></a>
+                        </td>
+                        <td class="col-right" x-text="formatMoney(item.preco_atual)"></td>
+                        <td class="col-right" x-text="formatMoney(item.preco_teto)"></td>
+                        <td class="col-right">
+                            <span :class="item.preco_teto > item.preco_atual ? 'positivo' : 'negativo'"
+                                  x-text="item.preco_teto && item.preco_atual ? ((item.preco_teto - item.preco_atual) / item.preco_atual * 100).toFixed(1) + '%' : '-'"></span>
+                        </td>
+                        <td class="col-center">
+                            <span style="font-weight:700; font-size:1.1rem;"
+                                  :style="{ color: item.buy_score >= 70 ? '#16a34a' : item.buy_score >= 40 ? '#ca8a04' : '#dc2626' }"
+                                  x-text="item.buy_score"></span>
+                        </td>
+                        <td class="col-center">
+                            <span class="badge"
+                                  :class="item.buy_score >= 70 ? 'badge-success' : item.buy_score >= 40 ? 'badge-warning' : 'badge-danger'"
+                                  x-text="item.buy_score >= 70 ? 'Compra' : item.buy_score >= 40 ? 'Neutro' : 'Venda'"></span>
+                        </td>
+                        <td class="col-center">
+                            <button class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                    @click="tickerConsulta = item.ticker; consultarScore()">
+                                <i class="fas fa-chart-line"></i> Detalhar
+                            </button>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="empty-state" x-show="!loading && watchlist.length === 0">
+        <div class="empty-state-icon"><i class="fas fa-star"></i></div>
+        <div class="empty-state-title">Nenhum ativo na watchlist</div>
+        <div class="empty-state-text">A watchlist top 10 será exibida quando houver ativos com score calculado.</div>
+    </div>
+</div>
+
+<!-- Nota metodológica -->
+<div style="padding:0.75rem 1rem; background:#eff6ff; border-radius:0.5rem; border:1px solid #bfdbfe; font-size:0.85rem; color:#1d4ed8;">
+    <i class="fas fa-info-circle"></i>
+    <strong>Metodologia:</strong> O Buy Score é calculado com base em critérios quantitativos (preço vs. valor justo, momentum, fundamentos). Não constitui recomendação de investimento.
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        watchlist: [],
+        tickerConsulta: '',
+        consultando: false,
+        scoreResultado: null,
+        margemResultado: null,
+        zscoreResultado: null,
+        zscoreError: '',
+        consultaError: '',
+
+        async loadData() {
+            try {
+                const res = await this.apiFetch('/api/buy-signals/watchlist-top');
+                this.watchlist = res?.data || [];
+                this.watchlist.sort((a, b) => (b.buy_score || 0) - (a.buy_score || 0));
+            } catch (e) {
+                console.error('Erro watchlist:', e);
+            }
+        },
+
+        async consultarScore() {
+            if (!this.tickerConsulta) return;
+            this.consultando = true;
+            this.scoreResultado = null;
+            this.margemResultado = null;
+            this.zscoreResultado = null;
+            this.zscoreError = '';
+            this.consultaError = '';
+
+            const ticker = this.tickerConsulta.toUpperCase();
+
+            try {
+                const [scoreRes, margemRes, zscoreRes] = await Promise.allSettled([
+                    this.apiFetch('/api/buy-signals/buy-score/' + ticker),
+                    this.apiFetch('/api/buy-signals/margem-seguranca/' + ticker),
+                    this.apiFetch('/api/buy-signals/zscore/' + ticker)
+                ]);
+
+                if (scoreRes.status === 'fulfilled' && scoreRes.value?.success !== false) {
+                    this.scoreResultado = scoreRes.value?.data || scoreRes.value;
+                } else {
+                    const msg = scoreRes.status === 'fulfilled' ? (scoreRes.value?.error || scoreRes.value?.message) : scoreRes.reason;
+                    this.consultaError = 'Erro ao consultar score: ' + (msg || 'Ticker não encontrado');
+                    this.consultando = false;
+                    return;
+                }
+
+                if (margemRes.status === 'fulfilled' && margemRes.value?.success !== false) {
+                    this.margemResultado = margemRes.value?.data || margemRes.value;
+                }
+
+                if (zscoreRes.status === 'fulfilled' && zscoreRes.value?.success !== false) {
+                    this.zscoreResultado = zscoreRes.value?.data || zscoreRes.value;
+                } else {
+                    const msg = zscoreRes.status === 'fulfilled' ? (zscoreRes.value?.error || zscoreRes.value?.message) : '';
+                    this.zscoreError = msg || 'Z-Score indisponível';
+                }
+            } catch (e) {
+                this.consultaError = e.message || 'Erro de conexão';
+            } finally {
+                this.consultando = false;
+            }
+        }
+    };
+}
+</script>
+{% endblock %}

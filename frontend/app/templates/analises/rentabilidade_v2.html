@@ -1,0 +1,209 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Rentabilidade{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Desempenho da carteira — TWR, MWR e comparação com benchmark</p>{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="dados">
+    <div class="kpi-card">
+        <div class="kpi-card-label">TWR (Time-Weighted)</div>
+        <div class="kpi-card-value" :class="(dados?.twr_percentual || 0) >= 0 ? 'positivo' : 'negativo'"
+             x-text="dados ? (dados.twr_percentual?.toFixed(2) || '0.00') + '%' : '-'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">MWR (Money-Weighted)</div>
+        <div class="kpi-card-value" :class="(dados?.mwr_percentual || 0) >= 0 ? 'positivo' : 'negativo'"
+             x-text="dados ? (dados.mwr_percentual?.toFixed(2) || '0.00') + '%' : '-'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Benchmark</div>
+        <div class="kpi-card-value"
+             x-text="dados?.benchmark?.retorno_percentual != null ? dados.benchmark.retorno_percentual.toFixed(2) + '%' : 'N/D'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Alpha</div>
+        <div class="kpi-card-value" :class="(dados?.alpha_percentual || 0) >= 0 ? 'positivo' : 'negativo'"
+             x-text="dados?.alpha_percentual != null ? dados.alpha_percentual.toFixed(2) + '%' : 'N/D'"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <span class="filter-label">Período:</span>
+    <template x-for="p in periodos" :key="p.value">
+        <button class="btn-exitus"
+                :class="periodo === p.value ? 'btn-exitus-primary' : 'btn-exitus-ghost'"
+                @click="periodo = p.value; calcular()"
+                x-text="p.label"></button>
+    </template>
+
+    <span class="filter-label" style="margin-left:1.5rem;">Benchmark:</span>
+    <template x-for="b in benchmarks" :key="b.value">
+        <button class="btn-exitus"
+                :class="benchmark === b.value ? 'btn-exitus-primary' : 'btn-exitus-ghost'"
+                @click="benchmark = b.value; calcular()"
+                x-text="b.label"></button>
+    </template>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Detalhes da Análise -->
+<div class="section-box" x-show="dados" x-cloak>
+    <div class="section-box-title"><i class="fas fa-chart-bar"></i> Resultado Detalhado</div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:1rem;">
+        <!-- Comparação visual -->
+        <div style="background:#f8fafc; border-radius:0.75rem; padding:1.25rem;">
+            <div style="font-weight:700; margin-bottom:1rem; font-size:0.9rem;">Carteira vs Benchmark</div>
+
+            <!-- TWR Bar -->
+            <div style="margin-bottom:1rem;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.25rem;">
+                    <span>TWR (Carteira)</span>
+                    <span :class="(dados?.twr_percentual || 0) >= 0 ? 'positivo' : 'negativo'"
+                          x-text="(dados?.twr_percentual?.toFixed(2) || '0.00') + '%'"></span>
+                </div>
+                <div style="width:100%; background:#e2e8f0; border-radius:9999px; height:10px;">
+                    <div style="height:10px; border-radius:9999px; transition:width 0.5s;"
+                         :style="{
+                            width: Math.min(Math.abs(dados?.twr_percentual || 0), 100) + '%',
+                            background: (dados?.twr_percentual || 0) >= 0 ? '#22c55e' : '#ef4444'
+                         }"></div>
+                </div>
+            </div>
+
+            <!-- MWR Bar -->
+            <div style="margin-bottom:1rem;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.25rem;">
+                    <span>MWR (Fluxo Real)</span>
+                    <span :class="(dados?.mwr_percentual || 0) >= 0 ? 'positivo' : 'negativo'"
+                          x-text="(dados?.mwr_percentual?.toFixed(2) || '0.00') + '%'"></span>
+                </div>
+                <div style="width:100%; background:#e2e8f0; border-radius:9999px; height:10px;">
+                    <div style="height:10px; border-radius:9999px; transition:width 0.5s;"
+                         :style="{
+                            width: Math.min(Math.abs(dados?.mwr_percentual || 0), 100) + '%',
+                            background: (dados?.mwr_percentual || 0) >= 0 ? '#3b82f6' : '#ef4444'
+                         }"></div>
+                </div>
+            </div>
+
+            <!-- Benchmark Bar -->
+            <div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.25rem;">
+                    <span x-text="dados?.benchmark?.nome || benchmark"></span>
+                    <span x-text="dados?.benchmark?.retorno_percentual != null ? dados.benchmark.retorno_percentual.toFixed(2) + '%' : 'N/D'"></span>
+                </div>
+                <div style="width:100%; background:#e2e8f0; border-radius:9999px; height:10px;">
+                    <div style="height:10px; border-radius:9999px; transition:width 0.5s; background:#a855f7;"
+                         :style="{ width: dados?.benchmark?.retorno_percentual != null ? Math.min(Math.abs(dados.benchmark.retorno_percentual), 100) + '%' : '0%' }"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info do Período -->
+        <div style="background:#f8fafc; border-radius:0.75rem; padding:1.25rem;">
+            <div style="font-weight:700; margin-bottom:1rem; font-size:0.9rem;">Período Analisado</div>
+            <div style="display:grid; gap:0.75rem;">
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding-bottom:0.5rem; border-bottom:1px solid #e2e8f0;">
+                    <span style="color:#6b7280;">Início</span>
+                    <span style="font-weight:600;" x-text="formatDate(dados?.data_inicio)"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding-bottom:0.5rem; border-bottom:1px solid #e2e8f0;">
+                    <span style="color:#6b7280;">Fim</span>
+                    <span style="font-weight:600;" x-text="formatDate(dados?.data_fim)"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding-bottom:0.5rem; border-bottom:1px solid #e2e8f0;">
+                    <span style="color:#6b7280;">Dias</span>
+                    <span style="font-weight:600;" x-text="(dados?.dias || 0) + ' dias'"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding-bottom:0.5rem; border-bottom:1px solid #e2e8f0;">
+                    <span style="color:#6b7280;">Fluxos de Caixa</span>
+                    <span style="font-weight:600;" x-text="dados?.total_fluxos || 0"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                    <span style="color:#6b7280;">Alpha</span>
+                    <span style="font-weight:700;"
+                          :class="(dados?.alpha_percentual || 0) >= 0 ? 'positivo' : 'negativo'"
+                          x-text="dados?.alpha_percentual != null ? (dados.alpha_percentual >= 0 ? '+' : '') + dados.alpha_percentual.toFixed(2) + '%' : 'N/D'"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Explicação -->
+<div style="padding:0.75rem 1rem; background:#eff6ff; border-radius:0.5rem; border:1px solid #bfdbfe; font-size:0.85rem; color:#1d4ed8;">
+    <i class="fas fa-info-circle"></i>
+    <strong>TWR</strong> (Time-Weighted Return): mede desempenho eliminando efeito de aportes/retiradas — ideal para comparar com benchmarks.
+    <strong>MWR</strong> (Money-Weighted Return): considera timing dos fluxos — reflete retorno real do investidor.
+</div>
+
+<!-- Empty / Error States -->
+<div class="section-box" x-show="!loading && !dados && !error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="empty-state-title">Nenhum dado de rentabilidade</div>
+        <div class="empty-state-text">Selecione um período acima para calcular a rentabilidade da carteira.</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        dados: null,
+        periodo: '6m',
+        benchmark: 'CDI',
+        periodos: [
+            { value: '1m', label: '1M' },
+            { value: '3m', label: '3M' },
+            { value: '6m', label: '6M' },
+            { value: '12m', label: '12M' },
+            { value: 'ytd', label: 'YTD' },
+            { value: 'max', label: 'MAX' }
+        ],
+        benchmarks: [
+            { value: 'CDI', label: 'CDI' },
+            { value: 'IBOV', label: 'IBOV' },
+            { value: 'IFIX', label: 'IFIX' },
+            { value: 'SP500', label: 'S&P500' },
+            { value: 'IPCA6', label: 'IPCA+6' }
+        ],
+
+        async loadData() {
+            await this.calcular();
+        },
+
+        async calcular() {
+            this.loading = true;
+            this.error = '';
+            try {
+                const res = await this.apiFetch(
+                    '/api/portfolios/rentabilidade?periodo=' + this.periodo + '&benchmark=' + this.benchmark
+                );
+                if (res?.success !== false) {
+                    this.dados = res?.data || res;
+                } else {
+                    this.error = res?.error || res?.message || 'Erro ao calcular';
+                }
+            } catch (e) {
+                this.error = e.message || 'Erro de conexão';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        formatDate(d) {
+            if (!d) return '-';
+            const parts = d.split('-');
+            if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+            return d;
+        }
+    };
+}
+</script>
+{% endblock %}

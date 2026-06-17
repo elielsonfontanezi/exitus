@@ -1,0 +1,367 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Alertas{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Monitoramento de preço, dividendos e eventos</p>{% endblock %}
+
+{% block page_actions %}
+<button class="btn-exitus btn-exitus-primary" @click="showModal = true">
+    <i class="fas fa-plus"></i> Novo Alerta
+</button>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Total de Alertas</div>
+        <div class="kpi-card-value" x-text="alertas.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos</div>
+        <div class="kpi-card-value positivo" x-text="alertas.filter(a => a.ativo).length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Inativos</div>
+        <div class="kpi-card-value" x-text="alertas.filter(a => !a.ativo).length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Já Acionados</div>
+        <div class="kpi-card-value" x-text="alertas.filter(a => a.total_acionamentos > 0).length"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar" x-show="!loading">
+    <span class="filter-label">Filtrar:</span>
+    <input type="text" class="filter-input" placeholder="Buscar ticker ou nome..."
+           x-model="filtroTexto" @input.debounce.300ms="filtrar()">
+    <select class="filter-select" x-model="filtroTipo" @change="filtrar()">
+        <option value="">Todos os tipos</option>
+        <option value="PRECO_ALVO">Preço Alvo</option>
+        <option value="STOP_LOSS">Stop Loss</option>
+        <option value="DIVIDENDO">Dividendo</option>
+    </select>
+    <select class="filter-select" x-model="filtroStatus" @change="filtrar()">
+        <option value="">Todos</option>
+        <option value="ativo">Ativos</option>
+        <option value="inativo">Inativos</option>
+    </select>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Tabela de Alertas -->
+<div class="section-box" x-show="alertasFiltrados.length > 0">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="sortable" @click="ordenar('nome')">Nome</th>
+                <th>Ticker</th>
+                <th>Tipo</th>
+                <th class="col-center">Condição</th>
+                <th class="col-center">Status</th>
+                <th class="col-center">Acion.</th>
+                <th>Frequência</th>
+                <th class="col-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="alerta in alertasFiltrados" :key="alerta.id">
+                <tr>
+                    <td>
+                        <span class="cell-ticker" x-text="alerta.nome"></span>
+                    </td>
+                    <td>
+                        <a :href="'/dashboard/ativo/' + alerta.ticker" class="badge badge-neutro"
+                           x-text="alerta.ticker" style="text-decoration:none;"></a>
+                    </td>
+                    <td>
+                        <span style="font-size:0.8rem;" x-text="tipoLabel(alerta.tipo_alerta)"></span>
+                    </td>
+                    <td class="col-center" style="font-family:monospace;">
+                        <span x-text="alerta.condicao_operador + ' ' + formatMoney(alerta.condicao_valor)"></span>
+                    </td>
+                    <td class="col-center">
+                        <button class="badge" style="cursor:pointer; border:none;"
+                                :class="alerta.ativo ? 'badge-success' : 'badge-danger'"
+                                @click="toggleAlerta(alerta)"
+                                :title="alerta.ativo ? 'Clique para desativar' : 'Clique para ativar'"
+                                x-text="alerta.ativo ? 'Ativo' : 'Inativo'"></button>
+                    </td>
+                    <td class="col-center">
+                        <span x-show="alerta.total_acionamentos > 0" class="badge badge-warning"
+                              x-text="alerta.total_acionamentos + 'x'"></span>
+                        <span x-show="!alerta.total_acionamentos" class="text-gray-400">—</span>
+                    </td>
+                    <td style="font-size:0.85rem;" x-text="frequenciaLabel(alerta.frequencia_notificacao)"></td>
+                    <td class="col-center">
+                        <div class="action-menu" x-data="{ open: false }">
+                            <button class="action-menu-btn" @click="open = !open" @click.away="open = false">⋯</button>
+                            <div class="action-menu-dropdown" :class="{ show: open }">
+                                <button class="action-menu-item" @click="open = false; toggleAlerta(alerta)">
+                                    <i class="fas" :class="alerta.ativo ? 'fa-pause' : 'fa-play'"></i>
+                                    <span x-text="alerta.ativo ? 'Desativar' : 'Ativar'"></span>
+                                </button>
+                                <button class="action-menu-item" style="color:var(--exitus-danger);"
+                                        @click="open = false; confirmarExclusao(alerta)">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<!-- Empty State -->
+<div class="section-box" x-show="!loading && alertasFiltrados.length === 0 && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-bell-slash"></i></div>
+        <div class="empty-state-title">Nenhum alerta encontrado</div>
+        <div class="empty-state-text" x-show="filtroTexto || filtroTipo || filtroStatus">
+            Tente ajustar os filtros.
+        </div>
+        <div class="empty-state-text" x-show="!filtroTexto && !filtroTipo && !filtroStatus">
+            Crie seu primeiro alerta clicando no botão acima.
+        </div>
+    </div>
+</div>
+
+<!-- Error State -->
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle text-red-500"></i></div>
+        <div class="empty-state-title">Erro ao carregar dados</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadData()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+
+<!-- Modal Criar Alerta -->
+<div x-show="showModal" x-cloak
+     style="position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;"
+     @click.self="showModal = false">
+    <div style="background:white; border-radius:0.75rem; padding:2rem; width:100%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <h3 style="margin:0 0 1.5rem; font-size:1.125rem; font-weight:700;">
+            <i class="fas fa-bell"></i> Novo Alerta
+        </h3>
+
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div>
+                <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Nome do Alerta</label>
+                <input type="text" class="filter-input" style="width:100%;" x-model="novoAlerta.nome"
+                       placeholder="Ex: PETR4 atingiu preço teto">
+            </div>
+            <div>
+                <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Ticker</label>
+                <input type="text" class="filter-input" style="width:100%;" x-model="novoAlerta.ticker"
+                       placeholder="Ex: PETR4" @input="novoAlerta.ticker = novoAlerta.ticker.toUpperCase()">
+            </div>
+            <div>
+                <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Tipo</label>
+                <select class="filter-select" style="width:100%;" x-model="novoAlerta.tipo_alerta">
+                    <option value="PRECO_ALVO">Preço Alvo</option>
+                    <option value="STOP_LOSS">Stop Loss</option>
+                    <option value="DIVIDENDO">Dividendo</option>
+                </select>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 2fr; gap:0.5rem;">
+                <div>
+                    <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Operador</label>
+                    <select class="filter-select" style="width:100%;" x-model="novoAlerta.condicao_operador">
+                        <option value=">=">≥</option>
+                        <option value="<=">≤</option>
+                        <option value=">">&gt;</option>
+                        <option value="<">&lt;</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Valor (R$)</label>
+                    <input type="number" step="0.01" class="filter-input" style="width:100%;"
+                           x-model.number="novoAlerta.condicao_valor" placeholder="0.00">
+                </div>
+            </div>
+            <div>
+                <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Frequência</label>
+                <select class="filter-select" style="width:100%;" x-model="novoAlerta.frequencia_notificacao">
+                    <option value="UNICA">Única vez</option>
+                    <option value="DIARIA">Diária</option>
+                    <option value="SEMANAL">Semanal</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Feedback -->
+        <div x-show="modalError" style="margin-top:1rem; padding:0.75rem; background:#fef2f2; border-radius:0.5rem; color:#dc2626; font-size:0.85rem;">
+            <i class="fas fa-exclamation-circle"></i> <span x-text="modalError"></span>
+        </div>
+        <div x-show="modalSuccess" style="margin-top:1rem; padding:0.75rem; background:#f0fdf4; border-radius:0.5rem; color:#16a34a; font-size:0.85rem;">
+            <i class="fas fa-check-circle"></i> <span x-text="modalSuccess"></span>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1.5rem;">
+            <button class="btn-exitus btn-exitus-ghost" @click="showModal = false; resetModal()">Cancelar</button>
+            <button class="btn-exitus btn-exitus-primary" @click="criarAlerta()" :disabled="criando">
+                <i class="fas fa-save"></i>
+                <span x-text="criando ? 'Salvando...' : 'Criar Alerta'"></span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        alertas: [],
+        alertasFiltrados: [],
+        filtroTexto: '',
+        filtroTipo: '',
+        filtroStatus: '',
+        ordenarPor: 'nome',
+        ordenarDir: 'asc',
+        showModal: false,
+        criando: false,
+        modalError: '',
+        modalSuccess: '',
+        novoAlerta: {
+            nome: '',
+            ticker: '',
+            tipo_alerta: 'PRECO_ALVO',
+            condicao_operador: '>=',
+            condicao_valor: null,
+            frequencia_notificacao: 'UNICA'
+        },
+
+        async loadData() {
+            const res = await this.apiFetch('/api/alertas');
+            this.alertas = res?.data || [];
+            this.filtrar();
+        },
+
+        filtrar() {
+            let result = [...this.alertas];
+
+            if (this.filtroTexto) {
+                const q = this.filtroTexto.toLowerCase();
+                result = result.filter(a =>
+                    (a.nome || '').toLowerCase().includes(q) ||
+                    (a.ticker || '').toLowerCase().includes(q)
+                );
+            }
+            if (this.filtroTipo) {
+                result = result.filter(a => a.tipo_alerta === this.filtroTipo);
+            }
+            if (this.filtroStatus === 'ativo') {
+                result = result.filter(a => a.ativo);
+            } else if (this.filtroStatus === 'inativo') {
+                result = result.filter(a => !a.ativo);
+            }
+
+            result.sort((a, b) => {
+                let va = (a[this.ordenarPor] || '').toString().toLowerCase();
+                let vb = (b[this.ordenarPor] || '').toString().toLowerCase();
+                if (va < vb) return this.ordenarDir === 'asc' ? -1 : 1;
+                if (va > vb) return this.ordenarDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            this.alertasFiltrados = result;
+        },
+
+        ordenar(campo) {
+            if (this.ordenarPor === campo) {
+                this.ordenarDir = this.ordenarDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.ordenarPor = campo;
+                this.ordenarDir = 'asc';
+            }
+            this.filtrar();
+        },
+
+        async toggleAlerta(alerta) {
+            try {
+                const res = await this.apiFetch('/api/alertas/' + alerta.id + '/toggle', { method: 'PATCH' });
+                if (res?.success !== false) {
+                    alerta.ativo = !alerta.ativo;
+                    this.filtrar();
+                } else {
+                    alert('Erro ao alterar status: ' + (res?.message || 'Erro desconhecido'));
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        },
+
+        async confirmarExclusao(alerta) {
+            if (!confirm('Excluir alerta "' + alerta.nome + '"? Esta ação não pode ser desfeita.')) return;
+            try {
+                const res = await this.apiFetch('/api/alertas/' + alerta.id, { method: 'DELETE' });
+                if (res?.success !== false) {
+                    this.alertas = this.alertas.filter(a => a.id !== alerta.id);
+                    this.filtrar();
+                } else {
+                    alert('Erro ao excluir: ' + (res?.message || 'Erro desconhecido'));
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        },
+
+        async criarAlerta() {
+            this.modalError = '';
+            this.modalSuccess = '';
+
+            if (!this.novoAlerta.nome || !this.novoAlerta.ticker || !this.novoAlerta.condicao_valor) {
+                this.modalError = 'Preencha todos os campos obrigatórios.';
+                return;
+            }
+
+            this.criando = true;
+            try {
+                const res = await this.apiFetch('/api/alertas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(this.novoAlerta)
+                });
+                if (res?.success !== false) {
+                    this.modalSuccess = 'Alerta criado com sucesso!';
+                    await this.loadData();
+                    setTimeout(() => { this.showModal = false; this.resetModal(); }, 1200);
+                } else {
+                    this.modalError = res?.message || 'Erro ao criar alerta.';
+                }
+            } catch (e) {
+                this.modalError = e.message || 'Erro de conexão.';
+            } finally {
+                this.criando = false;
+            }
+        },
+
+        resetModal() {
+            this.novoAlerta = {
+                nome: '', ticker: '', tipo_alerta: 'PRECO_ALVO',
+                condicao_operador: '>=', condicao_valor: null, frequencia_notificacao: 'UNICA'
+            };
+            this.modalError = '';
+            this.modalSuccess = '';
+        },
+
+        tipoLabel(tipo) {
+            const map = { 'PRECO_ALVO': 'Preço Alvo', 'STOP_LOSS': 'Stop Loss', 'DIVIDENDO': 'Dividendo' };
+            return map[tipo] || tipo || '-';
+        },
+
+        frequenciaLabel(freq) {
+            const map = { 'UNICA': 'Única', 'DIARIA': 'Diária', 'SEMANAL': 'Semanal' };
+            return map[freq] || freq || '-';
+        }
+    };
+}
+</script>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Exportar Dados{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Download dos seus dados em CSV, Excel ou PDF</p>{% endblock %}
+
+{% block page_content %}
+<div class="section-box" style="max-width:700px;">
+    <div class="section-box-title"><i class="fas fa-download"></i> Configurar Exportação</div>
+
+    <!-- Seletor de Entidade -->
+    <div style="display:flex; flex-direction:column; gap:1.25rem; margin-top:1rem;">
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.5rem;">O que exportar?</label>
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.75rem;">
+                <button class="btn-exitus" style="padding:1rem; text-align:center;"
+                        :class="entidade === 'transacoes' ? 'btn-exitus-primary' : 'btn-exitus-ghost'"
+                        @click="entidade = 'transacoes'">
+                    <i class="fas fa-exchange-alt" style="display:block; font-size:1.5rem; margin-bottom:0.5rem;"></i>
+                    Transações
+                </button>
+                <button class="btn-exitus" style="padding:1rem; text-align:center;"
+                        :class="entidade === 'proventos' ? 'btn-exitus-primary' : 'btn-exitus-ghost'"
+                        @click="entidade = 'proventos'">
+                    <i class="fas fa-coins" style="display:block; font-size:1.5rem; margin-bottom:0.5rem;"></i>
+                    Proventos
+                </button>
+                <button class="btn-exitus" style="padding:1rem; text-align:center;"
+                        :class="entidade === 'posicoes' ? 'btn-exitus-primary' : 'btn-exitus-ghost'"
+                        @click="entidade = 'posicoes'">
+                    <i class="fas fa-briefcase" style="display:block; font-size:1.5rem; margin-bottom:0.5rem;"></i>
+                    Posições
+                </button>
+            </div>
+        </div>
+
+        <!-- Formato -->
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.5rem;">Formato</label>
+            <div style="display:flex; gap:0.75rem;">
+                <button class="btn-exitus" :class="formato === 'csv' ? 'btn-exitus-primary' : 'btn-exitus-ghost'"
+                        @click="formato = 'csv'">
+                    <i class="fas fa-file-csv"></i> CSV
+                </button>
+                <button class="btn-exitus" :class="formato === 'excel' ? 'btn-exitus-primary' : 'btn-exitus-ghost'"
+                        @click="formato = 'excel'">
+                    <i class="fas fa-file-excel"></i> Excel
+                </button>
+                <button class="btn-exitus" :class="formato === 'pdf' ? 'btn-exitus-primary' : 'btn-exitus-ghost'"
+                        @click="formato = 'pdf'">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtros de data (para transações e proventos) -->
+        <div x-show="entidade !== 'posicoes'" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div>
+                <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Data Início</label>
+                <input type="date" class="filter-input" style="width:100%;" x-model="dataInicio">
+            </div>
+            <div>
+                <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Data Fim</label>
+                <input type="date" class="filter-input" style="width:100%;" x-model="dataFim">
+            </div>
+        </div>
+
+        <!-- Botão Download -->
+        <div style="margin-top:0.5rem;">
+            <button class="btn-exitus btn-exitus-primary" style="width:100%; padding:0.875rem;"
+                    @click="exportar()" :disabled="exportando">
+                <i class="fas" :class="exportando ? 'fa-spinner fa-spin' : 'fa-download'"></i>
+                <span x-text="exportando ? 'Baixando...' : 'Baixar ' + formato.toUpperCase()"></span>
+            </button>
+        </div>
+
+        <!-- Feedback -->
+        <div x-show="exportError" style="padding:0.75rem; background:#fef2f2; border-radius:0.5rem; color:#dc2626; font-size:0.85rem;">
+            <i class="fas fa-exclamation-circle"></i> <span x-text="exportError"></span>
+        </div>
+        <div x-show="exportSuccess" style="padding:0.75rem; background:#f0fdf4; border-radius:0.5rem; color:#16a34a; font-size:0.85rem;">
+            <i class="fas fa-check-circle"></i> <span x-text="exportSuccess"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Info -->
+<div style="max-width:700px; margin-top:1rem; padding:0.75rem 1rem; background:#f0f9ff; border-radius:0.5rem; border:1px solid #bae6fd; font-size:0.85rem; color:#0369a1;">
+    <i class="fas fa-info-circle"></i>
+    O download é gerado diretamente pela API backend. Seus dados não passam por servidores externos.
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        entidade: 'transacoes',
+        formato: 'csv',
+        dataInicio: '',
+        dataFim: '',
+        exportando: false,
+        exportError: '',
+        exportSuccess: '',
+
+        async loadData() {
+            this.loading = false;
+        },
+
+        async exportar() {
+            this.exportError = '';
+            this.exportSuccess = '';
+            this.exportando = true;
+
+            try {
+                let url = '/api/export/' + this.entidade + '?formato=' + this.formato;
+                if (this.dataInicio && this.entidade !== 'posicoes') url += '&data_inicio=' + this.dataInicio;
+                if (this.dataFim && this.entidade !== 'posicoes') url += '&data_fim=' + this.dataFim;
+
+                const fullUrl = (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:5000') + url;
+                const token = this.getToken();
+
+                const response = await fetch(fullUrl, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.message || 'Erro HTTP ' + response.status);
+                }
+
+                const blob = await response.blob();
+                const ext = this.formato === 'excel' ? 'xlsx' : this.formato;
+                const filename = 'exitus_' + this.entidade + '.' + ext;
+
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(a.href);
+
+                this.exportSuccess = 'Download de ' + filename + ' iniciado!';
+            } catch (e) {
+                this.exportError = e.message || 'Erro ao exportar';
+            } finally {
+                this.exportando = false;
+            }
+        }
+    };
+}
+</script>
+{% endblock %}

@@ -1358,6 +1358,10 @@ body {
   transform: rotate(180deg);
 }
 
+.dropdown-toggle.no-arrow::after {
+  content: none;
+}
+
 .dropdown-menu {
   position: absolute;
   top: 100%;
