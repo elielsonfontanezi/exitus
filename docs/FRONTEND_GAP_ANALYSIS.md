@@ -28,21 +28,67 @@
 
 ---
 
-### 🎯 Fase 2 — Dashboard reformulado (PRÓXIMA)
+### ✅ Fase 2 — Dashboard reformulado (CONCLUÍDA — 17/06/2026)
 *Atualizar o template `dashboard/index.html` para usar dados que a API já retorna mas o template ignora.*
 
 > **Nota:** inspeção mostrou que o dashboard já entrega mais do que o esperado.
-> Itens G18 (Top 5 por mercado ✅, toggle BRL/USD ✅, alertas recentes ✅) já implementados.
-> A Fase 2 foi reduzida a ajustes finos.
+> Itens G18 (Top 5 por mercado ✅, toggle BRL/USD ✅, alertas recentes ✅, alocação pizza ✅) já implementados.
 
-- [ ] Confirmar quais seções do dashboard ainda estão incompletas (inspecionar template)
-- [ ] Renderizar `alocacao_geografica` no gráfico pizza (BR/US/INTL)
-- [ ] Verificar se toggle BRL/USD está funcional ou só visual
+- [x] Confirmar quais seções do dashboard ainda estão incompletas → removidos 5 cards com dados falsos
+- [x] Renderizar `alocacao_geografica` no gráfico pizza (BR/US/INTL) → já estava funcionando
+- [x] Verificar se toggle BRL/USD está funcional → funcional (toggleMoeda)
+- [x] Remover botões de ação rápida (Nova Operação, Vender, Depositar, Ver Análises)
+
+---
+
+### 🎯 Fase 2.5 — Padronização Visual (PRÓXIMA — pré-requisito da Fase 3)
+*Criar base template e CSS compartilhado para que todas as telas novas nasçam no padrão Investidor10.*
+
+> **Investigação realizada em 17/06/2026** — Telas analisadas no Investidor10:
+> Carteira/Resumo, Proventos, Gráficos, Análise, Lançamentos, Metas, Ações (PETR4), FIIs.
+
+#### Padrões visuais do Investidor10 a replicar:
+
+| Elemento | Padrão Investidor10 | Nosso estado atual |
+|----------|--------------------|--------------------|
+| **Header de métricas** | Barra escura fixa com 3-4 KPIs condensados | ✅ Já temos (resumo-patrimonio) |
+| **Abas internas** | Barra horizontal de abas por módulo | ❌ Não temos — cada tela é isolada |
+| **Tabelas** | Sem borda lateral, header fixo, hover sutil, cores verde/vermelho | ⚠️ Parcial |
+| **Filtros** | Dropdowns inline acima da tabela (período, tipo, ativo) | ❌ Ausentes |
+| **Gráficos** | Barras + linhas sobrepostas, legenda acima, sem moldura | ⚠️ Parcial |
+| **Fundo** | Branco puro `#fff` com separação por espaçamento | ⚠️ Usamos `#f8f9fa` |
+| **Cards** | Mínimo de sombra, separação por espaço branco | ⚠️ Usamos sombra |
+| **Ações por linha** | Botão `⋯` contextual | ❌ Não temos |
+| **Progresso** | Barra horizontal com % e valores | ✅ Meta de patrimônio |
+
+#### Artefatos a criar:
+
+- [ ] **`templates/components/base_interna.html`** — extends `base.html`, inclui:
+  - CSS do design system (classes compartilhadas)
+  - Componente de abas reutilizável
+  - Componente de filtros inline
+  - Padrão de tabela (`.table-investidor10`)
+  - Loading skeleton padrão
+- [ ] **`static/css/exitus-components.css`** — CSS extraído do dashboard + novos componentes:
+  - `.card-metrica` / `.section-box` / `.data-table`
+  - `.tab-bar` / `.tab-active`
+  - `.filter-bar` / `.filter-dropdown`
+  - `.badge-positivo` / `.badge-negativo`
+  - `.action-menu` (three dots)
+- [ ] Documentar paleta final no topo do CSS como variáveis
+
+#### Decisões de design:
+
+1. **Fundo:** Manter `#f8f9fa` (diferencia do Investidor10 propositalmente — nosso é mais acolhedor)
+2. **Sombra:** Reduzir para `box-shadow: 0 1px 3px rgba(0,0,0,0.08)` (mais sutil)
+3. **Abas:** Adotar em todas as telas que tenham sub-seções (Carteira, Análises, Fiscal)
+4. **Tabelas:** Adotar padrão sem borda lateral, com hover e ações `⋯`
+5. **Cor primária:** Manter `#a38c65` — já é idêntico ao Investidor10
 
 ---
 
 ### 🔵 Fase 3 — Telas novas (alta prioridade)
-*APIs prontas no backend, telas inexistentes no frontend.*
+*APIs prontas no backend, telas inexistentes no frontend. Usar `base_interna.html`.*
 
 - [ ] **`carteira.py`** → `/carteira/posicoes` (G4) + `/carteira/movimentacoes` (G6)
 - [ ] **`configuracoes.py`** → `/configuracoes/perfil` (G1) + `/configuracoes/corretoras` (G1)
@@ -72,7 +118,7 @@
 
 ---
 
-## �📊 Índice de Grupos
+## �� Índice de Grupos
 
 | # | Grupo | APIs disponíveis | Frontend atual | GAPs | Prioridade |
 |---|-------|-----------------|----------------|------|-----------|
