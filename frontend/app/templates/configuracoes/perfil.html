@@ -1,0 +1,81 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Meu Perfil{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Informações da sua conta</p>{% endblock %}
+
+{% block tabs %}
+<div class="tab-bar">
+    <a href="/configuracoes/perfil" class="tab-item active">Perfil</a>
+    <a href="/configuracoes/corretoras" class="tab-item">Minhas Corretoras</a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" style="max-width: 600px;">
+    <div class="section-box-title"><i class="fas fa-user"></i> Dados do Usuário</div>
+
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <!-- Nome -->
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Nome Completo</label>
+            <div class="filter-input" style="background:#f8f9fa; padding:0.625rem 0.75rem; cursor:default;"
+                 x-text="perfil.nome_completo || '-'"></div>
+        </div>
+
+        <!-- Username -->
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Username</label>
+            <div class="filter-input" style="background:#f8f9fa; padding:0.625rem 0.75rem; cursor:default;"
+                 x-text="perfil.username || '-'"></div>
+        </div>
+
+        <!-- Email -->
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.25rem;">E-mail</label>
+            <div class="filter-input" style="background:#f8f9fa; padding:0.625rem 0.75rem; cursor:default;"
+                 x-text="perfil.email || '-'"></div>
+        </div>
+
+        <!-- Status -->
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Status</label>
+            <span class="badge" :class="perfil.ativo ? 'badge-success' : 'badge-danger'"
+                  x-text="perfil.ativo ? 'Ativo' : 'Inativo'"></span>
+        </div>
+
+        <!-- Membro desde -->
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Membro Desde</label>
+            <div class="filter-input" style="background:#f8f9fa; padding:0.625rem 0.75rem; cursor:default;"
+                 x-text="formatDate(perfil.created_at)"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Error State -->
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle text-red-500"></i></div>
+        <div class="empty-state-title">Erro ao carregar perfil</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadData()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        perfil: {},
+
+        async loadData() {
+            const res = await this.apiFetch('/api/auth/me');
+            this.perfil = res?.data || {};
+        }
+    };
+}
+</script>
+{% endblock %}

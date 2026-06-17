@@ -96,7 +96,7 @@
 *APIs prontas no backend, telas inexistentes no frontend. Usar `base_interna.html`.*
 
 - [x] **`carteira.py`** → `/carteira/posicoes` (G4) + `/carteira/movimentacoes` (G6) ✅ 17/06/2026
-- [ ] **`configuracoes.py`** → `/configuracoes/perfil` (G1) + `/configuracoes/corretoras` (G1)
+- [x] **`configuracoes.py`** → `/configuracoes/perfil` (G1) + `/configuracoes/corretoras` (G1) ✅ 17/06/2026
 - [x] **`/operacoes/historico`** → histórico de transações com filtros (G5) ✅ 17/06/2026
 - [ ] **`/ferramentas/reconciliacao`** → painel diagnóstico de integridade (G14)
 
