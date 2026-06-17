@@ -10,7 +10,69 @@
 
 ---
 
-## 📊 Índice de Grupos
+## �️ Plano de Execução por Fases
+
+> Status atualizado: **17/06/2026**
+
+### ✅ Fase 1 — Correções urgentes no menu (CONCLUÍDA — 16/06/2026)
+*Sem novas telas, só reorganização do `menu_horizontal.html`.*
+
+- [x] Remover "Planos" do menu (links 404)
+- [x] Mover "Alertas" para o sino do header
+- [x] Elevar "Fiscal" de sub-item de Análises para nível 1
+- [x] Elevar "Proventos" de sub-item de Análises para nível 1
+- [x] Criar "Carteira" como item nível 1 (Posições + Movimentações)
+- [x] Expandir "Operações" com item Histórico
+- [x] Adicionar "Reconciliação" em Ferramentas
+- [x] Corrigir `/perfil` → `/configuracoes/perfil` e `/configuracoes` → `/configuracoes/corretoras`
+
+---
+
+### 🎯 Fase 2 — Dashboard reformulado (PRÓXIMA)
+*Atualizar o template `dashboard/index.html` para usar dados que a API já retorna mas o template ignora.*
+
+> **Nota:** inspeção mostrou que o dashboard já entrega mais do que o esperado.
+> Itens G18 (Top 5 por mercado ✅, toggle BRL/USD ✅, alertas recentes ✅) já implementados.
+> A Fase 2 foi reduzida a ajustes finos.
+
+- [ ] Confirmar quais seções do dashboard ainda estão incompletas (inspecionar template)
+- [ ] Renderizar `alocacao_geografica` no gráfico pizza (BR/US/INTL)
+- [ ] Verificar se toggle BRL/USD está funcional ou só visual
+
+---
+
+### 🔵 Fase 3 — Telas novas (alta prioridade)
+*APIs prontas no backend, telas inexistentes no frontend.*
+
+- [ ] **`carteira.py`** → `/carteira/posicoes` (G4) + `/carteira/movimentacoes` (G6)
+- [ ] **`configuracoes.py`** → `/configuracoes/perfil` (G1) + `/configuracoes/corretoras` (G1)
+- [ ] **`/operacoes/historico`** → histórico de transações com filtros (G5)
+- [ ] **`/ferramentas/reconciliacao`** → painel diagnóstico de integridade (G14)
+
+---
+
+### 🟡 Fase 4 — Expansões de telas existentes
+*Telas existem, mas usam parcialmente as APIs disponíveis.*
+
+- [ ] **Alertas** → adicionar criar / toggle ativo-inativo / excluir (G9)
+- [ ] **Exportação** → seletor formato + entidades (CSV/Excel/PDF) (G13)
+- [ ] **Buy Signals** → adicionar Watchlist Top 10 + Z-Score (G8)
+- [ ] **Calendário de Proventos** → botão gerar automático + confirmar pagamento (G7/G16)
+- [ ] **Rentabilidade** → seletor de período + seletor de benchmark (G12)
+
+---
+
+### ⚪ Fase 5 — Melhorias de menor prioridade
+*Bom ter, mas sem urgência.*
+
+- [ ] Detalhe de ativo com fundamentalistas (G3)
+- [ ] DIRPF — bens e direitos com dados reais (G11)
+- [ ] Eventos corporativos no detalhe do ativo (G15)
+- [ ] Planos de compra/venda — aguardando APIs backend (G10)
+
+---
+
+## �📊 Índice de Grupos
 
 | # | Grupo | APIs disponíveis | Frontend atual | GAPs | Prioridade |
 |---|-------|-----------------|----------------|------|-----------|
