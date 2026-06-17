@@ -41,7 +41,7 @@
 
 ---
 
-### 🎯 Fase 2.5 — Padronização Visual (PRÓXIMA — pré-requisito da Fase 3)
+### ✅ Fase 2.5 — Padronização Visual (CONCLUÍDA — 17/06/2026)
 *Criar base template e CSS compartilhado para que todas as telas novas nasçam no padrão Investidor10.*
 
 > **Investigação realizada em 17/06/2026** — Telas analisadas no Investidor10:
@@ -61,21 +61,26 @@
 | **Ações por linha** | Botão `⋯` contextual | ❌ Não temos |
 | **Progresso** | Barra horizontal com % e valores | ✅ Meta de patrimônio |
 
-#### Artefatos a criar:
+#### Artefatos criados:
 
-- [ ] **`templates/components/base_interna.html`** — extends `base.html`, inclui:
+- [x] **`templates/components/base_interna.html`** — extends `base.html`, inclui:
   - CSS do design system (classes compartilhadas)
-  - Componente de abas reutilizável
-  - Componente de filtros inline
-  - Padrão de tabela (`.table-investidor10`)
+  - Componente de abas reutilizável (bloco `tabs`)
+  - Componente de filtros inline (bloco `filters`)
+  - Padrão de tabela (`.data-table`)
   - Loading skeleton padrão
-- [ ] **`static/css/exitus-components.css`** — CSS extraído do dashboard + novos componentes:
-  - `.card-metrica` / `.section-box` / `.data-table`
-  - `.tab-bar` / `.tab-active`
-  - `.filter-bar` / `.filter-dropdown`
-  - `.badge-positivo` / `.badge-negativo`
-  - `.action-menu` (three dots)
-- [ ] Documentar paleta final no topo do CSS como variáveis
+  - Helpers JS: `apiFetch()`, `formatMoney()`, `formatPercent()`, `formatDate()`
+- [x] **`static/css/exitus-components.css`** — 400+ linhas com componentes:
+  - `.kpi-bar` / `.kpi-card` / `.section-box` / `.data-table`
+  - `.tab-bar` / `.tab-item` / `.tab-item.active`
+  - `.filter-bar` / `.filter-select` / `.filter-input`
+  - `.badge-positivo` / `.badge-negativo` / `.badge-neutro`
+  - `.action-menu` / `.action-menu-btn` / `.action-menu-dropdown`
+  - `.btn-exitus-primary` / `.btn-exitus-outline` / `.btn-exitus-ghost`
+  - `.progress-bar-container` / `.progress-bar-fill`
+  - `.empty-state` / `.skeleton-line` / `.skeleton-card`
+- [x] Paleta documentada no topo do CSS como variáveis `--exitus-*`
+- [x] CSS incluído globalmente via `base.html`
 
 #### Decisões de design:
 
@@ -87,7 +92,7 @@
 
 ---
 
-### 🔵 Fase 3 — Telas novas (alta prioridade)
+### 🎯 Fase 3 — Telas novas (PRÓXIMA)
 *APIs prontas no backend, telas inexistentes no frontend. Usar `base_interna.html`.*
 
 - [ ] **`carteira.py`** → `/carteira/posicoes` (G4) + `/carteira/movimentacoes` (G6)

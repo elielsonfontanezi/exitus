@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{# =============================================================
+ # base_interna.html — Template base para telas internas Exitus
+ # Estende base.html e adiciona:
+ #   - CSS de componentes (exitus-components.css)
+ #   - Estrutura padrão de página (container, header, tabs)
+ #   - Loading skeleton reutilizável
+ #   - Blocos para personalização por tela
+ #
+ # Uso:
+ #   {% extends "components/base_interna.html" %}
+ #   {% block page_title %}Carteira{% endblock %}
+ #   {% block tabs %}...{% endblock %}
+ #   {% block page_content %}...{% endblock %}
+ #
+ # Criado: 17/06/2026 | Fase 2.5 — Padronização Visual
+ # ============================================================= #}
+
+{% block extra_css %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/exitus-components.css') }}">
+    {% block page_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="page-container" x-data="pageData()" x-init="init()">
+
+    {# --- HEADER DA PÁGINA --- #}
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">{% block page_title %}Página{% endblock %}</h1>
+            {% block page_subtitle %}{% endblock %}
+        </div>
+        <div class="flex items-center gap-3">
+            {% block page_actions %}{% endblock %}
+        </div>
+    </div>
+
+    {# --- KPI BAR (opcional) --- #}
+    {% block kpi_bar %}{% endblock %}
+
+    {# --- BARRA DE ABAS (opcional) --- #}
+    {% block tabs %}{% endblock %}
+
+    {# --- BARRA DE FILTROS (opcional) --- #}
+    {% block filters %}{% endblock %}
+
+    {# --- LOADING STATE --- #}
+    <div x-show="loading" x-cloak>
+        {% block loading_state %}
+        <div class="section-box">
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line medium"></div>
+        </div>
+        {% endblock %}
+    </div>
+
+    {# --- CONTEÚDO PRINCIPAL --- #}
+    <div x-show="!loading">
+        {% block page_content %}{% endblock %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+    {{ super() }}
+    <script>
+    function pageData() {
+        return {
+            loading: true,
+            error: null,
+            ...pageDataExtend(),
+
+            async init() {
+                try {
+                    await this.loadData();
+                } catch (e) {
+                    this.error = e.message || 'Erro ao carregar dados';
+                    console.error('Erro na página:', e);
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            async loadData() {
+                // Override em cada página
+            },
+
+            getToken() {
+                return localStorage.getItem('access_token');
+            },
+
+            async apiFetch(url, options = {}) {
+                const token = this.getToken();
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    }
+                });
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/auth/login';
+                        return;
+                    }
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                return response.json();
+            },
+
+            formatMoney(value, currency = 'BRL') {
+                if (value == null) return 'R$ 0,00';
+                return new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: currency
+                }).format(value);
+            },
+
+            formatPercent(value) {
+                if (value == null) return '0,00%';
+                return new Intl.NumberFormat('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(value) + '%';
+            },
+
+            formatDate(dateStr) {
+                if (!dateStr) return '-';
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('pt-BR');
+            }
+        };
+    }
+
+    // Extensão por página — cada template override esta função
+    function pageDataExtend() {
+        return {};
+    }
+    </script>
+    {% block page_scripts %}{% endblock %}
+{% endblock %}
