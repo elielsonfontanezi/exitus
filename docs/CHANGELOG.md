@@ -8,6 +8,54 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Frontend Fase 4: Expansões de Telas Existentes (17/06/2026)
+
+**GAPs:** G7, G8, G9, G12, G13, G16
+
+**Artefatos criados:**
+- `frontend/app/templates/alertas/lista_v2.html` — CRUD completo (criar/toggle/excluir), KPIs, filtros
+- `frontend/app/templates/relatorios/exportar_v2.html` — exportação multi-formato (CSV/Excel/PDF)
+- `frontend/app/templates/analises/buy_signals_v2.html` — Watchlist Top 10, Score, Margem, Z-Score
+- `frontend/app/templates/proventos/calendario_v2.html` — geração automática + confirmar pagamento
+- `frontend/app/templates/analises/rentabilidade_v2.html` — seletor período + benchmark interativo
+
+**Artefatos modificados:**
+- `frontend/app/routes/alertas.py` — rota usando lista_v2.html
+- `frontend/app/routes/analises.py` — rotas buy-signals e rentabilidade/periodo via Alpine.js
+- `frontend/app/routes/proventos.py` — rota calendario usando calendario_v2.html
+- `frontend/app/routes/relatorios.py` — nova rota /exportar multi-formato
+- `frontend/app/templates/components/menu_horizontal.html` — sino alertas corrigido, link exportação
+- `frontend/app/static/css/design-system.css` — regra .no-arrow
+- `.windsurfrules` — REGRA #7 (remover arquivos obsoletos)
+
+**Artefatos removidos (obsoletos):**
+- `alertas/lista.html`, `analises/buy_signals.html`, `analises/rentabilidade_periodo.html`, `components/buy_signals_table.html`
+
+**APIs integradas (5 novos grupos):**
+- `/api/alertas` (GET/POST/PATCH/DELETE)
+- `/api/export/{transacoes,proventos,posicoes}` (CSV/Excel/PDF)
+- `/api/buy-signals/watchlist-top`, `/buy-score/{t}`, `/margem-seguranca/{t}`, `/zscore/{t}`
+- `/api/calendario-dividendos/` (CRUD + gerar + confirmar-pagamento + resumo)
+- `/api/portfolios/rentabilidade` (período + benchmark)
+
+---
+
+### Feat — Frontend Fase 3: Telas Novas API-Driven (17/06/2026)
+
+**GAPs:** G1, G4, G5, G6, G14
+
+**Artefatos criados:**
+- `frontend/app/routes/carteira.py` — blueprint `/carteira/posicoes` + `/carteira/movimentacoes`
+- `frontend/app/routes/configuracoes.py` — blueprint `/configuracoes/perfil` + `/configuracoes/corretoras`
+- `frontend/app/templates/carteira/posicoes.html` — posições com KPIs e filtros
+- `frontend/app/templates/carteira/movimentacoes.html` — movimentações de caixa
+- `frontend/app/templates/configuracoes/perfil.html` — perfil do usuário
+- `frontend/app/templates/configuracoes/corretoras.html` — CRUD corretoras
+- `frontend/app/templates/operacoes/historico.html` — histórico transações com filtros
+- `frontend/app/templates/ferramentas/reconciliacao.html` — painel diagnóstico integridade
+
+---
+
 ### Feat — Testes E2E v3: Lógica de Negócio (16/06/2026)
 
 **GAP:** EXITUS-TESTS-E2E-V3 — Specs de lógica de negócio + plano de testes completo

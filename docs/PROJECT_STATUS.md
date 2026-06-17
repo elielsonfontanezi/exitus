@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 16/06/2026  
-> **Status:** 🟡 **Testes E2E v3 — Lógica de Negócio em Andamento**  
-> **Versão:** v0.9.16
+> **Data:** 17/06/2026  
+> **Status:** 🟡 **Frontend GAP Analysis — Fases 3 e 4 Concluídas**  
+> **Versão:** v0.9.17
 
 ---
 
@@ -35,20 +35,14 @@
 
 ---
 
-## ✅ Frontend API-Driven Integration — 25% Concluído
+## ✅ Frontend API-Driven Integration — 90% Concluído
 
-- **Sprint 1:** Operações Essenciais (100% funcionais)
-- **Telas:** 1/4 implementadas (25%)
-- **APIs:** 5/25 integradas (20%) — transacoes, ativos, cotacoes, posicoes, import/b3
-- **Tecnologia:** Alpine.js + Fetch API + API REST
-- **Concluído:** 
-  - ✅ Tela Operações com toggle Compra/Venda unificado
-  - ✅ Sincronização Transações-Posições (bug crítico corrigido)
-  - ✅ Renomeio tela "compra" → "operacoes"
-  - ✅ Modo VENDA 100% funcional (30 posições)
-  - ✅ Compra/Venda de ativos BR e internacionais
-  - ✅ Importação B3 com detecção automática de tipo (05/04/2026)
-- **Status:** ✅ Todos os 8 Sprints concluídos (09/06/2026)
+- **Sprints 1-8:** ✅ Todos concluídos (09/06/2026)
+- **GAP Analysis Fase 3:** ✅ 4 telas novas (17/06/2026) — posicoes, movimentacoes, perfil, corretoras, historico, reconciliacao
+- **GAP Analysis Fase 4:** ✅ 5 expansões (17/06/2026) — alertas CRUD, exportação multi-formato, buy signals top10, calendario proventos, rentabilidade benchmark
+- **APIs integradas:** 32+ endpoints (alertas, export, buy-signals, calendario-dividendos, portfolios/rentabilidade)
+- **Tecnologia:** Alpine.js + Fetch API + API REST + base_interna.html
+- **Pendente (Fase 5):** Detalhe ativo fundamentalistas, DIRPF bens reais, eventos corporativos, planos compra/venda
 
 ### Sprint 8 — Ferramentas (CONCLUÍDO ✅ — 09/06/2026)
 - ✅ `/ferramentas/screener` — Screener: filtra ativos por DY, P/VP, P/L, tipo; coloração semântica
