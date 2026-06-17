@@ -1,0 +1,168 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Apuração Mensal IR{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Cálculo de imposto de renda — <span x-text="mesAtual"></span></p>{% endblock %}
+
+{% block page_actions %}
+<a href="/imposto-renda/darfs" class="btn-exitus btn-exitus-ghost"><i class="fas fa-receipt"></i> DARFs</a>
+<a href="/imposto-renda/historico" class="btn-exitus btn-exitus-ghost"><i class="fas fa-calendar"></i> Histórico</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading && apuracao">
+    <div class="kpi-card">
+        <div class="kpi-card-label">IR Total Devido</div>
+        <div class="kpi-card-value" style="color:#dc2626;" x-text="formatMoney(apuracao?.ir_total || 0)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Categorias com Operações</div>
+        <div class="kpi-card-value" x-text="categoriasAtivas()"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">DARFs Geradas</div>
+        <div class="kpi-card-value" x-text="apuracao?.darf?.darfs?.length || 0"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Alertas</div>
+        <div class="kpi-card-value" x-text="apuracao?.alertas?.length || 0"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Alertas -->
+<div x-show="apuracao?.alertas?.length > 0" style="background:#fefce8; border:1px solid #fde68a; border-radius:8px; padding:1rem; margin-bottom:1.5rem;">
+    <h3 style="font-weight:600; color:#92400e; margin-bottom:0.5rem;"><i class="fas fa-exclamation-triangle"></i> Alertas do Mês</h3>
+    <ul style="list-style:none; padding:0; margin:0;">
+        <template x-for="alerta in apuracao?.alertas || []" :key="alerta">
+            <li style="font-size:0.85rem; color:#92400e; padding:0.15rem 0;" x-text="'• ' + alerta"></li>
+        </template>
+    </ul>
+</div>
+
+<!-- Categorias RV -->
+<div class="section-box" x-show="apuracao?.categorias">
+    <div class="section-box-title"><i class="fas fa-chart-bar"></i> Renda Variável — Detalhamento por Categoria</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Categoria</th>
+                <th class="col-right">Operações</th>
+                <th class="col-right">Lucro Líquido</th>
+                <th class="col-right">Alíquota</th>
+                <th class="col-right">IR Devido</th>
+                <th class="col-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="[key, cat] in categoriasRV()" :key="key">
+                <tr>
+                    <td style="font-weight:500;" x-text="catLabel(key)"></td>
+                    <td class="col-right" x-text="cat.operacoes || 0"></td>
+                    <td class="col-right" :style="(cat.lucro_liquido||0) > 0 ? 'color:#16a34a;font-weight:600;' : (cat.lucro_liquido||0) < 0 ? 'color:#dc2626;font-weight:600;' : ''" x-text="formatMoney(cat.lucro_liquido || 0)"></td>
+                    <td class="col-right" x-text="(cat.aliquota || 0) + '%'"></td>
+                    <td class="col-right" style="font-weight:700;" :style="(cat.ir_devido||0) > 0 ? 'color:#dc2626;' : 'color:#9ca3af;'" x-text="formatMoney(cat.ir_devido || 0)"></td>
+                    <td class="col-center">
+                        <span x-show="cat.isento" class="badge badge-positivo">Isento</span>
+                        <span x-show="!cat.isento && (cat.ir_devido||0) > 0" class="badge badge-negativo">Tributado</span>
+                        <span x-show="!cat.isento && (cat.ir_devido||0) <= 0" class="badge badge-neutro">Sem operações</span>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<!-- Renda Fixa -->
+<div class="section-box" x-show="apuracao?.categorias?.renda_fixa" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-university"></i> Renda Fixa</div>
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; padding:0.5rem 0;">
+        <div><div style="font-size:0.75rem; color:#6b7280;">Operações</div><div style="font-weight:700;" x-text="apuracao?.categorias?.renda_fixa?.operacoes || 0"></div></div>
+        <div><div style="font-size:0.75rem; color:#6b7280;">Valor Resgatado</div><div style="font-weight:700;" x-text="formatMoney(apuracao?.categorias?.renda_fixa?.valor_resgatado || 0)"></div></div>
+        <div><div style="font-size:0.75rem; color:#6b7280;">IR Devido</div><div style="font-weight:700; color:#dc2626;" x-text="formatMoney(apuracao?.categorias?.renda_fixa?.ir_devido || 0)"></div></div>
+        <div><div style="font-size:0.75rem; color:#6b7280;">IOF Devido</div><div style="font-weight:700; color:#ea580c;" x-text="formatMoney(apuracao?.categorias?.renda_fixa?.iof_devido || 0)"></div></div>
+    </div>
+</div>
+
+<!-- Proventos -->
+<div class="section-box" x-show="apuracao?.proventos" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-coins"></i> Proventos — IR Retido na Fonte</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th class="col-right">Operações</th>
+                <th class="col-right">Valor Bruto</th>
+                <th class="col-right">Alíquota</th>
+                <th class="col-right">IR Retido</th>
+                <th class="col-center">Regime</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="key in ['dividendos_br','dividendos_us','jcp','aluguel']" :key="key">
+                <tr x-show="apuracao?.proventos?.[key]">
+                    <td style="font-weight:500;" x-text="provLabel(key)"></td>
+                    <td class="col-right" x-text="apuracao?.proventos?.[key]?.operacoes || 0"></td>
+                    <td class="col-right" x-text="formatMoney(apuracao?.proventos?.[key]?.valor_bruto || 0)"></td>
+                    <td class="col-right" x-text="(apuracao?.proventos?.[key]?.aliquota || 0) + '%'"></td>
+                    <td class="col-right" style="font-weight:600;" :style="(apuracao?.proventos?.[key]?.ir_retido||0) > 0 ? 'color:#dc2626;' : 'color:#9ca3af;'" x-text="formatMoney(apuracao?.proventos?.[key]?.ir_retido || 0)"></td>
+                    <td class="col-center">
+                        <span x-show="apuracao?.proventos?.[key]?.isento" class="badge badge-positivo">Isento</span>
+                        <span x-show="!apuracao?.proventos?.[key]?.isento" class="badge badge-neutro" x-text="apuracao?.proventos?.[key]?.regime || 'Tributado'"></span>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<!-- Empty state -->
+<div class="section-box" x-show="!apuracao && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-calculator"></i></div>
+        <div class="empty-state-title">Nenhuma apuração disponível</div>
+        <div class="empty-state-text" x-text="'Mês: ' + mesAtual"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        apuracao: null,
+        mesAtual: '',
+
+        async loadData() {
+            const now = new Date();
+            const ano = now.getFullYear();
+            const mes = String(now.getMonth() + 1).padStart(2, '0');
+            this.mesAtual = `${ano}-${mes}`;
+
+            const res = await this.apiFetch(`/api/ir/apuracao?ano=${ano}&mes=${this.mesAtual}`);
+            if (res?.data) this.apuracao = res.data;
+        },
+
+        categoriasAtivas() {
+            if (!this.apuracao?.categorias) return 0;
+            return Object.values(this.apuracao.categorias).filter(c => c.operacoes > 0).length;
+        },
+
+        categoriasRV() {
+            if (!this.apuracao?.categorias) return [];
+            return Object.entries(this.apuracao.categorias).filter(([k]) => k !== 'renda_fixa');
+        },
+
+        catLabel(key) {
+            const labels = { swing_acoes: 'Swing Trade — Ações', day_trade: 'Day Trade', fiis: 'FIIs', exterior: 'Exterior' };
+            return labels[key] || key;
+        },
+
+        provLabel(key) {
+            const labels = { dividendos_br: 'Dividendos BR', dividendos_us: 'Dividendos EUA', jcp: 'JCP', aluguel: 'Aluguel de Ações' };
+            return labels[key] || key;
+        }
+    };
+}
+</script>
+{% endblock %}

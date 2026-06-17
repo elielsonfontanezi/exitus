@@ -1,0 +1,180 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Simulador de Aportes{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Projeção de patrimônio com juros compostos e aportes mensais</p>{% endblock %}
+
+{% block page_content %}
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+    <!-- Inputs -->
+    <div class="section-box">
+        <div class="section-box-title"><i class="fas fa-sliders-h"></i> Parâmetros</div>
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div>
+                <label style="font-size:0.75rem; color:#6b7280;">Capital Inicial (R$)</label>
+                <input type="number" class="filter-input" x-model="capital" @input="simular()" min="0" step="100" style="width:100%; margin-top:0.25rem;">
+            </div>
+            <div>
+                <label style="font-size:0.75rem; color:#6b7280;">Aporte Mensal (R$)</label>
+                <input type="number" class="filter-input" x-model="aporte" @input="simular()" min="0" step="100" style="width:100%; margin-top:0.25rem;">
+            </div>
+            <div>
+                <label style="font-size:0.75rem; color:#6b7280;">Rentabilidade Anual (%)</label>
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin:0.25rem 0;">
+                    <button class="btn-exitus btn-exitus-ghost" style="font-size:0.7rem; padding:0.2rem 0.5rem;" @click="rentabilidade=10.5; simular()">SELIC 10.5%</button>
+                    <button class="btn-exitus btn-exitus-ghost" style="font-size:0.7rem; padding:0.2rem 0.5rem;" @click="rentabilidade=10.4; simular()">CDI 10.4%</button>
+                    <button class="btn-exitus btn-exitus-ghost" style="font-size:0.7rem; padding:0.2rem 0.5rem;" @click="rentabilidade=12; simular()">IBOV 12%</button>
+                    <button class="btn-exitus btn-exitus-ghost" style="font-size:0.7rem; padding:0.2rem 0.5rem;" @click="rentabilidade=15; simular()">15%/a</button>
+                </div>
+                <input type="number" class="filter-input" x-model="rentabilidade" @input="simular()" min="0" step="0.1" style="width:100%; margin-top:0.25rem;">
+            </div>
+            <div>
+                <label style="font-size:0.75rem; color:#6b7280;">Período: <strong x-text="periodo + ' anos'" style="color:#16a34a;"></strong></label>
+                <input type="range" x-model="periodo" @input="simular()" min="1" max="40" step="1" style="width:100%; margin-top:0.5rem; accent-color:#a38c65;">
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#9ca3af;">
+                    <span>1 ano</span><span>40 anos</span>
+                </div>
+            </div>
+            <div>
+                <label style="font-size:0.75rem; color:#6b7280;">Inflação Anual (%) — opcional</label>
+                <input type="number" class="filter-input" x-model="inflacao" @input="simular()" min="0" step="0.1" style="width:100%; margin-top:0.25rem;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="section-box">
+        <div class="section-box-title"><i class="fas fa-chart-line"></i> Projeção</div>
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            <div style="background:#f0fdf4; border-radius:8px; padding:1rem; text-align:center;">
+                <div style="font-size:0.7rem; color:#6b7280;">Patrimônio Final</div>
+                <div style="font-size:1.8rem; font-weight:700; color:#16a34a;" x-text="fmtFull(res.patrimonio)"></div>
+                <div style="font-size:0.75rem; color:#6b7280;" x-text="fmtFull(res.patrimonioReal) + ' (real)'"></div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem;">
+                <div style="background:#eff6ff; border-radius:8px; padding:0.75rem; text-align:center;">
+                    <div style="font-size:0.65rem; color:#6b7280;">Total Investido</div>
+                    <div style="font-weight:700; color:#1d4ed8;" x-text="fmtR(res.investido)"></div>
+                </div>
+                <div style="background:#fefce8; border-radius:8px; padding:0.75rem; text-align:center;">
+                    <div style="font-size:0.65rem; color:#6b7280;">Rendimentos</div>
+                    <div style="font-weight:700; color:#ca8a04;" x-text="fmtR(res.rendimentos)"></div>
+                </div>
+                <div style="background:#faf5ff; border-radius:8px; padding:0.75rem; text-align:center;">
+                    <div style="font-size:0.65rem; color:#6b7280;">Multiplicador</div>
+                    <div style="font-weight:700; color:#7c3aed;" x-text="res.mult.toFixed(1) + 'x'"></div>
+                </div>
+            </div>
+            <div style="background:#fff7ed; border-radius:8px; padding:0.75rem; text-align:center;">
+                <div style="font-size:0.7rem; color:#6b7280;">Renda Mensal Projetada (4% a.a.)</div>
+                <div style="font-size:1.2rem; font-weight:700; color:#ea580c;" x-text="fmtFull(res.renda) + '/mês'"></div>
+            </div>
+            <!-- Barra composição -->
+            <div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#6b7280;">
+                    <span>Capital</span><span>Rendimentos</span>
+                </div>
+                <div style="width:100%; height:12px; background:#f1f5f9; border-radius:6px; overflow:hidden; display:flex;">
+                    <div style="background:#60a5fa; height:100%; transition:width 0.3s;" :style="'width:' + res.pctCapital + '%'"></div>
+                    <div style="background:#4ade80; height:100%; transition:width 0.3s;" :style="'width:' + res.pctRend + '%'"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#9ca3af; margin-top:0.15rem;">
+                    <span x-text="res.pctCapital.toFixed(0) + '%'"></span>
+                    <span x-text="res.pctRend.toFixed(0) + '%'"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabela marcos -->
+<div class="section-box" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-flag-checkered"></i> Evolução por Marco</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Ano</th>
+                <th class="col-right">Investido</th>
+                <th class="col-right">Patrimônio</th>
+                <th class="col-right">Rendimentos</th>
+                <th class="col-right">Renda/Mês (4%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="m in marcos" :key="m.ano">
+                <tr>
+                    <td style="font-weight:600;" x-text="m.ano + (m.ano > 1 ? ' anos' : ' ano')"></td>
+                    <td class="col-right" style="color:#1d4ed8;" x-text="fmtFull(m.inv)"></td>
+                    <td class="col-right" style="font-weight:700;" x-text="fmtFull(m.pat)"></td>
+                    <td class="col-right" style="color:#16a34a;" x-text="fmtFull(m.rend)"></td>
+                    <td class="col-right" style="color:#ea580c;" x-text="fmtFull(m.renda)"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        capital: 10000,
+        aporte: 1000,
+        rentabilidade: 12,
+        periodo: 10,
+        inflacao: 4.5,
+        res: { patrimonio: 0, patrimonioReal: 0, investido: 0, rendimentos: 0, mult: 0, renda: 0, pctCapital: 50, pctRend: 50 },
+        marcos: [],
+
+        async loadData() {
+            this.simular();
+        },
+
+        simular() {
+            const C0 = parseFloat(this.capital) || 0;
+            const A = parseFloat(this.aporte) || 0;
+            const r = (parseFloat(this.rentabilidade) || 0) / 100;
+            const n = parseInt(this.periodo) || 10;
+            const inf = (parseFloat(this.inflacao) || 0) / 100;
+            const rm = Math.pow(1 + r, 1/12) - 1;
+
+            let pat = C0;
+            const meses = n * 12;
+            for (let m = 0; m < meses; m++) pat = pat * (1 + rm) + A;
+
+            const investido = C0 + A * meses;
+            const rendimentos = pat - investido;
+            const mult = investido > 0 ? pat / investido : 0;
+            const renda = pat * 0.04 / 12;
+            const patReal = pat / Math.pow(1 + inf, n);
+            const pctCap = pat > 0 ? (investido / pat * 100) : 50;
+            const pctRend = pat > 0 ? (rendimentos / pat * 100) : 50;
+
+            this.res = { patrimonio: pat, patrimonioReal: patReal, investido, rendimentos, mult, renda, pctCapital: pctCap, pctRend };
+
+            // Marcos
+            const checkpoints = [1,2,3,5,10,15,20,25,30,40].filter(y => y <= n);
+            if (!checkpoints.includes(n)) checkpoints.push(n);
+            checkpoints.sort((a,b) => a-b);
+
+            let patM = C0, ano = 0;
+            this.marcos = [];
+            for (const cp of checkpoints) {
+                while (ano < cp) { for (let m = 0; m < 12; m++) patM = patM * (1 + rm) + A; ano++; }
+                const invM = C0 + A * cp * 12;
+                this.marcos.push({ ano: cp, inv: invM, pat: patM, rend: patM - invM, renda: patM * 0.04 / 12 });
+            }
+        },
+
+        fmtR(v) {
+            if (v >= 1e6) return 'R$ ' + (v/1e6).toFixed(2).replace('.',',') + 'M';
+            if (v >= 1e3) return 'R$ ' + (v/1e3).toFixed(1).replace('.',',') + 'k';
+            return 'R$ ' + v.toFixed(0);
+        },
+        fmtFull(v) {
+            return 'R$ ' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,'.').replace(/\.(\d{2})$/,',$1');
+        }
+    };
+}
+</script>
+{% endblock %}

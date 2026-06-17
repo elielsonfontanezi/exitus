@@ -1,0 +1,209 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Calculadora de IR{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Simule o ganho/perda e IR antes de vender — baseado nas suas posições reais</p>{% endblock %}
+
+{% block page_actions %}
+<a href="/relatorios/ir" class="btn-exitus btn-exitus-ghost"><i class="fas fa-calculator"></i> IR Completo</a>
+{% endblock %}
+
+{% block page_content %}
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+    <!-- Painel Input -->
+    <div class="section-box">
+        <div class="section-box-title"><i class="fas fa-calculator"></i> Parâmetros de Simulação</div>
+
+        <div style="margin-bottom:1rem;">
+            <label style="font-size:0.75rem; color:#6b7280;">Selecionar Posição (opcional)</label>
+            <select class="filter-input" x-model="selPosicao" @change="preencherPosicao()" style="width:100%; margin-top:0.25rem;">
+                <option value="">— Preencher manualmente —</option>
+                <template x-for="p in posicoes" :key="p.ticker">
+                    <option :value="p.ticker" x-text="p.ticker + ' — PM: R$ ' + parseFloat(p.preco_medio||0).toFixed(2)"></option>
+                </template>
+            </select>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem;">
+            <div>
+                <label style="font-size:0.75rem; color:#6b7280;">Preço Médio (R$)</label>
+                <input type="number" class="filter-input" x-model="precoMedio" @input="calcular()" step="0.01" style="width:100%; margin-top:0.25rem;">
+            </div>
+            <div>
+                <label style="font-size:0.75rem; color:#6b7280;">Quantidade</label>
+                <input type="number" class="filter-input" x-model="quantidade" @input="calcular()" step="1" style="width:100%; margin-top:0.25rem;">
+            </div>
+        </div>
+
+        <div style="margin-bottom:0.75rem;">
+            <label style="font-size:0.75rem; color:#6b7280;">Preço de Venda Simulado (R$)</label>
+            <input type="number" class="filter-input" x-model="precoVenda" @input="calcular()" step="0.01" style="width:100%; margin-top:0.25rem;">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div>
+                <label style="font-size:0.75rem; color:#6b7280;">Tipo Operação</label>
+                <select class="filter-input" x-model="tipoOp" @change="calcular()" style="width:100%; margin-top:0.25rem;">
+                    <option value="swing">Swing Trade</option>
+                    <option value="daytrade">Day Trade</option>
+                    <option value="fii">FII</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:0.75rem; color:#6b7280;">Corretagem (R$)</label>
+                <input type="number" class="filter-input" x-model="corretagem" @input="calcular()" step="0.01" value="0" style="width:100%; margin-top:0.25rem;">
+            </div>
+        </div>
+
+        <div style="background:#f8fafc; border-radius:8px; padding:0.75rem; font-size:0.75rem; color:#6b7280;">
+            <strong>Alíquotas vigentes:</strong> Swing 15% | Day Trade 20% | FII 20%<br>
+            Isenção Swing para vendas mensais ≤ R$20.000 (ações)
+        </div>
+    </div>
+
+    <!-- Painel Resultado -->
+    <div class="section-box">
+        <div class="section-box-title"><i class="fas fa-chart-line"></i> Resultado Simulado</div>
+
+        <div x-show="!resultado" style="text-align:center; padding:3rem 0; color:#d1d5db;">
+            <i class="fas fa-calculator" style="font-size:3rem; margin-bottom:1rem;"></i>
+            <p style="font-size:0.85rem;">Preencha os campos ao lado</p>
+        </div>
+
+        <div x-show="resultado" style="display:flex; flex-direction:column; gap:0.75rem;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                <div style="background:#eff6ff; border-radius:8px; padding:0.75rem; text-align:center;">
+                    <div style="font-size:0.7rem; color:#6b7280;">Custo Total</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:#1d4ed8;" x-text="formatMoney(resultado?.custo || 0)"></div>
+                </div>
+                <div style="background:#eff6ff; border-radius:8px; padding:0.75rem; text-align:center;">
+                    <div style="font-size:0.7rem; color:#6b7280;">Receita Bruta</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:#1d4ed8;" x-text="formatMoney(resultado?.receita || 0)"></div>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                <div :style="'border-radius:8px; padding:0.75rem; text-align:center; background:' + (resultado?.lucro >= 0 ? '#f0fdf4' : '#fef2f2')">
+                    <div style="font-size:0.7rem; color:#6b7280;">Lucro / Perda</div>
+                    <div style="font-size:1.1rem; font-weight:700;" :style="'color:' + (resultado?.lucro >= 0 ? '#16a34a' : '#dc2626')" x-text="formatMoney(resultado?.lucro || 0)"></div>
+                </div>
+                <div style="background:#f8fafc; border-radius:8px; padding:0.75rem; text-align:center;">
+                    <div style="font-size:0.7rem; color:#6b7280;">Rentabilidade</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:#4b5563;" x-text="(resultado?.rent || 0).toFixed(2) + '%'"></div>
+                </div>
+            </div>
+            <div :style="'border-radius:8px; padding:1rem; text-align:center; background:' + (resultado?.ir > 0 ? '#fef2f2' : '#f8fafc')">
+                <div style="font-size:0.7rem; color:#6b7280;">IR a Pagar</div>
+                <div style="font-size:1.5rem; font-weight:700;" :style="'color:' + (resultado?.ir > 0 ? '#dc2626' : '#9ca3af')" x-text="formatMoney(resultado?.ir || 0)"></div>
+                <div style="font-size:0.7rem; color:#6b7280;" x-text="resultado?.isento ? 'Isento' : 'Alíquota: ' + ((resultado?.aliq || 0) * 100).toFixed(0) + '%'"></div>
+            </div>
+            <div style="background:#f0fdf4; border-radius:8px; padding:0.75rem; text-align:center;">
+                <div style="font-size:0.7rem; color:#6b7280;">Lucro Líquido (após IR)</div>
+                <div style="font-size:1.2rem; font-weight:700; color:#16a34a;" x-text="formatMoney(resultado?.liquido || 0)"></div>
+            </div>
+            <div x-show="resultado?.isento" style="background:#dcfce7; border:1px solid #86efac; border-radius:8px; padding:0.5rem; font-size:0.75rem; color:#166534; text-align:center;">
+                ✅ Isento de IR — venda mensal ≤ R$20.000 (ações em Swing Trade)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Posições -->
+<div class="section-box" x-show="posicoes.length > 0" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-wallet"></i> Suas Posições (<span x-text="posicoes.length"></span>)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Nome</th>
+                <th class="col-right">Qtd</th>
+                <th class="col-right">PM</th>
+                <th class="col-right">Custo Total</th>
+                <th class="col-center">Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="p in posicoes" :key="p.ticker">
+                <tr>
+                    <td style="font-weight:700; font-family:monospace; color:#dc2626;" x-text="p.ticker"></td>
+                    <td style="font-size:0.85rem;" x-text="(p.nome || '').substring(0, 28)"></td>
+                    <td class="col-right" x-text="p.quantidade"></td>
+                    <td class="col-right" x-text="'R$ ' + parseFloat(p.preco_medio||0).toFixed(4)"></td>
+                    <td class="col-right" style="font-weight:600;" x-text="formatMoney(p.custo_total || 0)"></td>
+                    <td class="col-center">
+                        <button class="btn-exitus btn-exitus-ghost" style="font-size:0.7rem; padding:0.2rem 0.5rem;"
+                                @click="usarPosicao(p)">Usar</button>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        posicoes: [],
+        selPosicao: '',
+        precoMedio: '',
+        quantidade: '',
+        precoVenda: '',
+        tipoOp: 'swing',
+        corretagem: '0',
+        resultado: null,
+
+        async loadData() {
+            const res = await this.apiFetch('/api/posicoes');
+            if (res?.data) {
+                const raw = res.data.posicoes || [];
+                this.posicoes = raw.map(p => ({
+                    ticker: p.ativo?.ticker || '',
+                    nome: p.ativo?.nome || '',
+                    tipo: p.ativo?.tipo || '',
+                    quantidade: p.quantidade || 0,
+                    preco_medio: p.preco_medio || 0,
+                    custo_total: p.custo_total || 0,
+                }));
+            }
+        },
+
+        preencherPosicao() {
+            const p = this.posicoes.find(x => x.ticker === this.selPosicao);
+            if (p) {
+                this.precoMedio = p.preco_medio;
+                this.quantidade = p.quantidade;
+                if (p.tipo === 'fii') this.tipoOp = 'fii';
+                this.calcular();
+            }
+        },
+
+        usarPosicao(p) {
+            this.precoMedio = p.preco_medio;
+            this.quantidade = p.quantidade;
+            if (p.tipo === 'fii') this.tipoOp = 'fii';
+            this.calcular();
+        },
+
+        calcular() {
+            const pm = parseFloat(this.precoMedio) || 0;
+            const qtd = parseFloat(this.quantidade) || 0;
+            const pv = parseFloat(this.precoVenda) || 0;
+            const cor = parseFloat(this.corretagem) || 0;
+
+            if (pm <= 0 || qtd <= 0 || pv <= 0) { this.resultado = null; return; }
+
+            const custo = pm * qtd + cor;
+            const receita = pv * qtd;
+            const lucro = receita - custo;
+            const rent = custo > 0 ? (lucro / custo) * 100 : 0;
+            const aliq = this.tipoOp === 'daytrade' ? 0.20 : this.tipoOp === 'fii' ? 0.20 : 0.15;
+            const isento = this.tipoOp === 'swing' && receita <= 20000 && lucro > 0;
+            const ir = (isento || lucro <= 0) ? 0 : lucro * aliq;
+            const liquido = lucro - ir;
+
+            this.resultado = { custo, receita, lucro, rent, aliq, isento, ir, liquido };
+        }
+    };
+}
+</script>
+{% endblock %}

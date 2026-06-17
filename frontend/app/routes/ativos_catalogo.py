@@ -96,33 +96,12 @@ def _fetch_ativo_detalhe(headers, ticker):
 
 
 def _lista_view(categoria):
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
+    """Lista de ativos por categoria — Alpine.js API-driven"""
     config = TIPOS_CONFIG[categoria]
-    page = request.args.get('page', 1, type=int)
-    search = request.args.get('q', '').strip() or None
-
-    ativos = _fetch_ativos(headers, config['tipos_api'], page=page, search=search)
-
-    stats = {
-        'total': len(ativos),
-        'com_preco': sum(1 for a in ativos if a.get('preco_atual')),
-        'dy_medio': 0.0,
-    }
-    dys = [float(a['dividend_yield']) for a in ativos if a.get('dividend_yield')]
-    if dys:
-        stats['dy_medio'] = sum(dys) / len(dys)
-
     return render_template(
-        'ativos/lista.html',
-        ativos=ativos,
+        'ativos/lista_v2.html',
         config=config,
         categoria=categoria,
-        stats=stats,
-        page=page,
-        search=search or '',
     )
 
 

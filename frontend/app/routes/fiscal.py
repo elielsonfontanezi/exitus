@@ -26,100 +26,22 @@ def index():
 @bp.route('/mensal')
 @login_required
 def ir_mensal():
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    mes = _mes_atual()
-    apuracao = {}
-    erro = None
-
-    try:
-        resp = requests.get(
-            f'{API_BASE}/ir/apuracao',
-            headers=headers,
-            params={'ano': mes[:4], 'mes': mes},
-            timeout=10
-        )
-        if resp.status_code == 200:
-            apuracao = resp.json().get('data', {})
-        else:
-            erro = f'API retornou {resp.status_code}'
-    except Exception as e:
-        erro = str(e)
-
-    return render_template(
-        'fiscal/ir_mensal.html',
-        apuracao=apuracao,
-        mes_atual=mes,
-        erro=erro
-    )
+    """Apuração Mensal IR — Alpine.js API-driven"""
+    return render_template('fiscal/ir_mensal_v2.html')
 
 
 @bp.route('/darfs')
 @login_required
 def darfs():
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    mes = _mes_atual()
-    dados = {}
-    erro = None
-
-    try:
-        resp = requests.get(
-            f'{API_BASE}/ir/darf',
-            headers=headers,
-            params={'ano': mes[:4], 'mes': mes},
-            timeout=10
-        )
-        if resp.status_code == 200:
-            dados = resp.json().get('data', {})
-        else:
-            erro = f'API retornou {resp.status_code}'
-    except Exception as e:
-        erro = str(e)
-
-    return render_template(
-        'fiscal/darfs.html',
-        dados=dados,
-        mes_atual=mes,
-        erro=erro
-    )
+    """DARFs — Alpine.js API-driven"""
+    return render_template('fiscal/darfs_v2.html')
 
 
 @bp.route('/historico')
 @login_required
 def historico():
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    ano = _ano_atual()
-    dados = {}
-    erro = None
-
-    try:
-        resp = requests.get(
-            f'{API_BASE}/ir/historico',
-            headers=headers,
-            params={'ano': ano},
-            timeout=10
-        )
-        if resp.status_code == 200:
-            dados = resp.json().get('data', {})
-        else:
-            erro = f'API retornou {resp.status_code}'
-    except Exception as e:
-        erro = str(e)
-
-    return render_template(
-        'fiscal/historico.html',
-        dados=dados,
-        ano_atual=ano,
-        erro=erro
-    )
+    """Histórico IR — Alpine.js API-driven"""
+    return render_template('fiscal/historico_v2.html')
 
 
 @bp.route('/declaracao')

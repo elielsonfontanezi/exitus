@@ -1,0 +1,162 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Screener de Ativos{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Filtre ativos por fundamentos: DY, P/VP, P/L e tipo</p>{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos Encontrados</div>
+        <div class="kpi-card-value" x-text="filtrados().length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">DY Médio</div>
+        <div class="kpi-card-value" x-text="mediaIndicador('dividend_yield')"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">P/VP Médio</div>
+        <div class="kpi-card-value" x-text="mediaIndicador('p_vp')"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <div>
+        <label class="filter-label">Tipo:</label>
+        <select class="filter-input" x-model="tipo" @change="filtrar()" style="max-width:140px;">
+            <option value="">Todos</option>
+            <option value="acao">Ações</option>
+            <option value="fii">FIIs</option>
+            <option value="etf">ETFs</option>
+            <option value="stock_intl">Internacionais</option>
+            <option value="renda_fixa">Renda Fixa</option>
+        </select>
+    </div>
+    <div>
+        <label class="filter-label">DY mín (%):</label>
+        <input type="number" class="filter-input" x-model="dyMin" step="0.1" placeholder="5" style="max-width:80px;">
+    </div>
+    <div>
+        <label class="filter-label">P/VP máx:</label>
+        <input type="number" class="filter-input" x-model="pvpMax" step="0.1" placeholder="1.5" style="max-width:80px;">
+    </div>
+    <div>
+        <label class="filter-label">P/L máx:</label>
+        <input type="number" class="filter-input" x-model="plMax" step="1" placeholder="15" style="max-width:80px;">
+    </div>
+    <button class="btn-exitus btn-exitus-ghost" @click="dyMin=''; pvpMax=''; plMax=''; tipo='';" style="margin-left:auto;">Limpar</button>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="filtrados().length > 0">
+    <div class="section-box-title"><i class="fas fa-search"></i> Resultado — ordenado por DY ↓</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Nome</th>
+                <th class="col-center">Tipo</th>
+                <th class="col-right">DY %</th>
+                <th class="col-right">P/VP</th>
+                <th class="col-right">P/L</th>
+                <th class="col-right">Beta</th>
+                <th class="col-center">Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="a in filtrados().slice(0, 100)" :key="a.ticker || a.id">
+                <tr>
+                    <td><a :href="'/dashboard/ativo/' + a.ticker" style="font-weight:700; color:#a38c65; text-decoration:none; font-family:monospace;" x-text="a.ticker"></a></td>
+                    <td style="font-size:0.85rem;" x-text="(a.nome || '').substring(0, 30)"></td>
+                    <td class="col-center"><span class="badge badge-neutro" style="text-transform:capitalize; font-size:0.7rem;" x-text="(a.tipo || '').replace('_', ' ')"></span></td>
+                    <td class="col-right" :style="dyColor(a.dividend_yield)" x-text="fmtPct(a.dividend_yield)"></td>
+                    <td class="col-right" :style="pvpColor(a.p_vp)" x-text="fmtNum(a.p_vp)"></td>
+                    <td class="col-right" :style="plColor(a.p_l)" x-text="fmtNum(a.p_l)"></td>
+                    <td class="col-right" style="color:#6b7280;" x-text="a.beta ? parseFloat(a.beta).toFixed(2) : '—'"></td>
+                    <td class="col-center"><a :href="'/ferramentas/comparador?ticker=' + a.ticker" style="font-size:0.75rem; color:#7c3aed;">+ Comparar</a></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+    <div x-show="filtrados().length > 100" style="text-align:center; padding:0.5rem; font-size:0.75rem; color:#9ca3af;">
+        Exibindo 100 de <span x-text="filtrados().length"></span> ativos
+    </div>
+</div>
+
+<div class="section-box" x-show="filtrados().length === 0 && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-search"></i></div>
+        <div class="empty-state-title">Nenhum ativo encontrado</div>
+        <div class="empty-state-text">Tente ampliar os critérios de busca ou limpar os filtros.</div>
+    </div>
+</div>
+
+<div style="margin-top:0.75rem; display:flex; gap:1rem; font-size:0.75rem; color:#6b7280; flex-wrap:wrap;">
+    <span style="color:#16a34a; font-weight:600;">■ DY ≥ 8%</span>
+    <span style="color:#ca8a04; font-weight:600;">■ DY ≥ 5%</span>
+    <span style="color:#16a34a; font-weight:600;">■ P/VP ≤ 1 / P/L ≤ 12 (atrativo)</span>
+    <span style="color:#ef4444; font-weight:600;">■ P/VP > 2 / P/L > 25 (caro)</span>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        ativos: [],
+        tipo: '',
+        dyMin: '',
+        pvpMax: '',
+        plMax: '',
+
+        filtrados() {
+            let list = this.ativos;
+            if (this.tipo) list = list.filter(a => a.tipo === this.tipo);
+            if (this.dyMin) list = list.filter(a => parseFloat(a.dividend_yield || 0) >= parseFloat(this.dyMin));
+            if (this.pvpMax) list = list.filter(a => a.p_vp && parseFloat(a.p_vp) > 0 && parseFloat(a.p_vp) <= parseFloat(this.pvpMax));
+            if (this.plMax) list = list.filter(a => a.p_l && parseFloat(a.p_l) > 0 && parseFloat(a.p_l) <= parseFloat(this.plMax));
+            return list.sort((a, b) => parseFloat(b.dividend_yield || 0) - parseFloat(a.dividend_yield || 0));
+        },
+
+        mediaIndicador(campo) {
+            const list = this.filtrados();
+            if (!list.length) return '—';
+            const vals = list.map(a => parseFloat(a[campo] || 0)).filter(v => v > 0);
+            if (!vals.length) return '—';
+            return (vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(2);
+        },
+
+        async loadData() {
+            const res = await this.apiFetch('/api/ativos?limit=200');
+            if (res?.data) {
+                this.ativos = res.data.ativos || [];
+            }
+        },
+
+        fmtPct(v) { return v && parseFloat(v) > 0 ? parseFloat(v).toFixed(2) + '%' : '—'; },
+        fmtNum(v) { return v && parseFloat(v) > 0 ? parseFloat(v).toFixed(2) : '—'; },
+
+        dyColor(v) {
+            const n = parseFloat(v || 0);
+            if (n >= 8) return 'color:#16a34a; font-weight:600;';
+            if (n >= 5) return 'color:#ca8a04; font-weight:600;';
+            return 'color:#4b5563;';
+        },
+        pvpColor(v) {
+            const n = parseFloat(v || 0);
+            if (n > 0 && n <= 1) return 'color:#16a34a; font-weight:600;';
+            if (n > 2) return 'color:#ef4444; font-weight:600;';
+            return 'color:#4b5563;';
+        },
+        plColor(v) {
+            const n = parseFloat(v || 0);
+            if (n > 0 && n <= 12) return 'color:#16a34a; font-weight:600;';
+            if (n > 25) return 'color:#ef4444; font-weight:600;';
+            return 'color:#4b5563;';
+        }
+    };
+}
+</script>
+{% endblock %}

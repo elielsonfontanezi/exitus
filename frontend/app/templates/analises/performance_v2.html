@@ -1,0 +1,134 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Performance da Carteira{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Métricas de risco e retorno</p>{% endblock %}
+
+{% block page_actions %}
+<a href="/analises/rentabilidade/periodo" class="btn-exitus btn-exitus-ghost"><i class="fas fa-chart-line"></i> Rentabilidade</a>
+<a href="/analises/evolucao" class="btn-exitus btn-exitus-ghost"><i class="fas fa-chart-bar"></i> Evolução</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading && resultado">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Rentabilidade Bruta</div>
+        <div class="kpi-card-value" style="color:#16a34a;" x-text="resultado?.rentabilidade_bruta || '—'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Rentabilidade Líquida</div>
+        <div class="kpi-card-value" style="color:#1d4ed8;" x-text="resultado?.rentabilidade_liquida || '—'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Sharpe Ratio</div>
+        <div class="kpi-card-value" style="color:#7c3aed;" x-text="resultado?.sharpe_ratio ?? '—'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Max Drawdown</div>
+        <div class="kpi-card-value" style="color:#dc2626;" x-text="resultado?.max_drawdown || '—'"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;" x-show="resultado">
+    <!-- Composição -->
+    <div class="section-box">
+        <div class="section-box-title"><i class="fas fa-briefcase"></i> Composição da Carteira</div>
+        <div style="display:flex; flex-direction:column; gap:0.75rem; padding:0.5rem 0;">
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                <span style="color:#6b7280;">Posições Ativas</span>
+                <span style="font-weight:600;" x-text="resultado?.posicoes_ativas || '—'"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                <span style="color:#6b7280;">Proventos Recebidos</span>
+                <span style="font-weight:600;" x-text="resultado?.proventos || '—'"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                <span style="color:#6b7280;">Transações</span>
+                <span style="font-weight:600;" x-text="resultado?.transacoes || '—'"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                <span style="color:#6b7280;">Período</span>
+                <span style="font-weight:600;" x-text="resultado?.periodo || '—'"></span>
+            </div>
+            <div x-show="resultado?.patrimonio_final > 0" style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                <span style="color:#6b7280;">Patrimônio Final</span>
+                <span style="font-weight:700;" x-text="formatMoney(resultado?.patrimonio_final || 0)"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Ativos -->
+    <div class="section-box" x-show="resultado?.ativos_top?.length > 0">
+        <div class="section-box-title"><i class="fas fa-star"></i> Top Ativos</div>
+        <div style="display:flex; flex-direction:column; gap:0.5rem; padding:0.5rem 0;">
+            <template x-for="(ticker, i) in (resultado?.ativos_top || []).slice(0,5)" :key="ticker">
+                <div style="display:flex; align-items:center; gap:0.75rem; padding:0.5rem; background:#f8fafc; border-radius:8px;">
+                    <div style="width:28px; height:28px; background:#dbeafe; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; color:#1d4ed8;" x-text="i+1"></div>
+                    <span style="font-weight:600; font-family:monospace;" x-text="ticker"></span>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+
+<!-- Interpretação -->
+<div class="section-box" x-show="resultado" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-shield-alt"></i> Interpretação das Métricas</div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; padding:0.5rem 0;">
+        <div style="background:#faf5ff; border-radius:8px; padding:1rem;">
+            <div style="font-weight:700; color:#7c3aed; margin-bottom:0.25rem;">Sharpe: <span x-text="resultado?.sharpe_ratio ?? 'N/D'"></span></div>
+            <div style="font-size:0.8rem; color:#4b5563;" x-text="sharpeInterpretacao()"></div>
+        </div>
+        <div style="background:#fef2f2; border-radius:8px; padding:1rem;">
+            <div style="font-weight:700; color:#dc2626; margin-bottom:0.25rem;">Drawdown: <span x-text="resultado?.max_drawdown || 'N/D'"></span></div>
+            <div style="font-size:0.8rem; color:#4b5563;">Maior queda do patrimônio em relação ao pico anterior no período.</div>
+        </div>
+        <div style="background:#f0fdf4; border-radius:8px; padding:1rem;">
+            <div style="font-weight:700; color:#16a34a; margin-bottom:0.25rem;">Líquida: <span x-text="resultado?.rentabilidade_liquida || 'N/D'"></span></div>
+            <div style="font-size:0.8rem; color:#4b5563;">Retorno após custos operacionais, taxas e impostos sobre ganhos.</div>
+        </div>
+    </div>
+</div>
+
+<!-- Metadados -->
+<div x-show="dados?.timestamp_criacao" style="background:#f8fafc; border-radius:8px; padding:0.75rem 1rem; margin-top:1rem; font-size:0.75rem; color:#9ca3af; display:flex; justify-content:space-between;">
+    <span><i class="fas fa-clock" style="margin-right:0.25rem;"></i> Gerado em: <span x-text="(dados?.timestamp_criacao || '').substring(0,19).replace('T',' ')"></span></span>
+    <span>Tempo: <span x-text="(dados?.tempo_geracao_segundos || 0).toFixed(3)"></span>s</span>
+</div>
+
+<div class="section-box" x-show="!resultado && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-bolt"></i></div>
+        <div class="empty-state-title">Nenhum dado de performance disponível</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        dados: null,
+        resultado: null,
+
+        async loadData() {
+            const res = await this.apiFetch('/api/performance/performance');
+            if (res) {
+                this.dados = res;
+                this.resultado = res.resultado_json || res.data?.resultado_json || {};
+            }
+        },
+
+        sharpeInterpretacao() {
+            const s = parseFloat(this.resultado?.sharpe_ratio);
+            if (isNaN(s)) return 'Dados insuficientes para cálculo';
+            if (s >= 2) return 'Excelente — retorno ajustado ao risco muito alto';
+            if (s >= 1) return 'Bom — retorno adequado para o risco assumido';
+            if (s >= 0) return 'Aceitável — retorno positivo mas baixo para o risco';
+            return 'Negativo — retorno abaixo do ativo livre de risco';
+        }
+    };
+}
+</script>
+{% endblock %}

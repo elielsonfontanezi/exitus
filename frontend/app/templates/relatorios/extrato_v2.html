@@ -1,0 +1,110 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Extrato de Transações{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Histórico completo de operações com filtros</p>{% endblock %}
+
+{% block page_actions %}
+<a href="/relatorios/exportar" class="btn-exitus btn-exitus-ghost"><i class="fas fa-download"></i> Exportar</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Total Transações</div>
+        <div class="kpi-card-value" x-text="total"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Exibindo</div>
+        <div class="kpi-card-value" x-text="transacoes.length"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <label class="filter-label">Tipo:</label>
+    <select class="filter-input" x-model="tipo" @change="recarregar()" style="max-width:120px;">
+        <option value="">Todos</option>
+        <option value="compra">Compra</option>
+        <option value="venda">Venda</option>
+    </select>
+    <label class="filter-label">De:</label>
+    <input type="date" class="filter-input" x-model="dataInicio" @change="recarregar()" style="max-width:150px;">
+    <label class="filter-label">Até:</label>
+    <input type="date" class="filter-input" x-model="dataFim" @change="recarregar()" style="max-width:150px;">
+    <button class="btn-exitus btn-exitus-ghost" @click="tipo=''; dataInicio=''; dataFim=''; recarregar();" style="margin-left:auto;">Limpar</button>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="transacoes.length > 0">
+    <div class="section-box-title"><i class="fas fa-list"></i> Extrato</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Ticker</th>
+                <th class="col-right">Quantidade</th>
+                <th class="col-right">Preço Unit.</th>
+                <th class="col-right">Total</th>
+                <th class="col-right">Corretagem</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="t in transacoes" :key="t.id || t.data + t.ticker + Math.random()">
+                <tr>
+                    <td x-text="t.data || '—'"></td>
+                    <td><span class="badge" :class="t.tipo === 'compra' ? 'badge-positivo' : 'badge-negativo'" x-text="t.tipo"></span></td>
+                    <td style="font-family:monospace; font-weight:600;" x-text="t.ticker"></td>
+                    <td class="col-right" x-text="t.quantidade"></td>
+                    <td class="col-right" x-text="formatMoney(t.preco_unitario || 0)"></td>
+                    <td class="col-right" style="font-weight:600;" x-text="formatMoney(t.valor_total || 0)"></td>
+                    <td class="col-right" style="color:#6b7280;" x-text="formatMoney(t.corretagem || 0)"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+    <div x-show="transacoes.length < total" style="text-align:center; padding:0.75rem;">
+        <button class="btn-exitus btn-exitus-primary" @click="page++; recarregar();">Carregar mais</button>
+    </div>
+</div>
+
+<div class="section-box" x-show="transacoes.length === 0 && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-receipt"></i></div>
+        <div class="empty-state-title">Nenhuma transação encontrada</div>
+        <div class="empty-state-text">Tente ajustar os filtros acima.</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        transacoes: [],
+        total: 0,
+        tipo: '',
+        dataInicio: '',
+        dataFim: '',
+        page: 1,
+
+        async loadData() { await this.recarregar(); },
+
+        async recarregar() {
+            let params = `?page=${this.page}&limit=50`;
+            if (this.tipo) params += `&tipo=${this.tipo}`;
+            if (this.dataInicio) params += `&data_inicio=${this.dataInicio}`;
+            if (this.dataFim) params += `&data_fim=${this.dataFim}`;
+
+            const res = await this.apiFetch('/api/transacoes' + params);
+            if (res?.data) {
+                this.transacoes = res.data.transacoes || res.transacoes || [];
+                this.total = res.data.total || this.transacoes.length;
+            }
+        }
+    };
+}
+</script>
+{% endblock %}

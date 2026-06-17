@@ -64,33 +64,8 @@ def index():
 @bp.route('/buy-signals')
 @login_required
 def buy_signals():
-    """Buy Signals - M6.1"""
-    token = session.get('access_token')
-    signals = []
-    
-    if token:
-        try:
-            headers = {'Authorization': f'Bearer {token}'}
-            response = requests.get(
-                f'{Config.BACKEND_API_URL}/api/buy-signals/watchlist-top',
-                headers=headers,
-                timeout=5
-            )
-            if response.status_code == 200:
-                raw_signals = response.json().get('data', [])
-                # ✅ CORREÇÃO 1: Mapear buy_score → buyscore para compatibilidade com template
-                for item in raw_signals:
-                    signals.append({
-                        'ticker': item.get('ticker'),
-                        'nome': item.get('nome'),
-                        'mercado': item.get('mercado'),
-                        'buyscore': item.get('buy_score', 0),  # ← Mapeamento
-                        'margem': item.get('margem_seguranca', 0)
-                    })
-        except Exception as e:
-            print(f"Erro buy-signals: {e}")
-    
-    return render_template('dashboard/buy_signals.html', signals=signals)
+    """Redirect para versão Alpine.js"""
+    return redirect(url_for('analises.buy_signals'))
 
 
 @bp.route('/buy-signals/analisar/<ticker>')
@@ -899,126 +874,29 @@ def alerts_delete(alert_id):
 @bp.route('/planos-compra')
 @login_required
 def planos_compra():
-    """Lista de Planos de Compra"""
-    token = session.get('access_token')
-    planos = []
-    
-    if token:
-        try:
-            headers = {'Authorization': f'Bearer {token}'}
-            response = requests.get(f'{Config.BACKEND_API_URL}/api/plano-compra/', headers=headers, timeout=5)
-            
-            if response.status_code == 200:
-                data = response.json()
-                planos = data.get('data', [])
-                # Calcular progresso percentual para cada plano
-                for plano in planos:
-                    quantidade_alvo = float(plano.get('quantidade_alvo', 0))
-                    quantidade_acumulada = float(plano.get('quantidade_acumulada', 0))
-                    if quantidade_alvo > 0:
-                        plano['progresso_percentual'] = (quantidade_acumulada / quantidade_alvo) * 100
-                    else:
-                        plano['progresso_percentual'] = 0
-        except Exception as e:
-            print(f"Erro ao buscar planos de compra: {e}")
-    
-    return render_template('dashboard/planos_compra.html', planos=planos)
+    """Redirect para versão Alpine.js"""
+    return redirect(url_for('planos.compra_lista'))
 
 
 @bp.route('/planos-compra/novo')
 @login_required
 def planos_compra_novo():
-    """Formulário de Novo Plano de Compra"""
-    token = session.get('access_token')
-    ativos = []
-    
-    if token:
-        try:
-            headers = {'Authorization': f'Bearer {token}'}
-            response = requests.get(f'{Config.BACKEND_API_URL}/api/ativos', headers=headers, timeout=5)
-            
-            if response.status_code == 200:
-                data = response.json()
-                ativos = data.get('data', {}).get('ativos', [])
-        except Exception as e:
-            print(f"Erro ao buscar ativos: {e}")
-    
-    return render_template('dashboard/planos_compra_novo.html', ativos=ativos)
+    """Redirect para versão Alpine.js"""
+    return redirect(url_for('planos.compra_lista'))
 
 
 @bp.route('/planos-compra/<plano_id>')
 @login_required
 def planos_compra_detalhes(plano_id):
-    """Detalhes do Plano de Compra"""
-    token = session.get('access_token')
-    plano = None
-    
-    if token:
-        try:
-            headers = {'Authorization': f'Bearer {token}'}
-            response = requests.get(f'{Config.BACKEND_API_URL}/api/plano-compra/{plano_id}', headers=headers, timeout=5)
-            
-            if response.status_code == 200:
-                data = response.json()
-                plano = data.get('data')
-                # Calcular progresso
-                if plano:
-                    quantidade_alvo = float(plano.get('quantidade_alvo', 0))
-                    quantidade_acumulada = float(plano.get('quantidade_acumulada', 0))
-                    if quantidade_alvo > 0:
-                        plano['progresso_percentual'] = (quantidade_acumulada / quantidade_alvo) * 100
-                    else:
-                        plano['progresso_percentual'] = 0
-        except Exception as e:
-            print(f"Erro ao buscar plano: {e}")
-            flash('Plano não encontrado.', 'error')
-            return redirect(url_for('dashboard.planos_compra'))
-    
-    if not plano:
-        flash('Plano não encontrado.', 'error')
-        return redirect(url_for('dashboard.planos_compra'))
-    
-    return render_template('dashboard/planos_compra_detalhes.html', plano=plano)
+    """Redirect para versão Alpine.js"""
+    return redirect(url_for('planos.compra_lista'))
 
 
 @bp.route('/planos-compra/<plano_id>/editar')
 @login_required
 def planos_compra_editar(plano_id):
-    """Editar Plano de Compra"""
-    token = session.get('access_token')
-    plano = None
-    ativos = []
-    
-    if token:
-        # Buscar plano
-        try:
-            headers = {'Authorization': f'Bearer {token}'}
-            response = requests.get(f'{Config.BACKEND_API_URL}/api/plano-compra/{plano_id}', headers=headers, timeout=5)
-            
-            if response.status_code == 200:
-                data = response.json()
-                plano = data.get('data')
-        except Exception as e:
-            print(f"Erro ao buscar plano: {e}")
-            flash('Plano não encontrado.', 'error')
-            return redirect(url_for('dashboard.planos_compra'))
-        
-        # Buscar ativos
-        try:
-            headers = {'Authorization': f'Bearer {token}'}
-            response = requests.get(f'{Config.BACKEND_API_URL}/api/ativos', headers=headers, timeout=5)
-            
-            if response.status_code == 200:
-                data = response.json()
-                ativos = data.get('data', {}).get('ativos', [])
-        except Exception as e:
-            print(f"Erro ao buscar ativos: {e}")
-    
-    if not plano:
-        flash('Plano não encontrado.', 'error')
-        return redirect(url_for('dashboard.planos_compra'))
-    
-    return render_template('dashboard/planos_compra_novo.html', plano=plano, ativos=ativos)
+    """Redirect para versão Alpine.js"""
+    return redirect(url_for('planos.compra_lista'))
 
 
 # ✅ ADICIONAR NO FINAL (usando bp Blueprint)
@@ -1108,10 +986,8 @@ def performance():
 @bp.route('/proventos-calendario')
 @login_required
 def proventos_calendario():
-    """Gestão de Proventos - Fase 1 Sprint 1.5"""
-    token = session.get('access_token')
-    
-    return render_template('dashboard/proventos_calendario.html')
+    """Redirect para versão Alpine.js"""
+    return redirect(url_for('proventos.calendario'))
 
 
 # --- Alocação e Rebalanceamento (NOVO) ---
@@ -1148,20 +1024,16 @@ def imposto_renda():
 @bp.route('/alertas')
 @login_required
 def alertas():
-    """Central de Alertas - Fase 2 Sprint 2.4"""
-    token = session.get('access_token')
-    
-    return render_template('dashboard/alertas.html')
+    """Redirect para versão Alpine.js"""
+    return redirect(url_for('alertas.lista'))
 
 
 # --- Comparador de Ativos (NOVO) ---
 @bp.route('/comparador')
 @login_required
 def comparador():
-    """Comparador de Ativos - Fase 3 Sprint 3.1"""
-    token = session.get('access_token')
-    
-    return render_template('dashboard/comparador.html')
+    """Redirect para versão Alpine.js"""
+    return redirect(url_for('ferramentas.comparador'))
 
 
 
@@ -1170,10 +1042,8 @@ def comparador():
 @bp.route('/planos-venda')
 @login_required
 def planos_venda():
-    """Planos de Venda Disciplinada - Fase 3 Sprint 3.3"""
-    token = session.get('access_token')
-    
-    return render_template('dashboard/planos_venda.html')
+    """Redirect para versão Alpine.js"""
+    return redirect(url_for('planos_venda.venda_lista'))
 
 
 # --- Educação e Insights (NOVO) ---

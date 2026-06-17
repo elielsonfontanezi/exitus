@@ -1,8 +1,8 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 17/06/2026  
-> **Status:** ✅ **Frontend GAP Analysis — TODAS AS FASES CONCLUÍDAS (1-5)**  
-> **Versão:** v0.9.18
+> **Status:** ✅ **Frontend GAP Analysis — TODAS AS FASES CONCLUÍDAS (1-6)**  
+> **Versão:** v0.9.19
 
 ---
 
@@ -41,9 +41,10 @@
 - **GAP Analysis Fase 3:** ✅ 4 telas novas (17/06/2026) — posicoes, movimentacoes, perfil, corretoras, historico, reconciliacao
 - **GAP Analysis Fase 4:** ✅ 5 expansões (17/06/2026) — alertas CRUD, exportação multi-formato, buy signals top10, calendario proventos, rentabilidade benchmark
 - **GAP Analysis Fase 5:** ✅ 4 melhorias (17/06/2026) — detalhe ativo fundamentalistas, DIRPF bens reais, eventos corporativos, planos compra/venda unificados
+- **GAP Analysis Fase 6:** ✅ Unificação (17/06/2026) — 8 templates redundantes removidos, 15 telas migradas para base_interna.html + Alpine.js, 19 templates antigos deletados
 - **APIs integradas:** 36+ endpoints (todos os 16 GAPs do GAP Analysis cobertos)
 - **Tecnologia:** Alpine.js + Fetch API + API REST + base_interna.html
-- **Status:** ✅ COMPLETO — Todas as fases (1-5) finalizadas
+- **Status:** ✅ COMPLETO — Todas as fases (1-6) finalizadas
 
 ### Sprint 8 — Ferramentas (CONCLUÍDO ✅ — 09/06/2026)
 - ✅ `/ferramentas/screener` — Screener: filtra ativos por DY, P/VP, P/L, tipo; coloração semântica

@@ -1,0 +1,115 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Relatório Anual{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Resumo anual de operações, proventos e IR — <span x-text="anoFiltro"></span></p>{% endblock %}
+
+{% block page_actions %}
+<a href="/relatorios/mensal" class="btn-exitus btn-exitus-ghost"><i class="fas fa-calendar"></i> Mensal</a>
+<a href="/relatorios/ir" class="btn-exitus btn-exitus-ghost"><i class="fas fa-calculator"></i> IR Completo</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">IR Total Anual</div>
+        <div class="kpi-card-value" style="color:#dc2626;" x-text="formatMoney(totalIR())"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Transações</div>
+        <div class="kpi-card-value" x-text="transacoes.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Proventos</div>
+        <div class="kpi-card-value" x-text="proventos.length"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <label class="filter-label">Ano:</label>
+    <select class="filter-input" x-model="anoFiltro" @change="recarregar()" style="max-width:100px;">
+        <template x-for="a in anos" :key="a"><option :value="a" x-text="a"></option></template>
+    </select>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="historico.length > 0">
+    <div class="section-box-title"><i class="fas fa-chart-bar"></i> IR Mês a Mês</div>
+    <table class="data-table">
+        <thead><tr><th>Mês</th><th class="col-right">Operações</th><th class="col-right">IR Devido</th><th class="col-center">Status</th></tr></thead>
+        <tbody>
+            <template x-for="m in historico" :key="m.mes">
+                <tr>
+                    <td style="font-weight:500;" x-text="m.mes"></td>
+                    <td class="col-right" x-text="m.operacoes || 0"></td>
+                    <td class="col-right" style="font-weight:700;" :style="(m.ir_total||0) > 0 ? 'color:#dc2626;' : 'color:#9ca3af;'" x-text="formatMoney(m.ir_total || 0)"></td>
+                    <td class="col-center">
+                        <span x-show="(m.ir_total||0) > 0" class="badge badge-negativo">Tributado</span>
+                        <span x-show="(m.ir_total||0) <= 0 && m.operacoes > 0" class="badge badge-positivo">Isento</span>
+                        <span x-show="!m.operacoes" class="badge badge-neutro">—</span>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+        <tfoot><tr style="border-top:2px solid #e5e7eb; background:#f9fafb;"><td style="font-weight:700;">Total</td><td class="col-right" style="font-weight:700;" x-text="historico.reduce((s,m)=>s+(m.operacoes||0),0)"></td><td class="col-right" style="font-weight:700; color:#dc2626;" x-text="formatMoney(totalIR())"></td><td></td></tr></tfoot>
+    </table>
+</div>
+
+<div class="section-box" x-show="transacoes.length > 0" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-exchange-alt"></i> Transações do Ano (<span x-text="transacoes.length"></span>)</div>
+    <table class="data-table">
+        <thead><tr><th>Data</th><th>Tipo</th><th>Ticker</th><th class="col-right">Qtd</th><th class="col-right">Total</th></tr></thead>
+        <tbody>
+            <template x-for="t in transacoes.slice(0,50)" :key="t.id || t.data + t.ticker">
+                <tr>
+                    <td x-text="t.data || '—'"></td>
+                    <td><span class="badge" :class="t.tipo === 'compra' ? 'badge-positivo' : 'badge-negativo'" x-text="t.tipo"></span></td>
+                    <td style="font-family:monospace; font-weight:600;" x-text="t.ticker"></td>
+                    <td class="col-right" x-text="t.quantidade"></td>
+                    <td class="col-right" style="font-weight:600;" x-text="formatMoney(t.valor_total || 0)"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+    <div x-show="transacoes.length > 50" style="text-align:center; font-size:0.75rem; color:#9ca3af; padding:0.5rem;">Exibindo 50 de <span x-text="transacoes.length"></span></div>
+</div>
+
+<div class="section-box" x-show="historico.length === 0 && transacoes.length === 0 && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-calendar-alt"></i></div>
+        <div class="empty-state-title">Nenhum dado disponível para o ano selecionado</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        historico: [],
+        transacoes: [],
+        proventos: [],
+        anoFiltro: String(new Date().getFullYear()),
+        anos: Array.from({length: 5}, (_, i) => String(new Date().getFullYear() - i)),
+
+        async loadData() { await this.recarregar(); },
+
+        async recarregar() {
+            const params = `?ano=${this.anoFiltro}`;
+            const [r1, r2, r3] = await Promise.all([
+                this.apiFetch('/api/ir/historico' + params),
+                this.apiFetch('/api/transacoes' + params),
+                this.apiFetch('/api/proventos' + params),
+            ]);
+            this.historico = r1?.data?.meses || r1?.meses || [];
+            this.transacoes = r2?.data?.transacoes || r2?.transacoes || [];
+            this.proventos = r3?.data?.proventos || r3?.proventos || [];
+        },
+
+        totalIR() { return this.historico.reduce((s, m) => s + (m.ir_total || 0), 0); }
+    };
+}
+</script>
+{% endblock %}

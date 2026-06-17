@@ -1,0 +1,150 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Alocação de Ativos{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Distribuição da carteira por classe de ativo</p>{% endblock %}
+
+{% block page_actions %}
+<a href="/analises/rentabilidade/periodo" class="btn-exitus btn-exitus-ghost"><i class="fas fa-chart-line"></i> Rentabilidade</a>
+<a href="/analises/evolucao" class="btn-exitus btn-exitus-ghost"><i class="fas fa-chart-bar"></i> Evolução</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading && desvio?.patrimonio_total">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Patrimônio Total</div>
+        <div class="kpi-card-value" x-text="formatMoney(desvio?.patrimonio_total || 0)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Posições Ativas</div>
+        <div class="kpi-card-value" x-text="desvio?.total_posicoes || 0"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Classes de Ativos</div>
+        <div class="kpi-card-value" x-text="classesAtivas()"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Barras de alocação -->
+<div class="section-box" x-show="alocacao && classesAtivas() > 0">
+    <div class="section-box-title"><i class="fas fa-chart-pie"></i> Distribuição por Classe</div>
+    <div style="display:flex; flex-direction:column; gap:1.25rem; padding:0.5rem 0;">
+        <template x-for="cls in classesData()" :key="cls.key">
+            <div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <div style="width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;" :style="'background:' + cls.color + '20'">
+                            <i :class="'fas ' + cls.icon" style="font-size:0.75rem;" :style="'color:' + cls.color"></i>
+                        </div>
+                        <span style="font-weight:500;" x-text="cls.label"></span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="font-weight:700;" x-text="(cls.percentual || 0).toFixed(2) + '%'"></span>
+                        <span style="color:#9ca3af; font-size:0.8rem; margin-left:0.5rem;" x-text="formatMoney(cls.valor || 0)"></span>
+                    </div>
+                </div>
+                <div style="width:100%; background:#f1f5f9; border-radius:6px; height:12px;">
+                    <div style="height:12px; border-radius:6px; transition:width 0.5s;" :style="'width:' + (cls.percentual || 0) + '%; background:' + cls.color"></div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+
+<!-- Tabela detalhada -->
+<div class="section-box" x-show="alocacao && classesAtivas() > 0" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-table"></i> Detalhamento</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Classe</th>
+                <th class="col-right">Valor</th>
+                <th class="col-right">% Atual</th>
+                <th class="col-right" x-show="desvio?.alocacao_target">% Target</th>
+                <th class="col-right" x-show="desvio?.alocacao_target">Desvio</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="cls in classesData()" :key="cls.key">
+                <tr>
+                    <td style="display:flex; align-items:center; gap:0.5rem; font-weight:500;">
+                        <i :class="'fas ' + cls.icon" style="font-size:0.75rem;" :style="'color:' + cls.color"></i>
+                        <span x-text="cls.label"></span>
+                    </td>
+                    <td class="col-right" style="font-weight:600;" x-text="formatMoney(cls.valor || 0)"></td>
+                    <td class="col-right" style="font-weight:700;" :style="'color:' + cls.color" x-text="(cls.percentual || 0).toFixed(2) + '%'"></td>
+                    <td class="col-right" x-show="desvio?.alocacao_target" style="color:#6b7280;" x-text="(cls.target || 0).toFixed(1) + '%'"></td>
+                    <td class="col-right" x-show="desvio?.alocacao_target" :style="desvioStyle(cls)" x-text="desvioText(cls)"></td>
+                </tr>
+            </template>
+        </tbody>
+        <tfoot x-show="desvio?.patrimonio_total">
+            <tr style="border-top:2px solid #e5e7eb; background:#f9fafb;">
+                <td style="font-weight:700;">Total</td>
+                <td class="col-right" style="font-weight:700;" x-text="formatMoney(desvio?.patrimonio_total || 0)"></td>
+                <td class="col-right" style="font-weight:700;">100%</td>
+                <td x-show="desvio?.alocacao_target" colspan="2"></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="section-box" x-show="!alocacao && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-chart-pie"></i></div>
+        <div class="empty-state-title">Nenhum dado de alocação disponível</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        alocacao: null,
+        desvio: null,
+
+        async loadData() {
+            const [r1, r2] = await Promise.all([
+                this.apiFetch('/api/portfolios/alocacao'),
+                this.apiFetch('/api/performance/desvio-alocacao'),
+            ]);
+            this.alocacao = r1 || {};
+            this.desvio = r2 || {};
+        },
+
+        classesAtivas() {
+            if (!this.alocacao) return 0;
+            return ['renda_variavel', 'renda_fixa', 'cripto'].filter(k => this.alocacao[k]).length;
+        },
+
+        classesData() {
+            const cfg = [
+                { key: 'renda_variavel', label: 'Renda Variável', color: '#3b82f6', icon: 'fa-chart-line' },
+                { key: 'renda_fixa', label: 'Renda Fixa', color: '#10b981', icon: 'fa-university' },
+                { key: 'cripto', label: 'Criptoativos', color: '#f59e0b', icon: 'fa-coins' },
+            ];
+            return cfg.filter(c => this.alocacao?.[c.key]).map(c => ({
+                ...c,
+                percentual: this.alocacao[c.key]?.percentual || 0,
+                valor: this.alocacao[c.key]?.valor || 0,
+                target: this.desvio?.alocacao_target?.[c.key] || 0,
+            }));
+        },
+
+        desvioStyle(cls) {
+            const dev = (cls.percentual || 0) - (cls.target || 0);
+            if (dev > 2) return 'font-weight:600; color:#dc2626;';
+            if (dev < -2) return 'font-weight:600; color:#1d4ed8;';
+            return 'font-weight:600; color:#16a34a;';
+        },
+
+        desvioText(cls) {
+            const dev = (cls.percentual || 0) - (cls.target || 0);
+            return (dev > 0 ? '+' : '') + dev.toFixed(1) + '%';
+        }
+    };
+}
+</script>
+{% endblock %}

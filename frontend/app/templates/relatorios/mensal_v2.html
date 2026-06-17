@@ -1,0 +1,112 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Relatório Mensal{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Transações, proventos e IR do mês</p>{% endblock %}
+
+{% block page_actions %}
+<a href="/relatorios/anual" class="btn-exitus btn-exitus-ghost"><i class="fas fa-calendar-alt"></i> Anual</a>
+<a href="/relatorios/extrato" class="btn-exitus btn-exitus-ghost"><i class="fas fa-list"></i> Extrato</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Transações</div>
+        <div class="kpi-card-value" x-text="transacoes.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Proventos</div>
+        <div class="kpi-card-value" x-text="proventos.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">IR Devido</div>
+        <div class="kpi-card-value" style="color:#dc2626;" x-text="formatMoney(resumoIR?.ir_total || 0)"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <label class="filter-label">Mês:</label>
+    <input type="month" class="filter-input" x-model="mesFiltro" @change="recarregar()" style="max-width:160px;">
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="transacoes.length > 0">
+    <div class="section-box-title"><i class="fas fa-exchange-alt"></i> Transações (<span x-text="transacoes.length"></span>)</div>
+    <table class="data-table">
+        <thead><tr><th>Data</th><th>Tipo</th><th>Ticker</th><th class="col-right">Qtd</th><th class="col-right">Preço</th><th class="col-right">Total</th></tr></thead>
+        <tbody>
+            <template x-for="t in transacoes.slice(0,50)" :key="t.id || t.data + t.ticker">
+                <tr>
+                    <td x-text="t.data || '—'"></td>
+                    <td><span class="badge" :class="t.tipo === 'compra' ? 'badge-positivo' : 'badge-negativo'" x-text="t.tipo"></span></td>
+                    <td style="font-weight:600; font-family:monospace;" x-text="t.ticker"></td>
+                    <td class="col-right" x-text="t.quantidade"></td>
+                    <td class="col-right" x-text="formatMoney(t.preco_unitario || 0)"></td>
+                    <td class="col-right" style="font-weight:600;" x-text="formatMoney(t.valor_total || 0)"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="proventos.length > 0" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-coins"></i> Proventos (<span x-text="proventos.length"></span>)</div>
+    <table class="data-table">
+        <thead><tr><th>Data</th><th>Ticker</th><th>Tipo</th><th class="col-right">Valor</th></tr></thead>
+        <tbody>
+            <template x-for="p in proventos.slice(0,50)" :key="p.id || p.data_pagamento + p.ticker">
+                <tr>
+                    <td x-text="p.data_pagamento || '—'"></td>
+                    <td style="font-weight:600; font-family:monospace;" x-text="p.ticker || p.ativo?.ticker || '—'"></td>
+                    <td x-text="p.tipo || '—'"></td>
+                    <td class="col-right" style="font-weight:600; color:#16a34a;" x-text="formatMoney(p.valor_total || p.valor || 0)"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="transacoes.length === 0 && proventos.length === 0 && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="empty-state-title">Nenhum dado para o período selecionado</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        transacoes: [],
+        proventos: [],
+        resumoIR: null,
+        mesFiltro: '',
+
+        async loadData() {
+            const now = new Date();
+            if (!this.mesFiltro) this.mesFiltro = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+            await this.recarregar();
+        },
+
+        async recarregar() {
+            const [ano, mes] = (this.mesFiltro || '').split('-');
+            const params = ano ? `?ano=${ano}&mes=${this.mesFiltro}` : '';
+
+            const [r1, r2, r3] = await Promise.all([
+                this.apiFetch('/api/transacoes' + params),
+                this.apiFetch('/api/proventos' + params),
+                this.apiFetch('/api/ir/apuracao' + params),
+            ]);
+
+            this.transacoes = r1?.data?.transacoes || r1?.transacoes || [];
+            this.proventos = r2?.data?.proventos || r2?.proventos || [];
+            this.resumoIR = r3?.data || r3 || {};
+        }
+    };
+}
+</script>
+{% endblock %}

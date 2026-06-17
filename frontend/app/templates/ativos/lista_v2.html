@@ -1,0 +1,119 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}{{ config.titulo }}{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{{ config.subtitulo }}</p>{% endblock %}
+
+{% block page_actions %}
+<a href="/ativos/acoes" class="btn-exitus btn-exitus-ghost{% if categoria == 'acoes' %} active{% endif %}">Ações</a>
+<a href="/ativos/fiis" class="btn-exitus btn-exitus-ghost{% if categoria == 'fiis' %} active{% endif %}">FIIs</a>
+<a href="/ativos/etfs" class="btn-exitus btn-exitus-ghost{% if categoria == 'etfs' %} active{% endif %}">ETFs</a>
+<a href="/ativos/renda-fixa" class="btn-exitus btn-exitus-ghost{% if categoria == 'renda-fixa' %} active{% endif %}">Renda Fixa</a>
+<a href="/ativos/cripto" class="btn-exitus btn-exitus-ghost{% if categoria == 'cripto' %} active{% endif %}">Cripto</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos Encontrados</div>
+        <div class="kpi-card-value" x-text="ativos.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Com Preço Atual</div>
+        <div class="kpi-card-value" x-text="ativos.filter(a => a.preco_atual).length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">DY Médio</div>
+        <div class="kpi-card-value" x-text="dyMedio()"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <label class="filter-label">Buscar:</label>
+    <input type="text" class="filter-input" x-model="search" @keyup.enter="recarregar()" placeholder="Buscar por ticker..." style="max-width:200px;">
+    <button class="btn-exitus btn-exitus-primary" @click="recarregar()">Buscar</button>
+    <button x-show="search" class="btn-exitus btn-exitus-ghost" @click="search=''; recarregar();" style="margin-left:auto;">Limpar</button>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="ativos.length > 0">
+    <div class="section-box-title"><i class="{{ config.icone }}"></i> {{ config.titulo }} (<span x-text="ativos.length"></span> registros)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Nome</th>
+                {% if 'mercado' in config.colunas %}<th>Mercado</th>{% endif %}
+                <th class="col-right">Preço Atual</th>
+                {% if 'p_l' in config.colunas %}<th class="col-right">P/L</th>{% endif %}
+                {% if 'p_vp' in config.colunas %}<th class="col-right">P/VP</th>{% endif %}
+                {% if 'roe' in config.colunas %}<th class="col-right">ROE %</th>{% endif %}
+                {% if 'cap_rate' in config.colunas %}<th class="col-right">Cap Rate</th>{% endif %}
+                {% if 'taxa_cupom' in config.colunas %}<th class="col-right">Taxa</th>{% endif %}
+                {% if 'data_vencimento' in config.colunas %}<th>Vencimento</th>{% endif %}
+                {% if 'dividend_yield' in config.colunas %}<th class="col-right">DY %</th>{% endif %}
+                <th class="col-center">Detalhes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="a in ativos" :key="a.ticker || a.id">
+                <tr>
+                    <td><span style="font-family:monospace; font-weight:700; background:#f1f5f9; padding:2px 6px; border-radius:4px;" x-text="a.ticker"></span></td>
+                    <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" x-text="a.nome"></td>
+                    {% if 'mercado' in config.colunas %}<td style="color:#6b7280;" x-text="a.mercado || '—'"></td>{% endif %}
+                    <td class="col-right" style="font-weight:600;" x-text="a.preco_atual ? formatMoney(a.preco_atual) : '—'"></td>
+                    {% if 'p_l' in config.colunas %}<td class="col-right" x-text="a.p_l ? parseFloat(a.p_l).toFixed(1) : '—'"></td>{% endif %}
+                    {% if 'p_vp' in config.colunas %}<td class="col-right" x-text="a.p_vp ? parseFloat(a.p_vp).toFixed(2) : '—'"></td>{% endif %}
+                    {% if 'roe' in config.colunas %}<td class="col-right" :style="parseFloat(a.roe) > 15 ? 'color:#16a34a; font-weight:600;' : ''" x-text="a.roe ? parseFloat(a.roe).toFixed(1) : '—'"></td>{% endif %}
+                    {% if 'cap_rate' in config.colunas %}<td class="col-right" x-text="a.cap_rate ? parseFloat(a.cap_rate).toFixed(2) : '—'"></td>{% endif %}
+                    {% if 'taxa_cupom' in config.colunas %}<td class="col-right" x-text="a.taxa_cupom ? parseFloat(a.taxa_cupom).toFixed(2) + '%' : '—'"></td>{% endif %}
+                    {% if 'data_vencimento' in config.colunas %}<td x-text="a.data_vencimento ? a.data_vencimento.substring(0,10) : '—'"></td>{% endif %}
+                    {% if 'dividend_yield' in config.colunas %}<td class="col-right" :style="parseFloat(a.dividend_yield) > 6 ? 'color:#16a34a; font-weight:600;' : ''" x-text="a.dividend_yield ? parseFloat(a.dividend_yield).toFixed(2) + '%' : '—'"></td>{% endif %}
+                    <td class="col-center"><a :href="'/ativos/' + a.ticker" style="font-size:0.75rem; background:#f1f5f9; padding:4px 8px; border-radius:4px; color:#4b5563;"><i class="fas fa-eye" style="margin-right:2px;"></i>Ver</a></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="ativos.length === 0 && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="{{ config.icone }}"></i></div>
+        <div class="empty-state-title">Nenhum ativo encontrado</div>
+        <div class="empty-state-text" x-show="search" x-text="'Busca: ' + search"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        ativos: [],
+        search: '',
+        tipos: {{ config.tipos_api | tojson }},
+
+        async loadData() { await this.recarregar(); },
+
+        async recarregar() {
+            let allAtivos = [];
+            for (const tipo of this.tipos) {
+                let url = `/api/ativos?tipo=${tipo}&per_page=50`;
+                if (this.search) url += `&ticker=${this.search}`;
+                const res = await this.apiFetch(url);
+                if (res?.data?.ativos) allAtivos = allAtivos.concat(res.data.ativos);
+            }
+            this.ativos = allAtivos;
+        },
+
+        dyMedio() {
+            const dys = this.ativos.filter(a => a.dividend_yield).map(a => parseFloat(a.dividend_yield));
+            if (dys.length === 0) return '—';
+            return (dys.reduce((s,v) => s+v, 0) / dys.length).toFixed(2) + '%';
+        }
+    };
+}
+</script>
+{% endblock %}

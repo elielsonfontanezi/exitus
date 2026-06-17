@@ -1,0 +1,130 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Relatório IR Completo{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Consolidação anual para Imposto de Renda — <span x-text="anoFiltro"></span></p>{% endblock %}
+
+{% block page_actions %}
+<a href="/imposto-renda/mensal" class="btn-exitus btn-exitus-ghost"><i class="fas fa-calculator"></i> Apuração Mensal</a>
+<a href="/imposto-renda/declaracao" class="btn-exitus btn-exitus-ghost"><i class="fas fa-file-alt"></i> DIRPF</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">IR Total Anual</div>
+        <div class="kpi-card-value" style="color:#dc2626;" x-text="formatMoney(totalIR())"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Meses com IR</div>
+        <div class="kpi-card-value" x-text="historico.filter(m => (m.ir_total||0) > 0).length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Bens e Direitos</div>
+        <div class="kpi-card-value" x-text="dirpf?.bens_direitos?.length || 0"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <label class="filter-label">Ano:</label>
+    <select class="filter-input" x-model="anoFiltro" @change="recarregar()" style="max-width:100px;">
+        <template x-for="a in anos" :key="a"><option :value="a" x-text="a"></option></template>
+    </select>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Histórico mensal -->
+<div class="section-box" x-show="historico.length > 0">
+    <div class="section-box-title"><i class="fas fa-chart-bar"></i> IR Mensal — <span x-text="anoFiltro"></span></div>
+    <table class="data-table">
+        <thead><tr><th>Mês</th><th class="col-right">Operações</th><th class="col-right">IR Devido</th></tr></thead>
+        <tbody>
+            <template x-for="m in historico" :key="m.mes">
+                <tr>
+                    <td style="font-weight:500;" x-text="m.mes"></td>
+                    <td class="col-right" x-text="m.operacoes || 0"></td>
+                    <td class="col-right" style="font-weight:700;" :style="(m.ir_total||0) > 0 ? 'color:#dc2626;' : 'color:#9ca3af;'" x-text="formatMoney(m.ir_total || 0)"></td>
+                </tr>
+            </template>
+        </tbody>
+        <tfoot><tr style="border-top:2px solid #e5e7eb; background:#f9fafb;"><td style="font-weight:700;">Total</td><td class="col-right" style="font-weight:700;" x-text="historico.reduce((s,m)=>s+(m.operacoes||0),0)"></td><td class="col-right" style="font-weight:700; color:#dc2626;" x-text="formatMoney(totalIR())"></td></tr></tfoot>
+    </table>
+</div>
+
+<!-- DIRPF Bens -->
+<div class="section-box" x-show="dirpf?.bens_direitos?.length > 0" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-building"></i> Bens e Direitos (DIRPF)</div>
+    <table class="data-table">
+        <thead><tr><th>Código</th><th>Descrição</th><th class="col-right">Situação 31/12/<span x-text="parseInt(anoFiltro)-1"></span></th><th class="col-right">Situação 31/12/<span x-text="anoFiltro"></span></th></tr></thead>
+        <tbody>
+            <template x-for="b in dirpf?.bens_direitos || []" :key="b.codigo + (b.descricao||'')">
+                <tr>
+                    <td style="font-family:monospace;" x-text="b.codigo || '—'"></td>
+                    <td style="font-size:0.85rem;" x-text="(b.descricao || '').substring(0, 50)"></td>
+                    <td class="col-right" x-text="formatMoney(b.situacao_anterior || 0)"></td>
+                    <td class="col-right" style="font-weight:600;" x-text="formatMoney(b.situacao_atual || 0)"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<!-- Apuração atual -->
+<div class="section-box" x-show="apuracao?.categorias" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-calculator"></i> Apuração Atual</div>
+    <table class="data-table">
+        <thead><tr><th>Categoria</th><th class="col-right">Operações</th><th class="col-right">Lucro</th><th class="col-right">IR</th></tr></thead>
+        <tbody>
+            <template x-for="[key, cat] in Object.entries(apuracao?.categorias || {})" :key="key">
+                <tr>
+                    <td style="font-weight:500; text-transform:capitalize;" x-text="key.replace(/_/g, ' ')"></td>
+                    <td class="col-right" x-text="cat.operacoes || 0"></td>
+                    <td class="col-right" :style="(cat.lucro_liquido||0) >= 0 ? 'color:#16a34a;' : 'color:#dc2626;'" x-text="formatMoney(cat.lucro_liquido || 0)"></td>
+                    <td class="col-right" style="font-weight:700;" :style="(cat.ir_devido||0) > 0 ? 'color:#dc2626;' : ''" x-text="formatMoney(cat.ir_devido || 0)"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="historico.length === 0 && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="empty-state-title">Nenhum dado de IR disponível</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        historico: [],
+        dirpf: null,
+        apuracao: null,
+        anoFiltro: String(new Date().getFullYear()),
+        anos: Array.from({length: 5}, (_, i) => String(new Date().getFullYear() - i)),
+
+        async loadData() { await this.recarregar(); },
+
+        async recarregar() {
+            const params = `?ano=${this.anoFiltro}`;
+            const now = new Date();
+            const mesAtual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            const [r1, r2, r3] = await Promise.all([
+                this.apiFetch('/api/ir/historico' + params),
+                this.apiFetch('/api/ir/dirpf' + params),
+                this.apiFetch(`/api/ir/apuracao?ano=${this.anoFiltro}&mes=${mesAtual}`),
+            ]);
+            this.historico = r1?.data?.meses || r1?.meses || [];
+            this.dirpf = r2?.data || r2 || {};
+            this.apuracao = r3?.data || r3 || {};
+        },
+
+        totalIR() { return this.historico.reduce((s, m) => s + (m.ir_total || 0), 0); }
+    };
+}
+</script>
+{% endblock %}

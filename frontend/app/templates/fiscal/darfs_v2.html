@@ -1,0 +1,110 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}DARFs{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Documento de Arrecadação de Receitas Federais — <span x-text="mesAtual"></span></p>{% endblock %}
+
+{% block page_actions %}
+<a href="/imposto-renda/mensal" class="btn-exitus btn-exitus-ghost"><i class="fas fa-calculator"></i> Apuração IR</a>
+<a href="/imposto-renda/historico" class="btn-exitus btn-exitus-ghost"><i class="fas fa-calendar"></i> Histórico</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">DARFs do Mês</div>
+        <div class="kpi-card-value" x-text="dados?.darfs?.length || 0"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">IR Total Devido</div>
+        <div class="kpi-card-value" style="color:#dc2626;" x-text="formatMoney(dados?.ir_total || 0)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Status</div>
+        <div class="kpi-card-value" :style="(dados?.darfs?.length || 0) > 0 ? 'color:#dc2626;' : 'color:#16a34a;'" x-text="(dados?.darfs?.length || 0) > 0 ? 'Pendente' : 'OK'"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Alertas -->
+<div x-show="dados?.alertas?.length > 0" style="background:#fefce8; border:1px solid #fde68a; border-radius:8px; padding:1rem; margin-bottom:1.5rem;">
+    <h3 style="font-weight:600; color:#92400e; margin-bottom:0.5rem;"><i class="fas fa-exclamation-triangle"></i> Alertas</h3>
+    <ul style="list-style:none; padding:0; margin:0;">
+        <template x-for="alerta in dados?.alertas || []" :key="alerta">
+            <li style="font-size:0.85rem; color:#92400e; padding:0.15rem 0;" x-text="'• ' + alerta"></li>
+        </template>
+    </ul>
+</div>
+
+<!-- Lista DARFs -->
+<div class="section-box" x-show="dados?.darfs?.length > 0">
+    <div class="section-box-title"><i class="fas fa-list"></i> DARFs — <span x-text="mesAtual"></span></div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Código Receita</th>
+                <th>Descrição</th>
+                <th class="col-right">Competência</th>
+                <th class="col-right">Vencimento</th>
+                <th class="col-right">Valor</th>
+                <th class="col-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="darf in dados?.darfs || []" :key="darf.codigo_receita + darf.categoria">
+                <tr>
+                    <td style="font-family:monospace; color:#4b5563;" x-text="darf.codigo_receita || '—'"></td>
+                    <td x-text="darf.descricao || darf.categoria || '—'"></td>
+                    <td class="col-right" style="color:#6b7280;" x-text="darf.competencia || mesAtual"></td>
+                    <td class="col-right" style="color:#6b7280;" x-text="darf.vencimento || '—'"></td>
+                    <td class="col-right" style="font-weight:700; color:#dc2626;" x-text="formatMoney(darf.valor || 0)"></td>
+                    <td class="col-center"><span class="badge badge-alerta">Pendente</span></td>
+                </tr>
+            </template>
+        </tbody>
+        <tfoot>
+            <tr style="border-top:2px solid #e5e7eb; background:#f9fafb;">
+                <td colspan="4" style="font-weight:700; padding:0.75rem 1rem;">Total</td>
+                <td class="col-right" style="font-weight:700; color:#dc2626; padding:0.75rem 1rem;" x-text="formatMoney(dados?.ir_total || 0)"></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- Empty state -->
+<div class="section-box" x-show="(!dados?.darfs || dados?.darfs?.length === 0) && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon" style="color:#86efac;"><i class="fas fa-check-circle"></i></div>
+        <div class="empty-state-title" style="color:#16a34a;">Nenhuma DARF pendente</div>
+        <div class="empty-state-text" x-text="'IR total apurado: ' + formatMoney(dados?.ir_total || 0)"></div>
+    </div>
+</div>
+
+<!-- Info -->
+<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:0.75rem 1rem; margin-top:1.5rem; font-size:0.8rem; color:#1d4ed8;">
+    <i class="fas fa-info-circle" style="margin-right:0.25rem;"></i>
+    DARFs com valor inferior a R$ 10,00 são acumuladas para o mês seguinte. Vencimento: último dia útil do mês seguinte à apuração.
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        dados: null,
+        mesAtual: '',
+
+        async loadData() {
+            const now = new Date();
+            const ano = now.getFullYear();
+            const mes = String(now.getMonth() + 1).padStart(2, '0');
+            this.mesAtual = `${ano}-${mes}`;
+
+            const res = await this.apiFetch(`/api/ir/darf?ano=${ano}&mes=${this.mesAtual}`);
+            if (res?.data) this.dados = res.data;
+        }
+    };
+}
+</script>
+{% endblock %}

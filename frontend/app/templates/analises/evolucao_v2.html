@@ -1,0 +1,113 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Evolução Patrimonial{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Série histórica do patrimônio mês a mês</p>{% endblock %}
+
+{% block page_actions %}
+<a href="/analises/alocacao" class="btn-exitus btn-exitus-ghost"><i class="fas fa-chart-pie"></i> Alocação</a>
+<a href="/analises/performance" class="btn-exitus btn-exitus-ghost"><i class="fas fa-bolt"></i> Performance</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading && serie.length > 0">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Patrimônio Inicial</div>
+        <div class="kpi-card-value" x-text="formatMoney(serie[0]?.valor || 0)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Patrimônio Atual</div>
+        <div class="kpi-card-value" x-text="formatMoney(serie[serie.length-1]?.valor || 0)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Variação Total</div>
+        <div class="kpi-card-value" :style="variacao() >= 0 ? 'color:#16a34a;' : 'color:#dc2626;'" x-text="(variacao() >= 0 ? '+' : '') + variacao().toFixed(1) + '%'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Meses Registrados</div>
+        <div class="kpi-card-value" x-text="serie.length"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Gráfico de barras -->
+<div class="section-box" x-show="serie.length > 0">
+    <div class="section-box-title"><i class="fas fa-chart-bar"></i> Evolução Mês a Mês</div>
+    <div style="padding:1rem; overflow-x:auto;">
+        <div style="display:flex; align-items:flex-end; gap:4px; height:160px; min-width:max-content;">
+            <template x-for="(item, i) in serie" :key="item.data || i">
+                <div style="display:flex; flex-direction:column; align-items:center; min-width:36px; position:relative;" class="group">
+                    <div style="font-size:0.65rem; color:#6b7280; position:absolute; top:-18px; white-space:nowrap; opacity:0; transition:opacity 0.2s;" class="group-hover:!opacity-100" x-text="formatMoney(item.valor)"></div>
+                    <div style="width:28px; border-radius:4px 4px 0 0; background:#3b82f6; transition:height 0.3s;" :style="'height:' + barHeight(item.valor) + 'px; min-height:4px;'"></div>
+                    <div style="font-size:9px; color:#9ca3af; transform:rotate(45deg); transform-origin:left; white-space:nowrap; margin-top:4px;" x-text="(item.data || '').substring(2,7)"></div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+
+<!-- Tabela série -->
+<div class="section-box" x-show="serie.length > 0" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-table"></i> Série Histórica</div>
+    <table class="data-table">
+        <thead>
+            <tr><th>Data</th><th class="col-right">Patrimônio</th><th class="col-right">Variação</th><th class="col-right">% Acumulado</th></tr>
+        </thead>
+        <tbody>
+            <template x-for="(item, i) in serie" :key="item.data || i">
+                <tr>
+                    <td style="font-weight:500;" x-text="item.data || '—'"></td>
+                    <td class="col-right" style="font-weight:700;" x-text="formatMoney(item.valor)"></td>
+                    <td class="col-right" :style="varMes(i) >= 0 ? 'color:#16a34a;' : 'color:#dc2626;'" x-text="i > 0 ? ((varMes(i) >= 0 ? '+' : '') + formatMoney(item.valor - serie[i-1].valor)) : '—'"></td>
+                    <td class="col-right" :style="varAcum(i) >= 0 ? 'color:#16a34a;' : 'color:#dc2626;'" x-text="(varAcum(i) >= 0 ? '+' : '') + varAcum(i).toFixed(1) + '%'"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="serie.length === 0 && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-chart-area"></i></div>
+        <div class="empty-state-title">Nenhum dado de evolução patrimonial disponível</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        serie: [],
+        maxVal: 0,
+
+        async loadData() {
+            const res = await this.apiFetch('/api/portfolios/evolucao');
+            if (res?.data) {
+                this.serie = res.data.evolucao || res.data || [];
+                this.maxVal = Math.max(...this.serie.map(s => s.valor || 0), 1);
+            }
+        },
+
+        variacao() {
+            if (this.serie.length < 2) return 0;
+            const p = this.serie[0].valor;
+            const u = this.serie[this.serie.length-1].valor;
+            return p ? ((u - p) / p * 100) : 0;
+        },
+
+        varMes(i) {
+            if (i === 0) return 0;
+            return this.serie[i].valor - this.serie[i-1].valor;
+        },
+
+        varAcum(i) {
+            const p = this.serie[0]?.valor || 1;
+            return ((this.serie[i].valor - p) / p * 100);
+        },
+
+        barHeight(val) { return this.maxVal > 0 ? Math.max(4, (val / this.maxVal) * 140) : 4; }
+    };
+}
+</script>
+{% endblock %}

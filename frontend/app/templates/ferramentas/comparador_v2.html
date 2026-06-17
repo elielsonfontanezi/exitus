@@ -1,0 +1,151 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Comparador de Ativos{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Compare até 3 ativos lado a lado — fundamentos, DY, P/VP, Beta</p>{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <label class="filter-label">Ativo 1:</label>
+    <select class="filter-input" x-model="ticker1" style="max-width:160px;">
+        <option value="">Selecionar...</option>
+        <template x-for="a in ativosList" :key="a.ticker">
+            <option :value="a.ticker" x-text="a.ticker + ' — ' + (a.nome || '').substring(0, 20)"></option>
+        </template>
+    </select>
+    <label class="filter-label">Ativo 2:</label>
+    <select class="filter-input" x-model="ticker2" style="max-width:160px;">
+        <option value="">Selecionar...</option>
+        <template x-for="a in ativosList" :key="a.ticker">
+            <option :value="a.ticker" x-text="a.ticker + ' — ' + (a.nome || '').substring(0, 20)"></option>
+        </template>
+    </select>
+    <label class="filter-label">Ativo 3:</label>
+    <select class="filter-input" x-model="ticker3" style="max-width:160px;">
+        <option value="">Selecionar...</option>
+        <template x-for="a in ativosList" :key="a.ticker">
+            <option :value="a.ticker" x-text="a.ticker + ' — ' + (a.nome || '').substring(0, 20)"></option>
+        </template>
+    </select>
+    <button class="btn-exitus btn-exitus-primary" @click="comparar()"><i class="fas fa-balance-scale"></i> Comparar</button>
+    <button class="btn-exitus btn-exitus-ghost" @click="ticker1=''; ticker2=''; ticker3=''; comparacao=[];">Limpar</button>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="comparacao.length > 0">
+    <div class="section-box-title"><i class="fas fa-balance-scale"></i> Comparação — <span x-text="comparacao.length"></span> ativo(s)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Indicador</th>
+                <template x-for="c in comparacao" :key="c.ticker">
+                    <th class="col-center">
+                        <div style="font-weight:700; color:#1d4ed8; font-family:monospace;" x-text="c.ticker"></div>
+                        <div style="font-size:0.7rem; color:#6b7280;" x-text="(c.nome || '').substring(0, 22)"></div>
+                        <span class="badge badge-neutro" style="font-size:0.65rem; text-transform:capitalize; margin-top:0.25rem;" x-text="(c.tipo || '').replace('_',' ')"></span>
+                    </th>
+                </template>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="row in indicadores" :key="row.field">
+                <tr>
+                    <td style="font-weight:500; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; color:#6b7280;" x-text="row.label"></td>
+                    <template x-for="c in comparacao" :key="c.ticker + row.field">
+                        <td class="col-center" :style="cellStyle(c, row)" x-text="fmtCell(c, row)"></td>
+                    </template>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+    <div style="text-align:center; font-size:0.75rem; color:#9ca3af; margin-top:0.5rem;">★ = melhor valor entre os ativos comparados</div>
+</div>
+
+<div class="section-box" x-show="comparacao.length === 0 && !loading && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-balance-scale"></i></div>
+        <div class="empty-state-title">Selecione 2 ou 3 ativos acima para comparar</div>
+        <div class="empty-state-text">Ou use o <a href="/ferramentas/screener" style="color:#7c3aed;">Screener</a> para encontrar ativos por fundamentos.</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        ativosList: [],
+        ticker1: new URLSearchParams(window.location.search).getAll('ticker')[0] || '',
+        ticker2: new URLSearchParams(window.location.search).getAll('ticker')[1] || '',
+        ticker3: new URLSearchParams(window.location.search).getAll('ticker')[2] || '',
+        comparacao: [],
+
+        indicadores: [
+            { label: 'Preço Atual', field: 'preco', prefix: 'R$', better: 'higher' },
+            { label: 'Variação Dia', field: 'variacao', prefix: '%', better: 'higher' },
+            { label: 'Dividend Yield', field: 'dividend_yield', prefix: '%', better: 'higher' },
+            { label: 'P/VP', field: 'p_vp', prefix: '', better: 'lower' },
+            { label: 'P/L', field: 'p_l', prefix: '', better: 'lower' },
+            { label: 'ROE', field: 'roe', prefix: '%', better: 'higher' },
+            { label: 'Beta', field: 'beta', prefix: '', better: 'neutral' },
+            { label: 'Market Cap', field: 'market_cap', prefix: 'R$', better: 'higher' },
+        ],
+
+        async loadData() {
+            const res = await this.apiFetch('/api/ativos?limit=200');
+            if (res?.data) {
+                this.ativosList = (res.data.ativos || []).sort((a, b) => (a.ticker || '').localeCompare(b.ticker || ''));
+            }
+            if (this.ticker1) this.comparar();
+        },
+
+        async comparar() {
+            const tickers = [this.ticker1, this.ticker2, this.ticker3].filter(t => t);
+            if (!tickers.length) return;
+            this.comparacao = [];
+
+            for (const t of tickers) {
+                const ativo = this.ativosList.find(a => a.ticker === t) || {};
+                let cotacao = {};
+                try {
+                    const cRes = await this.apiFetch('/api/cotacoes/' + t);
+                    if (cRes?.data) cotacao = cRes.data;
+                } catch (e) {}
+                this.comparacao.push({
+                    ticker: t,
+                    nome: ativo.nome || cotacao.nome || t,
+                    tipo: ativo.tipo || '',
+                    preco: cotacao.preco_atual || ativo.preco_atual || 0,
+                    variacao: cotacao.variacao_dia || 0,
+                    dividend_yield: ativo.dividend_yield || 0,
+                    p_vp: ativo.p_vp || 0,
+                    p_l: ativo.p_l || 0,
+                    roe: ativo.roe || 0,
+                    beta: ativo.beta || 0,
+                    market_cap: ativo.market_cap || 0,
+                });
+            }
+        },
+
+        fmtCell(c, row) {
+            const v = parseFloat(c[row.field] || 0);
+            if (!v) return '—';
+            if (row.prefix === 'R$' && row.field === 'market_cap') return 'R$ ' + v.toLocaleString('pt-BR', {maximumFractionDigits: 0});
+            if (row.prefix === 'R$') return 'R$ ' + v.toFixed(2).replace('.', ',');
+            if (row.prefix === '%') return v.toFixed(2) + '%';
+            return v.toFixed(2);
+        },
+
+        cellStyle(c, row) {
+            const v = parseFloat(c[row.field] || 0);
+            if (!v || row.better === 'neutral') return 'font-weight:500;';
+            const vals = this.comparacao.map(x => parseFloat(x[row.field] || 0)).filter(x => x !== 0);
+            if (!vals.length) return '';
+            const best = row.better === 'higher' ? Math.max(...vals) : Math.min(...vals);
+            if (v === best) return 'font-weight:700; color:#16a34a; background:#f0fdf4;';
+            return 'font-weight:500;';
+        }
+    };
+}
+</script>
+{% endblock %}

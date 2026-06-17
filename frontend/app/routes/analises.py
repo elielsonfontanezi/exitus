@@ -147,73 +147,22 @@ def rentabilidade_periodo():
 @bp.route('/alocacao', methods=['GET'])
 @login_required
 def alocacao():
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    alocacao_data = {}
-    desvio_data = {}
-    erro = None
-    try:
-        r1 = requests.get(f"{Config.BACKEND_API_URL}/api/portfolios/alocacao",
-                          headers=headers, timeout=10)
-        r2 = requests.get(f"{Config.BACKEND_API_URL}/api/performance/desvio-alocacao",
-                          headers=headers, timeout=10)
-        if r1.status_code == 200:
-            alocacao_data = r1.json()
-        if r2.status_code == 200:
-            desvio_data = r2.json()
-    except Exception as e:
-        erro = str(e)
-
-    return render_template('analises/alocacao.html',
-                           alocacao=alocacao_data, desvio=desvio_data, erro=erro)
+    """Alocação de Ativos — Alpine.js API-driven"""
+    return render_template('analises/alocacao_v2.html')
 
 
 @bp.route('/evolucao', methods=['GET'])
 @login_required
 def evolucao():
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    dados = {}
-    erro = None
-    try:
-        resp = requests.get(f"{Config.BACKEND_API_URL}/api/portfolios/evolucao",
-                            headers=headers, timeout=10)
-        if resp.status_code == 200:
-            dados = resp.json().get('data', {})
-        else:
-            erro = f'API retornou {resp.status_code}'
-    except Exception as e:
-        erro = str(e)
-
-    return render_template('analises/evolucao.html', dados=dados, erro=erro)
+    """Evolução Patrimonial — Alpine.js API-driven"""
+    return render_template('analises/evolucao_v2.html')
 
 
 @bp.route('/performance', methods=['GET'])
 @login_required
 def performance():
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-
-    dados = {}
-    erro = None
-    try:
-        resp = requests.get(f"{Config.BACKEND_API_URL}/api/performance/performance",
-                            headers=headers, timeout=10)
-        if resp.status_code == 200:
-            dados = resp.json()
-        else:
-            erro = f'API retornou {resp.status_code}'
-    except Exception as e:
-        erro = str(e)
-
-    resultado = dados.get('resultado_json', {}) if dados else {}
-    return render_template('analises/performance.html',
-                           dados=dados, resultado=resultado, erro=erro)
+    """Performance da Carteira — Alpine.js API-driven"""
+    return render_template('analises/performance_v2.html')
 
 
 @bp.route('/buy-signals', methods=['GET'])

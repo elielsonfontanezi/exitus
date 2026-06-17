@@ -8,6 +8,36 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Frontend Fase 6: Unificação e Limpeza de Templates (17/06/2026)
+
+**Parte A — 8 templates redundantes removidos:**
+- `dashboard/alertas.html`, `buy_signals.html`, `planos_compra*.html`, `planos_venda.html`, `proventos_calendario.html`, `comparador.html`
+- Rotas redirecionam para versões Alpine.js já existentes
+
+**Parte B — 15 templates migrados para `base_interna.html` + Alpine.js:**
+- Ferramentas: `screener_v2.html`, `comparador_v2.html`, `calculadora_ir_v2.html`, `simulador_v2.html`
+- Fiscal: `ir_mensal_v2.html`, `darfs_v2.html`, `historico_v2.html`
+- Relatórios: `mensal_v2.html`, `anual_v2.html`, `extrato_v2.html`, `ir_completo_v2.html`
+- Análises: `evolucao_v2.html`, `performance_v2.html`, `alocacao_v2.html`
+- Ativos: `lista_v2.html` (catálogo parametrizado por tipo)
+
+**Rotas simplificadas (server-side fetch removido):**
+- `fiscal.py` — 3 rotas: render_template direto
+- `relatorios.py` — 4 rotas: render_template direto
+- `analises.py` — 3 rotas: render_template direto
+- `ativos_catalogo.py` — `_lista_view()` simplificada
+
+**Templates antigos removidos (19 arquivos):**
+- `fiscal/ir_mensal.html`, `darfs.html`, `historico.html`
+- `relatorios/mensal.html`, `anual.html`, `extrato.html`, `ir_completo.html`
+- `analises/evolucao.html`, `performance.html`, `alocacao.html`
+- `ativos/lista.html`
+- 8 templates redundantes do dashboard
+
+**Nota:** `operacoes/operacoes.html` e `dashboard/index.html` já Alpine.js — migração base adiada.
+
+---
+
 ### Feat — Frontend Fase 5: Melhorias e Correções Finais (17/06/2026)
 
 **GAPs:** G3, G10, G11, G15

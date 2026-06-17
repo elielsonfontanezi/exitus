@@ -51,8 +51,8 @@ def compra_lista():
 @bp.route('/<plano_id>')
 @login_required
 def compra_detalhe(plano_id):
-    """Redirect para versão Alpine.js do dashboard."""
-    return redirect(url_for('dashboard.planos_compra_detalhes', plano_id=plano_id))
+    """Redirect para tela unificada de planos."""
+    return redirect(url_for('planos.compra_lista'))
 
 
 # Blueprint separado para planos de venda (API pendente no backend)

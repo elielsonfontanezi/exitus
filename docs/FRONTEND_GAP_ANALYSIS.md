@@ -123,7 +123,36 @@
 
 ---
 
-## �� Índice de Grupos
+### ✅ Fase 6 — Unificação e Limpeza de Templates (17/06/2026)
+*Migrar todas as telas restantes para `base_interna.html` + Alpine.js. Remover templates redundantes.*
+
+**Parte A — Remover 8 templates redundantes** (já substituídos por versões novas):
+- [x] `dashboard/alertas.html` → redirecionar para `/alertas/`
+- [x] `dashboard/buy_signals.html` → redirecionar para `/analises/buy-signals`
+- [x] `dashboard/planos_compra.html` → redirecionar para `/planos-compra/`
+- [x] `dashboard/planos_compra_novo.html` → redirecionar para `/planos-compra/`
+- [x] `dashboard/planos_compra_detalhes.html` → redirecionar para `/planos-compra/`
+- [x] `dashboard/planos_venda.html` → redirecionar para `/planos-compra/` (aba venda)
+- [x] `dashboard/proventos_calendario.html` → redirecionar para `/proventos/calendario`
+- [x] `dashboard/comparador.html` → redirecionar para `/ferramentas/comparador`
+
+**Parte B — Migrar 15 telas para base_interna.html + Alpine.js:**
+- [x] Ferramentas (4): screener, comparador, calculadora-ir, simulador
+- [x] Fiscal (3): ir_mensal, darfs, historico
+- [x] Relatórios (4): mensal, anual, extrato, ir_completo
+- [x] Análises (3): evolucao, performance, alocacao
+- [x] Ativos (1): lista.html (catálogo por tipo)
+
+**Parte C — Já Alpine.js (migração de base adiada):**
+- [x] Operações (1): operacoes.html — já usa Alpine.js inline, 946 linhas
+- [x] Dashboard (1): index.html — já usa Alpine.js inline, 647 linhas
+
+> Nota: Operações e Dashboard já são reativos com Alpine.js mas herdam de `base.html`.
+> Migração para `base_interna.html` seria cosmética e de risco alto — adiada para fase posterior.
+
+---
+
+## 📋 Índice de Grupos
 
 | # | Grupo | APIs disponíveis | Frontend atual | GAPs | Prioridade |
 |---|-------|-----------------|----------------|------|-----------|
