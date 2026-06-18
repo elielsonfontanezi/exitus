@@ -1,9 +1,8 @@
 // Sistema de Autenticação Frontend
 class AuthManager {
     constructor() {
-        // Token mock para testes (válido por 24h)
-        this.token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3Mzg2NzQ0NCwianRpIjoiZmJmY2FmZDEtYzMzYi00ZTQ4LTgxODUtOWFkYWY0MDU1MTc5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFiZTVkNDFhLWFkYTctNDc4MC1hNGNkLWRkZGNlM2E5NGNkMiIsIm5iZiI6MTc3Mzg2NzQ0NCwiZXhwIjoxNzczODcxMDQ0LCJyb2xlIjoiYWRtaW4iLCJhc3Nlc3NvcmFfaWQiOiIyM2M1NGNiNC1jYjBhLTQzOGYtYjk4NS1kZWYyMWQ3MDkwNGUifQ.AZ1yWosV1BImNwDY7HjytwXWYLt5GXNK8osNNF6KWK0';
-        this.user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{"id":"abe5d41a-ada7-4780-a4cd-dddc3ea94cd2","username":"admin","role":"admin"}');
+        this.token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token') || null;
+        this.user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || 'null');
     }
     
     // Salvar token e usuário

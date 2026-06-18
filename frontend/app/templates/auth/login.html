@@ -3,144 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Exitus</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/static/css/tailwind.css">
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <title>Login — Exitus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary:     #a38c65;
+            --primary-dk:  #8b7454;
+            --primary-lt:  #f8f6f3;
+            --text:        #212529;
+            --text-muted:  #6c757d;
+            --border:      #e9ecef;
+            --surface:     #f8f9fa;
+            --danger:      #dc3545;
+            --success:     #28a745;
+            --font:        'Nunito', sans-serif;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--surface);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* ── Card principal ── */
+        .login-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 4px 24px rgba(0,0,0,.06);
+            width: 100%;
+            max-width: 420px;
+            padding: 2.5rem 2rem;
+        }
+
+        /* ── Branding ── */
+        .brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .brand-icon {
+            width: 56px; height: 56px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: .75rem;
+        }
+        .brand-icon i { color: #fff; font-size: 1.5rem; }
+        .brand h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -.5px;
+        }
+        .brand p {
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin-top: .25rem;
+        }
+
+        /* ── Formulário ── */
+        .field { margin-bottom: 1.1rem; }
+        .field label {
+            display: block;
+            font-size: .82rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: .35rem;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+        .field .input-wrap { position: relative; }
+        .field .input-wrap i {
+            position: absolute;
+            left: .85rem; top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: .85rem;
+            pointer-events: none;
+        }
+        .field input {
+            width: 100%;
+            padding: .65rem .85rem .65rem 2.4rem;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-family: var(--font);
+            font-size: .95rem;
+            color: var(--text);
+            background: #fff;
+            transition: border-color .2s;
+            outline: none;
+        }
+        .field input:focus { border-color: var(--primary); }
+
+        /* ── Botão ── */
+        .btn-login {
+            width: 100%;
+            padding: .75rem;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-family: var(--font);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            transition: background .2s, transform .1s;
+            margin-top: 1.4rem;
+        }
+        .btn-login:hover:not(:disabled) { background: var(--primary-dk); }
+        .btn-login:active:not(:disabled) { transform: scale(.98); }
+        .btn-login:disabled { opacity: .65; cursor: not-allowed; }
+
+        /* ── Mensagens flash ── */
+        .flash-box {
+            border-radius: 5px;
+            padding: .65rem .9rem;
+            font-size: .88rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .flash-error   { background: #fff5f5; border: 1px solid #f5c6cb; color: var(--danger); }
+        .flash-success { background: #f0fff4; border: 1px solid #c3e6cb; color: var(--success); }
+
+        /* ── Erro inline ── */
+        #loginError {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        /* ── Divisor ── */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--text-muted);
+            font-size: .8rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── Link versão ── */
+        .version {
+            text-align: center;
+            font-size: .75rem;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="fixed top-4 right-4 z-50 space-y-2" id="flash-messages">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'success' if category == 'success' else 'error' if category == 'error' else 'warning' }} max-w-md shadow-lg">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <i class="fas fa-{{ 'check-circle text-green-600' if category == 'success' else 'exclamation-circle text-red-600' if category == 'error' else 'info-circle text-blue-600' }}"></i>
-                                <span>{{ message }}</span>
-                            </div>
-                            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-gray-400 hover:text-gray-600">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
+<body>
 
-    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8">
-            <!-- Logo -->
-            <div class="text-center">
-                <div class="flex justify-center">
-                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-chart-line text-3xl text-white"></i>
-                    </div>
+    <div class="login-card">
+
+        <!-- Branding -->
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h1>Exitus</h1>
+            <p>Controle e Análise de Investimentos</p>
+        </div>
+
+        <!-- Flash messages do servidor -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-box flash-{{ 'error' if category == 'error' else 'success' }}">
+                    <i class="fas fa-{{ 'exclamation-circle' if category == 'error' else 'check-circle' }}"></i>
+                    {{ message }}
                 </div>
-                <h2 class="mt-6 text-3xl font-extrabold text-gray-900">Bem-vindo ao Exitus</h2>
-                <p class="mt-2 text-sm text-gray-600">Sistema de Controle e Análise de Investimentos</p>
+            {% endfor %}
+        {% endwith %}
+
+        <!-- Formulário -->
+        <form id="loginForm" novalidate>
+            <div class="field">
+                <label for="username">Usuário</label>
+                <div class="input-wrap">
+                    <i class="fas fa-user"></i>
+                    <input type="text"
+                           id="username"
+                           name="username"
+                           placeholder="Seu usuário"
+                           required
+                           autocomplete="username"
+                           autofocus>
+                </div>
             </div>
 
-            <!-- Formulário de Login - USERNAME para Backend M2 -->
-            <form id="loginForm" method="POST" action="/auth/login" class="card space-y-4">
-                <div>
-                    <label for="username" class="label">
-                        <i class="fas fa-user mr-1"></i> Usuário
-                    </label>
-                    <input type="text" 
-                           id="username" 
-                           name="username" 
-                           class="input" 
-                           value="e2e_user" 
-                           placeholder="e2e_user" 
-                           required 
-                           autocomplete="username">
-                </div>
-                
-                <div>
-                    <label for="password" class="label">
-                        <i class="fas fa-lock mr-1"></i> Senha
-                    </label>
-                    <input type="password" 
-                           id="password" 
-                           name="password" 
-                           class="input" 
-                           value="e2e_senha_123" 
-                           placeholder="••••••••" 
-                           required 
+            <div class="field">
+                <label for="password">Senha</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           placeholder="••••••••"
+                           required
                            autocomplete="current-password">
                 </div>
-
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input type="checkbox" id="remember_me" name="remember_me" class="h-4 w-4 text-blue-600">
-                        <label for="remember_me" class="ml-2 text-sm text-gray-700">Lembrar-me</label>
-                    </div>
-                    <a href="/auth/forgot-password" class="text-sm text-blue-600 hover:text-blue-700">Esqueceu?</a>
-                </div>
-
-                <button type="submit" class="w-full btn btn-primary flex items-center justify-center space-x-2">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Entrar</span>
-                </button>
-            </form>
-
-            <!-- Link Registro -->
-            <div class="text-center">
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">Não tem conta?</span>
-                    </div>
-                </div>
-                <a href="/auth/register" class="block w-full mt-4 text-blue-600 hover:text-blue-700 font-medium text-center">
-                    Criar nova conta
-                </a>
             </div>
-        </div>
+
+            <!-- Erro inline de autenticação -->
+            <div class="flash-box flash-error" id="loginError">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="loginErrorMsg">Usuário ou senha incorretos.</span>
+            </div>
+
+            <button type="submit" class="btn-login" id="submitBtn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Entrar</span>
+            </button>
+        </form>
+
+        <div class="version">Exitus v0.9.19</div>
     </div>
 
-    <!-- Auto-hide flash messages -->
-    <script>
-        setTimeout(() => {
-            const flashMessages = document.getElementById('flash-messages');
-            if (flashMessages) {
-                flashMessages.style.transition = 'opacity 0.5s';
-                flashMessages.style.opacity = '0';
-                setTimeout(() => flashMessages.remove(), 500);
-            }
-        }, 5000);
-        
-        // Verificar se tem mensagem de sucesso e extrair token
-        {% if get_flashed_messages(with_categories=true) %}
-            // Se chegou aqui com sucesso, tentar extrair token da resposta anterior
-            // Em produção, o backend deve retornar o token via JavaScript
-            console.log('Login realizado com sucesso');
-        {% endif %}
-    </script>
-    
-    <!-- Script de Login AJAX -->
+    <!-- auth.js antes do script de login -->
+    <script src="/static/js/auth.js"></script>
+
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const formData = new FormData(this);
-            const data = {
-                username: formData.get('username'),
-                password: formData.get('password')
-            };
-            
-            // Desabilitar botão
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const errorBox  = document.getElementById('loginError');
+            const errorMsg  = document.getElementById('loginErrorMsg');
+
+            // Esconder erro anterior
+            errorBox.style.display = 'none';
+
+            // Feedback no botão
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Entrando...';
-            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+
             try {
                 const response = await fetch('/auth/login', {
                     method: 'POST',
@@ -148,35 +266,31 @@
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({ username, password })
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
-                    // Salvar token e usuário
+                    // Salvar token no localStorage via AuthManager
                     if (window.auth) {
                         window.auth.saveToken(result.token, result.user);
                     }
-                    
-                    // Redirecionar para dashboard
                     window.location.href = result.redirect || '/dashboard/';
                 } else {
-                    // Mostrar erro
-                    alert('Login falhou: ' + (result.message || 'Verifique suas credenciais'));
+                    errorMsg.textContent = result.message || 'Usuário ou senha incorretos.';
+                    errorBox.style.display = 'flex';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
                 }
-            } catch (error) {
-                console.error('Erro no login:', error);
-                alert('Erro de conexão. Tente novamente.');
-            } finally {
-                // Restaurar botão
+            } catch (err) {
+                errorMsg.textContent = 'Erro de conexão. Verifique sua rede e tente novamente.';
+                errorBox.style.display = 'flex';
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
             }
         });
     </script>
-    
-    <!-- Script de autenticação -->
-    <script src="/static/js/auth.js"></script>
+
 </body>
 </html>

@@ -17,8 +17,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 1 |
-| 🟡 PARCIAL | 30 |
+| ✅ OK | 2 |
+| 🟡 PARCIAL | 29 |
 | 🔴 QUEBRADO | 5 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -28,7 +28,7 @@
 
 | # | Módulo | URL | Status | Problemas | Prioridade |
 |---|--------|-----|--------|-----------|-----------|
-| 1 | Login | `/auth/login` | 🟡 | URL roteiro errada; credenciais hardcoded; link Esqueceu? → 404 | Média |
+| 1 | Login | `/auth/login` | ✅ | Redesenhado: UX_DESIGN_SYSTEM aplicado, credenciais removidas, link Esqueceu removido (EXITUS-LOGIN-001) | — |
 | 2 | Dashboard | `/dashboard/` | 🟡 | CDI/Ibovespa hardcoded; meta hardcoded; token via localStorage pode falhar | Alta |
 | 3 | Configurações — Perfil | `/configuracoes/perfil` | 🟡 | Somente leitura — sem edição de nome/email/senha | Média |
 | 4 | Configurações — Corretoras | `/configuracoes/corretoras` | 🟡 | Listagem OK — sem botões CRUD (criar/editar/excluir corretora) | Alta |
@@ -546,8 +546,8 @@
 
 | ID | Problema | Tela(s) | Causa raiz identificada |
 |----|----------|---------|------------------------|
-| BUG-001 | **Token não salvo no localStorage após login Flask** — todas as telas `base_interna.html` usam `localStorage.getItem('access_token')` mas o login Flask salva apenas na sessão do servidor. Alpine.js recebe `null` → API retorna 401 → `loading` trava → tela parece "sem resposta" | 3, 4, 5, 6, 7, 8, 9–35 | `auth.py` route usa form POST → Flask session. `auth.js` `localStorage.setItem` só é chamado via AJAX. Fluxos não sincronizados. **Fix:** no `auth.py` após login bem-sucedido, passar o token para o template e injetá-lo via `<script>localStorage.setItem('access_token', '...')</script>` |
-| BUG-002 | **Toggle Compra/Venda não responde a cliques** | 6, 7 | Consequência de BUG-001: `loading=true` mantém `x-show="!loading"` do `base_interna.html` ocultando o container. **Fix:** depende de BUG-001 |
+| ~~BUG-001~~ | ~~**Token não salvo no localStorage após login Flask**~~ — **RESOLVIDO em EXITUS-LOGIN-001**: token mock hardcoded removido de `auth.js`; login já era AJAX e chamava `window.auth.saveToken()` corretamente. Causa real era o fallback com token expirado mascarando o fluxo | — todas as telas `base_interna.html` usam `localStorage.getItem('access_token')` mas o login Flask salva apenas na sessão do servidor. Alpine.js recebe `null` → API retorna 401 → `loading` trava → tela parece "sem resposta" | 3, 4, 5, 6, 7, 8, 9–35 | `auth.py` route usa form POST → Flask session. `auth.js` `localStorage.setItem` só é chamado via AJAX. Fluxos não sincronizados. **Fix:** no `auth.py` após login bem-sucedido, passar o token para o template e injetá-lo via `<script>localStorage.setItem('access_token', '...')</script>` |
+| BUG-002 | **Toggle Compra/Venda não responde a cliques** | 6, 7 | BUG-001 resolvido. Revalidar se toggle funciona após login real. Se persistir: investigar handler Alpine.js do toggle independentemente |
 | BUG-003 | **Import B3 (Canal do Investidor) não exibe registros** | 5 | `data.data` retornado pela API pode ter estrutura diferente de `{transacoes_criadas, proventos_criados, resumo}` esperada pelo template. **Fix:** inspecionar resposta real da API `/api/import/b3` e ajustar template |
 
 ### 🟡 Importantes (degradam experiência)
@@ -557,7 +557,7 @@
 | BUG-004 | **Filtro por data no Histórico filtra client-side** — só filtra as 50 transações da página atual, não todas | 8 | `filtrar()` opera sobre `this.transacoes` (50 itens). **Fix:** passar `data_inicio`/`data_fim` como params para API `/api/transacoes` |
 | BUG-005 | **CDI e Ibovespa hardcoded** — `11.75%` e `8.32%` fixos no template | 2 | Valores estáticos no HTML. **Fix:** criar endpoint `/api/indicadores` ou buscar de config |
 | BUG-006 | **Saldo de corretoras sempre R$ 0,00** | 4 | Campo `saldo_atual` não retornado pela API ou não existe no modelo. **Fix:** verificar schema tabela `corretoras` e endpoint `GET /api/corretoras` |
-| BUG-007 | **Link "Esqueceu a senha?"** retorna 404 | 1 | Rota `/auth/forgot-password` não implementada. **Fix:** implementar rota ou remover link |
+| ~~BUG-007~~ | ~~**Link "Esqueceu a senha?"** retorna 404~~ | — | **RESOLVIDO em EXITUS-LOGIN-001** — link removido do template (funcionalidade não implementada) | | 1 | Rota `/auth/forgot-password` não implementada. **Fix:** implementar rota ou remover link |
 | BUG-008 | ~~Link "Ver Ativo" retorna 404~~ — **RESOLVIDO na análise**: rota `/dashboard/ativo/<ticker>` existe em `dashboard.py` linha 913 | 8, 9 | Falso positivo — rota implementada |
 | BUG-009 | **`API_BASE` hardcoded como hostname Docker** em `fiscal.py` linha 9: `http://exitus-backend:5000/api` | 20, 21, 22, 23 | **Fix:** substituir por `Config.BACKEND_API_URL` (já usado corretamente nos outros blueprints) |
 | BUG-010 | **Tela DIRPF: `dados` e `erro` não passados ao template** — `render_template('fiscal/declaracao_v2.html')` sem argumentos, apesar de buscá-los | 23 | **Fix:** passar `dados=dados, erro=erro` no `render_template` |
@@ -708,8 +708,8 @@
 
 | Status | Qtd | % |
 |--------|-----|---|
-| ✅ OK | 1 | 3% |
-| 🟡 PARCIAL | 30 | 83% |
+| ✅ OK | 2 | 6% |
+| 🟡 PARCIAL | 29 | 80% |
 | 🔴 QUEBRADO | 5 | 14% |
 | ⬜ NÃO TESTADO | 0 | — |
 
