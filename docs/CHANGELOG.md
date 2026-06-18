@@ -8,6 +8,16 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — EXITUS-ANALISES-001 + Revalidação BUG-003: rota legacy + Import B3 (18/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/routes/analises.py`: `rentabilidade()` substituída por redirect para `rentabilidade_periodo()`; código morto removido
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-003 marcado falso positivo (import idempotente por design); BUG-018 resolvido; contadores ajustados para **0 telas quebradas**
+
+**Revalidado:** `/analises/rentabilidade` redireciona para `/periodo`; Import B3 com dados novos retorna Transações=2 corretamente
+
+---
+
 ### Fix — EXITUS-ATIVOS-001: BUG-016 falso positivo + link menu Eventos Corporativos (18/06/2026)
 
 **Arquivos alterados:**

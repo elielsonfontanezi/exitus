@@ -18,8 +18,8 @@
 | Status | Quantidade |
 |--------|-----------|
 | ✅ OK | 2 |
-| 🟡 PARCIAL | 32 |
-| 🔴 QUEBRADO | 2 |
+| 🟡 PARCIAL | 34 |
+| 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
 ---
@@ -32,7 +32,7 @@
 | 2 | Dashboard | `/dashboard/` | 🟡 | CDI/Ibovespa hardcoded; meta hardcoded; token via localStorage pode falhar | Alta |
 | 3 | Configurações — Perfil | `/configuracoes/perfil` | 🟡 | Somente leitura — sem edição de nome/email/senha | Média |
 | 4 | Configurações — Corretoras | `/configuracoes/corretoras` | 🟡 | Listagem OK — sem botões CRUD (criar/editar/excluir corretora) | Alta |
-| 5 | Operações — Import B3 | `/operacoes/` | � | Import Canal do Investidor não exibe registros importados | Alta |
+| 5 | Operações — Import B3 | `/operacoes/` | 🟡 | Import funciona ✅; retorna 0 com fixture existente (idempotente por design); revalidado com dados novos: Transações=2 | — |
 | 6 | Operações — Compra | `/operacoes/` | 🟡 | Toggle funciona ✅; busca de ativo sem autocomplete (BUG-014 relacionado) | Média |
 | 7 | Operações — Venda | `/operacoes/` | 🟡 | Toggle funciona ✅; modo venda acessível e formulário exibido corretamente | Média |
 | 8 | Operações — Histórico | `/operacoes/historico` | 🟡 | Filtro por data com bug; filtro ticker OK; sem editar/excluir | Média |
@@ -46,7 +46,7 @@
 | 16 | Análises — Performance | `/analises/performance` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 17 | Análises — Alocação | `/analises/alocacao` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 18 | Análises — Buy Signals | `/analises/buy-signals` | 🟡 | Carrega dados ✅; busca por ticker sem autocomplete (BUG-017) | Média |
-| 19 | Análises — Rentabilidade (legacy) | `/analises/rentabilidade` | � | NOT FOUND no browser; não aparece no menu — rota morta (BUG-018) | Alta |
+| 19 | Análises — Rentabilidade (legacy) | `/analises/rentabilidade` | 🟡 | Redirect para `/periodo` ✅ (EXITUS-ANALISES-001); código morto removido | — |
 | 19b | Análises — Rentabilidade por Período | `/analises/rentabilidade/periodo` | 🟡 | Acessível pelo menu como "Rentabilidade"; filtros de período OK; benchmark sem validação | Média |
 | 20 | Fiscal — IR Mensal | `/imposto-renda/mensal` | 🟡 | Carrega dados ✅; `API_BASE` hardcoded como `exitus-backend:5000` (BUG-009) | Média |
 | 21 | Fiscal — DARFs | `/imposto-renda/darfs` | 🟡 | Carrega dados ✅; `API_BASE` hardcoded (BUG-009) | Média |
@@ -544,7 +544,7 @@
 |----|----------|---------|------------------------|
 | ~~BUG-001~~ | ~~**Token não salvo no localStorage após login Flask**~~ — **RESOLVIDO em EXITUS-LOGIN-001**: token mock hardcoded removido de `auth.js`; login já era AJAX e chamava `window.auth.saveToken()` corretamente. Causa real era o fallback com token expirado mascarando o fluxo | — todas as telas `base_interna.html` usam `localStorage.getItem('access_token')` mas o login Flask salva apenas na sessão do servidor. Alpine.js recebe `null` → API retorna 401 → `loading` trava → tela parece "sem resposta" | 3, 4, 5, 6, 7, 8, 9–35 | `auth.py` route usa form POST → Flask session. `auth.js` `localStorage.setItem` só é chamado via AJAX. Fluxos não sincronizados. **Fix:** no `auth.py` após login bem-sucedido, passar o token para o template e injetá-lo via `<script>localStorage.setItem('access_token', '...')</script>` |
 | ~~BUG-002~~ | ~~**Toggle Compra/Venda: getters `isCompra`/`isVenda` invertidos após merge**~~ | — | **RESOLVIDO em EXITUS-OPERACOES-001**: getters substituídos por propriedades reativas simples em `operacoes_v2.html`. Spread `{ ...base, ...pageDataExtend() }` não preserva getters JavaScript — convertido para `isCompra: true, isVenda: false` atualizados em `toggleModo()` |
-| BUG-003 | **Import B3 (Canal do Investidor) não exibe registros** | 5 | `data.data` retornado pela API pode ter estrutura diferente de `{transacoes_criadas, proventos_criados, resumo}` esperada pelo template. **Fix:** inspecionar resposta real da API `/api/import/b3` e ajustar template |
+| ~~BUG-003~~ | ~~**Import B3 não exibe registros**~~ | — | **FALSO POSITIVO** — revalidado 18/06/2026: import retorna 0 quando dados já existem no banco (idempotência correta). Com CSV de dados novos: Transações=2, Proventos=0 — funcionamento correto |
 
 ### 🟡 Importantes (degradam experiência)
 
@@ -563,7 +563,7 @@
 | BUG-014 | **Busca por ticker no Catálogo de Ativos não funciona** — sem autocomplete e sem resultado ao buscar | 11 | `recarregar()` passa `ticker` como param para `GET /api/ativos?tipo=X&ticker=Y`. Possível que API não suporte filtro por `ticker` parcial ou que o param seja ignorado. **Fix:** verificar se API aceita busca parcial; implementar autocomplete se necessário |
 | BUG-015 | **Tela de Detalhe do Ativo demora e nem sempre exibe dados** | 11, 12 | Múltiplas chamadas em sequência (ativo, cotação, fundamentalistas, buy score). Ativos sem cotação ou sem dados no banco ficam com campos `N/D` ou vazios. **Fix:** (1) paralelizar chamadas com `Promise.all`; (2) mostrar estado vazio amigável quando dados inexistentes |
 | BUG-019 | **Botão "Comparar" no Comparador de Ativos não aciona nada** | 30 | Provável `@click` sem handler implementado ou handler que depende de tickers selecionados mas sem validação visível. **Fix:** inspecionar handler Alpine.js do botão; verificar se `comparar()` existe e faz chamada à API `/api/ativos/comparar` ou similar |
-| BUG-018 | **Rota `/analises/rentabilidade` (legacy) retorna NOT FOUND** — rota morta; menu aponta para `/periodo` corretamente, mas a rota legacy ainda existe no código gerando confusão | 19 | **Fix:** remover rota legacy ou adicionar redirect de `/analises/rentabilidade` → `/analises/rentabilidade/periodo` |
+| ~~BUG-018~~ | ~~**Rota `/analises/rentabilidade` legacy retorna NOT FOUND**~~ | — | **RESOLVIDO em EXITUS-ANALISES-001**: redirect adicionado em `analises.py`; código morto (template inexistente `rentabilidade.html`) removido |
 | BUG-017 | **Busca por ticker sem autocomplete em Buy Signals** — funciona se digitado exato, sem sugestões | 18 | Campo de busca é `<input>` simples sem `datalist` ou componente de autocomplete. **Fix:** adicionar `datalist` populado via `GET /api/ativos?ticker=X` ou usar biblioteca de autocomplete |
 | ~~BUG-016~~ | ~~**Tela Eventos Corporativos inacessível**~~ | — | **FALSO POSITIVO** — revalidado 18/06/2026 com token válido: `/ativos/eventos-corporativos` carrega corretamente (KPIs + filtros). Flask prioriza rota estática sobre `/<ticker>` no mesmo blueprint. Bug original era consequência do BUG-001 (token inválido) |
 
@@ -705,26 +705,24 @@
 | Status | Qtd | % |
 |--------|-----|---|
 | ✅ OK | 2 | 6% |
-| 🟡 PARCIAL | 32 | 89% |
-| 🔴 QUEBRADO | 2 | 5% |
+| 🟡 PARCIAL | 34 | 94% |
+| 🔴 QUEBRADO | 0 | 0% |
 | ⬜ NÃO TESTADO | 0 | — |
 
 ### Telas 🔴 QUEBRADAS
 
 | Tela | URL | Motivo |
 |------|-----|--------|
-| 5 | `/operacoes/` Import B3 | Import aceita mas não exibe registros (BUG-003) |
-| 19 | `/analises/rentabilidade` | Rota legacy morta — NOT FOUND (BUG-018) |
-| 6, 7 | `/operacoes/` Compra/Venda | ~~Toggle inoperante~~ → **RESOLVIDO** EXITUS-OPERACOES-001 |
-| 13 | `/ativos/eventos-corporativos` | ~~NOT FOUND~~ → **FALSO POSITIVO** — carrega OK com token válido |
-| 19 | `/analises/rentabilidade` | Rota legacy morta — NOT FOUND (BUG-018) |
-| 23 | `/imposto-renda/declaracao` | Carrega dados ✅ mas `dados`/`erro` não passados ao template (BUG-010) — dados visíveis provavelmente vem da chamada Alpine.js client-side |
+| ~~5~~ | ~~`/operacoes/` Import B3~~ | ~~Import não exibe registros~~ → **FALSO POSITIVO** — idempotente por design; revalidado com dados novos: Transações=2 |
+| ~~6, 7~~ | ~~`/operacoes/` Compra/Venda~~ | ~~Toggle inoperante~~ → **RESOLVIDO** EXITUS-OPERACOES-001 |
+| ~~13~~ | ~~`/ativos/eventos-corporativos`~~ | ~~NOT FOUND~~ → **FALSO POSITIVO** — carrega OK com token válido |
+| ~~19~~ | ~~`/analises/rentabilidade`~~ | ~~Rota legacy morta~~ → **RESOLVIDO** EXITUS-ANALISES-001 (redirect para `/periodo`) |
 
 ### Bugs por prioridade
 
 | Prioridade | Quantidade |
 |------------|-----------|
-| 🔴 Crítico | 3 (BUG-001, BUG-002, BUG-003) |
+| ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
 | 🟡 Importante | 15 (BUG-004 a BUG-019, excl. BUG-008 resolvido) |
 | ⬛ Feature ausente | 8 (FEAT-001 a FEAT-008) |
 

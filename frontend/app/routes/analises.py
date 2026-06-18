@@ -108,34 +108,9 @@ def proventos():
 @bp.route('/rentabilidade', methods=['GET'])
 @login_required
 def rentabilidade():
-    """Análise de rentabilidade"""
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-    
-    # Buscar dados do dashboard
-    dashboard_response = requests.get(
-        f"{Config.BACKEND_API_URL}/api/portfolios/dashboard",
-        headers=headers
-    )
-    
-    dashboard_data = {}
-    if dashboard_response.status_code == 200:
-        dashboard_data = dashboard_response.json().get('data', {})
-    
-    # Buscar evolução patrimonial
-    evolucao_response = requests.get(
-        f"{Config.BACKEND_API_URL}/api/portfolios/evolucao?meses=12",
-        headers=headers
-    )
-    
-    evolucao = []
-    if evolucao_response.status_code == 200:
-        evolucao = evolucao_response.json().get('data', [])
-    
-    return render_template('analises/rentabilidade.html',
-                         dashboard=dashboard_data,
-                         evolucao=evolucao)
+    """Rota legacy — redireciona para rentabilidade por período (v2)"""
+    return redirect(url_for('analises.rentabilidade_periodo'))
+
 
 @bp.route('/rentabilidade/periodo', methods=['GET'])
 @login_required
