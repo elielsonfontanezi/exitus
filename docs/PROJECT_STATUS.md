@@ -5,6 +5,7 @@
 > **Versão:** v0.9.20
 
 ### 🔧 Últimas correções (18/06/2026)
+- **EXITUS-ATIVOS-001:** BUG-016 falso positivo; link "Eventos Corporativos" adicionado ao menu — tela funcionava sem link
 - **EXITUS-OPERACOES-001:** BUG-002 resolvido — getters Alpine.js não sobrevivem a spread, substituídos por propriedades reativas em `operacoes_v2.html`
 - **EXITUS-LOGIN-001:** Redesenho `login.html` (UX_DESIGN_SYSTEM) + remoção token mock de `auth.js` — BUG-001 resolvido
 - **Auditoria Funcional:** 36 telas auditadas, 19 bugs documentados, 22 novas telas propostas (`AUDITORIA_FUNCIONAL_18_06_2026.md`)

@@ -8,6 +8,17 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — EXITUS-ATIVOS-001: BUG-016 falso positivo + link menu Eventos Corporativos (18/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/templates/components/menu_horizontal.html`: adicionado link "Eventos Corporativos" no dropdown Ativos → seção Outros
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-016 marcado como falso positivo; tela 13 atualizada; contadores ajustados (2 quebradas)
+
+**Bug resolvido:** BUG-016 era consequência do BUG-001 — tela funcionava, apenas sem link no menu
+**Revalidado:** navegação via menu → `/ativos/eventos-corporativos` funciona corretamente
+
+---
+
 ### Fix — EXITUS-OPERACOES-001: BUG-002 toggle Compra/Venda (18/06/2026)
 
 **Arquivo alterado:**

@@ -18,8 +18,8 @@
 | Status | Quantidade |
 |--------|-----------|
 | ✅ OK | 2 |
-| 🟡 PARCIAL | 31 |
-| 🔴 QUEBRADO | 3 |
+| 🟡 PARCIAL | 32 |
+| 🔴 QUEBRADO | 2 |
 | ⬜ NÃO TESTADO | 0 |
 
 ---
@@ -40,7 +40,7 @@
 | 10 | Carteira — Movimentações | `/carteira/movimentacoes` | 🟡 | KPIs e tabela OK; filtro tipo OK; filtro data quebrado — tela pisca ao digitar ano (BUG-013) | Alta |
 | 11 | Ativos — Catálogo | `/ativos/acoes` | 🟡 | Tabela e categorias OK; busca por ticker não funciona (BUG-014); detalhe lento e sem dados (BUG-015) | Alta |
 | 12 | Ativos — Detalhe | `/ativos/<TICKER>` | 🟡 | Abre mas demora e nem sempre traz dados (BUG-015) | Alta |
-| 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | � | NOT FOUND no browser; rota não aparece no menu; rota `/ativos/<ticker>` captura a URL antes de `/eventos-corporativos` (BUG-016) | Alta |
+| 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | 🟡 | Carrega corretamente ✅; KPIs + filtros OK; link adicionado ao menu (EXITUS-ATIVOS-001); sem dados (ambiente dev sem eventos cadastrados) | Baixa |
 | 14 | Proventos — Calendário | `/proventos/calendario` | 🟡 | Calendário e filtros OK; sem botão "Confirmar Recebimento" (FEAT-008); botão "Gerar Automático" presente | Média |
 | 15 | Análises — Evolução | `/analises/evolucao` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 16 | Análises — Performance | `/analises/performance` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
@@ -565,7 +565,7 @@
 | BUG-019 | **Botão "Comparar" no Comparador de Ativos não aciona nada** | 30 | Provável `@click` sem handler implementado ou handler que depende de tickers selecionados mas sem validação visível. **Fix:** inspecionar handler Alpine.js do botão; verificar se `comparar()` existe e faz chamada à API `/api/ativos/comparar` ou similar |
 | BUG-018 | **Rota `/analises/rentabilidade` (legacy) retorna NOT FOUND** — rota morta; menu aponta para `/periodo` corretamente, mas a rota legacy ainda existe no código gerando confusão | 19 | **Fix:** remover rota legacy ou adicionar redirect de `/analises/rentabilidade` → `/analises/rentabilidade/periodo` |
 | BUG-017 | **Busca por ticker sem autocomplete em Buy Signals** — funciona se digitado exato, sem sugestões | 18 | Campo de busca é `<input>` simples sem `datalist` ou componente de autocomplete. **Fix:** adicionar `datalist` populado via `GET /api/ativos?ticker=X` ou usar biblioteca de autocomplete |
-| BUG-016 | **Tela Eventos Corporativos inacessível** — URL `/ativos/eventos-corporativos` retorna NOT FOUND; rota não está no menu | 13 | Rota `GET /ativos/<ticker>` captura `eventos-corporativos` como ticker e redireciona para `/dashboard/ativo/EVENTOS-CORPORATIVOS`. Flask deveria priorizar rota estática, mas pode haver conflito de ordem de registro. **Fix:** mover rota `/eventos-corporativos` para antes de `/<ticker>` no blueprint, ou adicionar link direto no menu |
+| ~~BUG-016~~ | ~~**Tela Eventos Corporativos inacessível**~~ | — | **FALSO POSITIVO** — revalidado 18/06/2026 com token válido: `/ativos/eventos-corporativos` carrega corretamente (KPIs + filtros). Flask prioriza rota estática sobre `/<ticker>` no mesmo blueprint. Bug original era consequência do BUG-001 (token inválido) |
 
 ### 🟡 Pendências de funcionalidade (features ausentes)
 
@@ -705,8 +705,8 @@
 | Status | Qtd | % |
 |--------|-----|---|
 | ✅ OK | 2 | 6% |
-| 🟡 PARCIAL | 31 | 86% |
-| 🔴 QUEBRADO | 3 | 8% |
+| 🟡 PARCIAL | 32 | 89% |
+| 🔴 QUEBRADO | 2 | 5% |
 | ⬜ NÃO TESTADO | 0 | — |
 
 ### Telas 🔴 QUEBRADAS
@@ -714,8 +714,9 @@
 | Tela | URL | Motivo |
 |------|-----|--------|
 | 5 | `/operacoes/` Import B3 | Import aceita mas não exibe registros (BUG-003) |
-| 13 | `/ativos/eventos-corporativos` | NOT FOUND — rota `/<ticker>` captura a URL (BUG-016) |
+| 19 | `/analises/rentabilidade` | Rota legacy morta — NOT FOUND (BUG-018) |
 | 6, 7 | `/operacoes/` Compra/Venda | ~~Toggle inoperante~~ → **RESOLVIDO** EXITUS-OPERACOES-001 |
+| 13 | `/ativos/eventos-corporativos` | ~~NOT FOUND~~ → **FALSO POSITIVO** — carrega OK com token válido |
 | 19 | `/analises/rentabilidade` | Rota legacy morta — NOT FOUND (BUG-018) |
 | 23 | `/imposto-renda/declaracao` | Carrega dados ✅ mas `dados`/`erro` não passados ao template (BUG-010) — dados visíveis provavelmente vem da chamada Alpine.js client-side |
 
