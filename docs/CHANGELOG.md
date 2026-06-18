@@ -8,6 +8,34 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — Visual operacoes_v2.html: padronização com exitus-components.css (18/06/2026)
+
+**Correção de regressão visual em `operacoes_v2.html`:**
+- Template reescrito para usar exclusivamente as classes do sistema (`section-box`, `btn-exitus`, `kpi-card-value`, `op-input`, `op-toggle`, `tipo-card`)
+- Removido hero header roxo/azul e CSS custom de 150+ linhas — substituído por variáveis `--exitus-*`
+- Visual agora consistente com todas as outras telas migradas (Screener, Análises, Fiscal, Relatórios, Ativos)
+- Lição L-FE-009 adicionada em `LESSONS_LEARNED.md`
+
+---
+
+### Feat — Frontend Fase 7: Migração Final para base_interna.html (18/06/2026)
+
+**2 templates migrados para `base_interna.html` + Alpine.js API-driven:**
+- `operacoes/operacoes_v2.html` — compra/venda unificada, import B3, busca de ativo, posições para venda
+- `dashboard/index_v2.html` — KPIs patrimoniais, multi-mercado, gráficos Chart.js, benchmark, alertas
+
+**Rotas simplificadas (server-side fetch removido):**
+- `operacoes.py` — rota `/` sem busca de corretoras server-side
+- `dashboard.py` — rota `/` sem busca de portfólio server-side
+
+**Templates antigos removidos:**
+- `operacoes/operacoes.html` (946 linhas)
+- `dashboard/index.html` (647 linhas)
+
+**Resultado:** 100% dos templates ativos herdam de `base_interna.html`
+
+---
+
 ### Feat — Frontend Fase 6: Unificação e Limpeza de Templates (17/06/2026)
 
 **Parte A — 8 templates redundantes removidos:**

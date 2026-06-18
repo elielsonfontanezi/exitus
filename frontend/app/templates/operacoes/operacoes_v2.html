@@ -1,0 +1,614 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Operações{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Registre compras, vendas ou importe do Portal B3</p>{% endblock %}
+
+{% block page_css %}
+<style>
+    /* Tipo de ativo cards */
+    .tipo-card {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 4px; padding: 8px 6px; border: 2px solid var(--exitus-border); border-radius: 8px;
+        background: var(--exitus-bg-card); cursor: pointer; transition: var(--exitus-transition);
+        font-size: 0.78rem; font-weight: 600; color: var(--exitus-text-muted); text-align: center; min-height: 60px;
+    }
+    .tipo-card:hover { border-color: var(--exitus-primary); color: var(--exitus-primary-dark); background: var(--exitus-primary-bg); }
+    .tipo-card.active { border-color: var(--exitus-primary); background: var(--exitus-primary-bg); color: var(--exitus-primary-dark); box-shadow: var(--exitus-shadow); }
+    .tipo-card .tipo-icon { font-size: 1.2rem; }
+    /* Campos de formulário */
+    .op-input {
+        width: 100%; padding: 0.5rem 0.75rem; font-size: 0.875rem;
+        border: 1px solid var(--exitus-border); border-radius: 0.375rem;
+        background: white; color: var(--exitus-text); transition: var(--exitus-transition);
+    }
+    .op-input:focus { outline: none; border-color: var(--exitus-primary); box-shadow: 0 0 0 2px rgba(163,140,101,0.2); }
+    .op-label { font-size: 0.75rem; font-weight: 600; color: var(--exitus-text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem; }
+    /* Sugestões dropdown */
+    .suggestion-item { padding: 0.6rem 1rem; cursor: pointer; border-bottom: 1px solid var(--exitus-border-light); transition: var(--exitus-transition); }
+    .suggestion-item:hover { background: var(--exitus-bg-hover); }
+    .posicao-item { padding: 0.6rem 1rem; cursor: pointer; border-bottom: 1px solid var(--exitus-border-light); display: flex; justify-content: space-between; align-items: center; transition: var(--exitus-transition); }
+    .posicao-item:hover { background: var(--exitus-bg-hover); }
+    /* Badge ativo selecionado */
+    .badge-ativo-sel { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.75rem; background: var(--exitus-primary-bg); color: var(--exitus-primary); border: 1px solid var(--exitus-primary-light); border-radius: 9999px; font-weight: 600; font-size: 0.875rem; }
+    /* Toggle Compra/Venda */
+    .op-toggle { display: flex; background: var(--exitus-bg); border-radius: 0.5rem; padding: 3px; gap: 3px; border: 1px solid var(--exitus-border); }
+    .op-toggle-btn { flex: 1; padding: 0.5rem 1.25rem; border-radius: 0.375rem; font-weight: 700; font-size: 0.875rem; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 0.4rem; transition: var(--exitus-transition); color: var(--exitus-text-muted); background: transparent; }
+    .op-toggle-btn.active-compra { background: #16a34a; color: white; }
+    .op-toggle-btn.active-venda  { background: var(--exitus-danger); color: white; }
+    .op-toggle-btn:not(.active-compra):not(.active-venda):hover { background: var(--exitus-bg-hover); color: var(--exitus-primary); }
+    /* Resumo */
+    .resumo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    @media (max-width: 640px) { .resumo-grid { grid-template-columns: repeat(2, 1fr); } .tipo-cards-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+</style>
+{% endblock %}
+
+{% block page_actions %}
+<a href="/dashboard/" class="btn-exitus btn-exitus-ghost"><i class="fas fa-arrow-left"></i> Dashboard</a>
+{% endblock %}
+
+{% block page_content %}
+
+    <!-- Importação B3 -->
+    <div class="section-box" x-data="importB3()">
+        <div class="section-box-title"><i class="fas fa-file-upload"></i> Importação B3</div>
+        <p style="font-size:0.875rem; color:var(--exitus-text-muted); margin-bottom:1rem;">Arraste ou selecione arquivo CSV/Excel exportado do Portal B3</p>
+
+        <div
+            @drop.prevent="handleDrop($event)"
+            @dragover.prevent="dragover = true"
+            @dragleave.prevent="dragover = false"
+            @click="$refs.fileInput.click()"
+            :style="dragover ? 'border-color:#a38c65; background:#fef9f3;' : ''"
+            style="border: 2px dashed #d1d5db; border-radius:8px; padding:2rem; text-align:center; cursor:pointer; transition:all 0.2s;">
+
+            <input type="file" x-ref="fileInput" @change="handleFileSelect($event)" accept=".csv,.xlsx,.xls" style="display:none;">
+
+            <template x-if="!uploading && !resultado">
+                <div>
+                    <i class="fas fa-cloud-upload-alt" style="font-size:3rem; color:#9ca3af; display:block; margin-bottom:0.75rem;"></i>
+                    <p style="font-weight:600; color:#374151; margin-bottom:0.25rem;">Arraste o arquivo aqui ou clique para selecionar</p>
+                    <p style="font-size:0.875rem; color:#6b7280;">Formatos: CSV, Excel (.xlsx, .xls)</p>
+                </div>
+            </template>
+
+            <template x-if="uploading">
+                <div>
+                    <i class="fas fa-spinner fa-spin" style="font-size:2.5rem; color:#a38c65; display:block; margin-bottom:0.75rem;"></i>
+                    <p style="font-weight:600; color:#374151;">Processando arquivo...</p>
+                    <p style="font-size:0.875rem; color:#6b7280;" x-text="uploadProgress"></p>
+                </div>
+            </template>
+
+            <template x-if="resultado && !uploading">
+                <div @click.stop>
+                    <i class="fas fa-check-circle" style="font-size:3rem; color:#16a34a; display:block; margin-bottom:0.75rem;"></i>
+                    <p style="font-weight:700; color:#111827; margin-bottom:0.5rem;">Importação concluída!</p>
+                    <div style="background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:1rem; text-align:left; margin-top:0.75rem;">
+                        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; font-size:0.875rem;">
+                            <div><p style="color:#6b7280;">Transações</p><p style="font-size:1.25rem; font-weight:700; color:#a38c65;" x-text="resultado.transacoes_criadas"></p></div>
+                            <div><p style="color:#6b7280;">Proventos</p><p style="font-size:1.25rem; font-weight:700; color:#a38c65;" x-text="resultado.proventos_criados"></p></div>
+                            <div><p style="color:#6b7280;">Total Linhas</p><p style="font-size:1.25rem; font-weight:700; color:#6b7280;" x-text="resultado.resumo?.total_linhas"></p></div>
+                        </div>
+                        <template x-if="resultado.avisos && resultado.avisos.length > 0">
+                            <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid #e5e7eb;">
+                                <p style="font-size:0.75rem; font-weight:600; color:#374151; margin-bottom:0.5rem;">⚠️ Avisos:</p>
+                                <template x-for="aviso in resultado.avisos" :key="aviso">
+                                    <p style="font-size:0.75rem; color:#374151;" x-text="aviso"></p>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                    <button @click.stop="resetImport()" style="margin-top:1rem; font-size:0.875rem; color:#a38c65; font-weight:600; background:none; border:none; cursor:pointer; text-decoration:underline;">
+                        Importar outro arquivo
+                    </button>
+                </div>
+            </template>
+        </div>
+
+        <template x-if="erro">
+            <div style="margin-top:1rem; padding:0.75rem 1rem; background:#fef2f2; border:1px solid #fecaca; border-radius:8px;">
+                <p style="font-size:0.875rem; color:#dc2626;" x-text="erro"></p>
+            </div>
+        </template>
+    </div>
+
+    <!-- Toggle Compra / Venda -->
+    <div class="section-box">
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+            <div class="op-toggle">
+                <button type="button" class="op-toggle-btn"
+                        :class="isCompra ? 'active-compra' : ''"
+                        @click="toggleModo('compra')">
+                    <i class="fas fa-cart-plus"></i> Compra
+                </button>
+                <button type="button" class="op-toggle-btn"
+                        :class="isVenda ? 'active-venda' : ''"
+                        @click="toggleModo('venda')">
+                    <i class="fas fa-hand-holding-usd"></i> Venda
+                </button>
+            </div>
+            <span x-show="isCompra" style="font-size:0.875rem; color:#16a34a; font-weight:600;"><i class="fas fa-info-circle"></i> Registre a compra de um ativo</span>
+            <span x-show="isVenda" style="font-size:0.875rem; color:var(--exitus-danger); font-weight:600;"><i class="fas fa-info-circle"></i> Registre a venda de uma posição existente</span>
+        </div>
+
+        <form @submit.prevent="submitOperacao" style="display:flex; flex-direction:column; gap:1.25rem;">
+
+            <!-- Tipo de Ativo -->
+            <div>
+                <div class="op-label"><i class="fas fa-layer-group"></i> Tipo de Ativo <span style="color:var(--exitus-danger);">*</span></div>
+                <div class="tipo-cards-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem;">
+                    <template x-for="tipo in tiposAtivo" :key="tipo.key">
+                        <button type="button" class="tipo-card"
+                                :class="{ active: selectedTipo === tipo.key }"
+                                @click="selecionarTipo(tipo.key)">
+                            <span class="tipo-icon" x-text="tipo.emoji"></span>
+                            <span x-text="tipo.label"></span>
+                        </button>
+                    </template>
+                </div>
+                <div x-show="selectedTipo" style="display:flex; gap:0.5rem; margin-top:0.5rem; flex-wrap:wrap;">
+                    <span x-show="tipoAtualConfig && !tipoAtualConfig.fracao" style="font-size:0.7rem; background:#eff6ff; color:#2563eb; padding:2px 8px; border-radius:9999px; font-weight:600;"><i class="fas fa-hashtag"></i> Inteiro</span>
+                    <span x-show="tipoAtualConfig && tipoAtualConfig.fracao" style="font-size:0.7rem; background:#f5f3ff; color:#7c3aed; padding:2px 8px; border-radius:9999px; font-weight:600;"><i class="fas fa-divide"></i> Fração</span>
+                    <span x-show="tipoAtualConfig" style="font-size:0.7rem; background:var(--exitus-bg); color:var(--exitus-text-muted); padding:2px 8px; border-radius:9999px; font-weight:600;">Moeda: <strong x-text="tipoAtualConfig?.moeda"></strong></span>
+                </div>
+            </div>
+
+            <!-- Seleção de Ativo -->
+            <div style="position:relative;" x-show="selectedTipo" x-cloak>
+                <div class="op-label"><i class="fas fa-chart-line"></i> Ativo <span style="color:var(--exitus-danger);">*</span></div>
+
+                <!-- COMPRA: busca livre -->
+                <div x-show="isCompra && !selectedAtivo" style="position:relative;">
+                    <input type="text" class="op-input"
+                           x-model="searchTicker"
+                           @input.debounce.300ms="searchAtivos"
+                           @focus="showSuggestions = true"
+                           placeholder="Digite o ticker (ex: PETR4, VALE3, AAPL)..."
+                           autocomplete="off">
+                    <div x-show="showSuggestions && suggestions.length > 0"
+                         style="position:absolute; z-index:50; width:100%; margin-top:2px; background:white; border:1px solid var(--exitus-border); border-radius:0.375rem; box-shadow:var(--exitus-shadow-hover); max-height:220px; overflow-y:auto;">
+                        <template x-for="ativo in suggestions" :key="ativo.id">
+                            <div class="suggestion-item" @click="selectAtivo(ativo)">
+                                <div style="font-weight:700; color:var(--exitus-primary-dark);" x-text="ativo.ticker"></div>
+                                <div style="font-size:0.8rem; color:var(--exitus-text-muted);" x-text="ativo.nome"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- VENDA: seleção a partir das posições -->
+                <div x-show="isVenda && !selectedAtivo" style="position:relative;">
+                    <div x-show="loadingPosicoes" style="font-size:0.875rem; color:var(--exitus-text-muted); padding:0.5rem;">
+                        <i class="fas fa-spinner fa-spin"></i> Carregando posições...
+                    </div>
+                    <div x-show="!loadingPosicoes && posicoesPorTipo.length === 0" style="font-size:0.875rem; color:#d97706; background:#fffbeb; border:1px solid #fde68a; border-radius:0.375rem; padding:0.5rem 0.75rem;">
+                        <i class="fas fa-exclamation-triangle"></i> Nenhuma posição para este tipo.
+                    </div>
+                    <div x-show="!loadingPosicoes && posicoesPorTipo.length > 0">
+                        <input type="text" class="op-input"
+                               x-model="searchPosicao"
+                               @focus="showPosicoes = true"
+                               placeholder="Buscar nas suas posições..."
+                               autocomplete="off">
+                        <div x-show="showPosicoes && posicoesFiltradas.length > 0"
+                             style="position:absolute; z-index:50; width:100%; margin-top:2px; background:white; border:1px solid var(--exitus-border); border-radius:0.375rem; box-shadow:var(--exitus-shadow-hover); max-height:220px; overflow-y:auto;">
+                            <template x-for="pos in posicoesFiltradas" :key="pos.id">
+                                <div class="posicao-item" @click="selectPosicao(pos)">
+                                    <div>
+                                        <div style="font-weight:700; color:var(--exitus-primary-dark);" x-text="pos.ativo?.ticker || '---'"></div>
+                                        <div style="font-size:0.8rem; color:var(--exitus-text-muted);" x-text="pos.ativo?.nome || ''"></div>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <div style="font-size:0.8rem; font-weight:600;" x-text="pos.quantidade + ' un'"></div>
+                                        <div style="font-size:0.75rem; color:var(--exitus-text-muted);" x-text="'PM: ' + moedaSimbolo + ' ' + parseFloat(pos.preco_medio).toFixed(2)"></div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Badge ativo selecionado -->
+                <div x-show="selectedAtivo">
+                    <div class="badge-ativo-sel">
+                        <span style="font-weight:700;" x-text="selectedAtivo?.ticker"></span>
+                        <span style="color:var(--exitus-text-light);">|</span>
+                        <span style="font-size:0.875rem;" x-text="selectedAtivo?.nome"></span>
+                        <span x-show="isVenda && quantidadeMaxima > 0" style="font-size:0.75rem; color:var(--exitus-text-muted);" x-text="'(máx: ' + quantidadeMaxima + ')'"></span>
+                        <button type="button" @click="clearAtivo" style="background:none; border:none; cursor:pointer; color:var(--exitus-danger); font-size:0.875rem;">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data + Corretora -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div>
+                    <div class="op-label"><i class="far fa-calendar-alt"></i> Data <span style="color:var(--exitus-danger);">*</span></div>
+                    <input type="text" class="op-input"
+                           x-model="form.data_transacao_display"
+                           @input="formatarDataInput($event)"
+                           placeholder="DD/MM/AAAA" maxlength="10" required>
+                    <input type="hidden" x-model="form.data_transacao_iso">
+                </div>
+                <div>
+                    <div class="op-label"><i class="fas fa-building"></i> Corretora <span style="color:var(--exitus-danger);">*</span></div>
+                    <select class="op-input" x-model="form.corretora_id" required>
+                        <option value="">Selecione uma corretora</option>
+                        <template x-for="c in corretoras" :key="c.id">
+                            <option :value="c.id" x-text="c.nome"></option>
+                        </template>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Quantidade + Preço -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div>
+                    <div class="op-label" style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+                        <i class="fas fa-layer-group"></i> Quantidade <span style="color:var(--exitus-danger);">*</span>
+                        <span x-show="tipoAtualConfig && tipoAtualConfig.fracao" style="font-size:0.65rem; background:#f5f3ff; color:#7c3aed; padding:1px 6px; border-radius:9999px;">fração</span>
+                        <button type="button" x-show="isVenda && quantidadeMaxima > 0" @click="usarQuantidadeMaxima()"
+                                style="font-size:0.65rem; background:#fef2f2; color:var(--exitus-danger); border:1px solid #fecaca; border-radius:9999px; padding:1px 6px; cursor:pointer;">
+                            Máx: <span x-text="quantidadeMaxima"></span>
+                        </button>
+                    </div>
+                    <input type="number" class="op-input"
+                           x-model="form.quantidade" min="0"
+                           :max="isVenda && quantidadeMaxima > 0 ? quantidadeMaxima : undefined"
+                           :step="tipoAtualConfig && !tipoAtualConfig.fracao ? '1' : '0.00000001'"
+                           :placeholder="tipoAtualConfig && tipoAtualConfig.fracao ? '0.00000000' : '0'"
+                           required>
+                    <div x-show="isVenda && form.quantidade && parseFloat(form.quantidade) > quantidadeMaxima && quantidadeMaxima > 0"
+                         style="font-size:0.75rem; color:var(--exitus-danger); margin-top:3px;">
+                        <i class="fas fa-exclamation-circle"></i> Excede disponível (<span x-text="quantidadeMaxima"></span>)
+                    </div>
+                </div>
+                <div>
+                    <div class="op-label"><i class="fas fa-tag"></i> Preço Unitário <span style="color:var(--exitus-danger);">*</span></div>
+                    <div style="position:relative;">
+                        <span style="position:absolute; left:0.6rem; top:50%; transform:translateY(-50%); color:var(--exitus-text-muted); font-size:0.875rem; font-weight:600;" x-text="moedaSimbolo"></span>
+                        <input type="number" class="op-input"
+                               x-model="form.preco_unitario" min="0.01" step="0.01" placeholder="0.00" required
+                               style="padding-left:2rem;">
+                        <button type="button" @click="fetchPrecoAtual" :disabled="!selectedAtivo || loadingPreco"
+                                style="position:absolute; right:0.6rem; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--exitus-primary); opacity:0.8;">
+                            <i class="fas" :class="loadingPreco ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+                        </button>
+                    </div>
+                    <div x-show="precoInfo" style="font-size:0.75rem; color:var(--exitus-text-muted); margin-top:3px;" x-text="precoInfo"></div>
+                </div>
+            </div>
+
+            <!-- Resumo -->
+            <div style="background:var(--exitus-primary-bg); border:1px solid var(--exitus-border); border-radius:0.5rem; padding:1rem;">
+                <div class="op-label" style="margin-bottom:0.75rem;"><i class="fas fa-file-invoice-dollar"></i> Resumo da Operação</div>
+                <div class="resumo-grid">
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--exitus-text-muted);">Operação</div>
+                        <div style="font-weight:700;" :style="isCompra ? 'color:#16a34a;' : 'color:var(--exitus-danger);'" x-text="isCompra ? '🛒 Compra' : '💰 Venda'"></div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--exitus-text-muted);">Tipo</div>
+                        <div style="font-weight:700; color:var(--exitus-primary-dark);" x-text="tipoAtualConfig ? tipoAtualConfig.emoji + ' ' + tipoAtualConfig.label : '—'"></div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--exitus-text-muted);">Ativo</div>
+                        <div style="font-weight:700; color:var(--exitus-primary-dark);" x-text="selectedAtivo ? selectedAtivo.ticker : '—'"></div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--exitus-text-muted);" x-text="isCompra ? 'Investimento Total' : 'Valor da Venda'"></div>
+                        <div class="kpi-card-value" :class="isCompra ? '' : 'negativo'" x-text="formatCurrency(valorTotal)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div style="display:flex; justify-content:flex-end; align-items:center; gap:1rem; padding-top:0.5rem;">
+                <a href="/dashboard/" class="btn-exitus btn-exitus-ghost">Cancelar</a>
+                <button type="submit" class="btn-exitus"
+                        :class="isCompra ? 'btn-exitus-primary' : ''"
+                        :style="!isCompra ? 'background:var(--exitus-danger); color:white;' : ''"
+                        :disabled="loading || !selectedTipo || !selectedAtivo || !form.quantidade || !form.preco_unitario || (isVenda && quantidadeMaxima > 0 && parseFloat(form.quantidade) > quantidadeMaxima)"
+                        style="min-width:180px; justify-content:center;">
+                    <template x-if="!loading">
+                        <span style="display:flex; align-items:center; gap:0.4rem;">
+                            <i :class="isCompra ? 'fas fa-check-circle' : 'fas fa-hand-holding-usd'"></i>
+                            <span x-text="isCompra ? 'Confirmar Compra' : 'Confirmar Venda'"></span>
+                        </span>
+                    </template>
+                    <template x-if="loading">
+                        <span style="display:flex; align-items:center; gap:0.4rem;">
+                            <i class="fas fa-spinner fa-spin"></i> Processando...
+                        </span>
+                    </template>
+                </button>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        corretoras: [],
+        modoOperacao: 'compra',
+        tiposAtivo: [
+            { key: 'ACAO',       label: 'Ação BR',    emoji: '🇧🇷', tipos: ['ACAO','UNIT'],                               fracao: false, moeda: 'R$', step: '1',          currency: 'BRL' },
+            { key: 'FII',        label: 'FII',        emoji: '🏢', tipos: ['FII'],                                       fracao: false, moeda: 'R$', step: '1',          currency: 'BRL' },
+            { key: 'RENDA_FIXA', label: 'Renda Fixa', emoji: '📄', tipos: ['CDB','LCI_LCA','TESOURO_DIRETO','DEBENTURE'], fracao: false, moeda: 'R$', step: '0.01',       currency: 'BRL' },
+            { key: 'STOCK',      label: 'Stock EUA',  emoji: '🇺🇸', tipos: ['STOCK'],                                     fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+            { key: 'REIT',       label: 'REIT',       emoji: '🏗️', tipos: ['REIT'],                                      fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+            { key: 'ETF',        label: 'ETF EUA',    emoji: '📊', tipos: ['ETF'],                                       fracao: true,  moeda: '$',  step: '0.000001',   currency: 'USD' },
+            { key: 'ETF_INTL',   label: 'ETF Intl',   emoji: '🌎', tipos: ['ETF_INTL','etf_intl'],                       fracao: true,  moeda: 'R$', step: '0.01',       currency: 'BRL' },
+            { key: 'INTL',       label: 'Stock Intl', emoji: '🌍', tipos: ['STOCK_INTL'],                                fracao: false, moeda: 'R$', step: '1',          currency: 'BRL' },
+            { key: 'CRIPTO',     label: 'Cripto',     emoji: '₿',  tipos: ['CRIPTO'],                                   fracao: true,  moeda: '$',  step: '0.00000001', currency: 'USD' },
+        ],
+        selectedTipo: '',
+        searchTicker: '',
+        suggestions: [],
+        showSuggestions: false,
+        selectedAtivo: null,
+        loadingPreco: false,
+        precoInfo: '',
+        moedaSimbolo: 'R$',
+        posicoes: [],
+        loadingPosicoes: false,
+        quantidadeMaxima: 0,
+        showPosicoes: false,
+        searchPosicao: '',
+        form: {
+            tipo: 'compra',
+            ativo_id: '',
+            corretora_id: '',
+            data_transacao_display: new Date().toLocaleDateString('pt-BR'),
+            data_transacao_iso: new Date().toISOString().split('T')[0],
+            quantidade: '',
+            preco_unitario: '',
+            taxa_corretagem: '0',
+            taxa_liquidacao: '0',
+            emolumentos: '0',
+            imposto: '0',
+            outros_custos: '0'
+        },
+
+        get tipoAtualConfig() { return this.tiposAtivo.find(t => t.key === this.selectedTipo) || null; },
+        get valorTotal() { return (parseFloat(this.form.quantidade) || 0) * (parseFloat(this.form.preco_unitario) || 0); },
+        get isCompra() { return this.modoOperacao === 'compra'; },
+        get isVenda() { return this.modoOperacao === 'venda'; },
+        get posicoesPorTipo() {
+            if (!this.selectedTipo) return this.posicoes;
+            const cfg = this.tipoAtualConfig;
+            if (!cfg) return this.posicoes;
+            const s = new Set(cfg.tipos.map(t => t.toLowerCase()));
+            return this.posicoes.filter(p => s.has((p.ativo?.tipo || '').toLowerCase()));
+        },
+        get posicoesFiltradas() {
+            let lista = this.posicoesPorTipo;
+            if (this.searchPosicao) {
+                const t = this.searchPosicao.toLowerCase();
+                lista = lista.filter(p => (p.ativo?.ticker || '').toLowerCase().includes(t) || (p.ativo?.nome || '').toLowerCase().includes(t));
+            }
+            return lista.slice(0, 15);
+        },
+
+        async loadData() {
+            const res = await this.apiFetch('/api/corretoras?per_page=100');
+            this.corretoras = res?.data?.corretoras || res?.corretoras || [];
+        },
+
+        toggleModo(modo) {
+            if (this.modoOperacao === modo) return;
+            this.modoOperacao = modo;
+            this.form.tipo = modo;
+            this.clearAtivo();
+            this.selectedTipo = '';
+            if (modo === 'venda') this.fetchPosicoes();
+        },
+
+        selecionarTipo(key) {
+            if (this.selectedTipo === key) return;
+            this.selectedTipo = key;
+            const cfg = this.tipoAtualConfig;
+            if (cfg) this.moedaSimbolo = cfg.moeda;
+            this.clearAtivo();
+            if (this.isVenda && this.posicoes.length > 0) this.showPosicoes = true;
+        },
+
+        async fetchPosicoes() {
+            this.loadingPosicoes = true;
+            const res = await this.apiFetch('/api/posicoes?per_page=200');
+            this.posicoes = res?.data?.posicoes || res?.posicoes || [];
+            this.loadingPosicoes = false;
+        },
+
+        async searchAtivos() {
+            if (this.searchTicker.length < 2) { this.suggestions = []; return; }
+            const cfg = this.tipoAtualConfig;
+            const tipoParam = (cfg && cfg.tipos.length === 1) ? `&tipo=${cfg.tipos[0]}` : '';
+            const res = await this.apiFetch(`/api/ativos?search=${encodeURIComponent(this.searchTicker)}${tipoParam}`);
+            let ativos = res?.data?.ativos || [];
+            if (cfg && cfg.tipos.length > 1) {
+                const s = new Set(cfg.tipos.map(t => t.toLowerCase()));
+                const filtered = ativos.filter(a => s.has((a.tipo || '').toLowerCase()));
+                ativos = filtered.length > 0 ? filtered : ativos;
+            }
+            this.suggestions = ativos.slice(0, 10);
+        },
+
+        selectAtivo(ativo) {
+            this.selectedAtivo = ativo;
+            this.form.ativo_id = ativo.id;
+            this.searchTicker = ativo.ticker;
+            this.suggestions = [];
+            this.showSuggestions = false;
+            this.fetchPrecoAtual();
+        },
+
+        selectPosicao(pos) {
+            this.selectedAtivo = { id: pos.ativo_id, ticker: pos.ativo?.ticker || '---', nome: pos.ativo?.nome || '' };
+            this.form.ativo_id = pos.ativo_id;
+            this.form.corretora_id = pos.corretora_id;
+            this.quantidadeMaxima = parseFloat(pos.quantidade) || 0;
+            this.showPosicoes = false;
+            this.searchPosicao = '';
+            if (pos.preco_medio) {
+                this.form.preco_unitario = parseFloat(pos.preco_medio).toFixed(2);
+                this.precoInfo = '✓ Preço médio da posição';
+            }
+            this.fetchPrecoAtual();
+        },
+
+        usarQuantidadeMaxima() { this.form.quantidade = this.quantidadeMaxima.toString(); },
+
+        clearAtivo() {
+            this.selectedAtivo = null;
+            this.form.ativo_id = '';
+            this.searchTicker = '';
+            this.suggestions = [];
+            this.precoInfo = '';
+            this.form.quantidade = '';
+            this.form.preco_unitario = '';
+            this.quantidadeMaxima = 0;
+            this.searchPosicao = '';
+            this.showPosicoes = false;
+        },
+
+        async fetchPrecoAtual() {
+            if (!this.selectedAtivo) return;
+            this.loadingPreco = true;
+            this.precoInfo = '';
+            const res = await this.apiFetch(`/api/cotacoes/${this.selectedAtivo.ticker}`);
+            if (res?.data?.preco_atual) {
+                const dec = this.tipoAtualConfig?.fracao ? 8 : 2;
+                this.form.preco_unitario = res.data.preco_atual.toFixed(dec);
+                this.precoInfo = `✓ Preço atualizado via ${res.data.provider || 'API'}`;
+            } else {
+                this.precoInfo = '⚠ Preço não disponível';
+            }
+            this.loadingPreco = false;
+        },
+
+        formatCurrency(value) {
+            const cfg = this.tipoAtualConfig;
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: cfg ? cfg.currency : 'BRL' }).format(value);
+        },
+
+        formatarDataInput(event) {
+            let v = event.target.value.replace(/\D/g, '');
+            if (v.length > 8) v = v.slice(0, 8);
+            if (v.length >= 2) v = v.slice(0, 2) + '/' + v.slice(2);
+            if (v.length >= 5) v = v.slice(0, 5) + '/' + v.slice(5);
+            this.form.data_transacao_display = v;
+            if (v.length === 10) {
+                const [d, m, a] = v.split('/');
+                this.form.data_transacao_iso = `${a}-${m}-${d}`;
+            }
+        },
+
+        async submitOperacao() {
+            if (!this.selectedAtivo) return;
+            if (this.tipoAtualConfig && !this.tipoAtualConfig.fracao) {
+                const q = parseFloat(this.form.quantidade);
+                if (!Number.isInteger(q)) { alert('❌ Quantidade deve ser inteira para ' + this.tipoAtualConfig.label); return; }
+            }
+            if (this.isVenda && this.quantidadeMaxima > 0 && parseFloat(this.form.quantidade) > this.quantidadeMaxima) {
+                alert('❌ Quantidade excede o disponível!'); return;
+            }
+            this.loading = true;
+            const payload = {
+                tipo: this.form.tipo,
+                ativo_id: this.form.ativo_id,
+                corretora_id: this.form.corretora_id,
+                data_transacao: this.form.data_transacao_iso + 'T12:00:00',
+                quantidade: this.form.quantidade.toString(),
+                preco_unitario: this.form.preco_unitario.toString(),
+                taxa_corretagem: this.form.taxa_corretagem,
+                taxa_liquidacao: this.form.taxa_liquidacao,
+                emolumentos: this.form.emolumentos,
+                imposto: this.form.imposto,
+                outros_custos: this.form.outros_custos
+            };
+            const token = localStorage.getItem('access_token');
+            try {
+                const response = await fetch(`${window.API_BASE || 'http://localhost:5000'}/api/transacoes`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert(this.isCompra ? '✅ Compra registrada!' : '✅ Venda registrada!');
+                    window.location.href = '/dashboard/';
+                } else {
+                    alert('❌ Erro: ' + (data.message || 'Erro ao processar operação'));
+                }
+            } catch (e) {
+                alert('❌ Erro de conexão com o servidor.');
+            } finally {
+                this.loading = false;
+            }
+        }
+    };
+}
+
+function importB3() {
+    return {
+        dragover: false,
+        uploading: false,
+        uploadProgress: '',
+        resultado: null,
+        erro: null,
+
+        handleDrop(event) {
+            this.dragover = false;
+            const files = event.dataTransfer.files;
+            if (files.length > 0) this.uploadFile(files[0]);
+        },
+
+        handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) this.uploadFile(files[0]);
+        },
+
+        async uploadFile(file) {
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['csv', 'xlsx', 'xls'].includes(ext)) {
+                this.erro = 'Formato não suportado. Use CSV ou Excel (.xlsx, .xls)';
+                return;
+            }
+            this.uploading = true;
+            this.erro = null;
+            this.resultado = null;
+            this.uploadProgress = 'Enviando arquivo...';
+            const token = localStorage.getItem('access_token');
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const response = await fetch(`${window.API_BASE || 'http://localhost:5000'}/api/import/b3`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    this.resultado = data.data;
+                    this.uploadProgress = 'Concluído!';
+                } else {
+                    this.erro = data.error || 'Erro ao processar arquivo';
+                }
+            } catch (e) {
+                this.erro = 'Erro de conexão com o servidor';
+            } finally {
+                this.uploading = false;
+            }
+        },
+
+        resetImport() { this.resultado = null; this.erro = null; this.uploadProgress = ''; }
+    };
+}
+</script>
+{% endblock %}

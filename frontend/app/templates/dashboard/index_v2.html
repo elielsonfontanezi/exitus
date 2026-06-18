@@ -1,0 +1,472 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Visão geral do seu patrimônio</p>{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes shimmer {
+        0% { background-position: -1000px 0; }
+        100% { background-position: 1000px 0; }
+    }
+    .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 1000px 100%;
+        animation: shimmer 2s infinite linear;
+        border-radius: 4px;
+    }
+    .skeleton-text { height: 1em; margin-bottom: 0.5em; }
+    .skeleton-value { height: 2em; width: 80%; }
+    .tooltip-container { position: relative; display: inline-block; }
+    .tooltip-icon { cursor: help; color: #a38c65; font-size: 0.875rem; margin-left: 0.5rem; }
+    .tooltip-text {
+        visibility: hidden; position: absolute; bottom: 125%; left: 50%;
+        transform: translateX(-50%); background-color: #333; color: white;
+        padding: 8px 12px; border-radius: 6px; font-size: 0.875rem;
+        white-space: nowrap; z-index: 1000; opacity: 0; transition: opacity 0.3s;
+    }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+    .resumo-patrimonio {
+        display: grid; grid-template-columns: repeat(6, 1fr);
+        gap: 0.75rem; margin-bottom: 1.5rem;
+    }
+    @media (max-width: 1024px) { .resumo-patrimonio { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 640px) { .resumo-patrimonio { grid-template-columns: repeat(2, 1fr); } }
+    .resumo-item {
+        background: #fff; border: 1px solid #E3E6ED; border-radius: 8px;
+        padding: 12px 16px; display: flex; flex-direction: column; justify-content: center;
+        box-shadow: rgb(230,230,229) 0px 0px 12px 0px;
+    }
+    .resumo-item .label { font-size: 0.75rem; color: #6b7280; margin-bottom: 4px; }
+    .resumo-item .valor { font-size: 1.1rem; font-weight: 700; color: #111827; }
+    .resumo-item .variacao { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
+    .resumo-item .variacao.positiva { color: #16a34a; }
+    .card-mercado {
+        background: #fff; border: 1px solid #E3E6ED; border-radius: 8px;
+        padding: 16px; box-shadow: rgb(230,230,229) 0px 0px 12px 0px;
+    }
+    .chart-container {
+        background: #fff; border: 1px solid #E3E6ED; border-radius: 8px;
+        padding: 20px; box-shadow: rgb(230,230,229) 0px 0px 12px 0px; margin-bottom: 1.5rem;
+    }
+    .chart-title { font-size: 1rem; font-weight: 600; color: #a38c65; margin-bottom: 1rem; display: flex; align-items: center; }
+    .notification-panel {
+        background: #fff; border: 1px solid #E3E6ED; border-radius: 8px;
+        padding: 16px; box-shadow: rgb(230,230,229) 0px 0px 12px 0px;
+    }
+    .notification-panel h3 { font-size: 1rem; font-weight: 600; color: #a38c65; margin-bottom: 0.75rem; }
+    .notification-card { padding: 10px; border-radius: 6px; background: #f8f9fa; margin-bottom: 8px; }
+    .notification-title { font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 4px; }
+    .notification-time { font-size: 0.75rem; color: #9ca3af; margin-top: 4px; }
+    .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+    @media (max-width: 1024px) { .dash-grid { grid-template-columns: 1fr; } }
+    .mercados-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    @media (max-width: 768px) { .mercados-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div x-data="dashboardV2()" x-init="init()">
+
+    <!-- LOADING SKELETON -->
+    <div x-show="!dadosCarregados" class="resumo-patrimonio">
+        <template x-for="i in [1,2,3,4,5,6]" :key="i">
+            <div class="resumo-item">
+                <div class="skeleton skeleton-text" style="width:60%;"></div>
+                <div class="skeleton skeleton-value"></div>
+                <div class="skeleton skeleton-text" style="width:40%;"></div>
+            </div>
+        </template>
+    </div>
+
+    <!-- RESUMO PATRIMÔNIO -->
+    <div x-show="dadosCarregados" class="resumo-patrimonio">
+        <div class="resumo-item">
+            <div class="label">Patrimônio Total</div>
+            <div class="valor" x-text="formatMoney(dados.resumo.patrimonio_total)">R$ 0,00</div>
+            <div class="variacao positiva" x-show="dados.resumo.rentabilidade_geral > 0">
+                ▲ <span x-text="dados.resumo.rentabilidade_geral.toFixed(2)"></span>%
+            </div>
+        </div>
+        <div class="resumo-item">
+            <div class="label">Rentabilidade</div>
+            <div class="valor" x-text="dados.resumo.rentabilidade_geral.toFixed(2) + '%'">0%</div>
+            <div class="variacao">Sobre Custo</div>
+        </div>
+        <div class="resumo-item">
+            <div class="label">Rentabilidade Total</div>
+            <div class="valor" x-text="dados.resumo.rentabilidade_total ? dados.resumo.rentabilidade_total.toFixed(2) + '%' : '0%'">0%</div>
+            <div class="variacao positiva">Inclui Proventos</div>
+        </div>
+        <div class="resumo-item">
+            <div class="label">Proventos (12M)</div>
+            <div class="valor" x-text="formatMoney(dados.resumo.proventos_12m || 0)">R$ 0,00</div>
+            <div class="variacao" style="color:#10b981; font-weight:600;">Recebidos</div>
+        </div>
+        <div class="resumo-item">
+            <div class="label">Ativos</div>
+            <div class="valor" x-text="dados.resumo.total_posicoes">0</div>
+            <div class="variacao" x-text="(dados.resumo.total_portfolios || 0) + ' carteiras'"></div>
+        </div>
+        <div class="resumo-item">
+            <div class="label">Saldo em Caixa</div>
+            <div class="valor" x-text="moedaAtual === 'BRL' ? formatMoney(saldoCaixa.saldo_total_brl) : '$' + (saldoCaixa.saldo_usd || 0).toFixed(2)">R$ 0,00</div>
+            <div class="variacao">
+                <button @click="toggleMoeda()" style="background:#a38c65; color:#fff; border:none; border-radius:4px; padding:2px 8px; font-size:0.7rem; font-weight:600; cursor:pointer;">
+                    <span x-text="moedaAtual">BRL</span> ⇄ <span x-text="moedaAtual === 'BRL' ? 'USD' : 'BRL'">USD</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISÃO MULTI-MERCADO -->
+    <div class="mercados-grid">
+        <div class="card-mercado">
+            <h3 style="font-size:1rem; font-weight:600; color:#a38c65; margin-bottom:0.75rem;">🇧🇷 Brasil</h3>
+            <div style="font-size:1.5rem; font-weight:700; margin-bottom:4px;" x-text="formatMoney(dados.por_mercado.BR.patrimonio)">R$ 0,00</div>
+            <div style="font-size:0.875rem; color:#6b7280; margin-bottom:4px;" x-text="dados.por_mercado.BR.percentual.toFixed(1) + '% do total'">0%</div>
+            <div style="font-size:0.875rem;" :style="dados.por_mercado.BR.rentabilidade >= 0 ? 'color:#16a34a;' : 'color:#ef4444;'">
+                <span x-text="dados.por_mercado.BR.rentabilidade >= 0 ? '▲' : '▼'"></span>
+                <span x-text="Math.abs(dados.por_mercado.BR.rentabilidade).toFixed(2) + '%'"></span>
+            </div>
+        </div>
+        <div class="card-mercado">
+            <h3 style="font-size:1rem; font-weight:600; color:#a38c65; margin-bottom:0.75rem;">🇺🇸 EUA</h3>
+            <div style="font-size:1.5rem; font-weight:700; margin-bottom:4px;" x-text="formatMoney(dados.por_mercado.US.patrimonio)">R$ 0,00</div>
+            <div style="font-size:0.875rem; color:#6b7280; margin-bottom:4px;" x-text="dados.por_mercado.US.percentual.toFixed(1) + '% do total'">0%</div>
+            <div style="font-size:0.875rem;" :style="dados.por_mercado.US.rentabilidade >= 0 ? 'color:#16a34a;' : 'color:#ef4444;'">
+                <span x-text="dados.por_mercado.US.rentabilidade >= 0 ? '▲' : '▼'"></span>
+                <span x-text="Math.abs(dados.por_mercado.US.rentabilidade).toFixed(2) + '%'"></span>
+            </div>
+        </div>
+        <div class="card-mercado">
+            <h3 style="font-size:1rem; font-weight:600; color:#a38c65; margin-bottom:0.75rem;">🌍 Internacional</h3>
+            <div style="font-size:1.5rem; font-weight:700; margin-bottom:4px;" x-text="formatMoney(dados.por_mercado.INTL.patrimonio)">R$ 0,00</div>
+            <div style="font-size:0.875rem; color:#6b7280; margin-bottom:4px;" x-text="dados.por_mercado.INTL.percentual.toFixed(1) + '% do total'">0%</div>
+            <div style="font-size:0.875rem;" :style="dados.por_mercado.INTL.rentabilidade >= 0 ? 'color:#16a34a;' : 'color:#ef4444;'">
+                <span x-text="dados.por_mercado.INTL.rentabilidade >= 0 ? '▲' : '▼'"></span>
+                <span x-text="Math.abs(dados.por_mercado.INTL.rentabilidade).toFixed(2) + '%'"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRID PRINCIPAL -->
+    <div class="dash-grid">
+
+        <!-- COLUNA PRINCIPAL (2/3) -->
+        <div>
+            <!-- GRÁFICO EVOLUÇÃO -->
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    Evolução do Patrimônio — Histórico Completo
+                    <span class="tooltip-container">
+                        <span class="tooltip-icon">ℹ️</span>
+                        <span class="tooltip-text">Acompanhe como seu patrimônio evoluiu ao longo do tempo</span>
+                    </span>
+                </h3>
+                <canvas id="chartEvolucao" height="80"></canvas>
+            </div>
+
+            <!-- TOP 5 BRASIL -->
+            <div class="section-box" style="margin-bottom:1.5rem;">
+                <div class="section-box-title">Top 5 Ativos — Brasil</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Ativo</th><th>Tipo</th><th class="col-right">Valor</th><th class="col-right">Rentabilidade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="ativo in dados.por_mercado.BR.top_ativos.slice(0,5)" :key="ativo.ticker">
+                            <tr>
+                                <td><strong x-text="ativo.ticker"></strong></td>
+                                <td x-text="ativo.tipo"></td>
+                                <td class="col-right" x-text="formatMoney(ativo.valor)"></td>
+                                <td class="col-right" :style="ativo.rentabilidade >= 0 ? 'color:#16a34a;' : 'color:#ef4444;'">
+                                    <span x-text="ativo.rentabilidade >= 0 ? '▲' : '▼'"></span>
+                                    <span x-text="Math.abs(ativo.rentabilidade).toFixed(2) + '%'"></span>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ÚLTIMAS TRANSAÇÕES -->
+            <div class="section-box" style="margin-bottom:1.5rem;">
+                <div class="section-box-title">Últimas Transações</div>
+                <div>
+                    <template x-for="trx in transacoes" :key="trx.id">
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:6px; background:#f8f9fa; margin-bottom:6px;">
+                            <div>
+                                <span style="font-weight:600;" x-text="trx.ativo_ticker"></span>
+                                <span style="font-size:0.875rem; color:#6b7280; margin-left:8px;" x-text="trx.tipo"></span>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:600;" x-text="formatMoney(trx.valor_total)"></div>
+                                <div style="font-size:0.75rem; color:#9ca3af;" x-text="formatDate(trx.data_operacao)"></div>
+                            </div>
+                        </div>
+                    </template>
+                    <div x-show="transacoes.length === 0" style="text-align:center; color:#9ca3af; padding:1rem; font-size:0.875rem;">Nenhuma transação recente</div>
+                </div>
+            </div>
+
+            <!-- PRÓXIMOS PROVENTOS -->
+            <div class="section-box">
+                <div class="section-box-title">📅 Próximos Proventos (30 dias)</div>
+                <div x-show="proximosProventos.length > 0">
+                    <template x-for="evt in proximosProventos.slice(0,5)" :key="evt.id">
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:6px; background:#f8f6f3; margin-bottom:6px;">
+                            <div>
+                                <span style="font-weight:600; font-size:0.875rem;" x-text="evt.ativo_ticker"></span>
+                                <span style="font-size:0.75rem; color:#9ca3af; margin-left:6px;" x-text="evt.tipo"></span>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:600; font-size:0.875rem; color:#a38c65;" x-text="'R$ ' + evt.valor_total.toFixed(2)"></div>
+                                <div style="font-size:0.75rem; color:#9ca3af;" x-text="formatDate(evt.data_pagamento)"></div>
+                            </div>
+                        </div>
+                    </template>
+                    <div style="margin-top:8px; padding-top:8px; border-top:1px solid #e5e7eb; text-align:right; font-size:0.875rem; font-weight:600; color:#735c43;">
+                        Total esperado: <span x-text="'R$ ' + totalProventos.toFixed(2)"></span>
+                    </div>
+                </div>
+                <div x-show="proximosProventos.length === 0" style="text-align:center; color:#9ca3af; padding:1rem; font-size:0.875rem;">Nenhum provento nos próximos 30 dias</div>
+            </div>
+        </div>
+
+        <!-- COLUNA LATERAL (1/3) -->
+        <div>
+            <!-- META DE PATRIMÔNIO -->
+            <div class="card-mercado" style="margin-bottom:1.5rem;">
+                <h3 style="font-size:1rem; font-weight:600; color:#a38c65; margin-bottom:0.75rem; display:flex; align-items:center;">
+                    🎯 Meta de Patrimônio
+                    <span class="tooltip-container">
+                        <span class="tooltip-icon">ℹ️</span>
+                        <span class="tooltip-text">Progresso em relação à meta definida</span>
+                    </span>
+                </h3>
+                <div style="display:flex; justify-content:space-between; font-size:0.875rem; margin-bottom:6px;">
+                    <span>Atual: <strong x-text="formatMoney(dados.resumo.patrimonio_total)"></strong></span>
+                    <span>Meta: <strong>R$ 500.000,00</strong></span>
+                </div>
+                <div style="width:100%; background:#e5e7eb; border-radius:9999px; height:12px;">
+                    <div style="background:linear-gradient(90deg,#a38c65,#c4a97a); height:12px; border-radius:9999px; transition:width .5s;"
+                         :style="'width: ' + Math.min((dados.resumo.patrimonio_total / 500000) * 100, 100) + '%'"></div>
+                </div>
+                <div style="text-align:center; margin-top:8px; font-size:0.875rem; font-weight:600; color:#a38c65;"
+                     x-text="((dados.resumo.patrimonio_total / 500000) * 100).toFixed(1) + '% alcançado'"></div>
+            </div>
+
+            <!-- BENCHMARK -->
+            <div class="card-mercado" style="margin-bottom:1.5rem;">
+                <h3 style="font-size:1rem; font-weight:600; color:#a38c65; margin-bottom:0.75rem; display:flex; align-items:center;">
+                    📊 Benchmark
+                    <span class="tooltip-container">
+                        <span class="tooltip-icon">ℹ️</span>
+                        <span class="tooltip-text">Sua rentabilidade vs CDI e Ibovespa</span>
+                    </span>
+                </h3>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.875rem;">Sua Carteira</span>
+                        <span style="font-weight:600; color:#16a34a;" x-text="'▲ ' + dados.resumo.rentabilidade_geral.toFixed(2) + '%'"></span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.875rem;">CDI (12m)</span>
+                        <span style="font-weight:600; color:#6b7280;">▲ 11.75%</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.875rem;">Ibovespa (12m)</span>
+                        <span style="font-weight:600; color:#6b7280;">▲ 8.32%</span>
+                    </div>
+                    <div style="margin-top:8px; padding-top:8px; border-top:1px solid #e5e7eb; text-align:center; font-size:0.875rem;"
+                         :style="dados.resumo.rentabilidade_geral > 11.75 ? 'color:#16a34a; font-weight:600;' : 'color:#6b7280;'">
+                        <span x-show="dados.resumo.rentabilidade_geral > 11.75">🎉 Você está acima do CDI!</span>
+                        <span x-show="dados.resumo.rentabilidade_geral <= 11.75">📈 Continue investindo para superar o CDI</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRÁFICO ALOCAÇÃO -->
+            <div class="chart-container" style="margin-bottom:1.5rem;">
+                <h3 class="chart-title">
+                    Alocação por Mercado
+                    <span class="tooltip-container">
+                        <span class="tooltip-icon">ℹ️</span>
+                        <span class="tooltip-text">Distribuição do patrimônio entre Brasil, EUA e Internacional</span>
+                    </span>
+                </h3>
+                <canvas id="alocacaoChart" height="150"></canvas>
+            </div>
+
+            <!-- ALERTAS RECENTES -->
+            <div class="notification-panel">
+                <h3>Alertas Recentes</h3>
+                <template x-for="alerta in alertas" :key="alerta.id">
+                    <div class="notification-card">
+                        <div class="notification-title" x-text="alerta.nome"></div>
+                        <p style="font-size:0.875rem; color:#6b7280;" x-text="alerta.mensagem"></p>
+                        <div class="notification-time" x-text="formatDate(alerta.data)"></div>
+                    </div>
+                </template>
+                <div x-show="alertas.length === 0" style="text-align:center; color:#9ca3af; padding:1rem; font-size:0.875rem;">Nenhum alerta recente</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() { return {}; }
+
+function dashboardV2() {
+    return {
+        dados: {
+            resumo: { patrimonio_total: 0, rentabilidade_geral: 0, rentabilidade_total: 0, total_portfolios: 0, total_posicoes: 0, proventos_12m: 0 },
+            por_mercado: {
+                BR:   { patrimonio: 0, percentual: 0, rentabilidade: 0, top_ativos: [] },
+                US:   { patrimonio: 0, percentual: 0, rentabilidade: 0, top_ativos: [] },
+                INTL: { patrimonio: 0, percentual: 0, rentabilidade: 0, top_ativos: [] }
+            },
+            alocacao_geografica: { BR: 0, US: 0, INTL: 0 },
+            evolucao: []
+        },
+        saldoCaixa: { saldo_brl: 0, saldo_usd: 0, saldo_total_brl: 0, taxa_cambio: 5.46 },
+        moedaAtual: 'BRL',
+        alertas: [],
+        transacoes: [],
+        proximosProventos: [],
+        totalProventos: 0,
+        chartEvolucao: null,
+        chartAlocacao: null,
+        dadosCarregados: false,
+
+        async init() {
+            await this.carregarDados();
+            this.$nextTick(() => this.renderizarGraficos());
+        },
+
+        async carregarDados() {
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+            const base = window.API_BASE || 'http://localhost:5000';
+            const h = { 'Authorization': `Bearer ${token}` };
+            try {
+                const resDash = await fetch(`${base}/api/portfolios/dashboard`, { headers: h });
+                const dataDash = await resDash.json();
+                if (dataDash.success) this.dados = dataDash.data;
+
+                try {
+                    const r = await fetch(`${base}/api/carteira/saldo-caixa`, { headers: h });
+                    const d = await r.json();
+                    if (d.success) this.saldoCaixa = d.data;
+                } catch (e) { console.warn('saldo-caixa:', e); }
+
+                try {
+                    const r = await fetch(`${base}/api/alertas/recentes?limit=3`, { headers: h });
+                    const d = await r.json();
+                    if (d.success) this.alertas = d.data;
+                } catch (e) { console.warn('alertas:', e); }
+
+                try {
+                    const r = await fetch(`${base}/api/transacoes/recentes?limit=5`, { headers: h });
+                    const d = await r.json();
+                    if (d.success) this.transacoes = d.data.items || [];
+                } catch (e) { console.warn('transacoes:', e); }
+
+                try {
+                    const r = await fetch(`${base}/api/calendario-dividendos/?dias=30&limit=5`, { headers: h });
+                    if (r.ok) {
+                        const d = await r.json();
+                        if (d.success) {
+                            const itens = d.data?.calendario || [];
+                            this.proximosProventos = itens.map(item => ({
+                                id: item.id,
+                                ativo_ticker: item.ativo?.ticker || item.ticker || 'N/A',
+                                data_pagamento: item.data_esperada,
+                                valor_total: parseFloat(item.valor_estimado || item.valor_real || 0),
+                                tipo: item.tipo_provento || 'dividendo'
+                            }));
+                            this.totalProventos = this.proximosProventos.reduce((s, p) => s + (p.valor_total || 0), 0);
+                        }
+                    }
+                } catch (e) { console.warn('proventos:', e); }
+
+                this.dadosCarregados = true;
+            } catch (e) {
+                console.error('Erro ao carregar dashboard:', e);
+            }
+        },
+
+        renderizarGraficos() {
+            this.renderizarEvolucao();
+            this.renderizarAlocacao();
+        },
+
+        renderizarEvolucao() {
+            const ctx = document.getElementById('chartEvolucao');
+            if (!ctx) return;
+            if (this.chartEvolucao) { this.chartEvolucao.destroy(); this.chartEvolucao = null; }
+            if (!this.dados.evolucao || this.dados.evolucao.length === 0) {
+                const c = ctx.getContext('2d');
+                c.font = '14px Arial'; c.fillStyle = '#6c757d'; c.textAlign = 'center';
+                c.fillText('Dados históricos não disponíveis', ctx.width / 2, ctx.height / 2);
+                return;
+            }
+            const labels = this.dados.evolucao.map(e => new Date(e.data).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }));
+            const valores = this.dados.evolucao.map(e => e.valor);
+            this.chartEvolucao = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{ label: 'Patrimônio', data: valores, borderColor: '#a38c65', backgroundColor: 'rgba(163,140,101,0.1)', tension: 0.4, fill: true }]
+                },
+                options: {
+                    animation: false, responsive: true, maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => 'R$ ' + (v/1000).toFixed(0) + 'k' } } }
+                }
+            });
+        },
+
+        renderizarAlocacao() {
+            const ctx = document.getElementById('alocacaoChart');
+            if (!ctx) return;
+            if (this.chartAlocacao) { this.chartAlocacao.destroy(); this.chartAlocacao = null; }
+            if (!this.dados.alocacao_geografica) return;
+            this.chartAlocacao = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Brasil', 'EUA', 'Internacional'],
+                    datasets: [{
+                        data: [
+                            this.dados.alocacao_geografica.BR || 0,
+                            this.dados.alocacao_geografica.US || 0,
+                            this.dados.alocacao_geografica.INTL || 0
+                        ],
+                        backgroundColor: ['#a38c65', '#6c757d', '#495057'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { animation: false, responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        },
+
+        toggleMoeda() { this.moedaAtual = this.moedaAtual === 'BRL' ? 'USD' : 'BRL'; },
+
+        formatMoney(value) {
+            return 'R$ ' + (value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+
+        formatDate(dateStr) {
+            if (!dateStr) return '';
+            return new Date(dateStr).toLocaleDateString('pt-BR');
+        }
+    };
+}
+</script>
+{% endblock %}

@@ -2,12 +2,27 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 09/06/2026 — L-FE-008 adicionado (ternário Jinja2 em atributo HTML)  
+> **Atualizado:** 18/06/2026 — L-FE-009 adicionado (migração de template sem padrão visual do sistema)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
 
 ## 🖥️ Frontend Jinja2
+
+### L-FE-009 — Migração de template para base_interna.html deve replicar padrão visual do sistema
+**Origem:** Fase 7 — `operacoes_v2.html` | **Data:** 18/06/2026
+
+**Erro:** Ao migrar template de `base.html` para `base_interna.html`, a IA replicou o CSS custom do original (hero header, classes `.btn-primary-exitus`, `.compra-card`, etc.) em vez de usar as classes do sistema (`exitus-components.css`).
+
+**Consequência:** Visual inconsistente — tela de Operações ficou diferente de todas as outras telas migradas (Screener, Análises, Fiscal, Relatórios, Ativos).
+
+**Correto:** Toda migração para `base_interna.html` DEVE:
+1. Usar **exclusivamente** classes de `exitus-components.css` (`section-box`, `btn-exitus`, `kpi-bar`, `filter-bar`, etc.)
+2. Referenciar variáveis CSS `--exitus-*` em vez de cores hardcoded
+3. Verificar telas já migradas (ex: `screener_v2.html`) como referência visual antes de implementar
+4. **Nunca** copiar CSS custom do template original — descartar e reescrever no padrão do sistema
+
+---
 
 ### L-FE-008 — Ternário Jinja2 dentro de atributo HTML causa `TemplateSyntaxError`
 **Origem:** Sprint 8 Comparador — select `selected` | **Data:** 09/06/2026

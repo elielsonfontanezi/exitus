@@ -24,40 +24,8 @@ def login_required(f):
 @bp.route('/', methods=['GET'])
 @login_required
 def index():
-    """Dashboard Multi-Mercado - Fase 1 Sprint 1.2"""
-    token = session.get('access_token')
-
-    # Estrutura padrão (zerada) para evitar erros no template
-    dados = {
-        "resumo": {
-            "patrimonio_total": 0.0,
-            "rentabilidade_geral": 0.0,
-            "total_portfolios": 0,
-            "total_posicoes": 0
-        },
-        "por_mercado": {
-            "BR": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
-            "US": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []},
-            "INTL": {"patrimonio": 0.0, "percentual": 0.0, "rentabilidade": 0.0, "top_ativos": []}
-        },
-        "alocacao_geografica": {"BR": 0.0, "US": 0.0, "INTL": 0.0},
-        "evolucao": []
-    }
-
-    if token:
-        try:
-            headers = {'Authorization': f'Bearer {token}'}
-
-            # Chamada: Dashboard com dados por mercado
-            resp_dash = requests.get(f'{Config.BACKEND_API_URL}/api/portfolios/dashboard', headers=headers, timeout=5)
-            if resp_dash.status_code == 200:
-                data = resp_dash.json().get('data', {})
-                dados = data
-
-        except Exception as e:
-            print(f"Erro no dashboard home: {e}")
-
-    return render_template('dashboard/index.html', dados=dados)
+    """Dashboard principal — Alpine.js API-driven"""
+    return render_template('dashboard/index_v2.html')
 
 
 # --- Rotas Restauradas do Módulo 6 ---

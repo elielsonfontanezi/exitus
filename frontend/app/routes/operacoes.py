@@ -13,24 +13,8 @@ bp = Blueprint('operacoes', __name__, url_prefix='/operacoes')
 @bp.route('/', methods=['GET'])
 @login_required
 def operacoes():
-    """Página de operações de ativos (compra/venda unificada)"""
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-    
-    # Buscar corretoras para popular select (usando token renovado automaticamente)
-    corretoras_response = requests.get(
-        f"{Config.BACKEND_API_URL}/api/corretoras",
-        headers=headers
-    )
-    
-    corretoras = []
-    if corretoras_response.status_code == 200:
-        result = corretoras_response.json()
-        # A API retorna {data: {corretoras: [...], total: n}, success: true}
-        corretoras = result.get('data', {}).get('corretoras', [])
-    
-    return render_template('operacoes/operacoes.html', corretoras=corretoras)
+    """Operações de ativos (compra/venda) — Alpine.js API-driven"""
+    return render_template('operacoes/operacoes_v2.html')
 
 @bp.route('/compra', methods=['GET'])
 @login_required

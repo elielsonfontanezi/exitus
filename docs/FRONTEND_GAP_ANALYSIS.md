@@ -143,12 +143,20 @@
 - [x] Análises (3): evolucao, performance, alocacao
 - [x] Ativos (1): lista.html (catálogo por tipo)
 
-**Parte C — Já Alpine.js (migração de base adiada):**
-- [x] Operações (1): operacoes.html — já usa Alpine.js inline, 946 linhas
-- [x] Dashboard (1): index.html — já usa Alpine.js inline, 647 linhas
+**Parte C — Migrados na Fase 7 (18/06/2026):**
+- [x] Operações (1): `operacoes_v2.html` — compra/venda, import B3, busca Alpine.js puro
+- [x] Dashboard (1): `index_v2.html` — KPIs, Chart.js, multi-mercado, benchmark
 
-> Nota: Operações e Dashboard já são reativos com Alpine.js mas herdam de `base.html`.
-> Migração para `base_interna.html` seria cosmética e de risco alto — adiada para fase posterior.
+> ✅ **100% dos templates ativos herdam de `base_interna.html`** — migração de base concluída.
+
+---
+
+### ✅ Fase 7 — Migração Final para base_interna.html (18/06/2026)
+*Migrar os 2 últimos templates que ainda herdavam de `base.html`.*
+
+- [x] `operacoes/operacoes.html` → `operacoes_v2.html` + rota simplificada (server-side fetch removido)
+- [x] `dashboard/index.html` → `index_v2.html` + rota simplificada
+- [x] Templates antigos removidos (2 arquivos: 946 + 647 linhas)
 
 ---
 
