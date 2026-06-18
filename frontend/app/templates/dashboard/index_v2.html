@@ -3,65 +3,38 @@
 {% block page_title %}Dashboard{% endblock %}
 {% block page_subtitle %}<p class="page-subtitle">Visão geral do seu patrimônio</p>{% endblock %}
 
-{% block extra_css %}
+{% block page_css %}
 <style>
-    @keyframes shimmer {
-        0% { background-position: -1000px 0; }
-        100% { background-position: 1000px 0; }
-    }
-    .skeleton {
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 1000px 100%;
-        animation: shimmer 2s infinite linear;
-        border-radius: 4px;
-    }
-    .skeleton-text { height: 1em; margin-bottom: 0.5em; }
-    .skeleton-value { height: 2em; width: 80%; }
-    .tooltip-container { position: relative; display: inline-block; }
-    .tooltip-icon { cursor: help; color: #a38c65; font-size: 0.875rem; margin-left: 0.5rem; }
-    .tooltip-text {
-        visibility: hidden; position: absolute; bottom: 125%; left: 50%;
-        transform: translateX(-50%); background-color: #333; color: white;
-        padding: 8px 12px; border-radius: 6px; font-size: 0.875rem;
-        white-space: nowrap; z-index: 1000; opacity: 0; transition: opacity 0.3s;
-    }
-    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
-    .resumo-patrimonio {
+    /* Layout exclusivo do Dashboard */
+    .dash-kpi-grid {
         display: grid; grid-template-columns: repeat(6, 1fr);
         gap: 0.75rem; margin-bottom: 1.5rem;
     }
-    @media (max-width: 1024px) { .resumo-patrimonio { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 640px) { .resumo-patrimonio { grid-template-columns: repeat(2, 1fr); } }
-    .resumo-item {
-        background: #fff; border: 1px solid #E3E6ED; border-radius: 8px;
-        padding: 12px 16px; display: flex; flex-direction: column; justify-content: center;
-        box-shadow: rgb(230,230,229) 0px 0px 12px 0px;
+    @media (max-width: 1024px) { .dash-kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 640px)  { .dash-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    .mercados-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        gap: 1rem; margin-bottom: 1.5rem;
     }
-    .resumo-item .label { font-size: 0.75rem; color: #6b7280; margin-bottom: 4px; }
-    .resumo-item .valor { font-size: 1.1rem; font-weight: 700; color: #111827; }
-    .resumo-item .variacao { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
-    .resumo-item .variacao.positiva { color: #16a34a; }
-    .card-mercado {
-        background: #fff; border: 1px solid #E3E6ED; border-radius: 8px;
-        padding: 16px; box-shadow: rgb(230,230,229) 0px 0px 12px 0px;
-    }
-    .chart-container {
-        background: #fff; border: 1px solid #E3E6ED; border-radius: 8px;
-        padding: 20px; box-shadow: rgb(230,230,229) 0px 0px 12px 0px; margin-bottom: 1.5rem;
-    }
-    .chart-title { font-size: 1rem; font-weight: 600; color: #a38c65; margin-bottom: 1rem; display: flex; align-items: center; }
-    .notification-panel {
-        background: #fff; border: 1px solid #E3E6ED; border-radius: 8px;
-        padding: 16px; box-shadow: rgb(230,230,229) 0px 0px 12px 0px;
-    }
-    .notification-panel h3 { font-size: 1rem; font-weight: 600; color: #a38c65; margin-bottom: 0.75rem; }
-    .notification-card { padding: 10px; border-radius: 6px; background: #f8f9fa; margin-bottom: 8px; }
-    .notification-title { font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 4px; }
-    .notification-time { font-size: 0.75rem; color: #9ca3af; margin-top: 4px; }
+    @media (max-width: 768px) { .mercados-grid { grid-template-columns: 1fr; } }
     .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
     @media (max-width: 1024px) { .dash-grid { grid-template-columns: 1fr; } }
-    .mercados-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
-    @media (max-width: 768px) { .mercados-grid { grid-template-columns: 1fr; } }
+    /* Tooltip */
+    .tooltip-container { position: relative; display: inline-block; }
+    .tooltip-icon { cursor: help; color: var(--exitus-primary); font-size: 0.875rem; margin-left: 0.5rem; }
+    .tooltip-text {
+        visibility: hidden; position: absolute; bottom: 125%; left: 50%;
+        transform: translateX(-50%); background: #333; color: white;
+        padding: 6px 10px; border-radius: 6px; font-size: 0.8rem;
+        white-space: nowrap; z-index: 1000; opacity: 0; transition: opacity 0.2s;
+    }
+    .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+    /* Linha de item (transações, proventos, benchmark) */
+    .dash-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 8px 10px; border-radius: 6px; background: var(--exitus-bg);
+        margin-bottom: 6px; font-size: 0.875rem;
+    }
 </style>
 {% endblock %}
 
@@ -69,51 +42,49 @@
 <div x-data="dashboardV2()" x-init="init()">
 
     <!-- LOADING SKELETON -->
-    <div x-show="!dadosCarregados" class="resumo-patrimonio">
+    <div x-show="!dadosCarregados" class="dash-kpi-grid">
         <template x-for="i in [1,2,3,4,5,6]" :key="i">
-            <div class="resumo-item">
-                <div class="skeleton skeleton-text" style="width:60%;"></div>
-                <div class="skeleton skeleton-value"></div>
-                <div class="skeleton skeleton-text" style="width:40%;"></div>
+            <div class="kpi-card">
+                <div class="skeleton-line short"></div>
+                <div class="skeleton-line medium" style="height:1.5rem;"></div>
+                <div class="skeleton-line short"></div>
             </div>
         </template>
     </div>
 
-    <!-- RESUMO PATRIMÔNIO -->
-    <div x-show="dadosCarregados" class="resumo-patrimonio">
-        <div class="resumo-item">
-            <div class="label">Patrimônio Total</div>
-            <div class="valor" x-text="formatMoney(dados.resumo.patrimonio_total)">R$ 0,00</div>
-            <div class="variacao positiva" x-show="dados.resumo.rentabilidade_geral > 0">
-                ▲ <span x-text="dados.resumo.rentabilidade_geral.toFixed(2)"></span>%
-            </div>
+    <!-- KPIs PATRIMÔNIO -->
+    <div x-show="dadosCarregados" class="dash-kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-card-label">Patrimônio Total</div>
+            <div class="kpi-card-value" x-text="formatMoney(dados.resumo.patrimonio_total)"></div>
+            <div class="kpi-card-change badge-positivo" x-show="dados.resumo.rentabilidade_geral > 0" x-text="dados.resumo.rentabilidade_geral.toFixed(2) + '%'"></div>
         </div>
-        <div class="resumo-item">
-            <div class="label">Rentabilidade</div>
-            <div class="valor" x-text="dados.resumo.rentabilidade_geral.toFixed(2) + '%'">0%</div>
-            <div class="variacao">Sobre Custo</div>
+        <div class="kpi-card">
+            <div class="kpi-card-label">Rentabilidade</div>
+            <div class="kpi-card-value" :class="dados.resumo.rentabilidade_geral >= 0 ? 'positivo' : 'negativo'" x-text="dados.resumo.rentabilidade_geral.toFixed(2) + '%'"></div>
+            <div class="kpi-card-change">Sobre Custo</div>
         </div>
-        <div class="resumo-item">
-            <div class="label">Rentabilidade Total</div>
-            <div class="valor" x-text="dados.resumo.rentabilidade_total ? dados.resumo.rentabilidade_total.toFixed(2) + '%' : '0%'">0%</div>
-            <div class="variacao positiva">Inclui Proventos</div>
+        <div class="kpi-card">
+            <div class="kpi-card-label">Rentab. Total</div>
+            <div class="kpi-card-value positivo" x-text="dados.resumo.rentabilidade_total ? dados.resumo.rentabilidade_total.toFixed(2) + '%' : '0%'"></div>
+            <div class="kpi-card-change">Inclui Proventos</div>
         </div>
-        <div class="resumo-item">
-            <div class="label">Proventos (12M)</div>
-            <div class="valor" x-text="formatMoney(dados.resumo.proventos_12m || 0)">R$ 0,00</div>
-            <div class="variacao" style="color:#10b981; font-weight:600;">Recebidos</div>
+        <div class="kpi-card">
+            <div class="kpi-card-label">Proventos (12M)</div>
+            <div class="kpi-card-value" x-text="formatMoney(dados.resumo.proventos_12m || 0)"></div>
+            <div class="kpi-card-change" style="color:var(--exitus-success); font-weight:600;">Recebidos</div>
         </div>
-        <div class="resumo-item">
-            <div class="label">Ativos</div>
-            <div class="valor" x-text="dados.resumo.total_posicoes">0</div>
-            <div class="variacao" x-text="(dados.resumo.total_portfolios || 0) + ' carteiras'"></div>
+        <div class="kpi-card">
+            <div class="kpi-card-label">Ativos</div>
+            <div class="kpi-card-value" x-text="dados.resumo.total_posicoes"></div>
+            <div class="kpi-card-change" x-text="(dados.resumo.total_portfolios || 0) + ' carteiras'"></div>
         </div>
-        <div class="resumo-item">
-            <div class="label">Saldo em Caixa</div>
-            <div class="valor" x-text="moedaAtual === 'BRL' ? formatMoney(saldoCaixa.saldo_total_brl) : '$' + (saldoCaixa.saldo_usd || 0).toFixed(2)">R$ 0,00</div>
-            <div class="variacao">
-                <button @click="toggleMoeda()" style="background:#a38c65; color:#fff; border:none; border-radius:4px; padding:2px 8px; font-size:0.7rem; font-weight:600; cursor:pointer;">
-                    <span x-text="moedaAtual">BRL</span> ⇄ <span x-text="moedaAtual === 'BRL' ? 'USD' : 'BRL'">USD</span>
+        <div class="kpi-card">
+            <div class="kpi-card-label">Saldo em Caixa</div>
+            <div class="kpi-card-value" x-text="moedaAtual === 'BRL' ? formatMoney(saldoCaixa.saldo_total_brl) : '$' + (saldoCaixa.saldo_usd || 0).toFixed(2)"></div>
+            <div class="kpi-card-change">
+                <button @click="toggleMoeda()" class="btn-exitus btn-exitus-outline" style="padding:1px 8px; font-size:0.7rem;">
+                    <span x-text="moedaAtual"></span> ⇄ <span x-text="moedaAtual === 'BRL' ? 'USD' : 'BRL'"></span>
                 </button>
             </div>
         </div>
@@ -121,33 +92,18 @@
 
     <!-- VISÃO MULTI-MERCADO -->
     <div class="mercados-grid">
-        <div class="card-mercado">
-            <h3 style="font-size:1rem; font-weight:600; color:#a38c65; margin-bottom:0.75rem;">🇧🇷 Brasil</h3>
-            <div style="font-size:1.5rem; font-weight:700; margin-bottom:4px;" x-text="formatMoney(dados.por_mercado.BR.patrimonio)">R$ 0,00</div>
-            <div style="font-size:0.875rem; color:#6b7280; margin-bottom:4px;" x-text="dados.por_mercado.BR.percentual.toFixed(1) + '% do total'">0%</div>
-            <div style="font-size:0.875rem;" :style="dados.por_mercado.BR.rentabilidade >= 0 ? 'color:#16a34a;' : 'color:#ef4444;'">
-                <span x-text="dados.por_mercado.BR.rentabilidade >= 0 ? '▲' : '▼'"></span>
-                <span x-text="Math.abs(dados.por_mercado.BR.rentabilidade).toFixed(2) + '%'"></span>
+        <template x-for="(mercado, key) in [{key:'BR', emoji:'🇧🇷', label:'Brasil'}, {key:'US', emoji:'🇺🇸', label:'EUA'}, {key:'INTL', emoji:'🌍', label:'Internacional'}]" :key="key">
+            <div class="section-box" style="margin-bottom:0;">
+                <div class="section-box-title" style="font-size:0.95rem;" x-text="mercado.emoji + ' ' + mercado.label"></div>
+                <div style="font-size:1.35rem; font-weight:700; color:var(--exitus-text); margin-bottom:4px;"
+                     x-text="formatMoney(dados.por_mercado[mercado.key].patrimonio)"></div>
+                <div style="font-size:0.8rem; color:var(--exitus-text-muted); margin-bottom:4px;"
+                     x-text="dados.por_mercado[mercado.key].percentual.toFixed(1) + '% do total'"></div>
+                <div :class="dados.por_mercado[mercado.key].rentabilidade >= 0 ? 'badge-positivo' : 'badge-negativo'">
+                    <span x-text="Math.abs(dados.por_mercado[mercado.key].rentabilidade).toFixed(2) + '%'"></span>
+                </div>
             </div>
-        </div>
-        <div class="card-mercado">
-            <h3 style="font-size:1rem; font-weight:600; color:#a38c65; margin-bottom:0.75rem;">🇺🇸 EUA</h3>
-            <div style="font-size:1.5rem; font-weight:700; margin-bottom:4px;" x-text="formatMoney(dados.por_mercado.US.patrimonio)">R$ 0,00</div>
-            <div style="font-size:0.875rem; color:#6b7280; margin-bottom:4px;" x-text="dados.por_mercado.US.percentual.toFixed(1) + '% do total'">0%</div>
-            <div style="font-size:0.875rem;" :style="dados.por_mercado.US.rentabilidade >= 0 ? 'color:#16a34a;' : 'color:#ef4444;'">
-                <span x-text="dados.por_mercado.US.rentabilidade >= 0 ? '▲' : '▼'"></span>
-                <span x-text="Math.abs(dados.por_mercado.US.rentabilidade).toFixed(2) + '%'"></span>
-            </div>
-        </div>
-        <div class="card-mercado">
-            <h3 style="font-size:1rem; font-weight:600; color:#a38c65; margin-bottom:0.75rem;">🌍 Internacional</h3>
-            <div style="font-size:1.5rem; font-weight:700; margin-bottom:4px;" x-text="formatMoney(dados.por_mercado.INTL.patrimonio)">R$ 0,00</div>
-            <div style="font-size:0.875rem; color:#6b7280; margin-bottom:4px;" x-text="dados.por_mercado.INTL.percentual.toFixed(1) + '% do total'">0%</div>
-            <div style="font-size:0.875rem;" :style="dados.por_mercado.INTL.rentabilidade >= 0 ? 'color:#16a34a;' : 'color:#ef4444;'">
-                <span x-text="dados.por_mercado.INTL.rentabilidade >= 0 ? '▲' : '▼'"></span>
-                <span x-text="Math.abs(dados.por_mercado.INTL.rentabilidade).toFixed(2) + '%'"></span>
-            </div>
-        </div>
+        </template>
     </div>
 
     <!-- GRID PRINCIPAL -->
@@ -156,14 +112,14 @@
         <!-- COLUNA PRINCIPAL (2/3) -->
         <div>
             <!-- GRÁFICO EVOLUÇÃO -->
-            <div class="chart-container">
-                <h3 class="chart-title">
-                    Evolução do Patrimônio — Histórico Completo
+            <div class="section-box">
+                <div class="section-box-title">
+                    Evolução do Patrimônio
                     <span class="tooltip-container">
                         <span class="tooltip-icon">ℹ️</span>
                         <span class="tooltip-text">Acompanhe como seu patrimônio evoluiu ao longo do tempo</span>
                     </span>
-                </h3>
+                </div>
                 <canvas id="chartEvolucao" height="80"></canvas>
             </div>
 
@@ -193,125 +149,127 @@
             </div>
 
             <!-- ÚLTIMAS TRANSAÇÕES -->
-            <div class="section-box" style="margin-bottom:1.5rem;">
-                <div class="section-box-title">Últimas Transações</div>
-                <div>
-                    <template x-for="trx in transacoes" :key="trx.id">
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:6px; background:#f8f9fa; margin-bottom:6px;">
-                            <div>
-                                <span style="font-weight:600;" x-text="trx.ativo_ticker"></span>
-                                <span style="font-size:0.875rem; color:#6b7280; margin-left:8px;" x-text="trx.tipo"></span>
-                            </div>
-                            <div style="text-align:right;">
-                                <div style="font-weight:600;" x-text="formatMoney(trx.valor_total)"></div>
-                                <div style="font-size:0.75rem; color:#9ca3af;" x-text="formatDate(trx.data_operacao)"></div>
-                            </div>
+            <div class="section-box">
+                <div class="section-box-title"><i class="fas fa-exchange-alt"></i> Últimas Transações</div>
+                <template x-for="trx in transacoes" :key="trx.id">
+                    <div class="dash-row">
+                        <div>
+                            <span class="cell-ticker" x-text="trx.ativo_ticker"></span>
+                            <span style="font-size:0.8rem; color:var(--exitus-text-muted); margin-left:8px;" x-text="trx.tipo"></span>
                         </div>
-                    </template>
-                    <div x-show="transacoes.length === 0" style="text-align:center; color:#9ca3af; padding:1rem; font-size:0.875rem;">Nenhuma transação recente</div>
+                        <div style="text-align:right;">
+                            <div style="font-weight:600;" x-text="formatMoney(trx.valor_total)"></div>
+                            <div style="font-size:0.75rem; color:var(--exitus-text-light);" x-text="formatDate(trx.data_operacao)"></div>
+                        </div>
+                    </div>
+                </template>
+                <div x-show="transacoes.length === 0" class="empty-state" style="padding:1.5rem;">
+                    <div class="empty-state-text">Nenhuma transação recente</div>
                 </div>
             </div>
 
             <!-- PRÓXIMOS PROVENTOS -->
             <div class="section-box">
-                <div class="section-box-title">📅 Próximos Proventos (30 dias)</div>
-                <div x-show="proximosProventos.length > 0">
-                    <template x-for="evt in proximosProventos.slice(0,5)" :key="evt.id">
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:6px; background:#f8f6f3; margin-bottom:6px;">
-                            <div>
-                                <span style="font-weight:600; font-size:0.875rem;" x-text="evt.ativo_ticker"></span>
-                                <span style="font-size:0.75rem; color:#9ca3af; margin-left:6px;" x-text="evt.tipo"></span>
-                            </div>
-                            <div style="text-align:right;">
-                                <div style="font-weight:600; font-size:0.875rem; color:#a38c65;" x-text="'R$ ' + evt.valor_total.toFixed(2)"></div>
-                                <div style="font-size:0.75rem; color:#9ca3af;" x-text="formatDate(evt.data_pagamento)"></div>
-                            </div>
+                <div class="section-box-title"><i class="far fa-calendar-alt"></i> Próximos Proventos (30 dias)</div>
+                <template x-for="evt in proximosProventos.slice(0,5)" :key="evt.id">
+                    <div class="dash-row" style="background:var(--exitus-primary-bg);">
+                        <div>
+                            <span class="cell-ticker" x-text="evt.ativo_ticker"></span>
+                            <span style="font-size:0.75rem; color:var(--exitus-text-light); margin-left:6px;" x-text="evt.tipo"></span>
                         </div>
-                    </template>
-                    <div style="margin-top:8px; padding-top:8px; border-top:1px solid #e5e7eb; text-align:right; font-size:0.875rem; font-weight:600; color:#735c43;">
-                        Total esperado: <span x-text="'R$ ' + totalProventos.toFixed(2)"></span>
+                        <div style="text-align:right;">
+                            <div style="font-weight:600; color:var(--exitus-primary);" x-text="'R$ ' + evt.valor_total.toFixed(2)"></div>
+                            <div style="font-size:0.75rem; color:var(--exitus-text-light);" x-text="formatDate(evt.data_pagamento)"></div>
+                        </div>
                     </div>
+                </template>
+                <div x-show="proximosProventos.length > 0" style="margin-top:8px; padding-top:8px; border-top:1px solid var(--exitus-border); text-align:right; font-size:0.875rem; font-weight:600; color:var(--exitus-primary-dark);">
+                    Total esperado: <span x-text="'R$ ' + totalProventos.toFixed(2)"></span>
                 </div>
-                <div x-show="proximosProventos.length === 0" style="text-align:center; color:#9ca3af; padding:1rem; font-size:0.875rem;">Nenhum provento nos próximos 30 dias</div>
+                <div x-show="proximosProventos.length === 0" class="empty-state" style="padding:1.5rem;">
+                    <div class="empty-state-text">Nenhum provento nos próximos 30 dias</div>
+                </div>
             </div>
         </div>
 
         <!-- COLUNA LATERAL (1/3) -->
         <div>
             <!-- META DE PATRIMÔNIO -->
-            <div class="card-mercado" style="margin-bottom:1.5rem;">
-                <h3 style="font-size:1rem; font-weight:600; color:#a38c65; margin-bottom:0.75rem; display:flex; align-items:center;">
+            <div class="section-box">
+                <div class="section-box-title">
                     🎯 Meta de Patrimônio
                     <span class="tooltip-container">
                         <span class="tooltip-icon">ℹ️</span>
                         <span class="tooltip-text">Progresso em relação à meta definida</span>
                     </span>
-                </h3>
-                <div style="display:flex; justify-content:space-between; font-size:0.875rem; margin-bottom:6px;">
-                    <span>Atual: <strong x-text="formatMoney(dados.resumo.patrimonio_total)"></strong></span>
-                    <span>Meta: <strong>R$ 500.000,00</strong></span>
                 </div>
-                <div style="width:100%; background:#e5e7eb; border-radius:9999px; height:12px;">
-                    <div style="background:linear-gradient(90deg,#a38c65,#c4a97a); height:12px; border-radius:9999px; transition:width .5s;"
+                <div style="display:flex; justify-content:space-between; font-size:0.875rem; margin-bottom:6px; color:var(--exitus-text-muted);">
+                    <span>Atual: <strong style="color:var(--exitus-text);" x-text="formatMoney(dados.resumo.patrimonio_total)"></strong></span>
+                    <span>Meta: <strong style="color:var(--exitus-text);">R$ 500.000,00</strong></span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill"
                          :style="'width: ' + Math.min((dados.resumo.patrimonio_total / 500000) * 100, 100) + '%'"></div>
                 </div>
-                <div style="text-align:center; margin-top:8px; font-size:0.875rem; font-weight:600; color:#a38c65;"
+                <div style="text-align:center; margin-top:8px; font-size:0.875rem; font-weight:600; color:var(--exitus-primary);"
                      x-text="((dados.resumo.patrimonio_total / 500000) * 100).toFixed(1) + '% alcançado'"></div>
             </div>
 
             <!-- BENCHMARK -->
-            <div class="card-mercado" style="margin-bottom:1.5rem;">
-                <h3 style="font-size:1rem; font-weight:600; color:#a38c65; margin-bottom:0.75rem; display:flex; align-items:center;">
+            <div class="section-box">
+                <div class="section-box-title">
                     📊 Benchmark
                     <span class="tooltip-container">
                         <span class="tooltip-icon">ℹ️</span>
                         <span class="tooltip-text">Sua rentabilidade vs CDI e Ibovespa</span>
                     </span>
-                </h3>
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:0.875rem;">Sua Carteira</span>
-                        <span style="font-weight:600; color:#16a34a;" x-text="'▲ ' + dados.resumo.rentabilidade_geral.toFixed(2) + '%'"></span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <div class="dash-row">
+                        <span>Sua Carteira</span>
+                        <span class="badge-positivo" x-text="dados.resumo.rentabilidade_geral.toFixed(2) + '%'"></span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:0.875rem;">CDI (12m)</span>
-                        <span style="font-weight:600; color:#6b7280;">▲ 11.75%</span>
+                    <div class="dash-row">
+                        <span>CDI (12m)</span>
+                        <span class="badge-neutro">11.75%</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:0.875rem;">Ibovespa (12m)</span>
-                        <span style="font-weight:600; color:#6b7280;">▲ 8.32%</span>
+                    <div class="dash-row">
+                        <span>Ibovespa (12m)</span>
+                        <span class="badge-neutro">8.32%</span>
                     </div>
-                    <div style="margin-top:8px; padding-top:8px; border-top:1px solid #e5e7eb; text-align:center; font-size:0.875rem;"
-                         :style="dados.resumo.rentabilidade_geral > 11.75 ? 'color:#16a34a; font-weight:600;' : 'color:#6b7280;'">
-                        <span x-show="dados.resumo.rentabilidade_geral > 11.75">🎉 Você está acima do CDI!</span>
-                        <span x-show="dados.resumo.rentabilidade_geral <= 11.75">📈 Continue investindo para superar o CDI</span>
+                    <div style="margin-top:4px; padding-top:8px; border-top:1px solid var(--exitus-border); text-align:center; font-size:0.875rem;"
+                         :class="dados.resumo.rentabilidade_geral > 11.75 ? 'badge-positivo' : 'badge-neutro'">
+                        <span x-show="dados.resumo.rentabilidade_geral > 11.75">🎉 Acima do CDI!</span>
+                        <span x-show="dados.resumo.rentabilidade_geral <= 11.75">📈 Meta: superar o CDI</span>
                     </div>
                 </div>
             </div>
 
             <!-- GRÁFICO ALOCAÇÃO -->
-            <div class="chart-container" style="margin-bottom:1.5rem;">
-                <h3 class="chart-title">
+            <div class="section-box">
+                <div class="section-box-title">
                     Alocação por Mercado
                     <span class="tooltip-container">
                         <span class="tooltip-icon">ℹ️</span>
                         <span class="tooltip-text">Distribuição do patrimônio entre Brasil, EUA e Internacional</span>
                     </span>
-                </h3>
+                </div>
                 <canvas id="alocacaoChart" height="150"></canvas>
             </div>
 
             <!-- ALERTAS RECENTES -->
-            <div class="notification-panel">
-                <h3>Alertas Recentes</h3>
+            <div class="section-box">
+                <div class="section-box-title"><i class="fas fa-bell"></i> Alertas Recentes</div>
                 <template x-for="alerta in alertas" :key="alerta.id">
-                    <div class="notification-card">
-                        <div class="notification-title" x-text="alerta.nome"></div>
-                        <p style="font-size:0.875rem; color:#6b7280;" x-text="alerta.mensagem"></p>
-                        <div class="notification-time" x-text="formatDate(alerta.data)"></div>
+                    <div class="dash-row" style="flex-direction:column; align-items:flex-start; gap:4px;">
+                        <div style="font-weight:600; font-size:0.875rem;" x-text="alerta.nome"></div>
+                        <div style="font-size:0.8rem; color:var(--exitus-text-muted);" x-text="alerta.mensagem"></div>
+                        <div style="font-size:0.75rem; color:var(--exitus-text-light);" x-text="formatDate(alerta.data)"></div>
                     </div>
                 </template>
-                <div x-show="alertas.length === 0" style="text-align:center; color:#9ca3af; padding:1rem; font-size:0.875rem;">Nenhum alerta recente</div>
+                <div x-show="alertas.length === 0" class="empty-state" style="padding:1.5rem;">
+                    <div class="empty-state-text">Nenhum alerta recente</div>
+                </div>
             </div>
         </div>
 

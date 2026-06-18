@@ -8,6 +8,22 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — Visual dashboard/index_v2.html: padronização com exitus-components.css (18/06/2026)
+
+**Correção de regressão visual em `dashboard/index_v2.html`:**
+- KPIs patrimoniais migrados de `.resumo-item` custom → `kpi-card` + `kpi-card-value` + `badge-positivo/negativo`
+- Cards de mercado (BR/US/INTL) migrados de `.card-mercado` → `section-box` com template Alpine.js loop
+- Gráficos (evolução + alocação) migrados de `.chart-container` → `section-box`
+- Alertas migrados de `.notification-panel/.notification-card` → `section-box` + `dash-row`
+- Transações e proventos migrados para `dash-row` com variáveis `--exitus-*`
+- Meta de patrimônio usa `progress-bar-container` + `progress-bar-fill` do sistema
+- Benchmark usa `badge-positivo` + `badge-neutro` do sistema
+- CSS residual mínimo: apenas grids de layout (`.dash-kpi-grid`, `.mercados-grid`, `.dash-grid`) e tooltip
+
+**Resultado:** Dashboard 100% consistente com Screener, Análises, Fiscal, Relatórios, Ativos e Operações
+
+---
+
 ### Fix — Visual operacoes_v2.html: padronização com exitus-components.css (18/06/2026)
 
 **Correção de regressão visual em `operacoes_v2.html`:**
