@@ -1,8 +1,12 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 18/06/2026  
-> **Status:** ✅ **Frontend Migração Completa — 100% templates em `base_interna.html`**  
+> **Status:** ✅ **Frontend Migração Completa + Auditoria Funcional + Fix BUG-001**  
 > **Versão:** v0.9.20
+
+### 🔧 Últimas correções (18/06/2026)
+- **EXITUS-LOGIN-001:** Redesenho `login.html` (UX_DESIGN_SYSTEM) + remoção token mock de `auth.js` — BUG-001 resolvido
+- **Auditoria Funcional:** 36 telas auditadas, 19 bugs documentados, 22 novas telas propostas (`AUDITORIA_FUNCIONAL_18_06_2026.md`)
 
 ---
 

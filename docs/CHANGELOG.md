@@ -8,6 +8,23 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — EXITUS-LOGIN-001: Redesenho tela de login + fix token mock (18/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/templates/auth/login.html`: redesenho completo seguindo UX_DESIGN_SYSTEM
+  - Fonte Nunito, cor primária `#A38C65`, card clean sem dependência de Tailwind/Bootstrap
+  - Removidas credenciais hardcoded (`value="e2e_user"`, `value="e2e_senha_123"`)
+  - Removido link "Esqueceu a senha?" → `/auth/forgot-password` (rota não implementada)
+  - Login 100% AJAX via `fetch` + `window.auth.saveToken()` para persistir token no `localStorage`
+- `frontend/app/static/js/auth.js`: removido token mock hardcoded de `e2e_admin` como fallback no construtor
+  - Era a causa raiz do BUG-001: `localStorage` vazio → fallback com token expirado → Alpine.js recebia token inválido → API 401 silencioso
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-001, BUG-007 marcados como resolvidos; Tela 1 atualizada para ✅
+
+**Bugs resolvidos:** BUG-001, BUG-007
+**Para revalidar:** BUG-002 (toggle Compra/Venda — depende de login real com token válido)
+
+---
+
 ### Fix — Visual dashboard/index_v2.html: padronização com exitus-components.css (18/06/2026)
 
 **Correção de regressão visual em `dashboard/index_v2.html`:**
