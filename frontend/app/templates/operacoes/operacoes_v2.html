@@ -377,8 +377,8 @@ function pageDataExtend() {
 
         get tipoAtualConfig() { return this.tiposAtivo.find(t => t.key === this.selectedTipo) || null; },
         get valorTotal() { return (parseFloat(this.form.quantidade) || 0) * (parseFloat(this.form.preco_unitario) || 0); },
-        get isCompra() { return this.modoOperacao === 'compra'; },
-        get isVenda() { return this.modoOperacao === 'venda'; },
+        isCompra: true,
+        isVenda: false,
         get posicoesPorTipo() {
             if (!this.selectedTipo) return this.posicoes;
             const cfg = this.tipoAtualConfig;
@@ -403,6 +403,8 @@ function pageDataExtend() {
         toggleModo(modo) {
             if (this.modoOperacao === modo) return;
             this.modoOperacao = modo;
+            this.isCompra = modo === 'compra';
+            this.isVenda = modo === 'venda';
             this.form.tipo = modo;
             this.clearAtivo();
             this.selectedTipo = '';

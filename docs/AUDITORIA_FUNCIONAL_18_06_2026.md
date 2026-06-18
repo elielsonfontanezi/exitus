@@ -18,8 +18,8 @@
 | Status | Quantidade |
 |--------|-----------|
 | ✅ OK | 2 |
-| 🟡 PARCIAL | 29 |
-| 🔴 QUEBRADO | 5 |
+| 🟡 PARCIAL | 31 |
+| 🔴 QUEBRADO | 3 |
 | ⬜ NÃO TESTADO | 0 |
 
 ---
@@ -33,8 +33,8 @@
 | 3 | Configurações — Perfil | `/configuracoes/perfil` | 🟡 | Somente leitura — sem edição de nome/email/senha | Média |
 | 4 | Configurações — Corretoras | `/configuracoes/corretoras` | 🟡 | Listagem OK — sem botões CRUD (criar/editar/excluir corretora) | Alta |
 | 5 | Operações — Import B3 | `/operacoes/` | � | Import Canal do Investidor não exibe registros importados | Alta |
-| 6 | Operações — Compra | `/operacoes/` | � | Toggle Compra/Venda não responde a cliques | Alta |
-| 7 | Operações — Venda | `/operacoes/` | � | Toggle Compra/Venda não responde a cliques — impossível acessar modo venda | Alta |
+| 6 | Operações — Compra | `/operacoes/` | 🟡 | Toggle funciona ✅; busca de ativo sem autocomplete (BUG-014 relacionado) | Média |
+| 7 | Operações — Venda | `/operacoes/` | 🟡 | Toggle funciona ✅; modo venda acessível e formulário exibido corretamente | Média |
 | 8 | Operações — Histórico | `/operacoes/historico` | 🟡 | Filtro por data com bug; filtro ticker OK; sem editar/excluir | Média |
 | 9 | Carteira — Posições | `/carteira/posicoes` | ✅ | Validado visualmente: KPIs, filtros (ticker/tipo/mercado) e botão Recalcular funcionam | — |
 | 10 | Carteira — Movimentações | `/carteira/movimentacoes` | 🟡 | KPIs e tabela OK; filtro tipo OK; filtro data quebrado — tela pisca ao digitar ano (BUG-013) | Alta |
@@ -543,7 +543,7 @@
 | ID | Problema | Tela(s) | Causa raiz identificada |
 |----|----------|---------|------------------------|
 | ~~BUG-001~~ | ~~**Token não salvo no localStorage após login Flask**~~ — **RESOLVIDO em EXITUS-LOGIN-001**: token mock hardcoded removido de `auth.js`; login já era AJAX e chamava `window.auth.saveToken()` corretamente. Causa real era o fallback com token expirado mascarando o fluxo | — todas as telas `base_interna.html` usam `localStorage.getItem('access_token')` mas o login Flask salva apenas na sessão do servidor. Alpine.js recebe `null` → API retorna 401 → `loading` trava → tela parece "sem resposta" | 3, 4, 5, 6, 7, 8, 9–35 | `auth.py` route usa form POST → Flask session. `auth.js` `localStorage.setItem` só é chamado via AJAX. Fluxos não sincronizados. **Fix:** no `auth.py` após login bem-sucedido, passar o token para o template e injetá-lo via `<script>localStorage.setItem('access_token', '...')</script>` |
-| BUG-002 | **Toggle Compra/Venda não responde a cliques** | 6, 7 | BUG-001 resolvido. Revalidar se toggle funciona após login real. Se persistir: investigar handler Alpine.js do toggle independentemente |
+| ~~BUG-002~~ | ~~**Toggle Compra/Venda: getters `isCompra`/`isVenda` invertidos após merge**~~ | — | **RESOLVIDO em EXITUS-OPERACOES-001**: getters substituídos por propriedades reativas simples em `operacoes_v2.html`. Spread `{ ...base, ...pageDataExtend() }` não preserva getters JavaScript — convertido para `isCompra: true, isVenda: false` atualizados em `toggleModo()` |
 | BUG-003 | **Import B3 (Canal do Investidor) não exibe registros** | 5 | `data.data` retornado pela API pode ter estrutura diferente de `{transacoes_criadas, proventos_criados, resumo}` esperada pelo template. **Fix:** inspecionar resposta real da API `/api/import/b3` e ajustar template |
 
 ### 🟡 Importantes (degradam experiência)
@@ -705,18 +705,17 @@
 | Status | Qtd | % |
 |--------|-----|---|
 | ✅ OK | 2 | 6% |
-| 🟡 PARCIAL | 29 | 80% |
-| 🔴 QUEBRADO | 5 | 14% |
+| 🟡 PARCIAL | 31 | 86% |
+| 🔴 QUEBRADO | 3 | 8% |
 | ⬜ NÃO TESTADO | 0 | — |
 
 ### Telas 🔴 QUEBRADAS
 
 | Tela | URL | Motivo |
 |------|-----|--------|
-| 5 | `/operacoes/` Import B3 | Import aceita mas não exibe registros |
-| 6 | `/operacoes/` Compra | Toggle inoperante (BUG-001) |
-| 7 | `/operacoes/` Venda | Inacessível via toggle (BUG-001) |
+| 5 | `/operacoes/` Import B3 | Import aceita mas não exibe registros (BUG-003) |
 | 13 | `/ativos/eventos-corporativos` | NOT FOUND — rota `/<ticker>` captura a URL (BUG-016) |
+| 6, 7 | `/operacoes/` Compra/Venda | ~~Toggle inoperante~~ → **RESOLVIDO** EXITUS-OPERACOES-001 |
 | 19 | `/analises/rentabilidade` | Rota legacy morta — NOT FOUND (BUG-018) |
 | 23 | `/imposto-renda/declaracao` | Carrega dados ✅ mas `dados`/`erro` não passados ao template (BUG-010) — dados visíveis provavelmente vem da chamada Alpine.js client-side |
 
