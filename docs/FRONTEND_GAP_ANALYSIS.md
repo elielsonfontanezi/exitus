@@ -12,7 +12,7 @@
 
 ## �️ Plano de Execução por Fases
 
-> Status atualizado: **17/06/2026**
+> Status atualizado: **18/06/2026** — Fix visual: `operacoes_v2.html` + `dashboard/index_v2.html` padronizados com `exitus-components.css` (sem CSS custom)
 
 ### ✅ Fase 1 — Correções urgentes no menu (CONCLUÍDA — 16/06/2026)
 *Sem novas telas, só reorganização do `menu_horizontal.html`.*

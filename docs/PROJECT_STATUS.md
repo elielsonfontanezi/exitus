@@ -43,6 +43,7 @@
 - **GAP Analysis Fase 5:** ✅ 4 melhorias (17/06/2026) — detalhe ativo fundamentalistas, DIRPF bens reais, eventos corporativos, planos compra/venda unificados
 - **GAP Analysis Fase 6:** ✅ Unificação (17/06/2026) — 8 templates redundantes removidos, 15 telas migradas para base_interna.html + Alpine.js, 19 templates antigos deletados
 - **GAP Analysis Fase 7:** ✅ Migração Final (18/06/2026) — operacoes.html + dashboard/index.html migrados; 100% dos templates em base_interna.html
+- **Fix Visual Fase 7 (18/06/2026):** `operacoes_v2.html` + `dashboard/index_v2.html` reescritos para usar exclusivamente `exitus-components.css` — sem CSS custom, sem cores hardcoded; visual 100% consistente com todas as telas
 - **APIs integradas:** 36+ endpoints (todos os 16 GAPs do GAP Analysis cobertos)
 - **Tecnologia:** Alpine.js + Fetch API + API REST + base_interna.html
 - **Status:** ✅ COMPLETO — Todas as fases (1-7) finalizadas
