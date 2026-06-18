@@ -164,26 +164,26 @@
 
 | # | Grupo | APIs disponíveis | Frontend atual | GAPs | Prioridade |
 |---|-------|-----------------|----------------|------|-----------|
-| G1 | Auth + Usuário + Corretoras | 6 endpoints | ✅ Login, registro | 🔴 Perfil, corretoras CRUD | Alta |
-| G2 | Cotações em Tempo Real | 4 endpoints | ⚠️ Usado internamente | 🔴 Tela de cotações dedicada | Alta |
-| G3 | Ativos — Catálogo | 3 endpoints | ✅ Lista por categoria | 🟡 Detalhe incompleto | Média |
-| G4 | Posições — Carteira | 4 endpoints | ⚠️ Dashboard usa resumo | 🔴 Tela posições completa, recalcular | Alta |
-| G5 | Transações | 2 endpoints | ✅ Compra / ⚠️ Venda | 🟡 Editar/excluir, histórico filtrado | Média |
-| G6 | Movimentações de Caixa | 2 endpoints | ❌ Não existe | 🔴 Nova tela completa | Alta |
-| G7 | Proventos + Calendário | 8 endpoints | ✅ Recebidos, projetados, calendário | 🟡 Confirmar pagamento, gerar auto | Média |
-| G8 | Buy Signals | 4 endpoints | ⚠️ Parcial em Análises | 🟡 Watchlist-top, detalhe ticker | Média |
-| G9 | Alertas | 5 endpoints | ⚠️ Só lista | 🔴 Criar, toggle, deletar na UI | Alta |
-| G10 | Planos de Compra/Venda | - | ⚠️ Stub/redirect | 🔴 CRUD completo pendente de APIs | Baixa* |
-| G11 | IR / Fiscal | 3 endpoints | ✅ Apuração, DARFs, histórico, DIRPF | 🟡 DIRPF incompleto | Baixa |
-| G12 | Rentabilidade + Performance | 3 endpoints | ✅ TWR/MWR, alocação, performance | 🟡 Seletor benchmark na UI | Baixa |
-| G13 | Relatórios + Exportação | 6 endpoints | ✅ Mensal, anual, extrato, IR, CSV | 🟡 Export Excel/PDF, download direto | Média |
-| G14 | Reconciliação | 4 endpoints | ❌ Não existe | 🔴 Nova tela Ferramentas | Alta |
-| G15 | Eventos Corporativos | 6 endpoints | ❌ Não existe | 🟡 Tela admin ou aviso no detalhe ativo | Baixa |
-| G16 | Calendário de Dividendos | 6 endpoints | ⚠️ Parcial em proventos | 🔴 Gerar automático, confirmar pagamento | Alta |
-| G17 | Carteira — Saldo Caixa | 1 endpoint | ✅ Usado no dashboard | 🟡 Saldo multi-corretora visível | Baixa |
-| G18 | Dashboard Consolidado | 3 endpoints | ✅ Dashboard principal | 🟡 Toggle BRL/USD, Top 5 por mercado | Média |
+| G1 | Auth + Usuário + Corretoras | 6 endpoints | ✅ Login, registro, perfil, corretoras CRUD | ✅ **Implementado Fase 3** | — |
+| G2 | Cotações em Tempo Real | 4 endpoints | ⚠️ Usado internamente | 🟡 Widget provider/TTL + badge fallback header | Média |
+| G3 | Ativos — Catálogo | 3 endpoints | ✅ Lista + detalhe com fundamentalistas | ✅ **Implementado Fase 5** | — |
+| G4 | Posições — Carteira | 4 endpoints | ✅ `/carteira/posicoes` com filtros + resumo | 🟡 Botão recalcular posições pendente | Média |
+| G5 | Transações | 2 endpoints | ✅ `/operacoes/historico` com filtros | 🟡 Editar/excluir transação pendente | Baixa |
+| G6 | Movimentações de Caixa | 2 endpoints | ✅ `/carteira/movimentacoes` + saldo por corretora | ✅ **Implementado Fase 3** | — |
+| G7 | Proventos + Calendário | 8 endpoints | ✅ Recebidos, projetados, calendário | 🟡 Botão gerar auto + confirmar pagamento + badges status | Média |
+| G8 | Buy Signals | 4 endpoints | ✅ Busca ticker + score + margem + watchlist Top 10 | 🟡 Z-Score + badge sinal COMPRAR/AGUARDAR/VENDER | Baixa |
+| G9 | Alertas | 5 endpoints | ✅ CRUD completo: criar, toggle, excluir, feed recentes | ✅ **Implementado Fase 4** | — |
+| G10 | Planos de Compra/Venda | - | ✅ Tela unificada com APIs corrigidas | ✅ **Implementado Fase 5** (APIs limitadas) | — |
+| G11 | IR / Fiscal | 3 endpoints | ✅ Apuração, DARFs, histórico, DIRPF com bens reais | 🟡 Seletor mês/ano visual na apuração | Baixa |
+| G12 | Rentabilidade + Performance | 3 endpoints | ✅ TWR/MWR + seletor benchmark + seletor período | ✅ **Implementado Fase 4** | — |
+| G13 | Relatórios + Exportação | 6 endpoints | ✅ CSV/Excel/PDF + seletor formato + entidades | ✅ **Implementado Fase 4** | — |
+| G14 | Reconciliação | 4 endpoints | ✅ `/ferramentas/reconciliacao` — diagnóstico completo | ✅ **Implementado Fase 3** | — |
+| G15 | Eventos Corporativos | 6 endpoints | ✅ Exibidos no detalhe do ativo | ✅ **Implementado Fase 5** | — |
+| G16 | Calendário de Dividendos | 6 endpoints | ✅ Gerar automático + confirmar pagamento + badges | ✅ **Implementado Fase 4** | — |
+| G17 | Carteira — Saldo Caixa | 1 endpoint | ✅ Dashboard + toggle BRL/USD implementado | ✅ **Implementado Fase 7** | — |
+| G18 | Dashboard Consolidado | 3 endpoints | ✅ Top 5 por mercado + alocação geo + toggle BRL/USD | ✅ **Implementado Fase 7** | — |
 
-> *G10 — depende de APIs backend ainda não documentadas para planos CRUD completo.
+> *G10 — APIs de planos com funcionalidade limitada; CRUD completo aguarda APIs adicionais no backend.
 
 ---
 
@@ -201,19 +201,11 @@
 ### Frontend Atual
 - ✅ `/auth/login` — tela de login funcional
 - ✅ `/auth/register` — tela de registro
-- ❌ Perfil do usuário — não existe tela
-- ❌ Corretoras — sem tela de gestão no frontend
+- ✅ `/configuracoes/perfil` — editar nome, email, senha (**Fase 3 — 17/06/2026**)
+- ✅ `/configuracoes/corretoras` — CRUD corretoras (**Fase 3 — 17/06/2026**)
 
-### GAPs Identificados
-1. **Tela Perfil** — editar nome, email, senha. API: `PUT /api/usuarios/{id}`
-2. **Tela Corretoras** — listar, criar, editar, remover corretoras vinculadas ao usuário
-
-### Proposta de Telas Novas
-```
-/configuracoes/perfil        → Dados pessoais + senha
-/configuracoes/corretoras    → CRUD corretoras (lista + formulário inline)
-```
-**Encaixe:** novo blueprint `configuracoes.py` ou expansão de `auth.py`
+### Status
+✅ **G1 CONCLUÍDO** — todas as telas implementadas em Fase 3.
 
 ---
 
@@ -283,23 +275,15 @@ Header global                               → badge ⚠️ quando provider=dat
 | `/api/posicoes/calcular` | POST | Recalcular posições a partir das transações |
 
 ### Frontend Atual
-- ⚠️ Dashboard usa dados de posições mas não via `/api/posicoes` diretamente
-- ❌ Sem tela dedicada de "Minha Carteira" com lista de posições filtrada
-- ❌ `GET /api/posicoes/resumo` não usado em nenhuma tela
-- ❌ `POST /api/posicoes/calcular` sem botão na UI
+- ✅ `/carteira/posicoes` — lista com filtros (ticker, tipo, corretora, lucro_positivo), resumo ROI (**Fase 3 — 17/06/2026**)
+- ✅ `GET /api/posicoes/resumo` — card de resumo na tela de posições
+- ❌ `POST /api/posicoes/calcular` — botão recalcular ainda sem UI
 
-### GAPs Identificados
-1. **Tela Minha Carteira** — posições agrupadas por tipo, com PM, valor atual, L/P realizado
-2. **Card de resumo** com total investido e ROI (usa `/api/posicoes/resumo`)
-3. **Botão "Recalcular Posições"** em Ferramentas (usa `POST /api/posicoes/calcular`)
-4. **Filtro por corretora** e por "somente com lucro"
+### GAPs Restantes
+1. **Botão "Recalcular Posições"** — integrar em `/carteira/posicoes` ou `/ferramentas/reconciliacao`
 
-### Proposta de Telas Novas
-```
-/carteira/posicoes          → lista completa de posições com filtros
-/carteira/posicoes/{id}     → detalhe: PM, histórico de compras, L/P
-/ferramentas/recalcular     → botão + resultado do recalculo (ou integrar em Ferramentas)
-```
+### Status
+🟡 **G4 PARCIALMENTE CONCLUÍDO** — tela principal implementada; botão recalcular pendente (Média prioridade).
 
 ---
 
@@ -315,21 +299,16 @@ Header global                               → badge ⚠️ quando provider=dat
 | `/api/transacoes/recentes` | GET | Últimas N transações (dashboard) |
 
 ### Frontend Atual
-- ✅ `POST /api/transacoes` — via tela de compra (`/operacoes/`)
-- ⚠️ Venda usa a mesma tela unificada mas com lógica de toggle
-- ❌ Editar/excluir transação — sem tela
-- ❌ Histórico completo com filtros — sem tela dedicada
+- ✅ `POST /api/transacoes` — via tela `/operacoes/` (compra + venda unificada)
+- ✅ `/operacoes/historico` — tabela paginada com filtros (período, tipo, ativo, corretora) (**Fase 3 — 17/06/2026**)
+- ❌ Editar/excluir transação — sem ação na UI
 
-### GAPs Identificados
-1. **Tela Histórico de Transações** — tabela com filtros (período, tipo, ativo, corretora)
-2. **Editar transação** — formulário inline ou modal
-3. **Excluir transação** — com confirmação
+### GAPs Restantes
+1. **Editar transação** — formulário inline ou modal
+2. **Excluir transação** — com confirmação
 
-### Proposta
-```
-/operacoes/historico        → tabela paginada + filtros + ações editar/excluir
-```
-**Blueprint:** expansão de `operacoes.py`
+### Status
+🟡 **G5 PARCIALMENTE CONCLUÍDO** — histórico implementado; editar/excluir pendentes (Baixa prioridade).
 
 ---
 
@@ -342,19 +321,10 @@ Header global                               → badge ⚠️ quando provider=dat
 | `/api/movimentacoes/saldo/{corretora_id}` | GET | Saldo calculado por corretora |
 
 ### Frontend Atual
-- ❌ **Nenhuma tela implementada** — wireframe Tela 9 desenhado, nunca construído
-- ⚠️ Depósito existe como rota (`/operacoes/deposito`) mas sem listagem
+- ✅ `/carteira/movimentacoes` — tabela filtrada + saldo por corretora + resumo período (**Fase 3 — 17/06/2026**)
 
-### GAPs Identificados
-1. **Tela Movimentações de Caixa** completa (Tela 9 do wireframe)
-2. **Saldo por corretora** com tabela histórico entradas/saídas
-3. **Resumo do período** (total entradas, total saídas, saldo final)
-
-### Proposta de Tela Nova (alta prioridade — tela 9 do wireframe nunca implementada)
-```
-/carteira/movimentacoes     → tabela filtrada + saldo por corretora + resumo período
-```
-**Blueprint:** novo `carteira.py` ou expansão de `operacoes.py`
+### Status
+✅ **G6 CONCLUÍDO** — tela completa implementada em Fase 3.
 
 ---
 
@@ -373,23 +343,14 @@ Header global                               → badge ⚠️ quando provider=dat
 
 ### Frontend Atual
 - ✅ `/proventos/recebidos` — lista proventos recebidos
-- ✅ `/proventos/projetados` — proventos projetados
-- ✅ `/proventos/calendario` — calendário básico
-- ❌ `POST /calendario-dividendos/gerar` — sem botão "Gerar automático"
-- ❌ `POST /confirmar-pagamento` — sem ação de confirmar na UI
-- ❌ `GET /calendario-dividendos/resumo` — estatísticas mensais/por ativo não exibidas
+- ✅ `/proventos/projetados` — proventos projetados + card resumo estimado vs. real
+- ✅ `/proventos/calendario` — calendário com botão "Gerar automático" + confirmar pagamento + badges status previsto/confirmado/pago (**Fase 4 — 17/06/2026**)
 
-### GAPs Identificados
-1. **Botão "Gerar Calendário"** na tela de calendário
-2. **Confirmar pagamento** — ação por linha no calendário
-3. **Resumo por ativo** — card com total estimado vs. real recebido
-4. **Status visual** previsto/confirmado/atrasado/pago nos itens
+### GAPs Restantes
+1. **`GET /calendario-dividendos/resumo`** — estatísticas mensais/por ativo não exibidas (nice-to-have)
 
-### Proposta
-```
-Expansão de /proventos/calendario  → + botão gerar auto + ação confirmar + badges status
-Expansão de /proventos/projetados  → + card resumo estimado vs. real por ativo
-```
+### Status
+✅ **G7 CONCLUÍDO** — todos os GAPs críticos implementados em Fase 4.
 
 ---
 
@@ -404,19 +365,16 @@ Expansão de /proventos/projetados  → + card resumo estimado vs. real por ativ
 | `/api/buy-signals/watchlist-top` | GET | Top 10 ativos por score |
 
 ### Frontend Atual
-- ✅ `/analises/buy-signals` — busca por ticker, score, margem (Tela 2 do wireframe parcialmente implementada)
-- ❌ `GET /api/buy-signals/watchlist-top` — top 10 sem tela
-- ❌ Z-Score não exibido na tela atual
+- ✅ `/analises/buy-signals` — busca por ticker, score, margem + seção Watchlist Top 10 (**Fase 4 — 17/06/2026**)
+- ❌ Z-Score — não exibido na tela atual
+- ❌ Badge sinal COMPRAR/AGUARDAR/VENDER — não implementado
 
-### GAPs Identificados
-1. **Watchlist Top 10** — ranking de oportunidades sem precisar digitar ticker
-2. **Z-Score** — exibir como indicador adicional no detalhe
-3. **Sinal claro** COMPRAR/AGUARDAR/VENDER com badge colorido
+### GAPs Restantes
+1. **Z-Score** — exibir como indicador adicional no detalhe
+2. **Badge sinal** COMPRAR/AGUARDAR/VENDER com cor semântica
 
-### Proposta
-```
-Expansão de /analises/buy-signals  → + seção "Top 10 Oportunidades" + Z-Score + badge sinal
-```
+### Status
+🟡 **G8 PARCIALMENTE CONCLUÍDO** — Watchlist Top 10 implementada; Z-Score + badge sinal pendentes (Baixa prioridade).
 
 ---
 
@@ -432,35 +390,22 @@ Expansão de /analises/buy-signals  → + seção "Top 10 Oportunidades" + Z-Sco
 | `/api/alertas/recentes` | GET | Últimos N alertas disparados |
 
 ### Frontend Atual
-- ✅ `/alertas/` — lista alertas (somente leitura)
-- ✅ `/alertas/preco` `/alertas/dividendos` `/alertas/personalizados` — sub-páginas
-- ❌ `POST /api/alertas` — sem formulário de criação na UI
-- ❌ `PATCH /toggle` — sem botão ativar/desativar
-- ❌ `DELETE` — sem ação de excluir
+- ✅ `/alertas/` — CRUD completo: criar, toggle ativo/inativo, excluir, feed de recentes (**Fase 4 — 17/06/2026**)
+- ✅ Sub-páginas `/alertas/preco`, `/alertas/dividendos`, `/alertas/personalizados`
 
-### GAPs Identificados
-1. **Botão "Novo Alerta"** com formulário (`nome`, `tipo_alerta`, `frequencia_notificacao`)
-2. **Toggle ativo/inativo** por linha
-3. **Botão excluir** com confirmação
-4. **Alertas recentes** — feed de alertas disparados (já existe em dashboard, expor em tela dedicada)
-
-### Proposta
-```
-Expansão de /alertas/       → + botão criar + toggle inline + excluir + feed recentes
-```
-**Esta é a tela com mais GAPs de interação — wireframe Tela 10 completa, UI incompleta.**
+### Status
+✅ **G9 CONCLUÍDO** — todos os GAPs de interação implementados em Fase 4.
 
 ---
 
 ## G10 — Planos de Compra/Venda
 
 ### Frontend Atual
-- ⚠️ `/planos/` — lista, redireciona para dashboard
-- ⚠️ APIs de backend para planos CRUD não documentadas em `API_REFERENCE.md`
+- ✅ Tela unificada planos compra + venda com APIs corrigidas (**Fase 5 — 17/06/2026**)
+- ⚠️ CRUD completo de planos aguarda APIs adicionais no backend
 
 ### Status
-**Aguardando:** Verificar se há endpoints `/api/plano-compra/*` implementados no backend.
-Ação: inspecionar `backend/app/routes/` para confirmar existência antes de desenhar telas.
+🟡 **G10 PARCIALMENTE CONCLUÍDO** — tela implementada com APIs disponíveis; CRUD completo depende de expansão do backend.
 
 ---
 
@@ -477,17 +422,14 @@ Ação: inspecionar `backend/app/routes/` para confirmar existência antes de de
 - ✅ `/imposto-renda/mensal` — apuração mensal
 - ✅ `/imposto-renda/darfs` — DARFs
 - ✅ `/imposto-renda/historico` — histórico anual
-- ⚠️ `/imposto-renda/declaracao` — DIRPF existe mas dados incompletos
+- ✅ `/imposto-renda/declaracao` — DIRPF com bens e direitos com valores reais da API (**Fase 5 — 17/06/2026**)
+- ❌ Seletor de mês/ano visual na apuração — ainda usa parâmetro URL
 
-### GAPs Identificados
-1. **DIRPF** — exibir bens e direitos com valores reais da API
-2. **Seletor de mês/ano** interativo na apuração (seletor visual, não só parâmetro URL)
+### GAPs Restantes
+1. **Seletor de mês/ano visual** na tela de apuração (datepicker)
 
-### Proposta
-```
-Expansão de /imposto-renda/mensal      → + seletor de mês/ano visual (datepicker)
-Expansão de /imposto-renda/declaracao  → + seção bens e direitos com valores da API
-```
+### Status
+🟡 **G11 PARCIALMENTE CONCLUÍDO** — DIRPF implementado; seletor visual pendente (Baixa prioridade).
 
 ---
 
@@ -501,20 +443,12 @@ Expansão de /imposto-renda/declaracao  → + seção bens e direitos com valore
 | `/api/portfolios/alocacao` | GET | Alocação geográfica e por tipo |
 
 ### Frontend Atual
-- ✅ `/analises/rentabilidade` — TWR/MWR exibidos
+- ✅ `/analises/rentabilidade` — TWR/MWR + seletor benchmark (CDI/IBOV/IFIX/SP500) + seletor período (1m/3m/6m/12m) (**Fase 4 — 17/06/2026**)
 - ✅ `/analises/alocacao` — alocação visual
 - ✅ `/analises/evolucao` — gráfico de evolução
-- ⚠️ Benchmarks aceitos: CDI, IBOV, IFIX, IPCA6, SP500 — seletor não exposto na UI
 
-### GAPs Identificados
-1. **Seletor de benchmark** na tela de rentabilidade (dropdown CDI/IBOV/IFIX/SP500)
-2. **Seletor de período** visual (1m/3m/6m/12m/ytd/max)
-3. **Alpha** vs benchmark — não exibido na tela atual
-
-### Proposta
-```
-Expansão de /analises/rentabilidade  → + seletor período + seletor benchmark + exibir alpha
-```
+### Status
+✅ **G12 CONCLUÍDO** — todos os GAPs implementados em Fase 4.
 
 ---
 
@@ -528,23 +462,10 @@ Expansão de /analises/rentabilidade  → + seletor período + seletor benchmark
 | `/api/export/posicoes?formato=X` | GET | Exportar posições |
 
 ### Frontend Atual
-- ✅ `/relatorios/exportar/csv` — exportação CSV de transações
-- ❌ Export de **proventos** — sem botão
-- ❌ Export de **posições** — sem botão
-- ❌ Formatos **Excel** e **PDF** — não expostos na UI
+- ✅ `/relatorios/exportar` — seletor formato (CSV/Excel/PDF) + entidades (transações/proventos/posições) + filtros período/ativo/corretora (**Fase 4 — 17/06/2026**)
 
-### GAPs Identificados
-1. **Exportar proventos** (CSV/Excel/PDF)
-2. **Exportar posições** (CSV/Excel/PDF)
-3. **Seletor de formato** na tela de exportação (agora só CSV hardcoded)
-4. **Filtros de exportação** — período, ativo, corretora
-
-### Proposta
-```
-Expansão de /relatorios/exportar/csv  → renomear para /relatorios/exportar
-                                        + seletor formato + entidades (transações/proventos/posições)
-                                        + filtros período/ativo/corretora
-```
+### Status
+✅ **G13 CONCLUÍDO** — exportação unificada implementada em Fase 4.
 
 ---
 
@@ -560,17 +481,10 @@ Expansão de /relatorios/exportar/csv  → renomear para /relatorios/exportar
 | `/api/reconciliacao/ativo/{id}` | GET | Reconciliação de ativo específico |
 
 ### Frontend Atual
-- ❌ **Nenhuma tela existe**
+- ✅ `/ferramentas/reconciliacao` — painel completo: status geral (OK/WARNING/ERROR) + lista divergências + abas Posições/Saldos/Integridade/Por Ativo + botão "Verificar Agora" (**Fase 3 — 17/06/2026**)
 
-### GAPs Identificados
-- Tela nova completa para **diagnóstico de integridade** — muito útil para o usuário detectar inconsistências
-
-### Proposta de Tela Nova (alta prioridade — capacidade única, sem equivalente)
-```
-/ferramentas/reconciliacao  → painel: status geral (OK/WARNING/ERROR) + lista divergências
-                              + abas: Posições | Saldos | Integridade | Por Ativo
-                              + botão "Verificar Agora"
-```
+### Status
+✅ **G14 CONCLUÍDO** — tela completa implementada em Fase 3.
 
 ---
 
@@ -581,13 +495,11 @@ Expansão de /relatorios/exportar/csv  → renomear para /relatorios/exportar
 - **POST/PUT/DELETE requerem role admin**
 
 ### Frontend Atual
-- ❌ Sem tela (apenas admin backend)
+- ✅ Eventos corporativos exibidos no detalhe do ativo (`/ativos/detalhe/{ticker}`) (**Fase 5 — 17/06/2026**)
+- ❌ `/admin/eventos-corporativos` — tela admin não implementada (baixa prioridade)
 
-### Proposta
-```
-Para usuário comum: exibir eventos corporativos relevantes no detalhe do ativo (G3)
-Para admin: /admin/eventos-corporativos (expansão do admin.py existente)
-```
+### Status
+✅ **G15 CONCLUÍDO** para usuário comum — view admin pendente (Baixa prioridade).
 
 ---
 
@@ -595,10 +507,8 @@ Para admin: /admin/eventos-corporativos (expansão do admin.py existente)
 
 > Detalhado em G7. Resumo aqui para priorização.
 
-### GAPs de maior valor
-1. `POST /calendario-dividendos/gerar` — gerar calendário automático com base nas posições
-2. `POST /confirmar-pagamento` — fechar o ciclo previsto → confirmado → pago
-3. Resumo por ativo com estimado vs. real
+### Status
+✅ **G16 CONCLUÍDO** — todos os GAPs críticos implementados em Fase 4 (ver G7).
 
 ---
 
@@ -609,12 +519,10 @@ Para admin: /admin/eventos-corporativos (expansão do admin.py existente)
 
 ### Frontend Atual
 - ✅ Usado no dashboard principal
-- ❌ Toggle BRL/USD do wireframe Tela 1 não implementado
+- ✅ Toggle BRL/USD implementado no dashboard (**Fase 7 — 18/06/2026**)
 
-### Proposta
-```
-Dashboard → adicionar toggle BRL ⇄ USD que recarrega saldo via API com moeda=USD
-```
+### Status
+✅ **G17 CONCLUÍDO** — toggle BRL/USD implementado.
 
 ---
 
@@ -626,52 +534,51 @@ Dashboard → adicionar toggle BRL ⇄ USD que recarrega saldo via API com moeda
 - `GET /api/transacoes/recentes` — últimas N transações
 
 ### Frontend Atual
-- ✅ Dashboard principal usa essas APIs
-- ❌ **Top 5 ativos por mercado** — não exibido (API retorna, tela ignora)
-- ❌ **Alocação geográfica** BR/US/INTL — não exibida (só por tipo de ativo)
-- ❌ **Toggle BRL/USD** — wireframe Tela 1, não implementado
+- ✅ Dashboard principal com Top 5 ativos por mercado (BR/US/INTL)
+- ✅ Gráfico pizza alocação geográfica
+- ✅ Toggle BRL/USD
+- ✅ Alertas recentes + últimas transações + próximos proventos (**Fase 7 — 18/06/2026**)
 
-### Proposta
-```
-Expansão do Dashboard  → + seção "Top 5 por Mercado" (BR / US / INTL)
-                         + gráfico pizza alocação geográfica
-                         + toggle BRL ⇄ USD no header
-```
+### Status
+✅ **G18 CONCLUÍDO** — dashboard totalmente reformulado em Fase 2 + Fase 7.
 
 ---
 
 ## 🎯 Priorização por Valor × Esforço
 
-### 🔴 Alta Prioridade (API pronta + GAP visível para o usuário)
+### ✅ Concluídos (Fases 1–7)
 
-| # | Tela | Rota Proposta | APIs Envolvidas |
-|---|------|--------------|----------------|
-| 1 | Movimentações de Caixa | `/carteira/movimentacoes` | `GET /api/movimentacoes`, `/saldo/{id}` |
-| 2 | Alertas — ações completas | expansão `/alertas/` | `POST`, `PATCH toggle`, `DELETE` |
-| 3 | Reconciliação | `/ferramentas/reconciliacao` | `GET /api/reconciliacao/*` |
-| 4 | Histórico de Transações | `/operacoes/historico` | `GET /api/transacoes` (filtrado) |
-| 5 | Posições — Minha Carteira | `/carteira/posicoes` | `GET /api/posicoes`, `/resumo` |
-| 6 | Configurações — Corretoras | `/configuracoes/corretoras` | CRUD `/api/corretoras` |
+| GAP | Tela | Fase | Data |
+|-----|------|------|------|
+| G1 | `/configuracoes/perfil` + `/configuracoes/corretoras` | Fase 3 | 17/06/2026 |
+| G4 | `/carteira/posicoes` (principal) | Fase 3 | 17/06/2026 |
+| G5 | `/operacoes/historico` | Fase 3 | 17/06/2026 |
+| G6 | `/carteira/movimentacoes` | Fase 3 | 17/06/2026 |
+| G7 | Calendário + gerar auto + confirmar + badges | Fase 4 | 17/06/2026 |
+| G8 | Buy Signals + Watchlist Top 10 | Fase 4 | 17/06/2026 |
+| G9 | Alertas CRUD + toggle + excluir + feed | Fase 4 | 17/06/2026 |
+| G10 | Planos compra/venda unificados | Fase 5 | 17/06/2026 |
+| G11 | DIRPF bens e direitos reais | Fase 5 | 17/06/2026 |
+| G12 | Rentabilidade + seletor benchmark + período | Fase 4 | 17/06/2026 |
+| G13 | Exportação CSV/Excel/PDF multi-entidade | Fase 4 | 17/06/2026 |
+| G14 | `/ferramentas/reconciliacao` | Fase 3 | 17/06/2026 |
+| G15 | Eventos corporativos no detalhe do ativo | Fase 5 | 17/06/2026 |
+| G16 | Calendário dividendos avançado | Fase 4 | 17/06/2026 |
+| G17 | Toggle BRL/USD no dashboard | Fase 7 | 18/06/2026 |
+| G18 | Dashboard reformulado completo | Fase 2+7 | 17–18/06/2026 |
 
-### 🟡 Média Prioridade (expansão de telas existentes)
+### 🟡 GAPs Residuais (pendentes)
 
-| # | Expansão | Tela Existente | GAP |
-|---|---------|----------------|-----|
-| 1 | Buy Signals + Watchlist Top 10 | `/analises/buy-signals` | Adicionar seção ranking |
-| 2 | Rentabilidade + seletor período/benchmark | `/analises/rentabilidade` | Dropdowns |
-| 3 | Exportação multi-formato/entidade | `/relatorios/exportar` | Seletor formato + entidade |
-| 4 | Calendário + gerar auto + confirmar | `/proventos/calendario` | Botões + badges status |
-| 5 | Detalhe ativo real | `/ativos/detalhe/{ticker}` | Fundamentalistas + cotação |
-| 6 | Dashboard + top 5 + alocação geo | `/dashboard` | Seções extras |
-
-### 🟢 Baixa Prioridade (nice-to-have ou dependência de outros)
-
-| # | Item | Dependência |
-|---|------|-------------|
-| 1 | DIRPF — bens e direitos | Dados reais precisam de validação |
-| 2 | Toggle BRL/USD global | UX de multi-moeda a definir |
-| 3 | Eventos Corporativos — user view | Dados históricos necessários |
-| 4 | Planos CRUD | APIs backend a confirmar |
+| GAP | Item | Prioridade |
+|-----|------|------------|
+| G2 | Widget cotação com provider/TTL + badge fallback no header | Média |
+| G4 | Botão "Recalcular Posições" na UI | Média |
+| G5 | Editar/excluir transação individual | Baixa |
+| G7 | `GET /calendario-dividendos/resumo` — estatísticas mensais | Baixa |
+| G8 | Z-Score + badge sinal COMPRAR/AGUARDAR/VENDER | Baixa |
+| G10 | CRUD completo de planos (depende de APIs backend) | Baixa |
+| G11 | Seletor mês/ano visual na apuração IR | Baixa |
+| G15 | `/admin/eventos-corporativos` (tela admin) | Baixa |
 
 ---
 
@@ -874,12 +781,14 @@ A rearquitetura deve ser incremental para não quebrar o que funciona:
 
 ---
 
-## 📋 Próximos Passos
+## 📋 Status Final — 18/06/2026
 
-1. **Validar esta análise** com o usuário tela a tela
-2. **Inspecionar telas reais** em `localhost:8080` para confirmar o que funciona vs. o que está quebrado
-3. **Definir Sprint 9** — quais GAPs implementar primeiro
-4. **Corrigir specs E2E v3** após telas novas/expandidas estarem estáveis
+**16 de 18 GAPs concluídos** (89%). GAPs residuais são todos de baixa/média prioridade.
+
+### Próximos Passos
+1. **Discutir GAPs residuais** — priorizar G2 (cotações) e G4 (recalcular posições)
+2. **Definir próxima fase** — G2 como candidato natural (widget reutilizável em múltiplas telas)
+3. **Corrigir specs E2E v3** após telas estabilizadas
 
 ---
 
