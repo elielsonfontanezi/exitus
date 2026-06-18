@@ -544,7 +544,7 @@
 |----|----------|---------|------------------------|
 | ~~BUG-001~~ | ~~**Token não salvo no localStorage após login Flask**~~ — **RESOLVIDO em EXITUS-LOGIN-001**: token mock hardcoded removido de `auth.js`; login já era AJAX e chamava `window.auth.saveToken()` corretamente. Causa real era o fallback com token expirado mascarando o fluxo | — todas as telas `base_interna.html` usam `localStorage.getItem('access_token')` mas o login Flask salva apenas na sessão do servidor. Alpine.js recebe `null` → API retorna 401 → `loading` trava → tela parece "sem resposta" | 3, 4, 5, 6, 7, 8, 9–35 | `auth.py` route usa form POST → Flask session. `auth.js` `localStorage.setItem` só é chamado via AJAX. Fluxos não sincronizados. **Fix:** no `auth.py` após login bem-sucedido, passar o token para o template e injetá-lo via `<script>localStorage.setItem('access_token', '...')</script>` |
 | ~~BUG-002~~ | ~~**Toggle Compra/Venda: getters `isCompra`/`isVenda` invertidos após merge**~~ | — | **RESOLVIDO em EXITUS-OPERACOES-001**: getters substituídos por propriedades reativas simples em `operacoes_v2.html`. Spread `{ ...base, ...pageDataExtend() }` não preserva getters JavaScript — convertido para `isCompra: true, isVenda: false` atualizados em `toggleModo()` |
-| ~~BUG-003~~ | ~~**Import B3 não exibe registros**~~ | — | **FALSO POSITIVO** — revalidado 18/06/2026: import retorna 0 quando dados já existem no banco (idempotência correta). Com CSV de dados novos: Transações=2, Proventos=0 — funcionamento correto |
+| ~~BUG-003~~ | ~~**Import B3 não exibe registros**~~ | — | **FALSO POSITIVO** — import é idempotente por design; com dados novos retorna Transações=2. Registrado como **FEAT-009** (listagem dos importados) e **BUG-020** (classificação automática incorreta de ativos) |
 
 ### 🟡 Importantes (degradam experiência)
 
@@ -565,6 +565,7 @@
 | BUG-019 | **Botão "Comparar" no Comparador de Ativos não aciona nada** | 30 | Provável `@click` sem handler implementado ou handler que depende de tickers selecionados mas sem validação visível. **Fix:** inspecionar handler Alpine.js do botão; verificar se `comparar()` existe e faz chamada à API `/api/ativos/comparar` ou similar |
 | ~~BUG-018~~ | ~~**Rota `/analises/rentabilidade` legacy retorna NOT FOUND**~~ | — | **RESOLVIDO em EXITUS-ANALISES-001**: redirect adicionado em `analises.py`; código morto (template inexistente `rentabilidade.html`) removido |
 | BUG-017 | **Busca por ticker sem autocomplete em Buy Signals** — funciona se digitado exato, sem sugestões | 18 | Campo de busca é `<input>` simples sem `datalist` ou componente de autocomplete. **Fix:** adicionar `datalist` populado via `GET /api/ativos?ticker=X` ou usar biblioteca de autocomplete |
+| BUG-020 | **Import B3: classificação automática de ativo incorreta** — `_obter_ou_criar_ativo()` em `import_b3_service.py` infere tipo apenas pelo sufixo do ticker: termina em `11/12/13/31-36` → FII, senso contrário → AÇÃO. ETFs BR (BOVA11, SMAL11) são criados como FII. Ativos internacionais (AAPL, MSFT) são criados como AÇÃO mercado B3. **Fix:** expandir heuristica ou usar lookup de ativos conhecidos | 5 |
 | ~~BUG-016~~ | ~~**Tela Eventos Corporativos inacessível**~~ | — | **FALSO POSITIVO** — revalidado 18/06/2026 com token válido: `/ativos/eventos-corporativos` carrega corretamente (KPIs + filtros). Flask prioriza rota estática sobre `/<ticker>` no mesmo blueprint. Bug original era consequência do BUG-001 (token inválido) |
 
 ### 🟡 Pendências de funcionalidade (features ausentes)
@@ -579,6 +580,7 @@
 | FEAT-006 | Exportação CSV renderiza tabela HTML — sem download real do arquivo | 28 |
 | FEAT-007 | Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona | 34 |
 | FEAT-008 | Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível | 14 |
+| FEAT-009 | **Import B3 não lista os registros importados** — resultado mostra apenas totais numéricos (Transações=N, Proventos=N). Usuário não sabe quais ativos foram criados/importados. **Fix:** exibir lista dos tickers importados e ativos criados automaticamente após import | 5 |
 
 ---
 
@@ -723,8 +725,8 @@
 | Prioridade | Quantidade |
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
-| 🟡 Importante | 15 (BUG-004 a BUG-019, excl. BUG-008 resolvido) |
-| ⬛ Feature ausente | 8 (FEAT-001 a FEAT-008) |
+| 🟡 Importante | 16 (BUG-004 a BUG-020, excl. resolvidos/falsos positivos) |
+| ⬛ Feature ausente | 9 (FEAT-001 a FEAT-009) |
 
 ### Impacto do BUG-001
 

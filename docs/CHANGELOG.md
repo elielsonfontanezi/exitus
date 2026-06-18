@@ -16,6 +16,10 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 **Revalidado:** `/analises/rentabilidade` redireciona para `/periodo`; Import B3 com dados novos retorna Transações=2 corretamente
 
+**Descobertos na revalidação do Import B3:**
+- **BUG-020** (backend): `_obter_ou_criar_ativo()` classifica ETFs BR como FII e ativos internacionais como AÇÃO mercado B3
+- **FEAT-009** (frontend): resultado do import exibe apenas totais — sem listar quais tickers foram importados/criados
+
 ---
 
 ### Fix — EXITUS-ATIVOS-001: BUG-016 falso positivo + link menu Eventos Corporativos (18/06/2026)
