@@ -8,6 +8,16 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — EXITUS-OPERACOES-001: BUG-002 toggle Compra/Venda (18/06/2026)
+
+**Arquivo alterado:**
+- `frontend/app/templates/operacoes/operacoes_v2.html`: getters `isCompra`/`isVenda` substituídos por propriedades reativas simples. O spread `{ ...base, ...pageDataExtend() }` do `base_interna.html` não preserva getters JavaScript — propriedades agora são `isCompra: true, isVenda: false` e atualizadas explicitamente dentro de `toggleModo()`
+
+**Bug resolvido:** BUG-002
+**Revalidado:** toggle Compra→Venda funciona visualmente em `localhost:8080/operacoes/`
+
+---
+
 ### Fix — EXITUS-LOGIN-001: Redesenho tela de login + fix token mock (18/06/2026)
 
 **Arquivos alterados:**
