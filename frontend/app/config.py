@@ -23,6 +23,10 @@ class Config:
     APP_NAME = os.getenv('APP_NAME', 'Exitus')
     APP_VERSION = os.getenv('APP_VERSION', '1.0.0')
     
+    # Indicadores de mercado (atualizar manualmente ou via endpoint futuro)
+    CDI_ANUAL = os.getenv('CDI_ANUAL', '11.75')
+    IBOVESPA_ANUAL = os.getenv('IBOVESPA_ANUAL', '8.32')
+    
     # Session (necessário para autenticação M5)
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = False  # True em produção com HTTPS

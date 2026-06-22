@@ -231,16 +231,16 @@
                     </div>
                     <div class="dash-row">
                         <span>CDI (12m)</span>
-                        <span class="badge-neutro">11.75%</span>
+                        <span class="badge-neutro">{{ indicadores.cdi_anual }}%</span>
                     </div>
                     <div class="dash-row">
                         <span>Ibovespa (12m)</span>
-                        <span class="badge-neutro">8.32%</span>
+                        <span class="badge-neutro">{{ indicadores.ibovespa_anual }}%</span>
                     </div>
                     <div style="margin-top:4px; padding-top:8px; border-top:1px solid var(--exitus-border); text-align:center; font-size:0.875rem;"
-                         :class="dados.resumo.rentabilidade_geral > 11.75 ? 'badge-positivo' : 'badge-neutro'">
-                        <span x-show="dados.resumo.rentabilidade_geral > 11.75">🎉 Acima do CDI!</span>
-                        <span x-show="dados.resumo.rentabilidade_geral <= 11.75">📈 Meta: superar o CDI</span>
+                         :class="dados.resumo.rentabilidade_geral > {{ indicadores.cdi_anual }} ? 'badge-positivo' : 'badge-neutro'">
+                        <span x-show="dados.resumo.rentabilidade_geral > {{ indicadores.cdi_anual }}">🎉 Acima do CDI!</span>
+                        <span x-show="dados.resumo.rentabilidade_geral <= {{ indicadores.cdi_anual }}">📈 Meta: superar o CDI</span>
                     </div>
                 </div>
             </div>

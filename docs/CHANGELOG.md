@@ -27,6 +27,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
+### Fix — EXITUS-DASHBOARD-001: BUG-005 — CDI/Ibovespa hardcoded no dashboard (22/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/config.py`: adicionadas `CDI_ANUAL` e `IBOVESPA_ANUAL` (default `11.75` e `8.32`, sobrescrevíveis por env)
+- `frontend/app/routes/dashboard.py`: passa `indicadores` para `dashboard/index_v2.html`
+- `frontend/app/templates/dashboard/index_v2.html`: substitui valores hardcoded por `{{ indicadores.cdi_anual }}` e `{{ indicadores.ibovespa_anual }}`; comparação com CDI usa valor dinâmico
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-005 marcado como resolvido; FEAT-010 registrada (endpoint dinâmico `/api/indicadores`)
+- `docs/PROJECT_STATUS.md`: status consolidado atualizado
+
+**Bugs resolvidos:** BUG-005 (CDI/Ibovespa hardcoded)
+**Features registradas:** FEAT-010 (endpoint dinâmico de indicadores de mercado)
+
+---
+
 ### Fix — EXITUS-FISCAL-001: BUG-010 — DIRPF não recebia dados/erro do servidor (22/06/2026)
 
 **Arquivos alterados:**

@@ -554,7 +554,7 @@
 | ID | Problema | Tela(s) | Causa raiz identificada |
 |----|----------|---------|------------------------|
 | BUG-004 | **Filtro por data no Histórico filtra client-side** — só filtra as 50 transações da página atual, não todas | 8 | `filtrar()` opera sobre `this.transacoes` (50 itens). **Fix:** passar `data_inicio`/`data_fim` como params para API `/api/transacoes` |
-| BUG-005 | **CDI e Ibovespa hardcoded** — `11.75%` e `8.32%` fixos no template | 2 | Valores estáticos no HTML. **Fix:** criar endpoint `/api/indicadores` ou buscar de config |
+| ~~BUG-005~~ | ~~**CDI e Ibovespa hardcoded** — `11.75%` e `8.32%` fixos no template~~ | — | **RESOLVIDO em EXITUS-DASHBOARD-001**: valores movidos para `frontend/app/config.py` (`CDI_ANUAL`, `IBOVESPA_ANUAL`) e injetados no template `dashboard/index_v2.html` via `dashboard.py`. Atualização manual por variável de ambiente. **Feature futura:** endpoint dinâmico `/api/indicadores` (Opção B) registrado como FEAT-010 |
 | BUG-006 | **Saldo de corretoras sempre R$ 0,00** | 4 | Revalidado 22/06/2026: campo `saldo_atual` existe no modelo e é retornado pela API (`GET /api/corretoras`). Porém não é atualizado automaticamente a partir de movimentações de caixa — permanece com valor do seed/criação. **Fix:** implementar cálculo automático de saldo de corretora ou endpoint de sincronização |
 | ~~BUG-007~~ | ~~**Link "Esqueceu a senha?"** retorna 404~~ | — | **RESOLVIDO em EXITUS-LOGIN-001** — link removido do template (funcionalidade não implementada) | | 1 | Rota `/auth/forgot-password` não implementada. **Fix:** implementar rota ou remover link |
 | ~~BUG-008~~ | ~~**Link "Ver Ativo" retorna 404**~~ — **RESOLVIDO na análise**: rota `/dashboard/ativo/<ticker>` existe em `dashboard.py` linha 913 | 8, 9 | Falso positivo — rota implementada |
@@ -584,6 +584,7 @@
 | FEAT-007 | Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona | 34 |
 | FEAT-008 | Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível | 14 |
 | FEAT-009 | **Import B3 não lista os registros importados** — resultado mostra apenas totais numéricos (Transações=N, Proventos=N). Usuário não sabe quais ativos foram criados/importados. **Fix:** exibir lista dos tickers importados e ativos criados automaticamente após import | 5 |
+| FEAT-010 | **Indicadores de mercado (CDI/Ibovespa) sem endpoint dinâmico** — atualmente valores vêm de variáveis de ambiente no frontend. **Fix:** criar backend `GET /api/indicadores` com CDI/Ibovespa atualizados automaticamente; dashboard consumir via API | 2 |
 
 ---
 
@@ -728,8 +729,8 @@
 | Prioridade | Quantidade |
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
-| 🟡 Importante | 4 (BUG-004, BUG-005, BUG-006, BUG-017) |
-| ⬛ Feature ausente | 9 (FEAT-001 a FEAT-009) |
+| 🟡 Importante | 3 (BUG-004, BUG-006, BUG-017) |
+| ⬛ Feature ausente | 10 (FEAT-001 a FEAT-010) |
 
 ### Impacto do BUG-001
 
