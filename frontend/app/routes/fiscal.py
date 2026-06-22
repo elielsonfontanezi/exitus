@@ -69,4 +69,4 @@ def declaracao():
     except Exception as e:
         erro = str(e)
 
-    return render_template('fiscal/declaracao_v2.html')
+    return render_template('fiscal/declaracao_v2.html', dados=dados, erro=erro, ano=ano)

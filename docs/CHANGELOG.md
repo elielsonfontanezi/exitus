@@ -27,6 +27,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
+### Fix — EXITUS-FISCAL-001: BUG-010 — DIRPF não recebia dados/erro do servidor (22/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/routes/fiscal.py`: `render_template('fiscal/declaracao_v2.html')` agora passa `dados`, `erro` e `ano`
+- `frontend/app/templates/fiscal/declaracao_v2.html`: exibe mensagem de erro via Jinja; inicializa estado Alpine com dados e ano do servidor
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-010 marcado como resolvido; contagem de importantes: 4
+- `docs/PROJECT_STATUS.md`: status consolidado atualizado
+
+**Bugs resolvidos:** BUG-010 (tela DIRPF não exibia dados nem erro)
+
+---
+
 ### Fix — EXITUS-ATIVOS-003: BUG-014 — busca no Catálogo de Ativos (22/06/2026)
 
 **Arquivos alterados:**

@@ -559,7 +559,7 @@
 | ~~BUG-007~~ | ~~**Link "Esqueceu a senha?"** retorna 404~~ | — | **RESOLVIDO em EXITUS-LOGIN-001** — link removido do template (funcionalidade não implementada) | | 1 | Rota `/auth/forgot-password` não implementada. **Fix:** implementar rota ou remover link |
 | ~~BUG-008~~ | ~~**Link "Ver Ativo" retorna 404**~~ — **RESOLVIDO na análise**: rota `/dashboard/ativo/<ticker>` existe em `dashboard.py` linha 913 | 8, 9 | Falso positivo — rota implementada |
 | ~~BUG-009~~ | ~~**`API_BASE` hardcoded como hostname Docker** em `fiscal.py` linha 9: `http://exitus-backend:5000/api`~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: arquivo `fiscal.py` não existe mais em `app/routes/` e a string `exitus-backend:5000` não aparece no backend. Rotas fiscais atuais (`fiscal.py`) já usam `Config.BACKEND_API_URL` |
-| BUG-010 | **Tela DIRPF: `dados` e `erro` não passados ao template** — `render_template('fiscal/declaracao_v2.html')` sem argumentos, apesar de buscá-los | 23 | **Fix:** passar `dados=dados, erro=erro` no `render_template` |
+| ~~BUG-010~~ | ~~**Tela DIRPF: `dados` e `erro` não passados ao template**~~ | — | **RESOLVIDO em EXITUS-FISCAL-001**: `frontend/app/routes/fiscal.py` agora passa `dados`, `erro` e `ano` para `declaracao_v2.html`; template exibe mensagem de erro e inicializa estado Alpine com dados do servidor, evitando tela vazia enquanto `loadData()` não executa |
 | ~~BUG-011~~ | ~~**URL da Tela 34 (Estratégia/Planos) incorreta**~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: blueprint `planos` registrado em `/planos-compra`, menu aponta para `/dashboard/planos-compra`, e existe redirect `/planos-compra/*` → `/planos-compra/`. Nenhum link `/estrategia/planos` encontrado no frontend atual |
 | ~~BUG-012~~ | ~~**Rotas `/proventos/recebidos` e `/proventos/projetados`** redirecionam para `dashboard.proventos_calendario`~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: `dashboard.proventos_calendario` existe em `dashboard.py` linha 956 e redireciona para `proventos.calendario`. Rotas `/proventos/recebidos` e `/proventos/projetados` funcionam via redirect |
 | ~~BUG-013~~ | ~~**Filtro de data em Movimentações pisca ao digitar o ano**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `movimentacoes.html` usa `@change="carregarComFiltro()"` nos campos de data, não `@input`. Chamadas à API só ocorrem ao confirmar a data |
@@ -728,7 +728,7 @@
 | Prioridade | Quantidade |
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
-| 🟡 Importante | 5 (BUG-004, BUG-005, BUG-006, BUG-010, BUG-017) |
+| 🟡 Importante | 4 (BUG-004, BUG-005, BUG-006, BUG-017) |
 | ⬛ Feature ausente | 9 (FEAT-001 a FEAT-009) |
 
 ### Impacto do BUG-001

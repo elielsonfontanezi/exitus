@@ -50,6 +50,17 @@
 {% endblock %}
 
 {% block page_content %}
+{% if erro %}
+<div class="alert-exitus alert-exitus-error" style="margin-bottom:1rem;">
+    <i class="fas fa-exclamation-circle"></i> {{ erro }}
+</div>
+{% endif %}
+
+<script>
+window.__DIRPF_ANO__ = {{ ano | tojson }};
+window.__DIRPF_DADOS__ = {{ dados | tojson }};
+</script>
+
 <!-- Tabela Bens e Direitos -->
 <div class="section-box" x-show="posicoesFiltradas().length > 0">
     <div class="section-box-title"><i class="fas fa-file-alt"></i> Grupo 3 — Bens e Direitos (Renda Variável)</div>
@@ -109,10 +120,11 @@
 {% block page_scripts %}
 <script>
 function pageDataExtend() {
+    const dadosIniciais = window.__DIRPF_DADOS__ || null;
     return {
-        anoAtual: '2025',
-        dados: null,
-        posicoes: [],
+        anoAtual: window.__DIRPF_ANO__ || '2025',
+        dados: dadosIniciais,
+        posicoes: dadosIniciais?.bens_e_direitos?.posicoes || [],
         filtro: '',
         mercadoFiltro: '',
 
