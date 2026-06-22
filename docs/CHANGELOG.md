@@ -27,6 +27,17 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
+### Fix — EXITUS-ATIVOS-003: BUG-014 — busca no Catálogo de Ativos (22/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/templates/ativos/lista_v2.html`: parâmetro de busca alterado de `ticker` para `search` para corresponder ao contrato da API `/api/ativos`
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-014 marcado como resolvido; contagem de bugs importantes: 5
+- `docs/PROJECT_STATUS.md`: status consolidado atualizado
+
+**Bugs resolvidos:** BUG-014 (busca por ticker no catálogo de ativos ignorada)
+
+---
+
 ### Fix — EXITUS-AUDITORIA-001: revalidação funcional 22/06/2026
 
 **Arquivos alterados:**

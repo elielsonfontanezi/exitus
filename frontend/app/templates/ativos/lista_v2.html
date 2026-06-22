@@ -101,7 +101,7 @@ function pageDataExtend() {
             let allAtivos = [];
             for (const tipo of this.tipos) {
                 let url = `/api/ativos?tipo=${tipo}&per_page=50`;
-                if (this.search) url += `&ticker=${this.search}`;
+                if (this.search) url += `&search=${this.search}`;
                 const res = await this.apiFetch(url);
                 if (res?.data?.ativos) allAtivos = allAtivos.concat(res.data.ativos);
             }

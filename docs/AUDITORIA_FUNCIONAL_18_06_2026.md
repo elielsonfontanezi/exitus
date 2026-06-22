@@ -563,7 +563,7 @@
 | ~~BUG-011~~ | ~~**URL da Tela 34 (Estratégia/Planos) incorreta**~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: blueprint `planos` registrado em `/planos-compra`, menu aponta para `/dashboard/planos-compra`, e existe redirect `/planos-compra/*` → `/planos-compra/`. Nenhum link `/estrategia/planos` encontrado no frontend atual |
 | ~~BUG-012~~ | ~~**Rotas `/proventos/recebidos` e `/proventos/projetados`** redirecionam para `dashboard.proventos_calendario`~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: `dashboard.proventos_calendario` existe em `dashboard.py` linha 956 e redireciona para `proventos.calendario`. Rotas `/proventos/recebidos` e `/proventos/projetados` funcionam via redirect |
 | ~~BUG-013~~ | ~~**Filtro de data em Movimentações pisca ao digitar o ano**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `movimentacoes.html` usa `@change="carregarComFiltro()"` nos campos de data, não `@input`. Chamadas à API só ocorrem ao confirmar a data |
-| BUG-014 | **Busca por ticker no Catálogo de Ativos não funciona** | 11 | Revalidado 22/06/2026: frontend envia `ticker=${this.search}` mas backend espera `search`. API suporta busca parcial em ticker/nome via `?search=`. **Fix:** alterar `lista_v2.html` para usar `search` em vez de `ticker`; adicionar autocomplete opcional |
+| ~~BUG-014~~ | ~~**Busca por ticker no Catálogo de Ativos não funciona**~~ | — | **RESOLVIDO em EXITUS-ATIVOS-003**: `frontend/app/templates/ativos/lista_v2.html` alterado para enviar `search=${this.search}` ao invés de `ticker`; backend `/api/ativos` aplica busca parcial em ticker e nome via `?search=` |
 | ~~BUG-015~~ | ~~**Tela de Detalhe do Ativo demora e nem sempre exibe dados**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `ativo_detalhes_v2.html` já carrega cotação, buy-score, margem e eventos em paralelo via `Promise.allSettled`. Estado vazio é tratado com `N/D` quando dados não existem |
 | ~~BUG-019~~ | ~~**Botão "Comparar" no Comparador de Ativos não aciona nada**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `comparador_v2.html` implementa `comparar()` que consome `/api/ativos` e `/api/cotacoes/<ticker>` para cada ticker selecionado. Não depende de endpoint `/api/ativos/comparar` |
 | ~~BUG-018~~ | ~~**Rota `/analises/rentabilidade` legacy retorna NOT FOUND**~~ | — | **RESOLVIDO em EXITUS-ANALISES-001**: redirect adicionado em `analises.py`; código morto (template inexistente `rentabilidade.html`) removido |
@@ -728,7 +728,7 @@
 | Prioridade | Quantidade |
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
-| 🟡 Importante | 6 (BUG-004, BUG-005, BUG-006, BUG-010, BUG-014, BUG-017) |
+| 🟡 Importante | 5 (BUG-004, BUG-005, BUG-006, BUG-010, BUG-017) |
 | ⬛ Feature ausente | 9 (FEAT-001 a FEAT-009) |
 
 ### Impacto do BUG-001
