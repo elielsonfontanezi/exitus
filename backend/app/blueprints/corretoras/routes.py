@@ -112,6 +112,22 @@ def delete_corretora(id):
         return error(f"Erro ao deletar: {str(e)}", 500)
 
 
+@bp.route('/<uuid:id>/sincronizar-saldo', methods=['POST'])
+@jwt_required()
+def sincronizar_saldo(id):
+    """Recalcula e atualiza saldo da corretora a partir de movimentações de caixa"""
+    usuario_id = get_jwt_identity()
+    try:
+        corretora = CorretoraService.sincronizar_saldo(id, usuario_id)
+        return success(CorretoraResponseSchema().dump(corretora), "Saldo sincronizado com sucesso")
+    except PermissionError as e:
+        return forbidden(str(e))
+    except ValueError as e:
+        return not_found(str(e))
+    except Exception as e:
+        return error(f"Erro ao sincronizar saldo: {str(e)}", 500)
+
+
 @bp.route('/saldo-total', methods=['GET'])
 @jwt_required()
 def saldo_total():

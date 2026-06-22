@@ -27,6 +27,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
+### Fix — EXITUS-CORRETORA-001: BUG-006 — saldo de corretoras não sincronizado (22/06/2026)
+
+**Arquivos alterados:**
+- `backend/app/services/corretora_service.py`: adicionado `sincronizar_saldo()` que recalcula `saldo_atual` a partir de movimentações de caixa
+- `backend/app/blueprints/corretoras/routes.py`: novo endpoint `POST /api/corretoras/<id>/sincronizar-saldo`
+- `frontend/app/templates/configuracoes/corretoras.html`: botão "Sincronizar" por corretora; atualiza saldo e total na tela
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-006 marcado como resolvido; FEAT-011 registrada (saldo dinâmico automático)
+- `docs/PROJECT_STATUS.md`: status consolidado atualizado
+
+**Bugs resolvidos:** BUG-006 (saldo de corretoras sempre R$ 0,00)
+**Features registradas:** FEAT-011 (saldo dinâmico automático)
+
+---
+
 ### Fix — EXITUS-HISTORICO-001: BUG-004 — filtro de data no Histórico (22/06/2026)
 
 **Arquivos alterados:**

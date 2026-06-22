@@ -193,3 +193,40 @@ class CorretoraService:
         
         total = sum(c.saldo_atual for c in corretoras)
         return total
+    
+    @staticmethod
+    def sincronizar_saldo(corretora_id, usuario_id):
+        """
+        Recalcula e atualiza o saldo_atual de uma corretora a partir
+        das movimentações de caixa vinculadas.
+        
+        Returns:
+            Corretora atualizada
+        """
+        from app.models.movimentacao_caixa import MovimentacaoCaixa, TipoMovimentacao
+        
+        corretora = CorretoraService.get_by_id(corretora_id, usuario_id)
+        
+        movimentacoes = MovimentacaoCaixa.query.filter_by(
+            usuario_id=usuario_id,
+            corretora_id=corretora_id
+        ).all()
+        
+        saldo_calculado = Decimal('0')
+        entradas = {'deposito', 'credito_prov', 'transf_rec'}
+        saidas = {'saque', 'pagto_taxa', 'pagto_imposto', 'transf_env'}
+        
+        for mov in movimentacoes:
+            tipo = mov.tipo_movimentacao
+            if isinstance(tipo, TipoMovimentacao):
+                tipo = tipo.value
+            valor = mov.valor or Decimal('0')
+            
+            if tipo in entradas:
+                saldo_calculado += valor
+            elif tipo in saidas:
+                saldo_calculado -= valor
+        
+        corretora.saldo_atual = saldo_calculado
+        safe_commit()
+        return corretora

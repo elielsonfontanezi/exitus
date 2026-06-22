@@ -555,7 +555,7 @@
 |----|----------|---------|------------------------|
 | ~~BUG-004~~ | ~~**Filtro por data no Histórico filtra client-side** — só filtra as 50 transações da página atual, não todas~~ | — | **RESOLVIDO em EXITUS-HISTORICO-001**: `operacoes/historico.html` agora envia `data_inicio` e `data_fim` para `/api/transacoes` via `loadData()` ao alterar os campos de data. Backend aplica filtro no banco e retorna apenas transações do período |
 | ~~BUG-005~~ | ~~**CDI e Ibovespa hardcoded** — `11.75%` e `8.32%` fixos no template~~ | — | **RESOLVIDO em EXITUS-DASHBOARD-001**: valores movidos para `frontend/app/config.py` (`CDI_ANUAL`, `IBOVESPA_ANUAL`) e injetados no template `dashboard/index_v2.html` via `dashboard.py`. Atualização manual por variável de ambiente. **Feature futura:** endpoint dinâmico `/api/indicadores` (Opção B) registrado como FEAT-010 |
-| BUG-006 | **Saldo de corretoras sempre R$ 0,00** | 4 | Revalidado 22/06/2026: campo `saldo_atual` existe no modelo e é retornado pela API (`GET /api/corretoras`). Porém não é atualizado automaticamente a partir de movimentações de caixa — permanece com valor do seed/criação. **Fix:** implementar cálculo automático de saldo de corretora ou endpoint de sincronização |
+| ~~BUG-006~~ | ~~**Saldo de corretoras sempre R$ 0,00**~~ | — | **RESOLVIDO em EXITUS-CORRETORA-001**: adicionado `POST /api/corretoras/<id>/sincronizar-saldo` que recalcula `saldo_atual` a partir de movimentações de caixa (DEPOSITO, CREDITO_PROVENTO, TRANSFERENCIA_RECEBIDA aumentam; SAQUE, PAGAMENTO_TAXA, PAGAMENTO_IMPOSTO, TRANSFERENCIA_ENVIADA diminuem). Frontend `configuracoes/corretoras.html` exibe botão "Sincronizar" por corretora. **Feature futura:** saldo dinâmico automático (Opção B) registrada como FEAT-011 |
 | ~~BUG-007~~ | ~~**Link "Esqueceu a senha?"** retorna 404~~ | — | **RESOLVIDO em EXITUS-LOGIN-001** — link removido do template (funcionalidade não implementada) | | 1 | Rota `/auth/forgot-password` não implementada. **Fix:** implementar rota ou remover link |
 | ~~BUG-008~~ | ~~**Link "Ver Ativo" retorna 404**~~ — **RESOLVIDO na análise**: rota `/dashboard/ativo/<ticker>` existe em `dashboard.py` linha 913 | 8, 9 | Falso positivo — rota implementada |
 | ~~BUG-009~~ | ~~**`API_BASE` hardcoded como hostname Docker** em `fiscal.py` linha 9: `http://exitus-backend:5000/api`~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: arquivo `fiscal.py` não existe mais em `app/routes/` e a string `exitus-backend:5000` não aparece no backend. Rotas fiscais atuais (`fiscal.py`) já usam `Config.BACKEND_API_URL` |
@@ -585,6 +585,7 @@
 | FEAT-008 | Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível | 14 |
 | FEAT-009 | **Import B3 não lista os registros importados** — resultado mostra apenas totais numéricos (Transações=N, Proventos=N). Usuário não sabe quais ativos foram criados/importados. **Fix:** exibir lista dos tickers importados e ativos criados automaticamente após import | 5 |
 | FEAT-010 | **Indicadores de mercado (CDI/Ibovespa) sem endpoint dinâmico** — atualmente valores vêm de variáveis de ambiente no frontend. **Fix:** criar backend `GET /api/indicadores` com CDI/Ibovespa atualizados automaticamente; dashboard consumir via API | 2 |
+| FEAT-011 | **Saldo de corretoras não é dinâmico** — `sincronizar-saldo` resolve manualmente. **Fix:** remover coluna `saldo_atual` e calcular saldo sempre a partir de movimentações de caixa, ou atualizar automaticamente via triggers/eventos ao inserir movimentação | 4 |
 
 ---
 
@@ -729,8 +730,8 @@
 | Prioridade | Quantidade |
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
-| 🟡 Importante | 1 (BUG-006) |
-| ⬛ Feature ausente | 10 (FEAT-001 a FEAT-010) |
+| 🟡 Importante | 0 — todos os bugs importantes foram resolvidos ou reclassificados |
+| ⬛ Feature ausente | 11 (FEAT-001 a FEAT-011) |
 
 ### Impacto do BUG-001
 

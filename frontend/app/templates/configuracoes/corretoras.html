@@ -39,7 +39,7 @@
                 <th>Moeda Padrão</th>
                 <th class="col-right">Saldo</th>
                 <th class="col-center">Status</th>
-                <th>Criada em</th>
+                <th class="col-center">Ação</th>
             </tr>
         </thead>
         <tbody>
@@ -50,6 +50,7 @@
                         <template x-if="c.observacoes">
                             <br><small class="text-gray-500" x-text="c.observacoes"></small>
                         </template>
+                        <br><small class="text-gray-400" x-text="formatDate(c.created_at)"></small>
                     </td>
                     <td x-text="tipoLabel(c.tipo)"></td>
                     <td x-text="paisLabel(c.pais)"></td>
@@ -59,7 +60,13 @@
                         <span class="badge" :class="c.ativa ? 'badge-success' : 'badge-danger'"
                               x-text="c.ativa ? 'Ativa' : 'Inativa'"></span>
                     </td>
-                    <td x-text="formatDate(c.created_at)"></td>
+                    <td class="col-center">
+                        <button class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                @click="sincronizarSaldo(c)" :disabled="c.sincronizando">
+                            <i class="fas" :class="c.sincronizando ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+                            <span x-text="c.sincronizando ? '...' : 'Sincronizar'" style="margin-left:0.25rem;"></span>
+                        </button>
+                    </td>
                 </tr>
             </template>
         </tbody>
@@ -118,6 +125,24 @@ function pageDataExtend() {
         paisLabel(pais) {
             const map = { 'BR': 'Brasil', 'US': 'EUA', 'EU': 'Europa' };
             return map[pais] || pais || '-';
+        },
+
+        async sincronizarSaldo(corretora) {
+            corretora.sincronizando = true;
+            try {
+                const res = await this.apiFetch('/api/corretoras/' + corretora.id + '/sincronizar-saldo', {
+                    method: 'POST'
+                });
+                if (res?.data?.saldo_atual !== undefined) {
+                    corretora.saldo_atual = res.data.saldo_atual;
+                    this.saldoTotal = this.corretoras.reduce((sum, c) => sum + (Number(c.saldo_atual) || 0), 0);
+                }
+            } catch (e) {
+                console.error('Erro ao sincronizar saldo:', e);
+                alert('Erro ao sincronizar saldo da corretora.');
+            } finally {
+                corretora.sincronizando = false;
+            }
         }
     };
 }
