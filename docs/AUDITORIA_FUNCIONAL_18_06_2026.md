@@ -565,7 +565,7 @@
 | BUG-019 | **Botão "Comparar" no Comparador de Ativos não aciona nada** | 30 | Provável `@click` sem handler implementado ou handler que depende de tickers selecionados mas sem validação visível. **Fix:** inspecionar handler Alpine.js do botão; verificar se `comparar()` existe e faz chamada à API `/api/ativos/comparar` ou similar |
 | ~~BUG-018~~ | ~~**Rota `/analises/rentabilidade` legacy retorna NOT FOUND**~~ | — | **RESOLVIDO em EXITUS-ANALISES-001**: redirect adicionado em `analises.py`; código morto (template inexistente `rentabilidade.html`) removido |
 | BUG-017 | **Busca por ticker sem autocomplete em Buy Signals** — funciona se digitado exato, sem sugestões | 18 | Campo de busca é `<input>` simples sem `datalist` ou componente de autocomplete. **Fix:** adicionar `datalist` populado via `GET /api/ativos?ticker=X` ou usar biblioteca de autocomplete |
-| BUG-020 | **Import B3: classificação automática de ativo incorreta** — `_obter_ou_criar_ativo()` em `import_b3_service.py` infere tipo apenas pelo sufixo do ticker: termina em `11/12/13/31-36` → FII, senso contrário → AÇÃO. ETFs BR (BOVA11, SMAL11) são criados como FII. Ativos internacionais (AAPL, MSFT) são criados como AÇÃO mercado B3. **Fix:** expandir heuristica ou usar lookup de ativos conhecidos | 5 |
+| ~~BUG-020~~ | ~~**Import B3: classificação automática de ativo incorreta**~~ — **RESOLVIDO em EXITUS-ATIVOS-002**: `_obter_ou_criar_ativo()` agora usa classificador multi-camadas (DB → cache seed/manual → API externa → heurística → fallback `OUTRO`) com nível de confiança e fonte. ETFs BR (BOVA11, SMAL11) são classificados como ETF. Ativos internacionais (AAPL, MSFT) recebem mercado US. Confiança `BAIXA` vira `OUTRO` para revisão manual. | 5 |
 | ~~BUG-016~~ | ~~**Tela Eventos Corporativos inacessível**~~ | — | **FALSO POSITIVO** — revalidado 18/06/2026 com token válido: `/ativos/eventos-corporativos` carrega corretamente (KPIs + filtros). Flask prioriza rota estática sobre `/<ticker>` no mesmo blueprint. Bug original era consequência do BUG-001 (token inválido) |
 
 ### 🟡 Pendências de funcionalidade (features ausentes)
@@ -725,7 +725,7 @@
 | Prioridade | Quantidade |
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
-| 🟡 Importante | 16 (BUG-004 a BUG-020, excl. resolvidos/falsos positivos) |
+| 🟡 Importante | 15 (BUG-004 a BUG-020, excl. resolvidos/falsos positivos) |
 | ⬛ Feature ausente | 9 (FEAT-001 a FEAT-009) |
 
 ### Impacto do BUG-001

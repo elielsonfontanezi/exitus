@@ -17,12 +17,14 @@ import re
 
 from app.database import db
 from app.models.ativo import Ativo, ClasseAtivo, TipoAtivo
+from app.models.ativo_classificacao_cache import NivelConfianca
 from app.models.corretora import Corretora
 from app.models.provento import Provento, TipoProvento
 from app.models.transacao import Transacao, TipoTransacao
 from app.models.evento_custodia import EventoCustodia, TipoEventoCustodia
 from app.models.usuario import Usuario
 from app.services.ativo_service import AtivoService
+from app.utils.ativo_classifier import classificar_ativo
 from app.services.corretora_service import CorretoraService
 from app.services.provento_service import ProventoService
 from app.services.transacao_service import TransacaoService
@@ -604,34 +606,55 @@ class ImportB3Service:
         return self.usuario_id
 
     def _obter_ou_criar_ativo(self, ticker: str, resultado: Dict) -> Ativo:
-        """Obter ativo existente ou criar novo"""
+        """Obter ativo existente ou criar novo (BUG-020: usa ativo_classifier)"""
         ativo = Ativo.query.filter_by(ticker=ticker).first()
-        
+
         if not ativo:
-            # Criar novo ativo
-            # Determinar tipo e classe baseado no ticker
-            if ticker.endswith(('11', '12', '13', '31', '32', '33', '34', '35', '36')):
-                tipo_ativo = TipoAtivo.FII
-                classe_ativo = ClasseAtivo.RENDA_VARIAVEL
-            else:
-                tipo_ativo = TipoAtivo.ACAO
-                classe_ativo = ClasseAtivo.RENDA_VARIAVEL
-            
+            # Classificador multi-camadas: banco → cache → API → heurística → fallback
+            # Durante import B3 evitamos API externa síncrona para não travar o processo
+            classificacao = classificar_ativo(
+                ticker,
+                usuario_id=self._get_usuario_id(),
+                usar_api_externa=False,
+            )
+
+            # Se confiança baixa, classificar como OUTRO para revisão manual
+            if classificacao['confianca'] == NivelConfianca.BAIXA:
+                classificacao['tipo'] = TipoAtivo.OUTRO
+                classificacao['aviso'] = (
+                    f"Ticker {ticker} classificado como OUTRO devido a confiança baixa "
+                    "na classificação automática — revise manualmente."
+                )
+
             ativo = Ativo(
                 ticker=ticker,
                 nome=ticker,  # Nome temporário
-                mercado='B3',  # Padrão
-                tipo=tipo_ativo,
-                classe=classe_ativo,
-                moeda='BRL',
+                tipo=classificacao['tipo'],
+                classe=classificacao['classe'],
+                mercado=classificacao['mercado'],
+                moeda=classificacao['moeda'],
                 ativo=True
             )
-            
+
             db.session.add(ativo)
             db.session.flush()  # Obter ID sem commit
             resultado['ativos_criados'] += 1
-            logger.info(f"Ativo criado: {ticker}")
-        
+
+            # Propagar aviso de revisão (quando heurística é incerta)
+            if classificacao.get('aviso'):
+                resultado.setdefault('avisos', []).append(classificacao['aviso'])
+                logger.warning(
+                    f"Ativo criado: {ticker} ({classificacao['tipo'].value}, "
+                    f"{classificacao['mercado']}, fonte={classificacao.get('fonte').value if classificacao.get('fonte') else 'db'}, "
+                    f"conf={classificacao['confianca'].value}) — {classificacao['aviso']}"
+                )
+            else:
+                logger.info(
+                    f"Ativo criado: {ticker} ({classificacao['tipo'].value}, "
+                    f"{classificacao['mercado']}, fonte={classificacao.get('fonte').value if classificacao.get('fonte') else 'db'}, "
+                    f"conf={classificacao['confianca'].value})"
+                )
+
         return ativo
 
     def _obter_ou_criar_corretora(self, instituicao: str, resultado: Dict) -> Optional[Corretora]:

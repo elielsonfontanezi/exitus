@@ -1,7 +1,7 @@
 """add historico_patrimonio table
 
 Revision ID: 20260322_1830
-Revises: 20260315_2100
+Revises: 20260316_1545_assessora_id
 Create Date: 2026-03-22 18:30:00.000000
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '20260322_1830'
-down_revision = '20260316_1545'
+down_revision = '20260316_1545_assessora_id'
 branch_labels = None
 depends_on = None
 

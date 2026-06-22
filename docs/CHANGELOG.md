@@ -8,6 +8,25 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — EXITUS-ATIVOS-002: BUG-020 — Classificação multi-camadas de ativos B3 (22/06/2026)
+
+**Arquivos alterados:**
+- `backend/app/utils/ativo_classifier.py`: classificador multi-camadas com fonte (`seed`, `manual`, `api`, `heuristica`) e nível de confiança (`alta`, `media`, `baixa`); fallback para `OUTRO` quando confiança baixa
+- `backend/app/services/import_b3_service.py`: `_obter_ou_criar_ativo()` usa novo classificador com `usar_api_externa=False`; ativos com confiança `BAIXA` são classificados como `OUTRO` com aviso
+- `backend/app/models/ativo_classificacao_cache.py`: novo model para cache de classificações manuais e seed
+- `backend/alembic/versions/20260621_1300_add_ativo_classificacao_cache_table.py`: migration da tabela `ativo_classificacao_cache` e enums `fonteclassificacao`/`nivelconfianca`
+- `backend/app/models/__init__.py`: registro do novo model e enums
+- `backend/app/seeds/seed_ativos_intl.py`: ETFs listados na B3 recebem `mercado='BR'` ao invés de `INTL`
+- `backend/alembic/versions/20260322_1830_add_historico_patrimonio.py`: `down_revision` corrigido para `20260316_1545_assessora_id` (chain migration)
+- `backend/tests/test_ativo_classifier.py`: 28 testes cobrindo heurística, DB, cache, API externa (mockada) e fallback
+- `backend/tests/test_import_b3_idempotencia.py`: helper `_service()` garante `usuario_id` para criação de corretoras durante importação
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-020 marcado como resolvido; contadores de bugs importantes ajustados (15)
+
+**Bugs resolvidos:** BUG-020 (classificação errada de ETFs BR como FII e ativos internacionais como AÇÃO B3)
+**Revalidado:** `alembic upgrade` aplicado com sucesso; `pytest tests/test_ativo_classifier.py` = 28/28 passando; `test_import_b3_parsers.py` + `test_import_b3_idempotencia.py` = 77/77 passando
+
+---
+
 ### Fix — EXITUS-ANALISES-001 + Revalidação BUG-003: rota legacy + Import B3 (18/06/2026)
 
 **Arquivos alterados:**

@@ -1,10 +1,11 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 18/06/2026  
-> **Status:** ✅ **Frontend Migração Completa + Auditoria Funcional + Fix BUG-001**  
-> **Versão:** v0.9.20
+> **Data:** 22/06/2026  
+> **Status:** ✅ **BUG-020 Resolvido — Classificação multi-camadas de ativos B3**  
+> **Versão:** v0.9.21
 
-### 🔧 Últimas correções (18/06/2026)
+### 🔧 Últimas correções (22/06/2026)
+- **EXITUS-ATIVOS-002:** BUG-020 resolvido — classificador multi-camadas (DB → cache seed/manual → API externa → heurística → fallback `OUTRO`) com níveis de confiança e fonte; migration `ativo_classificacao_cache` aplicada com sucesso
 - **EXITUS-ANALISES-001:** BUG-018 resolvido + BUG-003 falso positivo (import idempotente) — **0 telas 🔴 QUEBRADAS**
 - **EXITUS-ATIVOS-001:** BUG-016 falso positivo; link "Eventos Corporativos" adicionado ao menu — tela funcionava sem link
 - **EXITUS-OPERACOES-001:** BUG-002 resolvido — getters Alpine.js não sobrevivem a spread, substituídos por propriedades reativas em `operacoes_v2.html`
@@ -31,11 +32,11 @@
 ## 🖥️ Backend — 87% Concluído
 
 - **GAPs:** 48/54 implementados (Fases 1-6 ✅, MULTICLIENTE-001 ✅, HistoricoPatrimonio ✅)
-- **Testes:** 508/546 passando (93.0%) - Correção concluída (03/04/2026)
+- **Testes:** 105/105 passando nos módulos afetados por BUG-020 (`test_ativo_classifier.py`: 28, `test_import_b3_parsers.py`: 59, `test_import_b3_idempotencia.py`: 18)
 - **Endpoints:** 156 funcionais (/api/portfolios/evolucao)
 - **Multi-tenancy:** ✅ Concluído — 10 services + RLS (28 políticas PostgreSQL) + isolamento via API/JWT
 - **Motor Fiscal:** IR completo, IOF, DARF, compensação
-- **Importação:** B3 Excel/CSV, 56 ativos seed
+- **Importação:** B3 Excel/CSV, 56 ativos seed; BUG-020 corrigido (classificação multi-camadas de ativos)
 - **APIs:** Cotações multi-provider, cache, circuit breaker
 - **Exportação:** CSV, Excel, JSON, PDF
 - **Próxima Fase:** 7 — Monitoramento, Rate Limiting, CI/CD

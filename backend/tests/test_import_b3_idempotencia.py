@@ -55,9 +55,37 @@ def _make_negociacao(codigo='PETR4', tipo='Compra', data=None,
     }
 
 
-def _service(arquivo='arquivo_teste.xlsx'):
+def _service(arquivo='arquivo_teste.xlsx', app=None):
     svc = ImportB3Service()
     svc.arquivo_origem = arquivo
+
+    # Garante usuario_id para criação de corretoras/ativos durante import
+    if app is not None:
+        with app.app_context():
+            from app.models.usuario import Usuario
+            usuario = Usuario.query.first()
+            if usuario is None:
+                from app.models.assessora import Assessora
+                assessora = Assessora(
+                    nome='Assessora Teste',
+                    razao_social='Assessora Teste LTDA',
+                    cnpj='00000000000000',
+                    email='teste@example.com',
+                    ativo=True,
+                )
+                _db.session.add(assessora)
+                _db.session.commit()
+                usuario = Usuario(
+                    username='import_test_user',
+                    email='import_test@example.com',
+                    role='user',
+                    assessora_id=assessora.id,
+                )
+                usuario.set_password('senha_teste_123')
+                _db.session.add(usuario)
+                _db.session.commit()
+            svc.usuario_id = usuario.id
+
     return svc
 
 
@@ -136,7 +164,7 @@ class TestGerarHashLinha:
 
 class TestIdempotenciaProventos:
     def test_reimportacao_nao_duplica(self, app):
-        svc = _service('mov_test.xlsx')
+        svc = _service('mov_test.xlsx', app)
         mov = _make_movimentacao(produto=f'BTLG{uuid.uuid4().int % 100:02d}')
         hash_val = svc._gerar_hash_linha(mov)
 
@@ -155,7 +183,7 @@ class TestIdempotenciaProventos:
             _cleanup_por_hash(hash_val)
 
     def test_relatorio_duplicatas_lista(self, app):
-        svc = _service('mov_test2.xlsx')
+        svc = _service('mov_test2.xlsx', app)
         mov = _make_movimentacao(produto=f'HYPE{uuid.uuid4().int % 100:02d}')
         hash_val = svc._gerar_hash_linha(mov)
 
@@ -169,8 +197,8 @@ class TestIdempotenciaProventos:
 
     def test_arquivo_diferente_permite_insercao(self, app):
         """Mesmo conteúdo mas arquivo diferente = registros diferentes = ambos inseridos"""
-        svc_a = _service('arquivo_a.xlsx')
-        svc_b = _service('arquivo_b.xlsx')
+        svc_a = _service('arquivo_a.xlsx', app)
+        svc_b = _service('arquivo_b.xlsx', app)
         produto = f'RBRR{uuid.uuid4().int % 100:02d}'
         mov = _make_movimentacao(produto=produto)
         hash_a = svc_a._gerar_hash_linha(mov)
@@ -192,7 +220,7 @@ class TestIdempotenciaProventos:
 
 class TestDryRunProventos:
     def test_dry_run_nao_persiste(self, app):
-        svc = _service('dry_test.xlsx')
+        svc = _service('dry_test.xlsx', app)
         mov = _make_movimentacao(produto=f'MXRF{uuid.uuid4().int % 100:02d}')
         hash_val = svc._gerar_hash_linha(mov)
 
@@ -206,7 +234,7 @@ class TestDryRunProventos:
             _cleanup_por_hash(hash_val)
 
     def test_dry_run_reporta_duplicatas_sem_persistir(self, app):
-        svc = _service('dry_test2.xlsx')
+        svc = _service('dry_test2.xlsx', app)
         mov = _make_movimentacao(produto=f'VISC{uuid.uuid4().int % 100:02d}')
         hash_val = svc._gerar_hash_linha(mov)
 
@@ -225,7 +253,7 @@ class TestDryRunProventos:
 
 class TestIdempotenciaNegociacoes:
     def test_reimportacao_nao_duplica(self, app):
-        svc = _service('neg_test.xlsx')
+        svc = _service('neg_test.xlsx', app)
         neg = _make_negociacao(codigo=f'PETR{uuid.uuid4().int % 10}')
         hash_val = svc._gerar_hash_linha(neg)
 
@@ -244,7 +272,7 @@ class TestIdempotenciaNegociacoes:
             _cleanup_por_hash(hash_val)
 
     def test_dry_run_nao_persiste_transacao(self, app):
-        svc = _service('neg_dry.xlsx')
+        svc = _service('neg_dry.xlsx', app)
         neg = _make_negociacao(codigo=f'VALE{uuid.uuid4().int % 10}')
         hash_val = svc._gerar_hash_linha(neg)
 
@@ -264,7 +292,7 @@ class TestIdempotenciaNegociacoes:
 
 class TestSanitizacaoNaImportacao:
     def test_xss_na_instituicao_e_limpo(self, app):
-        svc = _service('sanit_test.xlsx')
+        svc = _service('sanit_test.xlsx', app)
         mov = _make_movimentacao(
             produto=f'XPML{uuid.uuid4().int % 10}',
             instituicao='<script>alert(1)</script>XP'

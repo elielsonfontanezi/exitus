@@ -9,6 +9,11 @@ from .assessora import Assessora
 from .usuario import Usuario, UserRole
 from .corretora import Corretora, TipoCorretora
 from .ativo import Ativo, TipoAtivo, ClasseAtivo
+from .ativo_classificacao_cache import (
+    AtivoClassificacaoCache,
+    FonteClassificacao,
+    NivelConfianca,
+)
 from .transacao import Transacao, TipoTransacao
 
 # Módulo 3 - Entidades Financeiras
@@ -58,8 +63,11 @@ __all__ = [
     "Corretora",
     "TipoCorretora",
     "Ativo",
+    "AtivoClassificacaoCache",
     "TipoAtivo",
     "ClasseAtivo",
+    "FonteClassificacao",
+    "NivelConfianca",
     "Transacao",
     "TipoTransacao",
 

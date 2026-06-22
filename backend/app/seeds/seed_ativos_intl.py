@@ -106,13 +106,19 @@ def seed_ativos_intl():
                 skipped += 1
                 continue
             
-            moeda = 'BRL' if bolsa == 'B3' else 'USD'
-            
+            # FIX BUG-020: ETFs negociados na B3 são mercado='BR' (não INTL)
+            if bolsa == 'B3':
+                mercado = 'BR'
+                moeda = 'BRL'
+            else:
+                mercado = 'INTL'
+                moeda = 'USD'
+
             ativo = Ativo(
                 ticker=ticker, nome=nome,
                 tipo=TipoAtivo.ETF,
                 classe=ClasseAtivo.RENDA_VARIAVEL,
-                mercado='INTL', moeda=moeda,
+                mercado=mercado, moeda=moeda,
                 preco_atual=preco,
                 observacoes=f"Bolsa: {bolsa} | Setor: {setor}"
             )
