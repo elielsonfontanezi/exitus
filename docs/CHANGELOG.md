@@ -27,6 +27,17 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
+### Fix — EXITUS-BUY-SIGNALS-001: BUG-017 — autocomplete em Buy Signals (22/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/templates/analises/buy_signals_v2.html`: campo de busca vinculado a `<datalist>`; `buscarSugestoes()` consome `/api/ativos?search=` com debounce de 300ms; exibe até 10 tickers sugeridos
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-017 marcado como resolvido; contagem de importantes: 2
+- `docs/PROJECT_STATUS.md`: status consolidado atualizado
+
+**Bugs resolvidos:** BUG-017 (busca por ticker sem autocomplete em Buy Signals)
+
+---
+
 ### Fix — EXITUS-DASHBOARD-001: BUG-005 — CDI/Ibovespa hardcoded no dashboard (22/06/2026)
 
 **Arquivos alterados:**

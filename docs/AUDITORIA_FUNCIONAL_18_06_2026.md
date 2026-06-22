@@ -567,7 +567,7 @@
 | ~~BUG-015~~ | ~~**Tela de Detalhe do Ativo demora e nem sempre exibe dados**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `ativo_detalhes_v2.html` já carrega cotação, buy-score, margem e eventos em paralelo via `Promise.allSettled`. Estado vazio é tratado com `N/D` quando dados não existem |
 | ~~BUG-019~~ | ~~**Botão "Comparar" no Comparador de Ativos não aciona nada**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `comparador_v2.html` implementa `comparar()` que consome `/api/ativos` e `/api/cotacoes/<ticker>` para cada ticker selecionado. Não depende de endpoint `/api/ativos/comparar` |
 | ~~BUG-018~~ | ~~**Rota `/analises/rentabilidade` legacy retorna NOT FOUND**~~ | — | **RESOLVIDO em EXITUS-ANALISES-001**: redirect adicionado em `analises.py`; código morto (template inexistente `rentabilidade.html`) removido |
-| BUG-017 | **Busca por ticker sem autocomplete em Buy Signals** — funciona se digitado exato, sem sugestões | 18 | Campo de busca é `<input>` simples sem `datalist` ou componente de autocomplete. **Fix:** adicionar `datalist` populado via `GET /api/ativos?ticker=X` ou usar biblioteca de autocomplete |
+| ~~BUG-017~~ | ~~**Busca por ticker sem autocomplete em Buy Signals** — funciona se digitado exato, sem sugestões~~ | — | **RESOLVIDO em EXITUS-BUY-SIGNALS-001**: `buy_signals_v2.html` agora usa `<datalist>` populado via `GET /api/ativos?search=` com debounce de 300ms; busca parcial em ticker/nome retorna até 10 sugestões |
 | ~~BUG-020~~ | ~~**Import B3: classificação automática de ativo incorreta**~~ — **RESOLVIDO em EXITUS-ATIVOS-002**: `_obter_ou_criar_ativo()` agora usa classificador multi-camadas (DB → cache seed/manual → API externa → heurística → fallback `OUTRO`) com nível de confiança e fonte. ETFs BR (BOVA11, SMAL11) são classificados como ETF. Ativos internacionais (AAPL, MSFT) recebem mercado US. Confiança `BAIXA` vira `OUTRO` para revisão manual. | 5 |
 | ~~BUG-016~~ | ~~**Tela Eventos Corporativos inacessível**~~ | — | **FALSO POSITIVO** — revalidado 18/06/2026 com token válido: `/ativos/eventos-corporativos` carrega corretamente (KPIs + filtros). Flask prioriza rota estática sobre `/<ticker>` no mesmo blueprint. Bug original era consequência do BUG-001 (token inválido) |
 
@@ -729,7 +729,7 @@
 | Prioridade | Quantidade |
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
-| 🟡 Importante | 3 (BUG-004, BUG-006, BUG-017) |
+| 🟡 Importante | 2 (BUG-004, BUG-006) |
 | ⬛ Feature ausente | 10 (FEAT-001 a FEAT-010) |
 
 ### Impacto do BUG-001

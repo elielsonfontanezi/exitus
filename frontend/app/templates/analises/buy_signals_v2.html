@@ -33,12 +33,19 @@
                placeholder="Ex: PETR4, VALE3, AAPL..."
                x-model="tickerConsulta"
                @keydown.enter="consultarScore()"
-               @input="tickerConsulta = tickerConsulta.toUpperCase()">
+               @input="tickerConsulta = tickerConsulta.toUpperCase(); buscarSugestoes()"
+               list="ticker-sugestoes"
+               autocomplete="off">
         <button class="btn-exitus btn-exitus-primary" @click="consultarScore()" :disabled="consultando">
             <i class="fas" :class="consultando ? 'fa-spinner fa-spin' : 'fa-chart-line'"></i>
             <span x-text="consultando ? 'Analisando...' : 'Analisar'"></span>
         </button>
     </div>
+    <datalist id="ticker-sugestoes">
+        <template x-for="sugestao in sugestoes" :key="sugestao">
+            <option :value="sugestao"></option>
+        </template>
+    </datalist>
 </div>
 
 <!-- Resultado da consulta -->
@@ -186,6 +193,7 @@ function pageDataExtend() {
     return {
         watchlist: [],
         tickerConsulta: '',
+        sugestoes: [],
         consultando: false,
         scoreResultado: null,
         margemResultado: null,
@@ -201,6 +209,25 @@ function pageDataExtend() {
             } catch (e) {
                 console.error('Erro watchlist:', e);
             }
+        },
+
+        _debounceSugestoes: null,
+
+        async buscarSugestoes() {
+            if (this._debounceSugestoes) clearTimeout(this._debounceSugestoes);
+            const q = this.tickerConsulta.trim();
+            if (q.length < 2) {
+                this.sugestoes = [];
+                return;
+            }
+            this._debounceSugestoes = setTimeout(async () => {
+                try {
+                    const res = await this.apiFetch('/api/ativos?search=' + encodeURIComponent(q) + '&per_page=10');
+                    this.sugestoes = (res?.data?.ativos || []).map(a => a.ticker);
+                } catch (e) {
+                    this.sugestoes = [];
+                }
+            }, 300);
         },
 
         async consultarScore() {
