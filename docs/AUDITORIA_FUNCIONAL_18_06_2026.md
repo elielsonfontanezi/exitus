@@ -1,9 +1,12 @@
 # Auditoria Funcional — Sistema Exitus
 **Data:** 18/06/2026  
+**Revalidado:** 22/06/2026  
 **Auditor:** Cascade (análise de código + browser)  
 **Usuário de teste:** `e2e_user` / `e2e_senha_123`  
 **Frontend:** http://localhost:8080  
 **Backend:** http://localhost:5000  
+
+> **Nota de revalidação (22/06/2026):** após correção do BUG-020, a auditoria foi revisada em código. Bugs já resolvidos ou desatualizados foram marcados; contagem de bugs importantes ajustada de 15 para 6.
 
 **Legenda de status:**
 - ✅ `OK` — funciona conforme esperado
@@ -552,17 +555,17 @@
 |----|----------|---------|------------------------|
 | BUG-004 | **Filtro por data no Histórico filtra client-side** — só filtra as 50 transações da página atual, não todas | 8 | `filtrar()` opera sobre `this.transacoes` (50 itens). **Fix:** passar `data_inicio`/`data_fim` como params para API `/api/transacoes` |
 | BUG-005 | **CDI e Ibovespa hardcoded** — `11.75%` e `8.32%` fixos no template | 2 | Valores estáticos no HTML. **Fix:** criar endpoint `/api/indicadores` ou buscar de config |
-| BUG-006 | **Saldo de corretoras sempre R$ 0,00** | 4 | Campo `saldo_atual` não retornado pela API ou não existe no modelo. **Fix:** verificar schema tabela `corretoras` e endpoint `GET /api/corretoras` |
+| BUG-006 | **Saldo de corretoras sempre R$ 0,00** | 4 | Revalidado 22/06/2026: campo `saldo_atual` existe no modelo e é retornado pela API (`GET /api/corretoras`). Porém não é atualizado automaticamente a partir de movimentações de caixa — permanece com valor do seed/criação. **Fix:** implementar cálculo automático de saldo de corretora ou endpoint de sincronização |
 | ~~BUG-007~~ | ~~**Link "Esqueceu a senha?"** retorna 404~~ | — | **RESOLVIDO em EXITUS-LOGIN-001** — link removido do template (funcionalidade não implementada) | | 1 | Rota `/auth/forgot-password` não implementada. **Fix:** implementar rota ou remover link |
-| BUG-008 | ~~Link "Ver Ativo" retorna 404~~ — **RESOLVIDO na análise**: rota `/dashboard/ativo/<ticker>` existe em `dashboard.py` linha 913 | 8, 9 | Falso positivo — rota implementada |
-| BUG-009 | **`API_BASE` hardcoded como hostname Docker** em `fiscal.py` linha 9: `http://exitus-backend:5000/api` | 20, 21, 22, 23 | **Fix:** substituir por `Config.BACKEND_API_URL` (já usado corretamente nos outros blueprints) |
+| ~~BUG-008~~ | ~~**Link "Ver Ativo" retorna 404**~~ — **RESOLVIDO na análise**: rota `/dashboard/ativo/<ticker>` existe em `dashboard.py` linha 913 | 8, 9 | Falso positivo — rota implementada |
+| ~~BUG-009~~ | ~~**`API_BASE` hardcoded como hostname Docker** em `fiscal.py` linha 9: `http://exitus-backend:5000/api`~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: arquivo `fiscal.py` não existe mais em `app/routes/` e a string `exitus-backend:5000` não aparece no backend. Rotas fiscais atuais (`fiscal.py`) já usam `Config.BACKEND_API_URL` |
 | BUG-010 | **Tela DIRPF: `dados` e `erro` não passados ao template** — `render_template('fiscal/declaracao_v2.html')` sem argumentos, apesar de buscá-los | 23 | **Fix:** passar `dados=dados, erro=erro` no `render_template` |
-| BUG-011 | **URL da Tela 34 (Estratégia/Planos) incorreta** — menu/tabela referencia `/estrategia/planos` mas blueprint registrado como `/planos-compra/`. Link gera 404. | 34 | **Fix:** corrigir URL no menu para `/planos-compra/` ou criar rota `/estrategia/planos` com redirect |
-| BUG-012 | **Rotas `/proventos/recebidos` e `/proventos/projetados`** redirecionam para `dashboard.proventos_calendario` — verificar se essa função existe no blueprint `dashboard.py` | 14 | **Fix:** confirmar existência de `dashboard.proventos_calendario`; se ausente, criar rota ou redirecionar para `/proventos/calendario` |
-| BUG-013 | **Filtro de data em Movimentações pisca ao digitar o ano** — tela recarrega a cada tecla, incluindo estados intermediários inválidos | 10 | `x-model` no `<input type="date">` dispara `carregarComFiltro()` a cada keystroke via `@input` ou `@change`. **Fix:** usar `@change` em vez de `@input`, ou debounce, ou botão "Aplicar filtro" explícito |
-| BUG-014 | **Busca por ticker no Catálogo de Ativos não funciona** — sem autocomplete e sem resultado ao buscar | 11 | `recarregar()` passa `ticker` como param para `GET /api/ativos?tipo=X&ticker=Y`. Possível que API não suporte filtro por `ticker` parcial ou que o param seja ignorado. **Fix:** verificar se API aceita busca parcial; implementar autocomplete se necessário |
-| BUG-015 | **Tela de Detalhe do Ativo demora e nem sempre exibe dados** | 11, 12 | Múltiplas chamadas em sequência (ativo, cotação, fundamentalistas, buy score). Ativos sem cotação ou sem dados no banco ficam com campos `N/D` ou vazios. **Fix:** (1) paralelizar chamadas com `Promise.all`; (2) mostrar estado vazio amigável quando dados inexistentes |
-| BUG-019 | **Botão "Comparar" no Comparador de Ativos não aciona nada** | 30 | Provável `@click` sem handler implementado ou handler que depende de tickers selecionados mas sem validação visível. **Fix:** inspecionar handler Alpine.js do botão; verificar se `comparar()` existe e faz chamada à API `/api/ativos/comparar` ou similar |
+| ~~BUG-011~~ | ~~**URL da Tela 34 (Estratégia/Planos) incorreta**~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: blueprint `planos` registrado em `/planos-compra`, menu aponta para `/dashboard/planos-compra`, e existe redirect `/planos-compra/*` → `/planos-compra/`. Nenhum link `/estrategia/planos` encontrado no frontend atual |
+| ~~BUG-012~~ | ~~**Rotas `/proventos/recebidos` e `/proventos/projetados`** redirecionam para `dashboard.proventos_calendario`~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: `dashboard.proventos_calendario` existe em `dashboard.py` linha 956 e redireciona para `proventos.calendario`. Rotas `/proventos/recebidos` e `/proventos/projetados` funcionam via redirect |
+| ~~BUG-013~~ | ~~**Filtro de data em Movimentações pisca ao digitar o ano**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `movimentacoes.html` usa `@change="carregarComFiltro()"` nos campos de data, não `@input`. Chamadas à API só ocorrem ao confirmar a data |
+| BUG-014 | **Busca por ticker no Catálogo de Ativos não funciona** | 11 | Revalidado 22/06/2026: frontend envia `ticker=${this.search}` mas backend espera `search`. API suporta busca parcial em ticker/nome via `?search=`. **Fix:** alterar `lista_v2.html` para usar `search` em vez de `ticker`; adicionar autocomplete opcional |
+| ~~BUG-015~~ | ~~**Tela de Detalhe do Ativo demora e nem sempre exibe dados**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `ativo_detalhes_v2.html` já carrega cotação, buy-score, margem e eventos em paralelo via `Promise.allSettled`. Estado vazio é tratado com `N/D` quando dados não existem |
+| ~~BUG-019~~ | ~~**Botão "Comparar" no Comparador de Ativos não aciona nada**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `comparador_v2.html` implementa `comparar()` que consome `/api/ativos` e `/api/cotacoes/<ticker>` para cada ticker selecionado. Não depende de endpoint `/api/ativos/comparar` |
 | ~~BUG-018~~ | ~~**Rota `/analises/rentabilidade` legacy retorna NOT FOUND**~~ | — | **RESOLVIDO em EXITUS-ANALISES-001**: redirect adicionado em `analises.py`; código morto (template inexistente `rentabilidade.html`) removido |
 | BUG-017 | **Busca por ticker sem autocomplete em Buy Signals** — funciona se digitado exato, sem sugestões | 18 | Campo de busca é `<input>` simples sem `datalist` ou componente de autocomplete. **Fix:** adicionar `datalist` populado via `GET /api/ativos?ticker=X` ou usar biblioteca de autocomplete |
 | ~~BUG-020~~ | ~~**Import B3: classificação automática de ativo incorreta**~~ — **RESOLVIDO em EXITUS-ATIVOS-002**: `_obter_ou_criar_ativo()` agora usa classificador multi-camadas (DB → cache seed/manual → API externa → heurística → fallback `OUTRO`) com nível de confiança e fonte. ETFs BR (BOVA11, SMAL11) são classificados como ETF. Ativos internacionais (AAPL, MSFT) recebem mercado US. Confiança `BAIXA` vira `OUTRO` para revisão manual. | 5 |
@@ -725,7 +728,7 @@
 | Prioridade | Quantidade |
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
-| 🟡 Importante | 15 (BUG-004 a BUG-020, excl. resolvidos/falsos positivos) |
+| 🟡 Importante | 6 (BUG-004, BUG-005, BUG-006, BUG-010, BUG-014, BUG-017) |
 | ⬛ Feature ausente | 9 (FEAT-001 a FEAT-009) |
 
 ### Impacto do BUG-001

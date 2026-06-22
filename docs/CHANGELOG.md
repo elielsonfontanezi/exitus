@@ -27,6 +27,16 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
+### Fix — EXITUS-AUDITORIA-001: revalidação funcional 22/06/2026
+
+**Arquivos alterados:**
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: revalidação em código dos bugs importantes; marcados como resolvidos/falsos positivos: BUG-008, BUG-009, BUG-011, BUG-012, BUG-013, BUG-015, BUG-019; atualizadas causas raiz de BUG-006 e BUG-014; contagem de bugs importantes reduzida de 15 para 6
+
+**Bugs reimportantes pendentes:** BUG-004, BUG-005, BUG-006, BUG-010, BUG-014, BUG-017
+**Features pendentes:** FEAT-001 a FEAT-009
+
+---
+
 ### Fix — EXITUS-ANALISES-001 + Revalidação BUG-003: rota legacy + Import B3 (18/06/2026)
 
 **Arquivos alterados:**
