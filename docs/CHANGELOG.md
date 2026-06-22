@@ -27,6 +27,17 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
+### Fix — EXITUS-HISTORICO-001: BUG-004 — filtro de data no Histórico (22/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/templates/operacoes/historico.html`: `loadData()` agora envia `data_inicio` e `data_fim` para `/api/transacoes`; campos de data disparam `loadData()` ao invés de filtrar apenas no client-side
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-004 marcado como resolvido; contagem de importantes: 1
+- `docs/PROJECT_STATUS.md`: status consolidado atualizado
+
+**Bugs resolvidos:** BUG-004 (filtro por data no histórico filtrava apenas as 50 transações da página)
+
+---
+
 ### Fix — EXITUS-BUY-SIGNALS-001: BUG-017 — autocomplete em Buy Signals (22/06/2026)
 
 **Arquivos alterados:**

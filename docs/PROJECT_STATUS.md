@@ -23,7 +23,7 @@
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | ✅ 93.0% | 508/546 passando (+37 testes), 6 skipped (RLS), 68 errors (teardown) |
 | **Testes E2E** | 🟡 60% | v2: 127/127 ✅ Chromium (merged main 16/06) — v3 lógica negócio: 50 CTs planejados, specs criados (branch feature/testes-e2e-v3) |
-| **Auditoria Funcional** | 🟡 95% | 18/06/2026: 36 telas auditadas; 22/06/2026: 0 críticos, 2 importantes pendentes, 10 features ausentes |
+| **Auditoria Funcional** | 🟡 98% | 18/06/2026: 36 telas auditadas; 22/06/2026: 0 críticos, 1 importante pendente, 10 features ausentes |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 

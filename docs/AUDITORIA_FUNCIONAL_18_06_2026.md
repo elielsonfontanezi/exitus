@@ -553,7 +553,7 @@
 
 | ID | Problema | Tela(s) | Causa raiz identificada |
 |----|----------|---------|------------------------|
-| BUG-004 | **Filtro por data no Histórico filtra client-side** — só filtra as 50 transações da página atual, não todas | 8 | `filtrar()` opera sobre `this.transacoes` (50 itens). **Fix:** passar `data_inicio`/`data_fim` como params para API `/api/transacoes` |
+| ~~BUG-004~~ | ~~**Filtro por data no Histórico filtra client-side** — só filtra as 50 transações da página atual, não todas~~ | — | **RESOLVIDO em EXITUS-HISTORICO-001**: `operacoes/historico.html` agora envia `data_inicio` e `data_fim` para `/api/transacoes` via `loadData()` ao alterar os campos de data. Backend aplica filtro no banco e retorna apenas transações do período |
 | ~~BUG-005~~ | ~~**CDI e Ibovespa hardcoded** — `11.75%` e `8.32%` fixos no template~~ | — | **RESOLVIDO em EXITUS-DASHBOARD-001**: valores movidos para `frontend/app/config.py` (`CDI_ANUAL`, `IBOVESPA_ANUAL`) e injetados no template `dashboard/index_v2.html` via `dashboard.py`. Atualização manual por variável de ambiente. **Feature futura:** endpoint dinâmico `/api/indicadores` (Opção B) registrado como FEAT-010 |
 | BUG-006 | **Saldo de corretoras sempre R$ 0,00** | 4 | Revalidado 22/06/2026: campo `saldo_atual` existe no modelo e é retornado pela API (`GET /api/corretoras`). Porém não é atualizado automaticamente a partir de movimentações de caixa — permanece com valor do seed/criação. **Fix:** implementar cálculo automático de saldo de corretora ou endpoint de sincronização |
 | ~~BUG-007~~ | ~~**Link "Esqueceu a senha?"** retorna 404~~ | — | **RESOLVIDO em EXITUS-LOGIN-001** — link removido do template (funcionalidade não implementada) | | 1 | Rota `/auth/forgot-password` não implementada. **Fix:** implementar rota ou remover link |
@@ -729,7 +729,7 @@
 | Prioridade | Quantidade |
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
-| 🟡 Importante | 2 (BUG-004, BUG-006) |
+| 🟡 Importante | 1 (BUG-006) |
 | ⬛ Feature ausente | 10 (FEAT-001 a FEAT-010) |
 
 ### Impacto do BUG-001

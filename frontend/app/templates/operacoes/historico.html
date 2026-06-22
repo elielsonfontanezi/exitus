@@ -40,9 +40,9 @@
         <option value="compra">Compras</option>
         <option value="venda">Vendas</option>
     </select>
-    <input type="date" class="filter-input" x-model="filtroDataInicio" @change="filtrar()">
+    <input type="date" class="filter-input" x-model="filtroDataInicio" @change="loadData()">
     <span class="filter-label">até</span>
-    <input type="date" class="filter-input" x-model="filtroDataFim" @change="filtrar()">
+    <input type="date" class="filter-input" x-model="filtroDataFim" @change="loadData()">
     <span class="filter-label" style="margin-left:auto;" x-show="transacoesFiltradas.length !== transacoes.length"
           x-text="transacoesFiltradas.length + ' de ' + transacoes.length"></span>
 </div>
@@ -166,6 +166,8 @@ function pageDataExtend() {
 
         async loadData() {
             let url = '/api/transacoes?per_page=' + this.perPage + '&page=' + this.currentPage;
+            if (this.filtroDataInicio) url += '&data_inicio=' + this.filtroDataInicio;
+            if (this.filtroDataFim) url += '&data_fim=' + this.filtroDataFim;
             const res = await this.apiFetch(url);
             this.transacoes = res?.data?.transacoes || [];
             this.totalTransacoes = res?.data?.total || 0;
