@@ -33,6 +33,9 @@ class Usuario(db.Model):
     # Controle
     ativo = db.Column(Boolean, default=True, nullable=False)
     role = db.Column(Enum(UserRole, values_callable=lambda x: [e.value for e in x]), default=UserRole.USER, nullable=False)
+    
+    # Preferências
+    meta_patrimonio = db.Column(String(20), default='500000.00', nullable=False)  # R$ 500.000,00 padrão
 
     # Timestamps
     created_at = db.Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)

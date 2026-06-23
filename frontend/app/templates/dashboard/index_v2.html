@@ -205,14 +205,14 @@
                 </div>
                 <div style="display:flex; justify-content:space-between; font-size:0.875rem; margin-bottom:6px; color:var(--exitus-text-muted);">
                     <span>Atual: <strong style="color:var(--exitus-text);" x-text="formatMoney(dados.resumo.patrimonio_total)"></strong></span>
-                    <span>Meta: <strong style="color:var(--exitus-text);">R$ 500.000,00</strong></span>
+                    <span>Meta: <strong style="color:var(--exitus-text);" x-text="'R$ ' + formatMoney(user?.meta_patrimonio || 500000)"></strong></span>
                 </div>
                 <div class="progress-bar-container">
                     <div class="progress-bar-fill"
-                         :style="'width: ' + Math.min((dados.resumo.patrimonio_total / 500000) * 100, 100) + '%'"></div>
+                         :style="'width: ' + Math.min((dados.resumo.patrimonio_total / (user?.meta_patrimonio || 500000)) * 100, 100) + '%'"></div>
                 </div>
                 <div style="text-align:center; margin-top:8px; font-size:0.875rem; font-weight:600; color:var(--exitus-primary);"
-                     x-text="((dados.resumo.patrimonio_total / 500000) * 100).toFixed(1) + '% alcançado'"></div>
+                     x-text="((dados.resumo.patrimonio_total / (user?.meta_patrimonio || 500000)) * 100).toFixed(1) + '% alcançado'"></div>
             </div>
 
             <!-- BENCHMARK -->
@@ -302,6 +302,7 @@ function dashboardV2() {
         chartEvolucao: null,
         chartAlocacao: null,
         dadosCarregados: false,
+        user: null,
 
         async init() {
             await this.carregarDados();
@@ -317,6 +318,13 @@ function dashboardV2() {
                 const resDash = await fetch(`${base}/api/portfolios/dashboard`, { headers: h });
                 const dataDash = await resDash.json();
                 if (dataDash.success) this.dados = dataDash.data;
+
+                // Carregar dados do usuário (meta_patrimonio)
+                try {
+                    const r = await fetch(`${base}/api/auth/me`, { headers: h });
+                    const d = await r.json();
+                    if (d.success) this.user = d.data;
+                } catch (e) { console.warn('user/me:', e); }
 
                 try {
                     const r = await fetch(`${base}/api/carteira/saldo-caixa`, { headers: h });

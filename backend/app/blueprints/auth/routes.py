@@ -113,7 +113,7 @@ def update_me():
         return bad_request("Dados inválidos", e.messages)
     
     # Filtrar apenas campos permitidos para o próprio perfil
-    allowed = {k: v for k, v in validated.items() if k in ('email', 'nome_completo')}
+    allowed = {k: v for k, v in validated.items() if k in ('email', 'nome_completo', 'meta_patrimonio')}
     if not allowed:
         return bad_request("Nenhum campo permitido para atualização")
     

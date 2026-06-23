@@ -587,6 +587,146 @@
 | FEAT-010 | **Indicadores de mercado (CDI/Ibovespa) sem endpoint dinâmico** — atualmente valores vêm de variáveis de ambiente no frontend. **Fix:** criar backend `GET /api/indicadores` com CDI/Ibovespa atualizados automaticamente; dashboard consumir via API | 2 |
 | FEAT-011 | **Saldo de corretoras não é dinâmico** — `sincronizar-saldo` resolve manualmente. **Fix:** remover coluna `saldo_atual` e calcular saldo sempre a partir de movimentações de caixa, ou atualizar automaticamente via triggers/eventos ao inserir movimentação | 4 |
 | FEAT-012 | **Refinamentos edição/exclusão transações** — implementar validações (bloquear se já liquidada/IR), período de carência, auditoria de alterações, motivo obrigatório para exclusão, indicadores visuais de bloqueio | 6, 7, 8 |
+| FEAT-013 | **Validação de força de senha** — indicador visual (fraca/média/forte) com critérios claros (tamanho, maiúsculas, números, especiais) ao trocar senha | 3 |
+| FEAT-014 | **Confirmação de e-mail** — enviar token de verificação após alteração de e-mail; bloquear acesso até confirmação | 3 |
+| FEAT-015 | **Histórico de alterações de perfil** — registrar data/hora/IP quando usuário altera nome, e-mail ou senha; tela de visualização do histórico | 3 |
+| FEAT-016 | **Avatar/foto de perfil** — upload de imagem; redimensionamento automático; exibição no dashboard e menu | 2, 3 |
+| FEAT-017 | **Preferências do usuário** — tema (claro/escuro), idioma (PT/EN), formato de data/moeda; persistir no perfil | 3 |
+| FEAT-018 | **Autenticação de dois fatores (2FA)** — opção para ativar TOTP; QR code para apps authenticator; códigos de backup | 3 |
+| FEAT-019 | **Logo da corretora** — upload de imagem para identificação visual; exibir na tabela de corretoras e dashboard | 4 |
+| FEAT-020 | **Integração automática de dados da corretora** — buscar dados via CNPJ (razão social, status); API Receita Federal ou serviço similar | 4 |
+| FEAT-021 | **Saldos automáticos das corretoras** — integrar com APIs das corretoras (B3, XP, Rico, etc.) para atualizar saldos automaticamente | 4 |
+| FEAT-022 | **Taxas e comissões por corretora** — configurar taxas padrão (corretagem, custódia, emolumentos); usar em cálculos de rentabilidade | 4 |
+| FEAT-023 | **Relatórios por corretora** — extrato de movimentações, posição consolidada, IR retido; exportação PDF/Excel | 4 |
+| FEAT-024 | **Status avançado da corretora** — indicadores de conexão/API ativa; última sincronização; erros de integração | 4 |
+| FEAT-025 | **Metas de patrimônio por período** — configurar metas anuais, trimestrais, mensais com projeções automáticas baseadas em aportes esperados | 2 |
+| FEAT-026 | **Metas por classe de ativo** — definir percentuais-alvo para ações, FIIs, Tesouro, renda fixa; alertas de desvio | 2 |
+| FEAT-027 | **Alertas de progresso de meta** — notificar quando atingir X% da meta ou quando atrasar em relação ao planejado | 2 |
+| FEAT-028 | **Comparativo visual meta vs. realizado** — gráfico de linha mostrando projeção vs. patrimônio real ao longo do tempo | 2 |
+| FEAT-029 | **Migração automática template venda.html** — redirecionar para operacoes_v2.html com parâmetros ?tipo=venda&ticker=PETR4 | 7 |
+| FEAT-030 | **Exportação múltiplos formatos** — CSV, Excel (.xlsx), PDF com layout profissional; escolha do usuário | 28 |
+| FEAT-031 | **Exportação com colunas personalizáveis** — usuário seleciona quais campos incluir; salvar preferências | 28 |
+| FEAT-032 | **Exportação com filtros aplicados** — exportar já com os filtros ativos da tela; opção para incluir ou não | 28 |
+| FEAT-033 | **Agendamento de exportações** — exportações automáticas mensais/enviar por e-mail; histórico de exportações | 28 |
+| FEAT-034 | **Simulador "e se" do plano de compra** — calcular resultado se tivesse comprado X dias antes ou com diferentes aportes | 34 |
+| FEAT-035 | **Comparativo plano vs. realizado** — mostrar diferenças percentuais e absolutas entre planejado e executado | 34 |
+| FEAT-036 | **Ajuste automático de plano** — sugerir ajustes de aportes baseados na performance atual vs. meta | 34 |
+| FEAT-037 | **Importo automático de proventos** — ler e-mails de corretoras para detectar creditamentos; OCR de comprovantes | 14 |
+| FEAT-038 | **Rateio automático de proventos** — dividir valores proporcionalmente entre ativos do mesmo grupo (ex: fundos imobiliários) | 14 |
+| FEAT-039 | **Timeline de recebimentos** — histórico visual de todos os proventos com status (pendente/confirmado) | 14 |
+| FEAT-040 | **Validação prévia import B3** — preview dos dados antes de importar; opção para editar/corrigir | 5 |
+| FEAT-041 | **Mapeamento inteligente de colunas** — detectar automaticamente quais colunas correspondem a cada campo (data, ticker, etc.) | 5 |
+| FEAT-042 | **Deducação de duplicados** — identificar transações já existentes e oferecer opções (ignorar/sobrescrever) | 5 |
+| FEAT-043 | **Edição em lote pré-importação** — permitir editar múltiplos itens antes de confirmar importação | 5 |
+| FEAT-044 | **Mais indicadores de mercado** — Selic, IPCA, dólar, Bitcoin, ouro; fontes múltiplas (BC, B3, Yahoo Finance) | 2 |
+| FEAT-045 | **Histórico de indicadores** — gráfico de evolução dos indicadores ao longo do tempo; comparações | 2 |
+| FEAT-046 | **API pública de indicadores** — endpoint `/api/indicadores` para consumo por outros sistemas; cache automático | 2 |
+| FEAT-047 | **Saldo de corretoras em tempo real** — WebSocket para atualizações instantâneas quando houver movimentação | 4 |
+| FEAT-048 | **Conciliação bancária** — comparar saldos vs. extratos oficiais; destacar divergências | 4 |
+| FEAT-049 | **Regra de data-valor** — diferenciar data-lançamento vs. data-efeito financeiro; impactar cálculos de posição | 4 |
+
+---
+
+## 🔍 Database Investigation - 23/06/2026
+
+### Objetivo
+Investigar dificuldades com operações de banco de dados durante implementação do FEAT-004 (Meta de Patrimônio Configurável) e criar documentação de referência para evitar perda de tempo em investigações futuras.
+
+### Fontes Consultadas
+- ✅ `docs/EXITUS_DB_STRUCTURE.txt` - Estrutura completa do banco
+- ✅ `docs/OPERATIONS_RUNBOOK.md` - Scripts e procedimentos operacionais
+- ✅ `backend/app/config.py` - Configurações de conexão (porta 5433)
+- ⚠️ Ausência de documentação específica para migrations/troubleshooting
+
+### Problemas Encontrados
+
+1. **Flask-Migrate falha com erro de autenticação**
+   - **Erro**: `(psycopg2.OperationalError) connection to server at "localhost", port 5432 failed: FATAL: password authentication failed for user "exitus"`
+   - **Causa**: Configuração de porta incorreta (5432 vs 5433) e ambiente Flask não configurado
+   - **Solução**: Usar ALTER TABLE direto via psql para mudanças simples
+
+2. **Container PostgreSQL sem porta mapeada**
+   - **Erro**: `Connection refused` na porta 5433
+   - **Causa**: Container criado sem mapeamento de porta
+   - **Solução**: Recriar container com `-p 5433:5432`
+
+3. **ENUMs não criados antes das tabelas**
+   - **Erro**: `invalid input value for enum tipomovimentacao`
+   - **Causa**: `db.create_all()` executado sem ENUMs pré-existentes
+   - **Solução**: Criar ENUMs manualmente antes de criar tabelas
+
+4. **Database vazio após recriação**
+   - **Erro**: `relation "usuario" does not exist`
+   - **Causa**: Container recriado sem dados
+   - **Solução**: Executar `db.create_all()` para recriar schema
+
+### Comandos Executados
+
+```bash
+# Verificar status container
+podman ps | grep exitus-db
+
+# Recriar container com porta correta
+podman stop exitus-db
+podman rm exitus-db
+podman run -d --name exitus-db -e POSTGRES_USER=exitus -e POSTGRES_PASSWORD=exitus123 -e POSTGRES_DB=exitusdb -p 5433:5432 docker.io/library/postgres:16
+
+# Criar ENUMs manualmente
+podman exec -it exitus-db psql -U exitus -d exitusdb -c "CREATE TYPE tipomovimentacao AS ENUM ('aporte', 'resgate', 'transferencia_enviada', 'transferencia_recebida', 'credito_provento');"
+
+# Adicionar coluna meta_patrimonio
+podman exec -it exitus-db psql -U exitus -d exitusdb -c "ALTER TABLE usuario ADD COLUMN IF NOT EXISTS meta_patrimonio VARCHAR(20) DEFAULT '500000.00' NOT NULL;"
+
+# Criar tabelas via Flask
+cd backend && python -c "
+from app import create_app
+from app.database import db
+app = create_app()
+with app.app_context():
+    db.create_all()
+    print('✅ Tabelas criadas')
+"
+
+# Atualizar documentação do schema
+cd .. && ./scripts/update_db_structure.sh
+```
+
+### Resultados
+
+- ✅ Coluna `meta_patrimonio` adicionada à tabela `usuario`
+- ✅ Database recriado com schema completo
+- ✅ Documentação `EXITUS_DB_STRUCTURE.txt` atualizada
+- ✅ Aplicação Flask conectando normalmente
+
+### Lições Aprendidas
+
+- **L-DB-001**: Porta PostgreSQL é sempre 5433 (host) → 5432 (container)
+- **L-DB-002**: Flask-Migrate falha com frequência - preferir ALTER direto para mudanças simples
+- **L-DB-003**: ENUMs devem ser criados antes das tabelas
+- **L-DB-004**: Documentação do schema deve ser atualizada SEMPRE após mudanças
+
+### Artefatos Criados
+
+1. **`docs/DATABASE_INVESTIGATION_GUIDE.md`** - Guia completo para investigação de database
+   - Fontes de verdade obrigatórias
+   - Procedimentos operacionais padrão
+   - Troubleshooting com soluções conhecidas
+   - Checklist de investigação
+   - Template para registro de atividades
+
+### Melhorias Propostas
+
+1. **Documentação de Migrations**: Criar seção específica em `OPERATIONS_RUNBOOK.md`
+2. **Script de Recuperação**: Automatizar recriação de database com ENUMs
+3. **Validação de Schema**: Script para verificar integridade pós-mudanças
+4. **Registro Padrão**: Template para atividades de database em auditoria
+
+### Próximos Passos
+
+- [ ] Finalizar implementação FEAT-004 (testes finais)
+- [ ] Adicionar seção de migrations ao `OPERATIONS_RUNBOOK.md`
+- [ ] Criar script automatizado para setup de database do zero
+- [ ] Registrar novas lições em `docs/LESSONS_LEARNED.md`
 
 ---
 
@@ -732,7 +872,7 @@
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
 | 🟡 Importante | 0 — todos os bugs importantes foram resolvidos ou reclassificados |
-| ⬛ Feature ausente | 9 (FEAT-004 a FEAT-012) |
+| ⬛ Feature ausente | 46 (FEAT-004 a FEAT-049) |
 
 ### Impacto do BUG-001
 

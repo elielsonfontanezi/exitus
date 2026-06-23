@@ -39,6 +39,7 @@ class UsuarioUpdateSchema(Schema):
     nome_completo = fields.Str(required=False, allow_none=True)
     ativo = fields.Bool(required=False)
     role = fields.Str(required=False)
+    meta_patrimonio = fields.Str(required=False, validate=lambda x: float(x) >= 0 if x else True)
     
     @validates('email')
     def validate_email_unique(self, value):
@@ -66,6 +67,7 @@ class UsuarioResponseSchema(SQLAlchemyAutoSchema):
         exclude = ('password_hash',)
     
     role = fields.Method("get_role_str")
+    meta_patrimonio = fields.Str(dump_only=True)
     
     def get_role_str(self, obj):
         """Converte Enum para string"""

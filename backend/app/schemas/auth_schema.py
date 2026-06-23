@@ -86,6 +86,7 @@ class UserMeSchema(SQLAlchemyAutoSchema):
         exclude = ('password_hash', 'role')
     
     role = fields.Method('get_role_str')
+    meta_patrimonio = fields.Str(dump_only=True)
     
     def get_role_str(self, obj):
         """Converte Enum para string."""

@@ -41,6 +41,15 @@
                   x-text="perfil.ativo ? 'Ativo' : 'Inativo'"></span>
         </div>
 
+        <!-- Meta de Patrimônio -->
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Meta de Patrimônio (R$)</label>
+            <input type="number" class="filter-input" x-model="perfil.meta_patrimonio" step="0.01" min="0" style="width:100%;">
+            <small style="color:#6b7280; font-size:0.75rem; margin-top:0.25rem; display:block;">
+                Valor alvo para sua meta de patrimônio. Usado no dashboard para calcular progresso.
+            </small>
+        </div>
+
         <!-- Membro desde -->
         <div>
             <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Membro Desde</label>
@@ -124,7 +133,8 @@ function pageDataExtend() {
                     method: 'PUT',
                     body: JSON.stringify({
                         nome_completo: this.perfil.nome_completo,
-                        email: this.perfil.email
+                        email: this.perfil.email,
+                        meta_patrimonio: this.perfil.meta_patrimonio
                     })
                 });
                 this.perfil = res?.data || this.perfil;

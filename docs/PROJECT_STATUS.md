@@ -1,10 +1,12 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 22/06/2026  
-> **Status:** ✅ **BUG-020 Resolvido — Classificação multi-camadas de ativos B3**  
-> **Versão:** v0.9.21
+> **Data:** 23/06/2026  
+> **Status:** ✅ **FEAT-004 Concluído — Meta de Patrimônio Configurável**  
+> **Versão:** v0.9.22
 
-### 🔧 Últimas correções (22/06/2026)
+### 🔧 Últimas correções (23/06/2026)
+- **EXITUS-PERFIL-001:** FEAT-004 resolvido — campo `meta_patrimonio` adicionado ao modelo Usuario; dashboard exibe meta dinâmica; perfil permite edição; API GET/PUT `/api/auth/me` funcionando
+- **Database Investigation:** Guia completo criado (`DATABASE_INVESTIGATION_GUIDE.md`) para evitar perda de tempo em investigações futuras; lições L-DB-001 a L-DB-004 documentadas
 - **EXITUS-ATIVOS-002:** BUG-020 resolvido — classificador multi-camadas (DB → cache seed/manual → API externa → heurística → fallback `OUTRO`) com níveis de confiança e fonte; migration `ativo_classificacao_cache` aplicada com sucesso
 - **EXITUS-ANALISES-001:** BUG-018 resolvido + BUG-003 falso positivo (import idempotente) — **0 telas 🔴 QUEBRADAS**
 - **EXITUS-ATIVOS-001:** BUG-016 falso positivo; link "Eventos Corporativos" adicionado ao menu — tela funcionava sem link
@@ -23,7 +25,7 @@
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
 | **Testes Backend** | ✅ 93.0% | 508/546 passando (+37 testes), 6 skipped (RLS), 68 errors (teardown) |
 | **Testes E2E** | 🟡 60% | v2: 127/127 ✅ Chromium (merged main 16/06) — v3 lógica negócio: 50 CTs planejados, specs criados (branch feature/testes-e2e-v3) |
-| **Auditoria Funcional** | ✅ 100% | 18/06/2026: 36 telas auditadas; 23/06/2026: 0 críticos, 0 importantes pendentes, 9 features pendentes (FEAT-004 a FEAT-012) |
+| **Auditoria Funcional** | ✅ 100% | 18/06/2026: 36 telas auditadas; 23/06/2026: 0 críticos, 0 importantes pendentes, 8 features pendentes (FEAT-005 a FEAT-012) |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
 
