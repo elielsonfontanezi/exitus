@@ -16,6 +16,8 @@
 * **Sistema de Alertas**: Notificações configuráveis por preço, percentual e indicadores
 * **Relatórios Avançados**: Geração automática de relatórios de performance com Sharpe Ratio
 * **Cálculos Fiscais**: Regras configuráveis por país e tipo de ativo
+* **Exportação CSV**: Download direto via HTTP headers com preview automático
+* **Frontend Moderno**: Alpine.js + exitus-components.css, totalmente API-driven
 
 ### Tipos de Ativos Suportados (14 tipos)
 
@@ -59,7 +61,7 @@ O Exitus suporta **14 tipos de ativos** em 4 mercados diferentes:
 | --- | --- | --- |
 | **Backend** | Python + Flask | 3.11 / 3.0 |
 | **ORM** | SQLAlchemy + Alembic | 2.0 / 1.13 |
-| **Frontend** | HTMX + Alpine.js + TailwindCSS | 2.0 / 3.14 / 3.4 |
+| **Frontend** | Alpine.js + exitus-components.css | 3.14 / custom |
 | **Database** | PostgreSQL | 16 |
 | **Containers** | Podman (rootless) | 4.x |
 | **APIs Externas** | brapi.dev, yfinance, Alpha Vantage, Finnhub | - |
@@ -187,7 +189,7 @@ podman logs -f exitus-backend
 # Recriar banco de teste (primeira vez ou após migrations)
 ./scripts/create_test_db.sh
 
-# Executar suite completa (77 testes — dentro do container)
+# Executar suite completa (508+ testes — dentro do container)
 podman exec exitus-backend python -m pytest tests/ -q --no-cov
 ```
 
@@ -207,25 +209,22 @@ podman exec exitus-backend python -m pytest tests/ -q --no-cov
 
 ---
 
-## 📦 Módulos Implementados (M0-M7)
+## 📦 Fases de Implementação
 
-| Módulo | Status | Descrição | Endpoints |
+| Fase | Status | Descrição | GAPs |
 | --- | --- | --- | --- |
-| **M0** | ✅ PROD | Infraestrutura (Podman, PostgreSQL, Rede) | - |
-| **M1** | ✅ PROD | Database Schema (21 tabelas, 86+ índices) | - |
-| **M2** | ✅ PROD | Backend API Core (Auth JWT, CRUD, 16 blueprints) | 67 |
-| **M3** | ✅ PROD | Portfolio Analytics (Dashboard, Performance, Alocação) | 11 |
-| **M4** | ✅ PROD | Buy Signals & Cálculos Fiscais (Z-Score, Preço Teto) | 12 |
-| **M5** | ✅ PROD | Frontend Base (15 rotas, HTMX, Alpine.js) | 15 |
-| **M6** | ✅ PROD | Dashboards Frontend (4 telas, Chart.js) | 4 |
-| **M7.4** | ✅ PROD | Alertas (6 tipos, CRUD completo) | 4 |
-| **M7.5** | ✅ PROD | Cotações Live (Multi-provider, Cache 15min) | 3 |
-| **M7.6** | ✅ PROD | Relatórios (Performance, Export PDF stub) | 5 |
-| **TESTS** | ✅ PROD | Suite de testes automatizados — 77 testes (0 falhos) | - |
-| **M8** | 📅 PLAN | Analytics Avançados (Monte Carlo, Otimização) | - |
-| **M9** | 📅 PLAN | Deploy & Monitoramento (CI/CD, Prometheus) | - |
+| **Fase 1** | ✅ Concluída | Infraestrutura e Database (30 tabelas) | 9 |
+| **Fase 2** | ✅ Concluída | Backend Core (APIs, CRUD, Auth) | 9 |
+| **Fase 3** | ✅ Concluída | Business Logic (IR, Export, Testes) | 13 |
+| **Fase 4** | ✅ Concluída | Features Avançadas (Multi-moeda, Swagger) | 8 |
+| **Fase 5** | ✅ Concluída | Documentação e Enumeradores | 1 |
+| **Fase 6** | ✅ Concluída | Testes e Qualidade (508+ testes) | 1 |
+| **Fase 7** | 🎯 Próxima | Produção (Monitor, Rate Limit, CI/CD) | 4 |
+| **Fase 8** | 📋 Futuro | Otimizações (Rebalance, Dividendos) | 6 |
 
-**Total de Endpoints**: **67 rotas** validadas e documentadas
+**Total de GAPs**: **48/54 concluídos (87%)**  
+**Testes**: **508/546 passando (93.0%)**  
+**Frontend**: **API-Driven completo (8/8 sprints)**
 
 ---
 
@@ -364,7 +363,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE]() para mais deta
 
 ---
 
-**Versão atual**: v0.9.3 (HistoricoPatrimonio Implementation)
+**Versão atual**: v0.9.23 (Auditoria DB Concluída)
 
-**Última atualização**: 22 de Março de 2026
+**Última atualização**: 23 de Junho de 2026
 
