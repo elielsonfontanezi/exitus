@@ -256,7 +256,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 3. Error handling fragmentado
 
 **Origem:** Descoberto durante EXITUS-TESTS-001.  
-**Detalhes completos:** [archive/EXITUS-CRUD-002.md](archive/EXITUS-CRUD-002.md)
+**Detalhes completos:** [EXITUS-CRUD-002.md](EXITUS-CRUD-002.md)
 
 ---
 
