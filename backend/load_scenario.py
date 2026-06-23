@@ -424,22 +424,18 @@ class ScenarioLoader:
                 continue
             
             tipo_map = {
-                'DEPOSITO': TipoMovimentacao.DEPOSITO,
-                'SAQUE': TipoMovimentacao.SAQUE,
-                'TRANSFERENCIA_ENVIADA': TipoMovimentacao.TRANSFERENCIA_ENVIADA,
-                'TRANSFERENCIA_RECEBIDA': TipoMovimentacao.TRANSFERENCIA_RECEBIDA,
-                'CREDITO_PROVENTO': TipoMovimentacao.CREDITO_PROVENTO,
-                'PAGAMENTO_TAXA': TipoMovimentacao.PAGAMENTO_TAXA,
-                'PAGAMENTO_IMPOSTO': TipoMovimentacao.PAGAMENTO_IMPOSTO,
-                'AJUSTE': TipoMovimentacao.AJUSTE,
-                'OUTRO': TipoMovimentacao.OUTRO
+                'aporte': 'aporte',
+                'resgate': 'resgate',
+                'transferencia_enviada': 'transferencia_enviada',
+                'transferencia_recebida': 'transferencia_recebida',
+                'credito_provento': 'credito_provento'
             }
             
             movimentacao = MovimentacaoCaixa(
                 usuario_id=usuario_id,
                 corretora_id=corretora_id,
                 assessora_id=assessora_id,
-                tipo_movimentacao=tipo_map.get(mov_data['tipo'], TipoMovimentacao.DEPOSITO),
+                tipo_movimentacao=tipo_map.get(mov_data['tipo'], 'aporte'),
                 valor=Decimal(str(mov_data['valor'])),
                 moeda=mov_data.get('moeda', 'BRL'),
                 data_movimentacao=datetime.strptime(mov_data['data_movimentacao'], '%Y-%m-%d').date(),

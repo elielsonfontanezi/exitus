@@ -49,7 +49,7 @@
       "pais": "BR",
       "preco_atual": 38.50,
       "preco_teto": 45.00,
-      "dividend_yield": 15.2,
+      "dividend_yield": 8.5,
       "p_l": 4.1,
       "p_vp": 1.05,
       "observacoes": "Setor: Petróleo e Gás",
@@ -65,7 +65,7 @@
       "pais": "BR",
       "preco_atual": 68.90,
       "preco_teto": 75.00,
-      "dividend_yield": 12.8,
+      "dividend_yield": 6.8,
       "p_l": 5.2,
       "p_vp": 0.95,
       "observacoes": "Setor: Mineração",
@@ -239,7 +239,7 @@
     {
       "usuario": "e2e_user",
       "corretora": "XP INVESTIMENTOS",
-      "tipo": "DEPOSITO",
+      "tipo": "aporte",
       "data_movimentacao": "2024-01-10",
       "valor": 10000.00,
       "observacoes": "Depósito inicial"
@@ -247,7 +247,7 @@
     {
       "usuario": "e2e_user",
       "corretora": "XP INVESTIMENTOS",
-      "tipo": "SAQUE",
+      "tipo": "resgate",
       "data_movimentacao": "2024-04-15",
       "valor": 500.00,
       "observacoes": "Saque parcial"

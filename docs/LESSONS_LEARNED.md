@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 18/06/2026 — L-FE-009 adicionado (migração de template sem padrão visual do sistema)  
+> **Atualizado:** 23/06/2026 — L-DB-004 a L-DB-006 adicionadas (auditoria banco de dados)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---

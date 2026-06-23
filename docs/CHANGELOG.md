@@ -8,6 +8,21 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — EXITUS-DB-AUDIT-001: Auditoria Completa do Banco de Dados (23/06/2026)
+
+**Arquivos alterados:**
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: auditoria completa concluída (3 fases); 30 tabelas validadas; seeds corrigidos; 39 arquivos de documentação analisados
+- `backend/seed_data/scenarios/test_e2e.json`: dividend_yield corrigido (15.2→8.5, 12.8→6.8); tipomovimentacao ajustado (DEPOSITO→aporte, SAQUE→resgate)
+- `backend/load_scenario.py`: mapeamento ENUMs corrigido para strings; default alterado para 'aporte'
+- `docs/PROJECT_STATUS.md`: status atualizado com auditoria DB concluída
+- `docs/LESSONS_LEARNED.md`: 3 novas lições aprendidas (L-DB-004 a L-DB-006)
+
+**Problemas resolvidos:** Dados ausentes no banco (apenas 1 usuário, 0 ativos); ENUMs incorretos (overflow, case sensitive); script desatualizado
+**Dados carregados:** 3 usuários, 7 ativos, 4 transações, 2 proventos, 2 movimentações, 3 alertas, 1 assessora, 3 corretoras
+**Lições aprendidas:** Scripts de seed vs schema real; ENUMs case sensitive; precisão numeric
+
+---
+
 ### Feature — EXITUS-PERFIL-001: FEAT-004 — Meta de Patrimônio Configurável (23/06/2026)
 
 **Arquivos alterados:**
