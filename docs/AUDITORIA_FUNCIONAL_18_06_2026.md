@@ -577,7 +577,7 @@
 |----|----------|---------|
 | ~~FEAT-001~~ | ~~Perfil somente leitura — sem editar nome/email nem trocar senha~~ | — | **RESOLVIDA em EXITUS-PERFIL-001**: backend `PUT /api/auth/me` e `POST /api/auth/change-password`; frontend `configuracoes/perfil.html` agora permite editar nome, e-mail e trocar senha |
 | ~~FEAT-002~~ | ~~Corretoras sem CRUD — sem criar, editar ou excluir corretora~~ | — | **RESOLVIDA em EXITUS-CORRETORA-002**: frontend `configuracoes/corretoras.html` agora oferece botões Nova/Editar/Excluir com modal de formulário; backend já possuía endpoints POST/PUT/DELETE `/api/corretoras/*` |
-| FEAT-003 | Transações sem editar/excluir após registro | 6, 7, 8 |
+| ~~FEAT-003~~ | ~~Transações sem editar/excluir após registro~~ | — | **RESOLVIDA em EXITUS-TRANSACOES-003**: tela `/operacoes/historico.html` agora oferece botões Editar/Excluir no menu de ações; modal de edição para data, tipo, quantidade, preço e custos; backend endpoints PUT/DELETE `/api/transacoes/<id>` consumidos |
 | FEAT-004 | Meta de patrimônio hardcoded (R$ 500k) — não configurável | 2 |
 | FEAT-005 | Template `venda.html` legado ainda existe como rota separada | 7 |
 | FEAT-006 | Exportação CSV renderiza tabela HTML — sem download real do arquivo | 28 |
@@ -586,6 +586,7 @@
 | FEAT-009 | **Import B3 não lista os registros importados** — resultado mostra apenas totais numéricos (Transações=N, Proventos=N). Usuário não sabe quais ativos foram criados/importados. **Fix:** exibir lista dos tickers importados e ativos criados automaticamente após import | 5 |
 | FEAT-010 | **Indicadores de mercado (CDI/Ibovespa) sem endpoint dinâmico** — atualmente valores vêm de variáveis de ambiente no frontend. **Fix:** criar backend `GET /api/indicadores` com CDI/Ibovespa atualizados automaticamente; dashboard consumir via API | 2 |
 | FEAT-011 | **Saldo de corretoras não é dinâmico** — `sincronizar-saldo` resolve manualmente. **Fix:** remover coluna `saldo_atual` e calcular saldo sempre a partir de movimentações de caixa, ou atualizar automaticamente via triggers/eventos ao inserir movimentação | 4 |
+| FEAT-012 | **Refinamentos edição/exclusão transações** — implementar validações (bloquear se já liquidada/IR), período de carência, auditoria de alterações, motivo obrigatório para exclusão, indicadores visuais de bloqueio | 6, 7, 8 |
 
 ---
 
@@ -731,7 +732,7 @@
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
 | 🟡 Importante | 0 — todos os bugs importantes foram resolvidos ou reclassificados |
-| ⬛ Feature ausente | 9 (FEAT-003 a FEAT-011) |
+| ⬛ Feature ausente | 9 (FEAT-004 a FEAT-012) |
 
 ### Impacto do BUG-001
 

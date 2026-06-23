@@ -27,6 +27,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
+### Feature — EXITUS-TRANSACOES-003: FEAT-003 — Editar/Excluir transações (23/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/templates/operacoes/historico.html`: botões Editar/Excluir no menu de ações; modal de edição com campos data, tipo, quantidade, preço, custos; funções Alpine.js para PUT/DELETE `/api/transacoes/<id>`
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: FEAT-003 marcada como resolvida; contagem de features: 9
+- `docs/PROJECT_STATUS.md`: status consolidado atualizado
+
+**Features resolvidas:** FEAT-003 (transações sem editar/excluir)
+**Observação:** Implementação simples; validações e refinamentos delegados para FEAT-012
+
+---
+
 ### Feature — EXITUS-CORRETORA-002: FEAT-002 — CRUD de corretoras (23/06/2026)
 
 **Arquivos alterados:**

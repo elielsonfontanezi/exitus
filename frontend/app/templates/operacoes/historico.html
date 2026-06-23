@@ -95,6 +95,12 @@
                                 <a class="action-menu-item" :href="'/operacoes/?ticker=' + trx.ativo?.ticker">
                                     <i class="fas fa-plus"></i> Nova Operação
                                 </a>
+                                <button class="action-menu-item" @click="editarTransacao(trx)" :disabled="trx.editando">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="action-menu-item action-menu-danger" @click="excluirTransacao(trx)" :disabled="trx.excluindo">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
                             </div>
                         </div>
                     </td>
@@ -142,6 +148,46 @@
         </button>
     </div>
 </div>
+
+<!-- Modal Editar Transação -->
+<div x-show="showModalEdit" x-cloak
+     style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;">
+    <div @click.away="fecharModalEdit()" style="background:white; padding:2rem; border-radius:8px; max-width:500px; width:100%; max-height:90vh; overflow-y:auto;">
+        <h3 style="margin:0 0 1.5rem 0;">Editar Transação</h3>
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div>
+                <label class="filter-label">Data</label>
+                <input type="date" class="filter-input" x-model="formEdit.data_transacao" style="width:100%;">
+            </div>
+            <div>
+                <label class="filter-label">Tipo</label>
+                <select class="filter-input" x-model="formEdit.tipo" style="width:100%;">
+                    <option value="compra">Compra</option>
+                    <option value="venda">Venda</option>
+                </select>
+            </div>
+            <div>
+                <label class="filter-label">Quantidade</label>
+                <input type="number" class="filter-input" x-model="formEdit.quantidade" step="0.01" style="width:100%;">
+            </div>
+            <div>
+                <label class="filter-label">Preço Unitário</label>
+                <input type="number" class="filter-input" x-model="formEdit.preco_unitario" step="0.01" style="width:100%;">
+            </div>
+            <div>
+                <label class="filter-label">Custos Totais</label>
+                <input type="number" class="filter-input" x-model="formEdit.custos_totais" step="0.01" style="width:100%;">
+            </div>
+        </div>
+        <div style="display:flex; gap:0.5rem; margin-top:1.5rem; justify-content:flex-end;">
+            <button class="btn-exitus btn-exitus-ghost" @click="fecharModalEdit()">Cancelar</button>
+            <button class="btn-exitus btn-exitus-primary" @click="salvarEdit()" :disabled="salvandoEdit">
+                <i class="fas" :class="salvandoEdit ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+                <span x-text="salvandoEdit ? 'Salvando...' : 'Salvar'"></span>
+            </button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block page_scripts %}
@@ -163,6 +209,9 @@ function pageDataExtend() {
         filtroDataFim: '',
         ordenarPor: 'data_transacao',
         ordenarDir: 'desc',
+        showModalEdit: false,
+        salvandoEdit: false,
+        formEdit: {},
 
         async loadData() {
             let url = '/api/transacoes?per_page=' + this.perPage + '&page=' + this.currentPage;
@@ -249,6 +298,66 @@ function pageDataExtend() {
                 await this.loadData();
             } finally {
                 this.loading = false;
+            }
+        },
+
+        editarTransacao(trx) {
+            this.formEdit = {
+                id: trx.id,
+                data_transacao: (trx.data_transacao || '').substring(0, 10),
+                tipo: trx.tipo,
+                quantidade: trx.quantidade,
+                preco_unitario: trx.preco_unitario,
+                custos_totais: trx.custos_totais
+            };
+            this.showModalEdit = true;
+        },
+
+        fecharModalEdit() {
+            this.showModalEdit = false;
+            this.formEdit = {};
+        },
+
+        async salvarEdit() {
+            this.salvandoEdit = true;
+            try {
+                const payload = {
+                    data_transacao: this.formEdit.data_transacao,
+                    tipo: this.formEdit.tipo,
+                    quantidade: Number(this.formEdit.quantidade),
+                    preco_unitario: Number(this.formEdit.preco_unitario),
+                    custos_totais: Number(this.formEdit.custos_totais) || 0
+                };
+                const res = await this.apiFetch('/api/transacoes/' + this.formEdit.id, {
+                    method: 'PUT',
+                    body: JSON.stringify(payload)
+                });
+                const idx = this.transacoes.findIndex(t => t.id === this.formEdit.id);
+                if (idx !== -1) {
+                    this.transacoes[idx] = res?.data || this.transacoes[idx];
+                }
+                this.loadData();
+                this.fecharModalEdit();
+            } catch (e) {
+                console.error('Erro ao salvar transação:', e);
+                alert('Erro ao salvar transação.');
+            } finally {
+                this.salvandoEdit = false;
+            }
+        },
+
+        async excluirTransacao(trx) {
+            if (!confirm('Tem certeza que deseja excluir esta transação?')) return;
+            trx.excluindo = true;
+            try {
+                await this.apiFetch('/api/transacoes/' + trx.id, { method: 'DELETE' });
+                this.transacoes = this.transacoes.filter(t => t.id !== trx.id);
+                this.loadData();
+            } catch (e) {
+                console.error('Erro ao excluir transação:', e);
+                alert('Erro ao excluir transação.');
+            } finally {
+                trx.excluindo = false;
             }
         }
     };
