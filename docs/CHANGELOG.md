@@ -8,6 +8,21 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — FEAT-006: Exportação CSV real (23/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/routes/relatorios.py`: download direto via HTTP headers; parâmetro preview para comportamento antigo; nova rota /exportar
+- `frontend/app/templates/relatorios/exportar.html`: nova página de configuração moderna com Alpine.js e exitus-components.css
+
+**Problemas resolvidos:** Exportação CSV renderizava tabela HTML em vez de download direto; experiência de usuário inconsistente
+
+**Como funciona:** 
+- `/relatorios/exportar`: nova página de configuração com preview automático
+- `/relatorios/exportar/csv`: download direto via headers HTTP (Content-Disposition: attachment)
+- `/relatorios/exportar/csv?preview=true`: comportamento antigo (tabela HTML)
+
+---
+
 ### Fix — FEAT-005: Template venda.html legado (23/06/2026)
 
 **Arquivos alterados:**

@@ -44,9 +44,8 @@ def ir_completo():
 @bp.route('/exportar', methods=['GET'])
 @login_required
 def exportar():
-    """Exportação multi-formato (CSV/Excel/PDF) via API backend — Alpine.js client-side"""
-    return render_template('relatorios/exportar_v2.html')
-
+    """Página de configuração para exportação de dados"""
+    return render_template('relatorios/exportar.html')
 
 @bp.route('/exportar/csv', methods=['GET'])
 @login_required
@@ -58,6 +57,7 @@ def exportar_csv():
     tipo = request.args.get('tipo', 'transacoes')
     data_inicio = request.args.get('data_inicio', '')
     data_fim = request.args.get('data_fim', '')
+    preview = request.args.get('preview', 'false') == 'true'
 
     dados = []
     colunas = []
@@ -111,7 +111,59 @@ def exportar_csv():
     except Exception as e:
         erro = str(e)
 
-    return render_template('relatorios/exportar_csv.html',
-                           dados=dados, colunas=colunas,
-                           tipo=tipo, data_inicio=data_inicio,
-                           data_fim=data_fim, erro=erro)
+    # Se preview=True, renderiza página HTML (comportamento antigo)
+    if preview:
+        return render_template('relatorios/exportar_csv.html',
+                               dados=dados, colunas=colunas,
+                               tipo=tipo, data_inicio=data_inicio,
+                               data_fim=data_fim, erro=erro)
+
+    # Download direto do CSV (novo comportamento)
+    if erro:
+        return render_template('relatorios/exportar_csv.html',
+                               dados=[], colunas=[],
+                               tipo=tipo, data_inicio=data_inicio,
+                               data_fim=data_fim, erro=erro)
+
+    if not dados:
+        return render_template('relatorios/exportar_csv.html',
+                               dados=[], colunas=[],
+                               tipo=tipo, data_inicio=data_inicio,
+                               data_fim=data_fim, erro="Nenhum dado encontrado para exportação")
+
+    # Gerar CSV
+    csv_lines = []
+    csv_lines.append(','.join(colunas))
+    
+    for row in dados:
+        values = []
+        for col in colunas:
+            value = row.get(col, '')
+            if value is None:
+                value = ''
+            else:
+                value = str(value)
+            # Escapar aspas e adicionar aspas se necessário
+            if ',' in value or '"' in value or '\n' in value:
+                value = '"' + value.replace('"', '""') + '"'
+            values.append(value)
+        csv_lines.append(','.join(values))
+    
+    csv_content = '\n'.join(csv_lines)
+    
+    # Gerar nome do arquivo
+    data_str = f"_{data_inicio}_to_{data_fim}" if data_inicio and data_fim else ""
+    filename = f"exitus_{tipo}{data_str}.csv"
+    
+    # Criar resposta HTTP com download
+    from flask import Response
+    response = Response(
+        csv_content,
+        mimetype='text/csv; charset=utf-8',
+        headers={
+            'Content-Disposition': f'attachment; filename="{filename}"',
+            'Content-Type': 'text/csv; charset=utf-8'
+        }
+    )
+    
+    return response

@@ -5,6 +5,7 @@
 > **Versão:** v0.9.23
 
 ### 🔧 Últimas correções (23/06/2026)
+- **FEAT-006:** Exportação CSV real implementada — download direto via HTTP headers; nova página /exportar com preview automático; compatibilidade mantida com ?preview=true
 - **FEAT-005:** Template venda.html legado resolvido — suporte a ?venda=true em operacoes_v2.html; rota /venda redireciona mantendo compatibilidade; modo venda inicializa automaticamente com posições carregadas
 - **EXITUS-DB-AUDIT-001:** Auditoria completa concluída — 30 tabelas validadas, seeds corrigidos, 39 arquivos documentação analisados; dados E2E carregados (3 usuários, 7 ativos, 4 transações)
 - **EXITUS-PERFIL-001:** FEAT-004 resolvido — campo `meta_patrimonio` adicionado ao modelo Usuario; dashboard exibe meta dinâmica; perfil permite edição; API GET/PUT `/api/auth/me` funcionando

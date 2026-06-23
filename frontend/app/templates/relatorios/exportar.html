@@ -1,0 +1,267 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Exportar Dados{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Download dos seus dados em formato CSV</p>{% endblock %}
+
+{% block page_actions %}
+<a href="/relatorios/ir" class="btn-exitus btn-exitus-ghost"><i class="fas fa-file-invoice"></i> Relatório IR</a>
+{% endblock %}
+
+{% block page_content %}
+
+<div class="section-box" x-data="exportarDados()">
+    <div class="section-box-title"><i class="fas fa-download"></i> Exportar Dados</div>
+    
+    <div class="mb-6">
+        <p style="font-size:0.875rem; color:var(--exitus-text-muted); margin-bottom:1.5rem;">
+            Selecione o tipo de dado que deseja exportar. O download começará automaticamente.
+        </p>
+        
+        <!-- Tipos de dados -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <template x-for="tipo in tipos" :key="tipo.key">
+                <button type="button" 
+                        @click="selecionarTipo(tipo.key)"
+                        :class="selectedTipo === tipo.key ? 'ring-2 ring-var(--exitus-primary) bg-var(--exitus-primary-bg)' : 'hover:bg-gray-50'"
+                        class="p-4 border-2 border-gray-200 rounded-xl text-left transition-all">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i :class="tipo.icon" class="text-xl" :style="`color: ${tipo.color}`"></i>
+                        <span class="font-medium text-gray-800" x-text="tipo.label"></span>
+                    </div>
+                    <p class="text-xs text-gray-500" x-text="tipo.description"></p>
+                </button>
+            </template>
+        </div>
+        
+        <!-- Filtros de data (só para transações) -->
+        <div x-show="selectedTipo === 'transacoes'" class="border-t border-gray-200 pt-4">
+            <h3 class="font-medium text-gray-800 mb-3">Filtro de Período (Opcional)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="op-label">Data Início</label>
+                    <input type="date" x-model="dataInicio" class="op-input">
+                </div>
+                <div>
+                    <label class="op-label">Data Fim</label>
+                    <input type="date" x-model="dataFim" class="op-input">
+                </div>
+                <div class="flex items-end">
+                    <button @click="limparFiltros()" class="btn-exitus btn-exitus-ghost text-sm">
+                        <i class="fas fa-times"></i> Limpar Filtros
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botão de exportação -->
+        <div x-show="selectedTipo" class="border-t border-gray-200 pt-4 mt-6">
+            <button @click="exportarDados()" 
+                    :disabled="loading"
+                    class="btn-exitus btn-exitus-primary">
+                <i class="fas fa-download mr-2"></i>
+                <span x-show="!loading">Exportar CSV</span>
+                <span x-show="loading">Exportando...</span>
+            </button>
+        </div>
+        
+        <!-- Mensagem de erro -->
+        <div x-show="erro" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <span x-text="erro"></span>
+        </div>
+        
+        <!-- Preview dos dados -->
+        <div x-show="preview.length > 0" class="mt-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-medium text-gray-800">
+                    Preview - <span x-text="preview.length"></span> registros
+                </h3>
+                <button @click="exportarDados()" class="btn-exitus btn-exitus-success text-sm">
+                    <i class="fas fa-download mr-2"></i> Baixar CSV Completo
+                </button>
+            </div>
+            <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <template x-for="coluna in colunas" :key="coluna">
+                                <th class="text-left px-4 py-2 font-medium text-gray-700" x-text="coluna.replace('_', ' ')"></th>
+                            </template>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <template x-for="(row, index) in preview.slice(0, 10)" :key="index">
+                            <tr class="hover:bg-gray-50">
+                                <template x-for="coluna in colunas" :key="coluna">
+                                    <td class="px-4 py-2 text-gray-700" x-text="row[coluna] || ''"></td>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            <div x-show="preview.length > 10" class="text-center text-xs text-gray-500 mt-2">
+                Preview: 10 de <span x-text="preview.length"></span> registros. O CSV incluirá todos.
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        selectedTipo: '',
+        dataInicio: '',
+        dataFim: '',
+        loading: false,
+        erro: '',
+        preview: [],
+        colunas: [],
+        
+        tipos: [
+            {
+                key: 'transacoes',
+                label: 'Transações',
+                icon: 'fas fa-exchange-alt',
+                color: '#3b82f6',
+                description: 'Histórico completo de compras e vendas'
+            },
+            {
+                key: 'proventos',
+                label: 'Proventos',
+                icon: 'fas fa-coins',
+                color: '#eab308',
+                description: 'Dividendos, juros e rendimentos recebidos'
+            },
+            {
+                key: 'posicoes',
+                label: 'Posições',
+                icon: 'fas fa-briefcase',
+                color: '#8b5cf6',
+                description: 'Posições atuais com custos e quantidades'
+            }
+        ],
+        
+        selecionarTipo(tipo) {
+            this.selectedTipo = tipo;
+            this.erro = '';
+            this.preview = [];
+            this.colunas = [];
+            
+            // Carregar preview automaticamente
+            this.carregarPreview();
+        },
+        
+        limparFiltros() {
+            this.dataInicio = '';
+            this.dataFim = '';
+            if (this.selectedTipo) {
+                this.carregarPreview();
+            }
+        },
+        
+        async carregarPreview() {
+            if (!this.selectedTipo) return;
+            
+            this.loading = true;
+            this.erro = '';
+            
+            try {
+                const params = new URLSearchParams({
+                    tipo: this.selectedTipo,
+                    preview: 'true'
+                });
+                
+                if (this.dataInicio) params.append('data_inicio', this.dataInicio);
+                if (this.dataFim) params.append('data_fim', this.dataFim);
+                
+                const response = await fetch(`/relatorios/exportar/csv?${params}`);
+                const html = await response.text();
+                
+                // Extrair dados do HTML (parse simples)
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const table = doc.getElementById('csv-table');
+                
+                if (table) {
+                    const headers = Array.from(table.querySelectorAll('thead th')).map(th => 
+                        th.textContent.trim().replace(' ', '_')
+                    );
+                    const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => {
+                        const rowData = {};
+                        Array.from(tr.querySelectorAll('td')).forEach((td, index) => {
+                            rowData[headers[index]] = td.textContent.trim();
+                        });
+                        return rowData;
+                    });
+                    
+                    this.colunas = headers;
+                    this.preview = rows;
+                } else {
+                    // Verificar se há mensagem de erro
+                    const errorDiv = doc.querySelector('.bg-red-50');
+                    if (errorDiv) {
+                        this.erro = errorDiv.textContent.trim();
+                    } else {
+                        this.erro = 'Não foi possível carregar o preview';
+                    }
+                }
+            } catch (e) {
+                this.erro = 'Erro ao carregar preview: ' + e.message;
+            } finally {
+                this.loading = false;
+            }
+        },
+        
+        async exportarDados() {
+            if (!this.selectedTipo) {
+                this.erro = 'Selecione um tipo de dado para exportar';
+                return;
+            }
+            
+            this.loading = true;
+            this.erro = '';
+            
+            try {
+                const params = new URLSearchParams({
+                    tipo: this.selectedTipo
+                });
+                
+                if (this.dataInicio) params.append('data_inicio', this.dataInicio);
+                if (this.dataFim) params.append('data_fim', this.dataFim);
+                
+                const response = await fetch(`/relatorios/exportar/csv?${params}`);
+                
+                if (response.ok && response.headers.get('content-type')?.includes('csv')) {
+                    // Download do arquivo
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = response.headers.get('content-disposition')?.match(/filename="(.+)"/)?.[1] || `exitus_${this.selectedTipo}.csv`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const errorDiv = doc.querySelector('.bg-red-50');
+                    if (errorDiv) {
+                        this.erro = errorDiv.textContent.trim();
+                    } else {
+                        this.erro = 'Erro ao exportar dados';
+                    }
+                }
+            } catch (e) {
+                this.erro = 'Erro ao exportar: ' + e.message;
+            } finally {
+                this.loading = false;
+            }
+        }
+    };
+}
+</script>
+{% endblock %}
