@@ -653,10 +653,17 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
    - [ ] Validar migrations pendentes ou aplicadas
    - [ ] Identificar discrepancies
 
-6. **Documentação unificada**
-   - [ ] Atualizar `DATABASE_INVESTIGATION_GUIDE.md` com checklist completo
+6. **Auditoria de documentação DB** ← **NOVO**
+   - [ ] Mapear todos os arquivos `docs/*` que mencionam banco de dados (39 arquivos identificados)
+   - [ ] Categorizar: Críticos (4), Relevantes (4), Específicos (3), Históricos (28)
+   - [ ] Identificar conteúdo redundante ou desatualizado
+   - [ ] Proposer consolidação/remoção de arquivos obsoletos
+   - [ ] Validar que `AUDITORIA_FUNCIONAL_18_06_2026.md` é fonte única de verdade
+
+7. **Documentação unificada**
    - [ ] Integrar descobertas neste documento
    - [ ] Criar runbooks para manutenção preventiva
+   - [ ] Atualizar referências cruzadas
 
 ### 🔧 Deliverables Esperados
 
@@ -674,6 +681,8 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
    - Guia definitivo de investigação de DB
    - Runbook de operações críticas
    - Checklist de saúde do banco
+   - **Matriz de documentação DB** - status dos 39 arquivos analisados
+   - **Plano de consolidação** - arquivos a remover/consolidar
 
 ### 📋 Status de Execução
 
@@ -714,6 +723,40 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
 - **Impacto**: Evita investigações repetitivas
 
 *Novas lições serão adicionadas durante a execução da auditoria*
+
+### 📊 Matriz de Documentação DB (Pré-análise)
+
+#### 🔴 ARQUIVOS CRÍTICOS (Preservar - Fonte de Verdade)
+| Arquivo | Propósito | Status | Ação |
+|---------|-----------|--------|------|
+| `EXITUS_DB_STRUCTURE.txt` | Schema oficial do banco | ✅ Atual | Manter |
+| `SEEDS.md` | Dados de teste e usuários | ✅ Atual | Manter |
+| `ENUMS.md` | Mapeamento de ENUMs | ✅ Atual | Manter |
+| `OPERATIONS_RUNBOOK.md` | Scripts operacionais | ✅ Atual | Manter |
+
+#### 🟡 ARQUIVOS RELEVANTES (Avaliar - Consolidar se necessário)
+| Arquivo | Propósito | Status | Ação |
+|---------|-----------|--------|------|
+| `ARCHITECTURE.md` | Stack e componentes DB | ⏳ Avaliar | Consolidar referências |
+| `CODING_STANDARDS.md` | Padrões de código DB | ⏳ Avaliar | Consolidar padrões |
+| `PROJECT_STATUS.md` | Status consolidado | ✅ Atual | Manter |
+| `ROADMAP.md` | Planejamento de DB | ✅ Atual | Manter |
+
+#### 🟠 ARQUIVOS ESPECÍFICOS (Consolidar - Mover para auditoria)
+| Arquivo | Propósito | Status | Ação |
+|---------|-----------|--------|------|
+| `RLS_INVESTIGATION_NEEDED.md` | Investigação RLS | ⏳ Avaliar | Consolidar aqui |
+| `PLANO_TESTE_MULTITENANCY.md` | Testes multi-tenant | ⏳ Avaliar | Consolidar aqui |
+| `MULTICLIENTE.md` | Arquitetura multi-cliente | ⏳ Avaliar | Consolidar aqui |
+
+#### 🔵 ARQUIVOS HISTÓRICOS (Arquivar - Mover para /archive)
+| Arquivo | Propósito | Status | Ação |
+|---------|-----------|--------|------|
+| `archive/*` (28 arquivos) | Documentos antigos | 🗄️ Arquivado | Manter no archive |
+| `FRONTEND_GAP_ANALYSIS.md` | Análise de gaps | ⏳ Avaliar | Arquivar se obsoleto |
+| `PLANOS_ASSESSORAS.md` | Planos específicos | ⏳ Avaliar | Arquivar se obsoleto |
+
+**Total**: 39 arquivos → 4 críticos + 4 relevantes + 3 específicos + 28 históricos
 
 ### 📊 Critérios de Sucesso
 
