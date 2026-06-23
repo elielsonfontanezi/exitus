@@ -27,6 +27,19 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
+### Feature — EXITUS-PERFIL-001: FEAT-001 — Perfil editável e troca de senha (23/06/2026)
+
+**Arquivos alterados:**
+- `backend/app/utils/responses.py`: adicionados `bad_request()` e `conflict()`
+- `backend/app/blueprints/auth/routes.py`: endpoints `PUT /api/auth/me` e `POST /api/auth/change-password`
+- `frontend/app/templates/configuracoes/perfil.html`: formulários editáveis para nome/e-mail e troca de senha
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: FEAT-001 marcada como resolvida; contagem de features: 10
+- `docs/PROJECT_STATUS.md`: status consolidado atualizado
+
+**Features resolvidas:** FEAT-001 (perfil somente leitura)
+
+---
+
 ### Fix — EXITUS-CORRETORA-001: BUG-006 — saldo de corretoras não sincronizado (22/06/2026)
 
 **Arquivos alterados:**

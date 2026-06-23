@@ -38,6 +38,20 @@ def not_found(message="Recurso não encontrado"):
         "message": message
     }), 404
 
+def bad_request(message="Requisição inválida", errors=None):
+    """Resposta 400 com mensagem e opcionalmente lista de erros."""
+    response = {"success": False, "message": message}
+    if errors is not None:
+        response["errors"] = errors
+    return jsonify(response), 400
+
+def conflict(message="Conflito de dados"):
+    """Resposta 409."""
+    return jsonify({
+        "success": False,
+        "message": message
+    }), 409
+
 def paginated_response(items, total, page, per_page, message="Sucesso"):
     """Resposta paginada padronizada."""
     return jsonify({

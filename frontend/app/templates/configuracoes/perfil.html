@@ -18,8 +18,7 @@
         <!-- Nome -->
         <div>
             <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Nome Completo</label>
-            <div class="filter-input" style="background:#f8f9fa; padding:0.625rem 0.75rem; cursor:default;"
-                 x-text="perfil.nome_completo || '-'"></div>
+            <input type="text" class="filter-input" x-model="perfil.nome_completo" style="width:100%;">
         </div>
 
         <!-- Username -->
@@ -32,8 +31,7 @@
         <!-- Email -->
         <div>
             <label class="filter-label" style="display:block; margin-bottom:0.25rem;">E-mail</label>
-            <div class="filter-input" style="background:#f8f9fa; padding:0.625rem 0.75rem; cursor:default;"
-                 x-text="perfil.email || '-'"></div>
+            <input type="email" class="filter-input" x-model="perfil.email" style="width:100%;">
         </div>
 
         <!-- Status -->
@@ -48,6 +46,41 @@
             <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Membro Desde</label>
             <div class="filter-input" style="background:#f8f9fa; padding:0.625rem 0.75rem; cursor:default;"
                  x-text="formatDate(perfil.created_at)"></div>
+        </div>
+
+        <div class="flex items-center gap-2" style="margin-top:0.5rem;">
+            <button class="btn-exitus btn-exitus-primary" @click="salvarPerfil()" :disabled="salvando">
+                <i class="fas" :class="salvando ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+                <span x-text="salvando ? 'Salvando...' : 'Salvar Perfil'"></span>
+            </button>
+            <span class="text-sm" :class="mensagemPerfil?.tipo === 'erro' ? 'text-red-500' : 'text-green-600'" x-text="mensagemPerfil?.texto" x-show="mensagemPerfil"></span>
+        </div>
+    </div>
+</div>
+
+<div class="section-box" style="max-width: 600px; margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-lock"></i> Trocar Senha</div>
+
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Senha Atual</label>
+            <input type="password" class="filter-input" x-model="senhaAtual" style="width:100%;" autocomplete="current-password">
+        </div>
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Nova Senha</label>
+            <input type="password" class="filter-input" x-model="novaSenha" style="width:100%;" autocomplete="new-password">
+        </div>
+        <div>
+            <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Confirmar Nova Senha</label>
+            <input type="password" class="filter-input" x-model="confirmarSenha" style="width:100%;" autocomplete="new-password">
+        </div>
+
+        <div class="flex items-center gap-2" style="margin-top:0.5rem;">
+            <button class="btn-exitus btn-exitus-primary" @click="trocarSenha()" :disabled="trocandoSenha">
+                <i class="fas" :class="trocandoSenha ? 'fa-spinner fa-spin' : 'fa-key'"></i>
+                <span x-text="trocandoSenha ? 'Alterando...' : 'Trocar Senha'"></span>
+            </button>
+            <span class="text-sm" :class="mensagemSenha?.tipo === 'erro' ? 'text-red-500' : 'text-green-600'" x-text="mensagemSenha?.texto" x-show="mensagemSenha"></span>
         </div>
     </div>
 </div>
@@ -70,10 +103,67 @@
 function pageDataExtend() {
     return {
         perfil: {},
+        senhaAtual: '',
+        novaSenha: '',
+        confirmarSenha: '',
+        salvando: false,
+        trocandoSenha: false,
+        mensagemPerfil: null,
+        mensagemSenha: null,
 
         async loadData() {
             const res = await this.apiFetch('/api/auth/me');
             this.perfil = res?.data || {};
+        },
+
+        async salvarPerfil() {
+            this.salvando = true;
+            this.mensagemPerfil = null;
+            try {
+                const res = await this.apiFetch('/api/auth/me', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        nome_completo: this.perfil.nome_completo,
+                        email: this.perfil.email
+                    })
+                });
+                this.perfil = res?.data || this.perfil;
+                this.mensagemPerfil = { tipo: 'sucesso', texto: 'Perfil salvo com sucesso!' };
+            } catch (e) {
+                this.mensagemPerfil = { tipo: 'erro', texto: e.message || 'Erro ao salvar perfil' };
+            } finally {
+                this.salvando = false;
+            }
+        },
+
+        async trocarSenha() {
+            this.mensagemSenha = null;
+            if (this.novaSenha !== this.confirmarSenha) {
+                this.mensagemSenha = { tipo: 'erro', texto: 'As senhas não conferem' };
+                return;
+            }
+            if (this.novaSenha.length < 8) {
+                this.mensagemSenha = { tipo: 'erro', texto: 'Nova senha deve ter pelo menos 8 caracteres' };
+                return;
+            }
+            this.trocandoSenha = true;
+            try {
+                await this.apiFetch('/api/auth/change-password', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        old_password: this.senhaAtual,
+                        new_password: this.novaSenha
+                    })
+                });
+                this.senhaAtual = '';
+                this.novaSenha = '';
+                this.confirmarSenha = '';
+                this.mensagemSenha = { tipo: 'sucesso', texto: 'Senha alterada com sucesso!' };
+            } catch (e) {
+                this.mensagemSenha = { tipo: 'erro', texto: e.message || 'Erro ao alterar senha' };
+            } finally {
+                this.trocandoSenha = false;
+            }
         }
     };
 }

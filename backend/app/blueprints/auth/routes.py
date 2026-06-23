@@ -8,8 +8,10 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from marshmallow import ValidationError
 
 from app.services.auth_service import AuthService
+from app.services.usuario_service import UsuarioService
 from app.schemas.auth_schema import LoginSchema, TokenResponseSchema, UserMeSchema
-from app.utils.responses import success, error, unauthorized
+from app.schemas.usuario_schema import UsuarioUpdateSchema, ChangePasswordSchema
+from app.utils.responses import success, error, unauthorized, bad_request, conflict
 from app.utils.decorators import admin_required
 from app.models import Usuario
 from app.database import db
@@ -90,6 +92,63 @@ def me():
         return unauthorized("Usuário não encontrado")
     
     return success(UserMeSchema().dump(user), "Dados do usuário")
+
+
+@bp.route('/me', methods=['PUT'])
+@jwt_required()
+def update_me():
+    """Atualiza dados do usuário autenticado (nome e email)."""
+    identity = get_jwt_identity()
+    user = db.session.get(Usuario, identity)
+    if not user:
+        return unauthorized("Usuário não encontrado")
+    
+    data = request.get_json()
+    if not data:
+        return bad_request("Body da requisição é obrigatório")
+    
+    try:
+        validated = UsuarioUpdateSchema().load(data)
+    except ValidationError as e:
+        return bad_request("Dados inválidos", e.messages)
+    
+    # Filtrar apenas campos permitidos para o próprio perfil
+    allowed = {k: v for k, v in validated.items() if k in ('email', 'nome_completo')}
+    if not allowed:
+        return bad_request("Nenhum campo permitido para atualização")
+    
+    try:
+        updated = UsuarioService.update(user.id, allowed, user)
+        return success(UserMeSchema().dump(updated), "Perfil atualizado com sucesso")
+    except ValueError as e:
+        return bad_request(str(e))
+    except Exception as e:
+        return error(f"Erro ao atualizar perfil: {str(e)}", 500)
+
+
+@bp.route('/change-password', methods=['POST'])
+@jwt_required()
+def change_password():
+    """Troca senha do usuário autenticado."""
+    identity = get_jwt_identity()
+    user = db.session.get(Usuario, identity)
+    if not user:
+        return unauthorized("Usuário não encontrado")
+    
+    data = request.get_json()
+    if not data:
+        return bad_request("Body da requisição é obrigatório")
+    
+    try:
+        validated = ChangePasswordSchema().load(data)
+    except ValidationError as e:
+        return bad_request("Dados inválidos", e.messages)
+    
+    try:
+        UsuarioService.change_password(user.id, validated['old_password'], validated['new_password'])
+        return success(None, "Senha alterada com sucesso")
+    except Exception as e:
+        return error(f"Erro ao alterar senha: {str(e)}", 500)
 
 
 @bp.route('/me/admin', methods=['GET'])
