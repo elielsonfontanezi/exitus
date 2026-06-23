@@ -13,15 +13,14 @@ e este projeto adere semanticamente à versão v0.8.0.
 **Arquivos alterados:**
 - `backend/app/models/usuario.py`: campo `meta_patrimonio` adicionado com default '500000.00' e NOT NULL
 - `docs/EXITUS_DB_STRUCTURE.txt`: schema atualizado com nova coluna na tabela usuario
-- `docs/DATABASE_INVESTIGATION_GUIDE.md`: guia completo para investigação de database criado
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: registro completo da investigação e implementação
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: plano completo de auditoria de database criado + registro da investigação e implementação
 - `frontend/app/templates/dashboard/index_v2.html`: já exibia meta dinâmica via API `/api/auth/me`
 - `frontend/app/templates/configuracoes/perfil.html`: campo de edição adicionado; função `salvarPerfil()` atualizada para incluir `meta_patrimonio`
 - `backend/test_meta_patrimonio.py`: script de teste temporário (removido após validação)
 
 **Features resolvidas:** FEAT-004 (meta de patrimônio hardcoded R$ 500k)
 **Testes:** API GET/PUT `/api/auth/me` funcionando com campo `meta_patrimonio`; frontend dashboard e perfil operacionais
-**Lições aprendidas:** L-DB-001 a L-DB-004 documentadas em DATABASE_INVESTIGATION_GUIDE.md
+**Lições aprendidas:** L-DB-001 a L-DB-004 documentadas em AUDITORIA_FUNCIONAL_18_06_2026.md
 
 ---
 

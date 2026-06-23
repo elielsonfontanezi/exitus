@@ -539,37 +539,14 @@
 
 ## Backlog de Correções
 
-> Consolidado ao final da auditoria. Ordenado por prioridade. Corrigir após mapear todas as 35 telas.
+> Todos os bugs críticos e importantes foram resolvidos.  
+> Nenhum bug pendente no momento - apenas features a implementar (FEAT-005 a FEAT-049).
 
 ### 🔴 Críticos (bloqueiam uso)
-
-| ID | Problema | Tela(s) | Causa raiz identificada |
-|----|----------|---------|------------------------|
-| ~~BUG-001~~ | ~~**Token não salvo no localStorage após login Flask**~~ — **RESOLVIDO em EXITUS-LOGIN-001**: token mock hardcoded removido de `auth.js`; login já era AJAX e chamava `window.auth.saveToken()` corretamente. Causa real era o fallback com token expirado mascarando o fluxo | — todas as telas `base_interna.html` usam `localStorage.getItem('access_token')` mas o login Flask salva apenas na sessão do servidor. Alpine.js recebe `null` → API retorna 401 → `loading` trava → tela parece "sem resposta" | 3, 4, 5, 6, 7, 8, 9–35 | `auth.py` route usa form POST → Flask session. `auth.js` `localStorage.setItem` só é chamado via AJAX. Fluxos não sincronizados. **Fix:** no `auth.py` após login bem-sucedido, passar o token para o template e injetá-lo via `<script>localStorage.setItem('access_token', '...')</script>` |
-| ~~BUG-002~~ | ~~**Toggle Compra/Venda: getters `isCompra`/`isVenda` invertidos após merge**~~ | — | **RESOLVIDO em EXITUS-OPERACOES-001**: getters substituídos por propriedades reativas simples em `operacoes_v2.html`. Spread `{ ...base, ...pageDataExtend() }` não preserva getters JavaScript — convertido para `isCompra: true, isVenda: false` atualizados em `toggleModo()` |
-| ~~BUG-003~~ | ~~**Import B3 não exibe registros**~~ | — | **FALSO POSITIVO** — import é idempotente por design; com dados novos retorna Transações=2. Registrado como **FEAT-009** (listagem dos importados) e **BUG-020** (classificação automática incorreta de ativos) |
+*Nenhum bug crítico pendente*
 
 ### 🟡 Importantes (degradam experiência)
-
-| ID | Problema | Tela(s) | Causa raiz identificada |
-|----|----------|---------|------------------------|
-| ~~BUG-004~~ | ~~**Filtro por data no Histórico filtra client-side** — só filtra as 50 transações da página atual, não todas~~ | — | **RESOLVIDO em EXITUS-HISTORICO-001**: `operacoes/historico.html` agora envia `data_inicio` e `data_fim` para `/api/transacoes` via `loadData()` ao alterar os campos de data. Backend aplica filtro no banco e retorna apenas transações do período |
-| ~~BUG-005~~ | ~~**CDI e Ibovespa hardcoded** — `11.75%` e `8.32%` fixos no template~~ | — | **RESOLVIDO em EXITUS-DASHBOARD-001**: valores movidos para `frontend/app/config.py` (`CDI_ANUAL`, `IBOVESPA_ANUAL`) e injetados no template `dashboard/index_v2.html` via `dashboard.py`. Atualização manual por variável de ambiente. **Feature futura:** endpoint dinâmico `/api/indicadores` (Opção B) registrado como FEAT-010 |
-| ~~BUG-006~~ | ~~**Saldo de corretoras sempre R$ 0,00**~~ | — | **RESOLVIDO em EXITUS-CORRETORA-001**: adicionado `POST /api/corretoras/<id>/sincronizar-saldo` que recalcula `saldo_atual` a partir de movimentações de caixa (DEPOSITO, CREDITO_PROVENTO, TRANSFERENCIA_RECEBIDA aumentam; SAQUE, PAGAMENTO_TAXA, PAGAMENTO_IMPOSTO, TRANSFERENCIA_ENVIADA diminuem). Frontend `configuracoes/corretoras.html` exibe botão "Sincronizar" por corretora. **Feature futura:** saldo dinâmico automático (Opção B) registrada como FEAT-011 |
-| ~~BUG-007~~ | ~~**Link "Esqueceu a senha?"** retorna 404~~ | — | **RESOLVIDO em EXITUS-LOGIN-001** — link removido do template (funcionalidade não implementada) | | 1 | Rota `/auth/forgot-password` não implementada. **Fix:** implementar rota ou remover link |
-| ~~BUG-008~~ | ~~**Link "Ver Ativo" retorna 404**~~ — **RESOLVIDO na análise**: rota `/dashboard/ativo/<ticker>` existe em `dashboard.py` linha 913 | 8, 9 | Falso positivo — rota implementada |
-| ~~BUG-009~~ | ~~**`API_BASE` hardcoded como hostname Docker** em `fiscal.py` linha 9: `http://exitus-backend:5000/api`~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: arquivo `fiscal.py` não existe mais em `app/routes/` e a string `exitus-backend:5000` não aparece no backend. Rotas fiscais atuais (`fiscal.py`) já usam `Config.BACKEND_API_URL` |
-| ~~BUG-010~~ | ~~**Tela DIRPF: `dados` e `erro` não passados ao template**~~ | — | **RESOLVIDO em EXITUS-FISCAL-001**: `frontend/app/routes/fiscal.py` agora passa `dados`, `erro` e `ano` para `declaracao_v2.html`; template exibe mensagem de erro e inicializa estado Alpine com dados do servidor, evitando tela vazia enquanto `loadData()` não executa |
-| ~~BUG-011~~ | ~~**URL da Tela 34 (Estratégia/Planos) incorreta**~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: blueprint `planos` registrado em `/planos-compra`, menu aponta para `/dashboard/planos-compra`, e existe redirect `/planos-compra/*` → `/planos-compra/`. Nenhum link `/estrategia/planos` encontrado no frontend atual |
-| ~~BUG-012~~ | ~~**Rotas `/proventos/recebidos` e `/proventos/projetados`** redirecionam para `dashboard.proventos_calendario`~~ | — | **FALSO POSITIVO** — revalidado 22/06/2026: `dashboard.proventos_calendario` existe em `dashboard.py` linha 956 e redireciona para `proventos.calendario`. Rotas `/proventos/recebidos` e `/proventos/projetados` funcionam via redirect |
-| ~~BUG-013~~ | ~~**Filtro de data em Movimentações pisca ao digitar o ano**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `movimentacoes.html` usa `@change="carregarComFiltro()"` nos campos de data, não `@input`. Chamadas à API só ocorrem ao confirmar a data |
-| ~~BUG-014~~ | ~~**Busca por ticker no Catálogo de Ativos não funciona**~~ | — | **RESOLVIDO em EXITUS-ATIVOS-003**: `frontend/app/templates/ativos/lista_v2.html` alterado para enviar `search=${this.search}` ao invés de `ticker`; backend `/api/ativos` aplica busca parcial em ticker e nome via `?search=` |
-| ~~BUG-015~~ | ~~**Tela de Detalhe do Ativo demora e nem sempre exibe dados**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `ativo_detalhes_v2.html` já carrega cotação, buy-score, margem e eventos em paralelo via `Promise.allSettled`. Estado vazio é tratado com `N/D` quando dados não existem |
-| ~~BUG-019~~ | ~~**Botão "Comparar" no Comparador de Ativos não aciona nada**~~ | — | **RESOLVIDO** — revalidado 22/06/2026: `comparador_v2.html` implementa `comparar()` que consome `/api/ativos` e `/api/cotacoes/<ticker>` para cada ticker selecionado. Não depende de endpoint `/api/ativos/comparar` |
-| ~~BUG-018~~ | ~~**Rota `/analises/rentabilidade` legacy retorna NOT FOUND**~~ | — | **RESOLVIDO em EXITUS-ANALISES-001**: redirect adicionado em `analises.py`; código morto (template inexistente `rentabilidade.html`) removido |
-| ~~BUG-017~~ | ~~**Busca por ticker sem autocomplete em Buy Signals** — funciona se digitado exato, sem sugestões~~ | — | **RESOLVIDO em EXITUS-BUY-SIGNALS-001**: `buy_signals_v2.html` agora usa `<datalist>` populado via `GET /api/ativos?search=` com debounce de 300ms; busca parcial em ticker/nome retorna até 10 sugestões |
-| ~~BUG-020~~ | ~~**Import B3: classificação automática de ativo incorreta**~~ — **RESOLVIDO em EXITUS-ATIVOS-002**: `_obter_ou_criar_ativo()` agora usa classificador multi-camadas (DB → cache seed/manual → API externa → heurística → fallback `OUTRO`) com nível de confiança e fonte. ETFs BR (BOVA11, SMAL11) são classificados como ETF. Ativos internacionais (AAPL, MSFT) recebem mercado US. Confiança `BAIXA` vira `OUTRO` para revisão manual. | 5 |
-| ~~BUG-016~~ | ~~**Tela Eventos Corporativos inacessível**~~ | — | **FALSO POSITIVO** — revalidado 18/06/2026 com token válido: `/ativos/eventos-corporativos` carrega corretamente (KPIs + filtros). Flask prioriza rota estática sobre `/<ticker>` no mesmo blueprint. Bug original era consequência do BUG-001 (token inválido) |
+*Nenhum bug importante pendente*
 
 ### 🟡 Pendências de funcionalidade (features ausentes)
 
@@ -578,7 +555,7 @@
 | ~~FEAT-001~~ | ~~Perfil somente leitura — sem editar nome/email nem trocar senha~~ | — | **RESOLVIDA em EXITUS-PERFIL-001**: backend `PUT /api/auth/me` e `POST /api/auth/change-password`; frontend `configuracoes/perfil.html` agora permite editar nome, e-mail e trocar senha |
 | ~~FEAT-002~~ | ~~Corretoras sem CRUD — sem criar, editar ou excluir corretora~~ | — | **RESOLVIDA em EXITUS-CORRETORA-002**: frontend `configuracoes/corretoras.html` agora oferece botões Nova/Editar/Excluir com modal de formulário; backend já possuía endpoints POST/PUT/DELETE `/api/corretoras/*` |
 | ~~FEAT-003~~ | ~~Transações sem editar/excluir após registro~~ | — | **RESOLVIDA em EXITUS-TRANSACOES-003**: tela `/operacoes/historico.html` agora oferece botões Editar/Excluir no menu de ações; modal de edição para data, tipo, quantidade, preço e custos; backend endpoints PUT/DELETE `/api/transacoes/<id>` consumidos |
-| FEAT-004 | Meta de patrimônio hardcoded (R$ 500k) — não configurável | 2 |
+| ~~FEAT-004~~ | ~~Meta de patrimônio hardcoded (R$ 500k) — não configurável~~ | 2 | **RESOLVIDA em EXITUS-PERFIL-001**: campo `meta_patrimonio` adicionado ao modelo Usuario; dashboard exibe meta dinâmica via API `/api/auth/me`; perfil permite edição; API GET/PUT `/api/auth/me` funcionando |
 | FEAT-005 | Template `venda.html` legado ainda existe como rota separada | 7 |
 | FEAT-006 | Exportação CSV renderiza tabela HTML — sem download real do arquivo | 28 |
 | FEAT-007 | Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona | 34 |
@@ -627,7 +604,137 @@
 
 ---
 
+## 🔍 AUDITORIA DO BANCO DE DADOS - PLANO COMPLETO (23/06/2026)
+
+### Contexto e Justificativa
+
+Durante implementação da FEAT-004 (Meta de Patrimônio Configurável), foram identificados múltiplos problemas no banco de dados que comprometem a estabilidade e manutenibilidade do sistema:
+
+- **Problemas de conexão**: Container `exitus-db` não estava na rede correta (`exitus-net`)
+- **ENUMs ausentes**: `tipomovimentacao` não criado antes das tabelas
+- **Schema desatualizado**: Documentação não refletia estrutura real
+- **Seeds inconsistentes**: Usuários de teste com senhas inválidas
+- **Migrations falhando**: Flask-Migrate instável, requerendo ALTER manual
+
+### 🎯 Objetivo da Auditoria
+
+Garantir um banco de dados bem desenhado, com relações corretas, seeds consistentes e usuários de teste validados para suportar desenvolvimento contínuo e features futuras.
+
+### 📊 Fases da Auditoria
+
+#### **FASE 1: INVENTÁRIO E VALIDAÇÃO ESTRUTURAL** (2-3 horas)
+
+1. **Mapeamento completo de tabelas**
+   - [ ] Listar todas as tabelas com colunas, tipos, constraints
+   - [ ] Validar chaves primárias e estrangeiras
+   - [ ] Verificar índices e performance
+
+2. **Análise de relações e integridade**
+   - [ ] Mapear diagrama ER completo
+   - [ ] Validar FKs e CASCADE rules
+   - [ ] Identificar tabelas órfãs ou relações inconsistentes
+
+#### **FASE 2: AUDITORIA DE DADOS E SEEDS** (2 horas)
+
+3. **Validação de seeds de teste**
+   - [ ] Verificar `seed_data/scenarios/` completo
+   - [ ] Validar dados em `test_full`, `test_e2e`, `test_ir`, `test_stress`
+   - [ ] Confirmar integridade referencial nos seeds
+
+4. **Auditoria de usuários de teste**
+   - [ ] Validar `e2e_user`, `e2e_admin`, `e2e_viewer`
+   - [ ] Confirmar senhas, permissões e dados associados
+   - [ ] Testar fluxos completos com cada usuário
+
+#### **FASE 3: CONSISTÊNCIA E DOCUMENTAÇÃO** (1-2 horas)
+
+5. **Reconciliação schema vs código**
+   - [ ] Comparar `EXITUS_DB_STRUCTURE.txt` com models SQLAlchemy
+   - [ ] Validar migrations pendentes ou aplicadas
+   - [ ] Identificar discrepancies
+
+6. **Documentação unificada**
+   - [ ] Atualizar `DATABASE_INVESTIGATION_GUIDE.md` com checklist completo
+   - [ ] Integrar descobertas neste documento
+   - [ ] Criar runbooks para manutenção preventiva
+
+### 🔧 Deliverables Esperados
+
+1. **Relatório de Auditoria DB**
+   - Status de cada tabela (✅/⚠️/❌)
+   - Problemas encontrados e recomendações
+   - Diagrama ER atualizado
+
+2. **Scripts de Validação**
+   - Script automatizado para verificar integridade
+   - Testes de regressão para schema
+   - Utilitários de recuperação
+
+3. **Documentação Consolidada**
+   - Guia definitivo de investigação de DB
+   - Runbook de operações críticas
+   - Checklist de saúde do banco
+
+### 📋 Status de Execução
+
+| Fase | Status | Responsável | Data Prevista |
+|------|--------|-------------|---------------|
+| FASE 1 - Estrutura | ⏳ Pendente | - | 23/06/2026 |
+| FASE 2 - Dados/Seeds | ⏳ Pendente | - | 23/06/2026 |
+| FASE 3 - Documentação | ⏳ Pendente | - | 23/06/2026 |
+
+### 🚨 Descobertas e Correções (será preenchido durante execução)
+
+#### Problemas Identificados
+*Será preenchido durante a auditoria*
+
+#### Correções Aplicadas
+*Será preenchido durante a auditoria*
+
+#### Lições Aprendidas (já documentadas)
+
+##### L-DB-001: Porta PostgreSQL
+- **Erro**: Assumir porta 5432
+- **Correto**: Sempre usar 5433 (host) → 5432 (container)
+- **Impacto**: Perda de tempo em troubleshooting de conexão
+
+##### L-DB-002: Flask-Migrate vs ALTER Direto
+- **Problema**: `flask db migrate` falha com erros de conexão
+- **Solução**: Usar ALTER TABLE direto via psql para mudanças simples
+- **Quando usar migrate**: Mudanças complexas com múltiplas tabelas
+
+##### L-DB-003: ENUMs Pré-requisitos
+- **Erro**: Esquecer de criar ENUMs antes das tabelas
+- **Solução**: Sempre verificar/criar ENUMs antes de `db.create_all()`
+- **Checklist**: Verificar pg_enum antes de criar tabelas
+
+##### L-DB-004: Documentação Sincronizada
+- **Regra**: Atualizar `EXITUS_DB_STRUCTURE.txt` SEMPRE após mudanças
+- **Comando**: `./scripts/update_db_structure.sh`
+- **Impacto**: Evita investigações repetitivas
+
+*Novas lições serão adicionadas durante a execução da auditoria*
+
+### 📊 Critérios de Sucesso
+
+- [ ] 100% das tabelas mapeadas e validadas
+- [ ] Todas as FKs funcionando corretamente
+- [ ] Seeds de teste consistentes e funcionais
+- [ ] Usuários e2e validados com fluxos completos
+- [ ] Documentação unificada e atualizada
+- [ ] Scripts de validação automatizados
+
+---
+
 ## 🔍 Database Investigation - 23/06/2026
+
+### Contexto e Impacto
+
+**Tempo de investigação**: ~2 horas  
+**Cenário**: Implementação FEAT-004 requereu adicionar coluna `meta_patrimonio` à tabela `usuario`  
+**Impacto**: Bloqueio completo do desenvolvimento; impossível testar frontend/backend  
+**Estado esperado**: `ALTER TABLE usuario ADD COLUMN meta_patrimonio VARCHAR(20) DEFAULT '500000.00' NOT NULL;` em 5 minutos  
+**Estado encontrado**: Múltiplos problemas de conexão, configuração e estrutura do banco  
 
 ### Objetivo
 Investigar dificuldades com operações de banco de dados durante implementação do FEAT-004 (Meta de Patrimônio Configurável) e criar documentação de referência para evitar perda de tempo em investigações futuras.
@@ -691,12 +798,37 @@ with app.app_context():
 cd .. && ./scripts/update_db_structure.sh
 ```
 
+### Verificação e Validação
+
+```bash
+# Verificar coluna adicionada
+podman exec -it exitus-db psql -U exitus -d exitusdb -c "\d usuario"
+
+# Testar conexão Flask
+cd backend && python -c "
+from app import create_app
+app = create_app()
+with app.app_context():
+    from app.models.usuario import Usuario
+    u = Usuario.query.first()
+    print(f'✅ Conexão OK - Primeiro usuário: {u.username if u else \"Nenhum\"}')
+    print(f'✅ Meta patrimônio: {u.meta_patrimonio if u else \"N/A\"}')
+"
+
+# Validar API
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"e2e_user","password":"e2e_senha_123"}' \
+  | jq '.data.user.meta_patrimonio'
+```
+
 ### Resultados
 
 - ✅ Coluna `meta_patrimonio` adicionada à tabela `usuario`
 - ✅ Database recriado com schema completo
 - ✅ Documentação `EXITUS_DB_STRUCTURE.txt` atualizada
 - ✅ Aplicação Flask conectando normalmente
+- ✅ API `/api/auth/me` retornando `meta_patrimonio` corretamente
 
 ### Lições Aprendidas
 
@@ -872,7 +1004,7 @@ cd .. && ./scripts/update_db_structure.sh
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
 | 🟡 Importante | 0 — todos os bugs importantes foram resolvidos ou reclassificados |
-| ⬛ Feature ausente | 46 (FEAT-004 a FEAT-049) |
+| ⬛ Feature ausente | 45 (FEAT-005 a FEAT-049) |
 
 ### Impacto do BUG-001
 

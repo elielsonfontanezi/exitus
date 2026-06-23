@@ -6,7 +6,7 @@
 
 ### 🔧 Últimas correções (23/06/2026)
 - **EXITUS-PERFIL-001:** FEAT-004 resolvido — campo `meta_patrimonio` adicionado ao modelo Usuario; dashboard exibe meta dinâmica; perfil permite edição; API GET/PUT `/api/auth/me` funcionando
-- **Database Investigation:** Guia completo criado (`DATABASE_INVESTIGATION_GUIDE.md`) para evitar perda de tempo em investigações futuras; lições L-DB-001 a L-DB-004 documentadas
+- **Database Investigation:** Plano completo de auditoria criado em `AUDITORIA_FUNCIONAL_18_06_2026.md`; lições L-DB-001 a L-DB-004 documentadas
 - **EXITUS-ATIVOS-002:** BUG-020 resolvido — classificador multi-camadas (DB → cache seed/manual → API externa → heurística → fallback `OUTRO`) com níveis de confiança e fonte; migration `ativo_classificacao_cache` aplicada com sucesso
 - **EXITUS-ANALISES-001:** BUG-018 resolvido + BUG-003 falso positivo (import idempotente) — **0 telas 🔴 QUEBRADAS**
 - **EXITUS-ATIVOS-001:** BUG-016 falso positivo; link "Eventos Corporativos" adicionado ao menu — tela funcionava sem link
