@@ -576,7 +576,7 @@
 | ID | Problema | Tela(s) |
 |----|----------|---------|
 | ~~FEAT-001~~ | ~~Perfil somente leitura — sem editar nome/email nem trocar senha~~ | — | **RESOLVIDA em EXITUS-PERFIL-001**: backend `PUT /api/auth/me` e `POST /api/auth/change-password`; frontend `configuracoes/perfil.html` agora permite editar nome, e-mail e trocar senha |
-| FEAT-002 | Corretoras sem CRUD — sem criar, editar ou excluir corretora | 4 |
+| ~~FEAT-002~~ | ~~Corretoras sem CRUD — sem criar, editar ou excluir corretora~~ | — | **RESOLVIDA em EXITUS-CORRETORA-002**: frontend `configuracoes/corretoras.html` agora oferece botões Nova/Editar/Excluir com modal de formulário; backend já possuía endpoints POST/PUT/DELETE `/api/corretoras/*` |
 | FEAT-003 | Transações sem editar/excluir após registro | 6, 7, 8 |
 | FEAT-004 | Meta de patrimônio hardcoded (R$ 500k) — não configurável | 2 |
 | FEAT-005 | Template `venda.html` legado ainda existe como rota separada | 7 |
@@ -731,7 +731,7 @@
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
 | 🟡 Importante | 0 — todos os bugs importantes foram resolvidos ou reclassificados |
-| ⬛ Feature ausente | 10 (FEAT-002 a FEAT-011) |
+| ⬛ Feature ausente | 9 (FEAT-003 a FEAT-011) |
 
 ### Impacto do BUG-001
 

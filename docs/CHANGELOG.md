@@ -27,6 +27,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ---
 
+### Feature — EXITUS-CORRETORA-002: FEAT-002 — CRUD de corretoras (23/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/templates/configuracoes/corretoras.html`: botões Nova/Editar/Excluir; modal de formulário com validações; funções Alpine.js para POST/PUT/DELETE
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: FEAT-002 marcada como resolvida; contagem de features: 9
+- `docs/PROJECT_STATUS.md`: status consolidado atualizado
+
+**Features resolvidas:** FEAT-002 (CRUD de corretoras)
+**Observação:** Backend já possuía endpoints `/api/corretoras/*` (GET/POST/PUT/DELETE)
+
+---
+
 ### Feature — EXITUS-PERFIL-001: FEAT-001 — Perfil editável e troca de senha (23/06/2026)
 
 **Arquivos alterados:**
