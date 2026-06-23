@@ -333,9 +333,13 @@
 {% block page_scripts %}
 <script>
 function pageDataExtend() {
+    // Verificar se parâmetro ?venda=true está na URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const startInVendaMode = urlParams.get('venda') === 'true';
+    
     return {
         corretoras: [],
-        modoOperacao: 'compra',
+        modoOperacao: startInVendaMode ? 'venda' : 'compra',
         tiposAtivo: [
             { key: 'ACAO',       label: 'Ação BR',    emoji: '🇧🇷', tipos: ['ACAO','UNIT'],                               fracao: false, moeda: 'R$', step: '1',          currency: 'BRL' },
             { key: 'FII',        label: 'FII',        emoji: '🏢', tipos: ['FII'],                                       fracao: false, moeda: 'R$', step: '1',          currency: 'BRL' },
@@ -361,7 +365,7 @@ function pageDataExtend() {
         showPosicoes: false,
         searchPosicao: '',
         form: {
-            tipo: 'compra',
+            tipo: startInVendaMode ? 'venda' : 'compra',
             ativo_id: '',
             corretora_id: '',
             data_transacao_display: new Date().toLocaleDateString('pt-BR'),
@@ -377,8 +381,8 @@ function pageDataExtend() {
 
         get tipoAtualConfig() { return this.tiposAtivo.find(t => t.key === this.selectedTipo) || null; },
         get valorTotal() { return (parseFloat(this.form.quantidade) || 0) * (parseFloat(this.form.preco_unitario) || 0); },
-        isCompra: true,
-        isVenda: false,
+        isCompra: !startInVendaMode,
+        isVenda: startInVendaMode,
         get posicoesPorTipo() {
             if (!this.selectedTipo) return this.posicoes;
             const cfg = this.tipoAtualConfig;
@@ -398,6 +402,11 @@ function pageDataExtend() {
         async loadData() {
             const res = await this.apiFetch('/api/corretoras?per_page=100');
             this.corretoras = res?.data?.corretoras || res?.corretoras || [];
+            
+            // Se iniciou em modo venda, carregar posições automaticamente
+            if (this.isVenda) {
+                await this.fetchPosicoes();
+            }
         },
 
         toggleModo(modo) {

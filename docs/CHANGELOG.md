@@ -8,6 +8,21 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — FEAT-005: Template venda.html legado (23/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/templates/operacoes/operacoes_v2.html`: suporte a parâmetro ?venda=true; inicialização automática em modo venda; carregamento automático de posições
+- `frontend/app/routes/operacoes.py`: rota /venda redireciona para /operacoes?venda=true
+
+**Problemas resolvidos:** Template venda.html legado usando base.html; rota duplicada; experiência de usuário inconsistente
+
+**Como funciona:** 
+- Acessar /operacoes?venda=true inicia automaticamente em modo venda
+- Rota /venda redireciona mantendo compatibilidade
+- Posições carregadas automaticamente em modo venda
+
+---
+
 ### Fix — EXITUS-DB-AUDIT-001: Auditoria Completa do Banco de Dados (23/06/2026)
 
 **Arquivos alterados:**

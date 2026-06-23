@@ -25,7 +25,7 @@ def compra():
 @bp.route('/venda', methods=['GET', 'POST'])
 @login_required
 def venda():
-    """Página de venda de ativos"""
+    """Página de venda de ativos - redireciona para /operacoes?venda=true"""
     if request.method == 'POST':
         # Processar formulário de venda
         ativo_id = request.form.get('ativo_id')
@@ -37,35 +37,8 @@ def venda():
         flash('Operação de venda registrada com sucesso!', 'success')
         return redirect(url_for('dashboard.index'))
     
-    # Buscar posições do usuário
-    headers = get_api_headers()
-    if not headers:
-        return redirect(url_for('auth.login'))
-    
-    posicoes_response = requests.get(
-        f"{Config.BACKEND_API_URL}/api/posicoes",
-        headers=headers
-    )
-    
-    posicoes = []
-    if posicoes_response.status_code == 200:
-        posicoes = posicoes_response.json().get('data', {}).get('posicoes', [])
-    
-    # Buscar corretoras para popular select (API autenticada)
-    corretoras_response = requests.get(
-        f"{Config.BACKEND_API_URL}/api/corretoras",
-        headers=headers  # headers já renovado acima
-    )
-    
-    corretoras = []
-    if corretoras_response.status_code == 200:
-        result = corretoras_response.json()
-        # A API retorna {data: {corretoras: [...], total: n}, success: true}
-        corretoras = result.get('data', {}).get('corretoras', [])
-    
-    return render_template('operacoes/venda.html', 
-                         posicoes=posicoes, 
-                         corretoras=corretoras)
+    # Redirecionar para a página de operações com parâmetro venda=true
+    return redirect(url_for('operacoes.operacoes', venda='true'))
 
 @bp.route('/historico')
 @login_required

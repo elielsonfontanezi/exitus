@@ -556,7 +556,7 @@
 | ~~FEAT-002~~ | ~~Corretoras sem CRUD — sem criar, editar ou excluir corretora~~ | — | **RESOLVIDA em EXITUS-CORRETORA-002**: frontend `configuracoes/corretoras.html` agora oferece botões Nova/Editar/Excluir com modal de formulário; backend já possuía endpoints POST/PUT/DELETE `/api/corretoras/*` |
 | ~~FEAT-003~~ | ~~Transações sem editar/excluir após registro~~ | — | **RESOLVIDA em EXITUS-TRANSACOES-003**: tela `/operacoes/historico.html` agora oferece botões Editar/Excluir no menu de ações; modal de edição para data, tipo, quantidade, preço e custos; backend endpoints PUT/DELETE `/api/transacoes/<id>` consumidos |
 | ~~FEAT-004~~ | ~~Meta de patrimônio hardcoded (R$ 500k) — não configurável~~ | 2 | **RESOLVIDA em EXITUS-PERFIL-001**: campo `meta_patrimonio` adicionado ao modelo Usuario; dashboard exibe meta dinâmica via API `/api/auth/me`; perfil permite edição; API GET/PUT `/api/auth/me` funcionando |
-| FEAT-005 | Template `venda.html` legado ainda existe como rota separada | 7 |
+| ~~FEAT-005~~ | ~~Template `venda.html` legado ainda existe como rota separada~~ | 7 | **RESOLVIDA**: suporte a ?venda=true em operacoes_v2.html; rota /venda redireciona mantendo compatibilidade; modo venda inicializa automaticamente com posições carregadas |
 | FEAT-006 | Exportação CSV renderiza tabela HTML — sem download real do arquivo | 28 |
 | FEAT-007 | Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona | 34 |
 | FEAT-008 | Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível | 14 |
@@ -1197,7 +1197,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
 | 🟡 Importante | 0 — todos os bugs importantes foram resolvidos ou reclassificados |
-| ⬛ Feature ausente | 45 (FEAT-005 a FEAT-049) |
+| ⬛ Feature ausente | 44 (FEAT-006 a FEAT-049) |
 
 ### Impacto do BUG-001
 
