@@ -25,6 +25,13 @@
 | 🔴 QUEBRADO | 1 |
 | ⬜ NÃO TESTADO | 0 |
 
+**⚠️ ALERTA SISTÊMICO - 24/06/2026:**
+Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao`):
+- Valores corrigidos: `DEPOSITO/SAQUE` → `aporte/resgate`
+- **IMPACTO POTENCIAL:** Todas as funcionalidades que usam movimentações de caixa podem estar afetadas
+- **VERIFICAÇÃO OBRIGATÓRIA:** Frontend, APIs, relatórios, filtros, seeds e testes
+- **BUG-021** pode estar relacionado a esta mudança de ENUMs
+
 ---
 
 ## Tabela de Telas
@@ -271,6 +278,21 @@
 - 154 aportes (R$ 1.405.731,48)
 - 12 resgates (R$ 23.531,50)
 - Movimentações recentes: DARF R$ 76,00, Saques R$ 5.000,00, etc.
+
+**⚠️ IMPACTO CRÍTICO - VERIFICAÇÃO OBRIGATÓRIA:**
+Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
+- Valores em `movimentacao_caixa.tipo_movimentacao` corrigidos de `DEPOSITO/SAQUE` para `aporte/resgate`
+- ENUMS.md atualizado com L-DB-007 (documentação vs banco real)
+
+**ÁREAS QUE PODEM SER AFETADAS E PRECISAM DE VERIFICAÇÃO:**
+1. **Frontend:** Templates que usam `parseTipo()` podem estar quebrados
+2. **APIs:** Endpoints que validam ou processam `tipo_movimentacao`
+3. **Relatórios:** Geração de relatórios por tipo de movimentação
+4. **Filtros:** Componentes de filtro por tipo em todas as telas
+5. **Seed Data:** Outros cenários JSON que ainda usam valores antigos
+6. **Testes:** Testes unitários/integração que dependem dos ENUMs
+
+**AÇÃO RECOMENDADA:** Verificar todas as telas e funcionalidades que utilizam movimentações de caixa após esta atualização de ENUMs.
 
 ---
 
