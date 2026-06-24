@@ -2,8 +2,8 @@
 
 **APENAS PARA AMBIENTE DE DESENVOLVIMENTO** ⚠️
 
-> **v0.9.4** — Cenários de teste implementados (E2E, IR, Stress) + dados atualizados  
-> **Atualização:** 22/03/2026 - Adicionado histórico patrimonial ao test_full
+> **v0.9.23** — Base de teste 100% completa com Renda Fixa Brasil  
+> **Atualização:** 23/06/2026 - Adicionada Renda Fixa Brasil completa ao test_full
 
 ---
 
@@ -80,11 +80,17 @@ backend/
 
 **Conteúdo:**
 - **Usuários:** 3 (e2e_admin, e2e_user, e2e_viewer)
-- **Ativos:** 30 (10 BR + 10 US + 10 INTL)
-- **Transações:** 48 (compras, vendas, IR)
-- **Proventos:** 32 (DIVIDENDO, JCP, RENDIMENTO)
-- **Movimentações:** 15 (aportes BRL/USD, saques, DARF)
+- **Ativos:** 38 (10 BR + 10 US + 10 INTL + **8 Renda Fixa Brasil**)
+- **Transações:** 56 (48 RV + **8 RF** - compras, vendas, IR)
+- **Proventos:** 42 (32 RV + **10 RF** - DIVIDENDO, JCP, RENDIMENTO, JUROS)
+- **Movimentações:** 23 (15 gerais + **8 aportes RF específicos**)
 - **Portfolios:** 4 (Aposentadoria, Dividendos BR, Growth US)
+
+**Renda Fixa Brasil (8 ativos):**
+- 3 CDBs: Nubank 100% CDI, Inter 105% CDI, C6 Bank 107% CDI
+- 3 Tesouro: Selic 2029, IPCA+ 2035, Prefixado 2027
+- 2 Debêntures: Vale NT 7.5% a.a., Petrobras NT CDI+2%
+- Total investido RF: R$ 49.599,60
 - **Alertas:** 5
 - **Planos:** 4 compra + 3 venda
 - **Histórico Patrimonial:** 12 registros (Jan-Dez/2024)
