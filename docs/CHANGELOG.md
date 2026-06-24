@@ -8,6 +8,25 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Seeds: Renda Fixa Brasil completa ao cenário test_full (23/06/2026)
+
+**Arquivos alterados:**
+- `backend/app/seeds/seed_ativos_renda_fixa_br.py`: Corrigidos valores de enum para minúsculas
+- `backend/seed_data/scenarios/test_full.json`: Adicionados ativos, transações e proventos de RF
+
+**Novos dados de Renda Fixa Brasil:**
+- 8 ativos: 3 CDBs, 3 Tesouro Direto, 2 Debêntures
+- 8 transações de compra (total R$ 49.599,60)
+- 8 movimentações de caixa específicas para aportes RF
+- 10 proventos/juros (mensais e semestrais)
+
+**Impacto nos testes:**
+- Base de teste agora completa: 38 ativos, 56 transações, 42 proventos
+- Cenários realistas para validação de diversificação RV + RF
+- Dados para testes de performance, fiscal e relatórios completos
+
+---
+
 ### Fix — FEAT-008: Botão "Confirmar Recebimento" de provento (23/06/2026)
 
 **Arquivos verificados:**

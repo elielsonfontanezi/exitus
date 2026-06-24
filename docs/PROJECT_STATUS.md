@@ -5,6 +5,7 @@
 > **Versão:** v0.9.23
 
 ### 🔧 Últimas correções (23/06/2026)
+- **Seeds:** Renda Fixa Brasil completa ao cenário test_full — 8 ativos RF (CDBs, Tesouro, Debêntures), 8 transações (R$ 49.599,60), 8 movimentações de caixa, 10 proventos/juros; base de teste agora 100% completa: 38 ativos, 56 transações, 42 proventos
 - **FEAT-008:** Botão "Confirmar Recebimento" de provento já estava implementado — documentação atualizada; funcionalidade completa em calendario_v2.html
 - **FEAT-007:** Tela de detalhe de plano de compra implementada — modal com informações completas; botão Detalhes na tabela; carregamento via API específica
 - **FEAT-006:** Exportação CSV real implementada — download direto via HTTP headers; nova página /exportar com preview automático; compatibilidade mantida com ?preview=true
@@ -32,7 +33,7 @@
 | **Testes E2E** | 🟡 60% | v2: 127/127 ✅ Chromium (merged main 16/06) — v3 lógica negócio: 50 CTs planejados, specs criados (branch feature/testes-e2e-v3) |
 | **Auditoria Funcional** | ✅ 100% | 18/06/2026: 36 telas auditadas; 23/06/2026: 0 críticos, 0 importantes pendentes, 8 features pendentes (FEAT-005 a FEAT-012) |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
-| **Cenários de Teste** | ✅ 100% | 4 cenários predefinidos (E2E, Full, IR, Stress) + integração completa |
+| **Cenários de Teste** | ✅ 100% | test_full agora completo: 38 ativos (10 BR + 10 US + 10 BDRs + 8 RF), 56 transações, 42 proventos; dados realistas RV + RF |
 
 ---
 
