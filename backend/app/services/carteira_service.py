@@ -41,13 +41,20 @@ class CarteiraService:
             valor = Decimal(str(mov.valor))
             moeda = mov.moeda.upper()
             
-            # Entrada positiva, saída negativa
-            if mov.tipo_movimentacao in [TipoMovimentacao.DEPOSITO, TipoMovimentacao.CREDITO_PROVENTO, TipoMovimentacao.AJUSTE]:
-                multiplicador = Decimal('1')
-            else:
-                multiplicador = Decimal('-1')
+            # Ignorar transferências enviadas/recebidas entre corretoras do mesmo usuário
+            # (não alteram saldo total, apenas movem entre corretoras)
+            if mov.is_transferencia():
+                continue
             
-            valor_final = valor * multiplicador
+            # Ajuste manual: pode ser positivo ou negativo; usar sinal do impacto_saldo
+            if mov.is_ajuste():
+                valor_final = mov.impacto_saldo()
+            elif mov.is_entrada():
+                valor_final = valor
+            elif mov.is_saida():
+                valor_final = -valor
+            else:
+                valor_final = Decimal('0')
             
             # Acumular por moeda
             if moeda == 'BRL':

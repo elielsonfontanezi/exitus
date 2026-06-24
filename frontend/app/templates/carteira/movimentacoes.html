@@ -36,12 +36,16 @@
     <span class="filter-label">Filtrar:</span>
     <select class="filter-select" x-model="filtroTipo" @change="filtrar()">
         <option value="">Todos os tipos</option>
-        <option value="deposito">Depósitos</option>
-        <option value="saque">Saques</option>
         <option value="aporte">Aportes</option>
-        <option value="transferencia">Transferências</option>
-        <option value="pagamento_imposto">Pgto Imposto</option>
-        <option value="rendimento">Rendimentos</option>
+        <option value="resgate">Resgates</option>
+        <option value="transferencia_enviada">Transferências Enviadas</option>
+        <option value="transferencia_recebida">Transferências Recebidas</option>
+        <option value="credito_provento">Crédito Provento</option>
+        <option value="taxa_custodia">Taxa Custódia</option>
+        <option value="taxa_corretagem">Taxa Corretagem</option>
+        <option value="imposto">Imposto</option>
+        <option value="ajuste">Ajuste</option>
+        <option value="outro">Outro</option>
     </select>
     <input type="date" class="filter-input" x-model="filtroDataInicio" @change="carregarComFiltro()">
     <span class="filter-label">até</span>
@@ -153,9 +157,8 @@ function pageDataExtend() {
 
         parseTipo(raw) {
             if (!raw) return '';
-            // API retorna "TipoMovimentacao.DEPOSITO" — extrair parte depois do ponto
-            const parts = raw.split('.');
-            return (parts[parts.length - 1] || '').toLowerCase();
+            // API retorna string simples (ex: "aporte", "resgate")
+            return String(raw).toLowerCase();
         },
 
         filtrar() {
@@ -196,18 +199,32 @@ function pageDataExtend() {
 
         tipoLabel(tipo) {
             const map = {
-                'deposito': 'Depósito', 'saque': 'Saque',
-                'transferencia': 'Transferência', 'rendimento': 'Rendimento',
-                'pagamento_imposto': 'Pgto Imposto', 'aporte': 'Aporte'
+                'aporte': 'Aporte',
+                'resgate': 'Resgate',
+                'transferencia_enviada': 'Transf. Enviada',
+                'transferencia_recebida': 'Transf. Recebida',
+                'credito_provento': 'Crédito Provento',
+                'taxa_custodia': 'Taxa Custódia',
+                'taxa_corretagem': 'Taxa Corretagem',
+                'imposto': 'Imposto',
+                'ajuste': 'Ajuste',
+                'outro': 'Outro'
             };
             return map[tipo] || tipo || '-';
         },
 
         badgeTipo(tipo) {
             const map = {
-                'deposito': 'badge-success', 'saque': 'badge-danger',
-                'transferencia': 'badge-primary', 'rendimento': 'badge-warning',
-                'pagamento_imposto': 'badge-danger', 'aporte': 'badge-success'
+                'aporte': 'badge-success',
+                'resgate': 'badge-danger',
+                'transferencia_enviada': 'badge-warning',
+                'transferencia_recebida': 'badge-info',
+                'credito_provento': 'badge-success',
+                'taxa_custodia': 'badge-danger',
+                'taxa_corretagem': 'badge-danger',
+                'imposto': 'badge-danger',
+                'ajuste': 'badge-secondary',
+                'outro': 'badge-secondary'
             };
             return map[tipo] || 'badge-primary';
         }

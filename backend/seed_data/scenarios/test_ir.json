@@ -215,10 +215,10 @@
     {
       "usuario": "ir_test_user",
       "corretora": "CORRETORA IR TESTE",
-      "tipo": "DEPOSITO",
+      "tipo": "aporte",
       "data_movimentacao": "2024-01-05",
       "valor": 50000.00,
-      "observacoes": "Depósito para testes de IR"
+      "observacoes": "Aporte para testes de IR"
     }
   ]
 }

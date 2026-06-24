@@ -66,10 +66,10 @@ class TestBuySignalsEndpoints:
             moeda='BRL',
             preco_atual=Decimal('75.50'),
             preco_teto=Decimal('90.00'),
-            dividend_yield=Decimal('8.5'),
+            dividend_yield=Decimal('0.085'),
             p_l=Decimal('5.2'),
             p_vp=Decimal('1.8'),
-            roe=Decimal('25.0'),
+            roe=Decimal('0.25'),
             beta=Decimal('1.2')
         )
         db.session.add(ativo)
@@ -82,10 +82,10 @@ class TestBuySignalsEndpoints:
         
         resultado = data['data']
         assert resultado['ticker'] == 'VALE3'
-        assert resultado['dy'] == 8.5
+        assert resultado['dy'] == 0.085
         assert resultado['pl'] == 5.2
         assert resultado['pvp'] == 1.8
-        assert resultado['roe'] == 25.0
+        assert resultado['roe'] == 0.25
         assert resultado['buyscore'] > 0
         assert resultado['margem'] > 0
     
@@ -100,7 +100,7 @@ class TestBuySignalsEndpoints:
             moeda='BRL',
             preco_atual=Decimal('10.00'),
             preco_teto=Decimal('50.00'),  # Margem alta (80%)
-            dividend_yield=Decimal('10.0'),  # DY alto
+            dividend_yield=Decimal('0.10'),  # DY alto
             beta=Decimal('0.8')  # Beta baixo
         )
         db.session.add(ativo)
@@ -160,10 +160,10 @@ def seed_ativo_petr4(app):
         moeda='BRL',
         preco_atual=Decimal('38.50'),
         preco_teto=Decimal('45.00'),
-        dividend_yield=Decimal('12.5'),
+        dividend_yield=Decimal('0.125'),
         p_l=Decimal('4.2'),
         p_vp=Decimal('0.9'),
-        roe=Decimal('18.5'),
+        roe=Decimal('0.185'),
         beta=Decimal('1.3')
     )
     db.session.add(ativo)

@@ -214,19 +214,22 @@ nos respectivos blueprints.
 
 ---
 
-## 7. TipoMovimentacao (9 valores)
+## 7. TipoMovimentacao (10 valores)
 
 | Enum | Valor DB | Descrição |
 |------|----------|-----------|
-| `DEPOSITO` | `deposito` | Depósito na corretora |
-| `SAQUE` | `saque` | Saque da corretora |
-| `TRANSFERENCIA` | `transferencia` | Transferência entre corretoras |
-| `CREDITO_PROVENTO` | `creditoprovento` | Crédito de provento |
-| `TAXA_CORRETAGEM` | `taxacorretagem` | Taxa de corretagem |
-| `TAXA_CUSTODIA` | `taxacustodia` | Taxa de custódia |
-| `IMPOSTO` | `imposto` | Débito de imposto |
+| `APORTE` | `aporte` | Aporte/depósito na corretora |
+| `RESGATE` | `resgate` | Resgate/saque da corretora |
+| `TRANSFERENCIA_ENVIADA` | `transferencia_enviada` | Transferência para outra corretora |
+| `TRANSFERENCIA_RECEBIDA` | `transferencia_recebida` | Transferência de outra corretora |
+| `CREDITO_PROVENTO` | `credito_provento` | Crédito automático de provento |
+| `TAXA_CUSTODIA` | `taxa_custodia` | Taxa de custódia |
+| `TAXA_CORRETAGEM` | `taxa_corretagem` | Taxa de corretagem |
+| `IMPOSTO` | `imposto` | Pagamento de imposto |
 | `AJUSTE` | `ajuste` | Ajuste manual |
-| `OUTRO_MOV` | `outromov` | Outras movimentações |
+| `OUTRO` | `outro` | Outras movimentações |
+
+**Histórico de correção (24/06/2026):** Valores anteriores `DEPOSITO`/`SAQUE` foram consolidados para `APORTE`/`RESGATE` para refletir terminologia de investimentos e banco real. Modelo Python, services, frontend e seeds sincronizados.
 
 ---
 

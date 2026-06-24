@@ -5,11 +5,10 @@ Exitus - MovimentacaoCaixa Service M3.2 (Corrigido)
 
 from app.database import db
 from app.models import MovimentacaoCaixa, Corretora
+from app.models.movimentacao_caixa import TipoMovimentacao
 from app.utils.exceptions import NotFoundError
 from app.services.auditoria_service import AuditoriaService
 from app.utils.tenant import filter_by_assessora, get_current_assessora_id
-from sqlalchemy import or_
-from sqlalchemy.orm import joinedload
 from decimal import Decimal
 import logging
 from uuid import uuid4
@@ -18,17 +17,24 @@ logger = logging.getLogger(__name__)
 
 class MovimentacaoCaixaService:
     @staticmethod
-    def get_all(usuario_id, page=1, per_page=50, corretora_id=None, data_inicio=None, data_fim=None):
+    def get_all(usuario_id, page=1, per_page=50, filters=None):
         try:
+            if filters is None:
+                filters = {}
+
             query = MovimentacaoCaixa.query.filter_by(usuario_id=usuario_id)
             query = filter_by_assessora(query, MovimentacaoCaixa)
 
-            if corretora_id:
-                query = query.filter_by(corretora_id=corretora_id)
-            if data_inicio:
-                query = query.filter(MovimentacaoCaixa.data_movimentacao >= data_inicio)
-            if data_fim:
-                query = query.filter(MovimentacaoCaixa.data_movimentacao <= data_fim)
+            if filters.get('corretora_id'):
+                query = query.filter_by(corretora_id=filters['corretora_id'])
+            if filters.get('tipo_movimentacao'):
+                query = query.filter_by(tipo_movimentacao=filters['tipo_movimentacao'])
+            if filters.get('moeda'):
+                query = query.filter_by(moeda=filters['moeda'])
+            if filters.get('data_inicio'):
+                query = query.filter(MovimentacaoCaixa.data_movimentacao >= filters['data_inicio'])
+            if filters.get('data_fim'):
+                query = query.filter(MovimentacaoCaixa.data_movimentacao <= filters['data_fim'])
 
             query = query.order_by(MovimentacaoCaixa.data_movimentacao.desc())
             return query.paginate(page=page, per_page=per_page, error_out=False)
@@ -44,13 +50,18 @@ class MovimentacaoCaixaService:
             if not corretora:
                 raise NotFoundError("Corretora não encontrada")
 
+            # Normalizar tipo_movimentacao para enum
+            tipo_mov = data['tipo_movimentacao']
+            if isinstance(tipo_mov, str):
+                tipo_mov = TipoMovimentacao(tipo_mov)
+
             # Criar objeto
             nova_mov = MovimentacaoCaixa(
                 id=str(uuid4()),
                 usuario_id=usuario_id,
                 assessora_id=get_current_assessora_id(),
                 corretora_id=data['corretora_id'],
-                tipo_movimentacao=data['tipo_movimentacao'], # String ou Enum
+                tipo_movimentacao=tipo_mov,
                 valor=data['valor'],
                 data_movimentacao=data['data_movimentacao'],
                 descricao=data.get('descricao', ''),
@@ -88,14 +99,7 @@ class MovimentacaoCaixaService:
             
             saldo = Decimal('0.0')
             for m in movimentacoes:
-                # Lógica simples: Depósito/Dividendo/Venda (+) | Saque/Compra (-)
-                tipo = str(m.tipo_movimentacao).upper()
-                valor = Decimal(str(m.valor))
-                
-                if tipo in ['DEPOSITO', 'DIVIDENDO', 'JCP', 'VENDA', 'BONIFICACAO']:
-                    saldo += valor
-                elif tipo in ['SAQUE', 'COMPRA', 'TAXA']:
-                    saldo -= valor
+                saldo += m.impacto_saldo()
             
             return float(saldo)
         except Exception as e:

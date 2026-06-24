@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-06-23 22:31:20
+Gerado em: 2026-06-24 11:45:17
 ================================================================================
 
 ================================================================================
@@ -2890,7 +2890,7 @@ ENUMS DO BANCO
  tipoferiado           | nacional, bolsa, ponte, antecip, manutencao, outro
  tipofontedados        | api, scraper, manual, arquivo, outro
  tipogatilho           | preco_alvo, percentual_lucro, parcelas_semanais, parcelas_mensais, data_limite, gatilho_misto
- tipomovimentacao      | aporte, resgate, transferencia_enviada, transferencia_recebida, credito_provento
+ tipomovimentacao      | aporte, resgate, transferencia_enviada, transferencia_recebida, credito_provento, taxa_custodia, taxa_corretagem, imposto, ajuste, outro
  tipoprovento          | dividendo, jcp, rendimento, cupom, bonificacao, direito_sub, outro
  tipotransacao         | compra, venda, dividendo, jcp, aluguel, bonificacao, split, grupamento, subscricao, amortizacao
  userrole              | admin, user, readonly

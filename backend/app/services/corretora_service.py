@@ -213,8 +213,18 @@ class CorretoraService:
         ).all()
         
         saldo_calculado = Decimal('0')
-        entradas = {'deposito', 'credito_prov', 'transf_rec'}
-        saidas = {'saque', 'pagto_taxa', 'pagto_imposto', 'transf_env'}
+        entradas = {
+            TipoMovimentacao.APORTE.value,
+            TipoMovimentacao.CREDITO_PROVENTO.value,
+            TipoMovimentacao.TRANSFERENCIA_RECEBIDA.value
+        }
+        saidas = {
+            TipoMovimentacao.RESGATE.value,
+            TipoMovimentacao.TAXA_CUSTODIA.value,
+            TipoMovimentacao.TAXA_CORRETAGEM.value,
+            TipoMovimentacao.IMPOSTO.value,
+            TipoMovimentacao.TRANSFERENCIA_ENVIADA.value
+        }
         
         for mov in movimentacoes:
             tipo = mov.tipo_movimentacao

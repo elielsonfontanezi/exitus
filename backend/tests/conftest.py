@@ -156,7 +156,7 @@ def ativo_seed(app):
         mercado='BR', moeda='BRL',
         preco_atual=Decimal('38.50'),
         preco_teto=Decimal('50.00'),
-        dividend_yield=Decimal('12.5'),
+        dividend_yield=Decimal('0.125'),
         p_l=Decimal('4.2'),
         p_vp=Decimal('1.1'),
     )
@@ -299,7 +299,9 @@ def load_scenario(app, request):
         # Cenário já está carregado no banco
         pass
     """
-    scenario_name = request.param
+    # Quando usado com @pytest.mark.parametrize, request.param contém o nome do cenário.
+    # Caso contrário, carrega o cenário padrão test_e2e (comportamento esperado pelos testes não parametrizados).
+    scenario_name = getattr(request, 'param', 'test_e2e')
     
     # Caminho do cenário (suporta execução via container ou direto)
     from pathlib import Path
@@ -379,14 +381,13 @@ def load_scenario(app, request):
                     classe=ClasseAtivo[ativo_data['classe']],
                     mercado=ativo_data['mercado'],
                     moeda=ativo_data['moeda'],
-                    pais=ativo_data['pais'],
                     preco_atual=Decimal(str(ativo_data.get('preco_atual', 0))),
                     preco_teto=Decimal(str(ativo_data.get('preco_teto', 0))),
                     dividend_yield=Decimal(str(ativo_data.get('dividend_yield', 0))),
                     p_l=Decimal(str(ativo_data.get('p_l', 0))),
                     p_vp=Decimal(str(ativo_data.get('p_vp', 0))),
-                    taxa=Decimal(str(ativo_data.get('taxa', 0))) if ativo_data.get('taxa') else None,
-                    vencimento=datetime.fromisoformat(ativo_data['vencimento']).date() if ativo_data.get('vencimento') else None,
+                    taxa_cupom=Decimal(str(ativo_data.get('taxa_cupom', 0))) if ativo_data.get('taxa_cupom') else None,
+                    data_vencimento=datetime.fromisoformat(ativo_data['data_vencimento']).date() if ativo_data.get('data_vencimento') else None,
                     observacoes=ativo_data.get('observacoes'),
                     ativo=ativo_data.get('ativo', True)
                 )
@@ -403,7 +404,6 @@ def load_scenario(app, request):
                 
                 corretora = Corretora(
                     nome=corretora_data['nome'],
-                    cnpj=corretora_data['cnpj'],
                     tipo=TipoCorretora[corretora_data['tipo']],
                     pais=corretora_data['pais'],
                     usuario_id=usuario_id,
@@ -476,10 +476,23 @@ def load_scenario(app, request):
                 if not all([usuario, corretora]):
                     pytest.fail(f"Dados incompletos para movimentação: {mov_data}")
                 
+                tipo_map = {
+                    'aporte': TipoMovimentacao.APORTE,
+                    'resgate': TipoMovimentacao.RESGATE,
+                    'transferencia_enviada': TipoMovimentacao.TRANSFERENCIA_ENVIADA,
+                    'transferencia_recebida': TipoMovimentacao.TRANSFERENCIA_RECEBIDA,
+                    'credito_provento': TipoMovimentacao.CREDITO_PROVENTO,
+                    'taxa_custodia': TipoMovimentacao.TAXA_CUSTODIA,
+                    'taxa_corretagem': TipoMovimentacao.TAXA_CORRETAGEM,
+                    'imposto': TipoMovimentacao.IMPOSTO,
+                    'ajuste': TipoMovimentacao.AJUSTE,
+                    'outro': TipoMovimentacao.OUTRO
+                }
+                
                 movimentacao = MovimentacaoCaixa(
                     usuario_id=usuario.id,
                     corretora_id=corretora.id,
-                    tipo=TipoMovimentacao[mov_data['tipo']],
+                    tipo_movimentacao=tipo_map.get(mov_data['tipo'].lower(), TipoMovimentacao.APORTE),
                     data_movimentacao=datetime.fromisoformat(mov_data['data_movimentacao']).date(),
                     valor=Decimal(str(mov_data['valor'])),
                     observacoes=mov_data.get('observacoes')

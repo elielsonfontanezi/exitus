@@ -101,14 +101,14 @@ class TestReconciliacaoService:
             mov1 = MovimentacaoCaixa(
                 usuario_id=usuario_seed.id,
                 corretora_id=corretora_seed.id,
-                tipo_movimentacao=TipoMovimentacao.DEPOSITO,
+                tipo_movimentacao=TipoMovimentacao.APORTE,
                 valor=1000.00,
                 data_movimentacao=datetime.utcnow().date()
             )
             mov2 = MovimentacaoCaixa(
                 usuario_id=usuario_seed.id,
                 corretora_id=corretora_seed.id,
-                tipo_movimentacao=TipoMovimentacao.SAQUE,
+                tipo_movimentacao=TipoMovimentacao.RESGATE,
                 valor=200.00,
                 data_movimentacao=datetime.utcnow().date()
             )
@@ -132,7 +132,7 @@ class TestReconciliacaoService:
             mov1 = MovimentacaoCaixa(
                 usuario_id=usuario_seed.id,
                 corretora_id=corretora_seed.id,
-                tipo_movimentacao=TipoMovimentacao.DEPOSITO,
+                tipo_movimentacao=TipoMovimentacao.APORTE,
                 valor=1000.00,
                 data_movimentacao=datetime.utcnow().date()
             )

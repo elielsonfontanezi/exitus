@@ -21,16 +21,16 @@
 | Status | Quantidade |
 |--------|-----------|
 | ✅ OK | 2 |
-| 🟡 PARCIAL | 33 |
-| 🔴 QUEBRADO | 1 |
+| 🟡 PARCIAL | 34 |
+| 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
 **⚠️ ALERTA SISTÊMICO - 24/06/2026:**
 Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao`):
 - Valores corrigidos: `DEPOSITO/SAQUE` → `aporte/resgate`
-- **IMPACTO POTENCIAL:** Todas as funcionalidades que usam movimentações de caixa podem estar afetadas
+- **BUG-021 RESOLVIDO:** API `/api/movimentacoes-caixa` e tela `/carteira/movimentacoes` agora retornam/exibem os dados do fluxo de caixa (166 movimentações: aportes/resgates)
 - **VERIFICAÇÃO OBRIGATÓRIA:** Frontend, APIs, relatórios, filtros, seeds e testes
-- **BUG-021** pode estar relacionado a esta mudança de ENUMs
+- **PENDÊNCIA:** BUG-013 (filtro de data pisca ao digitar ano) ainda não corrigido
 
 ---
 
@@ -47,7 +47,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 7 | Operações — Venda | `/operacoes/` | 🟡 | Toggle funciona ✅; modo venda acessível e formulário exibido corretamente | Média |
 | 8 | Operações — Histórico | `/operacoes/historico` | 🟡 | Filtro por data com bug; filtro ticker OK; sem editar/excluir | Média |
 | 9 | Carteira — Posições | `/carteira/posicoes` | ✅ | Validado visualmente: KPIs, filtros (ticker/tipo/mercado) e botão Recalcular funcionam | — |
-| 10 | Carteira — Movimentações | `/carteira/movimentacoes` | � | KPIs e tabela não exibem dados atualizados; fluxo de caixa realista (154 aportes + 12 resgates) não aparece; filtro data quebrado — tela pisca ao digitar ano (BUG-013) | Alta |
+| 10 | Carteira — Movimentações | `/carteira/movimentacoes` | 🟡 | BUG-021 resolvido: API e tabela agora exibem movimentações (166 registros). Filtro de tipo atualizado. BUG-013 pendente: filtro data pisca ao digitar ano | Alta |
 | 11 | Ativos — Catálogo | `/ativos/acoes` | 🟡 | Tabela e categorias OK; busca por ticker não funciona (BUG-014); detalhe lento e sem dados (BUG-015) | Alta |
 | 12 | Ativos — Detalhe | `/ativos/<TICKER>` | 🟡 | Abre mas demora e nem sempre traz dados (BUG-015) | Alta |
 | 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | 🟡 | Carrega corretamente ✅; KPIs + filtros OK; link adicionado ao menu (EXITUS-ATIVOS-001); sem dados (ambiente dev sem eventos cadastrados) | Baixa |
@@ -253,7 +253,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 ---
 
 ### Tela 10 — Carteira — Movimentações (`/carteira/movimentacoes`)
-**Status:** � QUEBRADO
+**Status:** 🟡 PARCIAL
 
 **O que funciona (código):**
 - Herda `base_interna.html` ✅
@@ -263,20 +263,19 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 - Ordenação por coluna ✅
 
 **Problemas encontrados:**
-1. 🔴 **DADOS NÃO APARECEM** — Fluxo de caixa realista (154 aportes + 12 resgates) implementado em 24/06/2026 não está sendo exibido na tela. Dados existem no banco mas não chegam ao frontend.
-2. 🔴 **Afetada por BUG-001** — localStorage vazio → API retorna 401
-3. 🟡 **API retorna enum como string** — `tipo_movimentacao` vem como `"TipoMovimentacao.DEPOSITO"` e o template faz `parseTipo()` para extrair `"deposito"`. Funciona mas é frágil — se a API mudar o formato, quebra silenciosamente.
-4. 🟡 **Filtro data client-side no tipo** — filtro por tipo opera sobre os itens carregados, mas data já vai como param server-side via `carregarComFiltro()` ✅
+1. ✅ **BUG-021 RESOLVIDO** — API `/api/movimentacoes-caixa` retorna dados corretamente (166 movimentações: aportes/resgates). Serialização do enum ajustada para strings simples (`aporte`, `resgate`).
+2. 🔴 **BUG-013 PENDENTE** — filtro de data pisca ao digitar o ano no campo de data. Provável `x-model` no `<input type="date">` disparando `carregarComFiltro()` a cada tecla, incluindo estados intermediários inválidos.
+3. 🟡 **Filtro data client-side no tipo** — filtro por tipo opera sobre os itens carregados, mas data já vai como param server-side via `carregarComFiltro()` ✅
 
 **Validação visual (24/06/2026):**
-- [ ] KPIs de saldo não carregam dados atualizados ❌
-- [ ] Tabela não exibe registros do fluxo de caixa realista ❌
-- [ ] Filtro por tipo não funciona (sem dados) ❌
-- [x] **Filtro de data quebrado** 🔴 — tela pisca ao digitar o ano no campo de data. Provável `x-model` no `<input type="date">` disparando `carregarComFiltro()` a cada tecla, incluindo estados intermediários inválidos (ex: `2026-` sem completar). **Registrado como BUG-013.**
+- [x] KPIs de saldo carregam dados atualizados ✅
+- [x] Tabela exibe registros do fluxo de caixa realista ✅
+- [x] Filtro por tipo funciona com novos valores (`aporte`, `resgate`, etc.) ✅
+- [ ] **Filtro de data quebrado** 🔴 — tela pisca ao digitar o ano no campo de data. **Registrado como BUG-013.**
 
-**Dados que deveriam aparecer (verificados no banco):**
-- 154 aportes (R$ 1.405.731,48)
-- 12 resgates (R$ 23.531,50)
+**Dados exibidos (verificados na API):**
+- 166 movimentações no total
+- Tipos: `aporte` e `resgate`
 - Movimentações recentes: DARF R$ 76,00, Saques R$ 5.000,00, etc.
 
 **⚠️ IMPACTO CRÍTICO - VERIFICAÇÃO OBRIGATÓRIA:**
@@ -284,15 +283,15 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 - Valores em `movimentacao_caixa.tipo_movimentacao` corrigidos de `DEPOSITO/SAQUE` para `aporte/resgate`
 - ENUMS.md atualizado com L-DB-007 (documentação vs banco real)
 
-**ÁREAS QUE PODEM SER AFETADAS E PRECISAM DE VERIFICAÇÃO:**
-1. **Frontend:** Templates que usam `parseTipo()` podem estar quebrados
-2. **APIs:** Endpoints que validam ou processam `tipo_movimentacao`
-3. **Relatórios:** Geração de relatórios por tipo de movimentação
-4. **Filtros:** Componentes de filtro por tipo em todas as telas
-5. **Seed Data:** Outros cenários JSON que ainda usam valores antigos
-6. **Testes:** Testes unitários/integração que dependem dos ENUMs
+**ÁREAS VERIFICADAS (24/06/2026):**
+1. ✅ **Frontend:** `movimentacoes.html` atualizado — filtros, labels, badges e `parseTipo()` funcionam com strings simples (`aporte`, `resgate`, etc.)
+2. ✅ **APIs:** `/api/movimentacoes-caixa` validada e retornando dados serializados corretamente
+3. ⏭️ **Relatórios:** extrato de movimentações ainda precisa de validação visual
+4. ✅ **Filtros:** filtro por tipo em `/carteira/movimentacoes` funciona com novos valores
+5. ✅ **Seed Data:** `test_ir.json` corrigido (`DEPOSITO` → `aporte`); `test_full.json` e `test_e2e.json` já usavam valores corretos
+6. ✅ **Testes:** `test_rentabilidade.py` (21 testes) passou; `test_reconciliacao.py` impactado por problema pré-existente em `ativo_seed` (dividend_yield overflow)
 
-**AÇÃO RECOMENDADA:** Verificar todas as telas e funcionalidades que utilizam movimentações de caixa após esta atualização de ENUMs.
+**AÇÃO RECOMENDADA:** Monitorar relatórios que utilizam movimentações de caixa e corrigir BUG-013 (filtro de data).
 
 ---
 

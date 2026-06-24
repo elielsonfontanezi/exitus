@@ -425,9 +425,9 @@ class RentabilidadeService:
 
         for m in movimentacoes:
             valor = float(m.valor or 0)
-            if m.tipo_movimentacao in (TipoMovimentacao.DEPOSITO, TipoMovimentacao.TRANSFERENCIA_RECEBIDA):
+            if m.tipo_movimentacao in (TipoMovimentacao.APORTE, TipoMovimentacao.TRANSFERENCIA_RECEBIDA):
                 fluxos.append({'data': m.data_movimentacao, 'valor': -valor, 'tipo': 'aporte'})
-            elif m.tipo_movimentacao in (TipoMovimentacao.SAQUE, TipoMovimentacao.TRANSFERENCIA_ENVIADA):
+            elif m.tipo_movimentacao in (TipoMovimentacao.RESGATE, TipoMovimentacao.TRANSFERENCIA_ENVIADA):
                 fluxos.append({'data': m.data_movimentacao, 'valor': valor, 'tipo': 'resgate'})
 
         # Ordenar por data

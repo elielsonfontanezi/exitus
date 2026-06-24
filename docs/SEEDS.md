@@ -88,6 +88,35 @@ backend/
 
 ---
 
+## ✅ **CORREÇÃO BUG-021 - Valores Válidos de `tipo_movimentacao`**
+
+**Data:** 24/06/2026  
+**Status:** Aplicado
+
+Os cenários de seed devem usar **exclusivamente** os valores abaixo para `tipo_movimentacao` em `movimentacoes_caixa`:
+
+| Valor JSON | Enum Python | Descrição |
+|------------|-------------|------------|
+| `aporte` | `APORTE` | Entrada de capital na corretora |
+| `resgate` | `RESGATE` | Saída de capital da corretora |
+| `transferencia_enviada` | `TRANSFERENCIA_ENVIADA` | Transferência para outra corretora |
+| `transferencia_recebida` | `TRANSFERENCIA_RECEBIDA` | Transferência de outra corretora |
+| `credito_provento` | `CREDITO_PROVENTO` | Crédito automático de provento |
+| `taxa_custodia` | `TAXA_CUSTODIA` | Taxa de custódia |
+| `taxa_corretagem` | `TAXA_CORRETAGEM` | Taxa de corretagem |
+| `imposto` | `IMPOSTO` | Pagamento de imposto |
+| `ajuste` | `AJUSTE` | Ajuste manual |
+| `outro` | `OUTRO` | Outras movimentações |
+
+**Valores obsoletos (não usar):** `DEPOSITO`, `SAQUE`, `TRANSFERENCIA`, `PAGAMENTO_TAXA`, `PAGAMENTO_IMPOSTO`, `CREDITO_PROVENTO` (uppercase como string JSON), `IMPOSTO`, `TAXA_CUSTODIA`, `TAXA_CORRETAGEM`, `AJUSTE`, `OUTRO` (quando usados como string JSON, devem ser lowercase).
+
+**Cenários verificados:**
+- ✅ `test_full.json`: usa `aporte`/`resgate` corretamente
+- ✅ `test_e2e.json`: usa `aporte` corretamente
+- ✅ `test_ir.json`: corrigido de `DEPOSITO` para `aporte`
+
+---
+
 ## ⚠️ **NECESSIDADE DE SIMULAÇÃO DE DADOS - TIPOS FALTANTES**
 
 **Data:** 24/06/2026  
@@ -114,9 +143,16 @@ backend/
 - **COMMODITY** - Commodities (ouro, petróleo, etc.)
 
 ### **Movimentações de Caixa Adicionais:**
+- **APORTE** - Aportes/depósitos na corretora
+- **RESGATE** - Resgates/saques da corretora
+- **TRANSFERENCIA_ENVIADA** - Transferências para outra corretora
+- **TRANSFERENCIA_RECEBIDA** - Transferências de outra corretora
 - **CREDITO_PROVENTO** - Crédito automático de proventos
-- **AJUSTE** - Ajustes de caixa diversos
 - **TAXA_CUSTODIA** - Taxas de custódia
+- **TAXA_CORRETAGEM** - Taxas de corretagem
+- **IMPOSTO** - Pagamentos de imposto (DARF, etc.)
+- **AJUSTE** - Ajustes de caixa diversos
+- **OUTRO** - Outras movimentações
 
 ### **Impacto nos Testes:**
 - **Cobertura completa:** Garantir testes para todos os tipos de eventos

@@ -126,20 +126,27 @@ function fluxoCaixaData() {
         // Obter categoria do movimento
         getCategoria(tipo) {
             const categorias = {
-                'deposito': 'Aporte',
-                'saque': 'Resgate',
-                'dividendo': 'Dividendo',
-                'jcp': 'JCP',
-                'taxa': 'Taxa',
-                'transferencia': 'Transferência'
+                'aporte': 'Aporte',
+                'resgate': 'Resgate',
+                'credito_provento': 'Crédito Provento',
+                'transferencia_enviada': 'Transferência',
+                'transferencia_recebida': 'Transferência',
+                'taxa_custodia': 'Taxa Custódia',
+                'taxa_corretagem': 'Taxa Corretagem',
+                'imposto': 'Imposto',
+                'ajuste': 'Ajuste',
+                'outro': 'Outros'
             };
             return categorias[tipo] || 'Outros';
         },
         
         // Obter tipo de movimento
         getTipoMovimento(tipo) {
-            const entradas = ['deposito', 'dividendo', 'jcp'];
-            return entradas.includes(tipo) ? 'entrada' : 'saida';
+            const entradas = ['aporte', 'credito_provento', 'transferencia_recebida'];
+            const saidas = ['resgate', 'transferencia_enviada', 'taxa_custodia', 'taxa_corretagem', 'imposto'];
+            if (entradas.includes(tipo)) return 'entrada';
+            if (saidas.includes(tipo)) return 'saida';
+            return 'neutro';
         },
         
         // Carregar dados mock
@@ -157,7 +164,7 @@ function fluxoCaixaData() {
                 {
                     id: 2,
                     data: '2024-03-14T14:20:00',
-                    tipomovimentacao: 'deposito',
+                    tipomovimentacao: 'aporte',
                     descricao: 'Aporte',
                     valor: '5000.00',
                     corretora: { nome: 'Nu Invest' }
@@ -165,7 +172,7 @@ function fluxoCaixaData() {
                 {
                     id: 3,
                     data: '2024-03-13T09:15:00',
-                    tipomovimentacao: 'taxa',
+                    tipomovimentacao: 'taxa_corretagem',
                     descricao: 'Taxa de Corretagem',
                     valor: '25.50',
                     corretora: { nome: 'XP Investimentos' }
@@ -173,7 +180,7 @@ function fluxoCaixaData() {
                 {
                     id: 4,
                     data: '2024-03-12T16:45:00',
-                    tipomovimentacao: 'saque',
+                    tipomovimentacao: 'resgate',
                     descricao: 'Resgate parcial',
                     valor: '2000.00',
                     corretora: { nome: 'Rico Investimentos' }

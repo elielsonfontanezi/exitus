@@ -8,6 +8,47 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — BUG-021: Consistência do enum TipoMovimentacao (24/06/2026)
+
+**Arquivos alterados:**
+- `backend/app/models/movimentacao_caixa.py`: enum `TipoMovimentacao` sincronizado com banco (`APORTE`, `RESGATE`, `TRANSFERENCIA_ENVIADA`, `TRANSFERENCIA_RECEBIDA`, `CREDITO_PROVENTO`, `TAXA_CUSTODIA`, `TAXA_CORRETAGEM`, `IMPOSTO`, `AJUSTE`, `OUTRO`)
+- `backend/app/services/movimentacao_caixa_service.py`: cálculo de saldo usa `impacto_saldo()` do modelo; `get_all()` aceita filtros como dict
+- `backend/app/services/carteira_service.py`: saldo multi-moeda usa `is_entrada()`, `is_saida()`, `is_transferencia()`, `is_ajuste()`
+- `backend/app/services/rentabilidade_service.py`: fluxos TWR usam `APORTE`/`RESGATE`
+- `backend/app/services/corretora_service.py`: recálculo de saldo usa novos valores do enum
+- `backend/app/services/reconciliacao_service.py`: verificação de saldo usa novos valores do enum
+- `backend/app/schemas/movimentacao_caixa_schema.py`: validação de valores permitidos; serialização do enum como string simples
+- `backend/load_scenario.py`: mapeamento de strings JSON para enum Python
+- `backend/tests/conftest.py`: mapeamento de tipos de movimentação em cenários de teste
+- `backend/tests/test_reconciliacao.py`: valores `DEPOSITO`/`SAQUE` trocados por `APORTE`/`RESGATE`
+- `backend/seed_data/scenarios/test_ir.json`: `DEPOSITO` → `aporte`
+- `backend/alembic/versions/20260624_1000_consolidate_tipomovimentacao_enum.py`: migration para consolidar enum `tipomovimentacao` no PostgreSQL
+- `frontend/app/templates/carteira/movimentacoes.html`: filtros, labels e badges atualizados para novos tipos; `parseTipo()` simplificado para strings
+- `frontend/app/static/js/fluxo_caixa.js`: categorias e tipos de movimento atualizados
+- `docs/ENUMS.md`: tabela `TipoMovimentacao` atualizada com 10 valores e histórico de correção
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-021 marcado como resolvido; tela 10 de QUEBRADO para PARCIAL
+- `docs/CHANGELOG.md`: esta entrada
+
+**Problemas resolvidos:**
+- API `/api/movimentacoes-caixa` retornava erro `'resgate' is not among the defined enum values`
+- Tela `/carteira/movimentacoes` não exibia dados de fluxo de caixa
+- Inconsistência entre documentação, modelo Python, services, frontend e banco PostgreSQL
+
+**Como validar:**
+```bash
+# API deve retornar movimentações sem erro
+TOKEN=$(podman exec exitus-backend curl -s -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" -d '{"username":"e2e_user","password":"e2e_senha_123"}' | \
+  python3 -c "import sys,json; print(json.load(sys.stdin)['data']['access_token'])")
+podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:5000/api/movimentacoes-caixa?per_page=5"
+```
+
+**Pendências:**
+- BUG-013: filtro de data em `/carteira/movimentacoes` ainda pisca ao digitar ano
+
+---
+
 ### Feat — Seeds: Renda Fixa Brasil completa ao cenário test_full (23/06/2026)
 
 **Arquivos alterados:**

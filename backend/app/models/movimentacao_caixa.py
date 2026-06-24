@@ -14,16 +14,17 @@ import enum
 
 
 class TipoMovimentacao(enum.Enum):
-    """Enum para tipos de movimentação"""
-    DEPOSITO = "deposito"                    # Depósito na corretora
-    SAQUE = "saque"                          # Saque da corretora
-    TRANSFERENCIA_ENVIADA = "transf_env"    # Transferência para outra corretora
-    TRANSFERENCIA_RECEBIDA = "transf_rec"   # Transferência de outra corretora
-    CREDITO_PROVENTO = "credito_prov"       # Crédito de provento
-    PAGAMENTO_TAXA = "pagto_taxa"           # Pagamento de taxa/custódia
-    PAGAMENTO_IMPOSTO = "pagamento_imposto"     # Pagamento de imposto
-    AJUSTE = "ajuste"                        # Ajuste manual
-    OUTRO = "outro"                          # Outros tipos
+    """Enum para tipos de movimentação (sincronizado com banco PostgreSQL)"""
+    APORTE = "aporte"                          # Aporte/depósito na corretora
+    RESGATE = "resgate"                        # Resgate/saque da corretora
+    TRANSFERENCIA_ENVIADA = "transferencia_enviada"   # Transferência para outra corretora
+    TRANSFERENCIA_RECEBIDA = "transferencia_recebida" # Transferência de outra corretora
+    CREDITO_PROVENTO = "credito_provento"     # Crédito automático de provento
+    TAXA_CUSTODIA = "taxa_custodia"            # Taxa de custódia
+    TAXA_CORRETAGEM = "taxa_corretagem"        # Taxa de corretagem
+    IMPOSTO = "imposto"                        # Pagamento de imposto
+    AJUSTE = "ajuste"                          # Ajuste manual
+    OUTRO = "outro"                            # Outros tipos
 
 
 class MovimentacaoCaixa(db.Model):
@@ -211,19 +212,19 @@ class MovimentacaoCaixa(db.Model):
     def is_entrada(self):
         """Verifica se é movimentação de entrada (aumenta saldo)"""
         return self.tipo_movimentacao in [
-            TipoMovimentacao.DEPOSITO,
+            TipoMovimentacao.APORTE,
             TipoMovimentacao.TRANSFERENCIA_RECEBIDA,
-            TipoMovimentacao.CREDITO_PROVENTO,
-            TipoMovimentacao.AJUSTE  # Depende do contexto, mas incluímos aqui
+            TipoMovimentacao.CREDITO_PROVENTO
         ]
     
     def is_saida(self):
         """Verifica se é movimentação de saída (diminui saldo)"""
         return self.tipo_movimentacao in [
-            TipoMovimentacao.SAQUE,
+            TipoMovimentacao.RESGATE,
             TipoMovimentacao.TRANSFERENCIA_ENVIADA,
-            TipoMovimentacao.PAGAMENTO_TAXA,
-            TipoMovimentacao.PAGAMENTO_IMPOSTO
+            TipoMovimentacao.TAXA_CUSTODIA,
+            TipoMovimentacao.TAXA_CORRETAGEM,
+            TipoMovimentacao.IMPOSTO
         ]
     
     def is_transferencia(self):
@@ -236,6 +237,21 @@ class MovimentacaoCaixa(db.Model):
     def is_credito_provento(self):
         """Verifica se é crédito de provento"""
         return self.tipo_movimentacao == TipoMovimentacao.CREDITO_PROVENTO
+    
+    def is_taxa(self):
+        """Verifica se é pagamento de taxa/custódia/corretagem"""
+        return self.tipo_movimentacao in [
+            TipoMovimentacao.TAXA_CUSTODIA,
+            TipoMovimentacao.TAXA_CORRETAGEM
+        ]
+    
+    def is_imposto(self):
+        """Verifica se é pagamento de imposto"""
+        return self.tipo_movimentacao == TipoMovimentacao.IMPOSTO
+    
+    def is_ajuste(self):
+        """Verifica se é ajuste manual"""
+        return self.tipo_movimentacao == TipoMovimentacao.AJUSTE
     
     def impacto_saldo(self):
         """
