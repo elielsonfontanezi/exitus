@@ -558,7 +558,7 @@
 | ~~FEAT-004~~ | ~~Meta de patrimônio hardcoded (R$ 500k) — não configurável~~ | 2 | **RESOLVIDA em EXITUS-PERFIL-001**: campo `meta_patrimonio` adicionado ao modelo Usuario; dashboard exibe meta dinâmica via API `/api/auth/me`; perfil permite edição; API GET/PUT `/api/auth/me` funcionando |
 | ~~FEAT-005~~ | ~~Template `venda.html` legado ainda existe como rota separada~~ | 7 | **RESOLVIDA**: suporte a ?venda=true em operacoes_v2.html; rota /venda redireciona mantendo compatibilidade; modo venda inicializa automaticamente com posições carregadas |
 | ~~FEAT-006~~ | ~~Exportação CSV renderiza tabela HTML — sem download real do arquivo~~ | 28 | **RESOLVIDA**: download direto via HTTP headers; nova página /exportar com preview automático; compatibilidade mantida com ?preview=true |
-| FEAT-007 | Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona | 34 |
+| ~~FEAT-007~~ | ~~Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona~~ | 34 | **RESOLVIDA**: modal com informações completas; botão Detalhes na tabela; carregamento via API específica |
 | FEAT-008 | Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível | 14 |
 | FEAT-009 | **Import B3 não lista os registros importados** — resultado mostra apenas totais numéricos (Transações=N, Proventos=N). Usuário não sabe quais ativos foram criados/importados. **Fix:** exibir lista dos tickers importados e ativos criados automaticamente após import | 5 |
 | FEAT-010 | **Indicadores de mercado (CDI/Ibovespa) sem endpoint dinâmico** — atualmente valores vêm de variáveis de ambiente no frontend. **Fix:** criar backend `GET /api/indicadores` com CDI/Ibovespa atualizados automaticamente; dashboard consumir via API | 2 |
@@ -1197,7 +1197,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
 | 🟡 Importante | 0 — todos os bugs importantes foram resolvidos ou reclassificados |
-| ⬛ Feature ausente | 43 (FEAT-007 a FEAT-049) |
+| ⬛ Feature ausente | 42 (FEAT-008 a FEAT-049) |
 
 ### Impacto do BUG-001
 

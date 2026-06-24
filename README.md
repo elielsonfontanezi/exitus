@@ -17,6 +17,7 @@
 * **Relatórios Avançados**: Geração automática de relatórios de performance com Sharpe Ratio
 * **Cálculos Fiscais**: Regras configuráveis por país e tipo de ativo
 * **Exportação CSV**: Download direto via HTTP headers com preview automático
+* **Planos Disciplinados**: Modal de detalhes completo para planos de compra/venda
 * **Frontend Moderno**: Alpine.js + exitus-components.css, totalmente API-driven
 
 ### Tipos de Ativos Suportados (14 tipos)

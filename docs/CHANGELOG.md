@@ -8,6 +8,21 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — FEAT-007: Tela de detalhe de plano de compra (23/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/templates/estrategia/planos_v2.html`: botão Detalhes na tabela; modal completo com informações específicas por tipo; lógica Alpine.js para carregar dados via API
+
+**Problemas resolvidos:** Rota `/planos-compra/<id>` redirecionava para lista em vez de mostrar detalhes; usuário não conseguia ver informações completas do plano
+
+**Como funciona:** 
+- Botão "Detalhes" em cada linha da tabela (compra/venda)
+- Modal com informações completas (status, progresso, metas, dados específicos)
+- Carregamento via API `/api/plano-compra/{id}` ou `/api/plano-venda/{id}`
+- Botão Editar (placeholder para implementação futura)
+
+---
+
 ### Fix — FEAT-006: Exportação CSV real (23/06/2026)
 
 **Arquivos alterados:**
