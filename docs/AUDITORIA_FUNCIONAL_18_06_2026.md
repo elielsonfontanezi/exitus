@@ -1060,12 +1060,11 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 ### Artefatos Criados
 
-1. **`docs/DATABASE_INVESTIGATION_GUIDE.md`** - Guia completo para investigação de database
-   - Fontes de verdade obrigatórias
-   - Procedimentos operacionais padrão
-   - Troubleshooting com soluções conhecidas
-   - Checklist de investigação
-   - Template para registro de atividades
+1. **Lições Aprendidas Registradas** - L-DB-001 a L-DB-004 em `docs/LESSONS_LEARNED.md`
+   - Porta PostgreSQL: 5433 (host) → 5432 (container)
+   - Flask-Migrate vs ALTER direto para mudanças simples
+   - ENUMs devem ser criados antes das tabelas
+   - Documentação do schema deve ser atualizada SEMPRE após mudanças
 
 ### Melhorias Propostas
 
