@@ -276,27 +276,22 @@
 - `test_darf_acumulado.py` — 8 testes DARF
 - `test_import_b3_idempotencia.py` — 18 testes
 
-### Testes E2E Frontend (108 criados)
+### Testes E2E Frontend — v2 (16/06/2026)
 
 | Métrica | Valor |
 |---------|-------|
-| **Testes criados** | 108 |
-| **Testes passando** | 104 (96%) |
-| **Telas cobertas** | 17/17 (100%) |
-| **Console errors** | 0 (antes: 9) |
-| **URLs 404** | 0 (antes: 8) |
+| **Testes passando** | 127/127 (100%) |
+| **Specs criados** | 8 (por contexto: smoke, auth, operações, portfolio, fiscal, relatórios, ferramentas, regressão) |
+| **Rotas cobertas** | 47 rotas reais |
+| **Flaky tests** | 0 |
+| **Browser** | Chromium ✅ — Firefox/Mobile Chrome 📋 pendente |
 | **Framework** | Playwright |
+| **Branch** | `feature/testes-e2e-v2` (merged main 16/06/2026) |
 
-**Detalhamento por tela:**
-
-| Tela | Testes | Status |
-|------|--------|--------|
-| Dashboard | 16/16 | ✅ 100% |
-| Análise Ativos | 5/6 | ✅ 83% |
-| Portfolios | 6/7 | ✅ 86% |
-| Configurações | 4/5 | ✅ 80% |
-| Imposto Renda | 5/7 | ✅ 71% |
-| Demais 12 telas | 68/73 | ✅ 93% |
+**Status v3 (em andamento — branch `feature/testes-e2e-v3`):**
+- 73 CTs catalogados em `PLANO_TESTES_LOGICA.md`
+- 13 specs criados (ops, fiscal, portfolio, ferramentas, relatórios, ativos, planos, alertas)
+- Execução e validação dos 73 CTs: 📋 pendente
 
 ---
 

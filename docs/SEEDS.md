@@ -26,9 +26,10 @@
 | Username | Email | Senha | Perfil |
 |----------|-------|-------|-------|
 | `e2e_admin` | `admin@e2e.exitus` | `e2e_senha_123` | **Administrador** |
-| `e2e_user` | `usuario@e2e.exitus` | `e2e_senha_123` | Usuário |
+| `e2e_user` | `e2e_user@test.com` | `e2e_senha_123` | Usuário |
 | `e2e_viewer` | `viewer@e2e.exitus` | `e2e_senha_123` | Visualizador |
-| `teste.user` | `teste@exitus.com` | `senha123` | Teste |
+
+> **Nota:** `teste.user` foi removido — nunca existiu no banco real. Email de `e2e_user` corrigido para `e2e_user@test.com` (valor real no banco).
 
 ### Teste de Login
 
@@ -108,7 +109,9 @@ Os cenários de seed devem usar **exclusivamente** os valores abaixo para `tipo_
 | `ajuste` | `AJUSTE` | Ajuste manual |
 | `outro` | `OUTRO` | Outras movimentações |
 
-**Valores obsoletos (não usar):** `DEPOSITO`, `SAQUE`, `TRANSFERENCIA`, `PAGAMENTO_TAXA`, `PAGAMENTO_IMPOSTO`, `CREDITO_PROVENTO` (uppercase como string JSON), `IMPOSTO`, `TAXA_CUSTODIA`, `TAXA_CORRETAGEM`, `AJUSTE`, `OUTRO` (quando usados como string JSON, devem ser lowercase).
+**Valores obsoletos (não usar como string JSON):** `DEPOSITO`, `SAQUE`, `TRANSFERENCIA`, `PAGAMENTO_TAXA`, `PAGAMENTO_IMPOSTO`.
+
+**Regra de caixa:** nos arquivos JSON, sempre use **lowercase** (ex: `"aporte"`, `"credito_provento"`, `"imposto"`). O enum Python (`APORTE`, `CREDITO_PROVENTO`, `IMPOSTO`…) é interno ao código — nunca aparece nos JSONs de seed.
 
 **Cenários verificados:**
 - ✅ `test_full.json`: usa `aporte`/`resgate` corretamente

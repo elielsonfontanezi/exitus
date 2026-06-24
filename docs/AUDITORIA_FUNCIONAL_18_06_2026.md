@@ -1240,3 +1240,131 @@ return render_template('auth/login_success.html', token=access_token)
 # <script>localStorage.setItem('access_token', '{{ token }}')</script>
 ```
 Ou alternativamente: na resposta do login, fazer redirect para uma rota intermediária que seta o localStorage via JS antes de redirecionar para o dashboard.
+
+---
+
+## 🗂️ Pendências Técnicas — 24/06/2026
+
+> **Registrado por:** Cascade | **Sessão:** 24/06/2026 17:00  
+> Pendências identificadas após BUG-021 e análise de estado do sistema.
+
+---
+
+### 🔴 P1 — Banco de Testes Desatualizado (`exitusdb_test`)
+
+**Problema:** O enum `tipomovimentacao` em `exitusdb_test` tem apenas **5 valores**:
+`aporte`, `resgate`, `transferencia_enviada`, `transferencia_recebida`, `credito_provento`
+
+O banco oficial `exitusdb` tem **10 valores** (os 5 acima + `taxa_custodia`, `taxa_corretagem`, `imposto`, `ajuste`, `outro`).
+
+**Causa:** A migration `20260624_1000_consolidate_tipomovimentacao_enum.py` (BUG-021) foi aplicada somente no banco oficial. O banco de testes é recriado via `scripts/create_test_db.sh` — que não inclui a migration.
+
+**Impacto:** Testes que usam `taxa_custodia`, `taxa_corretagem`, `imposto`, `ajuste` ou `outro` falham com `invalid input value for enum`.
+
+**Fix:**
+```bash
+podman exec exitus-backend bash /scripts/create_test_db.sh
+```
+
+**Status:** 📋 Pendente
+
+---
+
+### 🔴 P2 — Dois Heads Alembic Divergentes
+
+**Problema:** O Alembic possui dois heads simultâneos sem merge:
+```
+20260403_1040 (head)   ← branch de migration antiga
+20260624_1000 (head)   ← migration BUG-021 (nova branch)
+```
+
+**Causa:** A migration BUG-021 foi criada a partir de um ponto anterior da árvore, gerando bifurcação. Sem merge, `alembic upgrade head` é ambíguo e pode falhar.
+
+**Impacto:** Alembic instável — qualquer tentativa de nova migration ou upgrade pode falhar. Continua-se aplicando DDL manual como workaround.
+
+**Fix:**
+```bash
+podman exec exitus-backend bash -c "cd /app && python -m alembic merge heads -m 'merge_heads_20260624'"
+podman exec exitus-backend bash -c "cd /app && python -m alembic upgrade head"
+```
+
+**Status:** 📋 Pendente — **aguarda aprovação antes de executar**
+
+---
+
+### 🟡 P3 — BUG-013: Filtro de Data Pisca em `/carteira/movimentacoes`
+
+**Problema:** O filtro de data pisca (recarrega a tela) ao digitar o ano no campo `<input type="date">`.
+
+**Causa provável:** `x-model` ligado diretamente ao campo data dispara `carregarComFiltro()` a cada keystroke, inclusive com datas intermediárias inválidas (ex: `2026-0` antes de completar `2026-06-24`).
+
+**Fix sugerido:** Usar `x-model.lazy` ou debounce de 500ms antes de disparar a chamada.
+
+**Tela afetada:** Tela 10 — `/carteira/movimentacoes`
+
+**Status:** 📋 Pendente
+
+---
+
+### 🟡 P4 — 61 Falhas + 35 Erros de Setup nos Testes Backend
+
+**Problema:** Suite de testes backend com 436/497 passando (87.7%). Restam:
+- **61 falhas** — principalmente `test_ir_integration.py` (campos obsoletos em cenários) e `test_constraints.py`
+- **35 erros de setup** — fixtures e importações em `conftest.py`
+
+**Causa parcialmente conhecida:**
+- `test_ir_integration.py` — usa campos de cenário que não existem mais
+- `test_reconciliacao.py` — `ativo_seed` com `dividend_yield` overflow (L-DB-006)
+- Parte das falhas pode ser resolvida após P1 (recriar `exitusdb_test` com enum completo)
+
+**Próximo passo:** Após P1, rodar `pytest` completo e reavaliar quantas falhas restam.
+
+**Status:** 📋 Pendente — **bloqueado por P1**
+
+---
+
+### 🟡 P5 — Testes E2E Multi-Browser (Firefox + Mobile Chrome)
+
+**Problema:** E2E v2 validado apenas em Chromium (127/127). Firefox e Mobile Chrome não foram executados.
+
+**Comando:**
+```bash
+cd tests/e2e && npx playwright test --project=firefox
+cd tests/e2e && npx playwright test --project="Mobile Chrome"
+```
+
+**Status:** 📋 Pendente
+
+---
+
+### 🟡 P6 — E2E v3: 73 CTs de Lógica de Negócio não Executados
+
+**Problema:** Branch `feature/testes-e2e-v3` tem 13 specs e 73 CTs catalogados em `PLANO_TESTES_LOGICA.md`, mas nenhum foi executado nem validado.
+
+**Status:** 📋 Pendente
+
+---
+
+### 📋 P7 — Fase 7 Backend (Produção)
+
+| GAP | Descrição | Status |
+|-----|-----------|--------|
+| MONITOR-001 | Prometheus + Grafana | 📋 Planejado |
+| RATELIMIT-001 | Rate limiting por IP/usuário | 📋 Planejado |
+| CICD-001 | GitHub Actions / GitLab CI | 📋 Planejado |
+
+---
+
+### 📊 Resumo de Prioridades
+
+| ID | Descrição | Prioridade | Bloqueante? |
+|----|-----------|------------|-------------|
+| P1 | Recriar `exitusdb_test` (enum incompleto) | 🔴 Alta | Sim — bloqueia P4 |
+| P2 | Merge Alembic heads divergentes | 🔴 Alta | Sim — Alembic instável |
+| P3 | BUG-013 filtro data pisca | 🟡 Média | Não |
+| P4 | 61 falhas + 35 erros setup testes | 🟡 Média | Depende de P1 |
+| P5 | E2E Firefox + Mobile Chrome | 🟡 Média | Não |
+| P6 | E2E v3 lógica negócio (73 CTs) | 🟡 Média | Não |
+| P7 | Fase 7 Backend (MONITOR/RATELIMIT/CICD) | 📋 Baixa | Não |
+
+**Ordem de ataque recomendada:** P1 → P2 → P4 (reavaliação) → P3 → P5/P6 → P7

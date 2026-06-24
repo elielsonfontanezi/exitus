@@ -1,9 +1,9 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 508/546 passing (93.0%) ✅  
+> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 436/497 passando (87.7%) 🟡 — 61 falhas (IR/constraints) + 35 erros setup  
 > **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅ | **Frontend API-Driven:** ✅ 8/8 Sprints Concluídos (09/06/2026) | **UI Consistency:** ✅ Menu limpo (15/06/2026)  
-> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.16 | **Última atualização:** 16/06/2026
+> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.23 | **Última atualização:** 24/06/2026
 
 ---
 
@@ -47,7 +47,7 @@
 | **Cenários de Teste** | ✅ | 4 cenários predefinidos (E2E, Full expandido, IR, Stress) + carga massiva (30 ativos, 48 transações, 32 proventos) |
 | **Histórico Patrimonial** | ✅ | Snapshots mensais, endpoint /api/portfolios/evolucao |
 | **Documentação** | ✅ | Swagger/OpenAPI auto-doc |
-| **Testes** | ✅ | 508/546 testes (93.0%) - Correção concluída (03/04/2026) |
+| **Testes** | 🟡 | 436/497 passando (87.7%) — 61 falhas (IR/constraints), 35 erros setup |
 
 ---
 
@@ -306,7 +306,7 @@ Transações | Movimentações | Proventos | Relatórios | Análises |
 | Métrica | Atual | Meta | Status |
 |---------|-------|------|--------|
 | **GAPs Backend** | 48/54 (87%) | 54/54 | 🟡 Em andamento |
-| **Testes Backend** | 508/546 (93%) | 546 | ✅ |
+| **Testes Backend** | 436/497 (87.7%) | 546 | 🟡 61 falhas (IR/constraints) + 35 erros setup |
 | **Endpoints** | 156 | 160 | ✅ |
 | **Telas Frontend API-Driven** | 33/~46 (87%) | 46 | 🟡 |
 | **Testes E2E (Chromium)** | 127/127 (100%) | 127+ multi-browser | 🟡 Multi-browser pendente |
@@ -340,6 +340,22 @@ Documentos históricos de roadmaps anteriores estão em `docs/archive/`:
 
 ---
 
-*Última atualização: 16/06/2026*  
-*Próxima revisão: Após validação E2E multi-browser e merge para main*  
+## 🐛 Bugs e Pendências Abertas
+
+| ID | Tela | Descrição | Prioridade | Status |
+|----|------|-----------|------------|--------|
+| **BUG-013** | `/carteira/movimentacoes` | Filtro de data pisca ao digitar ano | 🟡 Média | 📋 Aberto |
+| **BUG-021** | `/carteira/movimentacoes` | Enum `TipoMovimentacao` inconsistente — API retornava erro `'resgate' is not among the defined enum values` | 🔴 Crítico | ✅ Resolvido (24/06/2026) |
+
+### Pendências de Testes Backend
+
+| Categoria | Quantidade | Causa | Próximo Passo |
+|-----------|-----------|-------|---------------|
+| **Falhas** | 61 | Motor IR + constraints | Investigar `test_ir_integration.py` |
+| **Erros de setup** | 35 | Fixtures + importações | Revisar `conftest.py` e fixtures multi-tenant |
+
+---
+
+*Última atualização: 24/06/2026*  
+*Próxima revisão: Após correção BUG-013 e falhas de testes backend*  
 *Responsável: Elielson Fontanezi + Cascade AI*
