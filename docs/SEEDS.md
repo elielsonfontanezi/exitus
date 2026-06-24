@@ -86,6 +86,48 @@ backend/
 - **Movimentações:** 23 (15 gerais + **8 aportes RF específicos**)
 - **Portfolios:** 4 (Aposentadoria, Dividendos BR, Growth US)
 
+---
+
+## ⚠️ **NECESSIDADE DE SIMULAÇÃO DE DADOS - TIPOS FALTANTES**
+
+**Data:** 24/06/2026  
+**Status:** Pendente de implementação
+
+### **Eventos Corporativos Necessários:**
+- **ALUGUEL** - Recebimento de aluguel de ativos
+- **JCP** - Juros sobre Capital Próprio (já parcialmente implementado)
+- **BONIFICAÇÃO** - Distribuição de ações bonificadas
+- **SPLIT** - Desdobramento de ações
+- **GRUPAMENTO** - Agrupamento de ações
+- **SUBSCRIÇÃO** - Direito de subscrição de novas ações
+- **AMORTIZAÇÃO** - Amortização de investimentos
+- **FUSAO** - Fusão de empresas
+- **CISAO** - Cisão de empresas
+- **SPINOFF** - Desmembramento de empresas
+- **MUDANCA_TICKER** - Alteração de código de negociação
+- **DELISTAEM** - Deslistamento de bolsa
+- **CONVERSAO** - Conversão de ativos
+- **OUTRO_EVENTO** - Outros eventos corporativos
+
+### **Tipos de Ativos Adicionais:**
+- **CRIPTO** - Criptomoedas (Bitcoin, Ethereum, etc.)
+- **COMMODITY** - Commodities (ouro, petróleo, etc.)
+
+### **Movimentações de Caixa Adicionais:**
+- **CREDITO_PROVENTO** - Crédito automático de proventos
+- **AJUSTE** - Ajustes de caixa diversos
+- **TAXA_CUSTODIA** - Taxas de custódia
+
+### **Impacto nos Testes:**
+- **Cobertura completa:** Garantir testes para todos os tipos de eventos
+- **Validação de regras:** Testar lógica de cálculo para cada tipo
+- **UI/UX:** Verificar exibição correta em calendário e relatórios
+- **APIs:** Validar endpoints para todos os tipos de eventos
+
+**AÇÃO RECOMENDADA:** Implementar simulação completa destes tipos no cenário test_full para garantir cobertura 100% do sistema.
+
+---
+
 **Renda Fixa Brasil (8 ativos):**
 - 3 CDBs: Nubank 100% CDI, Inter 105% CDI, C6 Bank 107% CDI
 - 3 Tesouro: Selic 2029, IPCA+ 2035, Prefixado 2027
