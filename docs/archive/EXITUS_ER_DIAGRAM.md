@@ -226,7 +226,7 @@ corretora (1) ──→ (N) provento
 
 ## 🔄 Como Manter Este Diagrama
 
-1. **Atualização automática:** Usar script `scripts/exitus_db_doc.sh` para gerar `EXITUS_DB_STRUCTURE.txt`
+1. **Atualização automática:** Usar script `scripts/update_db_structure.sh` para gerar `EXITUS_DB_STRUCTURE.txt`
 2. **Atualização manual:** Editar este arquivo quando houver mudanças estruturais
 3. **Versionamento:** Sempre commitar junto com migrations que alteram o schema
 4. **Validação:** Comparar com `EXITUS_DB_STRUCTURE.txt` mensalmente
