@@ -211,33 +211,57 @@
     {"ativo":"PETR4DBNT","tipo_provento":"JUROS","data_com":"2024-10-20","data_pagamento":"2024-10-20","valor_unitario":20.52,"quantidade_ativos":4,"observacoes":"Juros semestrais Debênture Petrobras — CDI + 2.0%"}
   ],
   "movimentacoes_caixa": [
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-01-05","valor":50000.00,"moeda":"BRL","observacoes":"Aporte inicial BRL — início carteira Aposentadoria"},
-    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"DEPOSITO","data_movimentacao":"2024-01-05","valor":30000.00,"moeda":"BRL","observacoes":"Aporte inicial BRL — Itaú para FIIs"},
-    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"DEPOSITO","data_movimentacao":"2024-01-05","valor":20000.00,"moeda":"BRL","observacoes":"Aporte inicial BRL — Inter"},
-    {"usuario":"e2e_user","corretora":"AVENUE SECURITIES","tipo":"DEPOSITO","data_movimentacao":"2024-02-28","valor":8000.00,"moeda":"USD","observacoes":"Primeiro aporte em dólar — Avenue"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-01-05","valor":50000.00,"moeda":"BRL","observacoes":"Aporte inicial BRL — início carteira Aposentadoria"},
+    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"aporte","data_movimentacao":"2024-01-05","valor":20000.00,"moeda":"BRL","observacoes":"Aporte inicial BRL — Itaú para FIIs"},
+    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"aporte","data_movimentacao":"2024-01-05","valor":15000.00,"moeda":"BRL","observacoes":"Aporte inicial BRL — Inter"},
+    {"usuario":"e2e_user","corretora":"AVENUE SECURITIES","tipo":"aporte","data_movimentacao":"2024-02-15","valor":8000.00,"moeda":"USD","observacoes":"Primeiro aporte em dólar — Avenue"},
 
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-04-01","valor":25000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — XP (BDRs)"},
-    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"DEPOSITO","data_movimentacao":"2024-05-01","valor":15000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — Inter (BDRs)"},
-    {"usuario":"e2e_user","corretora":"AVENUE SECURITIES","tipo":"DEPOSITO","data_movimentacao":"2024-05-15","valor":5000.00,"moeda":"USD","observacoes":"Segundo aporte USD — NVDA e AMZN"},
-    {"usuario":"e2e_user","corretora":"NOMAD GLOBAL","tipo":"DEPOSITO","data_movimentacao":"2024-07-01","valor":6000.00,"moeda":"USD","observacoes":"Aporte USD Nomad — ETFs e REITs"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-02-15","valor":10000.00,"moeda":"BRL","observacoes":"Aporte Renda Fixa — CDB Nubank"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-03-10","valor":4602.25,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Tesouro Selic"},
 
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-08-01","valor":20000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — IVVB11"},
-    {"usuario":"e2e_user","corretora":"AVENUE SECURITIES","tipo":"DEPOSITO","data_movimentacao":"2024-09-01","valor":4000.00,"moeda":"USD","observacoes":"Aporte USD — reforço carteira US"},
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-10-01","valor":15000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — out"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-03-15","valor":83.30,"moeda":"BRL","observacoes":"Crédito automático — Juros CDB Nubank"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"resgate","data_movimentacao":"2024-03-20","valor":2000.00,"moeda":"BRL","observacoes":"Saque lucros — PETR4 dividendos"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-04-01","valor":8000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — XP (BDRs)"},
+    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"aporte","data_movimentacao":"2024-04-20","valor":8000.00,"moeda":"BRL","observacoes":"Aporte Renda Fixa — CDB Inter"},
 
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"SAQUE","data_movimentacao":"2024-06-20","valor":3000.00,"moeda":"BRL","observacoes":"Saque parcial — despesas pessoais"},
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"SAQUE","data_movimentacao":"2024-12-23","valor":5000.00,"moeda":"BRL","observacoes":"Saque fim de ano"},
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"PAGAMENTO_IMPOSTO","data_movimentacao":"2024-11-30","valor":685.50,"moeda":"BRL","observacoes":"DARF referente vendas outubro (ações > R$ 20K + BDR)"},
-    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"PAGAMENTO_IMPOSTO","data_movimentacao":"2024-12-30","valor":76.00,"moeda":"BRL","observacoes":"DARF referente venda FII novembro (20% s/ lucro HGLG11)"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-04-15","valor":84.50,"moeda":"BRL","observacoes":"Crédito automático — Juros CDB Nubank"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-04-10","valor":54.25,"moeda":"BRL","observacoes":"Crédito automático — Juros Tesouro Selic"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"resgate","data_movimentacao":"2024-04-25","valor":1500.00,"moeda":"BRL","observacoes":"Saque lucros — VALE3 dividendos"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"resgate","data_movimentacao":"2024-04-30","valor":320.00,"moeda":"BRL","observacoes":"DARF abril — vendas PETR4/VALE3"},
 
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-02-15","valor":10000.00,"moeda":"BRL","observacoes":"Aporte Renda Fixa — CDB Nubank"},
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-03-10","valor":4602.25,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Tesouro Selic"},
-    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"DEPOSITO","data_movimentacao":"2024-04-20","valor":8000.00,"moeda":"BRL","observacoes":"Aporte Renda Fixa — CDB Inter"},
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-05-15","valor":9000.40,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Tesouro IPCA+"},
-    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"DEPOSITO","data_movimentacao":"2024-06-25","valor":6000.00,"moeda":"BRL","observacoes":"Aporte Renda Fixa — CDB C6 Bank"},
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-07-30","valor":2642.25,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Tesouro Prefixado"},
-    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-08-15","valor":5259.50,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Debênture Vale"},
-    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"DEPOSITO","data_movimentacao":"2024-09-20","valor":4103.20,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Debênture Petrobras"}
+    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"aporte","data_movimentacao":"2024-05-01","valor":10000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — Inter (BDRs)"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-05-15","valor":9000.40,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Tesouro IPCA+"},
+    {"usuario":"e2e_user","corretora":"AVENUE SECURITIES","tipo":"aporte","data_movimentacao":"2024-05-15","valor":5000.00,"moeda":"USD","observacoes":"Segundo aporte USD — NVDA e AMZN"},
+
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-05-15","valor":85.20,"moeda":"BRL","observacoes":"Crédito automático — Juros CDB Nubank"},
+    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"aporte","data_movimentacao":"2024-05-20","valor":70.00,"moeda":"BRL","observacoes":"Crédito automático — Juros CDB Inter"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-05-10","valor":54.60,"moeda":"BRL","observacoes":"Crédito automático — Juros Tesouro Selic"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"resgate","data_movimentacao":"2024-05-25","valor":2500.00,"moeda":"BRL","observacoes":"Saque lucros — ITUB4 JCP"},
+
+    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"aporte","data_movimentacao":"2024-06-25","valor":6000.00,"moeda":"BRL","observacoes":"Aporte Renda Fixa — CDB C6 Bank"},
+    {"usuario":"e2e_user","corretora":"NOMAD GLOBAL","tipo":"aporte","data_movimentacao":"2024-07-01","valor":6000.00,"moeda":"USD","observacoes":"Aporte USD Nomad — ETFs e REITs"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"resgate","data_movimentacao":"2024-06-20","valor":3000.00,"moeda":"BRL","observacoes":"Saque parcial — despesas pessoais"},
+
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-07-30","valor":2642.25,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Tesouro Prefixado"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-06-15","valor":43.76,"moeda":"BRL","observacoes":"Crédito automático — Juros Tesouro IPCA+"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"resgate","data_movimentacao":"2024-07-31","valor":450.00,"moeda":"BRL","observacoes":"DARF julho — vendas BDRs"},
+
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-08-01","valor":12000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — IVVB11"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-08-15","valor":5259.50,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Debênture Vale"},
+    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"aporte","data_movimentacao":"2024-07-25","valor":53.40,"moeda":"BRL","observacoes":"Crédito automático — Juros CDB C6 Bank"},
+
+    {"usuario":"e2e_user","corretora":"AVENUE SECURITIES","tipo":"aporte","data_movimentacao":"2024-09-01","valor":4000.00,"moeda":"USD","observacoes":"Aporte USD — reforço carteira US"},
+    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"aporte","data_movimentacao":"2024-09-20","valor":4103.20,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Debênture Petrobras"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-09-15","valor":196.90,"moeda":"BRL","observacoes":"Crédito automático — Cupom Debênture Vale"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"resgate","data_movimentacao":"2024-09-25","valor":4000.00,"moeda":"BRL","observacoes":"Saque lucros — HGLG11 rendimentos"},
+
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"aporte","data_movimentacao":"2024-10-01","valor":10000.00,"moeda":"BRL","observacoes":"Aporte mensal BRL — out"},
+    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"aporte","data_movimentacao":"2024-10-20","valor":82.08,"moeda":"BRL","observacoes":"Crédito automático — Cupom Debênture Petrobras"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"resgate","data_movimentacao":"2024-10-25","valor":3500.00,"moeda":"BRL","observacoes":"Saque lucros — MXRF11 rendimentos"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"resgate","data_movimentacao":"2024-11-30","valor":685.50,"moeda":"BRL","observacoes":"DARF referente vendas outubro (ações > R$ 20K + BDR)"},
+
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"resgate","data_movimentacao":"2024-12-23","valor":5000.00,"moeda":"BRL","observacoes":"Saque fim de ano"},
+    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"resgate","data_movimentacao":"2024-12-30","valor":76.00,"moeda":"BRL","observacoes":"DARF referente venda FII novembro (20% s/ lucro HGLG11)"}
   ],
   "alertas": [
     {"usuario":"e2e_user","ativo_ticker":"PETR4","tipo_alerta":"PRECO_ALVO","condicao":"MAIOR_IGUAL","valor_referencia":45.00,"ativo":true,"notificar_email":true,"mensagem":"PETR4 atingiu preço teto de R$ 45,00"},

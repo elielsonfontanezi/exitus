@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 23/06/2026 — L-DB-004 a L-DB-006 adicionadas (auditoria banco de dados)  
+> **Atualizado:** 24/06/2026 — L-DB-007 adicionada (divergência ENUM vs banco)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -64,7 +64,41 @@ if not headers:
 
 ---
 
-## � Segurança Multi-Tenant
+## 🗄️ Banco de Dados
+
+### L-DB-007 — Documentação de ENUM pode estar desatualizada vs banco real
+**Origem:** Fluxo de caixa test_full.json | **Data:** 24/06/2026
+
+**Erro:** JSON usava valores da documentação ENUMS.md (`DEPOSITO`, `SAQUE`, `IMPOSTO`) mas banco PostgreSQL só aceitava `aporte` e `resgate`.
+
+**Investigação:**
+```sql
+-- Verificar valores reais no banco
+SELECT DISTINCT tipo_movimentacao FROM movimentacao_caixa;
+-- Resultado: apenas 'aporte' e 'resgate'
+
+-- Testar valor da documentação
+INSERT INTO movimentacao_caixa (tipo_movimentacao, ...) VALUES ('deposito', ...);
+-- ERROR: invalid input value for enum tipomovimentacao: "deposito"
+```
+
+**Correto — Fluxo obrigatório antes de usar ENUMs:**
+1. **Verificar realidade:** `SELECT DISTINCT coluna_enum FROM tabela`
+2. **Testar valores:** Fazer INSERT de teste com cada valor
+3. **Adaptar código:** Usar valores validados, não documentação
+4. **Documentar:** Atualizar ENUMS.md se necessário
+
+**Mapeamento aplicado:**
+- `DEPOSITO` → `aporte` (entradas de dinheiro)
+- `SAQUE` → `resgate` (saídas de dinheiro)
+- `IMPOSTO` → `resgate` (pagamentos como saídas)
+- `CREDITO_PROVENTO` → `aporte` (créditos como entradas)
+
+**Regra:** **SEMPRE** verificar valores reais do ENUM no banco antes de usar em JSON/seeds. Documentação pode estar desatualizada.
+
+---
+
+## 🛡️ Segurança Multi-Tenant
 
 ### L-SEC-001 — RLS é Defesa em Profundidade, não substituto de API
 **Origem:** Investigação de testes RLS falhando | **Data:** 03/04/2026
