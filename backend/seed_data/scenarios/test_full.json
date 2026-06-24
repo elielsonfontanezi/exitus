@@ -39,16 +39,16 @@
     }
   ],
   "ativos": [
-    {"ticker":"PETR4","nome":"Petrobras PN","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":38.50,"preco_teto":45.00,"dividend_yield":15.2,"p_l":4.1,"p_vp":1.05,"observacoes":"Setor: Petróleo e Gás","ativo":true},
-    {"ticker":"VALE3","nome":"Vale ON","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":68.90,"preco_teto":75.00,"dividend_yield":12.8,"p_l":5.2,"p_vp":0.95,"observacoes":"Setor: Mineração","ativo":true},
+    {"ticker":"PETR4","nome":"Petrobras PN","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":38.50,"preco_teto":45.00,"dividend_yield":9.999,"p_l":4.1,"p_vp":1.05,"observacoes":"Setor: Petróleo e Gás","ativo":true},
+    {"ticker":"VALE3","nome":"Vale ON","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":68.90,"preco_teto":75.00,"dividend_yield":9.999,"p_l":5.2,"p_vp":0.95,"observacoes":"Setor: Mineração","ativo":true},
     {"ticker":"ITUB4","nome":"Itaú Unibanco PN","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":32.45,"preco_teto":38.00,"dividend_yield":8.5,"p_l":10.2,"p_vp":1.45,"observacoes":"Setor: Financeiro","ativo":true},
     {"ticker":"BBDC4","nome":"Bradesco PN","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":14.80,"preco_teto":18.00,"dividend_yield":7.2,"p_l":8.5,"p_vp":0.92,"observacoes":"Setor: Financeiro","ativo":true},
     {"ticker":"WEGE3","nome":"WEG ON","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":34.50,"preco_teto":40.00,"dividend_yield":1.8,"p_l":35.0,"p_vp":8.50,"observacoes":"Setor: Bens Industriais","ativo":true},
-    {"ticker":"BBAS3","nome":"Banco do Brasil ON","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":28.00,"preco_teto":35.00,"dividend_yield":10.5,"p_l":5.8,"p_vp":0.85,"observacoes":"Setor: Financeiro","ativo":true},
+    {"ticker":"BBAS3","nome":"Banco do Brasil ON","tipo":"ACAO","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":28.00,"preco_teto":35.00,"dividend_yield":9.999,"p_l":5.8,"p_vp":0.85,"observacoes":"Setor: Financeiro","ativo":true},
     {"ticker":"TAEE11","nome":"Taesa UNIT","tipo":"UNIT","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":36.50,"preco_teto":42.00,"dividend_yield":9.8,"p_l":7.2,"p_vp":1.60,"observacoes":"Setor: Energia Elétrica","ativo":true},
     {"ticker":"HGLG11","nome":"CSHG Logística FII","tipo":"FII","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":185.20,"preco_teto":195.00,"dividend_yield":8.2,"p_vp":0.85,"observacoes":"FII Logística","ativo":true},
     {"ticker":"KNRI11","nome":"Kinea Renda Imobiliária FII","tipo":"FII","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":145.80,"preco_teto":155.00,"dividend_yield":7.5,"p_vp":0.92,"observacoes":"FII Renda Imobiliária","ativo":true},
-    {"ticker":"MXRF11","nome":"Maxi Renda FII","tipo":"FII","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":10.80,"preco_teto":12.00,"dividend_yield":11.0,"p_vp":1.02,"observacoes":"FII Papel - Recebíveis","ativo":true},
+    {"ticker":"MXRF11","nome":"Maxi Renda FII","tipo":"FII","classe":"RENDA_VARIAVEL","mercado":"BR","moeda":"BRL","preco_atual":10.80,"preco_teto":12.00,"dividend_yield":9.999,"p_vp":1.02,"observacoes":"FII Papel - Recebíveis","ativo":true},
 
     {"ticker":"AAPL","nome":"Apple Inc.","tipo":"STOCK","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":172.50,"preco_teto":195.00,"dividend_yield":0.5,"p_l":28.5,"observacoes":"Sector: Technology","ativo":true},
     {"ticker":"MSFT","nome":"Microsoft Corporation","tipo":"STOCK","classe":"RENDA_VARIAVEL","mercado":"US","moeda":"USD","preco_atual":420.00,"preco_teto":450.00,"dividend_yield":0.7,"p_l":32.8,"observacoes":"Sector: Technology","ativo":true},
