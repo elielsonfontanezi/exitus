@@ -1270,25 +1270,20 @@ podman exec exitus-backend bash /scripts/create_test_db.sh
 
 ---
 
-### 🔴 P2 — Dois Heads Alembic Divergentes
+### ~~🔴 P2 — Dois Heads Alembic Divergentes~~ ✅ RESOLVIDO (24/06/2026)
 
-**Problema:** O Alembic possui dois heads simultâneos sem merge:
+**Problema:** O Alembic possuía dois heads simultâneos sem merge:
 ```
-20260403_1040 (head)   ← branch de migration antiga
-20260624_1000 (head)   ← migration BUG-021 (nova branch)
-```
-
-**Causa:** A migration BUG-021 foi criada a partir de um ponto anterior da árvore, gerando bifurcação. Sem merge, `alembic upgrade head` é ambíguo e pode falhar.
-
-**Impacto:** Alembic instável — qualquer tentativa de nova migration ou upgrade pode falhar. Continua-se aplicando DDL manual como workaround.
-
-**Fix:**
-```bash
-podman exec exitus-backend bash -c "cd /app && python -m alembic merge heads -m 'merge_heads_20260624'"
-podman exec exitus-backend bash -c "cd /app && python -m alembic upgrade head"
+20260403_1040 (head)   ← RLS policies (MULTICLIENTE-001)
+20260624_1000 (head)   ← tipomovimentacao enum (BUG-021)
 ```
 
-**Status:** 📋 Pendente — **aguarda aprovação antes de executar**
+**Fix aplicado:**
+- Criado `20260624_1100_merge_rls_and_tipomovimentacao_heads.py` no host (sem escrita no container)
+- `alembic stamp 20260624_1100` — nenhum DDL executado (banco já estava correto)
+- Resultado: `alembic heads` retorna **1 único head**: `20260624_1100 (mergepoint)`
+
+**Status:** ✅ Resolvido — Alembic estável, novas migrations podem ser criadas normalmente
 
 ---
 
@@ -1357,14 +1352,14 @@ cd tests/e2e && npx playwright test --project="Mobile Chrome"
 
 ### 📊 Resumo de Prioridades
 
-| ID | Descrição | Prioridade | Bloqueante? |
-|----|-----------|------------|-------------|
-| P1 | Recriar `exitusdb_test` (enum incompleto) | 🔴 Alta | Sim — bloqueia P4 |
-| P2 | Merge Alembic heads divergentes | 🔴 Alta | Sim — Alembic instável |
-| P3 | BUG-013 filtro data pisca | 🟡 Média | Não |
-| P4 | 61 falhas + 35 erros setup testes | 🟡 Média | Depende de P1 |
-| P5 | E2E Firefox + Mobile Chrome | 🟡 Média | Não |
-| P6 | E2E v3 lógica negócio (73 CTs) | 🟡 Média | Não |
-| P7 | Fase 7 Backend (MONITOR/RATELIMIT/CICD) | 📋 Baixa | Não |
+| ID | Descrição | Prioridade | Status |
+|----|-----------|------------|--------|
+| P1 | Recriar `exitusdb_test` (enum incompleto) | 🔴 Alta | ✅ Resolvido 24/06/2026 |
+| P2 | Merge Alembic heads divergentes | 🔴 Alta | ✅ Resolvido 24/06/2026 |
+| P3 | BUG-013 filtro data pisca | 🟡 Média | 📋 Pendente |
+| P4 | 22 falhas + 8 erros setup testes (pós P1) | 🟡 Média | 📋 Pendente |
+| P5 | E2E Firefox + Mobile Chrome | 🟡 Média | 📋 Pendente |
+| P6 | E2E v3 lógica negócio (73 CTs) | 🟡 Média | 📋 Pendente |
+| P7 | Fase 7 Backend (MONITOR/RATELIMIT/CICD) | 📋 Baixa | 📋 Pendente |
 
-**Ordem de ataque recomendada:** P1 → P2 → P4 (reavaliação) → P3 → P5/P6 → P7
+**Progresso:** 2/7 resolvidos (P1, P2) | **Próximo:** P3 (BUG-013) ou P4 (testes)
