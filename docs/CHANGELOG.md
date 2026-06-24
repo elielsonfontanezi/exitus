@@ -8,6 +8,23 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — FEAT-008: Botão "Confirmar Recebimento" de provento (23/06/2026)
+
+**Arquivos verificados:**
+- `frontend/app/templates/proventos/calendario_v2.html`: botão "Confirmar" já implementado (linha 93-97)
+- Função `confirmarPagamento(item)` completa (linha 238-249)
+- API endpoint `/api/calendario-dividendos/{id}/confirmar-pagamento` funcional
+
+**Problemas resolvidos:** Documentação desatualizada - FEAT-008 já estava implementada e funcional
+
+**Como funciona:** 
+- Botão "Confirmar" aparece para proventos com status "previsto"
+- Prompt para valor real recebido
+- Atualização de status para "confirmado" via API
+- Feedback visual para usuário
+
+---
+
 ### Fix — FEAT-007: Tela de detalhe de plano de compra (23/06/2026)
 
 **Arquivos alterados:**

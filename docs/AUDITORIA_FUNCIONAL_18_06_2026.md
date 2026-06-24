@@ -559,7 +559,7 @@
 | ~~FEAT-005~~ | ~~Template `venda.html` legado ainda existe como rota separada~~ | 7 | **RESOLVIDA**: suporte a ?venda=true em operacoes_v2.html; rota /venda redireciona mantendo compatibilidade; modo venda inicializa automaticamente com posições carregadas |
 | ~~FEAT-006~~ | ~~Exportação CSV renderiza tabela HTML — sem download real do arquivo~~ | 28 | **RESOLVIDA**: download direto via HTTP headers; nova página /exportar com preview automático; compatibilidade mantida com ?preview=true |
 | ~~FEAT-007~~ | ~~Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona~~ | 34 | **RESOLVIDA**: modal com informações completas; botão Detalhes na tabela; carregamento via API específica |
-| FEAT-008 | Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível | 14 |
+| ~~FEAT-008~~ | ~~Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível~~ | 14 | **RESOLVIDA**: botão "Confirmar" já implementado em calendario_v2.html; função confirmarPagamento() completa; API /api/calendario-dividendos/{id}/confirmar-pagamento funcional |
 | FEAT-009 | **Import B3 não lista os registros importados** — resultado mostra apenas totais numéricos (Transações=N, Proventos=N). Usuário não sabe quais ativos foram criados/importados. **Fix:** exibir lista dos tickers importados e ativos criados automaticamente após import | 5 |
 | FEAT-010 | **Indicadores de mercado (CDI/Ibovespa) sem endpoint dinâmico** — atualmente valores vêm de variáveis de ambiente no frontend. **Fix:** criar backend `GET /api/indicadores` com CDI/Ibovespa atualizados automaticamente; dashboard consumir via API | 2 |
 | FEAT-011 | **Saldo de corretoras não é dinâmico** — `sincronizar-saldo` resolve manualmente. **Fix:** remover coluna `saldo_atual` e calcular saldo sempre a partir de movimentações de caixa, ou atualizar automaticamente via triggers/eventos ao inserir movimentação | 4 |
@@ -1197,7 +1197,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 |------------|-----------|
 | ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
 | 🟡 Importante | 0 — todos os bugs importantes foram resolvidos ou reclassificados |
-| ⬛ Feature ausente | 42 (FEAT-008 a FEAT-049) |
+| ⬛ Feature ausente | 41 (FEAT-009 a FEAT-049) |
 
 ### Impacto do BUG-001
 
