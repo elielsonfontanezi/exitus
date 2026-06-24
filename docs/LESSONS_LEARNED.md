@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 24/06/2026 — L-DB-007 adicionada (divergência ENUM vs banco)  
+> **Atualizado:** 24/06/2026 — L-DB-008 adicionada (banco de testes diverge após migration)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -95,6 +95,33 @@ INSERT INTO movimentacao_caixa (tipo_movimentacao, ...) VALUES ('deposito', ...)
 - `CREDITO_PROVENTO` → `aporte` (créditos como entradas)
 
 **Regra:** **SEMPRE** verificar valores reais do ENUM no banco antes de usar em JSON/seeds. Documentação pode estar desatualizada.
+
+---
+
+### L-DB-008 — Banco de testes diverge do banco oficial após migrations
+**Origem:** BUG-021 — enum `tipomovimentacao` | **Data:** 24/06/2026
+
+**Erro:** Migration `20260624_1000` adicionou 5 novos valores ao enum `tipomovimentacao` no banco oficial (`exitusdb`). O banco de testes (`exitusdb_test`) não foi recriado após a migration, ficando com apenas 5 dos 10 valores. Resultado: 61 testes falhando por `invalid input value for enum`.
+
+**Diagnóstico:**
+```sql
+-- Banco oficial: 10 valores
+SELECT enumlabel FROM pg_enum e JOIN pg_type t ON t.oid=e.enumtypid
+WHERE t.typname='tipomovimentacao';
+
+-- Banco de testes: apenas 5 valores (divergência)
+-- Causa: create_test_db.sh não foi executado após a migration
+```
+
+**Correto — Fluxo obrigatório após qualquer migration:**
+1. Aplicar migration no banco oficial (`alembic upgrade head` ou DDL manual)
+2. **Imediatamente** recriar o banco de testes: `./scripts/create_test_db.sh`
+3. Validar paridade: `./scripts/check_db_parity.sh --strict`
+4. Rodar suite: `podman exec exitus-backend python -m pytest tests/ -q --no-cov`
+
+**Impacto desta falha:** 436/497 (87.7%) → resolvido para 538/566 (95.1%) após recriar banco de testes (+102 testes recuperados).
+
+**Regra:** Toda migration aplicada no `exitusdb` **exige** recriação imediata do `exitusdb_test`. O `create_test_db.sh` agora executa automaticamente `check_db_parity.sh` para detectar divergências no final.
 
 ---
 

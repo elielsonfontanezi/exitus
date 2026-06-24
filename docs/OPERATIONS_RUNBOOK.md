@@ -960,14 +960,17 @@ podman exec exitus-backend python -m pytest tests/ -x --no-cov
 
 ### Recriar o banco de teste do zero
 
-**Obrigatório após qualquer `alembic upgrade`** — e também após schema corrompido ou primeiro setup em nova máquina:
+**🚨 OBRIGATÓRIO após qualquer migration ou DDL aplicado ao `exitusdb`** — também após schema corrompido ou primeiro setup em nova máquina (L-DB-008):
 
 ```bash
-# Recria exitusdb_test com schema idêntico ao exitusdb de produção
+# Recria exitusdb_test + seed test_e2e + verifica paridade (padrão)
 ./scripts/create_test_db.sh
 
 # Apenas valida containers sem alterar nada
 ./scripts/create_test_db.sh --dry-run
+
+# Recria sem carregar seed (só schema)
+./scripts/create_test_db.sh --skip-seed
 ```
 
 **O que o script faz:**
@@ -975,8 +978,22 @@ podman exec exitus-backend python -m pytest tests/ -x --no-cov
 2. Encerra conexões ativas no banco de teste
 3. Drop + create de `exitusdb_test`
 4. Aplica schema via `pg_dump --schema-only` do `exitusdb` (garante paridade total, inclusive ENUMs)
+5. Carrega seed `test_e2e` automaticamente (3 usuários, 7 ativos, 4 transações)
+6. Executa `check_db_parity.sh` para validar paridade de ENUMs, tabelas e colunas
 
-> **⚠️ Importante:** Usar sempre `create_test_db.sh` para recriar o banco de teste — nunca `db.create_all()` diretamente, pois não respeita a ordem de criação de ENUMs PostgreSQL (L-TEST-002).
+### Verificar paridade entre exitusdb e exitusdb_test
+
+```bash
+# Relatório de paridade (não falha mesmo com divergência)
+./scripts/check_db_parity.sh
+
+# Modo estrito — sai com erro se divergência encontrada (útil em CI)
+./scripts/check_db_parity.sh --strict
+```
+
+**O que verifica:** contagem de tabelas, todos os ENUMs (valores e ordem), contagem de colunas por tabela.
+
+> **⚠️ Importante:** Usar sempre `create_test_db.sh` para recriar o banco de teste — nunca `db.create_all()` diretamente, pois não respeita a ordem de criação de ENUMs PostgreSQL (L-DB-008).
 
 ### ❌ Métodos INCORRETOS (não usar)
 
