@@ -21,8 +21,8 @@
 | Status | Quantidade |
 |--------|-----------|
 | ✅ OK | 2 |
-| 🟡 PARCIAL | 34 |
-| 🔴 QUEBRADO | 0 |
+| 🟡 PARCIAL | 33 |
+| 🔴 QUEBRADO | 1 |
 | ⬜ NÃO TESTADO | 0 |
 
 ---
@@ -40,7 +40,7 @@
 | 7 | Operações — Venda | `/operacoes/` | 🟡 | Toggle funciona ✅; modo venda acessível e formulário exibido corretamente | Média |
 | 8 | Operações — Histórico | `/operacoes/historico` | 🟡 | Filtro por data com bug; filtro ticker OK; sem editar/excluir | Média |
 | 9 | Carteira — Posições | `/carteira/posicoes` | ✅ | Validado visualmente: KPIs, filtros (ticker/tipo/mercado) e botão Recalcular funcionam | — |
-| 10 | Carteira — Movimentações | `/carteira/movimentacoes` | 🟡 | KPIs e tabela OK; filtro tipo OK; filtro data quebrado — tela pisca ao digitar ano (BUG-013) | Alta |
+| 10 | Carteira — Movimentações | `/carteira/movimentacoes` | � | KPIs e tabela não exibem dados atualizados; fluxo de caixa realista (154 aportes + 12 resgates) não aparece; filtro data quebrado — tela pisca ao digitar ano (BUG-013) | Alta |
 | 11 | Ativos — Catálogo | `/ativos/acoes` | 🟡 | Tabela e categorias OK; busca por ticker não funciona (BUG-014); detalhe lento e sem dados (BUG-015) | Alta |
 | 12 | Ativos — Detalhe | `/ativos/<TICKER>` | 🟡 | Abre mas demora e nem sempre traz dados (BUG-015) | Alta |
 | 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | 🟡 | Carrega corretamente ✅; KPIs + filtros OK; link adicionado ao menu (EXITUS-ATIVOS-001); sem dados (ambiente dev sem eventos cadastrados) | Baixa |
@@ -246,7 +246,7 @@
 ---
 
 ### Tela 10 — Carteira — Movimentações (`/carteira/movimentacoes`)
-**Status:** 🟡 PARCIAL
+**Status:** � QUEBRADO
 
 **O que funciona (código):**
 - Herda `base_interna.html` ✅
@@ -256,15 +256,21 @@
 - Ordenação por coluna ✅
 
 **Problemas encontrados:**
-1. 🔴 **Afetada por BUG-001** — localStorage vazio → API retorna 401
-2. 🟡 **API retorna enum como string** — `tipo_movimentacao` vem como `"TipoMovimentacao.DEPOSITO"` e o template faz `parseTipo()` para extrair `"deposito"`. Funciona mas é frágil — se a API mudar o formato, quebra silenciosamente.
-3. 🟡 **Filtro data client-side no tipo** — filtro por tipo opera sobre os itens carregados, mas data já vai como param server-side via `carregarComFiltro()` ✅
+1. 🔴 **DADOS NÃO APARECEM** — Fluxo de caixa realista (154 aportes + 12 resgates) implementado em 24/06/2026 não está sendo exibido na tela. Dados existem no banco mas não chegam ao frontend.
+2. 🔴 **Afetada por BUG-001** — localStorage vazio → API retorna 401
+3. 🟡 **API retorna enum como string** — `tipo_movimentacao` vem como `"TipoMovimentacao.DEPOSITO"` e o template faz `parseTipo()` para extrair `"deposito"`. Funciona mas é frágil — se a API mudar o formato, quebra silenciosamente.
+4. 🟡 **Filtro data client-side no tipo** — filtro por tipo opera sobre os itens carregados, mas data já vai como param server-side via `carregarComFiltro()` ✅
 
-**Validação visual (18/06/2026):**
-- [x] KPIs de saldo carregam ✅
-- [x] Tabela exibe registros ✅
-- [x] Filtro por tipo funciona ✅
+**Validação visual (24/06/2026):**
+- [ ] KPIs de saldo não carregam dados atualizados ❌
+- [ ] Tabela não exibe registros do fluxo de caixa realista ❌
+- [ ] Filtro por tipo não funciona (sem dados) ❌
 - [x] **Filtro de data quebrado** 🔴 — tela pisca ao digitar o ano no campo de data. Provável `x-model` no `<input type="date">` disparando `carregarComFiltro()` a cada tecla, incluindo estados intermediários inválidos (ex: `2026-` sem completar). **Registrado como BUG-013.**
+
+**Dados que deveriam aparecer (verificados no banco):**
+- 154 aportes (R$ 1.405.731,48)
+- 12 resgates (R$ 23.531,50)
+- Movimentações recentes: DARF R$ 76,00, Saques R$ 5.000,00, etc.
 
 ---
 
@@ -1178,14 +1184,15 @@ curl -X POST http://localhost:5000/api/auth/login \
 | Status | Qtd | % |
 |--------|-----|---|
 | ✅ OK | 2 | 6% |
-| 🟡 PARCIAL | 34 | 94% |
-| 🔴 QUEBRADO | 0 | 0% |
-| ⬜ NÃO TESTADO | 0 | — |
+| 🟡 PARCIAL | 33 | 89% |
+| 🔴 QUEBRADO | 1 | 3% |
+| ⬜ NÃO TESTADO | 1 | 3% |
 
 ### Telas 🔴 QUEBRADAS
 
 | Tela | URL | Motivo |
 |------|-----|--------|
+| 10 | `/carteira/movimentacoes` | **BUG-021** — Dados não aparecem: fluxo de caixa realista (154 aportes + 12 resgates) implementado em 24/06/2026 não está sendo exibido na tela. Dados existem no banco mas não chegam ao frontend. |
 | ~~5~~ | ~~`/operacoes/` Import B3~~ | ~~Import não exibe registros~~ → **FALSO POSITIVO** — idempotente por design; revalidado com dados novos: Transações=2 |
 | ~~6, 7~~ | ~~`/operacoes/` Compra/Venda~~ | ~~Toggle inoperante~~ → **RESOLVIDO** EXITUS-OPERACOES-001 |
 | ~~13~~ | ~~`/ativos/eventos-corporativos`~~ | ~~NOT FOUND~~ → **FALSO POSITIVO** — carrega OK com token válido |
@@ -1195,7 +1202,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 | Prioridade | Quantidade |
 |------------|-----------|
-| ~~🔴 Crítico~~ | ~~3 (BUG-001, BUG-002, BUG-003)~~ | **0 críticos — todos resolvidos ou falsos positivos** |
+| 🔴 Crítico | 1 (BUG-021) | **Novo bug crítico identificado em 24/06/2026** |
 | 🟡 Importante | 0 — todos os bugs importantes foram resolvidos ou reclassificados |
 | ⬛ Feature ausente | 41 (FEAT-009 a FEAT-049) |
 
