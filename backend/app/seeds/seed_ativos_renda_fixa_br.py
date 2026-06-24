@@ -23,16 +23,16 @@ def seed_renda_fixa_br():
         
         ativos_renda_fixa_br = [
             # CDBs
-            {"ticker": "CDBNUBANK100CDI", "nome": "Nubank CDB 100% do CDI", "tipo": "CDB", "observacoes": "Liquidez D+0, mínimo R$1.000,00, rendimento 100% CDI", "preco_atual": 1000.00},
-            {"ticker": "CDBINTER105CDI", "nome": "Banco Inter CDB 105% do CDI", "tipo": "CDB", "observacoes": "Liquidez D+1, mínimo R$1.000,00, rendimento 105% CDI (>R$500k)", "preco_atual": 1000.00},
-            {"ticker": "CDBC6107CDI", "nome": "C6 Bank CDB 107% do CDI", "tipo": "CDB", "observacoes": "Liquidez D+0, mínimo R$1.000,00, rendimento 107% CDI (>R$1M)", "preco_atual": 1000.00},
+            {"ticker": "CDBNUBANK100CDI", "nome": "Nubank CDB 100% do CDI", "tipo": "cdb", "observacoes": "Liquidez D+0, mínimo R$1.000,00, rendimento 100% CDI", "preco_atual": 1000.00},
+            {"ticker": "CDBINTER105CDI", "nome": "Banco Inter CDB 105% do CDI", "tipo": "cdb", "observacoes": "Liquidez D+1, mínimo R$1.000,00, rendimento 105% CDI (>R$500k)", "preco_atual": 1000.00},
+            {"ticker": "CDBC6107CDI", "nome": "C6 Bank CDB 107% do CDI", "tipo": "cdb", "observacoes": "Liquidez D+0, mínimo R$1.000,00, rendimento 107% CDI (>R$1M)", "preco_atual": 1000.00},
             # Tesouro Direto
-            {"ticker": "TESOUROSELIC2029", "nome": "Tesouro Selic 2029", "tipo": "TESOURO_DIRETO", "observacoes": "Vencimento 01/03/2029, rentabilidade Selic + 0,00%", "preco_atual": 920.45},
-            {"ticker": "TESOUROIPCA2035", "nome": "Tesouro IPCA+ 2035", "tipo": "TESOURO_DIRETO", "observacoes": "Vencimento 15/08/2035, rentabilidade IPCA + 5,82%", "preco_atual": 4500.20},
-            {"ticker": "TESOUROPREFIX2027", "nome": "Tesouro Prefixado 2027", "tipo": "TESOURO_DIRETO", "observacoes": "Vencimento 01/01/2027, rentabilidade 11,85% a.a.", "preco_atual": 880.75},
+            {"ticker": "TESOUROSELIC2029", "nome": "Tesouro Selic 2029", "tipo": "tesouro_direto", "observacoes": "Vencimento 01/03/2029, rentabilidade Selic + 0,00%", "preco_atual": 920.45},
+            {"ticker": "TESOUROIPCA2035", "nome": "Tesouro IPCA+ 2035", "tipo": "tesouro_direto", "observacoes": "Vencimento 15/08/2035, rentabilidade IPCA + 5,82%", "preco_atual": 4500.20},
+            {"ticker": "TESOUROPREFIX2027", "nome": "Tesouro Prefixado 2027", "tipo": "tesouro_direto", "observacoes": "Vencimento 01/01/2027, rentabilidade 11,85% a.a.", "preco_atual": 880.75},
             # Debêntures
-            {"ticker": "VALE23DBNT", "nome": "Vale Debênture 2023 NT", "tipo": "DEBENTURE", "observacoes": "Debênture Não Tributável, cupom 7,5% a.a., vencimento 2030", "preco_atual": 1050.30},
-            {"ticker": "PETR4DBNT", "nome": "Petrobras Debênture NT", "tipo": "DEBENTURE", "observacoes": "Debênture Não Tributável, cupom CDI + 2,0%, vencimento 2028", "preco_atual": 1025.80}
+            {"ticker": "VALE23DBNT", "nome": "Vale Debênture 2023 NT", "tipo": "debenture", "observacoes": "Debênture Não Tributável, cupom 7,5% a.a., vencimento 2030", "preco_atual": 1050.30},
+            {"ticker": "PETR4DBNT", "nome": "Petrobras Debênture NT", "tipo": "debenture", "observacoes": "Debênture Não Tributável, cupom CDI + 2,0%, vencimento 2028", "preco_atual": 1025.80}
         ]
         
         total_criados = 0
@@ -51,7 +51,7 @@ def seed_renda_fixa_br():
                 ticker=ativo_data["ticker"],
                 nome=ativo_data["nome"],
                 tipo=ativo_data["tipo"],
-                classe="RENDA_FIXA",
+                classe="renda_fixa",
                 mercado="BR",
                 moeda="BRL",
                 preco_atual=ativo_data["preco_atual"],

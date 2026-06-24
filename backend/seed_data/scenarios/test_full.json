@@ -70,7 +70,16 @@
     {"ticker":"DISB34","nome":"Walt Disney BDR","tipo":"STOCK_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":22.50,"preco_teto":28.00,"dividend_yield":0.8,"p_l":55.0,"observacoes":"BDR: Walt Disney Co. (B3)","ativo":true},
     {"ticker":"COCA34","nome":"Coca-Cola BDR","tipo":"STOCK_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":28.00,"preco_teto":32.00,"dividend_yield":3.0,"p_l":24.0,"observacoes":"BDR: Coca-Cola Co. (B3)","ativo":true},
     {"ticker":"IVVB11","nome":"iShares S&P 500 BRL","tipo":"ETF_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":320.00,"preco_teto":350.00,"dividend_yield":1.2,"observacoes":"ETF INTL: replica S&P 500 em BRL (B3)","ativo":true},
-    {"ticker":"EURP11","nome":"Trend MSCI Europe ETF","tipo":"ETF_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":45.00,"preco_teto":52.00,"dividend_yield":2.0,"observacoes":"ETF INTL: replica MSCI Europe em BRL (B3)","ativo":true}
+    {"ticker":"EURP11","nome":"Trend MSCI Europe ETF","tipo":"ETF_INTL","classe":"RENDA_VARIAVEL","mercado":"INTL","moeda":"BRL","preco_atual":45.00,"preco_teto":52.00,"dividend_yield":2.0,"observacoes":"ETF INTL: replica MSCI Europe em BRL (B3)","ativo":true},
+
+    {"ticker":"CDBNUBANK100CDI","nome":"Nubank CDB 100% do CDI","tipo":"CDB","classe":"RENDA_FIXA","mercado":"BR","moeda":"BRL","preco_atual":1000.00,"observacoes":"Liquidez D+0, mínimo R$1.000,00, rendimento 100% CDI","ativo":true},
+    {"ticker":"CDBINTER105CDI","nome":"Banco Inter CDB 105% do CDI","tipo":"CDB","classe":"RENDA_FIXA","mercado":"BR","moeda":"BRL","preco_atual":1000.00,"observacoes":"Liquidez D+1, mínimo R$1.000,00, rendimento 105% CDI (>R$500k)","ativo":true},
+    {"ticker":"CDBC6107CDI","nome":"C6 Bank CDB 107% do CDI","tipo":"CDB","classe":"RENDA_FIXA","mercado":"BR","moeda":"BRL","preco_atual":1000.00,"observacoes":"Liquidez D+0, mínimo R$1.000,00, rendimento 107% CDI (>R$1M)","ativo":true},
+    {"ticker":"TESOUROSELIC2029","nome":"Tesouro Selic 2029","tipo":"TESOURO_DIRETO","classe":"RENDA_FIXA","mercado":"BR","moeda":"BRL","preco_atual":920.45,"observacoes":"Vencimento 01/03/2029, rentabilidade Selic + 0,00%","ativo":true},
+    {"ticker":"TESOUROIPCA2035","nome":"Tesouro IPCA+ 2035","tipo":"TESOURO_DIRETO","classe":"RENDA_FIXA","mercado":"BR","moeda":"BRL","preco_atual":4500.20,"observacoes":"Vencimento 15/08/2035, rentabilidade IPCA + 5,82%","ativo":true},
+    {"ticker":"TESOUROPREFIX2027","nome":"Tesouro Prefixado 2027","tipo":"TESOURO_DIRETO","classe":"RENDA_FIXA","mercado":"BR","moeda":"BRL","preco_atual":880.75,"observacoes":"Vencimento 01/01/2027, rentabilidade 11,85% a.a.","ativo":true},
+    {"ticker":"VALE23DBNT","nome":"Vale Debênture 2023 NT","tipo":"DEBENTURE","classe":"RENDA_FIXA","mercado":"BR","moeda":"BRL","preco_atual":1050.30,"observacoes":"Debênture Não Tributável, cupom 7,5% a.a., vencimento 2030","ativo":true},
+    {"ticker":"PETR4DBNT","nome":"Petrobras Debênture NT","tipo":"DEBENTURE","classe":"RENDA_FIXA","mercado":"BR","moeda":"BRL","preco_atual":1025.80,"observacoes":"Debênture Não Tributável, cupom CDI + 2,0%, vencimento 2028","ativo":true}
   ],
   "corretoras": [
     {"nome":"XP INVESTIMENTOS","cnpj":"08764140000176","tipo":"CORRETORA","pais":"BR","moeda_padrao":"BRL","ativa":true},
@@ -138,7 +147,16 @@
     {"usuario":"e2e_user","ativo":"KNRI11","corretora":"ITAU CV S/A","tipo":"VENDA","data_transacao":"2024-12-02","quantidade":20,"preco_unitario":152.00,"taxa_corretagem":1.52,"custos_totais":2.80,"observacoes":"Venda parcial FII — LUCRO R$ 140 (FII 20% IR)"},
     {"usuario":"e2e_user","ativo":"NVDA","corretora":"AVENUE SECURITIES","tipo":"VENDA","data_transacao":"2024-12-09","quantidade":4,"preco_unitario":1050.00,"taxa_corretagem":1.00,"custos_totais":2.00,"observacoes":"Venda parcial NVDA — LUCRO $600 (US 15% IR)"},
     {"usuario":"e2e_user","ativo":"BBAS3","corretora":"INTER BANCO","tipo":"VENDA","data_transacao":"2024-12-16","quantidade":100,"preco_unitario":26.50,"taxa_corretagem":1.32,"custos_totais":2.60,"observacoes":"Venda parcial BBAS3 — PREJUÍZO R$ 150 (PM 28.00, venda 26.50)"},
-    {"usuario":"e2e_user","ativo":"GOGL34","corretora":"INTER BANCO","tipo":"VENDA","data_transacao":"2024-12-20","quantidade":30,"preco_unitario":42.00,"taxa_corretagem":0.63,"custos_totais":1.40,"observacoes":"Venda parcial BDR Alphabet — LUCRO R$ 120 (BDR 15% IR)"}
+    {"usuario":"e2e_user","ativo":"GOGL34","corretora":"INTER BANCO","tipo":"VENDA","data_transacao":"2024-12-20","quantidade":30,"preco_unitario":42.00,"taxa_corretagem":0.63,"custos_totais":1.40,"observacoes":"Venda parcial BDR Alphabet — LUCRO R$ 120 (BDR 15% IR)"},
+
+    {"usuario":"e2e_user","ativo":"CDBNUBANK100CDI","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-02-15","quantidade":10,"preco_unitario":1000.00,"taxa_corretagem":0.00,"custos_totais":0.00,"observacoes":"Aporte Renda Fixa — CDB Nubank 100% CDI"},
+    {"usuario":"e2e_user","ativo":"TESOUROSELIC2029","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-03-10","quantidade":5,"preco_unitario":920.45,"taxa_corretagem":0.00,"custos_totais":0.00,"observacoes":"Aporte Renda Fixa — Tesouro Selic 2029"},
+    {"usuario":"e2e_user","ativo":"CDBINTER105CDI","corretora":"INTER BANCO","tipo":"COMPRA","data_transacao":"2024-04-20","quantidade":8,"preco_unitario":1000.00,"taxa_corretagem":0.00,"custos_totais":0.00,"observacoes":"Aporte Renda Fixa — CDB Inter 105% CDI"},
+    {"usuario":"e2e_user","ativo":"TESOUROIPCA2035","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-05-15","quantidade":2,"preco_unitario":4500.20,"taxa_corretagem":0.00,"custos_totais":0.00,"observacoes":"Aporte Renda Fixa — Tesouro IPCA+ 2035"},
+    {"usuario":"e2e_user","ativo":"CDBC6107CDI","corretora":"ITAU CV S/A","tipo":"COMPRA","data_transacao":"2024-06-25","quantidade":6,"preco_unitario":1000.00,"taxa_corretagem":0.00,"custos_totais":0.00,"observacoes":"Aporte Renda Fixa — CDB C6 Bank 107% CDI"},
+    {"usuario":"e2e_user","ativo":"TESOUROPREFIX2027","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-07-30","quantidade":3,"preco_unitario":880.75,"taxa_corretagem":0.00,"custos_totais":0.00,"observacoes":"Aporte Renda Fixa — Tesouro Prefixado 2027"},
+    {"usuario":"e2e_user","ativo":"VALE23DBNT","corretora":"XP INVESTIMENTOS","tipo":"COMPRA","data_transacao":"2024-08-15","quantidade":5,"preco_unitario":1050.30,"taxa_corretagem":5.25,"custos_totais":8.00,"observacoes":"Aporte Renda Fixa — Debênture Vale NT"},
+    {"usuario":"e2e_user","ativo":"PETR4DBNT","corretora":"INTER BANCO","tipo":"COMPRA","data_transacao":"2024-09-20","quantidade":4,"preco_unitario":1025.80,"taxa_corretagem":4.10,"custos_totais":6.50,"observacoes":"Aporte Renda Fixa — Debênture Petrobras NT"}
   ],
   "proventos": [
     {"ativo":"PETR4","tipo_provento":"DIVIDENDO","data_com":"2024-02-15","data_pagamento":"2024-03-08","valor_unitario":2.50,"quantidade_ativos":500,"observacoes":"Dividendo ordinário PETR4 — 1T24"},
@@ -179,7 +197,18 @@
     {"ativo":"TAEE11","tipo_provento":"DIVIDENDO","data_com":"2024-11-20","data_pagamento":"2024-12-10","valor_unitario":1.40,"quantidade_ativos":120,"observacoes":"Dividendo UNIT Taesa — extra"},
     {"ativo":"KNRI11","tipo_provento":"RENDIMENTO","data_com":"2024-11-28","data_pagamento":"2024-12-16","valor_unitario":1.02,"quantidade_ativos":30,"observacoes":"Rendimento FII KNRI11 (30 restantes após venda dez)"},
     {"ativo":"MXRF11","tipo_provento":"RENDIMENTO","data_com":"2024-11-28","data_pagamento":"2024-12-16","valor_unitario":0.12,"quantidade_ativos":150,"observacoes":"Rendimento FII MXRF11 (150 restantes)"},
-    {"ativo":"PLD","tipo_provento":"DIVIDENDO","data_com":"2024-11-29","data_pagamento":"2024-12-15","valor_unitario":0.96,"quantidade_ativos":12,"observacoes":"Dividend Prologis REIT — trimestral (USD)"}
+    {"ativo":"PLD","tipo_provento":"DIVIDENDO","data_com":"2024-11-29","data_pagamento":"2024-12-15","valor_unitario":0.96,"quantidade_ativos":12,"observacoes":"Dividend Prologis REIT — trimestral (USD)"},
+
+    {"ativo":"CDBNUBANK100CDI","tipo_provento":"JUROS","data_com":"2024-03-15","data_pagamento":"2024-03-15","valor_unitario":8.33,"quantidade_ativos":10,"observacoes":"Juros mensais CDB Nubank — 100% CDI"},
+    {"ativo":"CDBNUBANK100CDI","tipo_provento":"JUROS","data_com":"2024-04-15","data_pagamento":"2024-04-15","valor_unitario":8.45,"quantidade_ativos":10,"observacoes":"Juros mensais CDB Nubank — 100% CDI"},
+    {"ativo":"CDBNUBANK100CDI","tipo_provento":"JUROS","data_com":"2024-05-15","data_pagamento":"2024-05-15","valor_unitario":8.52,"quantidade_ativos":10,"observacoes":"Juros mensais CDB Nubank — 100% CDI"},
+    {"ativo":"TESOUROSELIC2029","tipo_provento":"JUROS","data_com":"2024-04-10","data_pagamento":"2024-04-10","valor_unitario":10.85,"quantidade_ativos":5,"observacoes":"Juros mensais Tesouro Selic — 10.75% a.a."},
+    {"ativo":"TESOUROSELIC2029","tipo_provento":"JUROS","data_com":"2024-05-10","data_pagamento":"2024-05-10","valor_unitario":10.92,"quantidade_ativos":5,"observacoes":"Juros mensais Tesouro Selic — 10.85% a.a."},
+    {"ativo":"CDBINTER105CDI","tipo_provento":"JUROS","data_com":"2024-05-20","data_pagamento":"2024-05-20","valor_unitario":8.75,"quantidade_ativos":8,"observacoes":"Juros mensais CDB Inter — 105% CDI"},
+    {"ativo":"TESOUROIPCA2035","tipo_provento":"JUROS","data_com":"2024-06-15","data_pagamento":"2024-06-15","valor_unitario":21.88,"quantidade_ativos":2,"observacoes":"Juros semestrais Tesouro IPCA+ — IPCA + 5.82%"},
+    {"ativo":"CDBC6107CDI","tipo_provento":"JUROS","data_com":"2024-07-25","data_pagamento":"2024-07-25","valor_unitario":8.90,"quantidade_ativos":6,"observacoes":"Juros mensais CDB C6 Bank — 107% CDI"},
+    {"ativo":"VALE23DBNT","tipo_provento":"JUROS","data_com":"2024-09-15","data_pagamento":"2024-09-15","valor_unitario":39.38,"quantidade_ativos":5,"observacoes":"Juros semestrais Debênture Vale — 7.5% a.a."},
+    {"ativo":"PETR4DBNT","tipo_provento":"JUROS","data_com":"2024-10-20","data_pagamento":"2024-10-20","valor_unitario":20.52,"quantidade_ativos":4,"observacoes":"Juros semestrais Debênture Petrobras — CDI + 2.0%"}
   ],
   "movimentacoes_caixa": [
     {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-01-05","valor":50000.00,"moeda":"BRL","observacoes":"Aporte inicial BRL — início carteira Aposentadoria"},
@@ -199,7 +228,16 @@
     {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"SAQUE","data_movimentacao":"2024-06-20","valor":3000.00,"moeda":"BRL","observacoes":"Saque parcial — despesas pessoais"},
     {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"SAQUE","data_movimentacao":"2024-12-23","valor":5000.00,"moeda":"BRL","observacoes":"Saque fim de ano"},
     {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"PAGAMENTO_IMPOSTO","data_movimentacao":"2024-11-30","valor":685.50,"moeda":"BRL","observacoes":"DARF referente vendas outubro (ações > R$ 20K + BDR)"},
-    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"PAGAMENTO_IMPOSTO","data_movimentacao":"2024-12-30","valor":76.00,"moeda":"BRL","observacoes":"DARF referente venda FII novembro (20% s/ lucro HGLG11)"}
+    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"PAGAMENTO_IMPOSTO","data_movimentacao":"2024-12-30","valor":76.00,"moeda":"BRL","observacoes":"DARF referente venda FII novembro (20% s/ lucro HGLG11)"},
+
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-02-15","valor":10000.00,"moeda":"BRL","observacoes":"Aporte Renda Fixa — CDB Nubank"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-03-10","valor":4602.25,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Tesouro Selic"},
+    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"DEPOSITO","data_movimentacao":"2024-04-20","valor":8000.00,"moeda":"BRL","observacoes":"Aporte Renda Fixa — CDB Inter"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-05-15","valor":9000.40,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Tesouro IPCA+"},
+    {"usuario":"e2e_user","corretora":"ITAU CV S/A","tipo":"DEPOSITO","data_movimentacao":"2024-06-25","valor":6000.00,"moeda":"BRL","observacoes":"Aporte Renda Fixa — CDB C6 Bank"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-07-30","valor":2642.25,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Tesouro Prefixado"},
+    {"usuario":"e2e_user","corretora":"XP INVESTIMENTOS","tipo":"DEPOSITO","data_movimentacao":"2024-08-15","valor":5259.50,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Debênture Vale"},
+    {"usuario":"e2e_user","corretora":"INTER BANCO","tipo":"DEPOSITO","data_movimentacao":"2024-09-20","valor":4103.20,"moeda":"BRL","observacoes":"Aporte Renda Fixa — Debênture Petrobras"}
   ],
   "alertas": [
     {"usuario":"e2e_user","ativo_ticker":"PETR4","tipo_alerta":"PRECO_ALVO","condicao":"MAIOR_IGUAL","valor_referencia":45.00,"ativo":true,"notificar_email":true,"mensagem":"PETR4 atingiu preço teto de R$ 45,00"},
