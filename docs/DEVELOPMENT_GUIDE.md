@@ -13,6 +13,16 @@
 
 ---
 
+## 🌐 Princípios Fundamentais
+
+- **Multi-Mercado:** Brasil, EUA, Europa, Ásia
+- **Multi-Classe:** Ações, FIIs, REITs, Renda Fixa, Cripto
+- **Multi-Corretora:** Abstração de caixa unificado
+- **Dados Near Real-Time:** Cotações com delay até 15 min
+- **Compliance por Design:** Regras fiscais configuráveis por jurisdição
+
+---
+
 ## 🛠️ Regras Inegociáveis (Não Modificar Sem Permissão)
 
 ### 1. Multi-Tenancy (Shared Database)
@@ -93,6 +103,23 @@ podman exec exitus-backend python -m pytest backend/tests/test_constraints.py -v
 
 ---
 
+## 🌱 Comandos de Seed e Reset
+
+```bash
+# Reset completo do banco de testes
+./scripts/create_test_db.sh
+
+# Seed específico
+python backend/load_scenario.py test_e2e
+
+# Verificar paridade de schema
+./scripts/check_db_parity.sh --strict
+```
+
+**Referência completa:** docs/SEEDS.md, docs/OPERATIONS_RUNBOOK.md
+
+---
+
 ## 📚 Fontes de Verdade (Ler ANTES de qualquer ação)
 
 **PRIORIDADE 1 (obrigatório):**
@@ -116,6 +143,28 @@ podman exec exitus-backend python -m pytest backend/tests/test_constraints.py -v
 - **Backend:** http://localhost:5000
 - **Database (host):** 127.0.0.1:5433
 - **Database (container):** 5432
+
+---
+
+## 🏗️ Stack Tecnológica
+
+- **Backend:** Python 3.11 + Flask + SQLAlchemy
+- **Database:** PostgreSQL 16
+- **Frontend:** HTMX + Alpine.js + Tailwind CSS
+- **Containers:** 3 containers Podman rootless (exitus-db, exitus-backend, exitus-frontend)
+- **Network:** exitus-net (bridge customizada)
+
+---
+
+## 🔐 Credenciais de Acesso (Desenvolvimento)
+
+| Username | Senha | Perfil |
+|----------|-------|-------|
+| e2e_admin | e2e_senha_123 | Administrador |
+| e2e_user | e2e_senha_123 | Usuário |
+| e2e_viewer | e2e_senha_123 | Visualizador |
+
+**Referência completa:** docs/SEEDS.md
 
 ---
 
