@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 24/06/2026 — L-DB-008 + L-TEST-001 adicionadas  
+> **Atualizado:** 25/06/2026 — L-DB-009 adicionada (paridade exitusdb/exitusdb_test)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -1366,6 +1366,25 @@ psycopg2.errors.UndefinedColumn: column "assessora_id" of relation "usuario" doe
    ```
 
 **Resultado:** 436/497 testes passando (87.7%) — +5 testes recuperados.
+
+---
+
+### L-DB-009 — Correções estruturais devem ser aplicadas em AMBOS os bancos
+**Origem:** CONSTRAINT-001 | **Data:** 25/06/2026
+
+**Erro:** CHECK constraints aplicadas em `exitusdb` via migration Alembic, mas `exitusdb_test` não foi atualizado simultaneamente. Os 13 testes de constraints continuaram falhando até aplicação manual via ALTER TABLE.
+
+**Regra obrigatória:** Qualquer correção estrutural (ALTER TABLE, constraints, enums, colunas) DEVE ser aplicada nos dois bancos no mesmo momento:
+- **exitusdb:** via migration Alembic (`flask db upgrade`) — criar arquivo `.py` em `migrations/versions/`
+- **exitusdb_test:** via ALTER TABLE direto — `podman exec exitus-db psql -U exitus -d exitusdb_test -c "ALTER TABLE ..."`
+
+**Verificação de paridade:**
+```bash
+podman exec exitus-db psql -U exitus -d exitusdb -c "SELECT conname FROM pg_constraint WHERE contype='c' ORDER BY conname;"
+podman exec exitus-db psql -U exitus -d exitusdb_test -c "SELECT conname FROM pg_constraint WHERE contype='c' ORDER BY conname;"
+```
+
+**Consequência de ignorar:** Testes falham localmente mas passariam em produção (ou vice-versa) — falsos negativos difíceis de diagnosticar.
 
 ---
 
