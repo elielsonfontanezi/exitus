@@ -8,6 +8,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — Arquivamento de documentação obsoleta e registro de GAP pendente (25/06/2026)
+
+**Motivo:** `EXITUS-CRUD-002.md` descrevia problemas estruturais na camada service/route. 2/3 problemas foram resolvidos (validação de delete, query duplicada no login), 1 parcial (ValueError residual em 5 services). GAP pendente registrado como TECH-001 na auditoria funcional.
+
+**Artefatos removidos/arquivados:**
+- `docs/EXITUS-CRUD-002.md` → movido para `docs/archive/EXITUS-CRUD-002.md`
+
+**Artefatos atualizados:**
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: TECH-001 adicionado ao Backlog de Correções (ValueError residual em 5 services)
+
+**Status TECH-001:** PENDENTE — services `parametros_macro`, `rfcalc`, `cambio`, `ir`, `alerta` ainda usam `ValueError` genérico. Hierarquia de exceções já existe em `app/utils/exceptions.py` e é usada por 15+ services.
+
+---
+
 ### Docs — Arquivamento de documentação obsoleta (25/06/2026)
 
 **Motivo:** `PLANO_TESTE_MULTITENANCY.md` descrevia plano de testes para MULTICLIENTE-001, que já está concluído. Testes formais consolidados em `backend/tests/test_multitenancy.py`.
