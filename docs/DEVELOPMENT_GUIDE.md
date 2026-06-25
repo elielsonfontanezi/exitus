@@ -123,20 +123,29 @@ podman exec exitus-backend python -m pytest backend/tests/test_import_b3_parsers
 
 ## 🌱 Comandos de Seed e Reset
 
+> ⚠️ **Apenas para ambiente de desenvolvimento.**
+
 ```bash
-# Reset completo do banco de testes
+# Reset completo do banco de testes (exitusdb_test + seed test_e2e + paridade)
 ./scripts/create_test_db.sh
 
-# Seed específico (cenários disponíveis: test_full, test_e2e, test_ir, test_stress)
+# Seed específico via load_scenario.py
 python backend/load_scenario.py test_full
+
+# Seed específico via reset_and_seed.py (alternativa dentro do container)
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_full
 
 # Verificar paridade de schema
 ./scripts/check_db_parity.sh --strict
 ```
 
-**Cenários principais:**
-- `test_full` — Cenário completo com histórico patrimonial (16 meses)
-- `test_e2e` — Dados realistas para testes E2E
+**Cenários disponíveis:**
+| Cenário | Descrição |
+|---------|-----------|
+| `test_full` | Cenário completo com histórico patrimonial (16 meses) |
+| `test_e2e` | Dados realistas para testes E2E |
+| `test_ir` | Dados específicos para testes de IR |
+| `test_stress` | Cenário de carga/stress |
 
 **Referência completa:** docs/SEEDS.md, docs/OPERATIONS_RUNBOOK.md
 
