@@ -36,17 +36,14 @@ entregando funcionalidades completas e testadas.
 | M7.7 | Histórico de Preços | PROD | 06 Jan 2026 | — |
 | M8 | Analytics Avançados | PLAN | Q2 2026 | — |
 | M9 | Deploy & Monitoramento | PLAN | Q1 2026 | — |
-| TESTS | Testes Automatizados | PROD | 03 Mar 2026 | — |
+| TESTS | Testes Automatizados | PROD | 25 Jun 2026 | — |
 
-**Total de Endpoints: 72+ rotas RESTful validadas.**  
-**Suite de testes: 371 passed, 82 errors** (`pytest` contra `exitusdb_test` no container).
+**Total de Endpoints: 156 rotas RESTful validadas.**  
+**Suite de testes: 567/574 passed (98.8%)** (`pytest` contra `exitusdb_test` no container).
 
-> v0.7.10: Validação completa de APIs — 16 GAPs corrigidos, envelope {success,data}
-> padronizado, strict_slashes aplicado, documentação atualizada. Ver CHANGELOG.md.
->
-> v0.8.0-dev: **32 GAPs concluídos** (Fases 2-5 completas + 2 da Fase 6). Engine de IR completo,
-> multi-moeda, exportação, Swagger, detecção de anomalias, cálculos RF/FII, auditoria CRUD,
-> reconciliação de dados. Suite: 371 passed, 82 errors. Ver CHANGELOG.md e ROADMAP.md v3.0.
+> v0.9.25: **48/54 GAPs concluídos** (Fases 1-6 ✅, MULTICLIENTE-001 ✅, HistoricoPatrimonio ✅). 
+> Motor fiscal completo, multi-tenancy 100%, importação B3, exportação multi-formato. 
+> Suite: 567/574 passed (98.8%). Ver CHANGELOG.md e ROADMAP.md.
 
 ---
 
@@ -224,8 +221,8 @@ e `IncidenciaImposto`.
 
 **Status:** PRODUCTION READY — Data: 04 Dez 2025 | **Frontend API-Driven:** 8/8 SPRINTS CONCLUÍDOS (09/06/2026)
 
-- 56+ rotas frontend (Sprint 1–8 API-Driven concluídos)
-- 56+ templates Jinja2
+- 36+ rotas frontend (Sprint 1–8 API-Driven concluídos)
+- 36+ templates Jinja2
 - Integração com JWT mantido em sessão via `get_api_headers()`
 - **Blueprints ativos:** auth, dashboard, operacoes, analises, admin, proventos, ativos_catalogo, planos, planos_venda, alertas, fiscal, relatorios, ferramentas
 
@@ -305,22 +302,22 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 
 | Categoria | Métrica | Valor |
 |---|---|---|
-| Endpoints | Rotas totais | **67+** |
-| Tabelas | Database | 23 |
+| Endpoints | Rotas totais | **156** |
+| Tabelas | Database | 30 |
 | Índices | PostgreSQL | 86+ |
-| Blueprints | Flask backend | 17 |
+| Blueprints | Flask backend | 17+ |
 | Blueprints | Flask frontend | 11 |
-| Templates | Frontend | 26+ |
-| Gráficos | Chart.js | 5 |
+| Templates | Frontend | 36+ |
+| Gráficos | Chart.js | 5+ |
 | Providers | Cotações | 5 |
 | Cache Hit Rate | Cotações | 85-95% |
 | Response Time | Médio | 50-500ms |
 | Usuários Teste | Concorrentes | 20-40 |
-| Ativos Seedados | — | 56 (15 ações BR, 10 FIIs, 6 US, 2 REITs, 8 ETFs, 5 RF, 10 EU) |
+| Ativos Seedados | — | 56 dev / 38 test_full (10 BR + 10 US + 10 BDRs + 8 RF) |
 | Cobertura ENUMs | — | 15/15 tipos implementados (inclui UNIT) |
-| Testes | Suite pytest | **376 passed, 16 errors** |
-| GAPs Concluídos | — | 35 (Fases 2, 3, 4, 5) |
-| GAPs Planejados | — | 19 + 1 proposta (Fases 6-8) |
+| Testes | Suite pytest | **567/574 passed (98.8%)** |
+| GAPs Concluídos | — | 48/54 (Fases 1-6 ✅, MULTICLIENTE-001 ✅) |
+| GAPs Planejados | — | 6 (Fase 7) |
 
 ---
 
@@ -335,6 +332,6 @@ Simulação Monte Carlo, otimização Markowitz, backtesting — ver ROADMAP.md 
 
 ---
 
-*Documento atualizado: 16/06/2026*
-*Versão: v0.9.16*
-*56 ativos com dados fundamentalistas — 48 GAPs concluídos — Frontend 8/8 Sprints API-Driven ✅ — ver ROADMAP.md*
+*Documento atualizado: 25/06/2026*
+*Versão: v0.9.25*
+*56 ativos com dados fundamentalistas — 48/54 GAPs concluídos — Frontend 8/8 Sprints API-Driven ✅ — ver ROADMAP.md*

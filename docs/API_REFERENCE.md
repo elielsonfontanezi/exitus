@@ -1,4 +1,4 @@
-# API Reference — Sistema Exitus v0.7.10
+# API Reference — Sistema Exitus v0.9.25
 
 ## Índice
 - Informações Gerais
@@ -325,7 +325,7 @@ Authorization: Bearer <token>
 
 ## 6. Posições
 
-> **Atualizado em v0.7.10** — 7 GAPs resolvidos. Schema completo com nested.
+> **Atualizado em v0.9.25** — 48/54 GAPs concluídos. Schema completo com nested.
 > Ver `M2_POSICOES.md` para histórico de validação.
 
 ### GET /api/posicoes

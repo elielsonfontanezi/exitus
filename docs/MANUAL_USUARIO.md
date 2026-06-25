@@ -1,7 +1,7 @@
-# Manual do Usuário — Sistema Exitus v0.9.16
+# Manual do Usuário — Sistema Exitus v0.9.25
 
-> **Versão:** v0.9.16  
-> **Data:** 16/06/2026 (atualizado Sprint 8 + E2E v2)  
+> **Versão:** v0.9.25  
+> **Data:** 25/06/2026 (atualizado com status atual do sistema)  
 > **Objetivo:** Guia completo de navegação e uso do sistema  
 > **Público:** Investidores e assessoras de investimento
 
