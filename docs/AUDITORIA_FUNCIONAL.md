@@ -693,7 +693,7 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
    - ✅ Categorizar: Críticos (4), Relevantes (4), Específicos (3), Históricos (28)
    - ✅ Identificar conteúdo redundante ou desatualizado
    - ✅ Propor consolidação/remoção de arquivos obsoletos
-   - ✅ Validar que `AUDITORIA_FUNCIONAL_18_06_2026.md` é fonte única de verdade
+   - ✅ Validar que `AUDITORIA_FUNCIONAL.md` é fonte única de verdade
 
 7. **Documentação unificada**
    - ✅ Integrar descobertas neste documento
@@ -734,7 +734,7 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
 | `CHANGELOG.md` | ✅ Atualizado | Cascade | 23/06/2026 |
 | `PROJECT_STATUS.md` | ✅ Atualizado | Cascade | 23/06/2026 |
 | `LESSONS_LEARNED.md` | ✅ Atualizado | Cascade | 23/06/2026 |
-| `AUDITORIA_FUNCIONAL_18_06_2026.md` | ✅ Finalizado | Cascade | 23/06/2026 |
+| `AUDITORIA_FUNCIONAL.md` | ✅ Finalizado | Cascade | 23/06/2026 |
 
 ### � Descobertas e Correções
 
@@ -929,7 +929,7 @@ Conforme as regras do `.windsurfrules`, os seguintes documentos foram atualizado
 3. **LESSONS_LEARNED.md** — 3 novas lições (L-DB-004 a L-DB-006)
 
 #### ✅ Específicos desta atividade
-4. **AUDITORIA_FUNCIONAL_18_06_2026.md** — Documento principal finalizado
+4. **AUDITORIA_FUNCIONAL.md** — Documento principal finalizado
 
 #### ⚠️ Não necessitaram atualização
 - ROADMAP.md (auditoria não mudou GAPs)

@@ -9,7 +9,7 @@
 ---
 
 ## 🚀 Fase Atual: Auditoria Funcional & Telas (Finalização)
-- **Objetivo:** Tornar o sistema 100% operacional conforme `AUDITORIA_FUNCIONAL_18_06_2026.md`
+- **Objetivo:** Tornar o sistema 100% operacional conforme `AUDITORIA_FUNCIONAL.md`
 - **Próximo:** Estabilização antes de retomar `ROADMAP.md`
 - **Status Suite:** 567/574 passed (98.8%) — ver `PROJECT_STATUS.md` para métricas atuais
 
@@ -165,7 +165,7 @@ podman exec exitus-backend python reset_and_seed.py --clean --scenario test_full
 
 **PRIORIDADE 2 (conforme contexto):**
 - `docs/ENUMS.md` — mapeamento de enums
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md` — bugs pendentes
+- `docs/AUDITORIA_FUNCIONAL.md` — bugs pendentes
 - `docs/ARCHITECTURE.md` — stack e convenções
 
 ---

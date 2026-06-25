@@ -10,7 +10,7 @@ Execute este workflow ANTES de qualquer ação, análise ou código.
    ```
    1. docs/LESSONS_LEARNED.md        ← erros reais — ler PRIMEIRO
    2. docs/PROJECT_STATUS.md         ← estado atual, métricas, versão
-   3. docs/AUDITORIA_FUNCIONAL_18_06_2026.md  ← P-items pendentes/resolvidos
+   3. docs/AUDITORIA_FUNCIONAL.md  ← P-items pendentes/resolvidos
    4. docs/ROADMAP.md                ← GAPs planejados e status
    5. docs/CHANGELOG.md              ← últimas mudanças (top 30 linhas)
    ```
@@ -44,7 +44,7 @@ Execute este workflow ANTES de qualquer ação, análise ou código.
 - Sugestões de próximos passos com justificativa
 
 **Onde registrar:**
-- Pendências e priorização → `docs/AUDITORIA_FUNCIONAL_18_06_2026.md` (seção "Análise de Sessão — DD/MM/AAAA")
+- Pendências e priorização → `docs/AUDITORIA_FUNCIONAL.md` (seção "Análise de Sessão — DD/MM/AAAA")
 - Decisões técnicas → `docs/LESSONS_LEARNED.md` (lição L-XXX-NNN)
 - Próximos passos do roadmap → `docs/ROADMAP.md`
 
@@ -76,7 +76,7 @@ Antes do commit final, verificar CADA item abaixo e confirmar ou justificar:
 |---|---|---|
 | `docs/CHANGELOG.md` | ✅ Sempre | Entrada com artefatos e suite |
 | `docs/PROJECT_STATUS.md` | ✅ Sempre | Data, versão, métricas |
-| `docs/AUDITORIA_FUNCIONAL_18_06_2026.md` | ✅ Se P-item resolvido | Marcar ✅, detalhar fix |
+| `docs/AUDITORIA_FUNCIONAL.md` | ✅ Se P-item resolvido | Marcar ✅, detalhar fix |
 | `docs/ROADMAP.md` | ✅ Sempre verificar | Marcar GAP como concluído se aplicável; atualizar "Próximo" |
 | `docs/LESSONS_LEARNED.md` | Se nova lição | Adicionar entrada L-XXX-NNN |
 | `docs/CODING_STANDARDS.md` | Se novo padrão | Documentar convenção |

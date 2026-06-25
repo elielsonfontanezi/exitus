@@ -16,7 +16,7 @@ e este projeto adere semanticamente à versão v0.8.0.
 - `docs/EXITUS-CRUD-002.md` → movido para `docs/archive/EXITUS-CRUD-002.md`
 
 **Artefatos atualizados:**
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: TECH-001 adicionado ao Backlog de Correções (ValueError residual em 5 services)
+- `docs/AUDITORIA_FUNCIONAL.md`: TECH-001 adicionado ao Backlog de Correções (ValueError residual em 5 services)
 
 **Status TECH-001:** PENDENTE — services `parametros_macro`, `rfcalc`, `cambio`, `ir`, `alerta` ainda usam `ValueError` genérico. Hierarquia de exceções já existe em `app/utils/exceptions.py` e é usada por 15+ services.
 
@@ -30,7 +30,7 @@ e este projeto adere semanticamente à versão v0.8.0.
 - `docs/PLANO_TESTE_MULTITENANCY.md` → movido para `docs/archive/PLANO_TESTE_MULTITENANCY.md`
 
 **Artefatos atualizados:**
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: ajustado status de `PLANO_TESTE_MULTITENANCY.md` para arquivado
+- `docs/AUDITORIA_FUNCIONAL.md`: ajustado status de `PLANO_TESTE_MULTITENANCY.md` para arquivado
 
 ---
 
@@ -46,7 +46,7 @@ e este projeto adere semanticamente à versão v0.8.0.
 - `backend/app/models/projecao_renda.py`: 4 constraints adicionadas ao `__table_args__` existente (todos os campos `>= 0`)
 - `backend/app/models/taxa_cambio.py`: constraint `taxa > 0` adicionada ao `__table_args__` existente
 - `backend/tests/test_constraints.py`: corrigido valor enum `liquidacao_d2 → LIQUIDACAO_D2` (uppercase conforme banco)
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: CONSTRAINT-001 marcado como ✅ Resolvido
+- `docs/AUDITORIA_FUNCIONAL.md`: CONSTRAINT-001 marcado como ✅ Resolvido
 
 **Constraints aplicadas:**
 - `transacao`: `ck_transacao_quantidade_positiva`, `ck_transacao_preco_positivo`, `ck_transacao_valor_total_positivo`
@@ -74,7 +74,7 @@ e este projeto adere semanticamente à versão v0.8.0.
   - `_seed_projecoes_renda()`: cria projeções com upsert por `usuario_id + mes_ano`
   - `_seed_regras_fiscais()`: cria regras com upsert por `pais + tipo_ativo + tipo_operacao`
   - Chamados em `seed_all()` após `_seed_historico_patrimonio()`
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: P8 marcado como ✅ Resolvido
+- `docs/AUDITORIA_FUNCIONAL.md`: P8 marcado como ✅ Resolvido
 
 ---
 
@@ -82,7 +82,7 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 **Arquivos alterados:**
 - `frontend/app/templates/carteira/movimentacoes.html`: `x-model → x-model.lazy` nos inputs de data; badge-cor corrigido (`deposito/saque → aporte/resgate`)
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: P3 marcado como ✅ Resolvido
+- `docs/AUDITORIA_FUNCIONAL.md`: P3 marcado como ✅ Resolvido
 
 ---
 
@@ -98,7 +98,7 @@ e este projeto adere semanticamente à versão v0.8.0.
 - `backend/tests/test_ativo_classifier.py`: `PETR4→PETX4` no teste de fallback heurística (PETR4 existe no seed, retornava `MANUAL`)
 - `backend/tests/test_buy_signals_endpoints.py`: upsert em `PETR4`/`VALE3`/`TEST{i}` — evitar `UniqueViolation` com seed persistente
 - `backend/tests/test_scenarios_example.py`: `role.value 'ADMIN'→'admin'`; `@pytest.mark.parametrize("scenario", ["test_ir"])` e `["test_stress"]` nos testes respectivos
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: P4 marcado como ✅ Resolvido; detalhes do fix
+- `docs/AUDITORIA_FUNCIONAL.md`: P4 marcado como ✅ Resolvido; detalhes do fix
 - `docs/LESSONS_LEARNED.md`: L-TEST-001 adicionada — fixture vs seed persistente: padrão upsert obrigatório
 
 **14 falhas residuais (fora do escopo P4 — dívida técnica):**
@@ -125,7 +125,7 @@ e este projeto adere semanticamente à versão v0.8.0.
 - `frontend/app/templates/carteira/movimentacoes.html`: filtros, labels e badges atualizados para novos tipos; `parseTipo()` simplificado para strings
 - `frontend/app/static/js/fluxo_caixa.js`: categorias e tipos de movimento atualizados
 - `docs/ENUMS.md`: tabela `TipoMovimentacao` atualizada com 10 valores e histórico de correção
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-021 marcado como resolvido; tela 10 de QUEBRADO para PARCIAL
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-021 marcado como resolvido; tela 10 de QUEBRADO para PARCIAL
 - `docs/CHANGELOG.md`: esta entrada
 
 **Problemas resolvidos:**
@@ -232,7 +232,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 ### Fix — EXITUS-DB-AUDIT-001: Auditoria Completa do Banco de Dados (23/06/2026)
 
 **Arquivos alterados:**
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: auditoria completa concluída (3 fases); 30 tabelas validadas; seeds corrigidos; 39 arquivos de documentação analisados
+- `docs/AUDITORIA_FUNCIONAL.md`: auditoria completa concluída (3 fases); 30 tabelas validadas; seeds corrigidos; 39 arquivos de documentação analisados
 - `backend/seed_data/scenarios/test_e2e.json`: dividend_yield corrigido (15.2→8.5, 12.8→6.8); tipomovimentacao ajustado (DEPOSITO→aporte, SAQUE→resgate)
 - `backend/load_scenario.py`: mapeamento ENUMs corrigido para strings; default alterado para 'aporte'
 - `docs/PROJECT_STATUS.md`: status atualizado com auditoria DB concluída
@@ -249,7 +249,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 **Arquivos alterados:**
 - `backend/app/models/usuario.py`: campo `meta_patrimonio` adicionado com default '500000.00' e NOT NULL
 - `docs/EXITUS_DB_STRUCTURE.txt`: schema atualizado com nova coluna na tabela usuario
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: plano completo de auditoria de database criado + registro da investigação e implementação
+- `docs/AUDITORIA_FUNCIONAL.md`: plano completo de auditoria de database criado + registro da investigação e implementação
 - `frontend/app/templates/dashboard/index_v2.html`: já exibia meta dinâmica via API `/api/auth/me`
 - `frontend/app/templates/configuracoes/perfil.html`: campo de edição adicionado; função `salvarPerfil()` atualizada para incluir `meta_patrimonio`
 - `backend/test_meta_patrimonio.py`: script de teste temporário (removido após validação)
@@ -272,7 +272,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 - `backend/alembic/versions/20260322_1830_add_historico_patrimonio.py`: `down_revision` corrigido para `20260316_1545_assessora_id` (chain migration)
 - `backend/tests/test_ativo_classifier.py`: 28 testes cobrindo heurística, DB, cache, API externa (mockada) e fallback
 - `backend/tests/test_import_b3_idempotencia.py`: helper `_service()` garante `usuario_id` para criação de corretoras durante importação
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-020 marcado como resolvido; contadores de bugs importantes ajustados (15)
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-020 marcado como resolvido; contadores de bugs importantes ajustados (15)
 
 **Bugs resolvidos:** BUG-020 (classificação errada de ETFs BR como FII e ativos internacionais como AÇÃO B3)
 **Revalidado:** `alembic upgrade` aplicado com sucesso; `pytest tests/test_ativo_classifier.py` = 28/28 passando; `test_import_b3_parsers.py` + `test_import_b3_idempotencia.py` = 77/77 passando
@@ -283,7 +283,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 
 **Arquivos alterados:**
 - `frontend/app/templates/operacoes/historico.html`: botões Editar/Excluir no menu de ações; modal de edição com campos data, tipo, quantidade, preço, custos; funções Alpine.js para PUT/DELETE `/api/transacoes/<id>`
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: FEAT-003 marcada como resolvida; contagem de features: 9
+- `docs/AUDITORIA_FUNCIONAL.md`: FEAT-003 marcada como resolvida; contagem de features: 9
 - `docs/PROJECT_STATUS.md`: status consolidado atualizado
 
 **Features resolvidas:** FEAT-003 (transações sem editar/excluir)
@@ -295,7 +295,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 
 **Arquivos alterados:**
 - `frontend/app/templates/configuracoes/corretoras.html`: botões Nova/Editar/Excluir; modal de formulário com validações; funções Alpine.js para POST/PUT/DELETE
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: FEAT-002 marcada como resolvida; contagem de features: 9
+- `docs/AUDITORIA_FUNCIONAL.md`: FEAT-002 marcada como resolvida; contagem de features: 9
 - `docs/PROJECT_STATUS.md`: status consolidado atualizado
 
 **Features resolvidas:** FEAT-002 (CRUD de corretoras)
@@ -309,7 +309,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 - `backend/app/utils/responses.py`: adicionados `bad_request()` e `conflict()`
 - `backend/app/blueprints/auth/routes.py`: endpoints `PUT /api/auth/me` e `POST /api/auth/change-password`
 - `frontend/app/templates/configuracoes/perfil.html`: formulários editáveis para nome/e-mail e troca de senha
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: FEAT-001 marcada como resolvida; contagem de features: 10
+- `docs/AUDITORIA_FUNCIONAL.md`: FEAT-001 marcada como resolvida; contagem de features: 10
 - `docs/PROJECT_STATUS.md`: status consolidado atualizado
 
 **Features resolvidas:** FEAT-001 (perfil somente leitura)
@@ -322,7 +322,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 - `backend/app/services/corretora_service.py`: adicionado `sincronizar_saldo()` que recalcula `saldo_atual` a partir de movimentações de caixa
 - `backend/app/blueprints/corretoras/routes.py`: novo endpoint `POST /api/corretoras/<id>/sincronizar-saldo`
 - `frontend/app/templates/configuracoes/corretoras.html`: botão "Sincronizar" por corretora; atualiza saldo e total na tela
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-006 marcado como resolvido; FEAT-011 registrada (saldo dinâmico automático)
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-006 marcado como resolvido; FEAT-011 registrada (saldo dinâmico automático)
 - `docs/PROJECT_STATUS.md`: status consolidado atualizado
 
 **Bugs resolvidos:** BUG-006 (saldo de corretoras sempre R$ 0,00)
@@ -334,7 +334,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 
 **Arquivos alterados:**
 - `frontend/app/templates/operacoes/historico.html`: `loadData()` agora envia `data_inicio` e `data_fim` para `/api/transacoes`; campos de data disparam `loadData()` ao invés de filtrar apenas no client-side
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-004 marcado como resolvido; contagem de importantes: 1
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-004 marcado como resolvido; contagem de importantes: 1
 - `docs/PROJECT_STATUS.md`: status consolidado atualizado
 
 **Bugs resolvidos:** BUG-004 (filtro por data no histórico filtrava apenas as 50 transações da página)
@@ -345,7 +345,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 
 **Arquivos alterados:**
 - `frontend/app/templates/analises/buy_signals_v2.html`: campo de busca vinculado a `<datalist>`; `buscarSugestoes()` consome `/api/ativos?search=` com debounce de 300ms; exibe até 10 tickers sugeridos
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-017 marcado como resolvido; contagem de importantes: 2
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-017 marcado como resolvido; contagem de importantes: 2
 - `docs/PROJECT_STATUS.md`: status consolidado atualizado
 
 **Bugs resolvidos:** BUG-017 (busca por ticker sem autocomplete em Buy Signals)
@@ -358,7 +358,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 - `frontend/app/config.py`: adicionadas `CDI_ANUAL` e `IBOVESPA_ANUAL` (default `11.75` e `8.32`, sobrescrevíveis por env)
 - `frontend/app/routes/dashboard.py`: passa `indicadores` para `dashboard/index_v2.html`
 - `frontend/app/templates/dashboard/index_v2.html`: substitui valores hardcoded por `{{ indicadores.cdi_anual }}` e `{{ indicadores.ibovespa_anual }}`; comparação com CDI usa valor dinâmico
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-005 marcado como resolvido; FEAT-010 registrada (endpoint dinâmico `/api/indicadores`)
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-005 marcado como resolvido; FEAT-010 registrada (endpoint dinâmico `/api/indicadores`)
 - `docs/PROJECT_STATUS.md`: status consolidado atualizado
 
 **Bugs resolvidos:** BUG-005 (CDI/Ibovespa hardcoded)
@@ -371,7 +371,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 **Arquivos alterados:**
 - `frontend/app/routes/fiscal.py`: `render_template('fiscal/declaracao_v2.html')` agora passa `dados`, `erro` e `ano`
 - `frontend/app/templates/fiscal/declaracao_v2.html`: exibe mensagem de erro via Jinja; inicializa estado Alpine com dados e ano do servidor
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-010 marcado como resolvido; contagem de importantes: 4
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-010 marcado como resolvido; contagem de importantes: 4
 - `docs/PROJECT_STATUS.md`: status consolidado atualizado
 
 **Bugs resolvidos:** BUG-010 (tela DIRPF não exibia dados nem erro)
@@ -382,7 +382,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 
 **Arquivos alterados:**
 - `frontend/app/templates/ativos/lista_v2.html`: parâmetro de busca alterado de `ticker` para `search` para corresponder ao contrato da API `/api/ativos`
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-014 marcado como resolvido; contagem de bugs importantes: 5
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-014 marcado como resolvido; contagem de bugs importantes: 5
 - `docs/PROJECT_STATUS.md`: status consolidado atualizado
 
 **Bugs resolvidos:** BUG-014 (busca por ticker no catálogo de ativos ignorada)
@@ -392,7 +392,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 ### Fix — EXITUS-AUDITORIA-001: revalidação funcional 22/06/2026
 
 **Arquivos alterados:**
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: revalidação em código dos bugs importantes; marcados como resolvidos/falsos positivos: BUG-008, BUG-009, BUG-011, BUG-012, BUG-013, BUG-015, BUG-019; atualizadas causas raiz de BUG-006 e BUG-014; contagem de bugs importantes reduzida de 15 para 6
+- `docs/AUDITORIA_FUNCIONAL.md`: revalidação em código dos bugs importantes; marcados como resolvidos/falsos positivos: BUG-008, BUG-009, BUG-011, BUG-012, BUG-013, BUG-015, BUG-019; atualizadas causas raiz de BUG-006 e BUG-014; contagem de bugs importantes reduzida de 15 para 6
 
 **Bugs reimportantes pendentes:** BUG-004, BUG-005, BUG-006, BUG-010, BUG-014, BUG-017
 **Features pendentes:** FEAT-001 a FEAT-009
@@ -403,7 +403,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 
 **Arquivos alterados:**
 - `frontend/app/routes/analises.py`: `rentabilidade()` substituída por redirect para `rentabilidade_periodo()`; código morto removido
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-003 marcado falso positivo (import idempotente por design); BUG-018 resolvido; contadores ajustados para **0 telas quebradas**
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-003 marcado falso positivo (import idempotente por design); BUG-018 resolvido; contadores ajustados para **0 telas quebradas**
 
 **Revalidado:** `/analises/rentabilidade` redireciona para `/periodo`; Import B3 com dados novos retorna Transações=2 corretamente
 
@@ -417,7 +417,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
 
 **Arquivos alterados:**
 - `frontend/app/templates/components/menu_horizontal.html`: adicionado link "Eventos Corporativos" no dropdown Ativos → seção Outros
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-016 marcado como falso positivo; tela 13 atualizada; contadores ajustados (2 quebradas)
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-016 marcado como falso positivo; tela 13 atualizada; contadores ajustados (2 quebradas)
 
 **Bug resolvido:** BUG-016 era consequência do BUG-001 — tela funcionava, apenas sem link no menu
 **Revalidado:** navegação via menu → `/ativos/eventos-corporativos` funciona corretamente
@@ -444,7 +444,7 @@ podman exec exitus-backend curl -s -H "Authorization: Bearer $TOKEN" \
   - Login 100% AJAX via `fetch` + `window.auth.saveToken()` para persistir token no `localStorage`
 - `frontend/app/static/js/auth.js`: removido token mock hardcoded de `e2e_admin` como fallback no construtor
   - Era a causa raiz do BUG-001: `localStorage` vazio → fallback com token expirado → Alpine.js recebia token inválido → API 401 silencioso
-- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: BUG-001, BUG-007 marcados como resolvidos; Tela 1 atualizada para ✅
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-001, BUG-007 marcados como resolvidos; Tela 1 atualizada para ✅
 
 **Bugs resolvidos:** BUG-001, BUG-007
 **Para revalidar:** BUG-002 (toggle Compra/Venda — depende de login real com token válido)
