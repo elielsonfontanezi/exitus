@@ -30,7 +30,20 @@ PRIORIDADE 2 — Consultar conforme contexto:
 
 ---
 
-## 🚨 REGRA #1 — NUNCA IMPLEMENTAR SEM APROVAÇÃO EXPLÍCITA
+## � CONTEXTO RÁPIDO (Início de Sessão)
+
+**Obrigatório:** Consultar `docs/DEVELOPMENT_GUIDE.md` no início de cada sessão para:
+- Fase atual do projeto
+- Regras inegociáveis (Multi-Tenancy, Motor Fiscal, Enums)
+- Fluxo de trabalho padrão (implementação → validação → commit)
+- Portas e URLs
+- Comandos de validação
+
+**Nota:** DEVELOPMENT_GUIDE.md é um resumo. Para detalhes profundos, sempre consultar as fontes de verdade acima.
+
+---
+
+## �🚨 REGRA #1 — NUNCA IMPLEMENTAR SEM APROVAÇÃO EXPLÍCITA
 
 Fluxo obrigatório em toda atividade:
 1. **Analisar** → ler fontes de verdade relevantes
