@@ -120,7 +120,30 @@ python backend/load_scenario.py test_e2e
 
 ---
 
-## 📚 Fontes de Verdade (Ler ANTES de qualquer ação)
+## � Comandos de Container
+
+```bash
+# Iniciar todos os containers
+./scripts/start_exitus.sh
+
+# Parar todos os containers (ordenado: frontend → backend → db)
+./scripts/stop_exitus.sh
+
+# Reiniciar todos os containers
+./scripts/restart_exitus.sh
+
+# Rebuild e restart do backend
+./scripts/rebuild_restart_exitus-backend.sh
+
+# Rebuild e restart do frontend
+./scripts/rebuild_restart_exitus-frontend.sh
+```
+
+**Referência completa:** docs/OPERATIONS_RUNBOOK.md
+
+---
+
+## �📚 Fontes de Verdade (Ler ANTES de qualquer ação)
 
 **PRIORIDADE 1 (obrigatório):**
 1. `docs/LESSONS_LEARNED.md` — erros reais para não repetir
