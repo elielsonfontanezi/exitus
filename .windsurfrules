@@ -177,7 +177,7 @@ Ao fechar qualquer GAP, os seguintes docs DEVEM ser atualizados **no mesmo commi
 | `docs/ARCHITECTURE.md` | Se mudança estrutural | Novos componentes, endpoints, stack |
 | `docs/OPERATIONS_RUNBOOK.md` | Se scripts/procedimentos | Scripts novos, troubleshooting, procedimentos |
 | `docs/LESSONS_LEARNED.md` | Se lição aprendida | Erros reais, soluções, padrões a evitar |
-| `docs/README.md` | Se versão/mudança | Versão, data, status geral do projeto |
+| `docs/INDEX.md` | Se versão/mudança | Versão, data, status geral do projeto |
 | `docs/00_DEVELOPMENT_GUIDE.md` | Se contexto operacional mudar | Fase, comandos, regras inegociáveis, portas, credenciais |
 | `docs/MODULES.md` | Se novo endpoint/blueprint | Status M0-M7, endpoints por módulo |
 | `docs/API_REFERENCE.md` | Se mudança em endpoint | Contratos completos dos endpoints |

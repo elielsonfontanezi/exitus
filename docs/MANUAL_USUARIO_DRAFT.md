@@ -1155,7 +1155,7 @@ Para assessoras:
 ## 📞 Suporte
 
 **Documentação:**
-- `docs/README.md` — Índice geral
+- `docs/INDEX.md` — Índice geral
 - `docs/API_REFERENCE.md` — APIs completas
 - `docs/ARCHITECTURE.md` — Arquitetura do sistema
 

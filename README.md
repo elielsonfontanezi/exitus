@@ -231,12 +231,12 @@ podman exec exitus-backend python -m pytest tests/ -q --no-cov
 
 ## 📚 Documentação Completa
 
-**Ver [docs/README.md](docs/README.md) para o guia completo de toda a documentação.**
+**Ver [docs/INDEX.md](docs/INDEX.md) para o guia completo de toda a documentação.**
 
 Principais documentos:
 | Documento | Descrição |
 | --- | --- |
-| **[docs/README.md](docs/README.md)** | **Guia de toda a documentação** — estrutura e como usar |
+| **[docs/INDEX.md](docs/INDEX.md)** | **Guia de toda a documentação** — estrutura e como usar |
 | **[docs/VISION.md](docs/VISION.md)** | Visão de negócio, proposta de valor, roadmap |
 | **[docs/PERSONAS.md](docs/PERSONAS.md)** | **Manual de Operação da IA** — como interagir com a assistente |
 | **[docs/API_REFERENCE.md](docs/API_REFERENCE.md)** | Referência completa de todas as 67 APIs |
