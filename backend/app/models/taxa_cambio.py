@@ -3,6 +3,7 @@
 
 from datetime import datetime, date
 from decimal import Decimal
+import sqlalchemy as sa
 from sqlalchemy import Column, String, Numeric, Date, DateTime, UniqueConstraint, Index
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -44,6 +45,7 @@ class TaxaCambio(db.Model):
     __table_args__ = (
         UniqueConstraint('par_moeda', 'data_referencia', name='uq_taxa_cambio_par_data'),
         Index('ix_taxa_cambio_par_data', 'par_moeda', 'data_referencia'),
+        sa.CheckConstraint('taxa > 0', name='ck_taxa_cambio_taxa_positiva'),
     )
 
     @classmethod

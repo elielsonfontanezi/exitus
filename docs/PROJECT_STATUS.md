@@ -1,10 +1,13 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 24/06/2026  
-> **Status:** ✅ **Suite de Testes Estabilizada — P4 Resolvido**  
-> **Versão:** v0.9.24
+> **Data:** 25/06/2026  
+> **Status:** ✅ **CONSTRAINT-001 + P8 + P3 Resolvidos — 567 passed**  
+> **Versão:** v0.9.25
 
-### 🔧 Últimas correções (24/06/2026)
+### 🔧 Últimas correções (25/06/2026)
+- **CONSTRAINT-001:** 10 CHECK constraints aplicadas em `transacao`, `evento_custodia`, `projecoes_renda`, `taxa_cambio` via migration Alembic; 17/17 testes passando; suite total 567/574 passed (98.8%)
+- **P8 — Seed enrichment:** `test_e2e.json` enriquecido com ITUB4/ETFs, 3 planos compra, 2 planos venda, 12 meses histórico patrimônio, 6 eventos calendário dividendos, 3 projeções renda, 3 regras fiscais; `load_scenario.py` com 3 novos `_seed_*`
+- **P3 — BUG-013:** `x-model.lazy` em filtros de data (movimentacoes.html); badge-cor corrigido
 - **P4 — Fix suite de testes:** 554 passed / 14 failed (dívida técnica) / 6 skipped — upsert em fixtures vs seed persistente; fix `ir_service.py` (DIVIDENDO/JCP/ALUGUEL no filtro); alíquota JCP 15%→17.5%; `conftest.py` campos corretos em `MovimentacaoCaixa` e `Provento`; `load_scenario` conectando ao `exitusdb_test` via env `TESTING`; `test_scenarios_example` com `@pytest.mark.parametrize` correto
 - **P1+P2 — DB/Alembic:** banco de testes recriado com enum completo; heads Alembic unificados em `20260624_1100`
 
@@ -33,7 +36,7 @@
 | **Backend** | ✅ 87% | 48/54 GAPs, 508/546 testes (93.0%), 156 endpoints |
 | **Frontend V2.0** | ✅ 100% | 17/17 telas premium, design classe mundial |
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
-| **Testes Backend** | ✅ 96.4% | 554/574 passando, 14 failed (dívida técnica: constraints + feature 2026+), 6 skipped |
+| **Testes Backend** | ✅ 98.8% | 567/574 passando, 1 failed (dívida técnica: feature IR 2026+), 6 skipped |
 | **Testes E2E** | 🟡 60% | v2: 127/127 ✅ Chromium (merged main 16/06) — v3 lógica negócio: 50 CTs planejados, specs criados (branch feature/testes-e2e-v3) |
 | **Auditoria Funcional** | ✅ 100% | 18/06/2026: 36 telas auditadas; 23/06/2026: 0 críticos, 0 importantes pendentes, 8 features pendentes (FEAT-005 a FEAT-012) |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |

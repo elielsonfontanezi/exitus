@@ -28,6 +28,9 @@ try:
     from app.models.plano_compra import PlanoCompra, StatusPlanoCompra
     from app.models.plano_venda import PlanoVenda, StatusPlanoVenda, TipoGatilho
     from app.models.historico_patrimonio import HistoricoPatrimonio
+    from app.models.calendario_dividendo import CalendarioDividendo
+    from app.models.projecao_renda import ProjecaoRenda
+    from app.models.regra_fiscal import RegraFiscal, IncidenciaImposto
     from werkzeug.security import generate_password_hash
 except ImportError as e:
     print(f"Erro ao importar módulos: {e}")
@@ -92,6 +95,9 @@ class ScenarioLoader:
                 self._seed_planos_compra()
                 self._seed_planos_venda()
                 self._seed_historico_patrimonio()
+                self._seed_calendario_dividendo()
+                self._seed_projecoes_renda()
+                self._seed_regras_fiscais()
                 
                 db.session.commit()
                 print("✅ Cenário carregado com sucesso!")
@@ -679,6 +685,128 @@ class ScenarioLoader:
             
             db.session.add(historico)
             print(f"✅ Histórico criado: {usuario_username} - {data_snapshot} - R$ {hist_data['patrimonio_total']}")
+        
+        db.session.flush()
+    
+    def _seed_calendario_dividendo(self):
+        """Seed de calendário de dividendos"""
+        cal_data = self.scenario_data.get('calendario_dividendo', [])
+        if not cal_data:
+            return
+        
+        print(f"📅 Criando {len(cal_data)} entradas de calendário de dividendos...")
+        
+        assessora_id = list(self.references['assessoras'].values())[0] if self.references['assessoras'] else None
+        
+        for item in cal_data:
+            usuario_id = self.references['usuarios'].get(item['usuario'])
+            ativo_id = self.references['ativos'].get(item['ativo_ticker'])
+            
+            if not all([usuario_id, ativo_id]):
+                print(f"⚠️  Referências faltando para calendário: {item}")
+                continue
+            
+            cal = CalendarioDividendo(
+                ativo_id=ativo_id,
+                assessora_id=assessora_id,
+                usuario_id=usuario_id,
+                data_esperada=datetime.strptime(item['data_esperada'], '%Y-%m-%d').date(),
+                tipo_provento=item.get('tipo_provento', 'dividendo'),
+                yield_estimado=Decimal(str(item.get('yield_estimado', 0))) if item.get('yield_estimado') else None,
+                valor_estimado=Decimal(str(item.get('valor_estimado', 0))) if item.get('valor_estimado') else None,
+                quantidade=int(item.get('quantidade', 0)),
+                status=item.get('status', 'previsto'),
+                observacoes=item.get('observacoes')
+            )
+            
+            db.session.add(cal)
+            print(f"✅ Calendário criado: {item['ativo_ticker']} - {item['data_esperada']}")
+        
+        db.session.flush()
+    
+    def _seed_projecoes_renda(self):
+        """Seed de projeções de renda"""
+        proj_data = self.scenario_data.get('projecoes_renda', [])
+        if not proj_data:
+            return
+        
+        print(f"📊 Criando {len(proj_data)} projeções de renda...")
+        
+        assessora_id = list(self.references['assessoras'].values())[0] if self.references['assessoras'] else None
+        
+        for item in proj_data:
+            usuario_id = self.references['usuarios'].get(item['usuario'])
+            
+            if not usuario_id:
+                print(f"⚠️  Usuário não encontrado para projeção: {item['usuario']}")
+                continue
+            
+            existing = ProjecaoRenda.query.filter_by(
+                usuario_id=usuario_id,
+                mes_ano=item['mes_ano']
+            ).first()
+            
+            if existing:
+                print(f"⏭️  Projeção já existe: {item['usuario']} - {item['mes_ano']}")
+                continue
+            
+            proj = ProjecaoRenda(
+                usuario_id=usuario_id,
+                assessora_id=assessora_id,
+                mes_ano=item['mes_ano'],
+                renda_dividendos_projetada=Decimal(str(item.get('renda_dividendos_projetada', 0))),
+                renda_jcp_projetada=Decimal(str(item.get('renda_jcp_projetada', 0))),
+                renda_rendimentos_projetada=Decimal(str(item.get('renda_rendimentos_projetada', 0))),
+                renda_total_mes=Decimal(str(item.get('renda_total_mes', 0))),
+                renda_anual_projetada=Decimal(str(item['renda_anual_projetada'])) if item.get('renda_anual_projetada') else None
+            )
+            
+            db.session.add(proj)
+            print(f"✅ Projeção criada: {item['usuario']} - {item['mes_ano']}")
+        
+        db.session.flush()
+    
+    def _seed_regras_fiscais(self):
+        """Seed de regras fiscais"""
+        regras_data = self.scenario_data.get('regras_fiscais', [])
+        if not regras_data:
+            return
+        
+        print(f"⚖️  Criando {len(regras_data)} regras fiscais...")
+        
+        incidencia_map = {
+            'lucro': IncidenciaImposto.LUCRO,
+            'receita': IncidenciaImposto.RECEITA,
+            'provento': IncidenciaImposto.PROVENTO,
+            'operacao': IncidenciaImposto.OPERACAO
+        }
+        
+        for item in regras_data:
+            existing = RegraFiscal.query.filter_by(
+                pais=item['pais'],
+                tipo_ativo=item.get('tipo_ativo'),
+                tipo_operacao=item.get('tipo_operacao')
+            ).first()
+            
+            if existing:
+                print(f"⏭️  Regra fiscal já existe: {item['pais']} {item.get('tipo_ativo')} {item.get('tipo_operacao')}")
+                continue
+            
+            regra = RegraFiscal(
+                pais=item['pais'],
+                tipo_ativo=item.get('tipo_ativo'),
+                tipo_operacao=item.get('tipo_operacao'),
+                aliquota_ir=Decimal(str(item['aliquota_ir'])),
+                valor_isencao=Decimal(str(item['valor_isencao'])) if item.get('valor_isencao') else None,
+                incide_sobre=incidencia_map.get(item['incide_sobre'], IncidenciaImposto.LUCRO),
+                descricao=item['descricao'],
+                vigencia_inicio=datetime.strptime(item['vigencia_inicio'], '%Y-%m-%d').date(),
+                vigencia_fim=datetime.strptime(item['vigencia_fim'], '%Y-%m-%d').date() if item.get('vigencia_fim') else None,
+                ativa=item.get('ativa', True)
+            )
+            
+            db.session.add(regra)
+            print(f"✅ Regra fiscal criada: {item['pais']} {item.get('tipo_ativo')} {item.get('tipo_operacao')}")
         
         db.session.flush()
 

@@ -28,8 +28,12 @@ class ProjecaoRenda(db.Model):
                        onupdate=datetime.utcnow, nullable=False)
     
     __table_args__ = (
-        db.UniqueConstraint('usuario_id', 'portfolio_id', 'mes_ano', 
-                           name='projecoes_renda_usuario_id_portfolio_id_mes_ano_key'),
+        db.UniqueConstraint('usuario_id', 'portfolio_id', 'mes_ano',
+                            name='projecoes_renda_usuario_id_portfolio_id_mes_ano_key'),
+        db.CheckConstraint('renda_dividendos_projetada >= 0', name='ck_projecoes_renda_dividendos_nao_negativo'),
+        db.CheckConstraint('renda_jcp_projetada >= 0', name='ck_projecoes_renda_jcp_nao_negativo'),
+        db.CheckConstraint('renda_rendimentos_projetada >= 0', name='ck_projecoes_renda_rendimentos_nao_negativo'),
+        db.CheckConstraint('renda_total_mes >= 0', name='ck_projecoes_renda_total_nao_negativo'),
     )
     
     def to_dict(self):

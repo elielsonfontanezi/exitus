@@ -76,6 +76,13 @@ class Transacao(db.Model):
     updated_at  = Column(DateTime(timezone=True), nullable=False,
                          default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # --- CHECK constraints (CONSTRAINT-001) ---
+    __table_args__ = (
+        sa.CheckConstraint('quantidade > 0', name='ck_transacao_quantidade_positiva'),
+        sa.CheckConstraint('preco_unitario > 0', name='ck_transacao_preco_positivo'),
+        sa.CheckConstraint('valor_total > 0', name='ck_transacao_valor_total_positivo'),
+    )
+
     # --- ORM relationships ---
     assessora = relationship('Assessora', back_populates='transacoes')
     usuario  = relationship('Usuario', backref='transacoes', lazy=True)

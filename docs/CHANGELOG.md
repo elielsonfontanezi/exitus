@@ -8,6 +8,58 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — CONSTRAINT-001: CHECK constraints em 4 tabelas críticas (25/06/2026)
+
+**Resultado:** 17/17 testes de constraints passando | Suite total: 567 passed / 1 failed (dívida técnica pré-existente) / 6 skipped
+
+**Artefatos criados/modificados:**
+- `backend/migrations/versions/20260624_1100_baseline.py`: stub de baseline para ancorar histórico Alembic
+- `backend/migrations/versions/20260625_001_add_check_constraints.py`: migration que adiciona 10 CHECK constraints
+- `backend/app/models/transacao.py`: `__table_args__` com 3 constraints (`quantidade > 0`, `preco_unitario > 0`, `valor_total > 0`)
+- `backend/app/models/evento_custodia.py`: `__table_args__` com 2 constraints (`quantidade > 0`, `valor_operacao > 0`)
+- `backend/app/models/projecao_renda.py`: 4 constraints adicionadas ao `__table_args__` existente (todos os campos `>= 0`)
+- `backend/app/models/taxa_cambio.py`: constraint `taxa > 0` adicionada ao `__table_args__` existente
+- `backend/tests/test_constraints.py`: corrigido valor enum `liquidacao_d2 → LIQUIDACAO_D2` (uppercase conforme banco)
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: CONSTRAINT-001 marcado como ✅ Resolvido
+
+**Constraints aplicadas:**
+- `transacao`: `ck_transacao_quantidade_positiva`, `ck_transacao_preco_positivo`, `ck_transacao_valor_total_positivo`
+- `evento_custodia`: `ck_evento_custodia_quantidade_positiva`, `ck_evento_custodia_valor_positivo`
+- `projecoes_renda`: 4 constraints (`dividendos`, `jcp`, `rendimentos`, `total` todos `>= 0`)
+- `taxa_cambio`: `ck_taxa_cambio_taxa_positiva`
+
+---
+
+### Feat — P8: Enriquecimento de Seed Data E2E (25/06/2026)
+
+**Cobertura estimada:** 63% → ~90%
+
+**Artefatos modificados:**
+- `backend/seed_data/scenarios/test_e2e.json`: adicionados 6 novos conjuntos de dados:
+  - `ativos`: +5 novos (ITUB4, BOVA11, IVVB11, SMAL11 ETFs)
+  - `planos_compra`: 3 planos (PETR4 ATIVO, VALE3 ATIVO, HGLG11 PAUSADO)
+  - `planos_venda`: 2 planos (PETR4 stop-gain, VALE3 realização parcial)
+  - `historico_patrimonio`: 12 meses de evolução (Jun/2025 → Mai/2026)
+  - `calendario_dividendo`: 6 eventos futuros (PETR4, VALE3, HGLG11, ITUB4)
+  - `projecoes_renda`: 3 meses projetados (Jul, Ago, Out 2026)
+  - `regras_fiscais`: 3 regras BR (ACAO/VENDA 15%, FII/VENDA 20%, ACAO/DAY_TRADE 20%)
+- `backend/load_scenario.py`: 3 novos métodos `_seed_*` + imports:
+  - `_seed_calendario_dividendo()`: cria entradas por ativo/usuário/data
+  - `_seed_projecoes_renda()`: cria projeções com upsert por `usuario_id + mes_ano`
+  - `_seed_regras_fiscais()`: cria regras com upsert por `pais + tipo_ativo + tipo_operacao`
+  - Chamados em `seed_all()` após `_seed_historico_patrimonio()`
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: P8 marcado como ✅ Resolvido
+
+---
+
+### Fix — P3: BUG-013 Filtro de data pisca (25/06/2026)
+
+**Arquivos alterados:**
+- `frontend/app/templates/carteira/movimentacoes.html`: `x-model → x-model.lazy` nos inputs de data; badge-cor corrigido (`deposito/saque → aporte/resgate`)
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: P3 marcado como ✅ Resolvido
+
+---
+
 ### Fix — P4: Estabilização da Suite de Testes Backend (24/06/2026)
 
 **Resultado:** 554 passed / 14 failed (dívida técnica) / 6 skipped

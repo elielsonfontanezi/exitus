@@ -47,7 +47,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 7 | Operações — Venda | `/operacoes/` | 🟡 | Toggle funciona ✅; modo venda acessível e formulário exibido corretamente | Média |
 | 8 | Operações — Histórico | `/operacoes/historico` | 🟡 | Filtro por data com bug; filtro ticker OK; sem editar/excluir | Média |
 | 9 | Carteira — Posições | `/carteira/posicoes` | ✅ | Validado visualmente: KPIs, filtros (ticker/tipo/mercado) e botão Recalcular funcionam | — |
-| 10 | Carteira — Movimentações | `/carteira/movimentacoes` | 🟡 | BUG-021 resolvido: API e tabela agora exibem movimentações (166 registros). Filtro de tipo atualizado. BUG-013 pendente: filtro data pisca ao digitar ano | Alta |
+| 10 | Carteira — Movimentações | `/carteira/movimentacoes` | 🟡 | BUG-021 resolvido: API e tabela exibem movimentações ✅. BUG-013 resolvido (25/06/2026): `x-model.lazy` nos filtros de data — sem piscar ao digitar ✅. Badge cor corrigido (aporte/resgate) ✅ | — |
 | 11 | Ativos — Catálogo | `/ativos/acoes` | 🟡 | Tabela e categorias OK; busca por ticker não funciona (BUG-014); detalhe lento e sem dados (BUG-015) | Alta |
 | 12 | Ativos — Detalhe | `/ativos/<TICKER>` | 🟡 | Abre mas demora e nem sempre traz dados (BUG-015) | Alta |
 | 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | 🟡 | Carrega corretamente ✅; KPIs + filtros OK; link adicionado ao menu (EXITUS-ATIVOS-001); sem dados (ambiente dev sem eventos cadastrados) | Baixa |
@@ -1419,11 +1419,120 @@ cd tests/e2e && npx playwright test --project="Mobile Chrome"
 |----|-----------|------------|--------|
 | P1 | Recriar `exitusdb_test` (enum incompleto) | 🔴 Alta | ✅ Resolvido 24/06/2026 |
 | P2 | Merge Alembic heads divergentes | 🔴 Alta | ✅ Resolvido 24/06/2026 |
-| P3 | BUG-013 filtro data pisca | 🟡 Média | 📋 Pendente |
+| P3 | BUG-013 filtro data pisca | 🟡 Média | ✅ Resolvido 25/06/2026 |
 | P4 | 22 falhas + 8 erros setup testes (pós P1) | 🟡 Média | ✅ Resolvido 24/06/2026 |
 | P5 | E2E Firefox + Mobile Chrome | 🟡 Média | 📋 Pendente |
 | P6 | E2E v3 lógica negócio (73 CTs) | 🟡 Média | 📋 Pendente |
 | P7 | Fase 7 Backend (MONITOR/RATELIMIT/CICD) | 📋 Baixa | 📋 Pendente |
-| P8 | Cobertura dados teste 63% → enriquecer test_e2e.json | 🟡 Média | 📋 Pendente |
+| P8 | Cobertura dados teste 63% → enriquecer test_e2e.json | 🟡 Média | ✅ Resolvido 25/06/2026 |
 
-**Progresso:** 3/8 resolvidos (P1, P2, P4) | **Próximo:** P3 (BUG-013) ou P8 (seed enrichment)
+**Progresso:** 6/8 resolvidos (P1, P2, P3, P4, P8, CONSTRAINT-001) | **Próximo:** P5/P6 (E2E v3)
+
+---
+
+## 🧭 Análise de Sessão — 24/06/2026
+
+> **Nota:** Esta análise foi gerada no chat da sessão de 24/06/2026 e se perdeu por não ter sido persistida no momento. Recuperada e documentada em 25/06/2026 conforme nova regra anti-perda do workflow `/inicio-sessao`.
+
+### Contexto
+
+Após resolução de P1, P2 e P4, foi solicitado um mapeamento de quais pendências podiam ser iniciadas imediatamente e qual a sequência ótima para desbloqueio do restante.
+
+### Telas/features que podem começar sem pré-requisito
+
+As seguintes novas telas propostas (NEW-XX) **não têm pré-requisito técnico** — as APIs backend já existem e funcionam; basta criar blueprint + template:
+
+| ID | Tela | Motivo de independência |
+|----|------|------------------------|
+| NEW-03 | Distribuição Detalhada | Expandir alocacao_v2.html; APIs `/distribuicao/classes` e `/setores` existem |
+| NEW-04 | Saúde das Cotações | APIs `/cotacoes/anomalias` e `/cotacoes/health` existem |
+| NEW-05 | Câmbio e Multimoeda | APIs `/cambio/converter`, `/cambio/historico` existem |
+| NEW-06 | Indicadores Macroeconômicos | API `/api/parametros-macro/*` existe; resolve BUG-005 (CDI/Ibovespa hardcoded) |
+| NEW-07 | Fontes de Dados | API `/api/fontes-dados/*` existe |
+| NEW-09 | Relatório Consolidado | API `/api/relatorios` existe |
+| NEW-10 | Detalhe de Posição | API `/api/posicoes/<posicao_id>` existe |
+| NEW-11 | Calculadora Preço Teto | APIs `/api/calculos/preco_teto`, `/api/calculos/fii` existem |
+| NEW-19 | Gerenciamento de Portfólios | CRUD `/api/portfolios` completo |
+| NEW-20 | Gerenciamento de Usuários | CRUD `/api/usuarios` completo |
+| NEW-21 | Editar/Excluir Transação | APIs PUT/DELETE `/api/transacoes/<id>` existem (FEAT-003 já foi resolvida) |
+| NEW-22 | Saúde da Reconciliação por Ativo | APIs `/api/reconciliacao/ativo/<id>` e `/api/reconciliacao/integridade` existem |
+
+### Sequência recomendada para desbloqueio geral
+
+1. **P3** (~30min) — corrigir BUG-013 (`x-model.lazy` em `movimentacoes.html`); sem dependências, baixo risco
+2. **P8** (~2-3h) — enriquecer `test_e2e.json` com dados para 5 tabelas vazias + ETFs + `regra_fiscal`; eleva cobertura 63%→~90%; melhora qualidade dos testes E2E v3 que virão na sequência
+3. **CONSTRAINT-001** (~1h) — migration com CHECK constraints; elimina as 13 falhas residuais em `test_constraints.py`; desbloqueia suite a 100% (exceto feature 2026+)
+4. **P6** (sessão longa) — executar 73 CTs do E2E v3; depende de P8 para ter dados suficientes
+5. **NEW-XX escolhidas** — após aprovação explícita do usuário; sem ordem obrigatória entre elas
+
+### Pré-requisitos identificados
+
+- **P8 antes de P6** — os 73 CTs do E2E v3 precisam de dados realistas; sem P8, metade dos CTs falhará com telas vazias
+- **CONSTRAINT-001 antes de considerar suite "verde"** — as 13 falhas de `test_constraints.py` são ruído que obscurece regressões reais
+- **NEW-XX independentes entre si** — qualquer uma pode ser feita em qualquer ordem; não há dependência cruzada
+
+### Decisões descartadas
+
+- **Fazer P6 antes de P8** — descartado porque testes E2E sem dados de seed nas 5 tabelas vazias gerarão falsos negativos em massa
+- **Fazer CONSTRAINT-001 primeiro** — descartado em favor de P3 (mais rápido, desbloqueio imediato visível ao usuário) e P8 (melhora o substrato de testes)
+
+### Status desta análise
+
+- P3: ✅ Resolvido 25/06/2026 — `x-model.lazy` + fix badge cor aporte/resgate
+- P8: ✅ Resolvido 25/06/2026 — seed enriquecido + 3 novos `_seed_*` em `load_scenario.py`
+- CONSTRAINT-001: ✅ Resolvido 25/06/2026 — migration + 10 constraints + 17/17 testes passando (suite 567/574)
+
+---
+
+## 🧭 Análise de Sessão — 25/06/2026
+
+### Contexto
+
+Usuário solicitou execução de P3, P8 e CONSTRAINT-001 nesta sessão. Também solicitou mecanismo para garantir que análises/priorizações geradas no chat não se percam entre sessões.
+
+### Ação estrutural tomada
+
+- Regra anti-perda adicionada ao workflow `/.devin/workflows/inicio-sessao.md`
+- Formato de seção "Análise de Sessão" definido como padrão obrigatório
+- Análise de 24/06/2026 recuperada e persistida neste documento
+
+### Estratégia para P3, P8 e CONSTRAINT-001
+
+#### P3 — BUG-013: Filtro de data pisca em `/carteira/movimentacoes`
+- **Arquivo:** `frontend/app/templates/carteira/movimentacoes.html`
+- **Fix:** Substituir `x-model` por `x-model.lazy` nos inputs `type="date"` → o evento `change` só dispara ao sair do campo, não a cada tecla
+- **Risco:** Mínimo — mudança de 2 atributos HTML
+- **Teste:** Digitar o ano `2026` no filtro sem piscar; filtrar por data e confirmar retorno de dados
+
+#### P8 — Enriquecer `test_e2e.json` (cobertura 63% → ~90%)
+- **Arquivo:** `backend/seed_data/scenarios/test_e2e.json`
+- **Dados a adicionar:**
+  1. `calendario_dividendo` — 5-8 entradas (Proventos/Calendário)
+  2. `projecoes_renda` — 3 cenários conservador/moderado/agressivo (Proventos/Projetados)
+  3. `historico_patrimonio` — snapshots mensais 12 meses (Análises/Evolução)
+  4. `plano_compra` — 3-5 planos com progresso variado (Planos/Compra)
+  5. `plano_venda` — 2-3 planos stop-gain/stop-loss (Planos/Venda)
+  6. ETFs — 3 ativos tipo `etf` (Ativos/ETFs)
+  7. `regra_fiscal` — alíquotas padrão (IR/Mensal fallback)
+- **Sequência:** Adicionar dados → `load_scenario.py test_e2e` → validar telas antes vazias
+- **Após:** Recriar banco de testes com `scripts/create_test_db.sh`
+
+#### CONSTRAINT-001 — Migration com CHECK constraints
+- **Problema:** 13 testes em `test_constraints.py` falham porque os CHECKs não existem no banco
+- **Arquivos a criar:**
+  1. Migration Alembic: `backend/alembic/versions/20260625_NNNN_add_check_constraints.py`
+  2. DDL com os CHECKs que os testes validam
+- **Sequência:** Ler `test_constraints.py` para extrair os CHECKs esperados → criar migration → aplicar no banco oficial → recriar banco de testes → rodar suite
+- **Meta:** Suite passa de 554/574 para 567/574 (eliminar as 13 falhas)
+
+### Ordem de execução nesta sessão
+
+1. P3 (≈20min) — mudança pontual, sem risco de regressão
+2. P8 (≈2h) — enriquecer seed + recriar banco de testes
+3. CONSTRAINT-001 (≈1h) — migration + validação suite
+
+### Modelo de IA recomendado
+
+- P3: `SWE Fast ($)` — mudança mecânica de atributo HTML
+- P8: `GPT 5.1 Codex Medium ($)` — geração de dados JSON estruturados
+- CONSTRAINT-001: `GPT 5.1 Codex Medium ($)` — migration SQL a partir de testes existentes

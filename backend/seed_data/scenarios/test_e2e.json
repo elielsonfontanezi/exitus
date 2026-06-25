@@ -146,6 +146,64 @@
       "p_l": 32.8,
       "observacoes": "Technology Sector",
       "ativo": true
+    },
+    {
+      "ticker": "ITUB4",
+      "nome": "Itaú Unibanco PN",
+      "tipo": "ACAO",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 32.45,
+      "preco_teto": 38.00,
+      "dividend_yield": 8.5,
+      "p_l": 10.2,
+      "p_vp": 1.45,
+      "observacoes": "Setor: Financeiro",
+      "ativo": true
+    },
+    {
+      "ticker": "BOVA11",
+      "nome": "iShares Ibovespa ETF",
+      "tipo": "ETF",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 125.40,
+      "preco_teto": 140.00,
+      "dividend_yield": 2.1,
+      "observacoes": "ETF Ibovespa",
+      "ativo": true
+    },
+    {
+      "ticker": "IVVB11",
+      "nome": "iShares S&P 500 ETF",
+      "tipo": "ETF",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 312.50,
+      "preco_teto": 350.00,
+      "dividend_yield": 1.5,
+      "observacoes": "ETF S&P 500 (BDR)",
+      "ativo": true
+    },
+    {
+      "ticker": "SMAL11",
+      "nome": "iShares Small Cap ETF",
+      "tipo": "ETF",
+      "classe": "RENDA_VARIAVEL",
+      "mercado": "BR",
+      "moeda": "BRL",
+      "pais": "BR",
+      "preco_atual": 98.70,
+      "preco_teto": 115.00,
+      "dividend_yield": 1.8,
+      "observacoes": "ETF Small Cap Brasil",
+      "ativo": true
     }
   ],
   "corretoras": [
@@ -251,6 +309,198 @@
       "data_movimentacao": "2024-04-15",
       "valor": 500.00,
       "observacoes": "Saque parcial"
+    }
+  ],
+  "planos_compra": [
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "PETR4",
+      "nome": "Plano Acumulação PETR4",
+      "quantidade_desejada": 500,
+      "valor_total_planejado": 19250.00,
+      "data_limite": "2027-12-31",
+      "status": "ATIVO"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "VALE3",
+      "nome": "Plano Acumulação VALE3",
+      "quantidade_desejada": 300,
+      "valor_total_planejado": 20670.00,
+      "data_limite": "2027-06-30",
+      "status": "ATIVO"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "HGLG11",
+      "nome": "Plano FII Logística",
+      "quantidade_desejada": 100,
+      "valor_total_planejado": 18520.00,
+      "data_limite": "2026-12-31",
+      "status": "PAUSADO"
+    }
+  ],
+  "planos_venda": [
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "PETR4",
+      "nome": "Stop-Gain PETR4 45",
+      "quantidade_planejada": 50,
+      "preco_alvo": 45.00,
+      "data_limite": "2026-12-31",
+      "status": "ATIVO"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "VALE3",
+      "nome": "Realização parcial VALE3",
+      "quantidade_planejada": 100,
+      "preco_alvo": 75.00,
+      "data_limite": "2027-03-31",
+      "status": "ATIVO"
+    }
+  ],
+  "historico_patrimonio": [
+    { "usuario": "e2e_user", "data": "2025-06-30", "patrimonio_total": 42000.00, "patrimonio_renda_variavel": 38000.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 4000.00 },
+    { "usuario": "e2e_user", "data": "2025-07-31", "patrimonio_total": 44500.00, "patrimonio_renda_variavel": 39800.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 4700.00 },
+    { "usuario": "e2e_user", "data": "2025-08-31", "patrimonio_total": 46200.00, "patrimonio_renda_variavel": 41000.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 5200.00 },
+    { "usuario": "e2e_user", "data": "2025-09-30", "patrimonio_total": 48800.00, "patrimonio_renda_variavel": 43100.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 5700.00 },
+    { "usuario": "e2e_user", "data": "2025-10-31", "patrimonio_total": 51300.00, "patrimonio_renda_variavel": 45500.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 5800.00 },
+    { "usuario": "e2e_user", "data": "2025-11-30", "patrimonio_total": 53900.00, "patrimonio_renda_variavel": 47800.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 6100.00 },
+    { "usuario": "e2e_user", "data": "2025-12-31", "patrimonio_total": 57200.00, "patrimonio_renda_variavel": 50400.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 6800.00 },
+    { "usuario": "e2e_user", "data": "2026-01-31", "patrimonio_total": 58500.00, "patrimonio_renda_variavel": 51200.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 7300.00 },
+    { "usuario": "e2e_user", "data": "2026-02-28", "patrimonio_total": 60100.00, "patrimonio_renda_variavel": 52700.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 7400.00 },
+    { "usuario": "e2e_user", "data": "2026-03-31", "patrimonio_total": 62800.00, "patrimonio_renda_variavel": 55000.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 7800.00 },
+    { "usuario": "e2e_user", "data": "2026-04-30", "patrimonio_total": 64500.00, "patrimonio_renda_variavel": 56500.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 8000.00 },
+    { "usuario": "e2e_user", "data": "2026-05-31", "patrimonio_total": 67200.00, "patrimonio_renda_variavel": 58800.00, "patrimonio_renda_fixa": 0.00, "saldo_caixa": 8400.00 }
+  ],
+  "calendario_dividendo": [
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "PETR4",
+      "data_esperada": "2026-07-15",
+      "tipo_provento": "dividendo",
+      "yield_estimado": 8.5,
+      "valor_estimado": 3.20,
+      "quantidade": 100,
+      "status": "previsto"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "VALE3",
+      "data_esperada": "2026-07-20",
+      "tipo_provento": "dividendo",
+      "yield_estimado": 6.8,
+      "valor_estimado": 4.70,
+      "quantidade": 200,
+      "status": "previsto"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "HGLG11",
+      "data_esperada": "2026-07-10",
+      "tipo_provento": "rendimento",
+      "yield_estimado": 8.2,
+      "valor_estimado": 1.25,
+      "quantidade": 50,
+      "status": "previsto"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "HGLG11",
+      "data_esperada": "2026-08-10",
+      "tipo_provento": "rendimento",
+      "yield_estimado": 8.2,
+      "valor_estimado": 1.25,
+      "quantidade": 50,
+      "status": "previsto"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "ITUB4",
+      "data_esperada": "2026-08-05",
+      "tipo_provento": "jcp",
+      "yield_estimado": 5.5,
+      "valor_estimado": 0.85,
+      "quantidade": 0,
+      "status": "previsto"
+    },
+    {
+      "usuario": "e2e_user",
+      "ativo_ticker": "PETR4",
+      "data_esperada": "2026-10-15",
+      "tipo_provento": "dividendo",
+      "yield_estimado": 8.5,
+      "valor_estimado": 3.50,
+      "quantidade": 100,
+      "status": "previsto"
+    }
+  ],
+  "projecoes_renda": [
+    {
+      "usuario": "e2e_user",
+      "mes_ano": "2026-07",
+      "renda_dividendos_projetada": 640.00,
+      "renda_jcp_projetada": 0.00,
+      "renda_rendimentos_projetada": 62.50,
+      "renda_total_mes": 702.50,
+      "renda_anual_projetada": 8430.00
+    },
+    {
+      "usuario": "e2e_user",
+      "mes_ano": "2026-08",
+      "renda_dividendos_projetada": 0.00,
+      "renda_jcp_projetada": 85.00,
+      "renda_rendimentos_projetada": 62.50,
+      "renda_total_mes": 147.50,
+      "renda_anual_projetada": 8430.00
+    },
+    {
+      "usuario": "e2e_user",
+      "mes_ano": "2026-10",
+      "renda_dividendos_projetada": 350.00,
+      "renda_jcp_projetada": 0.00,
+      "renda_rendimentos_projetada": 0.00,
+      "renda_total_mes": 350.00,
+      "renda_anual_projetada": 8430.00
+    }
+  ],
+  "regras_fiscais": [
+    {
+      "pais": "BR",
+      "tipo_ativo": "ACAO",
+      "tipo_operacao": "VENDA",
+      "aliquota_ir": 15.0,
+      "valor_isencao": 20000.00,
+      "incide_sobre": "lucro",
+      "descricao": "IR sobre ganho de capital em ações BR — isenção até R$20.000/mês",
+      "vigencia_inicio": "2016-01-01",
+      "vigencia_fim": null,
+      "ativa": true
+    },
+    {
+      "pais": "BR",
+      "tipo_ativo": "FII",
+      "tipo_operacao": "VENDA",
+      "aliquota_ir": 20.0,
+      "valor_isencao": null,
+      "incide_sobre": "lucro",
+      "descricao": "IR sobre ganho de capital em FIIs BR — sem isenção",
+      "vigencia_inicio": "2016-01-01",
+      "vigencia_fim": null,
+      "ativa": true
+    },
+    {
+      "pais": "BR",
+      "tipo_ativo": "ACAO",
+      "tipo_operacao": "DAY_TRADE",
+      "aliquota_ir": 20.0,
+      "valor_isencao": null,
+      "incide_sobre": "lucro",
+      "descricao": "IR Day Trade ações BR — alíquota 20%",
+      "vigencia_inicio": "2016-01-01",
+      "vigencia_fim": null,
+      "ativa": true
     }
   ],
   "alertas": [

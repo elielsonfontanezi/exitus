@@ -33,6 +33,12 @@ class EventoCustodia(db.Model):
     quantidade = db.Column(db.Numeric(18, 8), nullable=False)
     valor_operacao = db.Column(db.Numeric(18, 2), nullable=False)
     
+    # --- CHECK constraints (CONSTRAINT-001) ---
+    __table_args__ = (
+        db.CheckConstraint('quantidade > 0', name='ck_evento_custodia_quantidade_positiva'),
+        db.CheckConstraint('valor_operacao > 0', name='ck_evento_custodia_valor_positivo'),
+    )
+
     # Metadados
     observacoes = db.Column(db.Text)
     fonte = db.Column(db.String(50), default='B3_IMPORT')

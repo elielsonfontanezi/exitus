@@ -31,6 +31,43 @@ Execute este workflow ANTES de qualquer ação, análise ou código.
 
 ---
 
+## ⚠️ REGRA ANTI-PERDA: Toda síntese deve ir para documento ANTES de apresentar ao usuário
+
+**Problema documentado (24/06/2026):** Análise de priorização (sequência P3 → CONSTRAINT-001 → P8, pré-requisitos das NEW-XX) foi gerada apenas no chat e se perdeu ao fechar a sessão.
+
+**Regra obrigatória:** Toda vez que a IA gerar qualquer um dos itens abaixo, ele DEVE ser escrito no documento relevante ANTES de ser apresentado ao usuário:
+
+- Sequência de execução de pendências (ex: "fazer P3 antes de P8 porque...")
+- Pré-requisitos entre tarefas
+- Decisões técnicas descartadas e o motivo
+- Análise de impacto de um bug ou mudança
+- Sugestões de próximos passos com justificativa
+
+**Onde registrar:**
+- Pendências e priorização → `docs/AUDITORIA_FUNCIONAL_18_06_2026.md` (seção "Análise de Sessão — DD/MM/AAAA")
+- Decisões técnicas → `docs/LESSONS_LEARNED.md` (lição L-XXX-NNN)
+- Próximos passos do roadmap → `docs/ROADMAP.md`
+
+**Formato obrigatório para seção de análise:**
+```markdown
+## 🧭 Análise de Sessão — DD/MM/AAAA
+
+### Contexto
+[o que motivou a análise]
+
+### Sequência recomendada
+1. **ITEM** (estimativa) — justificativa
+2. ...
+
+### Pré-requisitos identificados
+- ITEM-A bloqueia ITEM-B porque: ...
+
+### Decisões descartadas
+- Alternativa X descartada porque: ...
+```
+
+---
+
 ## Checklist de docs obrigatórios ao FECHAR qualquer sessão
 
 Antes do commit final, verificar CADA item abaixo e confirmar ou justificar:

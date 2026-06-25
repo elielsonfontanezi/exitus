@@ -47,9 +47,9 @@
         <option value="ajuste">Ajuste</option>
         <option value="outro">Outro</option>
     </select>
-    <input type="date" class="filter-input" x-model="filtroDataInicio" @change="carregarComFiltro()">
+    <input type="date" class="filter-input" x-model.lazy="filtroDataInicio" @change="carregarComFiltro()">
     <span class="filter-label">até</span>
-    <input type="date" class="filter-input" x-model="filtroDataFim" @change="carregarComFiltro()">
+    <input type="date" class="filter-input" x-model.lazy="filtroDataFim" @change="carregarComFiltro()">
     <span class="filter-label" style="margin-left:auto;" x-show="movimentacoesFiltradas.length !== movimentacoes.length"
           x-text="movimentacoesFiltradas.length + ' de ' + movimentacoes.length"></span>
 </div>
@@ -79,7 +79,7 @@
                     <td x-text="mov.corretora?.nome || '-'"></td>
                     <td x-text="mov.descricao || '-'"></td>
                     <td class="col-right cell-money"
-                        :class="parseTipo(mov.tipo_movimentacao) === 'deposito' ? 'badge-positivo' : parseTipo(mov.tipo_movimentacao) === 'saque' ? 'badge-negativo' : ''"
+                        :class="parseTipo(mov.tipo_movimentacao) === 'aporte' ? 'badge-positivo' : parseTipo(mov.tipo_movimentacao) === 'resgate' ? 'badge-negativo' : ''"
                         x-text="formatMoney(mov.valor)"></td>
                     <td class="col-center" x-text="mov.moeda || 'BRL'"></td>
                 </tr>

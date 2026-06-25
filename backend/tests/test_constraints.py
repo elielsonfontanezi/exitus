@@ -83,7 +83,7 @@ _SQL_EVENTO = """
         (id, usuario_id, ativo_id, corretora_id, tipo_evento,
          data_evento, quantidade, valor_operacao, fonte, created_at, updated_at)
     VALUES
-        (:id, :uid, :aid, :cid, 'liquidacao_d2',
+        (:id, :uid, :aid, :cid, 'LIQUIDACAO_D2',
          NOW(), :qtd, :valor, 'B3_IMPORT', NOW(), NOW())
 """
 
