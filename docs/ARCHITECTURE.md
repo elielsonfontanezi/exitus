@@ -597,7 +597,7 @@ ativo = db.session.get(Ativo, id)
 
 20. **relatorios_performance** (já citado acima) — tabelas de métricas de performance agregadas.
 
-21. **projecaorenda** / **relatoriosperformance** — tabelas auxiliares de analytics (detalhadas em `MODULES.md`).[file:10]
+21. **projecaorenda** / **relatoriosperformance** — tabelas auxiliares de analytics (detalhadas em `PROJECT_STATUS.md`).[file:10]
 
 22. **calendario_dividendo** — calendário de proventos futuros para planejamento (DIVCALENDAR-001):
     - `usuario_id` (FK)
@@ -1146,7 +1146,7 @@ Cloud Provider
 
 ## Referências
 
-- [MODULES.md](MODULES.md) - Detalhes de cada módulo M0-M7
+- [PROJECT_STATUS.md](PROJECT_STATUS.md) - Status consolidado, módulos M0-M7
 - [API_REFERENCE.md](API_REFERENCE.md) - Endpoints completos (23 seções)
 - [OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md) - Deploy e troubleshooting
 - [ENUMS.md](ENUMS.md) - Documentação completa de ENUMs

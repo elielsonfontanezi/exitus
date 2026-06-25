@@ -20,7 +20,7 @@
 
 ---
 
-## 📁 Documentação (18 arquivos)
+## 📁 Documentação (15 arquivos)
 
 ### 🔴 Core Operacional
 
@@ -42,18 +42,10 @@
 |---------|-----------|
 | **[ENUMS.md](ENUMS.md)** | 15 TipoAtivo, mapeamentos DB/API/JSON |
 | **[SEEDS.md](SEEDS.md)** | Credenciais dev, dados de teste |
-| **[MODULES.md](MODULES.md)** | Status M0-M7, 17 blueprints, 23 tabelas |
 | **[EXITUS_DB_STRUCTURE.txt](EXITUS_DB_STRUCTURE.txt)** | Schema completo (auto-gerado) |
 | **[EXITUS_ER_DIAGRAM.md](EXITUS_ER_DIAGRAM.md)** | Diagramas ER |
 
-### 📋 GAPs e Funcionalidades
-
-| Arquivo | Descrição | Status |
-|---------|-----------|--------|
-| **[MULTICLIENTE.md](MULTICLIENTE.md)** | Multi-tenancy consolidado (RLS, Dashboard Admin) | ✅ 100% |
-| **[AUDITORIA_FUNCIONAL_18_06_2026.md](AUDITORIA_FUNCIONAL_18_06_2026.md)** | Bugs, GAPs pendentes (TECH-001) | 🟡 Ativo |
-
-### 📖 Guias
+###  Guias
 
 | Arquivo | Descrição |
 |---------|-----------|
@@ -61,7 +53,7 @@
 
 ### 📚 Archive (`docs/archive/`)
 
-28 documentos históricos preservados: GAPs concluídos, roadmaps anteriores, análises de frontend, planos de teste. Acessíveis para consulta mas não fazem parte da documentação ativa.
+30 documentos históricos preservados: GAPs concluídos, roadmaps anteriores, análises de frontend, planos de teste. Acessíveis para consulta mas não fazem parte da documentação ativa.
 
 ---
 

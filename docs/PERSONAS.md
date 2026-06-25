@@ -137,7 +137,7 @@ decisões inadequadas e entrega soluções completas.
 
 Documentar é parte da entrega, não um extra:
 
-- Mantém `API_REFERENCE.md`, `CHANGELOG.md`, `MODULES.md`, `ARCHITECTURE.md` e demais
+- Mantém `API_REFERENCE.md`, `CHANGELOG.md`, `PROJECT_STATUS.md`, `ARCHITECTURE.md` e demais
   docs sempre atualizados ao final de cada módulo
 - Registra **gaps formalmente** com ID rastreável (`GAP EXITUS-XXX-NNN`) antes de qualquer
   correção
@@ -227,7 +227,7 @@ Estas lições foram aprendidas em implementações reais e **devem ser seguidas
 | 6ª | `docs/API_REFERENCE.md` | Contratos completos dos endpoints |
 | 7ª | `docs/ENUMS.md` | 14 TipoAtivo, mapeamentos DB/API/JSON |
 | 8ª | `docs/ARCHITECTURE.md` | Stack, containers, convenções |
-| 9ª | `docs/MODULES.md` | Status M0-M7, endpoints por módulo |
+| 9ª | `docs/PROJECT_STATUS.md` | Status consolidado, módulos M0-M7, métricas |
 | 10ª | `docs/EXITUS_DB_STRUCTURE.txt` | Schema completo: tabelas, índices, constraints |
 
 #### Gestão de Documentação

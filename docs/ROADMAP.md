@@ -246,16 +246,26 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 ---
 
-## 📊 GAP Pendente: TECH-001
+## 🎨 Frontend — API-Driven Integration (8 Sprints)
 
-> **Status:** 🟡 Pendente | **Prioridade:** Média | **Modelo IA:** SWE Fast ($)
+> **Status:** ✅ 100% Concluído (09/06/2026) | **36+ endpoints integrados** | **36+ templates**
 
-**Problema:** ValueError residual em 5 services — sem exceções tipadas.
+### Resumo dos Sprints
 
-**Detalhes:** Services `parametros_macro`, `rfcalc`, `cambio`, `ir`, `alerta` ainda usam `ValueError` genérico em vez de exceções tipadas (`NotFoundError`, `ConflictError`, `ValidationError`). Hierarquia de exceções existe em `app/utils/exceptions.py` e já é usada por 15+ services.
+| Sprint | Título | Status | Endpoints |
+|--------|--------|--------|-----------|
+| Sprint 1 | Operações Essenciais | ✅ | 5 |
+| Sprint 2 | Histórico Transações | ✅ | 6 |
+| Sprint 3 | Planos & Alertas | ✅ | 8 |
+| Sprint 4 | Análises & Dashboard | ✅ | 5 |
+| Sprint 5 | Imposto de Renda | ✅ | 4 |
+| Sprint 6 | Rentabilidade | ✅ | 5 |
+| Sprint 7 | Relatórios & Exportação | ✅ | 6 |
+| Sprint 8 | Ferramentas | ✅ | 4 |
 
-**Origem:** Documento `EXITUS-CRUD-002.md` arquivado (2/3 problemas resolvidos, 1 parcial).  
-**Detalhes completos:** [AUDITORIA_FUNCIONAL_18_06_2026.md](AUDITORIA_FUNCIONAL_18_06_2026.md) — Backlog de Correções, TECH-001
+**Total:** 36+ endpoints integrados, 36+ templates Jinja2, 11 blueprints frontend.
+
+**Detalhes:** Ver `archive/FRONTEND_INTEGRATION_PLAN.md` para histórico completo.
 
 ---
 

@@ -44,6 +44,26 @@
 
 ---
 
+## 🏗️ Módulos do Sistema (M0-M7)
+
+| Módulo | Nome | Status | Endpoints |
+|---|---|---|---|
+| M0 | Infraestrutura | ✅ PROD | — |
+| M1 | Database Schema | ✅ PROD | — |
+| M2 | Backend API Core | ✅ PROD | 22 |
+| M3 | Portfolio Analytics | ✅ PROD | 11 |
+| M4 | Buy Signals & Fiscais | ✅ PROD | 12 |
+| M5 | Frontend Base | ✅ PROD | 15 |
+| M6 | Dashboards Frontend | ✅ PROD | 4 |
+| M7.4 | Alertas | ✅ PROD | 4 |
+| M7.5 | Cotações Live | ✅ PROD | 3 |
+| M7.6 | Relatórios | ✅ PROD | 5 |
+| M7.7 | Histórico de Preços | ✅ PROD | — |
+
+**Total de Endpoints:** 156 rotas RESTful validadas.
+
+---
+
 ## 🖥️ Backend — 87% Concluído
 
 - **GAPs:** 48/54 implementados (Fases 1-6 ✅, MULTICLIENTE-001 ✅, HistoricoPatrimonio ✅)
