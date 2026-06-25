@@ -1,9 +1,9 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 436/497 passando (87.7%) 🟡 — 61 falhas (IR/constraints) + 35 erros setup  
+> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 554/574 passando (96.4%) 🟡 — 14 failed (constraints P6 + feature 2026+), 6 skipped  
 > **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅ | **Frontend API-Driven:** ✅ 8/8 Sprints Concluídos (09/06/2026) | **UI Consistency:** ✅ Menu limpo (15/06/2026)  
-> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.23 | **Última atualização:** 24/06/2026
+> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.24 | **Última atualização:** 24/06/2026
 
 ---
 
@@ -47,7 +47,7 @@
 | **Cenários de Teste** | ✅ | 4 cenários predefinidos (E2E, Full expandido, IR, Stress) + carga massiva (30 ativos, 48 transações, 32 proventos) |
 | **Histórico Patrimonial** | ✅ | Snapshots mensais, endpoint /api/portfolios/evolucao |
 | **Documentação** | ✅ | Swagger/OpenAPI auto-doc |
-| **Testes** | 🟡 | 436/497 passando (87.7%) — 61 falhas (IR/constraints), 35 erros setup |
+| **Testes** | 🟡 | 554/574 passando (96.4%) — 14 failed (constraints P6 + feature 2026+), 6 skipped |
 
 ---
 
