@@ -40,7 +40,7 @@ Antes do commit final, verificar CADA item abaixo e confirmar ou justificar:
 | `docs/CHANGELOG.md` | ✅ Sempre | Entrada com artefatos e suite |
 | `docs/PROJECT_STATUS.md` | ✅ Sempre | Data, versão, métricas |
 | `docs/AUDITORIA_FUNCIONAL_18_06_2026.md` | ✅ Se P-item resolvido | Marcar ✅, detalhar fix |
-| `docs/ROADMAP.md` | Se GAP mudou status | Marcar concluído |
+| `docs/ROADMAP.md` | ✅ Sempre verificar | Marcar GAP como concluído se aplicável; atualizar "Próximo" |
 | `docs/LESSONS_LEARNED.md` | Se nova lição | Adicionar entrada L-XXX-NNN |
 | `docs/CODING_STANDARDS.md` | Se novo padrão | Documentar convenção |
 | `docs/ARCHITECTURE.md` | Se novo componente | Atualizar diagrama/tabela |

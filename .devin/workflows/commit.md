@@ -17,7 +17,7 @@ description: Fechar GAP com commit — testes, docs e commit atômico por ativid
 3. Atualizar documentação no mesmo commit (REGRA #8) — passar por CADA item:
    - `docs/CHANGELOG.md` — **SEMPRE** (entrada com artefatos alterados e resultado da suite)
    - `docs/PROJECT_STATUS.md` — **SEMPRE** (data, versão, métricas de testes atualizadas)
-   - `docs/ROADMAP.md` — se status de GAP mudou
+   - `docs/ROADMAP.md` — **SEMPRE verificar** (marcar GAP como concluído se aplicável; atualizar "Próximo")
    - `docs/AUDITORIA_FUNCIONAL_18_06_2026.md` — se P-item foi resolvido ou teve progresso
    - `docs/CODING_STANDARDS.md` — se introduz novo padrão
    - `docs/ARCHITECTURE.md` — se adiciona componentes ou endpoints
