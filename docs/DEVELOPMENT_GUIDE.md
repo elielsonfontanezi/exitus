@@ -90,15 +90,33 @@ GAPs: GAP-XXX
 
 ## 🧪 Comandos de Validação Obrigatórios
 
+### Sempre após qualquer alteração
 ```bash
-# Suite completa (alvo: manter >95%)
+# Suite completa (alvo: manter >95%, ideal próximo de 100%)
 podman exec exitus-backend python -m pytest --tb=no -q
+```
 
-# Multi-tenancy
+### Após alterações multi-tenancy / RLS
+```bash
 podman exec exitus-backend python -m pytest backend/tests/test_multitenancy.py -v
+```
 
-# Constraints (DDL)
+### Após alterações DDL (schema, migrations, constraints)
+```bash
+./scripts/check_db_parity.sh --strict
 podman exec exitus-backend python -m pytest backend/tests/test_constraints.py -v
+```
+
+### Após alterações fiscais (IR / DARF)
+```bash
+podman exec exitus-backend python -m pytest backend/tests/test_darf_acumulado.py -v
+podman exec exitus-backend python -m pytest backend/tests/test_ir_integration.py -v
+```
+
+### Após alterações de rentabilidade / importação
+```bash
+podman exec exitus-backend python -m pytest backend/tests/test_rentabilidade.py -v
+podman exec exitus-backend python -m pytest backend/tests/test_import_b3_parsers.py -v
 ```
 
 ---
