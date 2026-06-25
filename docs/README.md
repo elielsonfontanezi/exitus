@@ -20,7 +20,7 @@
 
 ---
 
-## 📁 Documentação (15 arquivos)
+## 📁 Documentação (13 arquivos)
 
 ### 🔴 Core Operacional
 
@@ -43,13 +43,6 @@
 | **[ENUMS.md](ENUMS.md)** | 15 TipoAtivo, mapeamentos DB/API/JSON |
 | **[SEEDS.md](SEEDS.md)** | Credenciais dev, dados de teste |
 | **[EXITUS_DB_STRUCTURE.txt](EXITUS_DB_STRUCTURE.txt)** | Schema completo (auto-gerado) |
-| **[EXITUS_ER_DIAGRAM.md](EXITUS_ER_DIAGRAM.md)** | Diagramas ER |
-
-###  Guias
-
-| Arquivo | Descrição |
-|---------|-----------|
-| **[USER_GUIDE.md](USER_GUIDE.md)** | Guia do usuário final |
 
 ### 📚 Archive (`docs/archive/`)
 
@@ -69,10 +62,7 @@
 ### Para Operações/DevOps
 1. **OPERATIONS_RUNBOOK.md** — Comandos e troubleshooting
 2. **SEEDS.md** — Credenciais e dados de teste
-3. **MODULES.md** — Status de cada módulo
-
-### Para Usuários Finais
-1. **USER_GUIDE.md** — Como usar o sistema
+3. **PROJECT_STATUS.md** — Status consolidado, módulos M0-M7
 
 ### Para IA Assistente (Cascade/Windsurf)
 1. **LESSONS_LEARNED.md** — **Ler PRIMEIRO**

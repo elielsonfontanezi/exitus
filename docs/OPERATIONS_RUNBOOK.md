@@ -1469,7 +1469,6 @@ ls -lh scripts/
 # ✅ docs/ARCHITECTURE.md encontrado
 # ✅ docs/PROJECT_STATUS.md encontrado
 # ✅ docs/API_REFERENCE.md encontrado
-# ✅ docs/USER_GUIDE.md encontrado
 # ✅ docs/OPERATIONS_RUNBOOK.md encontrado
 # ✅ docs/CHANGELOG.md encontrado
 # Total: 7/7 documentos OK
@@ -1925,7 +1924,6 @@ podman run -d --name exitus-backend \
 - [ARCHITECTURE.md](ARCHITECTURE.md) - Detalhes da arquitetura
 - [PROJECT_STATUS.md](PROJECT_STATUS.md) - Status consolidado, módulos M0-M7
 - [API_REFERENCE.md](API_REFERENCE.md) - Documentação de APIs
-- [USER_GUIDE.md](USER_GUIDE.md) - Guia do usuário
 
 ---
 
