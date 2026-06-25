@@ -1,7 +1,7 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 25/06/2026  
-> **Status:** ✅ **CONSTRAINT-001 + P8 + P3 Resolvidos — 567 passed**  
+> **Status:** 🟡 **Auditoria Funcional em andamento — 2 OK, 34 PARCIAL, 0 QUEBRADO**  
 > **Versão:** v0.9.25
 
 ### 🔧 Últimas correções (25/06/2026)
@@ -34,11 +34,11 @@
 | Componente | Progresso | Detalhe |
 |------------|-----------|---------|
 | **Backend** | ✅ 87% | 48/54 GAPs, 508/546 testes (93.0%), 156 endpoints |
-| **Frontend V2.0** | ✅ 100% | 17/17 telas premium, design classe mundial |
-| **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
+| **Frontend V2.0** | 🟡 94% | 2 OK, 34 PARCIAL, 0 QUEBRADO (36 telas auditadas) |
+| **Frontend UX Evolution** | 🟡 94% | 2 OK, 34 PARCIAL, 0 QUEBRADO (36 telas auditadas) |
 | **Testes Backend** | ✅ 98.8% | 567/574 passando, 1 failed (dívida técnica: feature IR 2026+), 6 skipped |
 | **Testes E2E** | 🟡 60% | v2: 127/127 ✅ Chromium (merged main 16/06) — v3 lógica negócio: 50 CTs planejados, specs criados (branch feature/testes-e2e-v3) |
-| **Auditoria Funcional** | ✅ 100% | 18/06/2026: 36 telas auditadas; 23/06/2026: 0 críticos, 0 importantes pendentes, 8 features pendentes (FEAT-005 a FEAT-012) |
+| **Auditoria Funcional** | 🟡 94% | 2 OK, 34 PARCIAL, 0 QUEBRADO (36 telas auditadas em 22/06/2026) |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | test_full agora completo: 38 ativos (10 BR + 10 US + 10 BDRs + 8 RF), 56 transações, 42 proventos; dados realistas RV + RF |
 
