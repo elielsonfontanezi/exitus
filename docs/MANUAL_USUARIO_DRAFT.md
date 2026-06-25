@@ -1,7 +1,8 @@
-# Manual do Usuário — Sistema Exitus v0.9.25
+# Manual do Usuário — Sistema Exitus v0.9.25 (RASCUNHO)
 
 > **Versão:** v0.9.25  
 > **Data:** 25/06/2026 (atualizado com status atual do sistema)  
+> **Status:** 🟡 RASCUNHO EM DESENVOLVIMENTO — Sistema ainda em fase de desenvolvimento (48/54 GAPs concluídos)  
 > **Objetivo:** Guia completo de navegação e uso do sistema  
 > **Público:** Investidores e assessoras de investimento
 

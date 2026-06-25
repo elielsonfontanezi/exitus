@@ -615,7 +615,7 @@ Badge no Preço:
 [api:6]
 
 ## Referências
-- [MANUAL_USUARIO.md](../MANUAL_USUARIO.md) - Manual completo do usuário (16 módulos)
+- [MANUAL_USUARIO_DRAFT.md](../MANUAL_USUARIO_DRAFT.md) - Manual completo do usuário (rascunho em desenvolvimento)
 - [API_REFERENCE.md](../API_REFERENCE.md) - Documentação completa de APIs
 - [MODULES.md](../MODULES.md) - Detalhes técnicos dos módulos
 - [OPERATIONS_RUNBOOK.md](../OPERATIONS_RUNBOOK.md) - Operações e deploy[file:14]
