@@ -1,4 +1,4 @@
-# 🎯 DEVELOPMENT GUIDE — Sistema Exitus
+# 🎯 00_DEVELOPMENT_GUIDE — Sistema Exitus
 
 > **Propósito:** Quick reference para contexto rápido de desenvolvimento.  
 > **Regras completas para IA:** `.windsurfrules` — consultar sempre no início da sessão.  

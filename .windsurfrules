@@ -32,14 +32,14 @@ PRIORIDADE 2 — Consultar conforme contexto:
 
 ## � CONTEXTO RÁPIDO (Início de Sessão)
 
-**Obrigatório:** Consultar `docs/DEVELOPMENT_GUIDE.md` no início de cada sessão para:
+**Obrigatório:** Consultar `docs/00_DEVELOPMENT_GUIDE.md` no início de cada sessão para:
 - Fase atual do projeto
 - Regras inegociáveis (Multi-Tenancy, Motor Fiscal, Enums)
 - Fluxo de trabalho padrão (implementação → validação → commit)
 - Portas e URLs
 - Comandos de validação
 
-**Nota:** DEVELOPMENT_GUIDE.md é um resumo. Para detalhes profundos, sempre consultar as fontes de verdade acima.
+**Nota:** 00_DEVELOPMENT_GUIDE.md é um resumo. Para detalhes profundos, sempre consultar as fontes de verdade acima.
 
 ---
 
@@ -178,7 +178,7 @@ Ao fechar qualquer GAP, os seguintes docs DEVEM ser atualizados **no mesmo commi
 | `docs/OPERATIONS_RUNBOOK.md` | Se scripts/procedimentos | Scripts novos, troubleshooting, procedimentos |
 | `docs/LESSONS_LEARNED.md` | Se lição aprendida | Erros reais, soluções, padrões a evitar |
 | `docs/README.md` | Se versão/mudança | Versão, data, status geral do projeto |
-| `docs/DEVELOPMENT_GUIDE.md` | Se contexto operacional mudar | Fase, comandos, regras inegociáveis, portas, credenciais |
+| `docs/00_DEVELOPMENT_GUIDE.md` | Se contexto operacional mudar | Fase, comandos, regras inegociáveis, portas, credenciais |
 | `.windsurfrules` | Se regras/processos da IA mudarem | Fluxo, prioridades, segurança, modelos, checklists |
 
 **O usuário nunca deve perguntar "e a documentação?" — ela já vem junto.**
