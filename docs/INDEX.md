@@ -1,6 +1,6 @@
 # Índice da Documentação — Sistema Exitus
 
-> **Total:** 12 arquivos ativos + archive  
+> **Total:** 11 arquivos ativos + archive  
 > **Última atualização:** 25/06/2026  
 > **Versão:** v0.9.25
 
@@ -46,7 +46,7 @@
 
 ### 📚 Archive (`docs/archive/`)
 
-31 documentos históricos preservados: GAPs concluídos, roadmaps anteriores, análises de frontend, planos de teste. Acessíveis para consulta mas não fazem parte da documentação ativa.
+32 documentos históricos preservados: GAPs concluídos, roadmaps anteriores, análises de frontend, planos de teste. Acessíveis para consulta mas não fazem parte da documentação ativa.
 
 ---
 
@@ -76,4 +76,4 @@
 ---
 
 *Atualizado: 25 de Junho de 2026*  
-*Versão: v0.9.25 — Documentação consolidada (12 arquivos)*
+*Versão: v0.9.25 — Documentação consolidada (11 arquivos)*
