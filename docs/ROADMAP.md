@@ -246,17 +246,16 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 ---
 
-## 📊 GAP Pendente: EXITUS-CRUD-002
+## 📊 GAP Pendente: TECH-001
 
-> **Status:** ❌ Não implementado | **Prioridade:** Alta | **Modelo IA:** Sonnet
+> **Status:** 🟡 Pendente | **Prioridade:** Média | **Modelo IA:** SWE Fast ($)
 
-**Problema:** 3 problemas estruturais sistêmicos na camada service/route:
-1. Inconsistência de retorno entre services
-2. Falta de validação centralizada
-3. Error handling fragmentado
+**Problema:** ValueError residual em 5 services — sem exceções tipadas.
 
-**Origem:** Descoberto durante EXITUS-TESTS-001.  
-**Detalhes completos:** [EXITUS-CRUD-002.md](EXITUS-CRUD-002.md)
+**Detalhes:** Services `parametros_macro`, `rfcalc`, `cambio`, `ir`, `alerta` ainda usam `ValueError` genérico em vez de exceções tipadas (`NotFoundError`, `ConflictError`, `ValidationError`). Hierarquia de exceções existe em `app/utils/exceptions.py` e já é usada por 15+ services.
+
+**Origem:** Documento `EXITUS-CRUD-002.md` arquivado (2/3 problemas resolvidos, 1 parcial).  
+**Detalhes completos:** [AUDITORIA_FUNCIONAL_18_06_2026.md](AUDITORIA_FUNCIONAL_18_06_2026.md) — Backlog de Correções, TECH-001
 
 ---
 

@@ -974,7 +974,7 @@ except ValueError as e:
     return error(str(e), 400)  # ← engloba casos de 404 incorretamente
 ```
 
-**Padrão correto (a implementar em EXITUS-CRUD-002):**
+**Padrão correto (implementado parcialmente — TECH-001 pendente):**
 ```python
 # No service — exceções tipadas
 class NotFoundError(Exception): pass
@@ -992,7 +992,7 @@ except ValidationError as e:
     return error(str(e), 400)     # 400
 ```
 
-**Fix planejado:** EXITUS-CRUD-002.
+**Fix planejado:** TECH-001 (ValueError residual em 5 services).
 
 ---
 

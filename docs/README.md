@@ -50,8 +50,8 @@
 
 | Arquivo | Descrição | Status |
 |---------|-----------|--------|
-| **[MULTICLIENTE.md](MULTICLIENTE.md)** | Multi-tenancy consolidado (4 partes) | 🟡 85% |
-| **[EXITUS-CRUD-002.md](EXITUS-CRUD-002.md)** | Revisão Service/Route | ❌ Pendente |
+| **[MULTICLIENTE.md](MULTICLIENTE.md)** | Multi-tenancy consolidado (RLS, Dashboard Admin) | ✅ 100% |
+| **[AUDITORIA_FUNCIONAL_18_06_2026.md](AUDITORIA_FUNCIONAL_18_06_2026.md)** | Bugs, GAPs pendentes (TECH-001) | 🟡 Ativo |
 
 ### 📖 Guias
 

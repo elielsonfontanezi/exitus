@@ -1799,7 +1799,7 @@ Documentação atualizada em `docs/SEEDS.md` e `docs/API_REFERENCE.md`.
   - Zero perda de informação
 - **Governança:**
   - `.windsurfrules` v2.4: referências atualizadas (ROADMAP_BACKEND→ROADMAP, TESTES_HISTORICO→PROJECT_STATUS)
-  - EXITUS-CRUD-002.md mantido como GAP pendente
+  - TECH-001 registrado como GAP pendente (ValueError residual em 5 services)
 
 ### Fixed — Testes E2E Login e Performance (18/03/2026)
 
