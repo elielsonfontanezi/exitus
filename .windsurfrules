@@ -1,6 +1,6 @@
 # .windsurfrules — Sistema Exitus
 ## Arquivo de regras para Cascade (Windsurf AI Assistant)
-### Versão: 2.6 — 05/04/2026 (tabela modelos IA + otimização custos)
+### Versão: 2.7 — 25/06/2026 (tabela modelos IA atualizada — novos modelos Claude Opus 4.7/4.8, Fable 5, Gemini 3.5, DeepSeek V4)
 
 ---
 
@@ -70,59 +70,66 @@ Justificativa: [1 linha]
 ### 📊 Tabela de Modelos Disponíveis
 
 **FREE (Custo Zero):**
-- SWE, Kimi K.2.5
+- SWE-1.5, GLM-5.2, Kimi K2.7
 
-**$ (Baixo Custo):**
-- SWE Fast, GLM 4.7 Beta, GLM-5, GPT 5.1 Codex Medium, GPT OSS 120B Medium Thinking, Grok Code fast 1, Minimax M2.5, Gemini 3 Flash High, GPT 5.1 Codex Mini Low
+**$ (Baixo Custo) — credit_multiplier ≤ 1:**
+- SWE-1.5 Fast, GPT-OSS 120B Medium Thinking, GPT-5-Codex, GPT-5 Low Thinking, GPT-5.1 No Thinking, GPT-5.1 Low Thinking, GPT-5.1-Codex Medium, GPT-5.1-Codex Low, GPT-5.1-Codex-Mini, GPT-5.1-Codex-Mini Low, GPT-5.1-Codex Max Low, GPT-5.2 No Thinking, GPT-5.2 Low Thinking, GPT-5.2-Codex Low, GPT-5.2-Codex Medium, Grok Code Fast 1, Gemini 3 Flash Minimal/Low/Medium, Gemini 2.5 Pro, Gemini 3.1 Pro Low Thinking, Fast Arena
 
-**$$ (Custo Médio):**
-- GPT 5.3 Codex Medium, Gemini 2.5 Pro, GPT 4.1, GPT 4o, GPT 5 High/Low/Medium Thinking, GPT 5.1 Codex/Mini/High/Low/Max High, GPT 5.2 High Thinking, GPT 5.2 Codex High
+**$$ (Custo Médio) — credit_multiplier 1.5 — 6:**
+- Adaptive (recomendado pela Devin — multiplier 1.5), GPT-5 Medium Thinking, GPT-5.1 Medium/High Thinking, GPT-5.1-Codex Max Medium/High, GPT-5.2 Medium/High Thinking, GPT-5.2-Codex High/XHigh, GPT-4o, GPT-4.1, o3, o3 High Reasoning, Gemini 3 Flash High, Gemini 3.1 Pro High Thinking, Hybrid/Frontier Arena, Claude Haiku 4.5, Claude Sonnet 4/4.5/4.6 (multiplier 3-4), Claude Sonnet 4/4.5/4.6 Thinking (multiplier 4-6), Claude Opus 4.5/4.6 (multiplier 6), DeepSeek V4 (multiplier 3 — recomendado)
 
-**$$$ (Alto Custo):**
-- Claude Opus 4.6 Thinking, GPT 5.4 Low Thinking, Claude Sonnet 4.6 Thinking, Opus 4.5, Sonnet 4.5, Gemini 3 Pro High Thinking, Gemini 3.1 Pro High Thinking
+**$$$ (Alto Custo) — credit_multiplier > 6:**
+- Claude Sonnet 4.6 Thinking 1M (multiplier 16), Claude Opus 4.5 Thinking (multiplier 8), Claude Opus 4.6 Thinking (multiplier 8), Claude Opus 4.6/4.8 1M (multiplier 10-12), Claude Opus 4.7 Low/Medium/High/XHigh/Max (multiplier 20-75), Claude Opus 4.8 Low/Medium/High/XHigh/Max (multiplier 20-50), Claude Fable 5 Low/Medium/High/XHigh/Max (multiplier 40-100), Gemini 3.5 Flash Low/Medium/High (multiplier 4-9), variantes Fast dos modelos acima (2x a 6x mais caras)
 
 ### 🎯 Recomendações por Tipo de Tarefa
 
 **1. Correções Simples / CRUD / Refatoração Pontual:**
-- Menor custo: SWE (Free) ou SWE Fast ($)
-- Modelo ideal: GPT 5.1 Codex Medium ($)
+- Menor custo: SWE-1.5 (Free) ou SWE-1.5 Fast ($)
+- Modelo ideal: GPT-5.1-Codex Medium ($)
 - Justificativa: Tarefas mecânicas não precisam de reasoning profundo
 
 **2. Lógica de Negócio / Integração / Testes:**
-- Menor custo: GPT 5.1 Codex Medium ($) ou Gemini 3 Flash High ($)
-- Modelo ideal: Claude Sonnet 4.6 Thinking ($$$)
+- Menor custo: GPT-5.1-Codex Medium ($) ou Gemini 3 Flash High ($)
+- Modelo ideal: Claude Sonnet 4.6 Thinking ($$)
 - Justificativa: Precisa de raciocínio moderado e consistência
 
 **3. Arquitetura / Design / Decisões Críticas:**
-- Menor custo: GPT 5 Medium Thinking ($$) ou Gemini 2.5 Pro ($$)
-- Modelo ideal: Claude Opus 4.6 Thinking ($$$)
+- Menor custo: GPT-5 Medium Thinking ($$) ou Gemini 2.5 Pro ($)
+- Modelo ideal: Claude Opus 4.8 Medium ($$$)
 - Justificativa: Requer raciocínio profundo e análise multidimensional
 
 **4. Análise de Código / Code Review / Segurança:**
-- Menor custo: GPT 5.1 Codex Low ($$)
-- Modelo ideal: Claude Sonnet 4.6 Thinking ($$$)
+- Menor custo: GPT-5.2-Codex Low ($)
+- Modelo ideal: Claude Sonnet 4.6 Thinking ($$)
 - Justificativa: Precisa de atenção a detalhes e padrões
 
 **5. Debugging Complexo / Root Cause Analysis:**
-- Menor custo: GPT 5.2 High Thinking ($$)
-- Modelo ideal: Claude Opus 4.6 Thinking ($$$)
+- Menor custo: GPT-5.2 High Thinking ($$)
+- Modelo ideal: Claude Opus 4.8 Medium ($$$)
 - Justificativa: Requer raciocínio profundo e investigação
 
 **6. Documentação / Explicações / Tutoriais:**
-- Menor custo: SWE Fast ($) ou Kimi K.2.5 (Free)
-- Modelo ideal: GPT 4o ($$)
+- Menor custo: SWE-1.5 Fast ($) ou SWE-1.5 (Free)
+- Modelo ideal: GPT-4o ($$)
 - Justificativa: Comunicação clara, não precisa de reasoning profundo
+
+**7. Tarefas Longas / Contexto Extenso:**
+- Menor custo: Claude Sonnet 4.6 1M ($$)
+- Modelo ideal: Claude Opus 4.6 Thinking 1M ($$$)
+- Justificativa: Variantes "1M" suportam janela de contexto de 1 milhão de tokens
 
 ### 💡 Estratégia de Uso Otimizada
 
 **Regra de Ouro:** Sempre começar com o modelo de menor custo adequado, escalar apenas se necessário.
 
 **Fluxo Recomendado:**
-1. Tarefa simples? → SWE (Free) ou SWE Fast ($)
-2. Precisa de código? → GPT 5.1 Codex Medium ($)
-3. Precisa de raciocínio? → GPT 5 Medium Thinking ($$)
-4. Crítico/Complexo? → Claude Sonnet 4.6 ($$$)
-5. Arquitetura/Design? → Claude Opus 4.6 ($$$)
+1. Tarefa simples? → SWE-1.5 (Free) ou SWE-1.5 Fast ($)
+2. Precisa de código? → GPT-5.1-Codex Medium ($)
+3. Precisa de raciocínio moderado? → Claude Sonnet 4.6 Thinking ($$)
+4. Contexto longo (>200k tokens)? → Claude Sonnet 4.6 1M ($$)
+5. Crítico/Complexo? → Claude Opus 4.8 Medium ($$$) ou Claude Fable 5 Medium ($$$)
+
+**Modelo recomendado pela Devin:** `Adaptive` — seleciona automaticamente o modelo mais adequado para cada etapa da tarefa.
 
 ---
 
