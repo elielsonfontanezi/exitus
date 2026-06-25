@@ -43,5 +43,6 @@ Antes do commit final, verificar CADA item abaixo e confirmar ou justificar:
 | `docs/ROADMAP.md` | ✅ Sempre verificar | Marcar GAP como concluído se aplicável; atualizar "Próximo" |
 | `docs/LESSONS_LEARNED.md` | Se nova lição | Adicionar entrada L-XXX-NNN |
 | `docs/CODING_STANDARDS.md` | Se novo padrão | Documentar convenção |
+| `docs/MODULES.md` | Se endpoint mudou | Status M0-M7, endpoints por módulo |
 | `docs/ARCHITECTURE.md` | Se novo componente | Atualizar diagrama/tabela |
 | `docs/OPERATIONS_RUNBOOK.md` | Se novo script | Documentar uso |

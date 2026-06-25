@@ -1356,6 +1356,63 @@ cd tests/e2e && npx playwright test --project="Mobile Chrome"
 
 ---
 
+### 📊 P8 — Cobertura de Dados de Teste por Item de Menu (Análise 24/06/2026)
+
+**Banco de testes (`exitusdb_test`) — estado atual:**
+354 usuários · 511 ativos · 129 transações · 145 proventos · 136 corretoras · 151 movimentações
+
+| Menu / Tela | Dados necessários | Cobertura |
+|---|---|---|
+| Dashboard | posições, patrimônio, proventos | ✅ |
+| Operações / Compra | ativos BR, corretoras | ✅ |
+| Operações / Venda | posições com lucro/prejuízo | ⚠️ apenas 9 vendas |
+| Operações / Histórico | compra + venda | ✅ |
+| Carteira / Posições | posicao calculada | ✅ |
+| Carteira / Movimentações | aporte, resgate, transferência | ⚠️ transferencia=0 |
+| Proventos / Recebidos | dividendo, JCP, rendimento | ✅ |
+| Proventos / Projetados | projecoes_renda | ❌ tabela vazia |
+| Proventos / Calendário | calendario_dividendo | ❌ tabela vazia |
+| IR / Mensal | transações + regra_fiscal | ⚠️ regra_fiscal vazia (usa fallback) |
+| IR / DARFs | saldo_darf_acumulado | ⚠️ não verificado |
+| IR / Declaração (DIRPF) | transações históricas | ✅ |
+| Análises / Rentabilidade | historico_patrimonio | ❌ tabela vazia |
+| Análises / Buy Signals | ativos com métricas | ✅ |
+| Análises / Proventos | proventos por período | ✅ |
+| Ativos / Ações | ação BR | ✅ (467) |
+| Ativos / FIIs | fii | ✅ (6) |
+| Ativos / ETFs | etf/unit | ❌ zero ETFs no seed |
+| Ativos / Renda Fixa | cdb, tesouro | ⚠️ apenas 3 ativos RF |
+| Planos / Compra | plano_compra | ❌ tabela vazia |
+| Planos / Venda | plano_venda | ❌ tabela vazia |
+| Alertas | alertas | ✅ |
+| Ferramentas / Screener | ativos com métricas | ✅ |
+| Ferramentas / Calculadora IR | transações | ✅ |
+| Ferramentas / Reconciliação | movimentações | ✅ |
+| Relatórios / Mensal + Anual | transações + proventos | ✅ |
+| Configurações / Corretoras | corretoras | ✅ (136) |
+| Admin / Assessoras | assessora | ✅ |
+
+**Resultado:** 17/27 telas com cobertura completa = **63%**
+- ✅ Completo: 17 (63%)
+- ⚠️ Parcial/fallback: 5 (18%)
+- ❌ Tela renderiza vazia: 5 (19%)
+
+**5 tabelas vazias que causam telas sem dados:**
+
+| Tabela | Tela afetada |
+|---|---|
+| `projecoes_renda` | Proventos / Projetados |
+| `historico_patrimonio` | Análises / Rentabilidade / Evolução |
+| `plano_compra` | Planos de Compra |
+| `plano_venda` | Planos de Venda |
+| `calendario_dividendo` | Proventos / Calendário |
+
+**Próxima ação:** Enriquecer `backend/seed_data/scenarios/test_e2e.json` com dados para as 5 tabelas vazias + ETFs + `regra_fiscal` → elevaria cobertura de **63% → ~90%**.
+
+**Status:** 📋 Pendente — registrado como P8
+
+---
+
 ### 📊 Resumo de Prioridades
 
 | ID | Descrição | Prioridade | Status |
@@ -1367,5 +1424,6 @@ cd tests/e2e && npx playwright test --project="Mobile Chrome"
 | P5 | E2E Firefox + Mobile Chrome | 🟡 Média | 📋 Pendente |
 | P6 | E2E v3 lógica negócio (73 CTs) | 🟡 Média | 📋 Pendente |
 | P7 | Fase 7 Backend (MONITOR/RATELIMIT/CICD) | 📋 Baixa | 📋 Pendente |
+| P8 | Cobertura dados teste 63% → enriquecer test_e2e.json | 🟡 Média | 📋 Pendente |
 
-**Progresso:** 3/7 resolvidos (P1, P2, P4) | **Próximo:** P3 (BUG-013) ou P6 (E2E v3)
+**Progresso:** 3/8 resolvidos (P1, P2, P4) | **Próximo:** P3 (BUG-013) ou P8 (seed enrichment)

@@ -20,6 +20,7 @@ description: Fechar GAP com commit — testes, docs e commit atômico por ativid
    - `docs/ROADMAP.md` — **SEMPRE verificar** (marcar GAP como concluído se aplicável; atualizar "Próximo")
    - `docs/AUDITORIA_FUNCIONAL_18_06_2026.md` — se P-item foi resolvido ou teve progresso
    - `docs/CODING_STANDARDS.md` — se introduz novo padrão
+   - `docs/MODULES.md` — se endpoint foi adicionado/removido ou status M0-M7 mudou
    - `docs/ARCHITECTURE.md` — se adiciona componentes ou endpoints
    - `docs/OPERATIONS_RUNBOOK.md` — se adiciona scripts
    - `docs/LESSONS_LEARNED.md` — se gerou lição nova
