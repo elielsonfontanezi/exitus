@@ -1,149 +1,18 @@
 # Exitus - Sistema de Gestão de Investimentos
 
-## Visão Geral
-
 **Exitus** é uma plataforma multi-usuário de gestão e análise de investimentos, suportando múltiplos mercados (Brasil, EUA, Europa, Ásia), múltiplas classes de ativos (ações, FIIs, REITs, renda fixa) e múltiplas corretoras com controle unificado de caixa.
 
-### Principais Funcionalidades
-
-* **Consolidação Multi-Mercado**: Gestão unificada de ativos brasileiros e internacionais
-* **Análise Fundamentalista**: Buy Score (0-100), Preço Teto (4 métodos), Z-Score com histórico real
-* **Cotações em Tempo Real**: Multi-provider com cache inteligente (15min TTL)
-* **Dashboards Interativos**: Performance, alocação, evolução patrimonial e métricas de risco
-* **Histórico Patrimonial**: Snapshots mensais com evolução detalhada por categoria (renda variável, fixa, caixa)
-  - API `/api/portfolios/evolucao` retorna histórico completo (default) ou últimos N meses
-  - Dashboard exibe jornada completa desde o primeiro registro
-* **Sistema de Alertas**: Notificações configuráveis por preço, percentual e indicadores
-* **Relatórios Avançados**: Geração automática de relatórios de performance com Sharpe Ratio
-* **Cálculos Fiscais**: Regras configuráveis por país e tipo de ativo
-* **Exportação CSV**: Download direto via HTTP headers com preview automático
-* **Planos Disciplinados**: Modal de detalhes completo para planos de compra/venda
-* **Frontend Moderno**: Alpine.js + exitus-components.css, totalmente API-driven
-
-### Tipos de Ativos Suportados (14 tipos)
-
-O Exitus suporta **14 tipos de ativos** em 4 mercados diferentes:
-
-#### **🇧🇷 Brasil (6 tipos)**
-
-* **Ações** (ACAO): B3 - PETR4, VALE3, ITUB4
-* **FIIs** (FII): Fundos Imobiliários - HGLG11, KNRI11
-* **CDB** (CDB): Certificados de Depósito Bancário
-* **LCI/LCA** (LCI_LCA): Letras de Crédito
-* **Tesouro Direto** (TESOURO_DIRETO): Selic, IPCA+, Prefixado
-* **Debêntures** (DEBENTURE): Títulos corporativos
-
-#### **🇺🇸 Estados Unidos (4 tipos)**
-
-* **Stocks** (STOCK): NYSE/NASDAQ - AAPL, MSFT, GOOGL
-* **REITs** (REIT): Real Estate Investment Trusts - O, VNQ
-* **Bonds** (BOND): Títulos corporativos e governamentais
-* **ETFs** (ETF): Fundos negociados em bolsa - SPY, QQQ
-
-#### **🌍 Internacional (2 tipos)**
-
-* **Stocks Internacionais** (STOCK_INTL): Europa/Ásia - SAP.DE, 7203.T
-* **ETFs Internacionais** (ETF_INTL): VWCE.DE
-
-#### **🔷 Outros (2 tipos)**
-
-* **Criptomoedas** (CRIPTO): BTC, ETH, SOL
-* **Outros** (OUTRO): Commodities, derivatives
-
-**Total de ativos cadastrados**: 56 (33 BR + 16 US + 3 EU + 4 outros)
-
-**Documentação completa**: [ENUMS.md]()
-
----
-
-## 🛠️ Stack Tecnológica
-
-| Camada | Tecnologia | Versão |
-| --- | --- | --- |
-| **Backend** | Python + Flask | 3.11 / 3.0 |
-| **ORM** | SQLAlchemy + Alembic | 2.0 / 1.13 |
-| **Frontend** | Alpine.js + exitus-components.css | 3.14 / custom |
-| **Database** | PostgreSQL | 16 |
-| **Containers** | Podman (rootless) | 4.x |
-| **APIs Externas** | brapi.dev, yfinance, Alpha Vantage, Finnhub | - |
-
-### Arquitetura de 3 Containers
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Browser (localhost:8080)            │
-└────────────────────────┬────────────────────────────────┘
-                         │
-                         ▼
-        ┌────────────────────────────────────┐
-        │  Container 3: exitus-frontend      │
-        │  Flask + HTMX + Alpine.js          │
-        │  Port: 8080                        │
-        └────────────┬───────────────────────┘
-                     │ HTTP/JSON
-                     ▼
-        ┌────────────────────────────────────┐
-        │  Container 2: exitus-backend       │
-        │  Flask API + SQLAlchemy            │
-        │  Port: 5000                        │
-        └────────────┬───────────────────────┘
-                     │ SQL
-                     ▼
-        ┌────────────────────────────────────┐
-        │  Container 1: exitus-db            │
-        │  PostgreSQL 16                     │
-        │  Port: 5432                        │
-        └────────────────────────────────────┘
-
-```
-
----
-
-## 🗄️ Database Schema
-
-### Tabelas Principais (21 tabelas)
-
-| Tabela | Descrição | Campos Críticos |
-| --- | --- | --- |
-| `ativo` | Instrumentos financeiros (62 ativos) | ticker, tipo (**14 ENUMs**), classe, mercado, cap_rate |
-| `usuario` | Usuários do sistema | username, email, role (3 ENUMs) |
-| `corretora` | Corretoras/Exchanges | nome, tipo (2 ENUMs), pais, saldo_atual |
-| `posicao` | Holdings atuais | quantidade, preco_medio, lucro_prejuizo |
-| `transacao` | Operações executadas | tipo (10 ENUMs), quantidade, preco_unitario |
-| `provento` | Dividendos/JCP/Rendimentos | tipo (7 ENUMs), valor_por_acao, data_com |
-| `movimentacao_caixa` | Depósitos/Saques | tipo (9 ENUMs), valor, moeda |
-| `evento_corporativo` | Splits/Bonificações | tipo (12 ENUMs), proporcao, data_evento |
-| `historico_preco` | Histórico OHLCV | data, preco_fechamento, volume |
-| `parametros_macro` | Taxa Selic, CDI, WACC | por país/mercado, cap_rate_fii |
-| `regra_fiscal` | Impostos por país | aliquota_ir, valor_isencao, incidencia (4 ENUMs) |
-
-* **Total de ENUMs**: 11 tipos, 62 valores únicos
-* **Índices**: 86+ otimizados para queries de cálculo
-* **Foreign Keys**: 15 com integridade referencial
-* **Migrations**: Gerenciadas com Alembic (versão atual: `202602162130`)
-
----
-
-## Coding Standard
-
-* **Naming Convention**: snakecase para variáveis, funções, tabelas, colunas e arquivos (ex: `created_at`, `buy_score`, `historico_preco`).
-* **Classes**: PascalCase (ex: `PortfolioService`).
-* **Constantes**: UPPER_SNAKE_CASE (ex: `JWT_SECRET_KEY`).
-* **Guia Completo**: [CODING_STANDARDS.md]()
-
----
-
-## 🚀 Quick Start (5 minutos)
+##  Quick Start
 
 ### Pré-requisitos
 
-* **Ubuntu 22.04 LTS** (ou similar)
-* **Podman 4.x** instalado
-* **Git**
-* **8GB RAM** mínimo
-* **10GB** de espaço em disco
+- Ubuntu 22.04 LTS (ou similar)
+- Podman 4.x instalado
+- Git
+- 8GB RAM mínimo
+- 10GB de espaço em disco
 
-### 1. Instalação
+### Instalação
 
 ```bash
 # Clone o repositório
@@ -155,191 +24,33 @@ cp .env.example .env
 
 # Edite o .env com suas credenciais (opcional para desenvolvimento)
 nano .env
-
 ```
 
-### 2. Configurar Tokens de APIs (Opcional)
-
-Para cotações em tempo real, configure no `.env`:
-
-```bash
-# APIs de Cotações (M7.5)
-BRAPI_TOKEN=seu_token_premium_aqui          # Premium: 60 req/min (FREE tier: 10 req/min)
-ALPHAVANTAGE_TOKEN=seu_token_aqui           # Free: 500 req/dia
-FINNHUB_TOKEN=seu_token_aqui                # Free: 60 req/min
-
-```
-
-**Nota**: O sistema funciona **SEM tokens** usando cache local e yfinance como fallback.
-
-### 3. Executar o Sistema
+### Executar o Sistema
 
 ```bash
 # Subir os 3 containers
 ./scripts/start_exitus.sh
 
 # Aguarde ~30 segundos para inicialização completa
-# Logs em tempo real (opcional):
-podman logs -f exitus-backend
-
 ```
 
-### 4. Rodar Testes (opcional)
+### Acessar
 
-```bash
-# Recriar banco de teste (primeira vez ou após migrations)
-./scripts/create_test_db.sh
+- **Frontend**: http://localhost:8080
+- **Backend API**: http://localhost:5000/api
+- **Credenciais padrão**: admin / senha123
 
-# Executar suite completa (508+ testes — dentro do container)
-podman exec exitus-backend python -m pytest tests/ -q --no-cov
-```
+## � Documentação
 
-> **Nota:** Testes rodam **dentro do container** `exitus-backend`. Não execute `pytest` diretamente no host.
+Para documentação completa (arquitetura, APIs, roadmap, operações), ver [docs/INDEX.md](docs/INDEX.md).
 
-### 5. Acessar
+## � Stack
 
-* **Frontend**: http://localhost:8080
-* **Backend API**: http://localhost:5000/api
-* **Health Check Backend**: http://localhost:5000/health
-* **Health Check Frontend**: http://localhost:8080/health
-
-**Credenciais padrão**:
-
-* **Usuário**: `admin`
-* **Senha**: `senha123`
-
----
-
-## 📦 Fases de Implementação
-
-| Fase | Status | Descrição | GAPs |
-| --- | --- | --- | --- |
-| **Fase 1** | ✅ Concluída | Infraestrutura e Database (30 tabelas) | 9 |
-| **Fase 2** | ✅ Concluída | Backend Core (APIs, CRUD, Auth) | 9 |
-| **Fase 3** | ✅ Concluída | Business Logic (IR, Export, Testes) | 13 |
-| **Fase 4** | ✅ Concluída | Features Avançadas (Multi-moeda, Swagger) | 8 |
-| **Fase 5** | ✅ Concluída | Documentação e Enumeradores | 1 |
-| **Fase 6** | ✅ Concluída | Testes e Qualidade (508+ testes) | 1 |
-| **Fase 7** | 🎯 Próxima | Produção (Monitor, Rate Limit, CI/CD) | 4 |
-| **Fase 8** | 📋 Futuro | Otimizações (Rebalance, Dividendos) | 6 |
-
-**Total de GAPs**: **48/54 concluídos (87%)**  
-**Testes**: **508/546 passando (93.0%)**  
-**Frontend**: **API-Driven completo (8/8 sprints)**
-
----
-
-## 📚 Documentação Completa
-
-**Ver [docs/INDEX.md](docs/INDEX.md) para o guia completo de toda a documentação.**
-
-Principais documentos:
-| Documento | Descrição |
-| --- | --- |
-| **[docs/INDEX.md](docs/INDEX.md)** | **Guia de toda a documentação** — estrutura e como usar |
-| **[docs/VISION.md](docs/VISION.md)** | Visão de negócio, proposta de valor, roadmap |
-| **[docs/PERSONAS.md](docs/PERSONAS.md)** | **Manual de Operação da IA** — como interagir com a assistente |
-| **[docs/API_REFERENCE.md](docs/API_REFERENCE.md)** | Referência completa de todas as 67 APIs |
-| **[docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md)** | Deploy, troubleshooting, scripts úteis |
-| **[docs/CHANGELOG.md](docs/CHANGELOG.md)** | Histórico de versões e GAPs registrados |
-
----
-
-## 🔧 Operações Comuns
-
-### Gerenciar Containers
-
-```bash
-# Ver status dos containers
-podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-
-# Parar o sistema
-./scripts/stop_exitus.sh
-
-# Restart completo
-./scripts/restart_exitus.sh
-
-# Ver logs
-podman logs exitus-backend
-podman logs exitus-frontend
-podman logs exitus-db
-
-```
-
-### Executar Migrations
-
-```bash
-# Acessar container backend
-podman exec -it exitus-backend bash
-
-# Rodar migrations
-flask db upgrade
-
-# Criar nova migration
-flask db migrate -m "Descrição da mudança"
-
-```
-
-### Popular Histórico de Preços
-
-```bash
-# Popular histórico de um ticker específico (últimos 252 dias)
-podman exec -it exitus-backend python3 app/scripts/popular_historico_inicial.py --ticker PETR4 --dias 252
-
-# Popular todos os ativos em posições
-podman exec -it exitus-backend python3 app/scripts/popular_historico_inicial.py --dias 252
-
-```
-
-### Testes
-
-```bash
-# Testes unitários
-podman exec -it exitus-backend pytest tests/
-
-# Teste de endpoints (requer token JWT)
-./scripts/test_performance.sh
-
-```
-
----
-
-## 🎯 Exemplos de Uso
-
-### 1. Obter Token JWT
-
-```bash
-curl -X POST http://localhost:5000/api/auth/login   -H "Content-Type: application/json"   -d '{"username":"admin","password":"admin123"}' | jq -r '.data.access_token'
-
-```
-
-### 2. Consultar Dashboard do Portfolio
-
-```bash
-TOKEN="seu_token_aqui"
-
-curl -H "Authorization: Bearer $TOKEN"   http://localhost:5000/api/portfolio/dashboard | jq .
-
-```
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "patrimonioativos": 0.0,
-    "custoaquisicao": 25021.0,
-    "saldocaixa": 0.0,
-    "patrimoniototal": 0.0,
-    "lucrobruto": -25021.0,
-    "rentabilidadeperc": -100.0
-  }
-}
-
-```
-
----
+- **Backend**: Python + Flask + SQLAlchemy
+- **Frontend**: Alpine.js + exitus-components.css
+- **Database**: PostgreSQL 16
+- **Containers**: Podman (rootless)
 
 ## 🤝 Contribuindo
 
@@ -349,22 +60,11 @@ curl -H "Authorization: Bearer $TOKEN"   http://localhost:5000/api/portfolio/das
 4. Push para a branch (`git push origin feature/MinhaFeature`)
 5. Abra um Pull Request
 
----
-
 ## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE]() para mais detalhes.
+Este projeto está sob a licença MIT.
 
 ---
 
-## 📞 Contato e Suporte
-
-* **Repositório**: [https://github.com/elielsonfontanezi/exitus]()
-* **Issues**: [https://github.com/elielsonfontanezi/exitus/issues]()
-
----
-
-**Versão atual**: v0.9.23 (Auditoria DB Concluída)
-
-**Última atualização**: 23 de Junho de 2026
+**Versão**: v0.9.25 | **Atualização**: 25/06/2026
 
