@@ -1,9 +1,9 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 554/574 passando (96.4%) 🟡 — 14 failed (constraints P6 + feature 2026+), 6 skipped  
-> **Frontend V2.0:** 17/17 telas (100%) ✅ | **UX Evolution:** 10/10 páginas (100%) ✅ | **Frontend API-Driven:** ✅ 8/8 Sprints Concluídos (09/06/2026) | **UI Consistency:** ✅ Menu limpo (15/06/2026)  
-> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.24 | **Última atualização:** 24/06/2026
+> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 567/574 passando (98.8%) 🟡 — 1 failed (feature 2026+), 6 skipped  
+> **Frontend V2.0:** 2 OK, 34 PARCIAL, 0 QUEBRADO (94%) 🟡 | **UX Evolution:** 2 OK, 34 PARCIAL, 0 QUEBRADO (94%) 🟡 | **Frontend API-Driven:** ✅ 8/8 Sprints Concluídos (09/06/2026) | **UI Consistency:** ✅ Menu limpo (15/06/2026)  
+> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.25 | **Última atualização:** 25/06/2026
 
 ---
 
@@ -13,8 +13,8 @@
  Backend Fases 1-6: Concluídas ✅
  Backend Fase 7: Produção 🎯 (próxima)
  Backend Fase 8: Futuro 📋
- Frontend V2.0: 17/17 telas ✅
- Frontend UX Evolution: 4 semanas ✅ (concluído)
+ Frontend V2.0: 2 OK, 34 PARCIAL, 0 QUEBRADO (94%) 🟡
+ Frontend UX Evolution: 2 OK, 34 PARCIAL, 0 QUEBRADO (94%) 🟡
  Frontend API-Driven: 8/8 Sprints ✅ (09/06/2026) — 33 telas, 27 APIs
  Testes E2E v2: 127/127 Chromium ✅ — Firefox/Mobile 🎯 (próximo)
  Backend Fase 7: MONITOR-001, RATELIMIT-001, CICD-001 📋
@@ -243,7 +243,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 ## 🎨 Frontend — API-Driven Integration (8 Sprints)
 
-> **Status:** ✅ 100% Concluído (09/06/2026) | **36+ endpoints integrados** | **36+ templates**
+> **Status:** ✅ 8/8 Sprints Concluídos (09/06/2026) | **36+ endpoints integrados** | **36+ templates** | **Telas: 2 OK, 34 PARCIAL, 0 QUEBRADO (94%)**
 
 ### Resumo dos Sprints
 
