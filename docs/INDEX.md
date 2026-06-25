@@ -84,11 +84,10 @@ Fluxo: Análise → Modelo IA → Estratégia → "APROVADO" → Implementação
 
 | Tipo | Local | Quantidade | Status |
 |------|-------|------------|--------|
-| **Backend (pytest)** | `backend/tests/` | 491 | ✅ 100% |
-| **E2E (Playwright)** | `tests/e2e/specs/` | 108 | ✅ 96% passando |
-| **Validação (shell)** | `tests/` | 6 scripts | ✅ Ativos |
+| **Backend (pytest)** | `backend/tests/` | 567 | ✅ 98.8% |
+| **E2E (Playwright)** | `tests/e2e/specs/` | 127 | ✅ 100% |
 
 ---
 
-*Atualizado: 18 de Março de 2026*  
-*Versão: 5.0 — Documentação consolidada (42 → 18 arquivos)*
+*Atualizado: 25 de Junho de 2026*  
+*Versão: v0.9.25 — Documentação consolidada (13 arquivos)*
