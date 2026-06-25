@@ -73,20 +73,6 @@
 6. **ROADMAP.md** — Status dos GAPs
 7. **PROJECT_STATUS.md** — Métricas e testes
 
-**Regras operacionais:** `.windsurfrules` na raiz do projeto
-
-**🚨 REGRA CRÍTICA:** A IA **NUNCA** executa mudanças sem aprovação explícita.  
-Fluxo: Análise → Modelo IA → Estratégia → "APROVADO" → Implementação → Testes → Docs → Commit
-
----
-
-## 🧪 Testes
-
-| Tipo | Local | Quantidade | Status |
-|------|-------|------------|--------|
-| **Backend (pytest)** | `backend/tests/` | 567 | ✅ 98.8% |
-| **E2E (Playwright)** | `tests/e2e/specs/` | 127 | ✅ 100% |
-
 ---
 
 *Atualizado: 25 de Junho de 2026*  
