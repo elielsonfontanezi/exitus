@@ -51,7 +51,7 @@ Fluxo obrigatório em toda atividade:
 3. **Apresentar estratégia** com diagnóstico, arquivos, ordem de implementação (ver REGRA #4)
 4. **Aguardar "APROVADO"** explicitamente do usuário
 5. **Implementar** — código completo, funcional, sem omissões (`...`)
-6. **Testar** → suite deve passar (491 testes)
+6. **Testar** → suite deve passar (567/574 testes, 98.8%)
 7. **Documentar** → mesma sessão, mesmo commit
 8. **Apresentar commit** e aguardar aprovação antes de executar
 
@@ -205,7 +205,7 @@ Ao substituir um arquivo por nova versão (ex: `lista.html` → `lista_v2.html`)
 
 ---
 
-## �🔧 REGRA #9 — FERRAMENTAS E MCPs DISPONÍVEIS
+## �🔧 REGRA #8 — FERRAMENTAS E MCPs DISPONÍVEIS
 
 ### MCPs (Model Context Protocol)
 Usar MCPs para acesso direto a dados e sistemas:
@@ -252,7 +252,7 @@ podman exec exitus-db psql -U exitus -d exitusdb -c "\dt"
 
 ---
 
-## 🗄️ REGRA #8 — ATUALIZAR SCHEMA APÓS MUDANÇA NO BANCO
+## 🗄️ REGRA #9 — ATUALIZAR SCHEMA APÓS MUDANÇA NO BANCO
 
 Sempre que uma atividade alterar o banco (nova tabela, migration, ALTER TABLE, novo índice):
 
@@ -264,7 +264,7 @@ Isso sobrescreve `docs/EXITUS_DB_STRUCTURE.txt`. Executar antes do commit final.
 
 ---
 
-## 🧪 REGRA #9 — PRESERVAR TESTES FORMAIS
+## 🧪 REGRA #10 — PRESERVAR TESTES FORMAIS
 
 Arquivos em `/backend/tests/` são testes formais e **NUNCA devem ser removidos**:
 - `test_darf_acumulado.py` (8 testes)
@@ -370,7 +370,7 @@ bash scripts/update_db_structure.sh
 ## �� SEGURANÇA MULTI-TENANT
 
 ```
-1. FILTER usuario_id em TODAS as queries — sem exceção
+1. FILTER assessora_id via filter_by_assessora() em TODAS as queries — sem exceção
 2. 403 Forbidden (NÃO 404) para recursos de outro usuário
 3. JWT HS256, expiração 1h
 4. Non-root: usuário exitus:1000
@@ -399,7 +399,7 @@ Antes de qualquer ação, confirmar mentalmente:
 - [ ] A atividade altera o banco? Se sim:
   - [ ] Aplicar migration no banco dev: `alembic upgrade head`
   - [ ] Aplicar migration no banco teste (L-MIG-001)
-  - [ ] Rodar `./scripts/update_db_structure.sh` (REGRA #7)
+  - [ ] Rodar `./scripts/update_db_structure.sh` (REGRA #9)
 - [ ] É um novo blueprint? Se sim:
   - [ ] Seguir padrão A (pasta + routes.py) ou B (arquivo único)
   - [ ] Registrar com try/except em `app/__init__.py`
@@ -455,7 +455,7 @@ Antes de qualquer ação, confirmar mentalmente:
 
 ### Testes Formais (`backend/tests/`):
 - **33 arquivos** Python
-- **491 testes** (100% passando)
+- **567/574 testes** (98.8% passando)
 - **Preservar permanentemente** - NUNCA remover (regra crítica)
 - **Principais:** `test_darf_acumulado.py` (8), `test_rentabilidade.py` (21), `test_ir_integration.py` (47KB)
 
@@ -468,7 +468,7 @@ Antes de qualquer ação, confirmar mentalmente:
 
 ## 📊 MÓDULOS E ENDPOINTS ATUAIS
 
-### Módulos Implementados (v0.8.0-dev):
+### Módulos Implementados (v0.9.23):
 - **M2:** Core API (auth, usuarios, corretoras, ativos, transacoes)
 - **M3:** Portfolio (posicoes, proventos, movimentacoes, eventos, portfolio)
 - **M4:** Buy Signals + Fiscais (feriados, fontes, regras-fiscais, calculos, buy-signals)
@@ -479,32 +479,13 @@ Antes de qualquer ação, confirmar mentalmente:
 ### Total:
 - **17 blueprints** registrados
 - **23 tabelas** no banco
-- **491 testes** passando
+- **567/574 testes** passando (98.8%)
 - **67+ endpoints** REST
 
 ### Novos Endpoints (DIVCALENDAR-001):
 - `/api/calendario-dividendos/` - CRUD completo
 - `/api/calendario-dividendos/gerar` - Geração automática
 - `/api/calendario-dividendos/resumo` - Estatísticas
-
----
-
-## 🤖 MODELOS DE IA DISPONÍVEIS PARA CASCADE
-
-### Modelos Internos (padrão):
-- **Claude Sonnet** - Padrão para maioria das tarefas
-- **Claude Opus** - Para tarefas complexas (design, arquitetura)
-- **SWE-1.5** - Para CRUD simples, refatorações pontuais
-
-### Modelos Disponíveis:
-- **SWE-1.5**: CRUD, ajustes simples, scripts
-- **Claude Sonnet**: Lógica de negócio, integrações, testes
-- **Claude Opus**: Design de sistemas, decisões arquitetônicas
-
-### Quando usar cada modelo:
-- **SWE-1.5**: CRUD, ajustes simples, scripts
-- **Claude Sonnet**: Lógica de negócio, integrações, testes
-- **Claude Opus**: Design de sistemas, decisões arquitetônicas
 
 ---
 
