@@ -299,9 +299,13 @@ def load_scenario(app, request):
         # Cenário já está carregado no banco
         pass
     """
-    # Quando usado com @pytest.mark.parametrize, request.param contém o nome do cenário.
-    # Caso contrário, carrega o cenário padrão test_e2e (comportamento esperado pelos testes não parametrizados).
-    scenario_name = getattr(request, 'param', 'test_e2e')
+    # Quando o teste usa @pytest.mark.parametrize("scenario", [...]), ler de callspec.
+    # Quando o fixture em si é parametrizado, usar request.param.
+    # Fallback: test_e2e.
+    try:
+        scenario_name = request.node.callspec.params.get('scenario', 'test_e2e')
+    except AttributeError:
+        scenario_name = getattr(request, 'param', 'test_e2e')
     
     # Caminho do cenário (suporta execução via container ou direto)
     from pathlib import Path
@@ -338,27 +342,34 @@ def load_scenario(app, request):
         corretora_map = {}
         
         try:
-            # 1. Criar assessoras
+            # 1. Criar assessoras (upsert — reutiliza se CNPJ já existir)
             for assessora_data in scenario_data.get('assessoras', []):
-                assessora = Assessora(
-                    nome=assessora_data['nome'],
-                    razao_social=assessora_data['razao_social'],
-                    cnpj=assessora_data['cnpj'],
-                    email=assessora_data.get('email'),
-                    telefone=assessora_data.get('telefone'),
-                    ativo=assessora_data.get('ativo', True)
-                )
-                _db.session.add(assessora)
-                _db.session.flush()
+                assessora = Assessora.query.filter_by(cnpj=assessora_data['cnpj']).first()
+                if not assessora:
+                    assessora = Assessora(
+                        nome=assessora_data['nome'],
+                        razao_social=assessora_data['razao_social'],
+                        cnpj=assessora_data['cnpj'],
+                        email=assessora_data.get('email'),
+                        telefone=assessora_data.get('telefone'),
+                        ativo=assessora_data.get('ativo', True)
+                    )
+                    _db.session.add(assessora)
+                    _db.session.flush()
                 assessora_map[assessora.nome] = assessora
-            
-            # 2. Criar usuários
+
+            # 2. Criar usuários (upsert — reutiliza se username já existir)
             for usuario_data in scenario_data.get('usuarios', []):
                 # Encontrar assessora (primeira disponível se não especificada)
                 assessora_id = None
                 if assessora_map:
                     assessora_id = list(assessora_map.values())[0].id
-                
+
+                usuario = Usuario.query.filter_by(username=usuario_data['username']).first()
+                if usuario:
+                    usuario_map[usuario.username] = usuario
+                    continue
+
                 usuario = Usuario(
                     username=usuario_data['username'],
                     email=usuario_data['email'],
@@ -372,36 +383,43 @@ def load_scenario(app, request):
                 _db.session.flush()
                 usuario_map[usuario.username] = usuario
             
-            # 3. Criar ativos
+            # 3. Criar ativos (upsert — reutiliza se ticker já existir)
             for ativo_data in scenario_data.get('ativos', []):
-                ativo = Ativo(
-                    ticker=ativo_data['ticker'],
-                    nome=ativo_data['nome'],
-                    tipo=TipoAtivo[ativo_data['tipo']],
-                    classe=ClasseAtivo[ativo_data['classe']],
-                    mercado=ativo_data['mercado'],
-                    moeda=ativo_data['moeda'],
-                    preco_atual=Decimal(str(ativo_data.get('preco_atual', 0))),
-                    preco_teto=Decimal(str(ativo_data.get('preco_teto', 0))),
-                    dividend_yield=Decimal(str(ativo_data.get('dividend_yield', 0))),
-                    p_l=Decimal(str(ativo_data.get('p_l', 0))),
-                    p_vp=Decimal(str(ativo_data.get('p_vp', 0))),
-                    taxa_cupom=Decimal(str(ativo_data.get('taxa_cupom', 0))) if ativo_data.get('taxa_cupom') else None,
-                    data_vencimento=datetime.fromisoformat(ativo_data['data_vencimento']).date() if ativo_data.get('data_vencimento') else None,
-                    observacoes=ativo_data.get('observacoes'),
-                    ativo=ativo_data.get('ativo', True)
-                )
-                _db.session.add(ativo)
-                _db.session.flush()
+                ativo = Ativo.query.filter_by(ticker=ativo_data['ticker']).first()
+                if not ativo:
+                    ativo = Ativo(
+                        ticker=ativo_data['ticker'],
+                        nome=ativo_data['nome'],
+                        tipo=TipoAtivo[ativo_data['tipo']],
+                        classe=ClasseAtivo[ativo_data['classe']],
+                        mercado=ativo_data['mercado'],
+                        moeda=ativo_data['moeda'],
+                        preco_atual=Decimal(str(ativo_data.get('preco_atual', 0))),
+                        preco_teto=Decimal(str(ativo_data.get('preco_teto', 0))),
+                        dividend_yield=Decimal(str(ativo_data.get('dividend_yield', 0))),
+                        p_l=Decimal(str(ativo_data.get('p_l', 0))),
+                        p_vp=Decimal(str(ativo_data.get('p_vp', 0))),
+                        taxa_cupom=Decimal(str(ativo_data.get('taxa_cupom', 0))) if ativo_data.get('taxa_cupom') else None,
+                        data_vencimento=datetime.fromisoformat(ativo_data['data_vencimento']).date() if ativo_data.get('data_vencimento') else None,
+                        observacoes=ativo_data.get('observacoes'),
+                        ativo=ativo_data.get('ativo', True)
+                    )
+                    _db.session.add(ativo)
+                    _db.session.flush()
                 ativo_map[ativo.ticker] = ativo
-            
-            # 4. Criar corretoras
+
+            # 4. Criar corretoras (upsert — reutiliza se nome já existir)
             for corretora_data in scenario_data.get('corretoras', []):
                 # Vincular a primeiro usuário se não especificado
                 usuario_id = None
                 if usuario_map:
                     usuario_id = list(usuario_map.values())[0].id
-                
+
+                corretora = Corretora.query.filter_by(nome=corretora_data['nome']).first()
+                if corretora:
+                    corretora_map[corretora.nome] = corretora
+                    continue
+
                 corretora = Corretora(
                     nome=corretora_data['nome'],
                     tipo=TipoCorretora[corretora_data['tipo']],
@@ -413,7 +431,13 @@ def load_scenario(app, request):
                 _db.session.flush()
                 corretora_map[corretora.nome] = corretora
             
-            # 5. Criar transações
+            # 5. Criar transações (limpar antes para evitar duplicatas em re-execuções)
+            if usuario_map and scenario_data.get('transacoes'):
+                from app.models.transacao import Transacao as _T
+                usuario_ids = [u.id for u in usuario_map.values()]
+                _T.query.filter(_T.usuario_id.in_(usuario_ids)).delete(synchronize_session=False)
+                _db.session.flush()
+
             for transacao_data in scenario_data.get('transacoes', []):
                 usuario = usuario_map.get(transacao_data['usuario'])
                 ativo = ativo_map.get(transacao_data['ativo'])
@@ -458,12 +482,21 @@ def load_scenario(app, request):
                 if not ativo:
                     pytest.fail(f"Ativo não encontrado para provento: {provento_data['ativo']}")
                 
+                valor_por_acao = Decimal(str(provento_data['valor_unitario']))
+                qtd = Decimal(str(provento_data.get('quantidade_ativos', '1')))
+                bruto = Decimal(str(provento_data.get('valor_bruto', str(valor_por_acao * qtd))))
+                imposto = Decimal(str(provento_data.get('imposto_retido', '0')))
+                liquido = Decimal(str(provento_data.get('valor_liquido', str(bruto - imposto))))
                 provento = Provento(
                     ativo_id=ativo.id,
                     tipo_provento=TipoProvento[provento_data['tipo_provento']],
                     data_com=datetime.fromisoformat(provento_data['data_com']).date(),
                     data_pagamento=datetime.fromisoformat(provento_data['data_pagamento']).date(),
-                    valor_unitario=Decimal(str(provento_data['valor_unitario'])),
+                    valor_por_acao=valor_por_acao,
+                    quantidade_ativos=qtd,
+                    valor_bruto=bruto,
+                    imposto_retido=imposto,
+                    valor_liquido=liquido,
                     observacoes=provento_data.get('observacoes')
                 )
                 _db.session.add(provento)
@@ -495,7 +528,7 @@ def load_scenario(app, request):
                     tipo_movimentacao=tipo_map.get(mov_data['tipo'].lower(), TipoMovimentacao.APORTE),
                     data_movimentacao=datetime.fromisoformat(mov_data['data_movimentacao']).date(),
                     valor=Decimal(str(mov_data['valor'])),
-                    observacoes=mov_data.get('observacoes')
+                    descricao=mov_data.get('observacoes')
                 )
                 _db.session.add(movimentacao)
             

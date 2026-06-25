@@ -1357,9 +1357,9 @@ cd tests/e2e && npx playwright test --project="Mobile Chrome"
 | P1 | Recriar `exitusdb_test` (enum incompleto) | 🔴 Alta | ✅ Resolvido 24/06/2026 |
 | P2 | Merge Alembic heads divergentes | 🔴 Alta | ✅ Resolvido 24/06/2026 |
 | P3 | BUG-013 filtro data pisca | 🟡 Média | 📋 Pendente |
-| P4 | 22 falhas + 8 erros setup testes (pós P1) | 🟡 Média | 📋 Pendente |
+| P4 | 22 falhas + 8 erros setup testes (pós P1) | 🟡 Média | ✅ Resolvido 24/06/2026 |
 | P5 | E2E Firefox + Mobile Chrome | 🟡 Média | 📋 Pendente |
 | P6 | E2E v3 lógica negócio (73 CTs) | 🟡 Média | 📋 Pendente |
 | P7 | Fase 7 Backend (MONITOR/RATELIMIT/CICD) | 📋 Baixa | 📋 Pendente |
 
-**Progresso:** 2/7 resolvidos (P1, P2) | **Próximo:** P3 (BUG-013) ou P4 (testes)
+**Progresso:** 3/7 resolvidos (P1, P2, P4) | **Próximo:** P3 (BUG-013) ou P6 (E2E v3)

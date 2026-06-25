@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 24/06/2026 — L-DB-008 adicionada (banco de testes diverge após migration)  
+> **Atualizado:** 24/06/2026 — L-DB-008 + L-TEST-001 adicionadas  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -122,6 +122,23 @@ WHERE t.typname='tipomovimentacao';
 **Impacto desta falha:** 436/497 (87.7%) → resolvido para 538/566 (95.1%) após recriar banco de testes (+102 testes recuperados).
 
 **Regra:** Toda migration aplicada no `exitusdb` **exige** recriação imediata do `exitusdb_test`. O `create_test_db.sh` agora executa automaticamente `check_db_parity.sh` para detectar divergências no final.
+
+---
+
+### L-TEST-001 — Fixture vs Seed Persistente: usar upsert, não INSERT puro
+**Origem:** P4 — UniqueViolation em `test_buy_signals_endpoints.py` e `test_scenarios_example.py` | **Data:** 24/06/2026
+
+**Erro:** Fixtures de teste faziam INSERT direto em entidades (Ativo, Assessora, Corretora) sem verificar existência prévia. Com o banco de testes populado por seed persistente (`test_e2e`), qualquer execução adicional gerava `UniqueViolation`.
+
+**Causa raiz:** Fixtures assumiam banco vazio; seed é persistente entre sessões.
+
+**Fix:**
+1. Fixtures de entidades-mestre (Ativo, Assessora, Corretora, Usuário) → **upsert**: buscar por campo único antes de inserir
+2. Fixtures de transações → **delete-then-insert**: deletar transações do usuário antes de recriar
+3. Fixtures que testam campos de classificação (ex: `classificar_ativo`) → usar ticker que não existe no seed (ex: `PETX4`, não `PETR4`)
+4. `load_scenario` → ler `request.node.callspec.params.get('scenario')` (não `request.param`) para capturar parâmetro do `@pytest.mark.parametrize` do teste
+
+**Regra:** Qualquer fixture que insere entidades-mestre deve verificar existência prévia. Transações e proventos: limpar do usuário antes de recriar.
 
 ---
 

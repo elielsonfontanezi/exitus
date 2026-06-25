@@ -319,7 +319,8 @@ class TestClassificacaoApiExterna:
     def test_api_externa_falha_cai_em_heuristica(self, app):
         with app.app_context():
             with mock.patch('yfinance.Ticker', side_effect=Exception('offline')):
-                r = classificar_ativo('PETR4', usar_api_externa=True)
+                # PETX4 não existe no banco de testes — força caminho heurística
+                r = classificar_ativo('PETX4', usar_api_externa=True)
                 assert r['tipo'] == TipoAtivo.ACAO
                 assert r['fonte'] == FonteClassificacao.HEURISTICA
                 assert r['confianca'] == NivelConfianca.ALTA

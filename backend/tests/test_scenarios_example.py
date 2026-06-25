@@ -44,7 +44,7 @@ class TestScenariosUsage:
             
             assert admin is not None, "Usuário e2e_admin não encontrado"
             assert user is not None, "Usuário e2e_user não encontrado"
-            assert admin.role.value == 'ADMIN', "Role do admin incorreto"
+            assert admin.role.value == 'admin', "Role do admin incorreto"
             
             # Verificar ativos específicos
             petr4 = Ativo.query.filter_by(ticker='PETR4').first()
@@ -55,7 +55,8 @@ class TestScenariosUsage:
             assert petr4.mercado == 'BR', "Mercado do PETR4 incorreto"
             assert aapl.mercado == 'US', "Mercado do AAPL incorreto"
     
-    def test_ir_scenario_calculations(self, app, load_scenario):
+    @pytest.mark.parametrize("scenario", ["test_ir"])
+    def test_ir_scenario_calculations(self, app, load_scenario, scenario):
         """Testa cálculos de IR com cenário específico"""
         with app.app_context():
             from app.models.usuario import Usuario
@@ -92,7 +93,8 @@ class TestScenariosUsage:
             print(f"   Custo total: R$ {total_compras:.2f}")
             print(f"   Preço médio: R$ {preco_medio:.4f}")
     
-    def test_stress_scenario_volume(self, app, load_scenario):
+    @pytest.mark.parametrize("scenario", ["test_stress"])
+    def test_stress_scenario_volume(self, app, load_scenario, scenario):
         """Testa volume de dados do cenário stress"""
         with app.app_context():
             from app.models.usuario import Usuario

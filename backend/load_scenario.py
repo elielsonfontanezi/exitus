@@ -39,7 +39,9 @@ class ScenarioLoader:
     """Carregador de cenários de teste JSON"""
     
     def __init__(self, app=None):
-        self.app = app or create_app()
+        import os
+        testing = os.getenv('TESTING', '').lower() in ('true', '1', 'yes')
+        self.app = app or create_app(testing=testing)
         self.scenario_data = {}
         self.references = {
             'usuarios': {},      # username -> id

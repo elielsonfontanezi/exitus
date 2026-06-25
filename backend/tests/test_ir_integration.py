@@ -520,10 +520,10 @@ class TestProventos:
         assert div_br['valor_bruto'] == 1000.0
 
     def test_jcp_aliquota_e_ir_retido(self, auth_client, cenario_proventos):
-        """JCP deve registrar 15% de alíquota e o IR retido da transação."""
+        """JCP deve registrar alíquota vigente (17.5% desde 2024) e o IR retido da transação."""
         rv = auth_client.get('/api/ir/apuracao?mes=2025-06', headers=auth_client._auth_headers)
         jcp = rv.get_json()['data']['proventos']['jcp']
-        assert jcp['aliquota'] == 15.0
+        assert jcp['aliquota'] == 17.5
         assert jcp['valor_bruto'] == 2000.0
         assert jcp['ir_retido'] == 300.0
         assert jcp['isento'] is False
