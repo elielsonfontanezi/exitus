@@ -8,6 +8,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — Arquivamento de documentação obsoleta (25/06/2026)
+
+**Motivo:** `PLANO_TESTE_MULTITENANCY.md` descrevia plano de testes para MULTICLIENTE-001, que já está concluído. Testes formais consolidados em `backend/tests/test_multitenancy.py`.
+
+**Artefatos removidos/arquivados:**
+- `docs/PLANO_TESTE_MULTITENANCY.md` → movido para `docs/archive/PLANO_TESTE_MULTITENANCY.md`
+
+**Artefatos atualizados:**
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: ajustado status de `PLANO_TESTE_MULTITENANCY.md` para arquivado
+
+---
+
 ### Feat — CONSTRAINT-001: CHECK constraints em 4 tabelas críticas (25/06/2026)
 
 **Resultado:** 17/17 testes de constraints passando | Suite total: 567 passed / 1 failed (dívida técnica pré-existente) / 6 skipped

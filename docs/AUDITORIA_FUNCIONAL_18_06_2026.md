@@ -819,8 +819,7 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
 #### 🟠 ARQUIVOS ESPECÍFICOS (Consolidado na Auditoria)
 | Arquivo | Propósito | Status | Ação | Observações |
 |---------|-----------|--------|------|-------------|
-| `RLS_INVESTIGATION_NEEDED.md` | Investigação RLS | ✅ Consolidado | Manter | 4 testes afetados |
-| `PLANO_TESTE_MULTITENANCY.md` | Testes multi-tenant | ✅ Consolidado | Manter | 38 testes planejados |
+| `RLS_INVESTIGATION_NEEDED.md` | Investigação RLS | ✅ Consolidado | Removido | 4 testes afetados |
 | `MULTICLIENTE.md` | Arquitetura multi-cliente | ✅ Consolidado | Manter | 85% implementado |
 
 #### 🔵 ARQUIVOS HISTÓRICOS (Arquivado)
@@ -830,6 +829,7 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
 | `AUDITORIA_VISUAL.md` | Auditoria visual | ✅ Arquivado | Mover | Análises anteriores |
 | `ADMIN_DASHBOARD.md` | Dashboard admin | ✅ Arquivado | Mover | Especificações antigas |
 | `PLANOS_ASSESSORAS.md` | Planos assessoras | ✅ Arquivado | Mover | Implementado em MULTICLIENTE |
+| `PLANO_TESTE_MULTITENANCY.md` | Testes multi-tenant | ✅ Arquivado | Mover | MULTICLIENTE-001 concluído, testes implementados |
 
 #### 🟢 ARQUIVOS DE GAP (Preservar)
 | Arquivo | Propósito | Status | Ação | Observações |
