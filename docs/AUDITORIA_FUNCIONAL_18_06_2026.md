@@ -845,8 +845,8 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
 - **GAPs preservados:** 30 (77%)
 - **Ações necessárias:** 0 arquivos pendentes
 | `archive/*` (28 arquivos) | Documentos antigos | 🗄️ Arquivado | Manter no archive |
-| `FRONTEND_GAP_ANALYSIS.md` | Análise de gaps | ⏳ Avaliar | Arquivar se obsoleto |
-| `PLANOS_ASSESSORAS.md` | Planos específicos | ⏳ Avaliar | Arquivar se obsoleto |
+| `FRONTEND_GAP_ANALYSIS.md` | Análise de gaps | ✅ Arquivado | Mover para archive | Já em `docs/archive/` |
+| `PLANOS_ASSESSORAS.md` | Planos específicos | ✅ Arquivado | Mover para archive | Já em `docs/archive/` |
 
 **Total**: 39 arquivos → 4 críticos + 4 relevantes + 3 específicos + 28 históricos
 
@@ -1083,7 +1083,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 ## Cobertura de APIs — Frontend vs. Backend
 
-> Fonte: `PLANO_EXECUCAO_18_06_2026.md` — Atividade 3  
+> Fonte: Análise interna da auditoria — Atividade 3  
 > O backend possui **~103 endpoints** em 33 blueprints. O frontend consome **~42 endpoints** (~41%). Há **~61 APIs não utilizadas**.
 
 ### APIs consumidas por tela
@@ -1340,7 +1340,7 @@ cd tests/e2e && npx playwright test --project="Mobile Chrome"
 
 ### 🟡 P6 — E2E v3: 73 CTs de Lógica de Negócio não Executados
 
-**Problema:** Branch `feature/testes-e2e-v3` tem 13 specs e 73 CTs catalogados em `PLANO_TESTES_LOGICA.md`, mas nenhum foi executado nem validado.
+**Problema:** Branch `feature/testes-e2e-v3` tem 13 specs e 73 CTs catalogados (documento de plano não disponível), mas nenhum foi executado nem validado.
 
 **Status:** 📋 Pendente
 
