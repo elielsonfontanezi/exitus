@@ -1369,22 +1369,19 @@ psycopg2.errors.UndefinedColumn: column "assessora_id" of relation "usuario" doe
 
 ---
 
-### L-DB-009 — Correções estruturais devem ser aplicadas em AMBOS os bancos
+### L-DB-009 — Alterações DDL devem ser aplicadas em AMBOS os bancos
 **Origem:** CONSTRAINT-001 | **Data:** 25/06/2026
 
-**Erro:** CHECK constraints aplicadas em `exitusdb` via migration Alembic, mas `exitusdb_test` não foi atualizado simultaneamente. Os 13 testes de constraints continuaram falhando até aplicação manual via ALTER TABLE.
+**Aplica-se APENAS a DDL (schema):** constraints, colunas, índices, enums, tabelas.
+**NÃO se aplica a:** correções de bugs de aplicação (fix vai no código Python), dados de teste (DML/seeds).
 
-**Regra obrigatória:** Qualquer correção estrutural (ALTER TABLE, constraints, enums, colunas) DEVE ser aplicada nos dois bancos no mesmo momento:
-- **exitusdb:** via migration Alembic (`flask db upgrade`) — criar arquivo `.py` em `migrations/versions/`
+**Erro:** CHECK constraints aplicadas em `exitusdb` via migration Alembic, mas `exitusdb_test` não foi atualizado. Os 13 testes de constraints continuaram falhando até aplicação manual via ALTER TABLE.
+
+**Como aplicar DDL:**
+- **exitusdb:** via migration Alembic (`flask db upgrade`) — criar `.py` em `migrations/versions/`
 - **exitusdb_test:** via ALTER TABLE direto — `podman exec exitus-db psql -U exitus -d exitusdb_test -c "ALTER TABLE ..."`
 
-**Verificação de paridade:**
-```bash
-podman exec exitus-db psql -U exitus -d exitusdb -c "SELECT conname FROM pg_constraint WHERE contype='c' ORDER BY conname;"
-podman exec exitus-db psql -U exitus -d exitusdb_test -c "SELECT conname FROM pg_constraint WHERE contype='c' ORDER BY conname;"
-```
-
-**Consequência de ignorar:** Testes falham localmente mas passariam em produção (ou vice-versa) — falsos negativos difíceis de diagnosticar.
+**Consequência de ignorar:** Schema divergente entre produção e testes — falsos negativos difíceis de diagnosticar.
 
 ---
 
