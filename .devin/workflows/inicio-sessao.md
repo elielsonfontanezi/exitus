@@ -1,0 +1,47 @@
+---
+description: Iniciar sessão nova — ler fontes de verdade e retomar contexto
+---
+
+## /inicio-sessao — Fluxo obrigatório ao iniciar qualquer sessão
+
+Execute este workflow ANTES de qualquer ação, análise ou código.
+
+1. Ler **obrigatoriamente** nesta ordem:
+   ```
+   1. docs/LESSONS_LEARNED.md        ← erros reais — ler PRIMEIRO
+   2. docs/PROJECT_STATUS.md         ← estado atual, métricas, versão
+   3. docs/AUDITORIA_FUNCIONAL_18_06_2026.md  ← P-items pendentes/resolvidos
+   4. docs/ROADMAP.md                ← GAPs planejados e status
+   5. docs/CHANGELOG.md              ← últimas mudanças (top 30 linhas)
+   ```
+
+2. Apresentar ao usuário o **resumo de contexto**:
+   ```
+   📋 Contexto retomado:
+   - Versão: vX.Y.Z (data)
+   - Suite: N passed / M failed
+   - P-items pendentes: P3, P5, P6, P7
+   - Último commit: [hash] — [mensagem]
+   - Próximo passo sugerido: [item]
+   ```
+
+3. Perguntar ao usuário o que deseja fazer nesta sessão.
+
+4. Só então iniciar análise/implementação seguindo o fluxo do .windsurfrules REGRA #1.
+
+---
+
+## Checklist de docs obrigatórios ao FECHAR qualquer sessão
+
+Antes do commit final, verificar CADA item abaixo e confirmar ou justificar:
+
+| Documento | Obrigatório | Condição |
+|---|---|---|
+| `docs/CHANGELOG.md` | ✅ Sempre | Entrada com artefatos e suite |
+| `docs/PROJECT_STATUS.md` | ✅ Sempre | Data, versão, métricas |
+| `docs/AUDITORIA_FUNCIONAL_18_06_2026.md` | ✅ Se P-item resolvido | Marcar ✅, detalhar fix |
+| `docs/ROADMAP.md` | Se GAP mudou status | Marcar concluído |
+| `docs/LESSONS_LEARNED.md` | Se nova lição | Adicionar entrada L-XXX-NNN |
+| `docs/CODING_STANDARDS.md` | Se novo padrão | Documentar convenção |
+| `docs/ARCHITECTURE.md` | Se novo componente | Atualizar diagrama/tabela |
+| `docs/OPERATIONS_RUNBOOK.md` | Se novo script | Documentar uso |
