@@ -109,12 +109,16 @@ podman exec exitus-backend python -m pytest backend/tests/test_constraints.py -v
 # Reset completo do banco de testes
 ./scripts/create_test_db.sh
 
-# Seed específico
-python backend/load_scenario.py test_e2e
+# Seed específico (cenários disponíveis: test_full, test_e2e, test_ir, test_stress)
+python backend/load_scenario.py test_full
 
 # Verificar paridade de schema
 ./scripts/check_db_parity.sh --strict
 ```
+
+**Cenários principais:**
+- `test_full` — Cenário completo com histórico patrimonial (16 meses)
+- `test_e2e` — Dados realistas para testes E2E
 
 **Referência completa:** docs/SEEDS.md, docs/OPERATIONS_RUNBOOK.md
 
