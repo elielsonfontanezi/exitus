@@ -33,6 +33,51 @@
 
 ---
 
+## 🔄 Fluxo de Trabalho Padrão
+
+### 1. Início de Sessão
+```bash
+# Verificar status dos containers
+podman ps
+
+# Ler fontes de verdade (PRIORIDADE 1)
+# docs/LESSONS_LEARNED.md, docs/PROJECT_STATUS.md, docs/CODING_STANDARDS.md
+```
+
+### 2. Implementação
+- Seguir padrões de `docs/CODING_STANDARDS.md` (snake_case, SQLAlchemy)
+- Para alterações DDL (schema): criar migration Alembic
+- Para bugs de aplicação: fix no código Python
+
+### 3. Validação
+```bash
+# Suite completa
+podman exec exitus-backend python -m pytest --tb=no -q
+
+# Se mexeu em banco (DDL):
+# - exitusdb: flask db upgrade
+# - exitusdb_test: scripts/create_test_db.sh (ou ALTER TABLE direto)
+# - Verificar paridade: scripts/check_db_parity.sh
+```
+
+### 4. Commit
+```bash
+git add -A
+git commit -m "feat/fix/docs: [GAP-XXX] — descrição
+
+GAPs: GAP-XXX
+- Artefato A: descrição
+- Artefato B: descrição
+- docs: arquivos atualizados
+- Suite: N passed, 0 failed"
+```
+
+### 5. Documentação (no mesmo commit)
+- **Obrigatório:** CHANGELOG.md, PROJECT_STATUS.md
+- **Se aplicável:** ROADMAP.md, LESSONS_LEARNED.md, ARCHITECTURE.md
+
+---
+
 ## 🧪 Comandos de Validação Obrigatórios
 
 ```bash
