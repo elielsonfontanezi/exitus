@@ -3,6 +3,7 @@
 > **Propósito:** Quick reference para contexto rápido de desenvolvimento.  
 > **Regras completas para IA:** `.windsurfrules` — consultar sempre no início da sessão.  
 > **Fontes de verdade:** `docs/PROJECT_STATUS.md`, `docs/CODING_STANDARDS.md`, `docs/LESSONS_LEARNED.md`  
+> **Nota:** Este arquivo é um resumo. Para detalhes profundos, consultar as fontes de verdade acima.  
 > **Atualizado:** 25/06/2026
 
 ---
