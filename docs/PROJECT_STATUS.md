@@ -1,10 +1,14 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 23/06/2026  
-> **Status:** ✅ **Auditoria DB Concluída — Sistema 100% Funcional**  
-> **Versão:** v0.9.23
+> **Data:** 24/06/2026  
+> **Status:** ✅ **Suite de Testes Estabilizada — P4 Resolvido**  
+> **Versão:** v0.9.24
 
-### 🔧 Últimas correções (23/06/2026)
+### 🔧 Últimas correções (24/06/2026)
+- **P4 — Fix suite de testes:** 554 passed / 14 failed (dívida técnica) / 6 skipped — upsert em fixtures vs seed persistente; fix `ir_service.py` (DIVIDENDO/JCP/ALUGUEL no filtro); alíquota JCP 15%→17.5%; `conftest.py` campos corretos em `MovimentacaoCaixa` e `Provento`; `load_scenario` conectando ao `exitusdb_test` via env `TESTING`; `test_scenarios_example` com `@pytest.mark.parametrize` correto
+- **P1+P2 — DB/Alembic:** banco de testes recriado com enum completo; heads Alembic unificados em `20260624_1100`
+
+### 🔧 Correções anteriores (23/06/2026)
 - **Seeds:** Renda Fixa Brasil completa ao cenário test_full — 8 ativos RF (CDBs, Tesouro, Debêntures), 8 transações (R$ 49.599,60), 8 movimentações de caixa, 10 proventos/juros; base de teste agora 100% completa: 38 ativos, 56 transações, 42 proventos
 - **FEAT-008:** Botão "Confirmar Recebimento" de provento já estava implementado — documentação atualizada; funcionalidade completa em calendario_v2.html
 - **FEAT-007:** Tela de detalhe de plano de compra implementada — modal com informações completas; botão Detalhes na tabela; carregamento via API específica
@@ -29,7 +33,7 @@
 | **Backend** | ✅ 87% | 48/54 GAPs, 508/546 testes (93.0%), 156 endpoints |
 | **Frontend V2.0** | ✅ 100% | 17/17 telas premium, design classe mundial |
 | **Frontend UX Evolution** | ✅ 100% | 10/10 páginas ultra-modernas, design unificado |
-| **Testes Backend** | ✅ 93.0% | 508/546 passando (+37 testes), 6 skipped (RLS), 68 errors (teardown) |
+| **Testes Backend** | ✅ 96.4% | 554/574 passando, 14 failed (dívida técnica: constraints + feature 2026+), 6 skipped |
 | **Testes E2E** | 🟡 60% | v2: 127/127 ✅ Chromium (merged main 16/06) — v3 lógica negócio: 50 CTs planejados, specs criados (branch feature/testes-e2e-v3) |
 | **Auditoria Funcional** | ✅ 100% | 18/06/2026: 36 telas auditadas; 23/06/2026: 0 críticos, 0 importantes pendentes, 8 features pendentes (FEAT-005 a FEAT-012) |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |

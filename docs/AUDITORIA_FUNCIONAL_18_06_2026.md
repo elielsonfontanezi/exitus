@@ -1301,20 +1301,26 @@ podman exec exitus-backend bash /scripts/create_test_db.sh
 
 ---
 
-### 🟡 P4 — 61 Falhas + 35 Erros de Setup nos Testes Backend
+### ~~🟡 P4 — 22 Falhas + 8 Erros de Setup nos Testes Backend~~ ✅ RESOLVIDO (24/06/2026)
 
-**Problema:** Suite de testes backend com 436/497 passando (87.7%). Restam:
-- **61 falhas** — principalmente `test_ir_integration.py` (campos obsoletos em cenários) e `test_constraints.py`
-- **35 erros de setup** — fixtures e importações em `conftest.py`
+**Estado inicial (pós P1):** 530 passando, 22 falhas, 8 erros de setup.
 
-**Causa parcialmente conhecida:**
-- `test_ir_integration.py` — usa campos de cenário que não existem mais
-- `test_reconciliacao.py` — `ativo_seed` com `dividend_yield` overflow (L-DB-006)
-- Parte das falhas pode ser resolvida após P1 (recriar `exitusdb_test` com enum completo)
+**Fixes aplicados:**
+- `ir_service.py` — incluir `DIVIDENDO`/`JCP`/`ALUGUEL` no filtro de transações (zeravam `valor_bruto`)
+- `load_scenario.py` — respeitar env `TESTING` para conectar ao `exitusdb_test`
+- `conftest.py` — upsert em entidades-mestre (Ativo/Assessora/Corretora/Usuário); `observacoes→descricao` em `MovimentacaoCaixa`; `valor_unitario→valor_por_acao` + campos NOT NULL em `Provento`; delete-then-insert para transações; `request.node.callspec.params` para capturar scenario do `@pytest.mark.parametrize`
+- `test_ir_integration.py` — alíquota JCP `15.0%→17.5%` (vigente 2026)
+- `test_ativo_classifier.py` — `PETR4→PETX4` (não existe no seed, força caminho heurística)
+- `test_buy_signals_endpoints.py` — upsert em `PETR4`/`VALE3`/`TEST{i}`
+- `test_scenarios_example.py` — `role.value 'ADMIN'→'admin'`; `@pytest.mark.parametrize` correto para `test_ir` e `test_stress`
 
-**Próximo passo:** Após P1, rodar `pytest` completo e reavaliar quantas falhas restam.
+**Resultado:** **554 passed**, 14 failed (dívida técnica — ver abaixo), 6 skipped
 
-**Status:** 📋 Pendente — **bloqueado por P1**
+**14 falhas residuais (fora do escopo P4):**
+- **13 × `test_constraints.py`** — CHECK constraints não existem no banco (P6 técnico — migration pendente)
+- **1 × `test_ir_integration.py::test_dividendo_br_tributado_acima_50k_em_2026`** — feature `regime 2026+` não implementada
+
+**Status:** ✅ Resolvido — commit `cd0d6be`
 
 ---
 

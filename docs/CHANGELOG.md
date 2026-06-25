@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — P4: Estabilização da Suite de Testes Backend (24/06/2026)
+
+**Resultado:** 554 passed / 14 failed (dívida técnica) / 6 skipped
+
+**Arquivos alterados:**
+- `backend/app/services/ir_service.py`: incluir `DIVIDENDO`/`JCP`/`ALUGUEL` no filtro de transações — proventos zeravam `valor_bruto`
+- `backend/load_scenario.py`: respeitar env `TESTING=true` para conectar ao `exitusdb_test` em vez de produção
+- `backend/tests/conftest.py`: upsert em entidades-mestre (Ativo/Assessora/Corretora/Usuário); `observacoes→descricao` em `MovimentacaoCaixa`; `valor_unitario→valor_por_acao` + campos NOT NULL (`quantidade_ativos`, `valor_bruto`, `imposto_retido`, `valor_liquido`) em `Provento`; delete-then-insert para transações antes de recriar; `request.node.callspec.params` para capturar `scenario` do `@pytest.mark.parametrize`
+- `backend/tests/test_ir_integration.py`: alíquota JCP `15.0%→17.5%` (vigente desde 2024)
+- `backend/tests/test_ativo_classifier.py`: `PETR4→PETX4` no teste de fallback heurística (PETR4 existe no seed, retornava `MANUAL`)
+- `backend/tests/test_buy_signals_endpoints.py`: upsert em `PETR4`/`VALE3`/`TEST{i}` — evitar `UniqueViolation` com seed persistente
+- `backend/tests/test_scenarios_example.py`: `role.value 'ADMIN'→'admin'`; `@pytest.mark.parametrize("scenario", ["test_ir"])` e `["test_stress"]` nos testes respectivos
+- `docs/AUDITORIA_FUNCIONAL_18_06_2026.md`: P4 marcado como ✅ Resolvido; detalhes do fix
+- `docs/LESSONS_LEARNED.md`: L-TEST-001 adicionada — fixture vs seed persistente: padrão upsert obrigatório
+
+**14 falhas residuais (fora do escopo P4 — dívida técnica):**
+- 13 × `test_constraints.py` — CHECK constraints não existem no banco (migration CONSTRAINT-001 pendente)
+- 1 × `test_ir_integration.py::test_dividendo_br_tributado_acima_50k_em_2026` — feature `regime 2026+` não implementada
+
+---
+
 ### Fix — BUG-021: Consistência do enum TipoMovimentacao (24/06/2026)
 
 **Arquivos alterados:**
