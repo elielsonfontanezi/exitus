@@ -82,24 +82,19 @@
 - [ ] Dashboard admin por assessora
 - [ ] Testes de isolamento ampliados (transações, posições, proventos)
 
-### Timeline Estimada Fase 7
+### Timeline Fase 7 (Atualizado: Junho 2026)
 
-```
-Março 2026:
-├── Semana 3-4: Concluir MULTICLIENTE-001
-│
-Abril 2026:
-├── Semana 1: MONITOR-001 + RATELIMIT-001
-├── Semana 2: CICD-001
-└── Semana 3: Testes integrados multi-tenant
-│
-Maio 2026:
-└── Go-live Fase 7 🎯
-```
+| GAP | Status | Data |
+|-----|--------|------|
+| **MULTICLIENTE-001** | ✅ Concluído | 03/04/2026 |
+| **MONITOR-001** | 🟡 Pendente | — |
+| **RATELIMIT-001** | 🟡 Pendente | — |
+| **CICD-001** | 🟡 Pendente | — |
+| **Testes integrados multi-tenant** | 🟡 Pendente | — |
 
 ---
 
-## 🎨 Frontend — Integração API-Driven (Em Progresso)
+## 🎨 Frontend — Integração API-Driven
 
 **Status:** ✅ TODOS OS 8 SPRINTS CONCLUÍDOS | **Última atualização:** 09/06/2026  
 **Referência completa:** `docs/FRONTEND_IMPLEMENTATION_PLAN.md`
