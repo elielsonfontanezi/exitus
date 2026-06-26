@@ -1,10 +1,13 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 25/06/2026  
+> **Data:** 26/06/2026  
 > **Status:** 🟡 **Auditoria Funcional em andamento — 2 OK, 34 PARCIAL, 0 QUEBRADO**  
 > **Versão:** v0.9.25
 
-### 🔧 Últimas correções (25/06/2026)
+### 🔧 Últimas correções (26/06/2026)
+- **BUG-009 — Plano de correção registrado:** Diagnóstico de URLs hardcoded de API no frontend (fiscal.py, templates admin, templates legados, scripts externos). Plano incremental registrado em AUDITORIA_FUNCIONAL.md antes de implementação. Backend não precisa ser varrido — problema está exclusivamente nos consumidores frontend.
+
+### 🔧 Correções anteriores (25/06/2026)
 - **CONSTRAINT-001:** 10 CHECK constraints aplicadas em `transacao`, `evento_custodia`, `projecoes_renda`, `taxa_cambio` via migration Alembic; 17/17 testes passando; suite total 567/574 passed (98.8%)
 - **P8 — Seed enrichment:** `test_e2e.json` enriquecido com ITUB4/ETFs, 3 planos compra, 2 planos venda, 12 meses histórico patrimônio, 6 eventos calendário dividendos, 3 projeções renda, 3 regras fiscais; `load_scenario.py` com 3 novos `_seed_*`
 - **P3 — BUG-013:** `x-model.lazy` em filtros de data (movimentacoes.html); badge-cor corrigido
