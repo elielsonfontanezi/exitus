@@ -2,12 +2,36 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 25/06/2026 — L-DB-009 adicionada (paridade exitusdb/exitusdb_test)  
+> **Atualizado:** 26/06/2026 — L-FE-010 adicionada (FRONTEND_API_URL vs BACKEND_API_URL)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
 
 ## 🖥️ Frontend Jinja2
+
+### L-FE-010 — Chave de config JS em base_interna.html deve espelhar exatamente a chave de Config
+**Origem:** BUG-009 — `base_interna.html` | **Data:** 26/06/2026
+
+**Erro:** `base_interna.html` usava `config.get("FRONTEND_API_URL", "http://localhost:5000")` — chave `FRONTEND_API_URL` não existe em `Config`. Resultado: todos os 25 templates _v2 ignoravam `Config.BACKEND_API_URL` e caíam sempre no fallback `http://localhost:5000`, quebrando qualquer ambiente diferente do dev local Podman.
+
+**Correto:** A chave no `config.get()` do template **deve ser idêntica** à chave definida em `Config`:
+```python
+# Config (frontend/app/config.py)
+BACKEND_API_URL = os.getenv('BACKEND_API_URL', 'http://localhost:5000')
+```
+```html
+<!-- base_interna.html — correto -->
+const API_BASE_URL = '{{ config.get("BACKEND_API_URL", "http://localhost:5000") }}';
+```
+
+**Regra:** Ao criar nova variável de config exposta ao JavaScript, sempre verificar o nome exato em `Config` antes de usar `config.get()` no template. Nomes errados não geram erro — apenas silenciosamente usam o fallback.
+
+**Padrão complementar:** `base.html` deve sempre injetar `window.API_BASE_URL` para templates admin (que não estendem `base_interna.html`):
+```html
+window.API_BASE_URL = '{{ config.get("BACKEND_API_URL", "http://localhost:5000") }}';
+```
+
+---
 
 ### L-FE-009 — Migração de template para base_interna.html deve replicar padrão visual do sistema
 **Origem:** Fase 7 — `operacoes_v2.html` | **Data:** 18/06/2026

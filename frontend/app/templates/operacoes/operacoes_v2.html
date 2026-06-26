@@ -545,7 +545,7 @@ function pageDataExtend() {
             };
             const token = localStorage.getItem('access_token');
             try {
-                const response = await fetch(`${window.API_BASE || 'http://localhost:5000'}/api/transacoes`, {
+                const response = await fetch(`${API_BASE_URL}/api/transacoes`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -599,7 +599,7 @@ function importB3() {
             const formData = new FormData();
             formData.append('file', file);
             try {
-                const response = await fetch(`${window.API_BASE || 'http://localhost:5000'}/api/import/b3`, {
+                const response = await fetch(`${API_BASE_URL}/api/import/b3`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData

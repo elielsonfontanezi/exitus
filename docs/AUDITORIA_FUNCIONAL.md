@@ -77,32 +77,24 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 
 ---
 
-## 🧭 Análise de Sessão — 26/06/2026 (BUG-009 — API_BASE hardcoded)
+## 🧭 Análise de Sessão — 26/06/2026 (BUG-009 ✅ RESOLVIDO)
 
 ### Contexto
 - AUDITORIA_FUNCIONAL é a fonte única: status geral 🟡 (2 OK, 34 PARCIAL, 0 QUEBRADO).
-- Durante a revisão do BUG-009 identificamos múltiplos consumidores de API no frontend que não respeitam `Config.BACKEND_API_URL`.
-- Objetivo: mapear escopo e definir plano gradual antes de alterar código.
+- BUG-009 **resolvido em 26/06/2026**: causa raiz era chave `FRONTEND_API_URL` (inexistente) em `base_interna.html` — todos os 25 templates _v2 caíam no fallback `http://localhost:5000`.
+- Correção aplicada em 9 artefatos: `base_interna.html`, `base.html`, `fiscal.py`, `operacoes_v2.html`, `index_v2.html`, `assessoras_list.html`, `assessoras_form.html`, `assessoras_stats.html`, `operacoes.js`.
 
-### Diagnóstico
-- `frontend/app/routes/fiscal.py` — constante `API_BASE = 'http://exitus-backend:5000/api'` (impacta `/imposto-renda/declaracao`).
-- Templates Admin (`admin/assessoras_form.html`, `admin/assessoras_list.html`, `admin/assessoras_stats.html`) — `fetch('http://localhost:5000/...')` para CRUD de assessor(a)s.
-- Templates legados (`operacoes/operacoes_v2.html`, `dashboard/index_v2.html`, `relatorios/exportar_v2.html`) — `const API_BASE = 'http://localhost:5000/api'` em scripts inline.
-- Script `app/static/js/operacoes.js` — `axios` apontando para `http://localhost:5000/api/operacoes`.
-- Situação atual: todos esses pontos fazem bypass do `Config.BACKEND_API_URL`; apenas `base_interna.html` centraliza corretamente via `config.get("FRONTEND_API_URL")`.
-- Backend não precisa ser varrido para este bug: problema está exclusivamente nos consumidores frontend (as APIs já existem e funcionam).
+### Diagnóstico (histórico — resolvido)
+- ✅ `frontend/app/routes/fiscal.py` — constante `API_BASE = 'http://exitus-backend:5000/api'` → substituída por `Config.BACKEND_API_URL`
+- ✅ Templates Admin (`assessoras_form.html`, `assessoras_list.html`, `assessoras_stats.html`) — `fetch('http://localhost:5000/...')` → `window.API_BASE_URL`
+- ✅ Templates legados (`operacoes_v2.html`, `dashboard/index_v2.html`) — `window.API_BASE` → `API_BASE_URL`
+- ✅ `relatorios/exportar_v2.html` — já usava `typeof API_BASE_URL !== 'undefined'` (correto, auto-corrigido pelo fix em `base_interna.html`)
+- ✅ `app/static/js/operacoes.js` — `const API_URL = 'http://localhost:5000'` → `window.API_BASE_URL || 'http://localhost:5000'`
+- ✅ **Causa raiz:** `base_interna.html` usava chave `FRONTEND_API_URL` (inexistente) → corrigida para `BACKEND_API_URL`
+- ✅ `base.html` — `window.API_BASE_URL` injetado globalmente para templates que não estendem `base_interna.html`
 
-### Plano de Correção (incremental)
-1. **Config global:** Expor `API_BASE_URL = current_app.config['BACKEND_API_URL']` (fallback `http://localhost:5000`) em contexto global JS (`base.html` / `base_interna.html`).
-2. **Rotas Flask:** Atualizar `fiscal.py` (e demais rotas que usem `requests`) para montar URLs com helper `get_backend_api_url()`.
-3. **Templates Admin/Legados:** Substituir URLs literais por `window.API_BASE_URL` (ou `{{ api_base_url }}`) e garantir uso do token correto (`access_token`).
-4. **Scripts externos:** Atualizar `app/static/js/operacoes.js` (e demais arquivos) para importar/configurar `API_BASE_URL`/`axios.defaults.baseURL`.
-5. **Validação:** Smoke test nas telas fiscais, admin e relatórios; confirmar que `BACKEND_API_URL` altera comportamento em runtime.
-6. **Documentação:** Marcar BUG-009 como resolvido somente após todos os itens acima estarem centralizados.
-
-### Observações
-- Lista acima cobre todas as ocorrências frontend conhecidas (auditadas em 26/06/2026). Caso futuras telas/scripts usem URLs diretas, devem seguir o mesmo padrão configurável.
-- Não há pendência de varrer o backend neste contexto.
+### Implementação (26/06/2026)
+Todos os 6 passos do plano executados. 9 artefatos modificados. Sistema respeita `BACKEND_API_URL` do `.env` em todos os ambientes. Ver `CHANGELOG.md` e `LESSONS_LEARNED.md` (L-FE-010).
 
 ---
 

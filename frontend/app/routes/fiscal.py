@@ -3,10 +3,9 @@ from datetime import datetime
 import requests
 
 from .auth import login_required, get_api_headers
+from ..config import Config
 
 bp = Blueprint('fiscal', __name__, url_prefix='/imposto-renda')
-
-API_BASE = 'http://exitus-backend:5000/api'
 
 
 def _mes_atual():
@@ -57,7 +56,7 @@ def declaracao():
 
     try:
         resp = requests.get(
-            f'{API_BASE}/ir/dirpf',
+            f'{Config.BACKEND_API_URL}/api/ir/dirpf',
             headers=headers,
             params={'ano': ano},
             timeout=10

@@ -286,10 +286,10 @@ function assessorasStatsApp(assessoraId) {
             this.loading = true;
             try {
                 const [assessoraRes, statsRes] = await Promise.all([
-                    fetch(`http://localhost:5000/api/assessoras/${this.assessoraId}`, {
+                    fetch(`${window.API_BASE_URL}/api/assessoras/${this.assessoraId}`, {
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                     }),
-                    fetch(`http://localhost:5000/api/assessoras/${this.assessoraId}/stats`, {
+                    fetch(`${window.API_BASE_URL}/api/assessoras/${this.assessoraId}/stats`, {
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                     })
                 ]);

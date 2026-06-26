@@ -312,7 +312,7 @@ function dashboardV2() {
         async carregarDados() {
             const token = localStorage.getItem('access_token');
             if (!token) return;
-            const base = window.API_BASE || 'http://localhost:5000';
+            const base = API_BASE_URL;
             const h = { 'Authorization': `Bearer ${token}` };
             try {
                 const resDash = await fetch(`${base}/api/portfolios/dashboard`, { headers: h });

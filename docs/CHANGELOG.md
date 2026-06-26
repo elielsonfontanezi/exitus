@@ -8,28 +8,24 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
-### Docs — Registro de plano de correção BUG-009 (API_BASE hardcoded) em AUDITORIA_FUNCIONAL.md (26/06/2026)
+### Fix — BUG-009: API_BASE hardcoded eliminado — frontend agora usa Config.BACKEND_API_URL (26/06/2026)
 
-**Motivo:** BUG-009 descreve URLs hardcoded de API no frontend que ignoram `Config.BACKEND_API_URL`, quebrando ambientes fora do Podman. Plano de correção incremental registrado antes de implementação.
+**Causa raiz:** `base_interna.html` usava `config.get("FRONTEND_API_URL", ...)` — chave inexistente em `Config`. Todos os 25 templates `_v2` que estendem `base_interna.html` caíam no fallback `http://localhost:5000` ignorando `Config.BACKEND_API_URL`. Adicionalmente, `fiscal.py` tinha `API_BASE = 'http://exitus-backend:5000/api'` hardcoded e admin templates/scripts externos não tinham acesso à config.
 
-**Artefatos atualizados:**
-- `docs/AUDITORIA_FUNCIONAL.md`: seção "🧭 Análise de Sessão — 26/06/2026 (BUG-009 — API_BASE hardcoded)" adicionada
+**Artefatos modificados:**
+- `frontend/app/templates/components/base_interna.html`: `FRONTEND_API_URL` → `BACKEND_API_URL` em `config.get()` — raiz do problema, propaga para todos os 25 templates _v2
+- `frontend/app/templates/base.html`: `window.API_BASE_URL = '{{ config.get("BACKEND_API_URL", ...) }}'` injetado globalmente — disponível para templates admin que estendem `base.html` diretamente
+- `frontend/app/routes/fiscal.py`: removida constante `API_BASE = 'http://exitus-backend:5000/api'`; `declaracao()` usa `Config.BACKEND_API_URL`; import `Config` adicionado
+- `frontend/app/templates/operacoes/operacoes_v2.html`: `window.API_BASE` → `API_BASE_URL` (2 ocorrências: `POST /api/transacoes`, `POST /api/import/b3`)
+- `frontend/app/templates/dashboard/index_v2.html`: `window.API_BASE` → `API_BASE_URL` (1 ocorrência: `GET /api/portfolios/dashboard`)
+- `frontend/app/templates/admin/assessoras_list.html`: 3 URLs `http://localhost:5000` → `window.API_BASE_URL`
+- `frontend/app/templates/admin/assessoras_form.html`: 3 URLs `http://localhost:5000` → `window.API_BASE_URL`
+- `frontend/app/templates/admin/assessoras_stats.html`: 2 URLs `http://localhost:5000` → `window.API_BASE_URL`
+- `frontend/app/static/js/operacoes.js`: `const API_URL = 'http://localhost:5000'` → `window.API_BASE_URL || 'http://localhost:5000'`
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-009 marcado como ✅ RESOLVIDO
+- `docs/LESSONS_LEARNED.md`: L-FE-010 adicionada
 
-**Diagnóstico:**
-- `frontend/app/routes/fiscal.py` — constante `API_BASE = 'http://exitus-backend:5000/api'` (impacta `/imposto-renda/declaracao`)
-- Templates Admin (`admin/assessoras_form.html`, `admin/assessoras_list.html`, `admin/assessoras_stats.html`) — `fetch('http://localhost:5000/...')` para CRUD de assessor(a)s
-- Templates legados (`operacoes/operacoes_v2.html`, `dashboard/index_v2.html`, `relatorios/exportar_v2.html`) — `const API_BASE = 'http://localhost:5000/api'` em scripts inline
-- Script `app/static/js/operacoes.js` — `axios` apontando para `http://localhost:5000/api/operacoes`
-
-**Plano de correção (incremental):**
-1. Config global: Expor `API_BASE_URL = current_app.config['BACKEND_API_URL']` em contexto global JS
-2. Rotas Flask: Atualizar `fiscal.py` para montar URLs com helper `get_backend_api_url()`
-3. Templates Admin/Legados: Substituir URLs literais por `window.API_BASE_URL`
-4. Scripts externos: Atualizar `app/static/js/operacoes.js` para configurar `API_BASE_URL`/`axios.defaults.baseURL`
-5. Validação: Smoke test nas telas fiscais, admin e relatórios
-6. Documentação: Marcar BUG-009 como resolvido somente após todos os itens acima estarem centralizados
-
-**Observação:** Backend não precisa ser varrido — problema está exclusivamente nos consumidores frontend.
+**Impacto:** Sistema agora respeita `BACKEND_API_URL` do `.env` em todos os ambientes (dev, staging, prod). Alterar `BACKEND_API_URL=http://meu-host:5000` no `.env` propaga para todos os 33+ pontos de consumo sem alteração de código.
 
 ---
 

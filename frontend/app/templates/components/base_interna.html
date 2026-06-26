@@ -70,7 +70,7 @@
 {% block extra_scripts %}
     {{ super() }}
     <script>
-    const API_BASE_URL = '{{ config.get("FRONTEND_API_URL", "http://localhost:5000") }}';
+    const API_BASE_URL = '{{ config.get("BACKEND_API_URL", "http://localhost:5000") }}';
 
     function pageData() {
         const base = {

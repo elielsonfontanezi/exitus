@@ -1,5 +1,5 @@
 // Modernização da tela de compra com API REST
-const API_URL = 'http://localhost:5000';
+const API_URL = window.API_BASE_URL || 'http://localhost:5000';
 
 async function searchAtivos(query) {
     const token = localStorage.getItem('access_token');

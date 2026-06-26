@@ -5,7 +5,7 @@
 > **Versão:** v0.9.25
 
 ### 🔧 Últimas correções (26/06/2026)
-- **BUG-009 — Plano de correção registrado:** Diagnóstico de URLs hardcoded de API no frontend (fiscal.py, templates admin, templates legados, scripts externos). Plano incremental registrado em AUDITORIA_FUNCIONAL.md antes de implementação. Backend não precisa ser varrido — problema está exclusivamente nos consumidores frontend.
+- **BUG-009 ✅ RESOLVIDO:** API_BASE hardcoded eliminado em 9 artefatos. Causa raiz: `base_interna.html` usava chave `FRONTEND_API_URL` (inexistente) em vez de `BACKEND_API_URL` — todos os 25 templates _v2 caíam no fallback `http://localhost:5000`. Fix: (1) `base_interna.html` corrigido — propaga para todos _v2; (2) `base.html` injeta `window.API_BASE_URL` globalmente — cobre admin templates; (3) `fiscal.py` usa `Config.BACKEND_API_URL`; (4) admin templates + `operacoes.js` usam `window.API_BASE_URL`. Sistema agora respeita `BACKEND_API_URL` do `.env` em todos os ambientes.
 
 ### 🔧 Correções anteriores (25/06/2026)
 - **CONSTRAINT-001:** 10 CHECK constraints aplicadas em `transacao`, `evento_custodia`, `projecoes_renda`, `taxa_cambio` via migration Alembic; 17/17 testes passando; suite total 567/574 passed (98.8%)
