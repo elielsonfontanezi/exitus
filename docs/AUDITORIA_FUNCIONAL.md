@@ -779,17 +779,7 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
 - ✅ **Dados Carregados**: 3 usuários, 7 ativos, 4 transações, 2 proventos, 2 movimentações, 3 alertas
 - ✅ **Script Corrigido**: Mapeamento de ENUMs como strings (não objetos)
 
-#### Lições Aprendidas (consolidadas em docs/LESSONS_LEARNED.md)
-
-As lições aprendidas durante a auditoria funcional foram consolidadas em `docs/LESSONS_LEARNED.md` (seção 💾 Database):
-
-- **L-DB-008:** Porta PostgreSQL (5433 host → 5432 container)
-- **L-DB-009:** Flask-Migrate vs ALTER direto
-- **L-DB-010:** ENUMs pré-requisitos
-- **L-DB-011:** Scripts de seed vs schema real
-- **L-DB-012:** ENUMs case sensitive
-- **L-DB-013:** Precisão numeric
-- **L-DB-014:** Documentação sincronizada (update_db_structure.sh)
+> **Nota:** Lições aprendidas durante a auditoria funcional (L-DB-008 a L-DB-014) foram consolidadas em `docs/LESSONS_LEARNED.md` (seção 💾 Database).
 
 ### 📊 Matriz de Documentação DB (Análise Completa)
 
