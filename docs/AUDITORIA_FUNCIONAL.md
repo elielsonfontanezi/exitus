@@ -779,46 +779,17 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
 - ✅ **Dados Carregados**: 3 usuários, 7 ativos, 4 transações, 2 proventos, 2 movimentações, 3 alertas
 - ✅ **Script Corrigido**: Mapeamento de ENUMs como strings (não objetos)
 
-#### Lições Aprendidas (já documentadas)
+#### Lições Aprendidas (consolidadas em docs/LESSONS_LEARNED.md)
 
-##### L-DB-001: Porta PostgreSQL
-- **Erro**: Assumir porta 5432
-- **Correto**: Sempre usar 5433 (host) → 5432 (container)
-- **Impacto**: Perda de tempo em troubleshooting de conexão
+As lições aprendidas durante a auditoria funcional (L-DB-001 a L-DB-007) foram consolidadas em `docs/LESSONS_LEARNED.md` (seção 💾 Database):
 
-##### L-DB-002: Flask-Migrate vs ALTER Direto
-- **Problema**: `flask db migrate` falha com erros de conexão
-- **Solução**: Usar ALTER TABLE direto via psql para mudanças simples
-- **Quando usar migrate**: Mudanças complexas com múltiplas tabelas
-
-##### L-DB-003: ENUMs Pré-requisitos
-- **Erro**: Esquecer de criar ENUMs antes das tabelas
-- **Solução**: Sempre verificar/criar ENUMs antes de `db.create_all()`
-- **Checklist**: Verificar pg_enum antes de criar tabelas
-
-##### L-DB-004: Scripts de Seed vs. Schema Real
-- **Erro**: Script `load_scenario.py` com ENUMs desatualizados
-- **Causa**: Schema evoluiu, script não foi atualizado
-- **Solução**: Validar scripts contra schema real antes de executar
-- **Verificação**: Comparar valores do JSON com limites do banco
-
-##### L-DB-005: ENUMs Case Sensitive
-- **Erro**: Usar `'DEPOSITO'` quando banco espera `'deposito'`
-- **Regra**: ENUMs PostgreSQL são case sensitive
-- **Solução**: Usar exatamente os valores do `unnest(enum_range())`
-
-##### L-DB-006: Precisão Numeric
-- **Erro**: `dividend_yield: 15.2` em `numeric(5,4)` (máx: 9.9999)
-- **Impacto**: Overflow impede inserção
-- **Solução**: Validar precisão antes de carregar dados
-- **Checklist**: Verificar `numeric(precision, scale)` no schema
-
-##### L-DB-004: Documentação Sincronizada
-- **Regra**: Atualizar `EXITUS_DB_STRUCTURE.txt` SEMPRE após mudanças
-- **Comando**: `./scripts/update_db_structure.sh`
-- **Impacto**: Evita investigações repetitivas
-
-*Novas lições serão adicionadas durante a execução da auditoria*
+- **L-DB-001:** Porta PostgreSQL (5433 host → 5432 container)
+- **L-DB-002:** Flask-Migrate vs ALTER direto
+- **L-DB-003:** ENUMs pré-requisitos
+- **L-DB-004:** Scripts de seed vs schema real
+- **L-DB-005:** ENUMs case sensitive
+- **L-DB-006:** Precisão numeric
+- **L-DB-007:** Documentação sincronizada (update_db_structure.sh)
 
 ### 📊 Matriz de Documentação DB (Análise Completa)
 

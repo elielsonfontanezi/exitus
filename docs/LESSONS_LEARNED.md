@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 26/06/2026 — L-BE-001 adicionada (exceções tipadas vs ValueError)  
+> **Atualizado:** 26/06/2026 — L-BE-001 adicionada (exceções tipadas vs ValueError), L-DB-001 a L-DB-007 adicionadas (Database)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -39,7 +39,88 @@ if quantidade_insuficiente:
 
 ---
 
-## 🖥️ Frontend Jinja2
+## � Database
+
+### L-DB-001 — Porta PostgreSQL
+**Origem:** Auditoria Funcional | **Data:** 2026
+
+**Erro:** Assumir porta 5432
+**Correto:** Sempre usar 5433 (host) → 5432 (container)
+**Impacto:** Perda de tempo em troubleshooting de conexão
+
+**Regra:** Ao conectar ao PostgreSQL via Podman, sempre usar porta 5433 no host (mapeada para 5432 no container).
+
+---
+
+### L-DB-002 — Flask-Migrate vs ALTER Direto
+**Origem:** Auditoria Funcional | **Data:** 2026
+
+**Problema:** `flask db migrate` falha com erros de conexão
+**Solução:** Usar ALTER TABLE direto via psql para mudanças simples
+**Quando usar migrate:** Mudanças complexas com múltiplas tabelas
+
+**Regra:** Para mudanças simples (adicionar coluna, constraint), usar ALTER TABLE direto via psql. Para mudanças complexas (múltiplas tabelas, renomear), usar Flask-Migrate.
+
+---
+
+### L-DB-003 — ENUMs Pré-requisitos
+**Origem:** Auditoria Funcional | **Data:** 2026
+
+**Erro:** Esquecer de criar ENUMs antes das tabelas
+**Solução:** Sempre verificar/criar ENUMs antes de `db.create_all()`
+**Checklist:** Verificar pg_enum antes de criar tabelas
+
+**Regra:** Ao criar tabelas com ENUMs, sempre verificar se o ENUM existe no banco antes de criar a tabela. Usar `SELECT typname FROM pg_enum` para listar ENUMs existentes.
+
+---
+
+### L-DB-004 — Scripts de Seed vs. Schema Real
+**Origem:** Auditoria Funcional | **Data:** 2026
+
+**Erro:** Script `load_scenario.py` com ENUMs desatualizados
+**Causa:** Schema evoluiu, script não foi atualizado
+**Solução:** Validar scripts contra schema real antes de executar
+**Verificação:** Comparar valores do JSON com limites do banco
+
+**Regra:** Sempre validar scripts de seed contra schema real antes de executar. Comparar valores do JSON com limites do banco (ENUMs, precisão numeric, constraints).
+
+---
+
+### L-DB-005 — ENUMs Case Sensitive
+**Origem:** Auditoria Funcional | **Data:** 2026
+
+**Erro:** Usar `'DEPOSITO'` quando banco espera `'deposito'`
+**Regra:** ENUMs PostgreSQL são case sensitive
+**Solução:** Usar exatamente os valores do `unnest(enum_range())`
+
+**Regra:** ENUMs PostgreSQL são case sensitive. Usar exatamente os valores retornados por `unnest(enum_range('nome_enum'))` para evitar erros.
+
+---
+
+### L-DB-006 — Precisão Numeric
+**Origem:** Auditoria Funcional | **Data:** 2026
+
+**Erro:** `dividend_yield: 15.2` em `numeric(5,4)` (máx: 9.9999)
+**Impacto:** Overflow impede inserção
+**Solução:** Validar precisão antes de carregar dados
+**Checklist:** Verificar `numeric(precision, scale)` no schema
+
+**Regra:** Validar precisão de campos `numeric(precision, scale)` antes de carregar dados. O valor máximo é `10^precision - 10^-scale`. Ex: `numeric(5,4)` máximo = 9.9999.
+
+---
+
+### L-DB-007 — Documentação Sincronizada
+**Origem:** Auditoria Funcional | **Data:** 2026
+
+**Regra:** Atualizar `EXITUS_DB_STRUCTURE.txt` SEMPRE após mudanças
+**Comando:** `./scripts/update_db_structure.sh`
+**Impacto:** Evita investigações repetitivas
+
+**Regra:** Sempre que o banco de dados for alterado (nova tabela, migration, ALTER TABLE), executar `./scripts/update_db_structure.sh` para atualizar `docs/EXITUS_DB_STRUCTURE.txt`.
+
+---
+
+## ��️ Frontend Jinja2
 
 ### L-FE-010 — Chave de config JS em base_interna.html deve espelhar exatamente a chave de Config
 **Origem:** BUG-009 — `base_interna.html` | **Data:** 26/06/2026
