@@ -11,6 +11,7 @@ from app.database import db
 from app.models.configuracao_alerta import ConfiguracaoAlerta
 from app.models.ativo import Ativo
 from app.utils.tenant import filter_by_assessora, get_current_assessora_id
+from app.utils.exceptions import NotFoundError, ValidationError
 
 class AlertaService:
     @staticmethod
@@ -168,12 +169,14 @@ class AlertaService:
         query = filter_by_assessora(query, ConfiguracaoAlerta)
         alerta = query.first()
         if not alerta:
-            raise ValueError("Alerta não encontrado")
+            raise NotFoundError("Alerta não encontrado")
         return alerta.to_dict()
 
     @staticmethod
     def criar_alerta(usuario_id: UUID, dados: Dict) -> Dict:
-        if not dados.get('nome'): raise ValueError("Nome obrigatório")
+        if not dados.get('nome'): raise ValidationError("Nome obrigatório")
+        if not dados.get('tipo_alerta'): raise ValidationError("Tipo obrigatório")
+        if 'condicao_valor' not in dados: raise ValidationError("Valor obrigatório")
         
         # Tratamento de Enum (Garante minúsculo se string)
         tipo_alerta = dados['tipo_alerta']
@@ -213,7 +216,7 @@ class AlertaService:
             )
         ).first()
         if not alerta:
-            raise ValueError("Alerta não encontrado")
+            raise NotFoundError("Alerta não encontrado")
 
         for campo, valor in dados.items():
             if campo in ['nome', 'tipo_alerta', 'frequencia_notificacao']:
@@ -238,7 +241,7 @@ class AlertaService:
             )
         ).first()
         if not alerta:
-            raise ValueError("Alerta não encontrado")
+            raise NotFoundError("Alerta não encontrado")
         db.session.delete(alerta)
         db.session.commit()
         return True

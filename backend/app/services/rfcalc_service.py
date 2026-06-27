@@ -6,6 +6,7 @@ Duration (Macaulay, Modified), YTM (Newton-Raphson), FFO, AFFO, P/FFO
 
 from datetime import date, datetime
 from decimal import Decimal
+from app.utils.exceptions import ValidationError
 
 
 class RFCalcService:
@@ -74,7 +75,7 @@ class RFCalcService:
             float: Duration de Macaulay em períodos
         """
         if preco_mercado <= 0 or taxa_desconto_periodo <= -1:
-            raise ValueError("Preço de mercado e taxa de desconto devem ser positivos")
+            raise ValidationError("Preço de mercado e taxa de desconto devem ser positivos")
 
         soma_ponderada = 0.0
         for t, fluxo in enumerate(fluxos, start=1):
@@ -119,9 +120,9 @@ class RFCalcService:
             float: YTM por período (multiplique por frequência para anualizar)
         """
         if preco_mercado <= 0:
-            raise ValueError("Preço de mercado deve ser positivo")
+            raise ValidationError("Preço de mercado deve ser positivo")
         if not fluxos:
-            raise ValueError("Lista de fluxos não pode ser vazia")
+            raise ValidationError("Lista de fluxos não pode ser vazia")
 
         ytm = chute_inicial
 

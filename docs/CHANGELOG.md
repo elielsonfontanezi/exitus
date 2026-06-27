@@ -8,6 +8,23 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — TECH-001: ValueError refatorado para exceções tipadas em 5 services (26/06/2026)
+
+**Causa raiz:** 5 services (`parametros_macro`, `rfcalc`, `cambio`, `ir`, `alerta`) usavam `ValueError` genérico em vez de exceções tipadas de `app/utils/exceptions.py`, violando CODING_STANDARDS.md e impedindo mapeamento correto para HTTP status codes.
+
+**Artefatos modificados:**
+- `backend/app/services/parametros_macro_service.py`: `ValueError` → `ConflictError` (duplicatas), `NotFoundError` (não encontrado); import adicionado
+- `backend/app/services/rfcalc_service.py`: `ValueError` → `ValidationError` (validação de preço/fluxos); import adicionado
+- `backend/app/services/cambio_service.py`: `ValueError` → `ValidationError` (formato de par inválido); import adicionado
+- `backend/app/services/ir_service.py`: `ValueError` → `ValidationError` (mês inválido); import adicionado
+- `backend/app/services/alerta_service.py`: `ValueError` → `NotFoundError` (não encontrado), `ValidationError` (campos obrigatórios); import adicionado
+- `backend/tests/test_rfcalc_integration.py`: testes atualizados para esperar `ValidationError` em vez de `ValueError`
+- `docs/AUDITORIA_FUNCIONAL.md`: TECH-001 marcado como ✅ RESOLVIDO
+
+**Impacto:** Backend agora usa exceções tipadas consistentemente em todos os services. HTTP error handler mapeia corretamente: `NotFoundError` → 404, `ConflictError` → 409, `ValidationError` → 400, `BusinessRuleError` → 422. Suite de testes: 567/574 passando (98.8%) — 1 falha pré-existente não relacionada (feature IR 2026+).
+
+---
+
 ### Fix — BUG-009: API_BASE hardcoded eliminado — frontend agora usa Config.BACKEND_API_URL (26/06/2026)
 
 **Causa raiz:** `base_interna.html` usava `config.get("FRONTEND_API_URL", ...)` — chave inexistente em `Config`. Todos os 25 templates `_v2` que estendem `base_interna.html` caíam no fallback `http://localhost:5000` ignorando `Config.BACKEND_API_URL`. Adicionalmente, `fiscal.py` tinha `API_BASE = 'http://exitus-backend:5000/api'` hardcoded e admin templates/scripts externos não tinham acesso à config.

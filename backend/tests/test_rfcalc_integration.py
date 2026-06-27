@@ -8,6 +8,7 @@ import pytest
 import json
 from datetime import date, timedelta
 from app.services.rfcalc_service import RFCalcService
+from app.utils.exceptions import ValidationError
 
 
 class TestDuration:
@@ -50,10 +51,10 @@ class TestDuration:
     def test_duration_preco_invalido(self):
         """Deve lançar exceção para preço zero ou negativo"""
         fluxos = [100.0, 1100.0]
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             RFCalcService.duration_macaulay(0, fluxos, 0.10)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             RFCalcService.duration_macaulay(-100, fluxos, 0.10)
 
 
@@ -91,12 +92,12 @@ class TestYTM:
 
     def test_ytm_preco_invalido(self):
         """Deve lançar exceção para preço zero"""
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             RFCalcService.calcular_ytm(0, [100.0, 1100.0])
 
     def test_ytm_fluxos_vazios(self):
         """Deve lançar exceção para lista de fluxos vazia"""
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             RFCalcService.calcular_ytm(1000.0, [])
 
 

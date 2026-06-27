@@ -33,7 +33,7 @@ from app.models.posicao import Posicao
 from app.models.saldo_prejuizo import SaldoPrejuizo
 from app.models.saldo_darf_acumulado import SaldoDarfAcumulado
 from app.models.regra_fiscal import RegraFiscal
-from app.utils.exceptions import BusinessRuleError
+from app.utils.exceptions import BusinessRuleError, ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +125,7 @@ def _parse_mes(mes_str: str) -> tuple[int, int]:
         ano, mes = mes_str.split('-')
         ano, mes = int(ano), int(mes)
         if not (1 <= mes <= 12):
-            raise ValueError
+            raise ValidationError("Mês deve estar entre 1 e 12")
         return ano, mes
     except Exception:
         raise BusinessRuleError(f"Formato de mês inválido: '{mes_str}'. Use YYYY-MM.")

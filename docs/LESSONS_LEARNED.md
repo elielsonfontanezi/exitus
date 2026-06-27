@@ -2,8 +2,40 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 26/06/2026 — L-FE-010 adicionada (FRONTEND_API_URL vs BACKEND_API_URL)  
+> **Atualizado:** 26/06/2026 — L-BE-001 adicionada (exceções tipadas vs ValueError)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
+
+---
+
+## ⚙️ Backend
+
+### L-BE-001 — Services devem usar exceções tipadas em vez de ValueError genérico
+**Origem:** TECH-001 — 5 services | **Data:** 26/06/2026
+
+**Erro:** Services `parametros_macro`, `rfcalc`, `cambio`, `ir`, `alerta` usavam `ValueError` genérico para todos os erros (não encontrado, duplicata, validação). Isso impede que o HTTP error handler mapeie corretamente para status codes semânticos (404, 409, 400, 422).
+
+**Correto:** Usar exceções tipadas de `app/utils/exceptions.py`:
+```python
+from app.utils.exceptions import NotFoundError, ConflictError, ValidationError, BusinessRuleError
+
+# Recurso não encontrado → 404
+if not parametro:
+    raise NotFoundError("Parâmetro não encontrado")
+
+# Duplicata/conflito → 409
+if existing:
+    raise ConflictError(f"Parâmetros para {pais}/{mercado} já existem")
+
+# Validação de entrada → 400
+if preco_mercado <= 0:
+    raise ValidationError("Preço de mercado deve ser positivo")
+
+# Violação de regra de negócio → 422
+if quantidade_insuficiente:
+    raise BusinessRuleError("Quantidade insuficiente na posição")
+```
+
+**Regra:** Ao criar novo service ou modificar existente, sempre usar exceções tipadas. `ValueError` genérico só deve ser usado em casos extremos onde nenhuma exceção tipada se aplica (quase nunca). Testes unitários devem esperar a exceção tipada correta.
 
 ---
 

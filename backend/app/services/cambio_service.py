@@ -7,6 +7,7 @@ from typing import Optional, Dict, List
 
 from app.database import db
 from app.models.taxa_cambio import TaxaCambio, TAXAS_FALLBACK, MOEDAS_SUPORTADAS
+from app.utils.exceptions import ValidationError
 
 
 class CambioService:
@@ -175,7 +176,7 @@ class CambioService:
         par_moeda = par_moeda.upper()
         partes = par_moeda.split('/')
         if len(partes) != 2:
-            raise ValueError(f'Formato de par inválido: {par_moeda}. Use BASE/COTACAO (ex: BRL/USD)')
+            raise ValidationError(f'Formato de par inválido: {par_moeda}. Use BASE/COTACAO (ex: BRL/USD)')
 
         moeda_base, moeda_cotacao = partes
 

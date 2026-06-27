@@ -6,6 +6,7 @@ CRUD e consultas de parâmetros macroeconômicos
 
 from app.database import db
 from app.models.parametros_macro import ParametrosMacro
+from app.utils.exceptions import NotFoundError, ConflictError
 
 
 class ParametrosMacroService:
@@ -49,7 +50,7 @@ class ParametrosMacroService:
         ).first()
         
         if existing:
-            raise ValueError(f"Parâmetros para {data['pais']}/{data['mercado']} já existem")
+            raise ConflictError(f"Parâmetros para {data['pais']}/{data['mercado']} já existem")
         
         parametro = ParametrosMacro(**data)
         db.session.add(parametro)
@@ -81,7 +82,7 @@ class ParametrosMacroService:
             ).first()
             
             if duplicate:
-                raise ValueError(f"Parâmetros para {pais}/{mercado} já existem")
+                raise ConflictError(f"Parâmetros para {pais}/{mercado} já existem")
         
         # Atualiza campos
         for key, value in data.items():
@@ -98,7 +99,7 @@ class ParametrosMacroService:
         parametro = ParametrosMacro.query.get(param_id)
         
         if not parametro:
-            raise ValueError("Parâmetro não encontrado")
+            raise NotFoundError("Parâmetro não encontrado")
         
         db.session.delete(parametro)
         db.session.commit()
