@@ -20,8 +20,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 3 |
-| 🟡 PARCIAL | 33 |
+| ✅ OK | 4 |
+| 🟡 PARCIAL | 32 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -68,7 +68,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 27 | Relatórios — IR Completo | `/relatorios/ir` | 🟡 | Carrega dados ✅ | Baixa |
 | 28 | Relatórios — Exportação | `/relatorios/exportar` | 🟡 | Carrega dados ✅; export CSV renderiza HTML em vez de download (FEAT-006) | Média |
 | 29 | Ferramentas — Screener | `/ferramentas/screener` | 🟡 | Carrega dados ✅ | Baixa |
-| 30 | Ferramentas — Comparador | `/ferramentas/comparador` | 🟡 | Tela carrega; botão "Comparar" não aciona nada (BUG-019) | Alta |
+| 30 | Ferramentas — Comparador | `/ferramentas/comparador` | ✅ | Botão "Comparar" funcionando (BUG-019 RESOLVIDO: parâmetro `limit` corrigido para `per_page`) | — |
 | 31 | Ferramentas — Calculadora IR | `/ferramentas/calculadora-ir` | 🟡 | Carrega dados ✅ | Baixa |
 | 32 | Ferramentas — Simulador | `/ferramentas/simulador` | 🟡 | Carrega dados ✅ | Baixa |
 | 33 | Ferramentas — Reconciliação | `/ferramentas/reconciliacao` | 🟡 | Carrega dados ✅ | Baixa |
@@ -778,8 +778,6 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
 - ✅ **ENUMs Corrigidos**: `dividend_yield` ajustado para < 10, `tipomovimentacao` mapeado
 - ✅ **Dados Carregados**: 3 usuários, 7 ativos, 4 transações, 2 proventos, 2 movimentações, 3 alertas
 - ✅ **Script Corrigido**: Mapeamento de ENUMs como strings (não objetos)
-
-> **Nota:** Lições aprendidas durante a auditoria funcional (L-DB-008 a L-DB-014) foram consolidadas em `docs/LESSONS_LEARNED.md` (seção 💾 Database).
 
 ### 📊 Matriz de Documentação DB (Análise Completa)
 

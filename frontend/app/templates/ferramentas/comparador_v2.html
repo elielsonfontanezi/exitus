@@ -92,7 +92,7 @@ function pageDataExtend() {
         ],
 
         async loadData() {
-            const res = await this.apiFetch('/api/ativos?limit=200');
+            const res = await this.apiFetch('/api/ativos?per_page=200');
             if (res?.data) {
                 this.ativosList = (res.data.ativos || []).sort((a, b) => (a.ticker || '').localeCompare(b.ticker || ''));
             }

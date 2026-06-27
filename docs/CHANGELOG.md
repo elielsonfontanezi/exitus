@@ -8,6 +8,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — BUG-019: Comparador de ativos não funciona (26/06/2026)
+
+**Causa raiz:** `comparador_v2.html` chamava `/api/ativos?limit=200` — o endpoint aceita `per_page`, não `limit`. O parâmetro `limit` era ignorado, retornando apenas 20 ativos (default). Se os tickers selecionados não estavam nos primeiros 20, `comparar()` encontrava `ativo = {}` e mostrava dados vazios.
+
+**Artefatos modificados:**
+- `frontend/app/templates/ferramentas/comparador_v2.html`: `?limit=200` → `?per_page=200`
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-019 marcado como ✅ RESOLVIDO; resumo executivo atualizado (4 OK, 32 PARCIAL)
+
+**Impacto:** Comparador agora carrega todos os ativos (200) e compara corretamente. Auditoria funcional: 4 OK, 32 PARCIAL, 0 QUEBRADO.
+
+---
+
 ### Fix — BUG-011: Planos de compra sem entrada no menu (26/06/2026)
 
 **Causa raiz:** Funcionalidade de Planos de Compra/Venda estava acessível apenas por URL direta (`/planos-compra/`, `/planos-venda/`), sem entrada no menu horizontal. Usuários não conseguiam descobrir a funcionalidade.
