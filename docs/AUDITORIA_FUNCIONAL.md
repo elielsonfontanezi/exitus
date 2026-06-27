@@ -20,8 +20,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 4 |
-| 🟡 PARCIAL | 32 |
+| ✅ OK | 5 |
+| 🟡 PARCIAL | 31 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -61,7 +61,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 20 | Fiscal — IR Mensal | `/imposto-renda/mensal` | 🟡 | Carrega dados ✅; `API_BASE` hardcoded como `exitus-backend:5000` (BUG-009) | Média |
 | 21 | Fiscal — DARFs | `/imposto-renda/darfs` | 🟡 | Carrega dados ✅; `API_BASE` hardcoded (BUG-009) | Média |
 | 22 | Fiscal — Histórico | `/imposto-renda/historico` | 🟡 | Carrega dados ✅ | Baixa |
-| 23 | Fiscal — DIRPF | `/imposto-renda/declaracao` | � | Carrega dados ✅; `dados`/`erro` não passados ao template (BUG-010); `API_BASE` hardcoded (BUG-009) | Alta |
+| 23 | Fiscal — DIRPF | `/imposto-renda/declaracao` | ✅ | Carrega dados ✅; `dados`/`erro` passados ao template via `window.__DIRPF_DADOS__` (BUG-010 RESOLVIDO — já estava correto no código); BUG-009 RESOLVIDO | — |
 | 24 | Relatórios — Mensal | `/relatorios/mensal` | 🟡 | Carrega dados ✅ | Baixa |
 | 25 | Relatórios — Anual | `/relatorios/anual` | 🟡 | Carrega dados ✅ | Baixa |
 | 26 | Relatórios — Extrato | `/relatorios/extrato` | 🟡 | Carrega dados ✅ | Baixa |

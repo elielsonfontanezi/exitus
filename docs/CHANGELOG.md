@@ -8,6 +8,17 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — BUG-010: DIRPF não passa dados ao template (27/06/2026)
+
+**Causa raiz:** Após investigação, BUG-010 já estava resolvido no código atual. A rota `fiscal.py:declaracao()` passa `dados=dados, erro=erro, ano=ano` ao template `declaracao_v2.html`, que injeta via `window.__DIRPF_DADOS__` e `window.__DIRPF_ANO__`. A auditoria estava desatualizada.
+
+**Artefatos modificados:**
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-010 marcado como ✅ RESOLVIDO; resumo executivo atualizado (5 OK, 31 PARCIAL)
+
+**Impacto:** Auditoria funcional atualizada: 5 OK, 31 PARCIAL, 0 QUEBRADO.
+
+---
+
 ### Fix — BUG-019: Comparador de ativos não funciona (26/06/2026)
 
 **Causa raiz:** `comparador_v2.html` chamava `/api/ativos?limit=200` — o endpoint aceita `per_page`, não `limit`. O parâmetro `limit` era ignorado, retornando apenas 20 ativos (default). Se os tickers selecionados não estavam nos primeiros 20, `comparar()` encontrava `ativo = {}` e mostrava dados vazios.

@@ -1,10 +1,13 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 26/06/2026  
-> **Status:** 🟡 **Auditoria Funcional em andamento — 4 OK, 32 PARCIAL, 0 QUEBRADO**  
+> **Status:** 🟡 **Auditoria Funcional em andamento — 5 OK, 31 PARCIAL, 0 QUEBRADO**  
 > **Versão:** v0.9.25
 
-### 🔧 Últimas correções (26/06/2026)
+### 🔧 Últimas correções (27/06/2026)
+- **BUG-010 ✅ RESOLVIDO:** DIRPF não passa dados ao template. Após investigação, código já estava correto — rota passa `dados`/`erro`/`ano` e template injeta via `window.__DIRPF_DADOS__`. Auditoria desatualizada. Auditoria: 5 OK, 31 PARCIAL, 0 QUEBRADO.
+
+### 🔧 Correções anteriores (26/06/2026)
 - **BUG-019 ✅ RESOLVIDO:** Comparador de ativos não funciona. Causa raiz: `comparador_v2.html` usava `?limit=200` mas endpoint aceita `per_page`. Correção: `?limit=200` → `?per_page=200`. Auditoria: 4 OK, 32 PARCIAL, 0 QUEBRADO.
 - **BUG-011 ✅ RESOLVIDO:** Planos de compra/venda sem entrada no menu. Dropdown "Estratégia" adicionado ao menu horizontal com Planos de Compra/Venda e Buy Signals/Alertas. Auditoria: 3 OK, 33 PARCIAL, 0 QUEBRADO.
 - **TECH-001 ✅ RESOLVIDO:** ValueError refatorado para exceções tipadas em 5 services (`parametros_macro`, `rfcalc`, `cambio`, `ir`, `alerta`). Mapeamento: `ConflictError` (duplicatas) → 409, `NotFoundError` (não encontrado) → 404, `ValidationError` (validação) → 400. Testes atualizados: 567/574 passando (98.8%).
