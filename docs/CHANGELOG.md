@@ -8,6 +8,17 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — BUG-013: Filtro de data pisca ao digitar ano (27/06/2026)
+
+**Causa raiz:** Após investigação, BUG-013 já estava resolvido no código atual. `x-model.lazy` já aplicado nos inputs `type="date"` em `movimentacoes.html` (linhas 50 e 52). A auditoria tinha seções contraditórias — algumas marcavam como resolvido, outras como pendente.
+
+**Artefatos modificados:**
+- `docs/AUDITORIA_FUNCIONAL.md`: 3 seções contraditórias atualizadas para BUG-013 RESOLVIDO (linhas 33, 288, 295)
+
+**Impacto:** Auditoria funcional consistente — BUG-013 marcado como resolvido em todas as seções.
+
+---
+
 ### Fix — BUG-010: DIRPF não passa dados ao template (27/06/2026)
 
 **Causa raiz:** Após investigação, BUG-010 já estava resolvido no código atual. A rota `fiscal.py:declaracao()` passa `dados=dados, erro=erro, ano=ano` ao template `declaracao_v2.html`, que injeta via `window.__DIRPF_DADOS__` e `window.__DIRPF_ANO__`. A auditoria estava desatualizada.

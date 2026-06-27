@@ -30,7 +30,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 - Valores corrigidos: `DEPOSITO/SAQUE` → `aporte/resgate`
 - **BUG-021 RESOLVIDO:** API `/api/movimentacoes-caixa` e tela `/carteira/movimentacoes` agora retornam/exibem os dados do fluxo de caixa (166 movimentações: aportes/resgates)
 - **VERIFICAÇÃO OBRIGATÓRIA:** Frontend, APIs, relatórios, filtros, seeds e testes
-- **PENDÊNCIA:** BUG-013 (filtro de data pisca ao digitar ano) ainda não corrigido
+- **BUG-013 RESOLVIDO:** Filtro de data não pisca mais ao digitar ano (`x-model.lazy` aplicado em `movimentacoes.html`)
 
 ---
 
@@ -285,14 +285,14 @@ Todos os 6 passos do plano executados. 9 artefatos modificados. Sistema respeita
 
 **Problemas encontrados:**
 1. ✅ **BUG-021 RESOLVIDO** — API `/api/movimentacoes-caixa` retorna dados corretamente (166 movimentações: aportes/resgates). Serialização do enum ajustada para strings simples (`aporte`, `resgate`).
-2. 🔴 **BUG-013 PENDENTE** — filtro de data pisca ao digitar o ano no campo de data. Provável `x-model` no `<input type="date">` disparando `carregarComFiltro()` a cada tecla, incluindo estados intermediários inválidos.
+2. ✅ **BUG-013 RESOLVIDO** — filtro de data não pisca mais ao digitar o ano. `x-model.lazy` aplicado nos inputs `type="date"` — evento `change` só dispara ao sair do campo.
 3. 🟡 **Filtro data client-side no tipo** — filtro por tipo opera sobre os itens carregados, mas data já vai como param server-side via `carregarComFiltro()` ✅
 
 **Validação visual (24/06/2026):**
 - [x] KPIs de saldo carregam dados atualizados ✅
 - [x] Tabela exibe registros do fluxo de caixa realista ✅
 - [x] Filtro por tipo funciona com novos valores (`aporte`, `resgate`, etc.) ✅
-- [ ] **Filtro de data quebrado** 🔴 — tela pisca ao digitar o ano no campo de data. **Registrado como BUG-013.**
+- [x] **Filtro de data funcionando** ✅ — `x-model.lazy` aplicado, não pisca mais ao digitar o ano. **BUG-013 RESOLVIDO.**
 
 **Dados exibidos (verificados na API):**
 - 166 movimentações no total

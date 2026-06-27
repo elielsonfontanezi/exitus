@@ -5,6 +5,7 @@
 > **Versão:** v0.9.25
 
 ### 🔧 Últimas correções (27/06/2026)
+- **BUG-013 ✅ RESOLVIDO:** Filtro de data pisca ao digitar ano. Após investigação, `x-model.lazy` já aplicado em `movimentacoes.html`. Auditoria tinha seções contraditórias — 3 linhas atualizadas para RESOLVIDO.
 - **BUG-010 ✅ RESOLVIDO:** DIRPF não passa dados ao template. Após investigação, código já estava correto — rota passa `dados`/`erro`/`ano` e template injeta via `window.__DIRPF_DADOS__`. Auditoria desatualizada. Auditoria: 5 OK, 31 PARCIAL, 0 QUEBRADO.
 
 ### 🔧 Correções anteriores (26/06/2026)
