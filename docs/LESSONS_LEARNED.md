@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 26/06/2026 — L-BE-001 adicionada (exceções tipadas vs ValueError), L-DB-008 a L-DB-014 adicionadas (Database)  
+> **Atualizado:** 27/06/2026 — L-FE-011 adicionada (separação server-side vs client-side URLs), L-DB-008 a L-DB-014 adicionadas (Database), L-BE-001 adicionada (exceções tipadas vs ValueError)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -141,8 +141,36 @@ const API_BASE_URL = '{{ config.get("BACKEND_API_URL", "http://localhost:5000") 
 
 **Padrão complementar:** `base.html` deve sempre injetar `window.API_BASE_URL` para templates admin (que não estendem `base_interna.html`):
 ```html
-window.API_BASE_URL = '{{ config.get("BACKEND_API_URL", "http://localhost:5000") }}';
+window.API_BASE_URL = '{{ config.get("BROWSER_API_URL", "http://localhost:5000") }}';
 ```
+
+---
+
+### L-FE-011 — URLs server-side vs client-side devem ser variáveis separadas
+**Origem:** BUG-009v2 — Dashboard sem dados (ERR_NAME_NOT_RESOLVED) | **Data:** 27/06/2026
+
+**Erro:** O frontend Flask roda dentro do container `exitus-frontend` e precisa de duas URLs distintas para o backend:
+1. **Server-side** (container→container, rede podman): `http://exitus-backend:5000`
+2. **Client-side** (browser→backend, rede host): `http://localhost:5000` (ou URL pública em produção)
+
+Uma única variável `BACKEND_API_URL` não serve para os dois casos. Se apontar para `exitus-backend:5000`, o browser não resolve (ERR_NAME_NOT_RESOLVED). Se apontar para `localhost:5000`, chamadas server-side do container frontend falham.
+
+**Correto:** Duas variáveis de ambiente separadas:
+```python
+# Config (frontend/app/config.py)
+BACKEND_API_URL = os.getenv('BACKEND_API_URL', 'http://localhost:5000')  # server-side
+BROWSER_API_URL = os.getenv('BROWSER_API_URL', 'http://localhost:5000')  # client-side
+```
+```html
+<!-- base_interna.html — client-side usa BROWSER_API_URL -->
+const API_BASE_URL = '{{ config.get("BROWSER_API_URL", "http://localhost:5000") }}';
+```
+```python
+# fiscal.py — server-side usa BACKEND_API_URL
+requests.get(f"{Config.BACKEND_API_URL}/api/...")
+```
+
+**Regra:** Sempre separar URLs server-side (container→container) de client-side (browser→backend). Em produção (Railway/Render/Fly.io), cada uma aponta para endpoints diferentes (interno vs público). Ver `docs/ARCHITECTURE.md` → "Exemplos de Deploy — Configuração por Cenário".
 
 ---
 

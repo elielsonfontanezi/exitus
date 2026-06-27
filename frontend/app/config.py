@@ -12,8 +12,10 @@ load_dotenv()
 class Config:
     """Configurações da aplicação Frontend"""
     
-    # Backend API
+    # Backend API — server-side (container→container, rede podman)
     BACKEND_API_URL = os.getenv('BACKEND_API_URL', 'http://localhost:5000')
+    # Browser API — client-side (browser→backend, URL publica ou localhost)
+    BROWSER_API_URL = os.getenv('BROWSER_API_URL', 'http://localhost:5000')
     
     # Flask
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')

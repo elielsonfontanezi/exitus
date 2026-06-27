@@ -1,10 +1,11 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 26/06/2026  
+> **Data:** 27/06/2026  
 > **Status:** 🟡 **Auditoria Funcional em andamento — 7 OK, 29 PARCIAL, 0 QUEBRADO**  
-> **Versão:** v0.9.25
+> **Versão:** v0.9.26
 
 ### 🔧 Últimas correções (27/06/2026)
+- **BUG-009v2 ✅ RESOLVIDO:** Dashboard e todas as telas do menu sem dados — `ERR_NAME_NOT_RESOLVED`. Causa raiz: `API_BASE_URL` nos templates usava `BACKEND_API_URL` (hostname interno do container `exitus-backend:5000`), que o browser não resolve. Solução: separar `BACKEND_API_URL` (server-side, container→container) de `BROWSER_API_URL` (client-side, browser→backend). 7 cenários de deploy documentados em `ARCHITECTURE.md`. L-FE-011 adicionada.
 - **Dashboard ✅ RESOLVIDO:** CDI/Ibovespa via env vars (não hardcoded); meta via API `/api/auth/me`. FEAT-010 registrada com nota de análise minuciosa do backend antes de implementar endpoint dinâmico. Auditoria: 7 OK, 29 PARCIAL, 0 QUEBRADO.
 - **Corretoras CRUD ✅ RESOLVIDO:** Após investigação, CRUD já estava totalmente implementado (frontend + backend). Auditoria desatualizada. Auditoria: 6 OK, 30 PARCIAL, 0 QUEBRADO.
 - **BUG-013 ✅ RESOLVIDO:** Filtro de data pisca ao digitar ano. Após investigação, `x-model.lazy` já aplicado em `movimentacoes.html`. Auditoria tinha seções contraditórias — 3 linhas atualizadas para RESOLVIDO.

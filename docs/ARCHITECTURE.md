@@ -186,6 +186,121 @@ User: non-root (exitus:1000)
 - Isolamento de segurança (DB não exposto ao frontend)
 - Escalabilidade (cada camada pode ter múltiplas instâncias)
 
+### Separação de URLs — Server-Side vs Client-Side (BUG-009v2)
+
+**Problema:** O frontend Flask roda dentro do container `exitus-frontend` e precisa de duas URLs distintas para o backend:
+
+1. **Server-side** (container→container, rede podman `exitus-net`): usa hostname interno `exitus-backend:5000`
+2. **Client-side** (browser→backend, rede host): usa porta mapeada `localhost:5000` (ou URL pública em produção)
+
+Uma única variável `BACKEND_API_URL` não serve para os dois casos. Se apontar para `exitus-backend:5000`, o browser não resolve (ERR_NAME_NOT_RESOLVED). Se apontar para `localhost:5000`, chamadas server-side do container frontend falham.
+
+**Solução — Duas variáveis de ambiente:**
+
+| Variável | Escopo | Uso | Default (dev local) |
+|----------|--------|-----|---------------------|
+| `BACKEND_API_URL` | Server-side | `fiscal.py`, rotas Flask que chamam API internamente | `http://localhost:5000` |
+| `BROWSER_API_URL` | Client-side | Templates HTML, Alpine.js, `window.API_BASE_URL` | `http://localhost:5000` |
+
+**Fluxo correto:**
+
+1. **Browser** → `http://localhost:8080/dashboard` → **Frontend (container)**
+2. **Frontend** renderiza HTML com `window.API_BASE_URL = BROWSER_API_URL` (client-side)
+3. **Alpine.js** (no browser) → `fetch(BROWSER_API_URL + '/api/...')` → **Backend (porta 5000)**
+4. **Frontend** (server-side, `fiscal.py`) → `requests.get(BACKEND_API_URL + '/api/...')` → **Backend (rede interna)**
+
+**Artefatos afetados:**
+- `frontend/app/config.py`: adicionar `BROWSER_API_URL`
+- `frontend/app/templates/base.html`: `window.API_BASE_URL` usa `BROWSER_API_URL`
+- `frontend/app/templates/components/base_interna.html`: `API_BASE_URL` usa `BROWSER_API_URL`
+- `.env*.example`: adicionar `BROWSER_API_URL`
+
+---
+
+### Exemplos de Deploy — Configuração por Cenário
+
+#### Cenário 1 — Desenvolvimento Local (Podman)
+
+```env
+# .env (host)
+BACKEND_API_URL=http://exitus-backend:5000
+BROWSER_API_URL=http://localhost:5000
+```
+
+- Frontend container: server-side usa `exitus-backend:5000` (rede podman)
+- Browser: client-side usa `localhost:5000` (porta mapeada no host)
+
+#### Cenário 2 — Railway (PaaS)
+
+```env
+# Railway — variáveis de ambiente do serviço frontend
+BACKEND_API_URL=https://exitus-backend.internal.railway.app
+BROWSER_API_URL=https://api.exitus.com
+```
+
+- Railway fornece URL interna (`*.internal.railway.app`) para comunicação entre serviços
+- URL pública (`api.exitus.com` via domínio customizado ou `*.up.railway.app`) para browser
+- Se backend e frontend no mesmo serviço: `BROWSER_API_URL=https://exitus.com/api`
+
+#### Cenário 3 — Render (PaaS)
+
+```env
+# Render — variáveis de ambiente do serviço frontend
+BACKEND_API_URL=http://exitus-backend:10000
+BROWSER_API_URL=https://exitus-api.onrender.com
+```
+
+- Render fornece URL interna (`*.onrender.com` na rede privada) para server-side
+- URL pública para browser
+- Domínio customizado: `BROWSER_API_URL=https://api.exitus.com`
+
+#### Cenário 4 — Fly.io (PaaS)
+
+```env
+# Fly.io — variáveis de ambiente do serviço frontend
+BACKEND_API_URL=http://exitus-backend.internal:8080
+BROWSER_API_URL=https://api.exitus.app
+```
+
+- Fly.io usa `.internal` para comunicação entre containers na mesma organização
+- URL pública (`*.fly.dev` ou domínio customizado) para browser
+
+#### Cenário 5 — CDN/Proxy + API Gateway
+
+```env
+# Frontend servido via CDN (Cloudflare/Netlify), backend via API Gateway
+BACKEND_API_URL=https://gateway-internal.exitus.com
+BROWSER_API_URL=https://api.exitus.com
+```
+
+- Frontend estático (HTML/JS/CSS) servido via CDN — sem server-side
+- `BACKEND_API_URL` só usado se frontend tiver rotas server-side (SSR)
+- `BROWSER_API_URL` aponta para API Gateway público que roteia para backend
+
+#### Cenário 6 — Mesmo Domínio (Reverse Proxy)
+
+```env
+# Tudo no mesmo domínio via reverse proxy (nginx/traefik)
+BACKEND_API_URL=http://exitus-backend:5000
+BROWSER_API_URL=/api
+```
+
+- Reverse proxy roteia `/api/*` para backend e `/*` para frontend
+- Browser usa URL relativa `/api` — sem CORS, sem exposição direta do backend
+- Server-side usa hostname interno do container
+
+#### Cenário 7 — Docker Compose (produção self-hosted)
+
+```env
+# .env (host)
+BACKEND_API_URL=http://exitus-backend:5000
+BROWSER_API_URL=https://api.exitus.com
+```
+
+- Containers na mesma rede bridge (`exitus-net`)
+- Reverse proxy (nginx/traefik) na frente do backend, exposto como `api.exitus.com`
+- Browser usa URL pública com TLS
+
 ---
 
 ## Stack Tecnológica Detalhada

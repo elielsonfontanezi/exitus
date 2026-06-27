@@ -8,6 +8,30 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — BUG-009v2: Dashboard sem dados — URLs server-side vs client-side (27/06/2026)
+
+**Causa raiz:** O commit BUG-009 (`201e0a9`) mudou `window.API_BASE || 'http://localhost:5000'` → `API_BASE_URL` em `dashboard/index_v2.html`. Mas `API_BASE_URL` é definida em `base_interna.html` como `config.get("BACKEND_API_URL", ...)`, e no container `BACKEND_API_URL=http://exitus-backend:5000` (hostname interno da rede podman). O browser não resolve `exitus-backend` — erro `ERR_NAME_NOT_RESOLVED`. Todas as telas que usam `API_BASE_URL` (Alpine.js `fetch()`) ficavam em loading infinito.
+
+**Solução:** Separar URLs server-side vs client-side:
+- `BACKEND_API_URL` — server-side (container→container, rede podman): `http://exitus-backend:5000`
+- `BROWSER_API_URL` (nova) — client-side (browser→backend): `http://localhost:5000` (ou URL pública em produção)
+
+**Artefatos modificados:**
+- `frontend/app/config.py`: adicionada `BROWSER_API_URL = os.getenv('BROWSER_API_URL', 'http://localhost:5000')`
+- `frontend/app/templates/base.html`: `window.API_BASE_URL` usa `BROWSER_API_URL`
+- `frontend/app/templates/components/base_interna.html`: `API_BASE_URL` usa `BROWSER_API_URL`
+- `frontend/.env`: criado com `BROWSER_API_URL=http://localhost:5000`
+- `frontend/.env*.example` (4 arquivos): adicionado `BROWSER_API_URL=http://localhost:5000`
+- `docs/ARCHITECTURE.md`: seção "Separação de URLs — Server-Side vs Client-Side" + 7 cenários de deploy (Podman, Railway, Render, Fly.io, CDN/Proxy, Reverse Proxy, Docker Compose)
+- `docs/OPERATIONS_RUNBOOK.md`: `.env` example atualizado com `BROWSER_API_URL` + nota sobre separação
+- `docs/LESSONS_LEARNED.md`: L-FE-011 adicionada
+
+**Validação:** Dashboard carregou com dados reais (R$ 1.708.563,02, 40 ativos, 18 carteiras) — todas as 7 chamadas de API retornaram 200 OK.
+
+**Impacto:** Todas as telas do menu voltam a mostrar dados. Arquitetura preparada para produção (Railway/Render/Fly.io/CDN/Reverse Proxy).
+
+---
+
 ### Fix — Dashboard: CDI/Ibovespa/meta não hardcoded (27/06/2026)
 
 **Causa raiz:** Após investigação, CDI/Ibovespa não são hardcoded no código — vêm de env vars (`Config.CDI_ANUAL`, `Config.IBOVESPA_ANUAL`). Meta de patrimônio vem de `user.meta_patrimonio` via API `/api/auth/me`. A auditoria estava desatualizada.

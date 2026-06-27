@@ -132,6 +132,7 @@ JWT_SECRET_KEY=chave_jwt_256_bits_aqui
 # Flask Frontend
 FLASK_FRONTEND_PORT=8080
 BACKEND_API_URL=http://exitus-backend:5000
+BROWSER_API_URL=http://localhost:5000
 
 # APIs de Cotações (Opcional - M7.5)
 # Alpha Vantage API
@@ -174,6 +175,12 @@ TZ=America/Sao_Paulo
   ```bash
   python3 -c "import secrets; print(secrets.token_hex(32))"
   ```
+
+**📌 Separação de URLs — `BACKEND_API_URL` vs `BROWSER_API_URL`:**
+- `BACKEND_API_URL`: usada em chamadas **server-side** (container→container, rede podman). Ex: `fiscal.py` chamando API do backend.
+- `BROWSER_API_URL`: usada em chamadas **client-side** (browser→backend). Ex: Alpine.js `fetch()` no dashboard.
+- Em desenvolvimento local (Podman): `BACKEND_API_URL=http://exitus-backend:5000` e `BROWSER_API_URL=http://localhost:5000`
+- **Para exemplos de configuração em produção (Railway, Render, Fly.io, CDN/Proxy, Reverse Proxy, Docker Compose)**, consulte [`docs/ARCHITECTURE.md` → "Exemplos de Deploy — Configuração por Cenário"](ARCHITECTURE.md#exemplos-de-deploy--configuração-por-cenário)
 
 ---
 

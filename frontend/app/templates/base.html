@@ -181,8 +181,8 @@
     
     <!-- Variáveis Globais para Alpine.js -->
     <script>
-        // URL base da API backend — única fonte de verdade no frontend
-        window.API_BASE_URL = '{{ config.get("BACKEND_API_URL", "http://localhost:5000") }}';
+        // URL base da API backend — única fonte de verdade no frontend (client-side)
+        window.API_BASE_URL = '{{ config.get("BROWSER_API_URL", "http://localhost:5000") }}';
 
         // Definir variáveis globais para compatibilidade com templates
         window.currentCurrency = localStorage.getItem('preferredCurrency') || 'BRL';
