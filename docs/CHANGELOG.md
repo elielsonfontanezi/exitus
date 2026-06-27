@@ -8,6 +8,19 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — Dashboard: CDI/Ibovespa/meta não hardcoded (27/06/2026)
+
+**Causa raiz:** Após investigação, CDI/Ibovespa não são hardcoded no código — vêm de env vars (`Config.CDI_ANUAL`, `Config.IBOVESPA_ANUAL`). Meta de patrimônio vem de `user.meta_patrimonio` via API `/api/auth/me`. A auditoria estava desatualizada.
+
+**FEAT-010 registrada:** Indicadores de mercado (CDI/Ibovespa) sem endpoint dinâmico. Antes de implementar, fazer análise minuciosa do backend para confirmar que não há APIs existentes para os indicadores esperados (CDI, Ibovespa, SELIC, IPCA). Investigar: `/api/parametros-macro` (tem `taxa_livre_risco` ≈ CDI, `inflacao_anual` ≈ IPCA, mas sem CDI/Ibovespa específicos); `/api/portfolio/rentabilidade?benchmark=IBOV` (calcula vs IBOV mas não retorna valor do Ibovespa); tabela `parametros_macro` (campos: `taxa_livre_risco`, `crescimento_medio`, `custo_capital`, `inflacao_anual`, `cap_rate_fii`, `ytm_rf` — sem CDI/Ibovespa anuais). Conclusão preliminar: não há endpoint específico, mas confirmar exhaustivamente antes de criar novo.
+
+**Artefatos modificados:**
+- `docs/AUDITORIA_FUNCIONAL.md`: Item 2 marcado como ✅ OK; FEAT-010 atualizada com nota de análise obrigatória; resumo executivo atualizado (7 OK, 29 PARCIAL)
+
+**Impacto:** Auditoria funcional atualizada: 7 OK, 29 PARCIAL, 0 QUEBRADO.
+
+---
+
 ### Fix — Corretoras CRUD já implementado (27/06/2026)
 
 **Causa raiz:** Após investigação, CRUD de corretoras já estava totalmente implementado em frontend (`corretoras.html` com botões criar/editar/excluir/sincronizar + modal) e backend (`/api/corretoras` com GET/POST/PUT/DELETE). A auditoria estava desatualizada.

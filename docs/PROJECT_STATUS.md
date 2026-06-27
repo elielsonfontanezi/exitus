@@ -1,10 +1,11 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 26/06/2026  
-> **Status:** 🟡 **Auditoria Funcional em andamento — 6 OK, 30 PARCIAL, 0 QUEBRADO**  
+> **Status:** 🟡 **Auditoria Funcional em andamento — 7 OK, 29 PARCIAL, 0 QUEBRADO**  
 > **Versão:** v0.9.25
 
 ### 🔧 Últimas correções (27/06/2026)
+- **Dashboard ✅ RESOLVIDO:** CDI/Ibovespa via env vars (não hardcoded); meta via API `/api/auth/me`. FEAT-010 registrada com nota de análise minuciosa do backend antes de implementar endpoint dinâmico. Auditoria: 7 OK, 29 PARCIAL, 0 QUEBRADO.
 - **Corretoras CRUD ✅ RESOLVIDO:** Após investigação, CRUD já estava totalmente implementado (frontend + backend). Auditoria desatualizada. Auditoria: 6 OK, 30 PARCIAL, 0 QUEBRADO.
 - **BUG-013 ✅ RESOLVIDO:** Filtro de data pisca ao digitar ano. Após investigação, `x-model.lazy` já aplicado em `movimentacoes.html`. Auditoria tinha seções contraditórias — 3 linhas atualizadas para RESOLVIDO.
 - **BUG-010 ✅ RESOLVIDO:** DIRPF não passa dados ao template. Após investigação, código já estava correto — rota passa `dados`/`erro`/`ano` e template injeta via `window.__DIRPF_DADOS__`. Auditoria desatualizada. Auditoria: 5 OK, 31 PARCIAL, 0 QUEBRADO.

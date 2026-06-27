@@ -20,8 +20,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 6 |
-| 🟡 PARCIAL | 30 |
+| ✅ OK | 7 |
+| 🟡 PARCIAL | 29 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -39,7 +39,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | # | Módulo | URL | Status | Problemas | Prioridade |
 |---|--------|-----|--------|-----------|-----------|
 | 1 | Login | `/auth/login` | ✅ | Redesenhado: UX_DESIGN_SYSTEM aplicado, credenciais removidas, link Esqueceu removido (EXITUS-LOGIN-001) | — |
-| 2 | Dashboard | `/dashboard/` | 🟡 | CDI/Ibovespa hardcoded; meta hardcoded; token via localStorage pode falhar | Alta |
+| 2 | Dashboard | `/dashboard/` | ✅ | CDI/Ibovespa via env vars (Config.CDI_ANUAL, Config.IBOVESPA_ANUAL); meta via API /api/auth/me (user.meta_patrimonio). FEAT-010 proposta: endpoint dinamico para CDI/Ibovespa/SELIC/IPCA | Baixa |
 | 3 | Configurações — Perfil | `/configuracoes/perfil` | 🟡 | Somente leitura — sem edição de nome/email/senha | Média |
 | 4 | Configurações — Corretoras | `/configuracoes/corretoras` | ✅ | CRUD completo: botões criar/editar/excluir/sincronizar implementados (frontend + backend API) | — |
 | 5 | Operações — Import B3 | `/operacoes/` | 🟡 | Import funciona ✅; retorna 0 com fixture existente (idempotente por design); revalidado com dados novos: Transações=2 | — |
@@ -610,7 +610,7 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 | ~~FEAT-007~~ | ~~Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona~~ | 34 | **RESOLVIDA**: modal com informações completas; botão Detalhes na tabela; carregamento via API específica |
 | ~~FEAT-008~~ | ~~Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível~~ | 14 | **RESOLVIDA**: botão "Confirmar" já implementado em calendario_v2.html; função confirmarPagamento() completa; API /api/calendario-dividendos/{id}/confirmar-pagamento funcional |
 | FEAT-009 | **Import B3 não lista os registros importados** — resultado mostra apenas totais numéricos (Transações=N, Proventos=N). Usuário não sabe quais ativos foram criados/importados. **Fix:** exibir lista dos tickers importados e ativos criados automaticamente após import | 5 |
-| FEAT-010 | **Indicadores de mercado (CDI/Ibovespa) sem endpoint dinâmico** — atualmente valores vêm de variáveis de ambiente no frontend. **Fix:** criar backend `GET /api/indicadores` com CDI/Ibovespa atualizados automaticamente; dashboard consumir via API | 2 |
+| FEAT-010 | **Indicadores de mercado (CDI/Ibovespa) sem endpoint dinâmico** — atualmente valores vêm de variáveis de ambiente no frontend. **Fix:** criar backend `GET /api/indicadores` com CDI/Ibovespa atualizados automaticamente; dashboard consumir via API. **⚠️ ANÁLISE OBRIGATÓRIA:** Antes de implementar, fazer análise minuciosa do backend para confirmar que não há APIs existentes para os indicadores esperados (CDI, Ibovespa, SELIC, IPCA). Investigar: `/api/parametros-macro` (tem `taxa_livre_risco` ≈ CDI, `inflacao_anual` ≈ IPCA, mas sem CDI/Ibovespa específicos); `/api/portfolio/rentabilidade?benchmark=IBOV` (calcula vs IBOV mas não retorna valor do Ibovespa); tabela `parametros_macro` (campos: `taxa_livre_risco`, `crescimento_medio`, `custo_capital`, `inflacao_anual`, `cap_rate_fii`, `ytm_rf` — sem CDI/Ibovespa anuais). Conclusão preliminar: não há endpoint específico, mas confirmar exhaustivamente antes de criar novo | 2 |
 | FEAT-011 | **Saldo de corretoras não é dinâmico** — `sincronizar-saldo` resolve manualmente. **Fix:** remover coluna `saldo_atual` e calcular saldo sempre a partir de movimentações de caixa, ou atualizar automaticamente via triggers/eventos ao inserir movimentação | 4 |
 | FEAT-012 | **Refinamentos edição/exclusão transações** — implementar validações (bloquear se já liquidada/IR), período de carência, auditoria de alterações, motivo obrigatório para exclusão, indicadores visuais de bloqueio | 6, 7, 8 |
 | FEAT-013 | **Validação de força de senha** — indicador visual (fraca/média/forte) com critérios claros (tamanho, maiúsculas, números, especiais) ao trocar senha | 3 |
