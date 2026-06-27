@@ -20,8 +20,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 5 |
-| 🟡 PARCIAL | 31 |
+| ✅ OK | 6 |
+| 🟡 PARCIAL | 30 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -41,7 +41,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 1 | Login | `/auth/login` | ✅ | Redesenhado: UX_DESIGN_SYSTEM aplicado, credenciais removidas, link Esqueceu removido (EXITUS-LOGIN-001) | — |
 | 2 | Dashboard | `/dashboard/` | 🟡 | CDI/Ibovespa hardcoded; meta hardcoded; token via localStorage pode falhar | Alta |
 | 3 | Configurações — Perfil | `/configuracoes/perfil` | 🟡 | Somente leitura — sem edição de nome/email/senha | Média |
-| 4 | Configurações — Corretoras | `/configuracoes/corretoras` | 🟡 | Listagem OK — sem botões CRUD (criar/editar/excluir corretora) | Alta |
+| 4 | Configurações — Corretoras | `/configuracoes/corretoras` | ✅ | CRUD completo: botões criar/editar/excluir/sincronizar implementados (frontend + backend API) | — |
 | 5 | Operações — Import B3 | `/operacoes/` | 🟡 | Import funciona ✅; retorna 0 com fixture existente (idempotente por design); revalidado com dados novos: Transações=2 | — |
 | 6 | Operações — Compra | `/operacoes/` | 🟡 | Toggle funciona ✅; busca de ativo sem autocomplete (BUG-014 relacionado) | Média |
 | 7 | Operações — Venda | `/operacoes/` | 🟡 | Toggle funciona ✅; modo venda acessível e formulário exibido corretamente | Média |

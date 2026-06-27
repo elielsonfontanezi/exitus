@@ -8,6 +8,17 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — Corretoras CRUD já implementado (27/06/2026)
+
+**Causa raiz:** Após investigação, CRUD de corretoras já estava totalmente implementado em frontend (`corretoras.html` com botões criar/editar/excluir/sincronizar + modal) e backend (`/api/corretoras` com GET/POST/PUT/DELETE). A auditoria estava desatualizada.
+
+**Artefatos modificados:**
+- `docs/AUDITORIA_FUNCIONAL.md`: Item 4 marcado como ✅ OK; resumo executivo atualizado (6 OK, 30 PARCIAL)
+
+**Impacto:** Auditoria funcional atualizada: 6 OK, 30 PARCIAL, 0 QUEBRADO.
+
+---
+
 ### Fix — BUG-013: Filtro de data pisca ao digitar ano (27/06/2026)
 
 **Causa raiz:** Após investigação, BUG-013 já estava resolvido no código atual. `x-model.lazy` já aplicado nos inputs `type="date"` em `movimentacoes.html` (linhas 50 e 52). A auditoria tinha seções contraditórias — algumas marcavam como resolvido, outras como pendente.
