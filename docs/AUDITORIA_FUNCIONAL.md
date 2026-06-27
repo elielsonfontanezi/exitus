@@ -781,15 +781,15 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
 
 #### Lições Aprendidas (consolidadas em docs/LESSONS_LEARNED.md)
 
-As lições aprendidas durante a auditoria funcional (L-DB-001 a L-DB-007) foram consolidadas em `docs/LESSONS_LEARNED.md` (seção 💾 Database):
+As lições aprendidas durante a auditoria funcional foram consolidadas em `docs/LESSONS_LEARNED.md` (seção 💾 Database):
 
-- **L-DB-001:** Porta PostgreSQL (5433 host → 5432 container)
-- **L-DB-002:** Flask-Migrate vs ALTER direto
-- **L-DB-003:** ENUMs pré-requisitos
-- **L-DB-004:** Scripts de seed vs schema real
-- **L-DB-005:** ENUMs case sensitive
-- **L-DB-006:** Precisão numeric
-- **L-DB-007:** Documentação sincronizada (update_db_structure.sh)
+- **L-DB-008:** Porta PostgreSQL (5433 host → 5432 container)
+- **L-DB-009:** Flask-Migrate vs ALTER direto
+- **L-DB-010:** ENUMs pré-requisitos
+- **L-DB-011:** Scripts de seed vs schema real
+- **L-DB-012:** ENUMs case sensitive
+- **L-DB-013:** Precisão numeric
+- **L-DB-014:** Documentação sincronizada (update_db_structure.sh)
 
 ### 📊 Matriz de Documentação DB (Análise Completa)
 

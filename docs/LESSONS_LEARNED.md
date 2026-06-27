@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 26/06/2026 — L-BE-001 adicionada (exceções tipadas vs ValueError), L-DB-001 a L-DB-007 adicionadas (Database)  
+> **Atualizado:** 26/06/2026 — L-BE-001 adicionada (exceções tipadas vs ValueError), L-DB-008 a L-DB-014 adicionadas (Database)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -39,9 +39,9 @@ if quantidade_insuficiente:
 
 ---
 
-## � Database
+## 💾 Database
 
-### L-DB-001 — Porta PostgreSQL
+### L-DB-008 — Porta PostgreSQL
 **Origem:** Auditoria Funcional | **Data:** 2026
 
 **Erro:** Assumir porta 5432
@@ -52,7 +52,7 @@ if quantidade_insuficiente:
 
 ---
 
-### L-DB-002 — Flask-Migrate vs ALTER Direto
+### L-DB-009 — Flask-Migrate vs ALTER Direto
 **Origem:** Auditoria Funcional | **Data:** 2026
 
 **Problema:** `flask db migrate` falha com erros de conexão
@@ -63,7 +63,7 @@ if quantidade_insuficiente:
 
 ---
 
-### L-DB-003 — ENUMs Pré-requisitos
+### L-DB-010 — ENUMs Pré-requisitos
 **Origem:** Auditoria Funcional | **Data:** 2026
 
 **Erro:** Esquecer de criar ENUMs antes das tabelas
@@ -74,7 +74,7 @@ if quantidade_insuficiente:
 
 ---
 
-### L-DB-004 — Scripts de Seed vs. Schema Real
+### L-DB-011 — Scripts de Seed vs. Schema Real
 **Origem:** Auditoria Funcional | **Data:** 2026
 
 **Erro:** Script `load_scenario.py` com ENUMs desatualizados
@@ -86,7 +86,7 @@ if quantidade_insuficiente:
 
 ---
 
-### L-DB-005 — ENUMs Case Sensitive
+### L-DB-012 — ENUMs Case Sensitive
 **Origem:** Auditoria Funcional | **Data:** 2026
 
 **Erro:** Usar `'DEPOSITO'` quando banco espera `'deposito'`
@@ -97,7 +97,7 @@ if quantidade_insuficiente:
 
 ---
 
-### L-DB-006 — Precisão Numeric
+### L-DB-013 — Precisão Numeric
 **Origem:** Auditoria Funcional | **Data:** 2026
 
 **Erro:** `dividend_yield: 15.2` em `numeric(5,4)` (máx: 9.9999)
@@ -109,7 +109,7 @@ if quantidade_insuficiente:
 
 ---
 
-### L-DB-007 — Documentação Sincronizada
+### L-DB-014 — Documentação Sincronizada
 **Origem:** Auditoria Funcional | **Data:** 2026
 
 **Regra:** Atualizar `EXITUS_DB_STRUCTURE.txt` SEMPRE após mudanças
