@@ -8,6 +8,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — BUG-011: Planos de compra sem entrada no menu (26/06/2026)
+
+**Causa raiz:** Funcionalidade de Planos de Compra/Venda estava acessível apenas por URL direta (`/planos-compra/`, `/planos-venda/`), sem entrada no menu horizontal. Usuários não conseguiam descobrir a funcionalidade.
+
+**Artefatos modificados:**
+- `frontend/app/templates/components/menu_horizontal.html`: dropdown "Estratégia" adicionado com sub-seções "Planos Disciplinados" (Planos de Compra/Venda) e "Análise e Sinais" (Buy Signals, Alertas Estratégicos)
+- `docs/AUDITORIA_FUNCIONAL.md`: BUG-011 marcado como ✅ RESOLVIDO; resumo executivo atualizado (3 OK, 33 PARCIAL)
+
+**Impacto:** Usuários agora podem acessar Planos de Compra/Venda diretamente pelo menu principal. Auditoria funcional: 3 OK, 33 PARCIAL, 0 QUEBRADO.
+
+---
+
 ### Fix — TECH-001: ValueError refatorado para exceções tipadas em 5 services (26/06/2026)
 
 **Causa raiz:** 5 services (`parametros_macro`, `rfcalc`, `cambio`, `ir`, `alerta`) usavam `ValueError` genérico em vez de exceções tipadas de `app/utils/exceptions.py`, violando CODING_STANDARDS.md e impedindo mapeamento correto para HTTP status codes.

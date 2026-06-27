@@ -1,10 +1,11 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 26/06/2026  
-> **Status:** 🟡 **Auditoria Funcional em andamento — 2 OK, 34 PARCIAL, 0 QUEBRADO**  
+> **Status:** 🟡 **Auditoria Funcional em andamento — 3 OK, 33 PARCIAL, 0 QUEBRADO**  
 > **Versão:** v0.9.25
 
 ### 🔧 Últimas correções (26/06/2026)
+- **BUG-011 ✅ RESOLVIDO:** Planos de compra/venda sem entrada no menu. Dropdown "Estratégia" adicionado ao menu horizontal com Planos de Compra/Venda e Buy Signals/Alertas. Auditoria: 3 OK, 33 PARCIAL, 0 QUEBRADO.
 - **TECH-001 ✅ RESOLVIDO:** ValueError refatorado para exceções tipadas em 5 services (`parametros_macro`, `rfcalc`, `cambio`, `ir`, `alerta`). Mapeamento: `ConflictError` (duplicatas) → 409, `NotFoundError` (não encontrado) → 404, `ValidationError` (validação) → 400. Testes atualizados: 567/574 passando (98.8%).
 - **BUG-009 ✅ RESOLVIDO:** API_BASE hardcoded eliminado em 9 artefatos. Causa raiz: `base_interna.html` usava chave `FRONTEND_API_URL` (inexistente) em vez de `BACKEND_API_URL` — todos os 25 templates _v2 caíam no fallback `http://localhost:5000`. Fix: (1) `base_interna.html` corrigido — propaga para todos _v2; (2) `base.html` injeta `window.API_BASE_URL` globalmente — cobre admin templates; (3) `fiscal.py` usa `Config.BACKEND_API_URL`; (4) admin templates + `operacoes.js` usam `window.API_BASE_URL`. Sistema agora respeita `BACKEND_API_URL` do `.env` em todos os ambientes.
 

@@ -1,4 +1,4 @@
-s0# Auditoria Funcional — Sistema Exitus
+# Auditoria Funcional — Sistema Exitus
 **Data:** 18/06/2026  
 **Revalidado:** 22/06/2026  
 **Auditor:** Cascade (análise de código + browser)  
@@ -20,8 +20,8 @@ s0# Auditoria Funcional — Sistema Exitus
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 2 |
-| 🟡 PARCIAL | 34 |
+| ✅ OK | 3 |
+| 🟡 PARCIAL | 33 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -72,7 +72,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 31 | Ferramentas — Calculadora IR | `/ferramentas/calculadora-ir` | 🟡 | Carrega dados ✅ | Baixa |
 | 32 | Ferramentas — Simulador | `/ferramentas/simulador` | 🟡 | Carrega dados ✅ | Baixa |
 | 33 | Ferramentas — Reconciliação | `/ferramentas/reconciliacao` | 🟡 | Carrega dados ✅ | Baixa |
-| 34 | Estratégia — Planos | `/planos-compra/` | 🟡 | Acessível por URL direta; lista e detalhes de planos OK; **sem entrada no menu** (BUG-011) | Alta |
+| 34 | Estratégia — Planos | `/planos-compra/` | ✅ | Acessível por URL direta e via menu (BUG-011 RESOLVIDO: dropdown Estratégia adicionado ao menu horizontal com Planos de Compra/Venda) | — |
 | 35 | Alertas | `/alertas/` | 🟡 | Acessível pelo menu; lista de alertas carrega ✅ | Baixa |
 
 ---
