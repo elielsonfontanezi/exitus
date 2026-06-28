@@ -206,6 +206,10 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 |--------|---------------|--------|
 | **VALUATION-001** | Adicionar EPS e FCF ao modelo Ativo | ✅ Concluído (28/06/2026) |
 | **CLEANUP-MIGRATIONS-001** | Remover diretório alembic/ duplicado (dívida técnica) | 📋 Planejado |
+| **VALUATION-002** | Popular EPS/FCF reais no banco (yfinance ou seed) | 🔴 Alta |
+| **BUG-VAL-001** | Corrigir fórmulas Bazin/Gordon/Graham (bugs estruturais) | 🔴 Alta |
+| **BUG-VAL-002** | Valor Justo Médio: usar mediana, não média simples | 🟡 Média |
+| **BUG-VAL-003** | Componente Margem do Score: 0/30 pts com 91,5% de margem | 🟡 Média |
 | REBALANCE-001 | Rebalanceamento automático | 📋 Planejado |
 | CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
@@ -251,6 +255,85 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 4. Atualizar `CODING_STANDARDS.md` com regra: migrations sempre em `migrations/versions/`
 
 **Prioridade:** Baixa | **Risco:** Baixo
+
+### VALUATION-002 — Popular EPS/FCF reais no banco (🔴 Alta)
+
+**Problema identificado (28/06/2026):**
+- Campos `eps` e `fcf` existem no modelo (VALUATION-001) mas estão NULL no banco
+- Fallback (eps=2,50, fcf=5,0) ainda é usado → valuation incorreto
+- ITUB4: LPA real ≈ R$ 4,17 (fonte: investidor10.com.br)
+
+**Plano de implementação:**
+1. Buscar EPS/FCF via yfinance para ativos BR e US
+2. Atualizar seeds com valores realistas para ativos principais
+3. Endpoint opcional: `/api/ativos/<ticker>/fundamentalistas` para atualizar manualmente
+
+**Arquivos a modificar:**
+- `backend/app/services/ativo_service.py` — buscar e popular EPS/FCF
+- `backend/seed_data/ativos_br.json` — adicionar eps/fcf aos seeds
+- `backend/seed_data/ativos_us.json` — adicionar eps/fcf aos seeds
+
+**Prioridade:** Alta | **Risco:** Baixo
+
+---
+
+### BUG-VAL-001 — Corrigir fórmulas Bazin/Gordon/Graham (🔴 Alta)
+
+**Problema identificado (28/06/2026 — validação Buy Signals ITUB4):**
+
+**Bug 1 — Graham (linha 73):**
+- Fórmula atual: `(eps * (8.5 + 2 * g * 100)) * 4.4 / k`
+- `k` está em decimal (0,105) mas a fórmula de Graham espera yield em percentual (10,5)
+- Resultado com eps=4,17: R$ 3.232 (absurdo)
+- **Fix:** `(eps * (8.5 + 2 * g * 100)) * 4.4 / (k * 100)`
+- Resultado corrigido: R$ 32,33 (razoável)
+
+**Bug 2 — Bazin (linha 72):**
+- Fórmula atual: `dy / (k - g)` onde `dy` é dividend_yield decimal (0,06)
+- Bazin deveria usar dividendo por ação, não yield: `dividendo = dy * preco_atual`
+- Resultado atual: 0,06 / 0,055 = R$ 1,09 (errado)
+- **Fix:** `(dy * preco_atual) / (k - g)`
+- Resultado corrigido: (0,06 × 42,24) / 0,055 = R$ 46,08 (razoável)
+
+**Bug 3 — Gordon (linhas 74-75):**
+- Fórmula atual: `d1 = dy * (1 + g)` onde `dy` é yield decimal
+- Gordon deveria usar dividendo por ação: `d1 = (dy * preco_atual) * (1 + g)`
+- Resultado atual: 0,063 / 0,055 = R$ 1,15 (errado)
+- **Fix:** `d1 = (dy * preco_atual) * (1 + g); pt_gordon = d1 / (k - g)`
+- Resultado corrigido: (0,06 × 42,24 × 1,05) / 0,055 = R$ 48,38 (razoável)
+
+**Arquivo a modificar:**
+- `backend/app/blueprints/calculos_blueprint.py:72-75`
+
+**Prioridade:** Alta | **Risco:** Médio (muda resultados de valuation — validar com testes)
+
+---
+
+### BUG-VAL-002 — Valor Justo Médio: usar mediana (🟡 Média)
+
+**Problema identificado (28/06/2026):**
+- Linha 90: `pt_medio = sum([v["pt"] for v in metodos.values()]) / 4`
+- Média simples é distorcida por outliers (ex: Graham R$ 1.938 arrasta média para R$ 499)
+- **Fix:** Usar mediana em vez de média
+
+**Arquivo a modificar:**
+- `backend/app/blueprints/calculos_blueprint.py:90`
+
+**Prioridade:** Média | **Risco:** Baixo
+
+---
+
+### BUG-VAL-003 — Componente Margem do Score incoerente (🟡 Média)
+
+**Problema identificado (28/06/2026):**
+- Tela mostra Margem 91,50% mas componente "Margem" do Score = 0/30 pts
+- Contradição: se margem é 91,5%, deveria ter pontuação alta
+- Provável causa: componente usa faixas diferentes ou compara com `ativo.preco_teto` (campo separado)
+
+**Arquivo a investigar:**
+- `backend/app/services/buy_signals_service.py` — cálculo do componente Margem
+
+**Prioridade:** Média | **Risco:** Baixo
 
 | **DIVCALENDAR-001** | Calendário de dividendos | ✅ Concluído (10/03/2026) |
 | **BLUEPRINT-CONSOLIDATION-001** | Consolidação de blueprints | ✅ Concluído (10/03/2026) |
