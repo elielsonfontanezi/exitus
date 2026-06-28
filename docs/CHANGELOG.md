@@ -23,6 +23,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 - `docs/ROADMAP.md`: HIST-002 marcado como ✅ Implementado + notas de melhoria futura
 - `docs/MANUAL_USUARIO_DRAFT.md`: seção Buy Signals agora explica o cache de histórico (80% threshold, chamada única, reuse)
 
+**Validação Frontend (28/06/2026):**
+- Login com `e2e_user`/`e2e_senha_123` ✅
+- Tela Buy Signals carregada com watchlist Top 10 ✅
+- ITUB4: Z-Score -2.97 exibido (valor real calculado de 168 dias de histórico) ✅
+- ITUB4: Buy Score 100 (FORTE COMPRA) — valor dinâmico, não mais 50 fixo ✅
+- ITUB4: Margem de Segurança 14.61% (🟢 COMPRA) ✅
+
+**Correções de bugs encontrados durante validação:**
+- `backend/app/services/buy_signals_service.py`: adicionado import de `logging` e `logger` (linha 96 usava logger sem import)
+- `backend/app/blueprints/buy_signals_blueprint.py`: campo `z_score` → `zscore` para consistência com frontend (template espera `zscore`)
+- `backend/app/services/buy_signals_service.py`: ajustado lógica `calcular_zscore()` para usar histórico existente se ≥30 dias (evita chamadas API desnecessárias quando já há dados suficientes no banco)
+
 ---
 
 ### Docs — BUG-014/015/017: Resolvidos indiretamente via BUG-009v2 (27/06/2026)

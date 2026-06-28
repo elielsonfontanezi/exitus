@@ -1,5 +1,9 @@
 import numpy as np
+import logging
 from app.models.ativo import Ativo
+from app.models.historico_preco import HistoricoPreco
+
+logger = logging.getLogger(__name__)
 
 def float_safe(value):
     """Converte Decimal/float/None para float seguro"""
@@ -81,7 +85,18 @@ def calcular_zscore(ticker_or_ativo, dias: int = 252) -> float:
     preco_atual = float(ativo.preco_atual)
     
     # ✅ NOVO: Buscar histórico real (lazy loading)
-    historico = HistoricoService.obter_ou_criar_historico(str(ativo.id), dias=dias)
+    # Se já tem histórico suficiente (≥30 dias), usar existente
+    # Se insuficiente, tentar buscar da API
+    historico_existente = HistoricoPreco.query\
+        .filter_by(ativoid=ativo.id)\
+        .order_by(HistoricoPreco.data.desc())\
+        .limit(dias)\
+        .all()
+    
+    if len(historico_existente) >= 30:
+        historico = historico_existente
+    else:
+        historico = HistoricoService.obter_ou_criar_historico(str(ativo.id), dias=dias)
     
     if len(historico) < 30:
         raise ValueError(f"Histórico insuficiente: {len(historico)} dias (mínimo 30)")

@@ -41,7 +41,7 @@ def zscore(ticker):
         return jsonify({"success": False, "error": f"Ativo {ticker} não encontrado"}), 404
     try:
         z = calcular_zscore(ticker)
-        return jsonify({"success": True, "data": {"ticker": ticker, "z_score": z}})
+        return jsonify({"success": True, "data": {"ticker": ticker, "zscore": z}})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
 

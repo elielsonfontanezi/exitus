@@ -1,12 +1,13 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 27/06/2026  
-> **Status:** � **Auditoria Funcional — 13 OK, 23 PARCIAL, 0 QUEBRADO**  
-> **Versão:** v0.9.27
+> **Data:** 28/06/2026
+> **Status:** ✅ **HIST-002 Validado — Z-Score funcionando no frontend**
+> **Versão:** v0.9.28
 
-### 🔧 Últimas correções (27/06/2026)
+### 🔧 Últimas correções (28/06/2026)
+- **HIST-002 ✅ VALIDADO:** Histórico de preços com fallback multi-provider implementado e validado no frontend. Z-Score calculado corretamente (-2.97 para ITUB4 usando 168 dias de histórico), Buy Score dinâmico (100 FORTE COMPRA, não mais 50 fixo). Correções de bugs encontrados durante validação: import de logger em buy_signals_service.py, campo z_score → zscore para consistência com frontend, lógica ajustada para usar histórico existente se ≥30 dias.
 - **BUG-014/015/017 ✅ RESOLVIDOS indiretamente via BUG-009v2:** Busca por ticker no catálogo (BUG-014), detalhe de ativo lento/sem dados (BUG-015) e busca em Buy Signals (BUG-017) — todos causados pelo mesmo problema de `BROWSER_API_URL` vs `BACKEND_API_URL`. Após separação, todas as chamadas `apiFetch()` do Alpine.js funcionam. Auditoria: 13 OK, 23 PARCIAL, 0 QUEBRADO.
-- **`.windsurfrules REGRA #3 atualizada:** Adicionado "Modelo free (custo zero)" ao cabeçalho obrigatório + coluna "Melhor Free" na tabela de recomendações por tipo de tarefa.
+- **`.windsurfrules REGRA #3 atualizada:`** Adicionado "Modelo free (custo zero)" ao cabeçalho obrigatório + coluna "Melhor Free" na tabela de recomendações por tipo de tarefa.
 - **BUG-009v2 ✅ RESOLVIDO:** Dashboard e todas as telas do menu sem dados — `ERR_NAME_NOT_RESOLVED`. Causa raiz: `API_BASE_URL` nos templates usava `BACKEND_API_URL` (hostname interno do container `exitus-backend:5000`), que o browser não resolve. Solução: separar `BACKEND_API_URL` (server-side, container→container) de `BROWSER_API_URL` (client-side, browser→backend). 7 cenários de deploy documentados em `ARCHITECTURE.md`. L-FE-011 adicionada.
 - **Dashboard ✅ RESOLVIDO:** CDI/Ibovespa via env vars (não hardcoded); meta via API `/api/auth/me`. FEAT-010 registrada com nota de análise minuciosa do backend antes de implementar endpoint dinâmico. Auditoria: 7 OK, 29 PARCIAL, 0 QUEBRADO.
 - **Corretoras CRUD ✅ RESOLVIDO:** Após investigação, CRUD já estava totalmente implementado (frontend + backend). Auditoria desatualizada. Auditoria: 6 OK, 30 PARCIAL, 0 QUEBRADO.

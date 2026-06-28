@@ -93,10 +93,10 @@
 | **CICD-001** | 🟡 Pendente | — |
 | **Testes integrados multi-tenant** | 🟡 Pendente | — |
 
-### HIST-002 — Histórico de preços: fallback multi-provider (Planejado)
+### HIST-002 — Histórico de preços: fallback multi-provider (✅ Validado no Frontend - 28/06/2026)
 
 **Problema identificado (27/06/2026):**
-- `CotacoesService.buscar_historico()` (`backend/app/services/cotacoes_service.py:314-380`) **só usa yfinance** — nenhum fallback
+- `CotacoesService.buscar_historico()` (`backend/app/services/cotacoes_service.py:314-380`) **só usava yfinance** — nenhum fallback
 - yfinance falha dentro do container Podman: `Failed to get ticker 'ITUB4.SA' reason: Expecting value: line 1 column 1` (possível problema de rede/DNS ou delisting)
 - `CotacoesService.obter_cotacao()` tem 8 providers com fallback (Brapi, HG, yfinance, Twelve Data, Finnhub, Alpha Vantage, Marketstack) — mas `buscar_historico()` não aproveita essa cascata
 - **Consequência:** `historico_preco` vazia → `calcular_zscore()` falha → Buy Score artificial (50 para todos) → "Z-Score indisponível" na tela
@@ -113,6 +113,18 @@
 3. Ordem BR: Brapi → Twelve Data → Alpha Vantage → yfinance (.SA)
 4. Ordem US: Alpha Vantage → Twelve Data → Finnhub → yfinance
 5. Histórico convertido para o mesmo formato do banco (`Decimal`, `date`, campos opcionais) e filtrado pelo intervalo solicitado
+
+**Validação Frontend (28/06/2026):**
+- Login com `e2e_user`/`e2e_senha_123` ✅
+- Tela Buy Signals carregada com watchlist Top 10 ✅
+- ITUB4: Z-Score -2.97 exibido (valor real calculado de 168 dias de histórico) ✅
+- ITUB4: Buy Score 100 (FORTE COMPRA) — valor dinâmico, não mais 50 fixo ✅
+- ITUB4: Margem de Segurança 14.61% (🟢 COMPRA) ✅
+
+**Correções de bugs encontrados durante validação:**
+- `backend/app/services/buy_signals_service.py`: adicionado import de `logging` e `logger` (linha 96 usava logger sem import)
+- `backend/app/blueprints/buy_signals_blueprint.py`: campo `z_score` → `zscore` para consistência com frontend (template espera `zscore`)
+- `backend/app/services/buy_signals_service.py`: ajustado lógica `calcular_zscore()` para usar histórico existente se ≥30 dias (evita chamadas API desnecessárias quando já há dados suficientes no banco)
 
 **Melhoria sugerida (após medir necessidade):** Caso os limites grátis continuem bloqueando ativos, avaliar provedores adicionais com OHLC diário estável — candidatos: Tiingo (planos acessíveis com dados ajustados), Polygon.io (intraday/stream, custo alto) e IEX Cloud (equities US). Requer business case e orçamento antes da assinatura.
 
