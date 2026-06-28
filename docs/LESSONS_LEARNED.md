@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 27/06/2026 — L-FE-012 adicionada (bugs resolvidos indiretamente por correções de infraestrutura), L-FE-011 adicionada (separação server-side vs client-side URLs), L-DB-008 a L-DB-014 adicionadas (Database), L-BE-001 adicionada (exceções tipadas vs ValueError)  
+> **Atualizado:** 28/06/2026 — L-DB-015 adicionada (diretórios duplicados de migration — alembic/ vs migrations/)
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -117,6 +117,24 @@ if quantidade_insuficiente:
 **Impacto:** Evita investigações repetitivas
 
 **Regra:** Sempre que o banco de dados for alterado (nova tabela, migration, ALTER TABLE), executar `./scripts/update_db_structure.sh` para atualizar `docs/EXITUS_DB_STRUCTURE.txt`.
+
+---
+
+### L-DB-015 — Diretório de migrations ativo é migrations/, não alembic/
+**Origem:** VALUATION-001 | **Data:** 28/06/2026
+
+**Erro:** Migration criada em `backend/alembic/versions/` (Alembic standalone) em vez de `backend/migrations/versions/` (Flask-Migrate). O projeto usa Flask-Migrate (`flask db upgrade`), que lê apenas `migrations/`. A migration em `alembic/` não seria aplicada.
+
+**Causa raiz:** Projeto começou com Alembic standalone e depois migrou para Flask-Migrate, mas o diretório `alembic/` nunca foi removido — dívida técnica que causa confusão.
+
+**Correto:** Toda migration nova deve ser criada em `backend/migrations/versions/` com `down_revision` apontando para o head atual do Flask-Migrate (`flask db heads`).
+
+**Comando para verificar head ativo:**
+```bash
+podman exec exitus-backend flask db heads
+```
+
+**Dívida técnica registrada:** CLEANUP-MIGRATIONS-001 (ROADMAP.md) — arquivar/remover `backend/alembic/` quando seguro.
 
 ---
 

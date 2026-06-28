@@ -205,6 +205,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | GAP ID | Funcionalidade | Status |
 |--------|---------------|--------|
 | **VALUATION-001** | Adicionar EPS e FCF ao modelo Ativo | ✅ Concluído (28/06/2026) |
+| **CLEANUP-MIGRATIONS-001** | Remover diretório alembic/ duplicado (dívida técnica) | 📋 Planejado |
 | REBALANCE-001 | Rebalanceamento automático | 📋 Planejado |
 | CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
@@ -234,6 +235,23 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 **Próximos passos (futuros):**
 - Implementar busca de EPS/FCF via API externa (yfinance) para eliminar fallback
 - Unificar Buy Score engine para usar `pt_medio` dinâmico em vez de `ativo.preco_teto`
+
+### CLEANUP-MIGRATIONS-001 — Remover diretório alembic/ duplicado (📋 Planejado)
+
+**Problema identificado (28/06/2026):**
+- Projeto tem dois diretórios de migration: `backend/alembic/` (standalone) e `backend/migrations/` (Flask-Migrate)
+- Apenas `migrations/` é ativo (Flask-Migrate via `flask db upgrade`)
+- `alembic/` é resquício histórico que causa confusão — migration criada lá não é aplicada
+- Ver L-DB-015 em `LESSONS_LEARNED.md`
+
+**Plano de implementação:**
+1. Confirmar que `alembic/versions/` não tem migrations não aplicadas (comparar cadeias)
+2. Arquivar `backend/alembic/` para `backup/` ou remover se seguro
+3. Documentar em `ARCHITECTURE.md` que apenas `migrations/` é ativo
+4. Atualizar `CODING_STANDARDS.md` com regra: migrations sempre em `migrations/versions/`
+
+**Prioridade:** Baixa | **Risco:** Baixo
+
 | **DIVCALENDAR-001** | Calendário de dividendos | ✅ Concluído (10/03/2026) |
 | **BLUEPRINT-CONSOLIDATION-001** | Consolidação de blueprints | ✅ Concluído (10/03/2026) |
 | ORPHAN-001 | Limpeza de código órfão | ❌ Cancelado (arriscado) |
