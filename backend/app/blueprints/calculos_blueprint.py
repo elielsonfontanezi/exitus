@@ -59,7 +59,8 @@ def calcular_preco_teto(ticker):
     g = params['crescimento_medio']     # Crescimento médio regional
     wacc = params['custo_capital']      # WACC regional
 
-    tipo = str(getattr(ativo, 'tipo', 'acao')).lower()  # converte enum para string
+    tipo_raw = getattr(ativo, 'tipo', 'acao')
+    tipo = (tipo_raw.value if hasattr(tipo_raw, 'value') else str(tipo_raw)).lower()
     preco_atual = float(ativo.preco_atual or 30)
     dy = float(ativo.dividend_yield or 0.06)
 

@@ -183,18 +183,8 @@
         </div>
     </div>
 
-    <!-- 2 colunas: Radar (esq) | Preço vs Valor Justo (dir) -->
-    <div style="display:grid; grid-template-columns:240px 1fr; gap:1.5rem; margin-top:1.25rem; align-items:start;">
-
-        <!-- Coluna esquerda: Radar Chart -->
-        <div x-show="scoreResultado?.components" x-cloak x-effect="renderRadarChart()">
-            <div style="font-size:0.75rem; font-weight:600; color:#6b7280; text-align:center; margin-bottom:0.4rem;">Componentes do Buy Score</div>
-            <div style="height:220px;">
-                <canvas id="buyScoreRadar"></canvas>
-            </div>
-        </div>
-
-        <!-- Coluna direita: Valor Justo + Margem Seg + Z-Score + Métodos -->
+    <!-- Card Valor Justo — largura total -->
+    <div style="margin-top:1.25rem;">
         <div>
             <template x-if="precoJustoInfo()">
                 <div class="valor-justo-card" style="margin-top:0;">
@@ -253,7 +243,7 @@
                                 <div class="metodos-row metodos-header">
                                     <span>Método</span><span>Valor</span><span>Parâmetros</span>
                                 </div>
-                                <template x-for="(dados, nome) in precoTetoDetalhes.metodos" :key="nome">
+                                <template x-for="(dados, nome) in (precoTetoDetalhes?.metodos || {})" :key="nome">
                                     <div class="metodos-row">
                                         <span x-text="formatMetodoNome(nome)"></span>
                                         <span x-text="formatMoney(dados.pt)"></span>
@@ -262,9 +252,9 @@
                                 </template>
                             </div>
                             <div class="parametros-regiao" x-show="precoTetoDetalhes?.parametros_regiao">
-                                <div>Taxa Livre de Risco: <strong x-text="precoTetoDetalhes.parametros_regiao.taxa_livre_risco"></strong></div>
-                                <div>Crescimento: <strong x-text="precoTetoDetalhes.parametros_regiao.crescimento"></strong></div>
-                                <div>WACC: <strong x-text="precoTetoDetalhes.parametros_regiao.wacc"></strong></div>
+                                <div>Taxa Livre de Risco: <strong x-text="precoTetoDetalhes?.parametros_regiao?.taxa_livre_risco"></strong></div>
+                                <div>Crescimento: <strong x-text="precoTetoDetalhes?.parametros_regiao?.crescimento"></strong></div>
+                                <div>WACC: <strong x-text="precoTetoDetalhes?.parametros_regiao?.wacc"></strong></div>
                             </div>
                         </div>
                     </div>
@@ -274,7 +264,7 @@
         </div>
     </div>
 
-    <!-- Strip compacto dos componentes -->
+    <!-- Strip compacto dos componentes (Buy Score) -->    
     <div x-show="componentCardData().length" x-cloak style="margin-top:1.25rem;">
         <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem;">
             <template x-for="card in componentCardData()" :key="card.key">
@@ -283,7 +273,6 @@
                         <span class="component-label" style="font-size:0.78rem;" x-text="card.label"></span>
                         <span class="component-points" x-text="card.pointsLabel"></span>
                     </div>
-                    <div class="component-value" style="font-size:1rem; margin:0.15rem 0;" x-text="card.valueLabel"></div>
                     <div class="component-progress">
                         <div class="component-progress-value" :style="{ width: card.percent + '%', background: card.color }"></div>
                     </div>
@@ -380,7 +369,6 @@ function pageDataExtend() {
         zscoreResultado: null,
         zscoreError: '',
         consultaError: '',
-        buyScoreChartInstance: null,
         precoTetoDetalhes: null,
         precoTetoError: '',
         mostrarMetodos: false,
@@ -456,11 +444,6 @@ function pageDataExtend() {
                 }
 
                 await this.carregarPrecoTeto(ticker);
-
-                // Renderizar radar chart após receber dados
-                this.$nextTick(() => {
-                    this.renderRadarChart();
-                });
             } catch (e) {
                 this.consultaError = e.message || 'Erro de conexão';
             } finally {
@@ -476,94 +459,6 @@ function pageDataExtend() {
                 this.precoTetoDetalhes = null;
                 this.precoTetoError = 'Não foi possível carregar os métodos de valuation.';
             }
-        },
-
-        renderRadarChart() {
-            if (!this.scoreResultado?.components) return;
-
-            const canvas = document.getElementById('buyScoreRadar');
-            if (!canvas) return;
-
-            // Destruir chart existente se houver (usando Chart.getChart)
-            const existingChart = Chart.getChart(canvas);
-            if (existingChart) {
-                existingChart.destroy();
-            }
-
-            const components = this.scoreResultado.components;
-            const labels = ['Margem', 'Z-Score', 'DY', 'Beta'];
-            const data = [
-                (components.margem.points / components.margem.max) * 100,
-                (components.zscore.points / components.zscore.max) * 100,
-                (components.dy.points / components.dy.max) * 100,
-                (components.beta.points / components.beta.max) * 100
-            ];
-
-            this.buyScoreChartInstance = new Chart(canvas, {
-                type: 'radar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: this.scoreResultado.ticker,
-                        data: data,
-                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                        borderColor: 'rgb(59, 130, 246)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'rgb(59, 130, 246)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgb(59, 130, 246)',
-                        pointHoverRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            max: 100,
-                            min: 0,
-                            ticks: {
-                                stepSize: 20,
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            },
-                            angleLines: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            },
-                            pointLabels: {
-                                font: {
-                                    size: 12,
-                                    weight: 'bold'
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const comp = components[context.label.toLowerCase()];
-                                    if (comp) {
-                                        return context.label + ': ' + comp.points + '/' + comp.max + ' pts (' + comp.value + ')';
-                                    }
-                                    return context.label + ': ' + context.parsed.r.toFixed(1) + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
         },
 
         precoJustoInfo() {

@@ -8,6 +8,31 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix + UX — BUY-REFINE-001: Bug tipo Enum, remoção radar, optional chaining (28/06/2026)
+
+**Bug 1 — tipo Enum (`calculos_blueprint.py`):**
+- `str(TipoAtivo.ACAO)` retornava `'tipoativo.acao'` → caia sempre no branch `else` → método `padrao`.
+- Fix: `tipo = (tipo_raw.value if hasattr(tipo_raw, 'value') else str(tipo_raw)).lower()`
+- Resultado: ITUB4 agora retorna Bazin + Graham + Gordon + DCF (4 métodos reais) e Valor Justo = R$499,51 (91,5% de margem).
+
+**UX — remoção do radar chart:**
+- Radar removido do HTML e JS Alpine (estado `buyScoreChartInstance`, função `renderRadarChart`, `$nextTick` call).
+- Layout simplificado para 1 coluna: card Valor Justo em largura total + strip compacto de componentes.
+
+**Bug 2 — optional chaining Alpine.js:**
+- `precoTetoDetalhes.metodos` e `precoTetoDetalhes.parametros_regiao.*` causavam `TypeError` quando `precoTetoDetalhes` era null durante renderização.
+- Fix: `(precoTetoDetalhes?.metodos || {})` e `precoTetoDetalhes?.parametros_regiao?.taxa_livre_risco` etc.
+
+**Documentação — MANUAL_USUARIO_DRAFT.md:**
+- Adicionada seção "Por que existem dois valores de margem?" explicando fontes, diferenças e qual confiar.
+
+**Arquivos modificados:**
+- `backend/app/blueprints/calculos_blueprint.py`
+- `frontend/app/templates/analises/buy_signals_v2.html`
+- `docs/MANUAL_USUARIO_DRAFT.md`
+
+---
+
 ### UX — BUY-OPT-A: Refatoração layout Buy Signals — Opção A (28/06/2026)
 
 **Motivação:** Layout anterior empilhava 4 blocos verticais (gauge + barra, radar, card valor justo, grid componentes) dentro de 700px, criando densidade excessiva. Badge "NEUTRO" ficava em linha própria abaixo da porcentagem, sem alinhamento com os demais títulos.

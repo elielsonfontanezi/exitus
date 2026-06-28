@@ -227,6 +227,27 @@ Isso permite ao usuário validar rapidamente o racional do valor justo apresenta
 
 **Requer:** mínimo de 30 registros de histórico de preços no banco (`historico_preco`). Se indisponível, a tela exibe "Z-Score indisponível".
 
+**⚠️ Por que existem dois valores de margem na tela?**
+
+A tela Buy Signals exibe informações de **duas fontes independentes**:
+
+| Onde aparece | Valor | Fonte | Método |
+|---|---|---|---|
+| Card "Margem:" (topo) | ex.: +9,10% | `calculos/preco_teto` | Média dinâmica: Bazin + Graham + Gordon + DCF |
+| Strip de componentes (rodapé) | ex.: 0/30 pts | `buy_signals_service.calcular_margem_seguranca` | `ativo.preco_teto` armazenado no banco |
+
+**Por que podem diferir?**
+- O `preco_teto` no banco é o valor **cadastrado ou importado** na criação do ativo. Pode estar desatualizado ou calculado por uma metodologia diferente.
+- O cálculo dinâmico `calculos/preco_teto` é **recalculado em tempo real** sempre que você consulta o ticker, usando os parâmetros macroeconômicos atuais da região.
+
+**Qual confiar?**
+- O card topo (+9,10%) reflete a análise **mais atual** com os 4 métodos aplicáveis ao tipo do ativo.
+- O strip rodapé mostra a pontuação do **Buy Score engine**, que usa o preco_teto armazenado. Observe os pontos (ex.: "0/30") como indicador — o valor numérico pode estar desatualizado.
+
+> **Planejado:** unificar ambas as fontes para que o Buy Score engine use o `pt_medio` dinâmico. Até lá, confie no card de cima para decisões de valuation.
+
+---
+
 **3. Buy Score** (`calcular_buy_score`)
 
 Score composto de 0 a 100, soma de 4 fatores ponderados:

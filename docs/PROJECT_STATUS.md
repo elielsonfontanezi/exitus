@@ -1,10 +1,11 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 28/06/2026
-> **Status:** ✅ **BUY-OPT-A — Refatoração UX Buy Signals (Opção A)**
-> **Versão:** v0.9.31
+> **Status:** ✅ **BUY-REFINE-001 — Bug tipo Enum + remoção radar + optional chaining**
+> **Versão:** v0.9.32
 
 ### 🔧 Últimas correções (28/06/2026)
+- **BUY-REFINE-001 ✅ RESOLVIDO:** Bug `str(TipoAtivo.ACAO)` retornava `'tipoativo.acao'` → ITUB4 sempre caia no branch `padrao`. Fix: `.value` se Enum. ITUB4 agora mostra 4 métodos reais (Bazin/Graham/Gordon/DCF), Valor Justo R$499,51, Margem 91,5%. Radar chart removido (1 coluna, layout mais limpo). Optional chaining nos `x-text` de `precoTetoDetalhes` eliminou 4 TypeErrors. Manual atualizado com seção sobre as duas fontes de margem.
 - **BUY-OPT-A ✅ IMPLEMENTADO:** Refatoração do layout Buy Signals — gauge removido, Score+Label+Barra em linha única no topo, radar na coluna esquerda (240px), card Valor Justo na coluna direita, badge de sinal inline com a porcentagem de margem, strip compacto de 4 componentes no rodapé. Padrão inspirado em Morningstar. Validado com ITUB4 sem erros de console.
 - **BUY-VAL-003 ✅ IMPLEMENTADO:** Cartão "Preço vs Valor Justo" no Buy Signals detalha preço atual, valor justo médio, margem e barra comparativa; tabela expansível de métodos (Bazin, Graham, Gordon, DCF, Cap Rate) com parâmetros regionais; grid dos componentes (Margem, Z-Score, DY, Beta) com barras de progresso. Backend `/margem-seguranca/<ticker>` passou a retornar `preco_atual` e `preco_teto`, frontend consome `/api/calculos/preco_teto/<ticker>`. Manual do usuário passou a documentar o cálculo do Preço Teto.
 - **Radar Chart ✅ IMPLEMENTADO:** Visualização gráfica dos componentes do Buy Score (Margem, Z-Score, DY, Beta) usando Chart.js. Backend modificado para retornar componentes individuais (value, points, max) via `calcular_buy_score()`. Endpoints `/buy-score/<ticker>` e `/analisar/<ticker>` atualizados. Radar chart mostra percentual de pontos obtidos vs máximo possível para cada componente. Validado com ITUB4 (100% em todos os componentes) e VALE3 (distribuição variada). `obter_watchlist_top()` corrigido para extrair score do novo formato de retorno.
