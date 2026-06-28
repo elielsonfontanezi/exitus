@@ -108,10 +108,10 @@
 - **yfinance** — manter como último recurso (sem key, mas instável em container)
 
 **Plano de implementação:**
-1. Refatorar `buscar_historico()` para usar padrão de cascata com circuit breaker (igual `obter_cotacao()`)
-2. Ordem BR: Brapi → Twelve Data → Alpha Vantage → yfinance
-3. Ordem US: Alpha Vantage → Twelve Data → Finnhub → yfinance
-4. Reutilizar `get_circuit_breaker()` já existente
+1. Refatorar `buscar_historico()` para usar o mesmo padrão de cascata por mercado já implementado em `obter_cotacao()` (ver `CHANGELOG.md` → EXITUS-CIRCUITBREAKER-001, 08/03/2026)
+2. Reutilizar `get_circuit_breaker()` já existente (`backend/app/utils/circuit_breaker.py`) — registry global singleton por provider, threshold=3, recovery=60/120s
+3. Ordem BR: Brapi → Twelve Data → Alpha Vantage → yfinance
+4. Ordem US: Alpha Vantage → Twelve Data → Finnhub → yfinance
 5. Seed de histórico sintético para ambiente dev (opcional)
 
 **Nota:** APIs grátis têm limites de rate (Brapi: ~10 req/min, Alpha Vantage: 5 req/dia, Twelve Data: 8 req/min). Para produção, avaliar assinatura oficial no final do projeto.

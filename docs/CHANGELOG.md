@@ -12,7 +12,7 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 **Diagnóstico:** `CotacoesService.buscar_historico()` só usa yfinance (nenhum fallback). yfinance falha dentro do container Podman (`Failed to get ticker 'ITUB4.SA'`). Consequência: `historico_preco` vazia → `calcular_zscore()` falha → Buy Score artificial (50 para todos) → "Z-Score indisponível" na tela. `obter_cotacao()` tem 8 providers com fallback, mas `buscar_historico()` não aproveita essa cascata.
 
-**GAP registrado:** `ROADMAP.md` → HIST-002 (Fase 7, prioridade média). Plano: refatorar `buscar_historico()` para cascata com circuit breaker (Brapi → Twelve Data → Alpha Vantage → yfinance). APIs grátis têm limites de rate — assinatura oficial avaliada no final do projeto.
+**GAP registrado:** `ROADMAP.md` → HIST-002 (Fase 7, prioridade média). Plano: refatorar `buscar_historico()` para cascata com circuit breaker seguindo o mesmo padrão do EXITUS-CIRCUITBREAKER-001 (08/03/2026) — `obter_cotacao()` já tem 8 providers com fallback por mercado (BR: Brapi/HG/yfinance/Twelve Data; US: Finnhub/Alpha Vantage/Twelve Data/yfinance). Reutilizar `get_circuit_breaker()` já existente. APIs grátis têm limites de rate — assinatura oficial avaliada no final do projeto.
 
 **Artefatos modificados:**
 - `docs/ROADMAP.md`: HIST-002 adicionado na tabela Fase 7 + seção detalhada + contagem atualizada (13 OK, 23 PARCIAL)
