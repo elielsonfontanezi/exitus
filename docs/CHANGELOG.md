@@ -8,6 +8,25 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### UX — BUY-OPT-A: Refatoração layout Buy Signals — Opção A (28/06/2026)
+
+**Motivação:** Layout anterior empilhava 4 blocos verticais (gauge + barra, radar, card valor justo, grid componentes) dentro de 700px, criando densidade excessiva. Badge "NEUTRO" ficava em linha própria abaixo da porcentagem, sem alinhamento com os demais títulos.
+
+**Mudanças em `buy_signals_v2.html`:**
+- Gauge circular removido; substituído por linha compacta **Score + Label + Barra** (uma única linha flex no topo).
+- Badge de sinal (NEUTRO/COMPRA/VENDA) agora é **inline** na mesma linha da porcentagem de margem.
+- Radar chart movido para **coluna esquerda** (240px) — padrão Morningstar de chart + métricas lado a lado.
+- Card "Preço vs Valor Justo" (Preço Atual, Valor Justo Médio, Margem, barra, Z-Score, métodos) ocupa **coluna direita** (1fr).
+- Grid de componentes convertido para **strip horizontal compacto** de 4 colunas no rodapé (label + valor + barra + pontos).
+
+**Validação (28/06/2026):**
+- ITUB4: `50 NEUTRO` inline com barra ✅; radar e card Valor Justo lado a lado ✅; badge `-9,10% [NEUTRO]` inline ✅; strip componentes ✅
+- Console: 0 erros (apenas warning Tailwind CDN esperado) ✅
+
+**Arquivo modificado:** `frontend/app/templates/analises/buy_signals_v2.html`
+
+---
+
 ### Feat — BUY-VAL-003: Transparência Preço vs Valor Justo (28/06/2026)
 
 **Diagnóstico:** Após o Radar Chart, usuários ainda não viam claramente como o Valor Justo era calculado nem os métodos (Bazin, Graham, Gordon, DCF/CapRate). KPI "Score ≥ 60" estava correto, mas faltava contexto visual do Preço vs Valor Justo e detalhamento dos componentes.
