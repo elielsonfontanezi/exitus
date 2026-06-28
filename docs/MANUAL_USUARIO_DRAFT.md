@@ -235,6 +235,14 @@ Authorization: Bearer <token>
 
 **Nota técnica:** O Z-Score requer histórico de preços populado no banco. Em ambiente de desenvolvimento sem provider de histórico configurado, o Z-Score pode estar indisponível. Ver `ROADMAP.md` → HIST-002 para plano de fallback multi-provider.
 
+#### Como o histórico é populado e atualizado
+
+1. Ao consultar um ticker, o sistema verifica quantos registros existem em `historico_preco`. Se houver pelo menos 80% dos dias solicitados (ex.: 200 de 252), os dados do banco são usados diretamente.
+2. Se faltar histórico, o `HistoricoService` aciona os providers externos (`CotacoesService.buscar_historico`) apenas uma vez para preencher o intervalo solicitado. Os dados retornados são persistidos com timestamp (`updatedat`).
+3. Nas consultas seguintes, o frontend reutiliza o histórico salvo até que uma regra de negócio peça atualização (ex.: solicitado mais dias ou identificado gap superior a 1 dia útil). Assim evitamos chamadas repetidas às APIs externas e mantemos o Z-Score confiável mesmo offline.
+
+> Resumo: histórico é "dado frio" — fica no banco por padrão e só é baixado novamente quando há lacunas suficientes para comprometer o cálculo.
+
 ---
 
 ### 2. Portfolios — Gestão de Carteiras

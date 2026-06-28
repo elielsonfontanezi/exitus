@@ -114,6 +114,10 @@
 4. Ordem US: Alpha Vantage → Twelve Data → Finnhub → yfinance
 5. Seed de histórico sintético para ambiente dev (opcional)
 
+**Melhoria sugerida (após medir necessidade):** Caso os limites grátis continuem bloqueando ativos, avaliar provedores adicionais com OHLC diário estável — candidatos: Tiingo (planos acessíveis com dados ajustados), Polygon.io (intraday/stream, custo alto) e IEX Cloud (equities US). Requer business case e orçamento antes da assinatura.
+
+**Atividade futura:** Depois que o fallback multi-provider estiver em produção, monitorar por ~30 dias quantos tickers ficam sem histórico suficiente (falls para último recurso) e registrar métricas em `PROJECT_STATUS.md`. Essa medição orientará se precisamos contratar provider premium ou apenas ajustar seeds/TTL.
+
 **Nota:** APIs grátis têm limites de rate (Brapi: ~10 req/min, Alpha Vantage: 5 req/dia, Twelve Data: 8 req/min). Para produção, avaliar assinatura oficial no final do projeto.
 
 **Dependência:** Nenhum GAP bloqueia, mas resolve indiretamente o "Z-Score indisponível" em Buy Signals.
