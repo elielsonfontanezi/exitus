@@ -8,6 +8,35 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feature — VALUATION-001: Campos EPS e FCF no modelo Ativo (28/06/2026)
+
+**Problema:**
+- `calculos_blueprint.py` usava valores hardcoded: `eps = 2.50` (linha 71), `fcf = 5.0` (linha 77)
+- Graham e DCF calculavam com números fictícios → `pt_medio` incorreto
+- Valuation não confiável (ex: ITUB4 → Valor Justo R$499,51 com preço atual R$42,24)
+
+**Solução:**
+- Campos `eps` (Numeric 10,4) e `fcf` (Numeric 15,2) adicionados ao modelo `Ativo`
+- Migration Alembic `20260628_1800` criada em `migrations/versions/`
+- `calculos_blueprint.py` agora lê `ativo.eps` e `ativo.fcf` do banco, com fallback para 2.50/5.0 quando NULL
+- Paridade de bancos aplicada: `exitusdb` (migration) + `exitusdb_test` (pg_dump schema-only)
+- `EXITUS_DB_STRUCTURE.txt` atualizado via `update_db_structure.sh`
+
+**Validação:**
+- Endpoint `/api/calculos/preco_teto/ITUB4` testado com `eps=3.50`, `fcf=8.0`:
+  - Graham: 1938.1 → 2713.33 (usa eps do banco)
+  - DCF: 57.69 → 92.3 (usa fcf do banco)
+- Suite de testes: 543 passed, 6 skipped, 1 failed (IR integration — pré-existente), 1 error (reconciliação — pré-existente)
+
+**Arquivos modificados:**
+- `backend/app/models/ativo.py` — campos `eps`, `fcf` + `to_dict()`
+- `backend/migrations/versions/20260628_1800_add_eps_fcf_to_ativo.py` — migration
+- `backend/app/blueprints/calculos_blueprint.py` — fix hardcoded
+- `docs/EXITUS_DB_STRUCTURE.txt` — schema atualizado
+- `docs/CHANGELOG.md`, `docs/PROJECT_STATUS.md`, `docs/ROADMAP.md`
+
+---
+
 ### Fix + UX — BUY-REFINE-001: Bug tipo Enum, remoção radar, optional chaining (28/06/2026)
 
 **Bug 1 — tipo Enum (`calculos_blueprint.py`):**

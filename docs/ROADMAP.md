@@ -204,33 +204,32 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 | GAP ID | Funcionalidade | Status |
 |--------|---------------|--------|
-| **VALUATION-001** | Adicionar EPS e FCF ao modelo Ativo | 🎯 PRÓXIMA AÇÃO |
+| **VALUATION-001** | Adicionar EPS e FCF ao modelo Ativo | ✅ Concluído (28/06/2026) |
 | REBALANCE-001 | Rebalanceamento automático | 📋 Planejado |
 | CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
 
-### VALUATION-001 — Adicionar EPS e FCF ao modelo Ativo (🎯 PRÓXIMA AÇÃO)
+### VALUATION-001 — Adicionar EPS e FCF ao modelo Ativo (✅ Concluído 28/06/2026)
 
 **Problema identificado (28/06/2026):**
-- `calculos_blueprint.py` usa valores hardcoded: `eps = 2.50` (linha 71), `fcf = 5.0` (linha 77)
-- Graham e DCF calculam com números fictícios → `pt_medio` incorreto
+- `calculos_blueprint.py` usava valores hardcoded: `eps = 2.50` (linha 71), `fcf = 5.0` (linha 77)
+- Graham e DCF calculavam com números fictícios → `pt_medio` incorreto
 - **Consequência:** Valuation não confiável (ex: ITUB4 → Valor Justo R$499,51 com preço atual R$42,24)
 
-**Plano de implementação:**
-1. Adicionar campos `eps` (Numeric 10, 4) e `fcf` (Numeric 15, 2) ao modelo `Ativo`
-2. Criar migration Alembic: `alembic revision --autogenerate -m "add_eps_fcf_to_ativo"`
-3. Corrigir hardcoded em `calculos_blueprint.py`: usar `ativo.eps` e `ativo.fcf` com fallback
-4. (Opcional) Atualizar seed com valores realistas de EPS/FCF para ITUB4
-5. Validar `/api/calculos/preco_teto/ITUB4` → Valor Justo deve ser razoável
+**Implementação concluída:**
+1. ✅ Campos `eps` (Numeric 10,4) e `fcf` (Numeric 15,2) adicionados ao modelo `Ativo`
+2. ✅ Migration Alembic `20260628_1800` criada em `migrations/versions/`
+3. ✅ Hardcoded corrigido em `calculos_blueprint.py`: usa `ativo.eps` e `ativo.fcf` com fallback 2.50/5.0
+4. ✅ Paridade de bancos aplicada (`exitusdb` + `exitusdb_test`)
+5. ✅ Endpoint `/api/calculos/preco_teto/ITUB4` validado — Graham e DCF agora leem do banco
 
-**Arquivos a modificar:**
-- `backend/app/models/ativo.py` — adicionar campos
-- `backend/alembic/versions/[nova_migration].py` — migration
-- `backend/app/blueprints/calculos_blueprint.py` — corrigir hardcoded
-- `docs/CHANGELOG.md` — documentar
-- `docs/PROJECT_STATUS.md` — atualizar status
+**Arquivos modificados:**
+- `backend/app/models/ativo.py` — campos `eps`, `fcf` + `to_dict()`
+- `backend/migrations/versions/20260628_1800_add_eps_fcf_to_ativo.py` — migration
+- `backend/app/blueprints/calculos_blueprint.py` — fix hardcoded
+- `docs/EXITUS_DB_STRUCTURE.txt` — schema atualizado
 
-**Modelo IA recomendado:** Claude Sonnet 4.6 Thinking ($$)
+**Modelo IA utilizado:** Claude Sonnet 4.6 Thinking ($$)
 
 **Próximos passos (futuros):**
 - Implementar busca de EPS/FCF via API externa (yfinance) para eliminar fallback

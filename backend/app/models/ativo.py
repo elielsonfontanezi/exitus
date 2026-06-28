@@ -123,6 +123,8 @@ class Ativo(db.Model):
     # Indicadores para Valuation
     preco_teto = Column(Numeric(15, 2), nullable=True)
     cap_rate = Column(Numeric(8, 4), nullable=True)  # Para FIIs/REITs
+    eps = Column(Numeric(10, 4), nullable=True)       # Earnings Per Share (VALUATION-001)
+    fcf = Column(Numeric(15, 2), nullable=True)       # Free Cash Flow (VALUATION-001)
 
     # Campos de Renda Fixa (RFCALC-001)
     taxa_cupom = Column(Numeric(8, 6), nullable=True)      # Taxa de cupom anual (ex: 0.1050 = 10,50%)
@@ -171,6 +173,8 @@ class Ativo(db.Model):
             'beta': float(self.beta) if self.beta else None,
             'preco_teto': float(self.preco_teto) if self.preco_teto else None,
             'cap_rate': float(self.cap_rate) if self.cap_rate else None,
+            'eps': float(self.eps) if self.eps else None,
+            'fcf': float(self.fcf) if self.fcf else None,
             'taxa_cupom': float(self.taxa_cupom) if self.taxa_cupom else None,
             'valor_nominal': float(self.valor_nominal) if self.valor_nominal else None,
             'data_vencimento': self.data_vencimento.isoformat() if self.data_vencimento else None,

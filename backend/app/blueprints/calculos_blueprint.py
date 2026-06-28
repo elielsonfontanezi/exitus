@@ -68,13 +68,13 @@ def calcular_preco_teto(ticker):
 
     if tipo in ['acao', 'acoes']:
         # Ações: 4 métodos com parâmetros regionais
-        eps = 2.50
+        eps = float(ativo.eps) if ativo.eps is not None else 2.50
         pt_bazin = (dy / (k - g)) if (k > g) else 0
         pt_graham = (eps * (8.5 + 2 * g * 100)) * 4.4 / k
         d1 = dy * (1 + g)
         pt_gordon = d1 / (k - g) if (k > g) else 0
 
-        fcf = 5.0
+        fcf = float(ativo.fcf) if ativo.fcf is not None else 5.0
         anos = 5
         fluxos = [fcf * (1 + g)**i for i in range(1, anos + 1)]
         valor_terminal = fluxos[-1] * 1.03 / (wacc - 0.03)

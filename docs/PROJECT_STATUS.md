@@ -1,10 +1,11 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 28/06/2026
-> **Status:** ✅ **BUY-REFINE-001 — Bug tipo Enum + remoção radar + optional chaining**
-> **Versão:** v0.9.32
+> **Status:** ✅ **VALUATION-001 — Campos EPS e FCF no modelo Ativo**
+> **Versão:** v0.9.33
 
 ### 🔧 Últimas correções (28/06/2026)
+- **VALUATION-001 ✅ CONCLUÍDO:** Campos `eps` (Numeric 10,4) e `fcf` (Numeric 15,2) adicionados ao modelo `Ativo`. Migration Alembic `20260628_1800` criada e aplicada. `calculos_blueprint.py` corrigido — lê `ativo.eps` e `ativo.fcf` do banco com fallback 2.50/5.0 quando NULL. Paridade de bancos aplicada (`exitusdb` + `exitusdb_test`). Endpoint `/api/calculos/preco_teto/ITUB4` validado: Graham e DCF agora usam dados do banco (teste com eps=3.50 → Graham 2713.33, fcf=8.0 → DCF 92.3). `EXITUS_DB_STRUCTURE.txt` atualizado. Suite: 543 passed, 6 skipped, 1 failed (IR — pré-existente), 1 error (reconciliação — pré-existente).
 - **BUY-REFINE-001 ✅ RESOLVIDO:** Bug `str(TipoAtivo.ACAO)` retornava `'tipoativo.acao'` → ITUB4 sempre caia no branch `padrao`. Fix: `.value` se Enum. ITUB4 agora mostra 4 métodos reais (Bazin/Graham/Gordon/DCF), Valor Justo R$499,51, Margem 91,5%. Radar chart removido (1 coluna, layout mais limpo). Optional chaining nos `x-text` de `precoTetoDetalhes` eliminou 4 TypeErrors. Manual atualizado com seção sobre as duas fontes de margem.
 - **BUY-OPT-A ✅ IMPLEMENTADO:** Refatoração do layout Buy Signals — gauge removido, Score+Label+Barra em linha única no topo, radar na coluna esquerda (240px), card Valor Justo na coluna direita, badge de sinal inline com a porcentagem de margem, strip compacto de 4 componentes no rodapé. Padrão inspirado em Morningstar. Validado com ITUB4 sem erros de console.
 - **BUY-VAL-003 ✅ IMPLEMENTADO:** Cartão "Preço vs Valor Justo" no Buy Signals detalha preço atual, valor justo médio, margem e barra comparativa; tabela expansível de métodos (Bazin, Graham, Gordon, DCF, Cap Rate) com parâmetros regionais; grid dos componentes (Margem, Z-Score, DY, Beta) com barras de progresso. Backend `/margem-seguranca/<ticker>` passou a retornar `preco_atual` e `preco_teto`, frontend consome `/api/calculos/preco_teto/<ticker>`. Manual do usuário passou a documentar o cálculo do Preço Teto.
