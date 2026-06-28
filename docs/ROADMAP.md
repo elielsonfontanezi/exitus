@@ -206,12 +206,14 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 |--------|---------------|--------|
 | **VALUATION-001** | Adicionar EPS e FCF ao modelo Ativo | ✅ Concluído (28/06/2026) |
 | **CLEANUP-MIGRATIONS-001** | Remover diretório alembic/ duplicado (dívida técnica) | 📋 Planejado |
+| **SEED-MACRO-001** | Popular tabela parametros_macro com valores reais BR/US | 🔴 Pré-requisito |
 | **VALUATION-002** | Popular EPS/FCF reais no banco (yfinance ou seed) | 🔴 Alta |
 | **BUG-VAL-001** | Corrigir fórmulas Bazin/Gordon/Graham (bugs estruturais) | 🔴 Alta |
-| **BUG-VAL-002** | Valor Justo Médio: usar mediana, não média simples | 🟡 Média |
-| **BUG-VAL-003** | Componente Margem do Score: 0/30 pts com 91,5% de margem | 🟡 Média |
+| **BUG-VAL-002** | Valor Justo Médio: usar mediana (absorvido por BUG-VAL-005) | ♻️ Absorvido |
+| **BUG-VAL-003** | Componente Margem do Score incoerente (resolvido por BUG-VAL-004) | ♻️ Absorvido |
 | **BUG-VAL-004** | Unificar preco_teto (estático) e pt_medio (calculado) | 🔴 Alta |
-| **BUG-VAL-005** | Metodologia de agregação: média simples → padrão de mercado | 🔴 Alta |
+| **BUG-VAL-005** | Metodologia de agregação: padrão de mercado (valuation_service.py) | 🔴 Alta |
+| **BUG-VAL-006** | FII: fórmula cap_rate incorreta (1/cap_rate) | 🔴 Alta |
 | REBALANCE-001 | Rebalanceamento automático | 📋 Planejado |
 | CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
@@ -292,10 +294,13 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 **Bug 2 — Bazin (linha 72):**
 - Fórmula atual: `dy / (k - g)` onde `dy` é dividend_yield decimal (0,06)
-- Bazin deveria usar dividendo por ação, não yield: `dividendo = dy * preco_atual`
+- **Erro duplo:** usa yield decimal (não dividendo por ação) E usa `k-g` (Gordon) em vez do threshold fixo de Bazin (6%)
 - Resultado atual: 0,06 / 0,055 = R$ 1,09 (errado)
-- **Fix:** `(dy * preco_atual) / (k - g)`
-- Resultado corrigido: (0,06 × 42,24) / 0,055 = R$ 46,08 (razoável)
+- **Fix correto:** `(dy * preco_atual) / 0.06`
+  - Décio Bazin: Preço Teto = Dividendo Anual por Ação / 6% (threshold fixo)
+  - 6% é o rendimento mínimo exigido por Bazin — independe de k ou g
+- Resultado corrigido (ITUB4): (0,06 × 42,24) / 0,06 = **R$ 42,24** (teto = preço quando DY exato 6%)
+- **ATENÇÃO:** Não usar `(k - g)` — isso seria Gordon Growth Model, não Bazin. Os dois devem ser métodos distintos.
 
 **Bug 3 — Gordon (linhas 74-75):**
 - Fórmula atual: `d1 = dy * (1 + g)` onde `dy` é yield decimal
@@ -311,17 +316,13 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 ---
 
-### BUG-VAL-002 — Valor Justo Médio: usar mediana (🟡 Média)
+### BUG-VAL-002 — Valor Justo Médio: usar mediana (♻️ Absorvido por BUG-VAL-005)
 
 **Problema identificado (28/06/2026):**
 - Linha 90: `pt_medio = sum([v["pt"] for v in metodos.values()]) / 4`
 - Média simples é distorcida por outliers (ex: Graham R$ 1.938 arrasta média para R$ 499)
-- **Fix:** Usar mediana em vez de média
 
-**Arquivo a modificar:**
-- `backend/app/blueprints/calculos_blueprint.py:90`
-
-**Prioridade:** Média | **Risco:** Baixo
+**Status:** Absorvido por BUG-VAL-005 — `valuation_service.py` implementará mediana ponderada + remoção de outliers (IQR) de forma mais completa. Não implementar isoladamente em `calculos_blueprint.py`.
 
 ---
 
@@ -497,7 +498,60 @@ Todas as abordagens de mercado chegam a **R$ 46-47** — valor razoável para IT
 - `backend/tests/test_valuation_service.py` — **novo** testes unitários
 
 **Prioridade:** Alta | **Risco:** Médio
-**Dependências:** BUG-VAL-001 (fixes das fórmulas) e VALUATION-002 (popular EPS/FCF) devem ser feitos primeiro
+**Dependências:** SEED-MACRO-001 + BUG-VAL-001 + VALUATION-002 devem ser feitos primeiro
+
+---
+
+### SEED-MACRO-001 — Popular tabela parametros_macro com valores reais BR/US (🔴 Pré-requisito)
+
+**Problema identificado (28/06/2026 — análise crítica do plano de valuation):**
+- Tabela `parametros_macro` está **completamente vazia** no banco (0 rows)
+- Todo o sistema de valuation usa defaults hardcoded em `parametros_macro_service.py:141-148`:
+  - `taxa_livre_risco = 0.105` (10,5%)
+  - `crescimento_medio = 0.05` (5%)
+  - `custo_capital = 0.12` (12%)
+- Os "parâmetros regionais dinâmicos" mencionados no código são uma **ilusão** — BR e US usam os mesmos valores fixos
+- BUG-VAL-005 (pesos por perfil) depende de parâmetros reais por mercado para funcionar corretamente
+
+**Plano de implementação:**
+1. Seed via `flask shell` ou script: inserir parâmetros para BR/B3 e US/NYSE
+2. Valores iniciais sugeridos:
+
+| pais | mercado | taxa_livre_risco | crescimento_medio | custo_capital | cap_rate_fii |
+|------|---------|-----------------|-------------------|---------------|-------------|
+| BR | B3 | 0.105 (Selic) | 0.050 | 0.120 | 0.080 |
+| US | NYSE | 0.043 (T-Bill) | 0.070 | 0.090 | 0.055 |
+| US | NASDAQ | 0.043 (T-Bill) | 0.100 | 0.100 | 0.050 |
+
+3. Verificar: `SELECT * FROM parametros_macro;` deve retornar ≥ 2 rows
+
+**Arquivos a modificar:**
+- Script de seed ou `backend/app/seeds/seed_parametros_macro.py` — **novo**
+
+**Prioridade:** Pré-requisito para BUG-VAL-001 (regional) e BUG-VAL-005 (pesos por perfil) | **Risco:** Baixo
+
+---
+
+### BUG-VAL-006 — FII: fórmula cap_rate incorreta (🔴 Alta)
+
+**Problema identificado (28/06/2026 — análise crítica do plano de valuation):**
+- Linha 95 em `calculos_blueprint.py`: `pt_cap_rate = 1 / cap_rate`
+- Para `cap_rate = 0.089` → resultado = R$ 11,24 (sem sentido dimensional)
+- A fórmula `1/cap_rate` não tem relação com o preço por cota do FII
+
+**Fórmula correta:**
+```python
+# Preço teto via Cap Rate (padrão de mercado para FIIs)
+dy_anual = dy * preco_atual          # dividendo anual por cota (R$)
+pt_cap_rate = dy_anual / cap_rate    # preço teto implícito
+# Ex: HGLG11 → dy=8,2%, preco=152,30, cap=8,9%
+# pt = (0.082 × 152.30) / 0.089 = 12.49 / 0.089 = R$ 140,22
+```
+
+**Arquivo a modificar:**
+- `backend/app/blueprints/calculos_blueprint.py:94-100`
+
+**Prioridade:** Alta | **Risco:** Baixo (FIIs não afetam cálculos de ações)
 
 | **DIVCALENDAR-001** | Calendário de dividendos | ✅ Concluído (10/03/2026) |
 | **BLUEPRINT-CONSOLIDATION-001** | Consolidação de blueprints | ✅ Concluído (10/03/2026) |
