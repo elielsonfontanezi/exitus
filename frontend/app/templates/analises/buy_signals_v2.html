@@ -111,6 +111,14 @@
             </div>
         </div>
     </div>
+
+    <!-- Radar Chart - Componentes do Buy Score -->
+    <div x-show="scoreResultado?.components" x-cloak x-effect="renderRadarChart()" style="margin-top:1.5rem;">
+        <div style="font-size:0.85rem; font-weight:600; margin-bottom:0.5rem;">Componentes do Buy Score</div>
+        <div style="height:250px;">
+            <canvas id="buyScoreRadar"></canvas>
+        </div>
+    </div>
 </div>
 
 <!-- Erro consulta -->
@@ -200,6 +208,7 @@ function pageDataExtend() {
         zscoreResultado: null,
         zscoreError: '',
         consultaError: '',
+        buyScoreChartInstance: null,
 
         async loadData() {
             try {
@@ -267,11 +276,104 @@ function pageDataExtend() {
                     const msg = zscoreRes.status === 'fulfilled' ? (zscoreRes.value?.error || zscoreRes.value?.message) : '';
                     this.zscoreError = msg || 'Z-Score indisponível';
                 }
+
+                // Renderizar radar chart após receber dados
+                this.$nextTick(() => {
+                    this.renderRadarChart();
+                });
             } catch (e) {
                 this.consultaError = e.message || 'Erro de conexão';
             } finally {
                 this.consultando = false;
             }
+        },
+
+        renderRadarChart() {
+            if (!this.scoreResultado?.components) return;
+
+            const canvas = document.getElementById('buyScoreRadar');
+            if (!canvas) return;
+
+            // Destruir chart existente se houver (usando Chart.getChart)
+            const existingChart = Chart.getChart(canvas);
+            if (existingChart) {
+                existingChart.destroy();
+            }
+
+            const components = this.scoreResultado.components;
+            const labels = ['Margem', 'Z-Score', 'DY', 'Beta'];
+            const data = [
+                (components.margem.points / components.margem.max) * 100,
+                (components.zscore.points / components.zscore.max) * 100,
+                (components.dy.points / components.dy.max) * 100,
+                (components.beta.points / components.beta.max) * 100
+            ];
+
+            this.buyScoreChartInstance = new Chart(canvas, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: this.scoreResultado.ticker,
+                        data: data,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgb(59, 130, 246)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgb(59, 130, 246)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(59, 130, 246)',
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            min: 0,
+                            ticks: {
+                                stepSize: 20,
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const comp = components[context.label.toLowerCase()];
+                                    if (comp) {
+                                        return context.label + ': ' + comp.points + '/' + comp.max + ' pts (' + comp.value + ')';
+                                    }
+                                    return context.label + ': ' + context.parsed.r.toFixed(1) + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
     };
 }

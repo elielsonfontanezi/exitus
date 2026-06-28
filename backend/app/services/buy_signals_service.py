@@ -30,7 +30,19 @@ def calcular_margem_seguranca(ticker_or_ativo):
     return margem, preco_teto
 
 def calcular_buy_score(ticker_or_ativo):
-    """Calcula buy score. Aceita ticker (str) ou objeto Ativo."""
+    """Calcula buy score. Aceita ticker (str) ou objeto Ativo.
+    
+    Returns:
+        dict: {
+            'score': int (0-100),
+            'components': {
+                'margem': {'value': float, 'points': int, 'max': 30},
+                'zscore': {'value': float, 'points': int, 'max': 25},
+                'dy': {'value': float, 'points': int, 'max': 20},
+                'beta': {'value': float, 'points': int, 'max': 25}
+            }
+        }
+    """
     if isinstance(ticker_or_ativo, str):
         ativo = Ativo.query.filter_by(ticker=ticker_or_ativo.upper()).first()
         if not ativo:
@@ -54,7 +66,16 @@ def calcular_buy_score(ticker_or_ativo):
     beta_pts = np.clip(max(0, 25 - (beta - 1) * 12.5), 0, 25)
     
     score = margem_pts + z_pts + dy_pts + beta_pts
-    return round(min(score, 100))
+    
+    return {
+        'score': round(min(score, 100)),
+        'components': {
+            'margem': {'value': round(margem, 2), 'points': round(margem_pts), 'max': 30},
+            'zscore': {'value': round(zscore, 2), 'points': z_pts, 'max': 25},
+            'dy': {'value': round(dy, 2), 'points': round(dy_pts), 'max': 20},
+            'beta': {'value': round(beta, 2), 'points': round(beta_pts), 'max': 25}
+        }
+    }
 
 
 def calcular_zscore(ticker_or_ativo, dias: int = 252) -> float:
@@ -120,7 +141,8 @@ def obter_watchlist_top():
     resultado = []
     for ativo in ativos:
         try:
-            score = calcular_buy_score(ativo.ticker)
+            score_result = calcular_buy_score(ativo.ticker)
+            score = score_result['score'] if isinstance(score_result, dict) else score_result
             resultado.append({
                 "ticker": ativo.ticker,
                 "buy_score": score,

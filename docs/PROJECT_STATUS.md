@@ -1,10 +1,11 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 28/06/2026
-> **Status:** ✅ **HIST-002 Validado — Z-Score funcionando no frontend**
-> **Versão:** v0.9.28
+> **Status:** ✅ **Radar Chart implementado — Visualização de componentes do Buy Score**
+> **Versão:** v0.9.29
 
 ### 🔧 Últimas correções (28/06/2026)
+- **Radar Chart ✅ IMPLEMENTADO:** Visualização gráfica dos componentes do Buy Score (Margem, Z-Score, DY, Beta) usando Chart.js. Backend modificado para retornar componentes individuais (value, points, max) via `calcular_buy_score()`. Endpoints `/buy-score/<ticker>` e `/analisar/<ticker>` atualizados. Radar chart mostra percentual de pontos obtidos vs máximo possível para cada componente. Validado com ITUB4 (100% em todos os componentes) e VALE3 (distribuição variada). `obter_watchlist_top()` corrigido para extrair score do novo formato de retorno.
 - **HIST-002 ✅ VALIDADO:** Histórico de preços com fallback multi-provider implementado e validado no frontend. Z-Score calculado corretamente (-2.97 para ITUB4 usando 168 dias de histórico), Buy Score dinâmico (100 FORTE COMPRA, não mais 50 fixo). Correções de bugs encontrados durante validação: import de logger em buy_signals_service.py, campo z_score → zscore para consistência com frontend, lógica ajustada para usar histórico existente se ≥30 dias.
 - **BUG-014/015/017 ✅ RESOLVIDOS indiretamente via BUG-009v2:** Busca por ticker no catálogo (BUG-014), detalhe de ativo lento/sem dados (BUG-015) e busca em Buy Signals (BUG-017) — todos causados pelo mesmo problema de `BROWSER_API_URL` vs `BACKEND_API_URL`. Após separação, todas as chamadas `apiFetch()` do Alpine.js funcionam. Auditoria: 13 OK, 23 PARCIAL, 0 QUEBRADO.
 - **`.windsurfrules REGRA #3 atualizada:`** Adicionado "Modelo free (custo zero)" ao cabeçalho obrigatório + coluna "Melhor Free" na tabela de recomendações por tipo de tarefa.

@@ -28,8 +28,8 @@ def buy_score(ticker):
     if not ativo:
         return jsonify({"success": False, "error": f"Ativo {ticker} não encontrado"}), 404
     try:
-        score = calcular_buy_score(ticker)
-        return jsonify({"success": True, "data": {"ticker": ticker, "buy_score": score}})
+        result = calcular_buy_score(ticker)
+        return jsonify({"success": True, "data": {"ticker": ticker, "buy_score": result['score'], "components": result['components']}})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
 
@@ -71,21 +71,23 @@ def analisar_ativo(ticker):
         }), 404
     
     try:
-        buy_score = calcular_buy_score(ticker)
+        buy_score_result = calcular_buy_score(ticker)
+        buy_score = buy_score_result['score']
         margem, preco_teto = calcular_margem_seguranca(ticker)
-        
+
         try:
             z_score = calcular_zscore(ticker)
         except:
             z_score = 0.0
-        
+
         sinal = "COMPRAR" if buy_score >= 80 else "AGUARDAR" if buy_score >= 60 else "VENDER"
-        
+
         resultado = {
             "ticker": ticker,
             "nome": ativo.nome or ticker,
             "mercado": ativo.mercado or "BR",
             "buyscore": buy_score,
+            "components": buy_score_result['components'],
             "margem": round(margem, 2),
             "z_score": z_score,
             "sinal": sinal,
@@ -97,7 +99,7 @@ def analisar_ativo(ticker):
             "roe": float(ativo.roe) if ativo.roe else 0.0,
             "tipo": ativo.tipo.value if ativo.tipo else "ACAO"
         }
-        
+
         return jsonify({"success": True, "data": resultado}), 200
         
     except Exception as e:

@@ -8,6 +8,30 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Radar Chart: Visualização de componentes do Buy Score (28/06/2026)
+
+**Diagnóstico:** A tela Buy Signals mostrava apenas Margem de Segurança e Z-Score, mas o Buy Score é calculado com base em 4 componentes (Margem, Z-Score, DY, Beta). Usuário solicitou visualização gráfica de todos os componentes para melhor compreensão da pontuação.
+
+**Implementação:**
+- `backend/app/services/buy_signals_service.py`: `calcular_buy_score()` agora retorna dict com `score` e `components` (value, points, max para cada componente)
+- `backend/app/blueprints/buy_signals_blueprint.py`: endpoints `/buy-score/<ticker>` e `/analisar/<ticker>` atualizados para incluir `components` no response
+- `backend/app/services/buy_signals_service.py`: `obter_watchlist_top()` corrigido para extrair `score` do novo formato de retorno
+- `frontend/app/templates/analises/buy_signals_v2.html`: adicionado radar chart usando Chart.js com x-effect para renderização automática
+- Radar chart mostra percentual de pontos obtidos vs máximo possível para cada componente (Margem 30pts, Z-Score 25pts, DY 20pts, Beta 25pts)
+- Tooltip customizado mostra pontos/max e valor bruto de cada componente
+
+**Validação Frontend (28/06/2026):**
+- ITUB4: Radar chart exibido com 100% em todos os componentes (Margem 30/30pts, Z-Score 25/25pts, DY 20/20pts, Beta 25/25pts) ✅
+- VALE3: Radar chart exibido com distribuição variada (Margem 0/30pts, Z-Score 5/25pts, DY 20/20pts, Beta 25/25pts) ✅
+- Chart.js reutiliza canvas corretamente com `Chart.getChart(canvas).destroy()` ✅
+
+**Artefatos modificados:**
+- `backend/app/services/buy_signals_service.py`: `calcular_buy_score()` retorna dict com components, `obter_watchlist_top()` corrigido
+- `backend/app/blueprints/buy_signals_blueprint.py`: endpoints atualizados com components no response
+- `frontend/app/templates/analises/buy_signals_v2.html`: radar chart implementado com Chart.js e x-effect
+
+---
+
 ### Feat — HIST-002: Histórico de preços com fallback multi-provider (28/06/2026)
 
 **Diagnóstico:** `CotacoesService.buscar_historico()` só usava yfinance (sem fallback). Quando yfinance falhava no container Podman (`Failed to get ticker 'ITUB4.SA'`), nenhum histórico era salvo → `calcular_zscore()` levantava exceção → Buy Score caía no fallback fixo (50) e a tela mostrava "Z-Score indisponível".
