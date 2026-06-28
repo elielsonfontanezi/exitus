@@ -210,6 +210,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | **BUG-VAL-001** | Corrigir fórmulas Bazin/Gordon/Graham (bugs estruturais) | 🔴 Alta |
 | **BUG-VAL-002** | Valor Justo Médio: usar mediana, não média simples | 🟡 Média |
 | **BUG-VAL-003** | Componente Margem do Score: 0/30 pts com 91,5% de margem | 🟡 Média |
+| **BUG-VAL-004** | Unificar preco_teto (estático) e pt_medio (calculado) | 🔴 Alta |
 | REBALANCE-001 | Rebalanceamento automático | 📋 Planejado |
 | CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
@@ -327,13 +328,60 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 **Problema identificado (28/06/2026):**
 - Tela mostra Margem 91,50% mas componente "Margem" do Score = 0/30 pts
-- Contradição: se margem é 91,5%, deveria ter pontuação alta
-- Provável causa: componente usa faixas diferentes ou compara com `ativo.preco_teto` (campo separado)
+- **Causa raiz confirmada:** componente usa `ativo.preco_teto` (estático, R$ 38,00) enquanto o card usa `pt_medio` (calculado, R$ 499,51)
+- ITUB4: preco_atual=42,24, preco_teto=38,00 → margem = (38-42,24)/38 = **-11,2%** → negativa → 0 pts
+- Card mostra +91,5% (vs pt_medio) — **contradição total**
+- Ver BUG-VAL-004 para solução de unificação
 
-**Arquivo a investigar:**
-- `backend/app/services/buy_signals_service.py` — cálculo do componente Margem
+**Arquivo a modificar:**
+- `backend/app/services/buy_signals_service.py:14-30` — cálculo do componente Margem
 
 **Prioridade:** Média | **Risco:** Baixo
+**Dependências:** BUG-VAL-004 (unificar preco_teto vs pt_medio) resolve este bug também
+
+---
+
+### BUG-VAL-004 — Unificar preco_teto (estático) e pt_medio (calculado) (🔴 Alta)
+
+**Problema identificado (28/06/2026 — investigação aprofundada):**
+
+O sistema mantém **dois conceitos de "valor justo"** que não se comunicam:
+
+**1. `ativo.preco_teto` (campo estático no banco):**
+- Populado via seed (`ativos_fundamentalistas.json`) — valores subjetivos manuais
+- Exemplos no banco: ITUB4=38,00, PETR4=45,00, VALE3=75,00, AAPL=195,00
+- Usado por: `buy_signals_service.py:calcular_margem_seguranca()` → componente Margem do Buy Score
+- **Problema:** Valor subjetivo sem metodologia clara — alguém decidiu "teto" sem fórmula
+
+**2. `pt_medio` (calculado dinamicamente):**
+- Calculado em `calculos_blueprint.py:90` — média de Bazin+Graham+Gordon+DCF
+- Não é persistido no banco — calculado em tempo real
+- Usado por: card "Valor Justo" na tela Buy Signals
+- **Problema:** Tem bugs estruturais (BUG-VAL-001) mas é metodologicamente correto
+
+**Divergência observada (ITUB4):**
+- `preco_teto` (banco): R$ 38,00
+- `pt_medio` (calculado): R$ 499,51 (13x diferente!)
+- Margem 1 (vs pt_medio): 91,50% → 🟢 COMPRA
+- Margem 2 (vs preco_teto): (38-42,24)/38 = -11,2% → deveria ser 🔴 VENDA
+- **Contradição total na mesma tela**
+
+**Solução proposta:**
+1. **Eliminar `ativo.preco_teto`** como fonte de verdade para Score
+2. Buy Score deve usar `pt_medio` calculado (após fixes BUG-VAL-001/002)
+3. `ativo.preco_teto` pode permanecer como campo opcional (override manual) mas não como fonte primária
+4. Renomear na tela:
+   - "Margem vs Valor Justo Calculado" (pt_medio)
+   - "Margem vs Teto Manual" (preco_teto, se existir)
+5. Ou unificar: Score usa sempre pt_medio, preco_teto vira apenas referência
+
+**Arquivos a modificar:**
+- `backend/app/services/buy_signals_service.py:14-30` — usar pt_medio em vez de preco_teto
+- `backend/app/blueprints/buy_signals_blueprint.py` — endpoint margem-seguranca
+- `frontend/app/templates/analises/buy_signals_v2.html` — renomear labels
+
+**Prioridade:** Alta | **Risco:** Médio (muda Buy Score — validar com testes)
+**Dependências:** BUG-VAL-001 (fixes das fórmulas) deve ser feito primeiro
 
 | **DIVCALENDAR-001** | Calendário de dividendos | ✅ Concluído (10/03/2026) |
 | **BLUEPRINT-CONSOLIDATION-001** | Consolidação de blueprints | ✅ Concluído (10/03/2026) |
