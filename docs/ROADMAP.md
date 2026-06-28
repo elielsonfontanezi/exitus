@@ -204,9 +204,37 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 | GAP ID | Funcionalidade | Status |
 |--------|---------------|--------|
+| **VALUATION-001** | Adicionar EPS e FCF ao modelo Ativo | 🎯 PRÓXIMA AÇÃO |
 | REBALANCE-001 | Rebalanceamento automático | 📋 Planejado |
 | CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
+
+### VALUATION-001 — Adicionar EPS e FCF ao modelo Ativo (🎯 PRÓXIMA AÇÃO)
+
+**Problema identificado (28/06/2026):**
+- `calculos_blueprint.py` usa valores hardcoded: `eps = 2.50` (linha 71), `fcf = 5.0` (linha 77)
+- Graham e DCF calculam com números fictícios → `pt_medio` incorreto
+- **Consequência:** Valuation não confiável (ex: ITUB4 → Valor Justo R$499,51 com preço atual R$42,24)
+
+**Plano de implementação:**
+1. Adicionar campos `eps` (Numeric 10, 4) e `fcf` (Numeric 15, 2) ao modelo `Ativo`
+2. Criar migration Alembic: `alembic revision --autogenerate -m "add_eps_fcf_to_ativo"`
+3. Corrigir hardcoded em `calculos_blueprint.py`: usar `ativo.eps` e `ativo.fcf` com fallback
+4. (Opcional) Atualizar seed com valores realistas de EPS/FCF para ITUB4
+5. Validar `/api/calculos/preco_teto/ITUB4` → Valor Justo deve ser razoável
+
+**Arquivos a modificar:**
+- `backend/app/models/ativo.py` — adicionar campos
+- `backend/alembic/versions/[nova_migration].py` — migration
+- `backend/app/blueprints/calculos_blueprint.py` — corrigir hardcoded
+- `docs/CHANGELOG.md` — documentar
+- `docs/PROJECT_STATUS.md` — atualizar status
+
+**Modelo IA recomendado:** Claude Sonnet 4.6 Thinking ($$)
+
+**Próximos passos (futuros):**
+- Implementar busca de EPS/FCF via API externa (yfinance) para eliminar fallback
+- Unificar Buy Score engine para usar `pt_medio` dinâmico em vez de `ativo.preco_teto`
 | **DIVCALENDAR-001** | Calendário de dividendos | ✅ Concluído (10/03/2026) |
 | **BLUEPRINT-CONSOLIDATION-001** | Consolidação de blueprints | ✅ Concluído (10/03/2026) |
 | ORPHAN-001 | Limpeza de código órfão | ❌ Cancelado (arriscado) |
