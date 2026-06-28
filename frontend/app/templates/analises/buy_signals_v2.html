@@ -228,14 +228,9 @@
                             <span>Preço Atual</span><span>Valor Justo</span>
                         </div>
                     </div>
-                    <!-- Margem de Segurança e Z-Score -->
+                    <!-- Z-Score -->
                     <div style="margin-top:0.65rem; display:flex; flex-direction:column; gap:0.3rem;"
-                         x-show="margemResultado || zscoreResultado || zscoreError">
-                        <div style="font-size:0.8rem;" x-show="margemResultado">
-                            <span style="color:#6b7280;">Margem Seg.:</span>
-                            <strong x-text="margemResultado?.margem_seguranca?.toFixed(2) + '%'"></strong>
-                            <span style="color:#6b7280; margin-left:0.25rem;" x-text="margemResultado?.sinal"></span>
-                        </div>
+                         x-show="zscoreResultado || zscoreError">
                         <div style="font-size:0.8rem;" x-show="zscoreResultado">
                             <span style="color:#6b7280;">Z-Score:</span>
                             <strong x-text="zscoreResultado?.zscore?.toFixed(2)"></strong>
