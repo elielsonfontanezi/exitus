@@ -3,6 +3,110 @@
 {% block page_title %}Buy Signals{% endblock %}
 {% block page_subtitle %}<p class="page-subtitle">Score de compra, margem de segurança e watchlist — análise quantitativa</p>{% endblock %}
 
+{% block page_css %}
+    {{ super() }}
+    <style>
+        .valor-justo-card {
+            margin-top: 1rem;
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+        }
+
+        .vj-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #9CA3AF;
+            text-transform: uppercase;
+        }
+
+        .vj-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0F172A;
+        }
+
+        .metodos-table {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            font-size: 0.85rem;
+        }
+
+        .metodos-row {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr 1fr;
+            padding: 0.4rem 0.2rem;
+            border-bottom: 1px dashed #E5E7EB;
+        }
+
+        .metodos-header {
+            font-weight: 700;
+            color: #6B7280;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .parametros-regiao {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: #6B7280;
+        }
+
+        .component-grid {
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .component-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 0.85rem;
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.04);
+        }
+
+        .component-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .component-points {
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+
+        .component-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0.35rem 0;
+        }
+
+        .component-progress {
+            height: 6px;
+            background: #F3F4F6;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .component-progress-value {
+            height: 6px;
+            border-radius: 9999px;
+        }
+
+        .component-description {
+            font-size: 0.75rem;
+            color: #6B7280;
+            margin-top: 0.35rem;
+        }
+    </style>
+{% endblock %}
+
 {% block kpi_bar %}
 <div class="kpi-bar" x-show="watchlist.length > 0">
     <div class="kpi-card">
@@ -92,7 +196,7 @@
             <div style="margin-top:1rem;" x-show="margemResultado">
                 <div style="font-size:0.85rem; font-weight:600; margin-bottom:0.25rem;">Margem de Segurança</div>
                 <div style="display:flex; gap:1rem; font-size:0.85rem;">
-                    <span>Margem: <strong x-text="margemResultado?.margem_seguranca?.toFixed(2) + '%'"></strong></span>
+                    <span>Margem: <strong x-text="margemResultado?.margem_seguranca?.toFixed(2) + '%' "></strong></span>
                     <span x-text="margemResultado?.sinal"></span>
                 </div>
             </div>
@@ -109,6 +213,7 @@
             <div style="margin-top:0.75rem;" x-show="zscoreError">
                 <div style="font-size:0.8rem; color:#9ca3af;" x-text="zscoreError"></div>
             </div>
+
         </div>
     </div>
 
@@ -118,6 +223,86 @@
         <div style="height:250px;">
             <canvas id="buyScoreRadar"></canvas>
         </div>
+    </div>
+
+    <!-- Preço vs Valor Justo -->
+    <template x-if="precoJustoInfo()">
+        <div class="valor-justo-card" x-cloak>
+            <div style="display:flex; gap:1.5rem; flex-wrap:wrap; align-items:flex-end;">
+                <div>
+                    <div class="vj-label">Preço Atual</div>
+                    <div class="vj-value" x-text="formatMoney(precoJustoInfo().preco_atual)"></div>
+                </div>
+                <div>
+                    <div class="vj-label">Valor Justo Médio</div>
+                    <div class="vj-value" x-text="formatMoney(precoJustoInfo().preco_teto)"></div>
+                </div>
+                <div>
+                    <div class="vj-label">Margem</div>
+                    <div class="vj-value" x-text="precoJustoInfo().margem != null ? precoJustoInfo().margem.toFixed(2) + '%' : '-' "></div>
+                    <span class="badge" :class="precoJustoInfo().margem > 5 ? 'badge-success' : precoJustoInfo().margem > 0 ? 'badge-warning' : 'badge-danger'" x-text="precoJustoInfo().sinal"></span>
+                </div>
+            </div>
+            <div style="margin-top:0.75rem;">
+                <div style="height:10px; background:#f3f4f6; border-radius:9999px; position:relative; overflow:hidden;">
+                    <div style="height:10px; border-radius:9999px; transition:width 0.4s; background:#0ea5e9;" :style="{ width: precoJustoProgress() + '%' }"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#9ca3af; margin-top:0.25rem;">
+                    <span>Preço Atual</span>
+                    <span>Valor Justo</span>
+                </div>
+            </div>
+            <div style="margin-top:0.5rem; font-size:0.8rem; color:#6b7280;" x-text="precoJustoDescricao()"></div>
+
+            <div style="margin-top:1rem;" x-show="precoTetoDetalhes?.metodos">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-size:0.85rem; font-weight:600;">Métodos de Valuation</div>
+                    <button class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem;" @click="mostrarMetodos = !mostrarMetodos">
+                        <i class="fas" :class="mostrarMetodos ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                        <span x-text="mostrarMetodos ? 'Ocultar' : 'Ver detalhes'"></span>
+                    </button>
+                </div>
+                <div x-show="mostrarMetodos" x-transition style="margin-top:0.75rem;">
+                    <div class="metodos-table">
+                        <div class="metodos-row metodos-header">
+                            <span>Método</span>
+                            <span>Valor</span>
+                            <span>Parâmetros</span>
+                        </div>
+                        <template x-for="(dados, nome) in precoTetoDetalhes.metodos" :key="nome">
+                            <div class="metodos-row">
+                                <span x-text="formatMetodoNome(nome)"></span>
+                                <span x-text="formatMoney(dados.pt)"></span>
+                                <span x-text="formatMetodoParametros(dados)"></span>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="parametros-regiao" x-show="precoTetoDetalhes?.parametros_regiao">
+                        <div>Taxa Livre de Risco: <strong x-text="precoTetoDetalhes.parametros_regiao.taxa_livre_risco"></strong></div>
+                        <div>Crescimento: <strong x-text="precoTetoDetalhes.parametros_regiao.crescimento"></strong></div>
+                        <div>WACC: <strong x-text="precoTetoDetalhes.parametros_regiao.wacc"></strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <div style="margin-top:0.5rem; font-size:0.8rem; color:#dc2626;" x-show="precoTetoError" x-text="precoTetoError"></div>
+
+    <!-- Grid detalhado dos componentes -->
+    <div class="component-grid" x-show="componentCardData().length" x-cloak>
+        <template x-for="card in componentCardData()" :key="card.key">
+            <div class="component-card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="component-label" x-text="card.label"></div>
+                    <div class="component-points" x-text="card.pointsLabel"></div>
+                </div>
+                <div class="component-value" x-text="card.valueLabel"></div>
+                <div class="component-progress">
+                    <div class="component-progress-value" :style="{ width: card.percent + '%', background: card.color }"></div>
+                </div>
+                <div class="component-description" x-text="card.description"></div>
+            </div>
+        </template>
     </div>
 </div>
 
@@ -209,6 +394,9 @@ function pageDataExtend() {
         zscoreError: '',
         consultaError: '',
         buyScoreChartInstance: null,
+        precoTetoDetalhes: null,
+        precoTetoError: '',
+        mostrarMetodos: false,
 
         async loadData() {
             try {
@@ -247,6 +435,9 @@ function pageDataExtend() {
             this.zscoreResultado = null;
             this.zscoreError = '';
             this.consultaError = '';
+            this.precoTetoDetalhes = null;
+            this.precoTetoError = '';
+            this.mostrarMetodos = false;
 
             const ticker = this.tickerConsulta.toUpperCase();
 
@@ -277,6 +468,8 @@ function pageDataExtend() {
                     this.zscoreError = msg || 'Z-Score indisponível';
                 }
 
+                await this.carregarPrecoTeto(ticker);
+
                 // Renderizar radar chart após receber dados
                 this.$nextTick(() => {
                     this.renderRadarChart();
@@ -285,6 +478,16 @@ function pageDataExtend() {
                 this.consultaError = e.message || 'Erro de conexão';
             } finally {
                 this.consultando = false;
+            }
+        },
+
+        async carregarPrecoTeto(ticker) {
+            try {
+                const detalhes = await this.apiFetch('/api/calculos/preco_teto/' + ticker);
+                this.precoTetoDetalhes = detalhes;
+            } catch (e) {
+                this.precoTetoDetalhes = null;
+                this.precoTetoError = 'Não foi possível carregar os métodos de valuation.';
             }
         },
 
@@ -374,6 +577,91 @@ function pageDataExtend() {
                     }
                 }
             });
+        },
+
+        precoJustoInfo() {
+            if (this.precoTetoDetalhes) {
+                const margem = this.precoTetoDetalhes?.margem_seguranca ?? this.margemResultado?.margem_seguranca;
+                return {
+                    preco_atual: this.precoTetoDetalhes.preco_atual,
+                    preco_teto: this.precoTetoDetalhes.pt_medio,
+                    margem,
+                    sinal: this.precoTetoDetalhes?.sinal || this.margemResultado?.sinal || ''
+                };
+            }
+
+            if (this.margemResultado && this.margemResultado.preco_teto) {
+                return {
+                    preco_atual: this.margemResultado.preco_atual,
+                    preco_teto: this.margemResultado.preco_teto,
+                    margem: this.margemResultado.margem_seguranca,
+                    sinal: this.margemResultado.sinal
+                };
+            }
+
+            return null;
+        },
+
+        precoJustoProgress() {
+            const info = this.precoJustoInfo();
+            if (!info || !info.preco_teto) return 0;
+            const ratio = (info.preco_atual / info.preco_teto) * 100;
+            return Math.min(Math.max(ratio, 0), 100);
+        },
+
+        precoJustoDescricao() {
+            const info = this.precoJustoInfo();
+            if (!info) return '';
+            if (info.margem == null) return 'Valor justo estimado com base nos parâmetros regionais.';
+            return info.margem > 5
+                ? 'Preço atual abaixo do valor justo — oportunidade de compra.'
+                : info.margem > 0
+                    ? 'Preço levemente abaixo do valor justo — cenário neutro.'
+                    : 'Preço acima do valor justo — atenção redobrada.';
+        },
+
+        componentCardData() {
+            if (!this.scoreResultado?.components) return [];
+            const map = [
+                { key: 'margem', label: 'Margem', description: 'Distância entre preço atual e valor justo.' },
+                { key: 'zscore', label: 'Z-Score', description: 'Momentum baseado no desvio padrão dos preços.' },
+                { key: 'dy', label: 'Dividend Yield', description: 'Retorno anualizado em dividendos.' },
+                { key: 'beta', label: 'Beta', description: 'Risco relativo comparado ao mercado.' }
+            ];
+            const palette = ['#2563eb', '#0ea5e9', '#22c55e', '#f59e0b'];
+            return map.map((item, idx) => {
+                const comp = this.scoreResultado.components[item.key];
+                if (!comp) return null;
+                const percent = Math.round((comp.points / comp.max) * 100);
+                return {
+                    ...item,
+                    pointsLabel: `${comp.points}/${comp.max} pts`,
+                    valueLabel: `${comp.value}`,
+                    percent,
+                    color: palette[idx] || '#2563eb'
+                };
+            }).filter(Boolean);
+        },
+
+        formatMetodoNome(nome) {
+            const lookup = {
+                bazin: 'Bazin',
+                graham: 'Graham',
+                gordon: 'Gordon',
+                dcf: 'Fluxo de Caixa (DCF)',
+                cap_rate: 'Cap Rate',
+                padrao: 'Padrão'
+            };
+            return lookup[nome] || nome.toUpperCase();
+        },
+
+        formatMetodoParametros(dados) {
+            if (!dados) return '-';
+            const extras = [];
+            if (dados.k) extras.push(`k ${dados.k}`);
+            if (dados.cap_rate) extras.push(`Cap ${dados.cap_rate}`);
+            if (dados.wacc) extras.push(`WACC ${dados.wacc}`);
+            return extras.length ? extras.join(' • ') : (dados.descricao || '-');
         }
     };
 }

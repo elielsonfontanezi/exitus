@@ -1,10 +1,11 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 28/06/2026
-> **Status:** ✅ **Radar Chart implementado — Visualização de componentes do Buy Score**
-> **Versão:** v0.9.29
+> **Status:** ✅ **BUY-VAL-003 — Transparência Preço vs Valor Justo implementada**
+> **Versão:** v0.9.30
 
 ### 🔧 Últimas correções (28/06/2026)
+- **BUY-VAL-003 ✅ IMPLEMENTADO:** Cartão "Preço vs Valor Justo" no Buy Signals detalha preço atual, valor justo médio, margem e barra comparativa; tabela expansível de métodos (Bazin, Graham, Gordon, DCF, Cap Rate) com parâmetros regionais; grid dos componentes (Margem, Z-Score, DY, Beta) com barras de progresso. Backend `/margem-seguranca/<ticker>` passou a retornar `preco_atual` e `preco_teto`, frontend consome `/api/calculos/preco_teto/<ticker>`. Manual do usuário passou a documentar o cálculo do Preço Teto.
 - **Radar Chart ✅ IMPLEMENTADO:** Visualização gráfica dos componentes do Buy Score (Margem, Z-Score, DY, Beta) usando Chart.js. Backend modificado para retornar componentes individuais (value, points, max) via `calcular_buy_score()`. Endpoints `/buy-score/<ticker>` e `/analisar/<ticker>` atualizados. Radar chart mostra percentual de pontos obtidos vs máximo possível para cada componente. Validado com ITUB4 (100% em todos os componentes) e VALE3 (distribuição variada). `obter_watchlist_top()` corrigido para extrair score do novo formato de retorno.
 - **HIST-002 ✅ VALIDADO:** Histórico de preços com fallback multi-provider implementado e validado no frontend. Z-Score calculado corretamente (-2.97 para ITUB4 usando 168 dias de histórico), Buy Score dinâmico (100 FORTE COMPRA, não mais 50 fixo). Correções de bugs encontrados durante validação: import de logger em buy_signals_service.py, campo z_score → zscore para consistência com frontend, lógica ajustada para usar histórico existente se ≥30 dias.
 - **BUG-014/015/017 ✅ RESOLVIDOS indiretamente via BUG-009v2:** Busca por ticker no catálogo (BUG-014), detalhe de ativo lento/sem dados (BUG-015) e busca em Buy Signals (BUG-017) — todos causados pelo mesmo problema de `BROWSER_API_URL` vs `BACKEND_API_URL`. Após separação, todas as chamadas `apiFetch()` do Alpine.js funcionam. Auditoria: 13 OK, 23 PARCIAL, 0 QUEBRADO.

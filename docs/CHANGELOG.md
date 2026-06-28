@@ -8,6 +8,31 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — BUY-VAL-003: Transparência Preço vs Valor Justo (28/06/2026)
+
+**Diagnóstico:** Após o Radar Chart, usuários ainda não viam claramente como o Valor Justo era calculado nem os métodos (Bazin, Graham, Gordon, DCF/CapRate). KPI "Score ≥ 60" estava correto, mas faltava contexto visual do Preço vs Valor Justo e detalhamento dos componentes.
+
+**Implementação:**
+- `backend/app/blueprints/buy_signals_blueprint.py`: endpoint `/margem-seguranca/<ticker>` agora retorna `preco_atual` e `preco_teto` para uso direto no frontend.
+- `frontend/app/templates/analises/buy_signals_v2.html`:
+  - Card "Preço vs Valor Justo" com preço atual, valor justo médio, badge de margem e barra comparativa.
+  - Tabela expansível com métodos de valuation (Bazin, Graham, Gordon, DCF, Cap Rate) e parâmetros regionais (taxa livre de risco, crescimento, WACC).
+  - Grid de componentes (Margem, Z-Score, DY, Beta) com barras de progresso e descrições.
+  - Novos helpers Alpine (`precoJustoInfo`, `componentCardData`, `carregarPrecoTeto`) e fetch do endpoint `/api/calculos/preco_teto/<ticker>`.
+- `docs/MANUAL_USUARIO_DRAFT.md`: seção "Preço Teto / Valor Justo" documenta fórmulas e leitura do novo painel.
+
+**Validação (28/06/2026):**
+- Login `e2e_user` / `e2e_senha_123` → `/analises/buy-signals` ✅
+- Ticker ITUB4: card mostra R$ 42,24 vs R$ 46,46 (margem -9,10% NEUTRO), radar preservado e tabela de métodos listando Bazin/Graham/Gordon/DCF com parâmetros regionais ✅
+- Console limpo (apenas warning Tailwind CDN esperado) ✅
+
+**Artefatos modificados:**
+- `backend/app/blueprints/buy_signals_blueprint.py`
+- `frontend/app/templates/analises/buy_signals_v2.html`
+- `docs/MANUAL_USUARIO_DRAFT.md`
+
+---
+
 ### Feat — Radar Chart: Visualização de componentes do Buy Score (28/06/2026)
 
 **Diagnóstico:** A tela Buy Signals mostrava apenas Margem de Segurança e Z-Score, mas o Buy Score é calculado com base em 4 componentes (Margem, Z-Score, DY, Beta). Usuário solicitou visualização gráfica de todos os componentes para melhor compreensão da pontuação.

@@ -16,8 +16,19 @@ def margem_seguranca(ticker):
         return jsonify({"success": False, "error": f"Ativo {ticker} não encontrado"}), 404
     try:
         margem, preco_teto = calcular_margem_seguranca(ticker)
+        preco_atual = float(ativo.preco_atual) if ativo.preco_atual else 0.0
         sinal = "🟢 COMPRA" if margem > 5 else "🟡 NEUTRO" if margem > 0 else "🔴 VENDA"
-        return jsonify({"success": True, "data": {"ticker": ticker, "margem_seguranca": margem, "sinal": sinal}, "message": f"Margem de segurança: {margem:.2f}% vs Teto R${preco_teto:.2f}"})
+        return jsonify({
+            "success": True,
+            "data": {
+                "ticker": ticker,
+                "margem_seguranca": round(margem, 2),
+                "sinal": sinal,
+                "preco_teto": round(preco_teto, 2),
+                "preco_atual": round(preco_atual, 2)
+            },
+            "message": f"Margem de segurança: {margem:.2f}% vs Teto R${preco_teto:.2f}"
+        })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
 

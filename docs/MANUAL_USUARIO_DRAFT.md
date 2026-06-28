@@ -199,6 +199,32 @@ Z-Score = (Preço Atual - Média_252d) / Desvio_Padrão_252d
 - **Z -1 a 0:** Abaixo da média (neutro)
 - **Z > 0:** Acima da média (relativamente caro)
 
+**3. Preço Teto / Valor Justo** (`/api/calculos/preco_teto/<ticker>`)
+
+O valor justo exibido no painel é calculado no backend a partir de métodos regionais e depende do tipo do ativo. A rota aplica parâmetros macroeconômicos dinâmicos (taxa livre de risco, crescimento médio, custo de capital e cap rate) obtidos no `ParametrosMacroService`.
+
+- **Ações (Tipo "ACAO")** — Média de 4 métodos:
+  1. **Bazin Local** — Dividend Yield ajustado pela taxa livre de risco da região
+  2. **Graham Local** — Fórmula 8,5 + 2×crescimento, normalizada para a taxa livre de risco local
+  3. **Gordon Growth** — Dividendos projetados (D1) dividido por `(k - g)`
+  4. **Fluxo de Caixa Descontado (DCF)** — 5 períodos de FCF com valor terminal (3%) descontados pelo WACC regional
+
+  O valor mostrado como "Valor Justo Médio" é a média aritmética desses quatro preços teto.
+
+- **FIIs/REITs** — Utiliza Cap Rate regional: `Preço Justo = 1 / CapRate`. O cap rate vem dos parâmetros macro de FIIs.
+
+- **Demais tipos** — Fallback conservador: 10% acima do preço atual (mantém compatibilidade até que cada tipo tenha modelo dedicado).
+
+O painel "Preço vs Valor Justo" mostra:
+1. Preço atual (última cotação)
+2. Valor justo médio (média dos métodos aplicáveis)
+3. Margem calculada com base nesses valores
+4. Distribuição visual (barra que compara preço vs teto)
+5. Tabela "Métodos de Valuation" com cada método, resultado e parâmetros usados (ex.: k, WACC, cap rate)
+6. Parâmetros regionais aplicados (taxa livre de risco, crescimento, WACC)
+
+Isso permite ao usuário validar rapidamente o racional do valor justo apresentado e entender quais métodos puxam o preço para cima ou para baixo.
+
 **Requer:** mínimo de 30 registros de histórico de preços no banco (`historico_preco`). Se indisponível, a tela exibe "Z-Score indisponível".
 
 **3. Buy Score** (`calcular_buy_score`)
