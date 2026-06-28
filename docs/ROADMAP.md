@@ -211,6 +211,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | **BUG-VAL-002** | Valor Justo Médio: usar mediana, não média simples | 🟡 Média |
 | **BUG-VAL-003** | Componente Margem do Score: 0/30 pts com 91,5% de margem | 🟡 Média |
 | **BUG-VAL-004** | Unificar preco_teto (estático) e pt_medio (calculado) | 🔴 Alta |
+| **BUG-VAL-005** | Metodologia de agregação: média simples → padrão de mercado | 🔴 Alta |
 | REBALANCE-001 | Rebalanceamento automático | 📋 Planejado |
 | CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
@@ -382,6 +383,121 @@ O sistema mantém **dois conceitos de "valor justo"** que não se comunicam:
 
 **Prioridade:** Alta | **Risco:** Médio (muda Buy Score — validar com testes)
 **Dependências:** BUG-VAL-001 (fixes das fórmulas) deve ser feito primeiro
+
+---
+
+### BUG-VAL-005 — Metodologia de agregação: média simples → padrão de mercado (🔴 Alta)
+
+**Problema identificado (28/06/2026):**
+- Exitus usa **média aritmética simples** de 4 métodos (Bazin+Graham+Gordon+DCF) com pesos iguais (25% cada)
+- Não é o padrão de mercado — sistemas de referência (Investidor10, Status Invest, GuruFocus, Simply Wall St) usam abordagem mais sofisticada
+- **Problemas da abordagem atual:**
+  1. Média simples é distorcida por outliers (Graham R$ 1.938 arrasta média para R$ 499)
+  2. Todos os métodos aplicados a todos os ativos indiscriminadamente
+  3. Número único dá falsa precisão — mercado mostra faixa
+  4. Pesos iguais ignoram perfil do ativo (dividendos vs crescimento vs value)
+
+**Padrão de mercado (referências: Investidor10, Status Invest, GuruFocus, Simply Wall St):**
+
+**1. Seleção de métodos por perfil do ativo:**
+- Nem todo método se aplica a todo ativo
+- **Ações de dividendos** (BR comum): Bazin, Gordon, Graham, DCF
+- **Ações de crescimento** (US tech): DCF, Graham (com g ajustado)
+- **Value stocks**: Graham, DCF
+- **FIIs/REITs**: Cap Rate, FFO/AFFO múltiplos
+- **Renda Fixa**: Yield to Maturity
+
+**2. Remoção de outliers (método IQR — Interquartile Range):**
+- Calcular Q1, Q3 e IQR = Q3 - Q1
+- Remover valores fora de [Q1 - 1.5×IQR, Q3 + 1.5×IQR]
+- Só então calcular agregação
+
+**3. Mediana ou média ponderada (não média simples):**
+- **Mediana** — mais robusta, imune a outliers residuais
+- **Média ponderada** — pesos variam por perfil do ativo:
+
+| Perfil | Bazin | Gordon | Graham | DCF |
+|--------|-------|--------|--------|-----|
+| Dividendos (BR) | 35% | 25% | 20% | 20% |
+| Crescimento (US tech) | 10% | 10% | 30% | 50% |
+| Value | 10% | 15% | 40% | 35% |
+| Bancos (BR) | 35% | 25% | 20% | 20% |
+
+**4. Faixa de valor justo (não número único):**
+- Mostrar min, max e tendência central (mediana ou ponderada)
+- Usuário vê intervalo: "Valor Justo: R$ 35 – R$ 50 (mediana: R$ 46)"
+- Margem de segurança calculada contra a mediana
+
+**5. Margem de segurança conservadora:**
+- Usar o **limite inferior** da faixa (cuidado) ou mediana (neutro)
+- Sinal: COMPRA se preço < mediana × 0,80 (20% margem), NEUTRO se entre 0,80-1,00, VENDA se > 1,00
+
+**Arquitetura proposta:**
+
+```python
+# novo arquivo: backend/app/services/valuation_service.py
+
+def calcular_valor_justo(ativo, params):
+    # 1. Classificar perfil do ativo
+    perfil = classificar_perfil(ativo)  # dividend, growth, value, fii, bond
+
+    # 2. Selecionar métodos aplicáveis ao perfil
+    metodos_aplicaveis = METODOS_POR_PERFIL[perfil]
+
+    # 3. Calcular cada método
+    valores = {}
+    for metodo in metodos_aplicaveis:
+        valores[metodo] = calcular_metodo(metodo, ativo, params)
+
+    # 4. Remover outliers (IQR)
+    valores_filtrados = remover_outliers_iqr(valores)
+
+    # 5. Calcular faixa e tendência central
+    faixa = (min(valores_filtrados.values()), max(valores_filtrados.values()))
+    valor_justo = mediana(valores_filtrados)  # ou ponderada
+
+    # 6. Margem de segurança
+    margem = (valor_justo - preco_atual) / valor_justo * 100
+
+    return {
+        'valor_justo': valor_justo,
+        'faixa_min': faixa[0],
+        'faixa_max': faixa[1],
+        'margem_seguranca': margem,
+        'metodos': valores,
+        'perfil': perfil,
+        'pesos': PESOS_POR_PERFIL.get(perfil, {}),
+        'outliers_removidos': set(valores) - set(valores_filtrados)
+    }
+```
+
+**Comparação de resultados (ITUB4 com EPS=4,17, após fixes BUG-VAL-001):**
+
+| Método | Valor |
+|--------|-------|
+| Bazin | R$ 46,08 |
+| Graham | R$ 32,33 |
+| Gordon | R$ 48,38 |
+| DCF | R$ 57,69 |
+
+| Abordagem | Cálculo | Resultado |
+|-----------|---------|-----------|
+| Exitus atual (média simples) | (46+32+48+58)/4 | R$ 46,00 |
+| **Mediana** | meio(32,46,48,58) | **R$ 47,00** |
+| **Ponderada (dividendos)** | 46×35%+48×25%+32×20%+58×20% | **R$ 46,80** |
+| **Faixa** | min–max | **R$ 32 – R$ 58** |
+
+Todas as abordagens de mercado chegam a **R$ 46-47** — valor razoável para ITUB4 (preço atual R$ 42,24 → margem ~10%).
+
+**Arquivos a criar/modificar:**
+- `backend/app/services/valuation_service.py` — **novo** serviço central de valuation
+- `backend/app/blueprints/calculos_blueprint.py` — usar valuation_service
+- `backend/app/services/buy_signals_service.py` — usar valuation_service para margem
+- `frontend/app/templates/analises/buy_signals_v2.html` — mostrar faixa em vez de número único
+- `backend/tests/test_valuation_service.py` — **novo** testes unitários
+
+**Prioridade:** Alta | **Risco:** Médio
+**Dependências:** BUG-VAL-001 (fixes das fórmulas) e VALUATION-002 (popular EPS/FCF) devem ser feitos primeiro
 
 | **DIVCALENDAR-001** | Calendário de dividendos | ✅ Concluído (10/03/2026) |
 | **BLUEPRINT-CONSOLIDATION-001** | Consolidação de blueprints | ✅ Concluído (10/03/2026) |
