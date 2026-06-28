@@ -175,11 +175,13 @@ Authorization: Bearer <token>
 
 **1. Margem de Segurança** (`calcular_margem_seguranca`)
 
-Mede a distância entre o preço atual e o **valor justo calculado** do ativo. Após a unificação planejada (BUG-VAL-004), a margem passará a usar o valor justo dinâmico (`pt_medio`) em vez do campo `ativo.preco_teto` armazenado no banco.
+Mede a distância entre o preço atual e o **valor justo calculado em tempo real** do ativo. O valor justo é sempre recalculado quando você consulta o ticker — não é armazenado no banco.
 
 ```
 Margem = (Valor Justo - Preço Atual) / Valor Justo × 100
 ```
+
+O sistema ainda mantém o campo `preco_teto_usuario` (antigo `preco_teto`) como uma referência opcional definida manualmente pelo usuário, mas ele **não influencia** o Buy Score.
 
 - **Margem > 20%:** 🟢 COMPRA — ativo significativamente abaixo do valor justo
 - **Margem 0-20%:** 🟡 NEUTRO — próximo do valor justo
@@ -221,6 +223,10 @@ Onde:
 - **k** = taxa livre de risco em decimal (ex: 0.105)
 - **WACC** = custo médio ponderado de capital (decimal)
 - **FCF** = Free Cash Flow por ação
+
+##### Sobre `preco_teto_usuario` (campo opcional)
+
+O sistema permite que você cadastre um **teto manual** para o ativo. Ele aparece na tela como referência, mas **não é usado no cálculo do Buy Score**. O score sempre usa o valor justo calculado em tempo real pelos métodos de valuation.
 
 ##### Para FIIs/REITs
 

@@ -368,22 +368,43 @@ O sistema mantém **dois conceitos de "valor justo"** que não se comunicam:
 - Margem 2 (vs preco_teto): (38-42,24)/38 = -11,2% → deveria ser 🔴 VENDA
 - **Contradição total na mesma tela**
 
-**Solução proposta:**
-1. **Eliminar `ativo.preco_teto`** como fonte de verdade para Score
-2. Buy Score deve usar `pt_medio` calculado (após fixes BUG-VAL-001/002)
-3. `ativo.preco_teto` pode permanecer como campo opcional (override manual) mas não como fonte primária
-4. Renomear na tela:
-   - "Margem vs Valor Justo Calculado" (pt_medio)
-   - "Margem vs Teto Manual" (preco_teto, se existir)
-5. Ou unificar: Score usa sempre pt_medio, preco_teto vira apenas referência
+**Solução adotada (Opção B):**
+
+**1. Renomear `ativo.preco_teto` → `ativo.preco_teto_usuario`**
+- O campo permanece no banco, mas com nome semântico claro: **teto definido manualmente pelo usuário**
+- Não será mais usado como fonte de verdade para o Buy Score
+- Visível na tela como referência opcional: "Teto definido pelo usuário"
+
+**2. `pt_medio` será sempre calculado em tempo real**
+- Não será persistido no banco de dados
+- Fonte de verdade: `valuation_service.py` (BUG-VAL-005)
+- Recalculado a cada consulta com preço atual, EPS, FCF e parâmetros macro atualizados
+- Segue padrão de mercado: Investidor10, Status Invest, GuruFocus e Simply Wall St calculam valor justo sob demanda
+
+**3. Buy Score usará apenas `pt_medio` (valor justo calculado)**
+- `calcular_margem_seguranca()` passa a chamar `valuation_service.calcular_valor_justo(ativo)`
+- Não há mais duas margens na tela — apenas uma, consistente
+
+**4. Migration DDL obrigatória**
+- Renomear coluna `preco_teto` para `preco_teto_usuario` em `ativo`
+- Aplicar em `exitusdb` via Flask-Migrate e em `exitusdb_test` via ALTER TABLE (regra de paridade DDL)
+- Atualizar modelos, seeds, schemas e documentação
 
 **Arquivos a modificar:**
-- `backend/app/services/buy_signals_service.py:14-30` — usar pt_medio em vez de preco_teto
+- `backend/app/models/ativo.py` — renomear coluna
+- `backend/migrations/versions/` — migration DDL de rename
+- `backend/app/seeds/seed_ativos_fundamentalistas.py` — ajustar campo
+- `backend/app/seeds/data/ativos_fundamentalistas.json` — ajustar campo
+- `backend/app/services/valuation_service.py` — **novo** serviço central
+- `backend/app/services/buy_signals_service.py:14-30` — usar valuation_service
 - `backend/app/blueprints/buy_signals_blueprint.py` — endpoint margem-seguranca
-- `frontend/app/templates/analises/buy_signals_v2.html` — renomear labels
+- `backend/app/blueprints/calculos_blueprint.py` — delegar para valuation_service
+- `frontend/app/templates/analises/buy_signals_v2.html` — renomear labels e mostrar faixa
+- `docs/EXITUS_DB_STRUCTURE.txt` — atualizar schema
 
-**Prioridade:** Alta | **Risco:** Médio (muda Buy Score — validar com testes)
-**Dependências:** BUG-VAL-001 (fixes das fórmulas) deve ser feito primeiro
+**Prioridade:** Alta | **Risco:** Médio (muda Buy Score e schema — validar com testes)
+**Dependências:** SEED-MACRO-001 + BUG-VAL-001 + VALUATION-002 + BUG-VAL-005 devem ser feitos primeiro
+**Nota:** `pt_medio` nunca será coluna no banco. Se necessário histórico, criar tabela separada `historico_valuation` no futuro.
 
 ---
 
