@@ -8,15 +8,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
-### Docs — HIST-002: Histórico de preços sem fallback multi-provider (27/06/2026)
+### Feat — HIST-002: Histórico de preços com fallback multi-provider (28/06/2026)
 
-**Diagnóstico:** `CotacoesService.buscar_historico()` só usa yfinance (nenhum fallback). yfinance falha dentro do container Podman (`Failed to get ticker 'ITUB4.SA'`). Consequência: `historico_preco` vazia → `calcular_zscore()` falha → Buy Score artificial (50 para todos) → "Z-Score indisponível" na tela. `obter_cotacao()` tem 8 providers com fallback, mas `buscar_historico()` não aproveita essa cascata.
+**Diagnóstico:** `CotacoesService.buscar_historico()` só usava yfinance (sem fallback). Quando yfinance falhava no container Podman (`Failed to get ticker 'ITUB4.SA'`), nenhum histórico era salvo → `calcular_zscore()` levantava exceção → Buy Score caía no fallback fixo (50) e a tela mostrava "Z-Score indisponível".
 
-**GAP registrado:** `ROADMAP.md` → HIST-002 (Fase 7, prioridade média). Plano: refatorar `buscar_historico()` para cascata com circuit breaker seguindo o mesmo padrão do EXITUS-CIRCUITBREAKER-001 (08/03/2026) — `obter_cotacao()` já tem 8 providers com fallback por mercado (BR: Brapi/HG/yfinance/Twelve Data; US: Finnhub/Alpha Vantage/Twelve Data/yfinance). Reutilizar `get_circuit_breaker()` já existente. APIs grátis têm limites de rate — assinatura oficial avaliada no final do projeto.
+**Implementação:**
+- `CotacoesService.buscar_historico()` agora usa cadeias por mercado (BR: Brapi → Twelve Data → Alpha Vantage → yfinance.SA; US: Alpha Vantage → Twelve Data → Finnhub → yfinance) com circuit breaker compartilhado.
+- Helpers `_historico_*` normalizam os retornos (Decimal + `date`) e reutilizam `get_circuit_breaker()`.
+- Logs indicam provider utilizado e quantos registros foram retornados; erro final só ocorre se todos falharem.
+- `pytest backend/tests/test_circuit_breaker.py -q` ✅ (23 passed).
 
 **Artefatos modificados:**
-- `docs/ROADMAP.md`: HIST-002 adicionado na tabela Fase 7 + seção detalhada + contagem atualizada (13 OK, 23 PARCIAL)
-- `docs/MANUAL_USUARIO_DRAFT.md`: seção "Buy Signals" reescrita com subseção "Técnicas de Cálculo" (Margem de Segurança, Z-Score, Buy Score, Watchlist Top 10) — inclui fórmulas, exemplos (ITUB4), limitação conhecida do score fallback, e referência ao HIST-002
+- `backend/app/services/cotacoes_service.py`: refatorado com helpers e cascata multi-provider
+- `docs/ROADMAP.md`: HIST-002 marcado como ✅ Implementado + notas de melhoria futura
+- `docs/MANUAL_USUARIO_DRAFT.md`: seção Buy Signals agora explica o cache de histórico (80% threshold, chamada única, reuse)
 
 ---
 

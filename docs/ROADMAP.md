@@ -59,7 +59,7 @@
 | **MONITOR-001** | Monitoramento e alertas | 🟡 Média | 📋 Planejado | Prometheus + Grafana vs DataDog |
 | **RATELIMIT-001** | Rate limiting | 🟡 Média | 📋 Planejado | — |
 | **CICD-001** | CI/CD + deploy | 🟡 Média | 📋 Planejado | GitHub Actions vs GitLab CI |
-| **HIST-002** | Histórico de preços — fallback multi-provider | 🟡 Média | 📋 Planejado | `buscar_historico()` só usa yfinance (falha em container). Adicionar Brapi/Alpha Vantage como fallback. Ver detalhe abaixo |
+| **HIST-002** | Histórico de preços — fallback multi-provider | 🟡 Média | ✅ Implementado (28/06/2026) | `buscar_historico()` agora segue o padrão de cascata por mercado (Brapi/Twelve/Alpha/YF para BR; Alpha/Twelve/Finnhub/YF para US). Ver detalhe abaixo |
 
 ### MULTICLIENTE-001 — Concluído (03/04/2026)
 
@@ -107,12 +107,12 @@
 - **Twelve Data** — `/time_series?symbol={ticker}&interval=1day&outputsize=252` (8 req/min grátis)
 - **yfinance** — manter como último recurso (sem key, mas instável em container)
 
-**Plano de implementação:**
-1. Refatorar `buscar_historico()` para usar o mesmo padrão de cascata por mercado já implementado em `obter_cotacao()` (ver `CHANGELOG.md` → EXITUS-CIRCUITBREAKER-001, 08/03/2026)
-2. Reutilizar `get_circuit_breaker()` já existente (`backend/app/utils/circuit_breaker.py`) — registry global singleton por provider, threshold=3, recovery=60/120s
-3. Ordem BR: Brapi → Twelve Data → Alpha Vantage → yfinance
+**Implementação (28/06/2026):**
+1. `CotacoesService.buscar_historico()` refatorado para replicar o padrão de cascata por mercado (ver `CHANGELOG.md` → EXITUS-CIRCUITBREAKER-001, 08/03/2026)
+2. `get_circuit_breaker()` reaproveitado em todos os providers de histórico; circuitos compartilham telemetria com `obter_cotacao()`
+3. Ordem BR: Brapi → Twelve Data → Alpha Vantage → yfinance (.SA)
 4. Ordem US: Alpha Vantage → Twelve Data → Finnhub → yfinance
-5. Seed de histórico sintético para ambiente dev (opcional)
+5. Histórico convertido para o mesmo formato do banco (`Decimal`, `date`, campos opcionais) e filtrado pelo intervalo solicitado
 
 **Melhoria sugerida (após medir necessidade):** Caso os limites grátis continuem bloqueando ativos, avaliar provedores adicionais com OHLC diário estável — candidatos: Tiingo (planos acessíveis com dados ajustados), Polygon.io (intraday/stream, custo alto) e IEX Cloud (equities US). Requer business case e orçamento antes da assinatura.
 

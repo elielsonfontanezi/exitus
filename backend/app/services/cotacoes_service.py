@@ -313,57 +313,254 @@ class CotacoesService:
     # def buscar_historico(ticker: str, data_inicio: date, data_fim: date) -> List[dict]:
     @staticmethod
     def buscar_historico(ticker: str, data_inicio: date, data_fim: date, mercado: str = 'BR') -> List[dict]:        
-        """
-        Busca histórico de preços de um ticker entre duas datas.
-        
-        Args:
-            ticker: Símbolo do ativo (ex: 'PETR4')
-            data_inicio: Data inicial do histórico
-            data_fim: Data final do histórico
-            
-        Returns:
-            Lista de dicts com formato:
-            [
-                {
-                    'data': date(2026, 1, 6),
-                    'abertura': Decimal('31.50'),
-                    'fechamento': Decimal('31.26'),
-                    'minimo': Decimal('31.10'),
-                    'maximo': Decimal('31.80'),
-                    'volume': 125000000
-                },
-                ...
-            ]
-        """
+        """Busca histórico com fallback multi-provider (EXITUS-CIRCUITBREAKER-001)."""
+
+        logger.info(
+            "Buscando histórico multi-provider: %s (%s a %s, mercado=%s)",
+            ticker,
+            data_inicio,
+            data_fim,
+            mercado
+        )
+
+        provedores = (
+            CotacoesService._cadeia_historico_br
+            if mercado == 'BR'
+            else CotacoesService._cadeia_historico_us
+        )
+
+        for fetcher in provedores(ticker, data_inicio, data_fim):
+            registros = fetcher()
+            if registros:
+                logger.info(
+                    "✅ Histórico obtido via %s: %s registros",
+                    fetcher.__name__,
+                    len(registros)
+                )
+                return registros
+
+        logger.error("❌ Nenhum provider retornou histórico para %s", ticker)
+        return []
+
+    # ------------------------------------------------------------------
+    # Helpers de histórico
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _filtrar_intervalo(registros: List[dict], data_inicio: date, data_fim: date) -> List[dict]:
+        return [r for r in registros if data_inicio <= r['data'] <= data_fim]
+
+    @staticmethod
+    def _cadeia_historico_br(ticker: str, data_inicio: date, data_fim: date):
+        yield lambda: CotacoesService._historico_brapi(ticker, data_inicio, data_fim)
+        yield lambda: CotacoesService._historico_twelvedata(f"{ticker}.SA", data_inicio, data_fim)
+        yield lambda: CotacoesService._historico_alphavantage(f"{ticker}.SA", data_inicio, data_fim)
+        yield lambda: CotacoesService._historico_yfinance(ticker, data_inicio, data_fim, sufixo_br=True)
+
+    @staticmethod
+    def _cadeia_historico_us(ticker: str, data_inicio: date, data_fim: date):
+        yield lambda: CotacoesService._historico_alphavantage(ticker, data_inicio, data_fim)
+        yield lambda: CotacoesService._historico_twelvedata(ticker, data_inicio, data_fim)
+        yield lambda: CotacoesService._historico_finnhub(ticker, data_inicio, data_fim)
+        yield lambda: CotacoesService._historico_yfinance(ticker, data_inicio, data_fim)
+
+    @staticmethod
+    def _historico_brapi(ticker: str, data_inicio: date, data_fim: date) -> List[dict]:
+        cb = get_circuit_breaker('brapi.dev', failure_threshold=3, recovery_timeout=60)
+        if not cb.call_allowed():
+            logger.info("⚡ brapi.dev historico OPEN — pulando")
+            return []
+
         try:
-            logger.info(f"Buscando histórico: {ticker} ({data_inicio} a {data_fim})")
-            
+            interval = "?interval=1d&range=1y"
+            url = f"https://brapi.dev/api/quote/{ticker}{interval}"
+            if CotacoesService.BRAPI_TOKEN:
+                url = f"{url}&token={CotacoesService.BRAPI_TOKEN}"
+
+            resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+            resp.raise_for_status()
+            data = resp.json()
+            historico = data['results'][0].get('historicalDataPrice', [])
+
+            registros = []
+            for row in historico:
+                data_row = datetime.fromtimestamp(row['date']).date()
+                registros.append({
+                    'data': data_row,
+                    'abertura': Decimal(str(row.get('open'))) if row.get('open') is not None else None,
+                    'fechamento': Decimal(str(row.get('close'))) if row.get('close') is not None else None,
+                    'minimo': Decimal(str(row.get('low'))) if row.get('low') is not None else None,
+                    'maximo': Decimal(str(row.get('high'))) if row.get('high') is not None else None,
+                    'volume': row.get('volume')
+                })
+
+            cb.record_success()
+            return CotacoesService._filtrar_intervalo(registros, data_inicio, data_fim)
+
+        except Exception as e:
+            cb.record_failure()
+            logger.warning("⚠️ brapi.dev historico falhou: %s", e)
+            return []
+
+    @staticmethod
+    def _historico_twelvedata(symbol: str, data_inicio: date, data_fim: date) -> List[dict]:
+        if not CotacoesService.TWELVE_KEY:
+            return []
+
+        cb = get_circuit_breaker('twelvedata', failure_threshold=3, recovery_timeout=60)
+        if not cb.call_allowed():
+            logger.info("⚡ twelvedata historico OPEN — pulando")
+            return []
+
+        try:
+            url = (
+                "https://api.twelvedata.com/time_series"
+                f"?symbol={symbol}&interval=1day&start_date={data_inicio}&end_date={data_fim}"
+                f"&apikey={CotacoesService.TWELVE_KEY}"
+            )
+            resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+            resp.raise_for_status()
+            payload = resp.json()
+
+            if 'values' not in payload:
+                raise ValueError(payload.get('message', 'sem dados de histórico'))
+
+            registros = []
+            for row in payload['values']:
+                data_row = datetime.strptime(row['datetime'], '%Y-%m-%d').date()
+                registros.append({
+                    'data': data_row,
+                    'abertura': Decimal(row['open']),
+                    'fechamento': Decimal(row['close']),
+                    'minimo': Decimal(row['low']),
+                    'maximo': Decimal(row['high']),
+                    'volume': int(float(row.get('volume') or 0)) or None
+                })
+
+            cb.record_success()
+            return CotacoesService._filtrar_intervalo(registros, data_inicio, data_fim)
+
+        except Exception as e:
+            cb.record_failure()
+            logger.warning("⚠️ twelvedata historico falhou: %s", e)
+            return []
+
+    @staticmethod
+    def _historico_alphavantage(symbol: str, data_inicio: date, data_fim: date) -> List[dict]:
+        cb = get_circuit_breaker('alphavantage', failure_threshold=3, recovery_timeout=60)
+        if not cb.call_allowed():
+            logger.info("⚡ alphavantage historico OPEN — pulando")
+            return []
+
+        try:
+            url = (
+                "https://www.alphavantage.co/query"
+                f"?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={CotacoesService.ALPHA_KEY}"
+            )
+            resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+            resp.raise_for_status()
+            payload = resp.json()
+            series = payload.get('Time Series (Daily)', {})
+
+            if not series:
+                raise ValueError(payload.get('Note') or 'limite atingido ou sem dados')
+
+            registros = []
+            for data_str, valores in series.items():
+                data_row = datetime.strptime(data_str, '%Y-%m-%d').date()
+                registros.append({
+                    'data': data_row,
+                    'abertura': Decimal(valores['1. open']),
+                    'fechamento': Decimal(valores['4. close']),
+                    'minimo': Decimal(valores['3. low']),
+                    'maximo': Decimal(valores['2. high']),
+                    'volume': int(valores['6. volume']) if valores.get('6. volume') else None
+                })
+
+            cb.record_success()
+            return CotacoesService._filtrar_intervalo(registros, data_inicio, data_fim)
+
+        except Exception as e:
+            cb.record_failure()
+            logger.warning("⚠️ alphavantage historico falhou: %s", e)
+            return []
+
+    @staticmethod
+    def _historico_finnhub(ticker: str, data_inicio: date, data_fim: date) -> List[dict]:
+        if not CotacoesService.FINNHUB_KEY:
+            return []
+
+        cb = get_circuit_breaker('finnhub', failure_threshold=3, recovery_timeout=60)
+        if not cb.call_allowed():
+            logger.info("⚡ finnhub historico OPEN — pulando")
+            return []
+
+        try:
+            unix_from = int(datetime.combine(data_inicio, datetime.min.time()).timestamp())
+            unix_to = int(datetime.combine(data_fim, datetime.max.time()).timestamp())
+            url = (
+                "https://finnhub.io/api/v1/stock/candle"
+                f"?symbol={ticker}&resolution=D&from={unix_from}&to={unix_to}&token={CotacoesService.FINNHUB_KEY}"
+            )
+            resp = requests.get(url, timeout=CotacoesService.TIMEOUT)
+            resp.raise_for_status()
+            payload = resp.json()
+
+            if payload.get('s') != 'ok':
+                raise ValueError(payload.get('s'))
+
+            registros = []
+            for ts, o, h, l, c, v in zip(
+                payload['t'], payload['o'], payload['h'], payload['l'], payload['c'], payload['v']
+            ):
+                data_row = datetime.fromtimestamp(ts).date()
+                registros.append({
+                    'data': data_row,
+                    'abertura': Decimal(str(o)),
+                    'fechamento': Decimal(str(c)),
+                    'minimo': Decimal(str(l)),
+                    'maximo': Decimal(str(h)),
+                    'volume': int(v)
+                })
+
+            cb.record_success()
+            return CotacoesService._filtrar_intervalo(registros, data_inicio, data_fim)
+
+        except Exception as e:
+            cb.record_failure()
+            logger.warning("⚠️ finnhub historico falhou: %s", e)
+            return []
+
+    @staticmethod
+    def _historico_yfinance(ticker: str, data_inicio: date, data_fim: date, sufixo_br: bool = False) -> List[dict]:
+        cb = get_circuit_breaker(
+            'yfinance.BR' if sufixo_br else 'yfinance.US',
+            failure_threshold=3,
+            recovery_timeout=120
+        )
+        if not cb.call_allowed():
+            logger.info("⚡ yfinance historico OPEN — pulando")
+            return []
+
+        try:
             import yfinance as yf
             from datetime import timedelta
-            
-            # yfinance usa ticker com sufixo para Brasil
-            #yahoo_ticker = f"{ticker}.SA" if ticker and not any(x in ticker for x in ['.SA', '^']) else ticker
-            yahoo_ticker = ticker
-            if mercado == 'BR' and '.' not in ticker and '^' not in ticker:
-                yahoo_ticker = f"{ticker}.SA"
-                        
-            # Adicionar 1 dia à data_fim porque yfinance é exclusive no end
+
+            yahoo_ticker = f"{ticker}.SA" if sufixo_br and '.' not in ticker and '^' not in ticker else ticker
             data_fim_ajustada = data_fim + timedelta(days=1)
-            
+
             stock = yf.Ticker(yahoo_ticker)
             hist = stock.history(
                 start=data_inicio.strftime('%Y-%m-%d'),
                 end=data_fim_ajustada.strftime('%Y-%m-%d')
             )
-            
+
             if hist.empty:
-                logger.warning(f"yfinance não retornou dados para {ticker}")
-                return []
-            
-            # Converter DataFrame para lista de dicts
-            resultado = []
+                raise ValueError('yfinance retornou dataframe vazio')
+
+            registros = []
             for data_index, row in hist.iterrows():
-                resultado.append({
+                registros.append({
                     'data': data_index.date(),
                     'abertura': Decimal(str(row['Open'])) if not pd.isna(row['Open']) else None,
                     'fechamento': Decimal(str(row['Close'])),
@@ -371,10 +568,11 @@ class CotacoesService:
                     'maximo': Decimal(str(row['High'])) if not pd.isna(row['High']) else None,
                     'volume': int(row['Volume']) if not pd.isna(row['Volume']) else None
                 })
-            
-            logger.info(f"✅ {len(resultado)} registros obtidos para {ticker}")
-            return resultado
-            
+
+            cb.record_success()
+            return registros
+
         except Exception as e:
-            logger.error(f"Erro ao buscar histórico de {ticker}: {str(e)}", exc_info=True)
+            cb.record_failure()
+            logger.warning("⚠️ yfinance historico falhou: %s", e)
             return []
