@@ -175,17 +175,15 @@ Authorization: Bearer <token>
 
 **1. Margem de Segurança** (`calcular_margem_seguranca`)
 
-Mede a distância entre o preço atual e o preço teto (valor justo) cadastrado no ativo.
+Mede a distância entre o preço atual e o **valor justo calculado** do ativo. Após a unificação planejada (BUG-VAL-004), a margem passará a usar o valor justo dinâmico (`pt_medio`) em vez do campo `ativo.preco_teto` armazenado no banco.
 
 ```
-Margem = (Preço Teto - Preço Atual) / Preço Teto × 100
+Margem = (Valor Justo - Preço Atual) / Valor Justo × 100
 ```
 
-- **Margem > 5%:** 🟢 COMPRA — ativo abaixo do valor justo
-- **Margem 0-5%:** 🟡 NEUTRO — próximo do valor justo
+- **Margem > 20%:** 🟢 COMPRA — ativo significativamente abaixo do valor justo
+- **Margem 0-20%:** 🟡 NEUTRO — próximo do valor justo
 - **Margem < 0%:** 🔴 VENDA — acima do valor justo
-
-**Exemplo ITUB4:** Preço atual R$ 32,45, Preço teto R$ 38,00 → Margem = 14,61% → 🟢 COMPRA
 
 **2. Z-Score** (`calcular_zscore`)
 
@@ -199,52 +197,70 @@ Z-Score = (Preço Atual - Média_252d) / Desvio_Padrão_252d
 - **Z -1 a 0:** Abaixo da média (neutro)
 - **Z > 0:** Acima da média (relativamente caro)
 
-**3. Preço Teto / Valor Justo** (`/api/calculos/preco_teto/<ticker>`)
+**3. Valor Justo / Preço Teto** (`/api/calculos/preco_teto/<ticker>`)
 
-O valor justo exibido no painel é calculado no backend a partir de métodos regionais e depende do tipo do ativo. A rota aplica parâmetros macroeconômicos dinâmicos (taxa livre de risco, crescimento médio, custo de capital e cap rate) obtidos no `ParametrosMacroService`.
+O valor justo exibido é calculado no backend por **métodos de valuation reconhecidos no mercado**. Os parâmetros macroeconômicos (taxa livre de risco, crescimento médio, WACC, cap rate) são obtidos do `ParametrosMacroService` e diferem por mercado (ex: Brasil vs EUA).
 
-- **Ações (Tipo "ACAO")** — Média de 4 métodos:
-  1. **Bazin Local** — Dividend Yield ajustado pela taxa livre de risco da região
-  2. **Graham Local** — Fórmula 8,5 + 2×crescimento, normalizada para a taxa livre de risco local
-  3. **Gordon Growth** — Dividendos projetados (D1) dividido por `(k - g)`
-  4. **Fluxo de Caixa Descontado (DCF)** — 5 períodos de FCF com valor terminal (3%) descontados pelo WACC regional
+##### Para Ações (Tipo "ACAO")
 
-  O valor mostrado como "Valor Justo Médio" é a média aritmética desses quatro preços teto.
+São calculados 4 preços teto, cada um por um método diferente. Depois o sistema remove outliers (IQR) e apresenta uma **faixa de valor justo** com min, max e mediana ponderada.
 
-- **FIIs/REITs** — Utiliza Cap Rate regional: `Preço Justo = 1 / CapRate`. O cap rate vem dos parâmetros macro de FIIs.
+| Método | Fórmula | O que mede |
+|--------|---------|------------|
+| **Bazin** | `Dividendo Anual / 0.06` | Preço teto para quem busca 6% de DY mínimo (threshold fixo de Décio Bazin) |
+| **Graham** | `EPS × (8.5 + 2g) × 4.4 / Y` | Valor justo de Benjamin Graham, baseado em lucro e crescimento esperado |
+| **Gordon** | `D₁ / (k - g)` | Valor presente de dividendos crescentes perpetuamente |
+| **DCF** | `Σ FCFₜ / (1 + WACC)ᵗ + Valor Terminal / (1 + WACC)⁵` | Valor presente do fluxo de caixa livre da empresa |
 
-- **Demais tipos** — Fallback conservador: 10% acima do preço atual (mantém compatibilidade até que cada tipo tenha modelo dedicado).
+Onde:
+- **Dividendo Anual** = `DY × Preço Atual` (R$ por ação)
+- **D₁** = `Dividendo Anual × (1 + g)` (próximo dividendo estimado)
+- **EPS** = Lucro por ação (LPA) do ativo
+- **g** = crescimento médio esperado da empresa (decimal, ex: 0.05 = 5%)
+- **Y** = taxa livre de risco em percentual (ex: 10.5 para 10,5%)
+- **k** = taxa livre de risco em decimal (ex: 0.105)
+- **WACC** = custo médio ponderado de capital (decimal)
+- **FCF** = Free Cash Flow por ação
 
-O painel "Preço vs Valor Justo" mostra:
+##### Para FIIs/REITs
+
+Usa Cap Rate regional. O cap rate reflete o retorno anual esperado pelo mercado para imóveis/fundo desse segmento.
+
+```
+Valor Justo = Dividendo Anual por Cota / Cap Rate
+```
+
+##### Para demais tipos
+
+Fallback conservador: 10% acima do preço atual, até que cada tipo tenha modelo dedicado.
+
+##### O que a tela mostra
+
+O painel "Preço vs Valor Justo" exibe:
 1. Preço atual (última cotação)
-2. Valor justo médio (média dos métodos aplicáveis)
-3. Margem calculada com base nesses valores
-4. Distribuição visual (barra que compara preço vs teto)
-5. Tabela "Métodos de Valuation" com cada método, resultado e parâmetros usados (ex.: k, WACC, cap rate)
+2. **Faixa de valor justo** — mínimo e máximo entre os métodos
+3. **Mediana / valor central** — usado para calcular a margem
+4. Margem de segurança com base no valor central
+5. Tabela "Métodos de Valuation" com cada método, resultado e parâmetros usados
 6. Parâmetros regionais aplicados (taxa livre de risco, crescimento, WACC)
 
-Isso permite ao usuário validar rapidamente o racional do valor justo apresentado e entender quais métodos puxam o preço para cima ou para baixo.
+Isso permite ao usuário validar rapidamente o racional e perceber quando um método produz um valor discrepante (outlier).
 
-**Requer:** mínimo de 30 registros de histórico de preços no banco (`historico_preco`). Se indisponível, a tela exibe "Z-Score indisponível".
+**Requer:** mínimo de 30 registros de histórico de preços no banco (`historico_preco`) para o Z-Score. Se indisponível, o Z-Score fica indisponível.
 
-**⚠️ Por que existem dois valores de margem na tela?**
+**⚠️ Limitações conhecidas e em correção**
 
-A tela Buy Signals exibe informações de **duas fontes independentes**:
+A metodologia de valuation do Exitus está em transição para alinhar com o padrão de mercado. Atualmente existem algumas inconsistências que estão sendo corrigidas:
 
-| Onde aparece | Valor | Fonte | Método |
-|---|---|---|---|
-| Card "Margem:" (topo) | ex.: +9,10% | `calculos/preco_teto` | Média dinâmica: Bazin + Graham + Gordon + DCF |
-| Strip de componentes (rodapé) | ex.: 0/30 pts | `buy_signals_service.calcular_margem_seguranca` | `ativo.preco_teto` armazenado no banco |
+| Problema | Impacto na tela | Status |
+|---|---|---|
+| Dois conceitos de "preço teto" (`ativo.preco_teto` estático vs `pt_medio` calculado) | Podem aparecer duas margens diferentes | Em correção: unificação para usar sempre `pt_medio` |
+| EPS/FCF não populados para todos os ativos | Graham e DCF usam valores fallback (2,50/5,0) | Em correção: integração com yfinance |
+| `parametros_macro` vazia | Todos os mercados usam parâmetros hardcoded | Em correção: seed de parâmetros por mercado |
+| Fórmula de FII `1 / cap_rate` | Resultado dimensionalmente incorreto | Em correção: `dividendo_anual / cap_rate` |
+| Média simples dos métodos | Pode ser distorcida por outliers | Em correção: mediana ponderada + IQR |
 
-**Por que podem diferir?**
-- O `preco_teto` no banco é o valor **cadastrado ou importado** na criação do ativo. Pode estar desatualizado ou calculado por uma metodologia diferente.
-- O cálculo dinâmico `calculos/preco_teto` é **recalculado em tempo real** sempre que você consulta o ticker, usando os parâmetros macroeconômicos atuais da região.
-
-**Qual confiar?**
-- O card topo (+9,10%) reflete a análise **mais atual** com os 4 métodos aplicáveis ao tipo do ativo.
-- O strip rodapé mostra a pontuação do **Buy Score engine**, que usa o preco_teto armazenado. Observe os pontos (ex.: "0/30") como indicador — o valor numérico pode estar desatualizado.
-
-> **Planejado:** unificar ambas as fontes para que o Buy Score engine use o `pt_medio` dinâmico. Até lá, confie no card de cima para decisões de valuation.
+> **Recomendação:** use o card de "Valor Justo" como referência principal, mas sempre confira a tabela de métodos para identificar outliers. Um valor justo muito distante do preço atual (ex: ITUB4 com valor justo R$ 499 vs preço R$ 42) indica que algum método está usando dados incorretos — geralmente EPS/FCF em branco.
 
 ---
 
