@@ -1,9 +1,9 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) | **Testes:** 567/574 passando (98.8%) 🟡 — 1 failed (feature 2026+), 6 skipped  
-> **Frontend V2.0:** 2 OK, 34 PARCIAL, 0 QUEBRADO (94%) 🟡 | **UX Evolution:** 2 OK, 34 PARCIAL, 0 QUEBRADO (94%) 🟡 | **Frontend API-Driven:** ✅ 8/8 Sprints Concluídos (09/06/2026) | **UI Consistency:** ✅ Menu limpo (15/06/2026)  
-> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.25 | **Última atualização:** 25/06/2026
+> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) + HIST-002 planejado | **Testes:** 567/574 passando (98.8%) 🟡 — 1 failed (feature 2026+), 6 skipped  
+> **Frontend V2.0:** 13 OK, 23 PARCIAL, 0 QUEBRADO (64%) � | **UX Evolution:** 13 OK, 23 PARCIAL, 0 QUEBRADO (64%) � | **Frontend API-Driven:** ✅ 8/8 Sprints Concluídos (09/06/2026) | **UI Consistency:** ✅ Menu limpo (15/06/2026)  
+> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.28 | **Última atualização:** 27/06/2026
 
 ---
 
@@ -13,11 +13,11 @@
  Backend Fases 1-6: Concluídas ✅
  Backend Fase 7: Produção 🎯 (próxima)
  Backend Fase 8: Futuro 📋
- Frontend V2.0: 2 OK, 34 PARCIAL, 0 QUEBRADO (94%) 🟡
- Frontend UX Evolution: 2 OK, 34 PARCIAL, 0 QUEBRADO (94%) 🟡
+ Frontend V2.0: 13 OK, 23 PARCIAL, 0 QUEBRADO (64%) �
+ Frontend UX Evolution: 13 OK, 23 PARCIAL, 0 QUEBRADO (64%) �
  Frontend API-Driven: 8/8 Sprints ✅ (09/06/2026) — 33 telas, 27 APIs
  Testes E2E v2: 127/127 Chromium ✅ — Firefox/Mobile 🎯 (próximo)
- Backend Fase 7: MONITOR-001, RATELIMIT-001, CICD-001 📋
+ Backend Fase 7: MONITOR-001, RATELIMIT-001, CICD-001, HIST-002 📋
 ```
 
 ---
@@ -59,6 +59,7 @@
 | **MONITOR-001** | Monitoramento e alertas | 🟡 Média | 📋 Planejado | Prometheus + Grafana vs DataDog |
 | **RATELIMIT-001** | Rate limiting | 🟡 Média | 📋 Planejado | — |
 | **CICD-001** | CI/CD + deploy | 🟡 Média | 📋 Planejado | GitHub Actions vs GitLab CI |
+| **HIST-002** | Histórico de preços — fallback multi-provider | 🟡 Média | 📋 Planejado | `buscar_historico()` só usa yfinance (falha em container). Adicionar Brapi/Alpha Vantage como fallback. Ver detalhe abaixo |
 
 ### MULTICLIENTE-001 — Concluído (03/04/2026)
 
@@ -91,6 +92,31 @@
 | **RATELIMIT-001** | 🟡 Pendente | — |
 | **CICD-001** | 🟡 Pendente | — |
 | **Testes integrados multi-tenant** | 🟡 Pendente | — |
+
+### HIST-002 — Histórico de preços: fallback multi-provider (Planejado)
+
+**Problema identificado (27/06/2026):**
+- `CotacoesService.buscar_historico()` (`backend/app/services/cotacoes_service.py:314-380`) **só usa yfinance** — nenhum fallback
+- yfinance falha dentro do container Podman: `Failed to get ticker 'ITUB4.SA' reason: Expecting value: line 1 column 1` (possível problema de rede/DNS ou delisting)
+- `CotacoesService.obter_cotacao()` tem 8 providers com fallback (Brapi, HG, yfinance, Twelve Data, Finnhub, Alpha Vantage, Marketstack) — mas `buscar_historico()` não aproveita essa cascata
+- **Consequência:** `historico_preco` vazia → `calcular_zscore()` falha → Buy Score artificial (50 para todos) → "Z-Score indisponível" na tela
+
+**Providers disponíveis para histórico (APIs grátis, limitadas):**
+- **Brapi.dev** — endpoint `/api/quote/{ticker}?interval=1d&range=1y` retorna histórico OHLCV (testado: funciona no container)
+- **Alpha Vantage** — `TIME_SERIES_DAILY` (5 req/dia grátis)
+- **Twelve Data** — `/time_series?symbol={ticker}&interval=1day&outputsize=252` (8 req/min grátis)
+- **yfinance** — manter como último recurso (sem key, mas instável em container)
+
+**Plano de implementação:**
+1. Refatorar `buscar_historico()` para usar padrão de cascata com circuit breaker (igual `obter_cotacao()`)
+2. Ordem BR: Brapi → Twelve Data → Alpha Vantage → yfinance
+3. Ordem US: Alpha Vantage → Twelve Data → Finnhub → yfinance
+4. Reutilizar `get_circuit_breaker()` já existente
+5. Seed de histórico sintético para ambiente dev (opcional)
+
+**Nota:** APIs grátis têm limites de rate (Brapi: ~10 req/min, Alpha Vantage: 5 req/dia, Twelve Data: 8 req/min). Para produção, avaliar assinatura oficial no final do projeto.
+
+**Dependência:** Nenhum GAP bloqueia, mas resolve indiretamente o "Z-Score indisponível" em Buy Signals.
 
 ---
 

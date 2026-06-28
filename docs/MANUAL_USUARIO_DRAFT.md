@@ -155,49 +155,85 @@ Authorization: Bearer <token>
 
 ### 1. Buy Signals — Oportunidades de Compra
 
-**URL:** `/dashboard/buy-signals`
+**URL:** `/analises/buy-signals`
 
-**Descrição:** Identifica as melhores oportunidades de compra usando análise fundamentalista com IA.
+**Descrição:** Identifica as melhores oportunidades de compra usando análise quantitativa — combina margem de segurança, Z-Score estatístico, dividend yield e beta em um score de 0 a 100.
 
 **Funcionalidades:**
-- Lista de ativos com Buy Score (0-100)
-- Margem de segurança calculada
-- Filtros por mercado e classe de ativo
-- Análise detalhada por ativo
+- Watchlist Top 10 — ativos com melhores Buy Scores
+- Consulta individual por ticker (autocomplete)
+- Painel de detalhe com score, margem, Z-Score e sinal
+- KPIs: Top Score, Ativos Analisados, Score ≥ 60, Score < 40
 
 **Como usar:**
-1. Acesse "Buy Signals" no menu ou dashboard
-2. Visualize a lista de ativos ranqueados por Buy Score
-3. Clique em "Analisar" para ver detalhes do ativo
-4. Use os filtros para refinar a busca
+1. Acesse "Análises → Buy Signals" no menu
+2. Visualize a watchlist Top 10 ranqueada por Buy Score
+3. Digite um ticker no campo "Consultar Score por Ticker" e clique "Analisar"
+4. O painel de detalhe exibe: Score (0-100), Margem de Segurança, Z-Score e sinal (NEUTRO/COMPRAR/VENDER)
 
-**Regras de Negócio:**
-- Buy Score > 70: Forte compra
-- Buy Score 50-70: Compra moderada
-- Buy Score < 50: Aguardar
-- Margem de segurança: diferença entre preço atual e preço teto
+#### Técnicas de Cálculo
+
+**1. Margem de Segurança** (`calcular_margem_seguranca`)
+
+Mede a distância entre o preço atual e o preço teto (valor justo) cadastrado no ativo.
+
+```
+Margem = (Preço Teto - Preço Atual) / Preço Teto × 100
+```
+
+- **Margem > 5%:** 🟢 COMPRA — ativo abaixo do valor justo
+- **Margem 0-5%:** 🟡 NEUTRO — próximo do valor justo
+- **Margem < 0%:** 🔴 VENDA — acima do valor justo
+
+**Exemplo ITUB4:** Preço atual R$ 32,45, Preço teto R$ 38,00 → Margem = 14,61% → 🟢 COMPRA
+
+**2. Z-Score** (`calcular_zscore`)
+
+Mede quantos desvios-padrão o preço atual está da média histórica (252 dias úteis = 1 ano). Indica se o ativo está "caro" ou "barato" estatisticamente.
+
+```
+Z-Score = (Preço Atual - Média_252d) / Desvio_Padrão_252d
+```
+
+- **Z < -1:** Ativo significativamente abaixo da média (oportunidade estatística)
+- **Z -1 a 0:** Abaixo da média (neutro)
+- **Z > 0:** Acima da média (relativamente caro)
+
+**Requer:** mínimo de 30 registros de histórico de preços no banco (`historico_preco`). Se indisponível, a tela exibe "Z-Score indisponível".
+
+**3. Buy Score** (`calcular_buy_score`)
+
+Score composto de 0 a 100, soma de 4 fatores ponderados:
+
+| Fator | Peso Máximo | Cálculo | Descrição |
+|-------|-------------|---------|-----------|
+| **Margem de Segurança** | 30 pts | `margem × 3` (clipado em 30) | Quanto maior a margem, mais pontos |
+| **Z-Score** | 25 pts | `25 se Z < -1, 15 se Z < 0, 5 caso contrário` | Ativos abaixo da média histórica pontuam mais |
+| **Dividend Yield** | 20 pts | `DY × 5` (clipado em 20) | DY de 4% = 20 pts (máximo) |
+| **Beta** | 25 pts | `max(0, 25 - (beta-1) × 12.5)` (clipado em 25) | Beta 1.0 = 25 pts; beta alto reduz pontos (risco) |
+
+**Sinais:**
+- **Score ≥ 80:** COMPRAR (forte oportunidade)
+- **Score 60-79:** AGUARDAR (oportunidade moderada)
+- **Score < 60:** VENDER/NEUTRO (não é momento)
+
+**Limitação conhecida:** Se margem ou Z-Score não podem ser calculados (ex: sem histórico de preços), o `try/except` zera esses fatores e o score cai para ~50 (fallback artificial). Nesse caso, o score não reflete análise real — apenas DY e beta contribuem. Para identificar: se todos os ativos da watchlist têm score 50, é provável que histórico esteja indisponível.
+
+**4. Watchlist Top 10**
+
+Lista os 10 ativos com maiores Buy Scores. Ordenada por score decrescente. Exibe: Ticker, Preço Atual, Preço Teto, Margem %, Buy Score, Sinal.
 
 **API:**
 ```bash
 GET /api/buy-signals/watchlist-top
+GET /api/buy-signals/buy-score/{ticker}
+GET /api/buy-signals/margem-seguranca/{ticker}
+GET /api/buy-signals/zscore/{ticker}
+GET /api/buy-signals/analisar/{ticker}
 Authorization: Bearer <token>
-
-# Resposta:
-{
-  "success": true,
-  "data": [
-    {
-      "ticker": "PETR4",
-      "nome": "Petrobras PN",
-      "mercado": "BR",
-      "buy_score": 85,
-      "margem_seguranca": 25.5,
-      "preco_atual": 28.50,
-      "preco_teto": 38.20
-    }
-  ]
-}
 ```
+
+**Nota técnica:** O Z-Score requer histórico de preços populado no banco. Em ambiente de desenvolvimento sem provider de histórico configurado, o Z-Score pode estar indisponível. Ver `ROADMAP.md` → HIST-002 para plano de fallback multi-provider.
 
 ---
 

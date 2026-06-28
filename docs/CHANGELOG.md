@@ -8,6 +8,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — HIST-002: Histórico de preços sem fallback multi-provider (27/06/2026)
+
+**Diagnóstico:** `CotacoesService.buscar_historico()` só usa yfinance (nenhum fallback). yfinance falha dentro do container Podman (`Failed to get ticker 'ITUB4.SA'`). Consequência: `historico_preco` vazia → `calcular_zscore()` falha → Buy Score artificial (50 para todos) → "Z-Score indisponível" na tela. `obter_cotacao()` tem 8 providers com fallback, mas `buscar_historico()` não aproveita essa cascata.
+
+**GAP registrado:** `ROADMAP.md` → HIST-002 (Fase 7, prioridade média). Plano: refatorar `buscar_historico()` para cascata com circuit breaker (Brapi → Twelve Data → Alpha Vantage → yfinance). APIs grátis têm limites de rate — assinatura oficial avaliada no final do projeto.
+
+**Artefatos modificados:**
+- `docs/ROADMAP.md`: HIST-002 adicionado na tabela Fase 7 + seção detalhada + contagem atualizada (13 OK, 23 PARCIAL)
+- `docs/MANUAL_USUARIO_DRAFT.md`: seção "Buy Signals" reescrita com subseção "Técnicas de Cálculo" (Margem de Segurança, Z-Score, Buy Score, Watchlist Top 10) — inclui fórmulas, exemplos (ITUB4), limitação conhecida do score fallback, e referência ao HIST-002
+
+---
+
 ### Docs — BUG-014/015/017: Resolvidos indiretamente via BUG-009v2 (27/06/2026)
 
 **Diagnóstico:** BUG-014 (busca por ticker no catálogo), BUG-015 (detalhe de ativo lento/sem dados) e BUG-017 (busca por ticker em Buy Signals) foram todos causados pelo mesmo problema do BUG-009v2: `API_BASE_URL` nos templates usava `BACKEND_API_URL` (hostname interno `exitus-backend:5000`), que o browser não resolvia. Após a separação `BROWSER_API_URL` / `BACKEND_API_URL`, todas as chamadas `apiFetch()` do Alpine.js passaram a funcionar.
