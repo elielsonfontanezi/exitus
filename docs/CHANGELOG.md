@@ -8,6 +8,23 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — BUG-014/015/017: Resolvidos indiretamente via BUG-009v2 (27/06/2026)
+
+**Diagnóstico:** BUG-014 (busca por ticker no catálogo), BUG-015 (detalhe de ativo lento/sem dados) e BUG-017 (busca por ticker em Buy Signals) foram todos causados pelo mesmo problema do BUG-009v2: `API_BASE_URL` nos templates usava `BACKEND_API_URL` (hostname interno `exitus-backend:5000`), que o browser não resolvia. Após a separação `BROWSER_API_URL` / `BACKEND_API_URL`, todas as chamadas `apiFetch()` do Alpine.js passaram a funcionar.
+
+**Validação browser (27/06/2026):**
+- BUG-014: busca "PETR" retorna 1 registro, busca "A" retorna 11 registros ✅
+- BUG-015: `/ativos/PETR4` carrega em <1s com dados (Preço R$ 38,06, P/L, P/VP, DY, Buy Score, Eventos) — 4 chamadas de API em paralelo retornam 200 OK ✅
+- BUG-017: busca por ticker em `/analises/buy-signals` funcionando ✅
+
+**Artefatos modificados:**
+- `docs/AUDITORIA_FUNCIONAL.md`: 6 telas atualizadas (6, 11, 12, 18, 20, 21) — contagem 7→13 OK, 29→23 PARCIAL
+- `.windsurfrules`: REGRA #3 atualizada — adicionado "Modelo free (custo zero)" ao cabeçalho obrigatório + coluna "Melhor Free" na tabela de recomendações por tipo de tarefa
+
+**Impacto:** Auditoria funcional 13 OK, 23 PARCIAL, 0 QUEBRADO. Apenas 3 bugs abertos restantes (nenhum crítico).
+
+---
+
 ### Fix — BUG-009v2: Dashboard sem dados — URLs server-side vs client-side (27/06/2026)
 
 **Causa raiz:** O commit BUG-009 (`201e0a9`) mudou `window.API_BASE || 'http://localhost:5000'` → `API_BASE_URL` em `dashboard/index_v2.html`. Mas `API_BASE_URL` é definida em `base_interna.html` como `config.get("BACKEND_API_URL", ...)`, e no container `BACKEND_API_URL=http://exitus-backend:5000` (hostname interno da rede podman). O browser não resolve `exitus-backend` — erro `ERR_NAME_NOT_RESOLVED`. Todas as telas que usam `API_BASE_URL` (Alpine.js `fetch()`) ficavam em loading infinito.

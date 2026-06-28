@@ -1,10 +1,12 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 27/06/2026  
-> **Status:** 🟡 **Auditoria Funcional em andamento — 7 OK, 29 PARCIAL, 0 QUEBRADO**  
-> **Versão:** v0.9.26
+> **Status:** � **Auditoria Funcional — 13 OK, 23 PARCIAL, 0 QUEBRADO**  
+> **Versão:** v0.9.27
 
 ### 🔧 Últimas correções (27/06/2026)
+- **BUG-014/015/017 ✅ RESOLVIDOS indiretamente via BUG-009v2:** Busca por ticker no catálogo (BUG-014), detalhe de ativo lento/sem dados (BUG-015) e busca em Buy Signals (BUG-017) — todos causados pelo mesmo problema de `BROWSER_API_URL` vs `BACKEND_API_URL`. Após separação, todas as chamadas `apiFetch()` do Alpine.js funcionam. Auditoria: 13 OK, 23 PARCIAL, 0 QUEBRADO.
+- **`.windsurfrules REGRA #3 atualizada:** Adicionado "Modelo free (custo zero)" ao cabeçalho obrigatório + coluna "Melhor Free" na tabela de recomendações por tipo de tarefa.
 - **BUG-009v2 ✅ RESOLVIDO:** Dashboard e todas as telas do menu sem dados — `ERR_NAME_NOT_RESOLVED`. Causa raiz: `API_BASE_URL` nos templates usava `BACKEND_API_URL` (hostname interno do container `exitus-backend:5000`), que o browser não resolve. Solução: separar `BACKEND_API_URL` (server-side, container→container) de `BROWSER_API_URL` (client-side, browser→backend). 7 cenários de deploy documentados em `ARCHITECTURE.md`. L-FE-011 adicionada.
 - **Dashboard ✅ RESOLVIDO:** CDI/Ibovespa via env vars (não hardcoded); meta via API `/api/auth/me`. FEAT-010 registrada com nota de análise minuciosa do backend antes de implementar endpoint dinâmico. Auditoria: 7 OK, 29 PARCIAL, 0 QUEBRADO.
 - **Corretoras CRUD ✅ RESOLVIDO:** Após investigação, CRUD já estava totalmente implementado (frontend + backend). Auditoria desatualizada. Auditoria: 6 OK, 30 PARCIAL, 0 QUEBRADO.
@@ -47,11 +49,11 @@
 | Componente | Progresso | Detalhe |
 |------------|-----------|---------|
 | **Backend** | ✅ 87% | 48/54 GAPs, 508/546 testes (93.0%), 156 endpoints |
-| **Frontend V2.0** | 🟡 94% | 2 OK, 34 PARCIAL, 0 QUEBRADO (36 telas auditadas) |
-| **Frontend UX Evolution** | 🟡 94% | 2 OK, 34 PARCIAL, 0 QUEBRADO (36 telas auditadas) |
+| **Frontend V2.0** | � 36% | 13 OK, 23 PARCIAL, 0 QUEBRADO (36 telas auditadas) |
+| **Frontend UX Evolution** | � 36% | 13 OK, 23 PARCIAL, 0 QUEBRADO (36 telas auditadas) |
 | **Testes Backend** | ✅ 98.8% | 567/574 passando, 1 failed (dívida técnica: feature IR 2026+), 6 skipped |
 | **Testes E2E** | 🟡 60% | v2: 127/127 ✅ Chromium (merged main 16/06) — v3 lógica negócio: 50 CTs planejados, specs criados (branch feature/testes-e2e-v3) |
-| **Auditoria Funcional** | 🟡 94% | 2 OK, 34 PARCIAL, 0 QUEBRADO (36 telas auditadas em 22/06/2026) |
+| **Auditoria Funcional** | � 36% | 13 OK, 23 PARCIAL, 0 QUEBRADO (36 telas auditadas em 27/06/2026) |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |
 | **Cenários de Teste** | ✅ 100% | test_full agora completo: 38 ativos (10 BR + 10 US + 10 BDRs + 8 RF), 56 transações, 42 proventos; dados realistas RV + RF |
 

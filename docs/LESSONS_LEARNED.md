@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 27/06/2026 — L-FE-011 adicionada (separação server-side vs client-side URLs), L-DB-008 a L-DB-014 adicionadas (Database), L-BE-001 adicionada (exceções tipadas vs ValueError)  
+> **Atualizado:** 27/06/2026 — L-FE-012 adicionada (bugs resolvidos indiretamente por correções de infraestrutura), L-FE-011 adicionada (separação server-side vs client-side URLs), L-DB-008 a L-DB-014 adicionadas (Database), L-BE-001 adicionada (exceções tipadas vs ValueError)  
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
 ---
@@ -143,6 +143,20 @@ const API_BASE_URL = '{{ config.get("BACKEND_API_URL", "http://localhost:5000") 
 ```html
 window.API_BASE_URL = '{{ config.get("BROWSER_API_URL", "http://localhost:5000") }}';
 ```
+
+---
+
+### L-FE-012 — Bugs podem ser resolvidos indiretamente por correções de infraestrutura
+**Origem:** BUG-014/015/017 — resolvidos por BUG-009v2 | **Data:** 27/06/2026
+
+**Lição:** BUG-014 (busca por ticker no catálogo), BUG-015 (detalhe de ativo lento/sem dados) e BUG-017 (busca em Buy Signals) foram diagnosticados como bugs de UI/autocomplete. Na verdade, eram todos sintomas do mesmo problema de infraestrutura: `API_BASE_URL` nos templates apontava para `BACKEND_API_URL` (hostname interno `exitus-backend:5000`), que o browser não resolvia. Após a separação `BROWSER_API_URL` / `BACKEND_API_URL` (BUG-009v2), todas as chamadas `apiFetch()` do Alpine.js passaram a funcionar, resolvendo 3 bugs simultaneamente sem alteração de código de UI.
+
+**Regra:** Antes de investigar um bug de UI como "autocomplete quebrado" ou "tela lenta", verificar:
+1. O `API_BASE_URL` está acessível pelo browser? (abrir DevTools → Network — se houver `ERR_NAME_NOT_RESOLVED`, é problema de URL, não de UI)
+2. A chamada `fetch()` retorna 200 ou erro de rede?
+3. Outras telas que usam o mesmo padrão `apiFetch()` também estão afetadas?
+
+Se múltiplas telas têm o mesmo sintoma, é provavelmente um problema de infraestrutura (URL, rede, CORS), não um bug individual de cada tela.
 
 ---
 

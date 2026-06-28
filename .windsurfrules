@@ -62,10 +62,14 @@ Fluxo obrigatório em toda atividade:
 Ao iniciar qualquer GAP, indicar obrigatoriamente:
 
 ```
+[IDENTIFICAÇÃO DO CENÁRIO]: [tipo da tarefa]
+Modelo free (custo zero): [MODELO] (Free)
 Modelo recomendado (menor custo): [MODELO] ($/$$/$$$)
 Modelo ideal (melhor resultado): [MODELO] ($/$$/$$$)
 Justificativa: [1 linha]
 ```
+
+**Regra:** "Modelo free" = o melhor modelo free **para o contexto específico da tarefa**, não apenas qualquer modelo free. Escolher com base na natureza da tarefa (raciocínio, contexto, velocidade).
 
 ### 📊 Tabela de Modelos Disponíveis
 
@@ -84,39 +88,46 @@ Justificativa: [1 linha]
 ### 🎯 Recomendações por Tipo de Tarefa
 
 **1. Correções Simples / CRUD / Refatoração Pontual:**
-- Menor custo: SWE-1.5 (Free) ou SWE-1.5 Fast ($)
+- Melhor Free: SWE-1.5
+- Menor custo: SWE-1.5 Fast ($)
 - Modelo ideal: GPT-5.1-Codex Medium ($)
 - Justificativa: Tarefas mecânicas não precisam de reasoning profundo
 
 **2. Lógica de Negócio / Integração / Testes:**
+- Melhor Free: GLM-5.2
 - Menor custo: GPT-5.1-Codex Medium ($) ou Gemini 3 Flash High ($)
 - Modelo ideal: Claude Sonnet 4.6 Thinking ($$)
 - Justificativa: Precisa de raciocínio moderado e consistência
 
 **3. Arquitetura / Design / Decisões Críticas:**
+- Melhor Free: GLM-5.2
 - Menor custo: GPT-5 Medium Thinking ($$) ou Gemini 2.5 Pro ($)
 - Modelo ideal: Claude Opus 4.8 Medium ($$$)
 - Justificativa: Requer raciocínio profundo e análise multidimensional
 
 **4. Análise de Código / Code Review / Segurança:**
+- Melhor Free: GLM-5.2
 - Menor custo: GPT-5.2-Codex Low ($)
 - Modelo ideal: Claude Sonnet 4.6 Thinking ($$)
 - Justificativa: Precisa de atenção a detalhes e padrões
 
 **5. Debugging Complexo / Root Cause Analysis:**
+- Melhor Free: GLM-5.2
 - Menor custo: GPT-5.2 High Thinking ($$)
 - Modelo ideal: Claude Opus 4.8 Medium ($$$)
 - Justificativa: Requer raciocínio profundo e investigação
 
 **6. Documentação / Explicações / Tutoriais:**
-- Menor custo: SWE-1.5 Fast ($) ou SWE-1.5 (Free)
+- Melhor Free: SWE-1.5
+- Menor custo: SWE-1.5 Fast ($)
 - Modelo ideal: GPT-4o ($$)
 - Justificativa: Comunicação clara, não precisa de reasoning profundo
 
 **7. Tarefas Longas / Contexto Extenso:**
+- Melhor Free: Kimi K2.7
 - Menor custo: Claude Sonnet 4.6 1M ($$)
 - Modelo ideal: Claude Opus 4.6 Thinking 1M ($$$)
-- Justificativa: Variantes "1M" suportam janela de contexto de 1 milhão de tokens
+- Justificativa: Kimi K2.7 tem maior janela de contexto entre os free; variantes "1M" suportam 1 milhão de tokens
 
 ### 💡 Estratégia de Uso Otimizada
 

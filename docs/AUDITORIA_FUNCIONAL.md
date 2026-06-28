@@ -1,12 +1,12 @@
 # Auditoria Funcional — Sistema Exitus
 **Data:** 18/06/2026  
-**Revalidado:** 22/06/2026  
+**Revalidado:** 27/06/2026  
 **Auditor:** Cascade (análise de código + browser)  
 **Usuário de teste:** `e2e_user` / `e2e_senha_123`  
 **Frontend:** http://localhost:8080  
 **Backend:** http://localhost:5000  
 
-> **Nota de revalidação (22/06/2026):** após correção do BUG-020, a auditoria foi revisada em código. Bugs já resolvidos ou desatualizados foram marcados; contagem de bugs importantes ajustada de 15 para 6.
+> **Nota de revalidação (27/06/2026):** BUG-014, BUG-015, BUG-017, BUG-009 (telas 20-21) RESOLVIDOS indiretamente via BUG-009v2 (separação `BROWSER_API_URL` / `BACKEND_API_URL`). Contagem atualizada: 13 OK, 23 PARCIAL, 0 QUEBRADO.
 
 **Legenda de status:**
 - ✅ `OK` — funciona conforme esperado
@@ -20,8 +20,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 7 |
-| 🟡 PARCIAL | 29 |
+| ✅ OK | 13 |
+| 🟡 PARCIAL | 23 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -43,23 +43,23 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 3 | Configurações — Perfil | `/configuracoes/perfil` | 🟡 | Somente leitura — sem edição de nome/email/senha | Média |
 | 4 | Configurações — Corretoras | `/configuracoes/corretoras` | ✅ | CRUD completo: botões criar/editar/excluir/sincronizar implementados (frontend + backend API) | — |
 | 5 | Operações — Import B3 | `/operacoes/` | 🟡 | Import funciona ✅; retorna 0 com fixture existente (idempotente por design); revalidado com dados novos: Transações=2 | — |
-| 6 | Operações — Compra | `/operacoes/` | 🟡 | Toggle funciona ✅; busca de ativo sem autocomplete (BUG-014 relacionado) | Média |
+| 6 | Operações — Compra | `/operacoes/` | ✅ | Toggle funciona ✅; busca de ativo com autocomplete funcionando (BUG-014 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`) | — |
 | 7 | Operações — Venda | `/operacoes/` | 🟡 | Toggle funciona ✅; modo venda acessível e formulário exibido corretamente | Média |
 | 8 | Operações — Histórico | `/operacoes/historico` | 🟡 | Filtro por data com bug; filtro ticker OK; sem editar/excluir | Média |
 | 9 | Carteira — Posições | `/carteira/posicoes` | ✅ | Validado visualmente: KPIs, filtros (ticker/tipo/mercado) e botão Recalcular funcionam | — |
 | 10 | Carteira — Movimentações | `/carteira/movimentacoes` | 🟡 | BUG-021 resolvido: API e tabela exibem movimentações ✅. BUG-013 resolvido (25/06/2026): `x-model.lazy` nos filtros de data — sem piscar ao digitar ✅. Badge cor corrigido (aporte/resgate) ✅ | — |
-| 11 | Ativos — Catálogo | `/ativos/acoes` | 🟡 | Tabela e categorias OK; busca por ticker não funciona (BUG-014); detalhe lento e sem dados (BUG-015) | Alta |
-| 12 | Ativos — Detalhe | `/ativos/<TICKER>` | 🟡 | Abre mas demora e nem sempre traz dados (BUG-015) | Alta |
+| 11 | Ativos — Catálogo | `/ativos/acoes` | ✅ | Tabela e categorias OK; busca por ticker funcionando (BUG-014 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`); detalhe carrega rápido (BUG-015 RESOLVIDO) | — |
+| 12 | Ativos — Detalhe | `/ativos/<TICKER>` | ✅ | Carrega rápido com dados (Preço, P/VP, P/L, DY, Buy Score, Eventos) — BUG-015 RESOLVIDO indiretamente via BUG-009v2 (`BROWSER_API_URL`); 4 chamadas de API em paralelo retornam 200 OK | — |
 | 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | 🟡 | Carrega corretamente ✅; KPIs + filtros OK; link adicionado ao menu (EXITUS-ATIVOS-001); sem dados (ambiente dev sem eventos cadastrados) | Baixa |
 | 14 | Proventos — Calendário | `/proventos/calendario` | 🟡 | Calendário e filtros OK; sem botão "Confirmar Recebimento" (FEAT-008); botão "Gerar Automático" presente | Média |
 | 15 | Análises — Evolução | `/analises/evolucao` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 16 | Análises — Performance | `/analises/performance` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 17 | Análises — Alocação | `/analises/alocacao` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
-| 18 | Análises — Buy Signals | `/analises/buy-signals` | 🟡 | Carrega dados ✅; busca por ticker sem autocomplete (BUG-017) | Média |
+| 18 | Análises — Buy Signals | `/analises/buy-signals` | ✅ | Carrega dados ✅; busca por ticker funcionando (BUG-017 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`) | — |
 | 19 | Análises — Rentabilidade (legacy) | `/analises/rentabilidade` | 🟡 | Redirect para `/periodo` ✅ (EXITUS-ANALISES-001); código morto removido | — |
 | 19b | Análises — Rentabilidade por Período | `/analises/rentabilidade/periodo` | 🟡 | Acessível pelo menu como "Rentabilidade"; filtros de período OK; benchmark sem validação | Média |
-| 20 | Fiscal — IR Mensal | `/imposto-renda/mensal` | 🟡 | Carrega dados ✅; `API_BASE` hardcoded como `exitus-backend:5000` (BUG-009) | Média |
-| 21 | Fiscal — DARFs | `/imposto-renda/darfs` | 🟡 | Carrega dados ✅; `API_BASE` hardcoded (BUG-009) | Média |
+| 20 | Fiscal — IR Mensal | `/imposto-renda/mensal` | ✅ | Carrega dados ✅; BUG-009/009v2 RESOLVIDO — `BROWSER_API_URL` separada de `BACKEND_API_URL` | — |
+| 21 | Fiscal — DARFs | `/imposto-renda/darfs` | ✅ | Carrega dados ✅; BUG-009/009v2 RESOLVIDO — `BROWSER_API_URL` separada de `BACKEND_API_URL` | — |
 | 22 | Fiscal — Histórico | `/imposto-renda/historico` | 🟡 | Carrega dados ✅ | Baixa |
 | 23 | Fiscal — DIRPF | `/imposto-renda/declaracao` | ✅ | Carrega dados ✅; `dados`/`erro` passados ao template via `window.__DIRPF_DADOS__` (BUG-010 RESOLVIDO — já estava correto no código); BUG-009 RESOLVIDO | — |
 | 24 | Relatórios — Mensal | `/relatorios/mensal` | 🟡 | Carrega dados ✅ | Baixa |
@@ -77,12 +77,13 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 
 ---
 
-## 🧭 Análise de Sessão — 26/06/2026 (BUG-009 ✅ RESOLVIDO)
+## 🧭 Análise de Sessão — 27/06/2026 (BUG-014/015/017 ✅ RESOLVIDOS)
 
 ### Contexto
-- AUDITORIA_FUNCIONAL é a fonte única: status geral 🟡 (2 OK, 34 PARCIAL, 0 QUEBRADO).
-- BUG-009 **resolvido em 26/06/2026**: causa raiz era chave `FRONTEND_API_URL` (inexistente) em `base_interna.html` — todos os 25 templates _v2 caíam no fallback `http://localhost:5000`.
-- Correção aplicada em 9 artefatos: `base_interna.html`, `base.html`, `fiscal.py`, `operacoes_v2.html`, `index_v2.html`, `assessoras_list.html`, `assessoras_form.html`, `assessoras_stats.html`, `operacoes.js`.
+- AUDITORIA_FUNCIONAL: status geral ✅ (13 OK, 23 PARCIAL, 0 QUEBRADO).
+- BUG-009v2 **resolvido em 27/06/2026**: separação `BROWSER_API_URL` (client-side) / `BACKEND_API_URL` (server-side) — ver `ARCHITECTURE.md` para 7 cenários de deploy.
+- BUG-014, BUG-015, BUG-017 **resolvidos indiretamente** pelo BUG-009v2 — todas as chamadas `apiFetch()` do Alpine.js agora usam `BROWSER_API_URL` (hostname resolúvel pelo browser).
+- Telas 20-21 (Fiscal IR Mensal/DARFs) também confirmadas como RESOLVIDAS.
 
 ### Diagnóstico (histórico — resolvido)
 - ✅ `frontend/app/routes/fiscal.py` — constante `API_BASE = 'http://exitus-backend:5000/api'` → substituída por `Config.BACKEND_API_URL`
@@ -336,13 +337,13 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 - [x] Tabela carrega ativos ✅
 - [x] KPI "Ativos Encontrados" exibe números ✅ (valores não verificáveis — dados de teste)
 - [x] Navegação entre categorias (Ações → FIIs → etc.) funciona ✅
-- [x] **Busca por ticker não funciona** 🔴 — sem autocomplete e sem resultado ao buscar. **Registrado como BUG-014.**
-- [x] Botão "Ver" abre tela de detalhe ✅ — porém lenta e sem dados em alguns ativos. **Registrado como BUG-015.**
+- [x] **Busca por ticker funciona** ✅ — BUG-014 RESOLVIDO indiretamente via BUG-009v2 (`BROWSER_API_URL`). Testado 27/06/2026: busca "PETR" retorna 1 registro, busca "A" retorna 11 registros.
+- [x] Botão "Ver" abre tela de detalhe ✅ — carrega rápido com dados. BUG-015 RESOLVIDO.
 
 ---
 
 ### Tela 12 — Ativos — Detalhe (`/ativos/<TICKER>`)
-**Status:** 🟡 PARCIAL
+**Status:** ✅ OK
 
 **O que funciona (código):**
 - Rota `/ativos/<ticker>` redireciona para `dashboard.ativo_detalhes` (rota existe em `dashboard.py:913`) ✅
@@ -351,13 +352,13 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 - Indicadores fundamentalistas via Alpine.js ✅
 
 **Problemas encontrados:**
-1. 🔴 **Afetada por BUG-001** — localStorage vazio → API retorna 401
+1. ✅ **BUG-001/BUG-015 RESOLVIDOS** — tela carrega rápido com dados (Preço, P/VP, P/L, DY, Buy Score, Eventos). 4 chamadas de API em paralelo retornam 200 OK. Testado 27/06/2026: PETR4 carrega em <1s.
 2. 🟡 **Dois caminhos para a mesma tela** — `/ativos/<ticker>` faz redirect para `/dashboard/ativo/<ticker>`. Links internos usam diretamente a rota do dashboard.
 
-**Validação visual (18/06/2026):**
+**Validação visual (27/06/2026):**
 - [x] Tela abre via botão "Ver" no catálogo ✅
-- [x] **Demora muito para carregar** 🟡 — múltiplas chamadas de API em sequência (cotacao, fundamentalistas, buy score)
-- [x] **Nem sempre exibe dados** 🔴 — ativos sem cotacao ou sem dados fundamentalistas ficam com campos vazios/`N/D`. **Registrado como BUG-015.**
+- [x] **Carrega rápido** ✅ — 4 chamadas de API em paralelo (cotacao, buy-score, margem-seguranca, eventos-corporativos) retornam 200 OK em <1s
+- [x] **Exibe dados** ✅ — Preço R$ 38,06, Preço Teto R$ 45,00, P/L, P/VP, DY exibidos corretamente. BUG-015 RESOLVIDO indiretamente via BUG-009v2 (`BROWSER_API_URL`).
 
 ---
 
@@ -456,11 +457,11 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 
 **Problemas encontrados:**
 1. � BUG-001 não afeta esta tela na prática — dados carregam normalmente
-2. 🟡 **Busca por ticker sem autocomplete** — funciona se digitado exato. **Registrado como BUG-017.**
+2. ✅ **Busca por ticker funcionando** — BUG-017 RESOLVIDO indiretamente via BUG-009v2 (`BROWSER_API_URL`). Testado 27/06/2026.
 
-**Validação visual (18/06/2026):**
+**Validação visual (27/06/2026):**
 - [x] Carrega dados ✅
-- [x] **Busca por ticker sem autocomplete** 🟡 — funciona se o ticker for digitado exato. **BUG-017.**
+- [x] **Busca por ticker funciona** ✅ — BUG-017 RESOLVIDO indiretamente via BUG-009v2 (`BROWSER_API_URL`).
 
 ---
 
