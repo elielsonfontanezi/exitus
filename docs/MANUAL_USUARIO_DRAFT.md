@@ -33,6 +33,7 @@
 
 ### Diferenciais
 
+
 - ✅ **Multi-mercado:** BR, US, INTL em uma única plataforma
 - ✅ **Multi-moeda:** BRL, USD, EUR com conversão automática
 - ✅ **Motor fiscal completo:** IR, IOF, DARF, compensação de prejuízos
