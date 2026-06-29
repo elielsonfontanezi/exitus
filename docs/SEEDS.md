@@ -498,7 +498,7 @@ grep "HistoricoPatrimonio" backend/app/models/__init__.py -A2
 
 ---
 
-## 🚀 Para Próxima Sessão Cascade
+## 🚀 Para Próxima Sessão (Cursor Agent)
 
 Quando voltar a trabalhar com seeds, use este prompt:
 

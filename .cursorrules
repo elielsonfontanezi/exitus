@@ -1,6 +1,6 @@
 # .cursorrules — Sistema Exitus
 ## Regras para Cursor Agent (Exitus AI Assistant)
-### Versão: 3.2 — 29/06/2026 (conteúdo extenso em docs/AI_OPERATIONS.md)
+### Versão: 3.3 — 29/06/2026 (conteúdo extenso em docs/AI_OPERATIONS.md)
 
 ---
 
@@ -106,7 +106,7 @@ Cabeçalho obrigatório ao iniciar GAP. Detalhes: **`docs/AI_OPERATIONS.md` § M
 | `docs/ARCHITECTURE.md` | Se mudança estrutural |
 | `docs/CODING_STANDARDS.md` | Se novo padrão |
 | `docs/OPERATIONS_RUNBOOK.md` | Se script/procedimento novo |
-| `docs/FRONTEND_INTEGRATION_PLAN.md` | Se nova tela frontend |
+| `docs/archive/FRONTEND_INTEGRATION_PLAN.md` | Padrões de integração históricos (nova tela: priorizar `AUDITORIA_FUNCIONAL.md`) |
 | `.cursorrules` | Se regras mudarem |
 
 O usuário nunca deve perguntar "e a documentação?" — ela já vem junto.

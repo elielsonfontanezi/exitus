@@ -419,7 +419,7 @@ POST   /api/assessoras/:id/toggle — Ativar/desativar
 | **Índices criados** | 24 (20 simples + 4 compostos) |
 | **Foreign Keys** | 20 (assessora_id em todas as tabelas de usuário) |
 | **Services com filtros** | 15/15 (100%) |
-| **Testes passando** | 567/574 (98.8%) |
+| **Testes passando** | 565/574 (98,4%) — ver `PROJECT_STATUS.md` |
 | **Assessora padrão** | 23c54cb4-cb0a-438f-b985-def21d70904e |
 | **Status** | ✅ CONCLUÍDO (19/03/2026) |
 

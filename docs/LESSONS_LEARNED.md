@@ -1581,11 +1581,32 @@ psycopg2.errors.UndefinedColumn: column "assessora_id" of relation "usuario" doe
 - **Lições:** `docs/LESSONS_LEARNED.md` — consultar por domínio (L-*), nunca copiar inline
 - **`.windsurfrules`:** removido — não recriar
 
-**Validação pós-mudança:**
+**Validação pós-mudança:** ver script completo em **`docs/AI_OPERATIONS.md` § Validação migração**.
+
+Resumo:
 ```bash
-test ! -f .windsurfrules && echo "OK: legado removido"
-rg '\.windsurfrules' --glob '!docs/archive/**' --glob '!docs/CHANGELOG.md'
-wc -l .cursorrules
+test ! -f .windsurfrules && echo "PASS: .windsurfrules removido"
+test -f docs/MODULES.md && echo "PASS: docs/MODULES.md existe"
+LINES=$(wc -l < .cursorrules)
+test "$LINES" -le 200 && echo "PASS: .cursorrules $LINES linhas (<= 200)"
+REFS=$(rg '\.windsurfrules' \
+  --glob '!docs/archive/**' \
+  --glob '!docs/CHANGELOG.md' \
+  --glob '!docs/AI_OPERATIONS.md' \
+  --glob '!docs/LESSONS_LEARNED.md' \
+  --glob '!docs/ROADMAP.md' \
+  --glob '!docs/PROJECT_STATUS.md' \
+  -c 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
+test "$REFS" -eq 0 && echo "PASS: 0 refs operacionais a .windsurfrules"
+rg 'Cascade AI|Para Próxima Sessão Cascade' docs/ \
+  --glob '!archive/**' \
+  --glob '!CHANGELOG.md' \
+  --glob '!AI_OPERATIONS.md' \
+  --glob '!LESSONS_LEARNED.md' \
+  -q \
+  && echo "FAIL: refs Cascade operacionais" || echo "PASS: sem refs Cascade operacionais"
+rg '\.cursorrules' docs/PERSONAS.md docs/LESSONS_LEARNED.md docs/AUDITORIA_FUNCIONAL.md -q \
+  && echo "PASS: .cursorrules referenciado nos docs operacionais"
 ```
 
 ---

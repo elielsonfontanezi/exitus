@@ -1284,4 +1284,4 @@ Para assessoras:
 ---
 
 *Última atualização: 19/03/2026 — v0.9.2*  
-*Responsável: Elielson Fontanezi + Cascade AI*
+*Responsável: Elielson Fontanezi + Cursor Agent*

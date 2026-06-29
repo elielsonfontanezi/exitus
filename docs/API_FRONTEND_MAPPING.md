@@ -125,4 +125,4 @@
 
 ---
 
-**Consultar:** FRONTEND_INTEGRATION_PLAN.md para detalhes
+**Consultar:** `docs/AUDITORIA_FUNCIONAL.md` (status telas) e `docs/archive/FRONTEND_INTEGRATION_PLAN.md` (padrões históricos)

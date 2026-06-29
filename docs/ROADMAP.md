@@ -169,7 +169,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 
 ### Documentação
 - **FRONTEND_IMPLEMENTATION_PLAN.md** — Plano detalhado por sprint ⭐ NOVO
-- **FRONTEND_INTEGRATION_PLAN.md** — Estratégia de integração API
+- **archive/FRONTEND_INTEGRATION_PLAN.md** — Estratégia de integração API (histórico)
 - **API_REFERENCE.md** — Contratos das 156 APIs
 - **UX_DESIGN_SYSTEM.md** — Componentes visuais
 
@@ -209,6 +209,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | **CURSORRULES-001** | Reestruturar `.cursorrules` v3.0 + `docs/AI_OPERATIONS.md`; remover `.windsurfrules` | ✅ Concluído (29/06/2026) |
 | **CURSORRULES-001.1** | Plano de controle: ROADMAP + AUDITORIA_FUNCIONAL + índice LESSONS | ✅ Concluído (29/06/2026) |
 | **CURSORRULES-001.2** | REGRA #2 Plan/Agent; PERSONAS/INDEX; commit template; validação | ✅ Concluído (29/06/2026) |
+| **CURSORRULES-001.3** | Fechamento migração: MODULES stub, links mortos, modelos Cursor, legacy | ✅ Concluído (29/06/2026) |
 | **SEED-MACRO-001** | Popular tabela parametros_macro com valores reais BR/US | ✅ Concluído (29/06/2026) |
 | **VALUATION-002** | Popular EPS/FCF reais no banco (yfinance ou seed) | ✅ Concluído (29/06/2026) |
 | **BUG-VAL-001** | Corrigir fórmulas Bazin/Gordon/Graham (bugs estruturais) | ✅ Concluído (29/06/2026) |
@@ -772,6 +773,6 @@ Documentos históricos de roadmaps anteriores estão em `docs/archive/`:
 
 ---
 
-*Última atualização: 24/06/2026*  
-*Próxima revisão: Após correção BUG-013 e falhas de testes backend*  
-*Responsável: Elielson Fontanezi + Cascade AI*
+*Última atualização: 29/06/2026*  
+*Próxima revisão: Após BUG-VAL-006/005/004*  
+*Responsável: Elielson Fontanezi + Cursor Agent*

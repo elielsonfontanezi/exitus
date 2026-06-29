@@ -1,7 +1,7 @@
 # Auditoria Funcional — Sistema Exitus
 **Data:** 18/06/2026  
 **Revalidado:** 27/06/2026  
-**Auditor:** Cascade (análise de código + browser)  
+**Auditor:** Cascade (análise de código + browser) — *registro histórico; operação atual via Cursor Agent (CURSORRULES-001)*  
 **Usuário de teste:** `e2e_user` / `e2e_senha_123`  
 **Frontend:** http://localhost:8080  
 **Backend:** http://localhost:5000  
@@ -607,7 +607,7 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 | ~~FEAT-004~~ | ~~Meta de patrimônio hardcoded (R$ 500k) — não configurável~~ | 2 | **RESOLVIDA em EXITUS-PERFIL-001**: campo `meta_patrimonio` adicionado ao modelo Usuario; dashboard exibe meta dinâmica via API `/api/auth/me`; perfil permite edição; API GET/PUT `/api/auth/me` funcionando |
 | ~~FEAT-005~~ | ~~Template `venda.html` legado ainda existe como rota separada~~ | 7 | **RESOLVIDA**: suporte a ?venda=true em operacoes_v2.html; rota /venda redireciona mantendo compatibilidade; modo venda inicializa automaticamente com posições carregadas |
 | ~~FEAT-006~~ | ~~Exportação CSV renderiza tabela HTML — sem download real do arquivo~~ | 28 | **RESOLVIDA**: download direto via HTTP headers; nova página /exportar com preview automático; compatibilidade mantida com ?preview=true |
-| ~~TECH-001~~ | ~~ValueError residual em 5 services — sem exceções tipadas~~ | — | **RESOLVIDO**: `ValueError` substituído por exceções tipadas em `parametros_macro_service.py` (ConflictError, NotFoundError), `rfcalc_service.py` (ValidationError), `cambio_service.py` (ValidationError), `ir_service.py` (ValidationError), `alerta_service.py` (NotFoundError, ValidationError). Testes atualizados: 567/574 passando (98.8%). |
+| ~~TECH-001~~ | ~~ValueError residual em 5 services — sem exceções tipadas~~ | — | **RESOLVIDO**: `ValueError` substituído por exceções tipadas em `parametros_macro_service.py` (ConflictError, NotFoundError), `rfcalc_service.py` (ValidationError), `cambio_service.py` (ValidationError), `ir_service.py` (ValidationError), `alerta_service.py` (NotFoundError, ValidationError). Testes atualizados: 565/574 passando (baseline 29/06/2026: 3 failed pré-existentes). |
 | ~~FEAT-007~~ | ~~Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona~~ | 34 | **RESOLVIDA**: modal com informações completas; botão Detalhes na tabela; carregamento via API específica |
 | ~~FEAT-008~~ | ~~Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível~~ | 14 | **RESOLVIDA**: botão "Confirmar" já implementado em calendario_v2.html; função confirmarPagamento() completa; API /api/calendario-dividendos/{id}/confirmar-pagamento funcional |
 | FEAT-009 | **Import B3 não lista os registros importados** — resultado mostra apenas totais numéricos (Transações=N, Proventos=N). Usuário não sabe quais ativos foram criados/importados. **Fix:** exibir lista dos tickers importados e ativos criados automaticamente após import | 5 |

@@ -1863,7 +1863,7 @@ ORDER BY total DESC;
 
 ### Problema Comum
 
-Ao editar arquivos no Windsurf (Windows) através do WSL, os arquivos são criados com UID/GID diferentes do usuário dentro dos containers Podman.
+Ao editar arquivos em uma **IDE no Windows via WSL** (Cursor, VS Code, etc.), os arquivos podem ser criados com UID/GID diferentes do usuário dentro dos containers Podman.
 
 ### Sintomas
 - Erros: "Permission denied", "Operation not permitted"

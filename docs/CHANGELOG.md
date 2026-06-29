@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — CURSORRULES-001.3: Fechamento migração Cursor (29/06/2026)
+
+**Problema:**
+- Links mortos: `docs/MODULES.md`, `docs/FRONTEND_INTEGRATION_PLAN.md` citados em `.cursorrules`/PERSONAS
+- PERSONAS duplicava LIÇÃO 001–004 inline (contradiz LESSONS_LEARNED)
+- Tabela modelos IA 100% legacy (Windsurf/Devin)
+- INDEX sem `MULTICLIENTE.md`; métricas stale 567/574 em seções atuais
+- Resíduos Cascade/Windsurf em docs operacionais; L-OPS-001 desatualizada
+
+**Solução:**
+- `docs/MODULES.md`: stub ativo (remissão PROJECT_STATUS/API_REFERENCE)
+- `.cursorrules` v3.3: REGRA #6 → `archive/FRONTEND_INTEGRATION_PLAN.md`
+- `PERSONAS.md`: remissão LESSONS por ID (L-DB-*, L-BE-*, L-OPS-001)
+- `AI_OPERATIONS.md` v1.3: tabela modelos Cursor-native + validação ampliada
+- `INDEX.md`: +MODULES, +MULTICLIENTE (16 arquivos)
+- Limpeza legacy: SEEDS, ROADMAP footer, OPERATIONS_RUNBOOK, AUDITORIA, prompt
+- Métricas atuais 565/574 em MULTICLIENTE e AUDITORIA TECH-001
+- L-OPS-001 sincronizada com AI_OPERATIONS § Validação
+
+---
+
 ### Docs — CURSORRULES-001.2: Alinhamento PERSONAS/INDEX e REGRA #2 (29/06/2026)
 
 **Problema:**

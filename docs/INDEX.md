@@ -1,6 +1,6 @@
 # Índice da Documentação — Sistema Exitus
 
-> **Total:** 14 arquivos ativos + archive  
+> **Total:** 16 arquivos ativos + archive  
 > **Última atualização:** 29/06/2026  
 > **Versão:** v0.9.34
 
@@ -20,7 +20,7 @@
 
 ---
 
-## 📁 Documentação (14 arquivos)
+## 📁 Documentação (16 arquivos)
 
 ### 🔴 Core Operacional
 
@@ -30,6 +30,7 @@
 | **[AUDITORIA_FUNCIONAL.md](AUDITORIA_FUNCIONAL.md)** | Auditoria de 36 telas — OK/PARCIAL/QUEBRADO, P-items |
 | **[CHANGELOG.md](CHANGELOG.md)** | Histórico completo de mudanças |
 | **[PROJECT_STATUS.md](PROJECT_STATUS.md)** | Status consolidado do projeto |
+| **[MODULES.md](MODULES.md)** | Índice M0–M7 (métricas em PROJECT_STATUS) |
 | **[ARCHITECTURE.md](ARCHITECTURE.md)** | Decisões arquiteturais, stack, containers |
 | **[CODING_STANDARDS.md](CODING_STANDARDS.md)** | Padrões obrigatórios (snake_case, SQLAlchemy) |
 | **[API_REFERENCE.md](API_REFERENCE.md)** | Contratos da API, endpoints |
@@ -43,6 +44,7 @@
 | Arquivo | Descrição |
 |---------|-----------|
 | **[ENUMS.md](ENUMS.md)** | 15 TipoAtivo, mapeamentos DB/API/JSON |
+| **[MULTICLIENTE.md](MULTICLIENTE.md)** | Multi-tenancy, RLS, isolamento assessora |
 | **[SEEDS.md](SEEDS.md)** | Credenciais dev, dados de teste |
 | **[EXITUS_DB_STRUCTURE.txt](EXITUS_DB_STRUCTURE.txt)** | Schema completo (auto-gerado) |
 
@@ -78,4 +80,4 @@
 ---
 
 *Atualizado: 29 de Junho de 2026*  
-*Versão: v0.9.34 — Documentação consolidada (14 arquivos)*
+*Versão: v0.9.34 — Documentação consolidada (16 arquivos)*

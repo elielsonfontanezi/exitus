@@ -2,7 +2,7 @@
 
 > **Propósito:** Manual operacional estendido para o Cursor Agent.  
 > **Fonte canônica de regras inegociáveis:** `.cursorrules` (raiz do repositório).  
-> **Versão:** 1.2 — 29/06/2026  
+> **Versão:** 1.3 — 29/06/2026  
 > **Nota:** `.windsurfrules` descontinuado (CURSORRULES-001); regras inegociáveis em `.cursorrules`.
 
 ---
@@ -53,7 +53,24 @@ Justificativa: [1 linha]
 
 **Regra:** "Modelo free" deve ser o melhor modelo gratuito para o cenário específico da tarefa.
 
-**Nota Cursor:** A tabela abaixo usa nomes de referência (Windsurf/Devin legacy). **Adaptar aos modelos disponíveis no Cursor** no momento da sessão — manter a estrutura do cabeçalho (free / recomendado / ideal).
+### Modelos Cursor (referência 29/06/2026)
+
+Usar esta tabela ao indicar modelo na REGRA #3. Adaptar se novos modelos forem adicionados ao Cursor.
+
+| Tipo de tarefa | Free | Recomendado ($) | Ideal ($$) |
+|----------------|------|-----------------|------------|
+| CRUD / refatoração | — | Composer 2.5 Fast | GPT-5.3 Codex |
+| Lógica / testes | GLM 5.2 | GPT-5.2 / Gemini 3.1 Pro | Sonnet 4.6 |
+| Arquitetura | GLM 5.2 | GPT-5.4 | Opus 4.8 |
+| Code review / segurança | GLM 5.2 | Codex 5.1 Max | Sonnet 4.6 |
+| Debug financeiro | GLM 5.2 | Codex 5.3 | Opus 4.8 |
+| Contexto extenso | Kimi K2.5 | Gemini 3.5 Flash | Opus 1M |
+
+---
+
+### Referência histórica (Windsurf/Devin)
+
+**Nota:** Tabela abaixo preservada para contexto de CHANGELOG. **Preferir a tabela Cursor acima** na operação diária.
 
 ### Tabela de Modelos Disponíveis
 
@@ -276,11 +293,14 @@ Executar após CURSORRULES-001 para confirmar que referências operacionais fora
 # 1. Arquivo legado removido
 test ! -f .windsurfrules && echo "PASS: .windsurfrules removido"
 
-# 2. .cursorrules enxuto (v3.x)
+# 2. Stub MODULES ativo
+test -f docs/MODULES.md && echo "PASS: docs/MODULES.md existe"
+
+# 3. .cursorrules enxuto (v3.x)
 LINES=$(wc -l < .cursorrules)
 test "$LINES" -le 200 && echo "PASS: .cursorrules tem $LINES linhas (<= 200)"
 
-# 3. Zero refs operacionais fora de histórico (archive + CHANGELOG + LESSONS + ROADMAP + PROJECT_STATUS + este arquivo)
+# 4. Zero refs operacionais fora de histórico (archive + CHANGELOG + LESSONS + ROADMAP + PROJECT_STATUS + este arquivo)
 REFS=$(rg '\.windsurfrules' \
   --glob '!docs/archive/**' \
   --glob '!docs/CHANGELOG.md' \
@@ -291,7 +311,16 @@ REFS=$(rg '\.windsurfrules' \
   -c 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
 test "$REFS" -eq 0 && echo "PASS: 0 refs operacionais a .windsurfrules" || echo "FAIL: $REFS refs restantes"
 
-# 4. Novo caminho presente nos docs operacionais
+# 5. Sem refs Cascade operacionais em docs ativos (excluir este arquivo e LESSONS — contêm o script)
+rg 'Cascade AI|Para Próxima Sessão Cascade' docs/ \
+  --glob '!archive/**' \
+  --glob '!CHANGELOG.md' \
+  --glob '!AI_OPERATIONS.md' \
+  --glob '!LESSONS_LEARNED.md' \
+  -q \
+  && echo "FAIL: refs Cascade operacionais restantes" || echo "PASS: sem refs Cascade operacionais"
+
+# 6. Novo caminho presente nos docs operacionais
 rg '\.cursorrules' docs/PERSONAS.md docs/LESSONS_LEARNED.md docs/AUDITORIA_FUNCIONAL.md -q \
   && echo "PASS: .cursorrules referenciado nos docs operacionais"
 ```

@@ -1,15 +1,15 @@
 # 🎯 PROMPT: REENGENHARIA FRONTEND EXITUS v2.0
 
-**Persona:** Cascade (Persona 2 - docs/PERSONAS.md)  
-**Modelo IA Recomendado:** Claude Sonnet (complexidade moderada-alta)  
-**Créditos Estimados:** 60-80
+**Persona:** Cursor Agent (Persona 2 — docs/PERSONAS.md)  
+**Modelo IA Recomendado:** Sonnet 4.6 (complexidade moderada-alta)  
+**Métricas atuais:** ver docs/PROJECT_STATUS.md
 
 ---
 
 ## 📋 CONTEXTO ESTRATÉGICO
 
 O Exitus tem um **backend robusto** com:
-- ✅ 491 testes passando (100%)
+- ✅ Suite de testes — ver `docs/PROJECT_STATUS.md` (baseline 565 passed)
 - ✅ 67+ endpoints REST
 - ✅ PostgreSQL com 22 tabelas
 - ✅ Motor fiscal completo (IR, IOF, DARF)

@@ -163,34 +163,26 @@ Para evitar erros de interpretação de Markdown e garantir a integridade técni
 
 ### 🎓 Lições Aprendidas — Regras Obrigatórias
 
-Estas lições foram aprendidas em implementações reais e **devem ser seguidas sempre**:
+Consultar **`docs/LESSONS_LEARNED.md`** por domínio — **nunca duplicar** lições neste arquivo.
 
-#### LIÇÃO 001 — DELETE vs DROP TABLE
-- **NUNCA** usar `db.drop_all()` / `db.create_all()` para reset de dados
-- **SEMPRE** usar `DELETE FROM tabela` para limpar dados
-- Schema é controlado por Alembic migrations — nunca destruir estrutura
+| Domínio | IDs relevantes |
+|---------|----------------|
+| Database / reset / PKs | L-DB-001, L-DB-002, L-DB-003, L-MIG-001 |
+| Models / campos | L-BE-001, L-SA-001 |
+| Frontend | L-FE-001 a L-FE-012 |
+| Testes | L-TEST-001 a L-TEST-005 |
+| Operações IA | L-OPS-001 |
 
-#### LIÇÃO 002 — Sempre Verificar Tabelas Existentes
-- **NUNCA** deduzir nomes de tabelas pelo domínio de negócio
-- **SEMPRE** consultar `inspect(db.engine).get_table_names()` antes de referenciar tabelas
-- Um nome errado aborta **toda a transação** PostgreSQL (`InFailedSqlTransaction`)
-
-#### LIÇÃO 003 — PKs são UUID neste Sistema
-- Todas as PKs do Exitus usam `UUID(as_uuid=True)` — **não há sequences numéricas**
-- Confirmado: `SELECT sequence_name FROM information_schema.sequences` retorna vazio
-- **Nunca** tentar `ALTER SEQUENCE ... RESTART WITH 1` neste projeto
-
-#### LIÇÃO 004 — Verificar Fields do Model Antes de Usar
-- **NUNCA** assumir campos de um model por analogia com outros models ou lógica de domínio
-- Exemplo: `Corretora` tem `pais`, mas `Ativo` usa `mercado` para o mesmo conceito
-- **SEMPRE** ler o arquivo `models/nome_model.py` completo antes de usar qualquer campo
-- Regra de negócio coerente ≠ campo existente no model
+Índice completo por domínio: **`docs/AI_OPERATIONS.md` § Índice de lições**.
 
 #### Checklist Obrigatório ao Manipular Models/Banco
-- [ ] Li o `models/nome_model.py` completo para verificar campos reais?
-- [ ] Consultei `inspect(db.engine).get_table_names()` antes de listar tabelas?
-- [ ] Verifiquei o tipo de PK (UUID vs serial) antes de resetar sequences?
-- [ ] Usei `DELETE` ao invés de `DROP TABLE` para limpar dados?
+
+Antes de tocar em models ou banco, buscar em LESSONS_LEARNED:
+
+- [ ] Li o `models/nome_model.py` completo? (L-BE-001)
+- [ ] Consultei tabelas reais via MCP ou `EXITUS_DB_STRUCTURE.txt`? (L-DB-002)
+- [ ] PKs são UUID — nunca resetar sequences? (L-DB-003)
+- [ ] Usei `DELETE` ao invés de `DROP TABLE`? (L-DB-001)
 
 ---
 
