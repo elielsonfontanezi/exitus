@@ -2,6 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
+> **Atualizado:** 29/06/2026 — L-OPS-001 adicionada (migração `.windsurfrules` → `.cursorrules`)
 > **Atualizado:** 28/06/2026 — L-DB-015 adicionada (diretórios duplicados de migration — alembic/ vs migrations/)
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
@@ -1499,7 +1500,7 @@ def usuario_seed(app):
 ### L-DOCS-001 — Documentação no mesmo commit (REGRA #6)
 **Origem:** Planejamento Frontend | **Data:** 13/03/2026
 
-**Problema:** Criar commits de código/documentação separados, violando REGRA #6 do `.windsurfrules`. Usuário precisa perguntar "e a documentação?".
+**Problema:** Criar commits de código/documentação separados, violando REGRA #6 do `.cursorrules`. Usuário precisa perguntar "e a documentação?".
 
 **Solução:**
 1. **Sempre** atualizar documentação no mesmo commit:
@@ -1566,6 +1567,27 @@ psycopg2.errors.UndefinedColumn: column "assessora_id" of relation "usuario" doe
 
 ---
 
+## Operações / IA
+
+### L-OPS-001 — Fonte única de regras: `.cursorrules` (não `.windsurfrules`)
+**Origem:** CURSORRULES-001 — migração Cursor | **Data:** 29/06/2026
+
+**Erro:** Dois arquivos de regras (`.cursorrules` e `.windsurfrules`) divergiam após migração Windsurf → Cursor. Métricas stale (567/574), paths MCP errados (`.windsurf/`), referências a Cascade/Windsurf.
+
+**Correto:**
+- **Fonte única:** `.cursorrules` na raiz (carregado automaticamente pelo Cursor)
+- **Conteúdo extenso:** `docs/AI_OPERATIONS.md` (modelos IA, scripts, checklists)
+- **`.windsurfrules`:** removido — não recriar
+
+**Validação pós-mudança:**
+```bash
+test ! -f .windsurfrules && echo "OK: legado removido"
+rg '\.windsurfrules' --glob '!docs/archive/**' --glob '!docs/CHANGELOG.md'
+wc -l .cursorrules
+```
+
+---
+
 ### L-DB-009 — Alterações DDL devem ser aplicadas em AMBOS os bancos
 **Origem:** CONSTRAINT-001 | **Data:** 25/06/2026
 
@@ -1588,5 +1610,6 @@ psycopg2.errors.UndefinedColumn: column "assessora_id" of relation "usuario" doe
 |---|---|
 | `docs/CODING_STANDARDS.md` | Padrões de código para humanos |
 | `docs/ROADMAP.md` | GAPs registrados (ENUM-001, TESTDB-001) |
-| `.windsurfrules` | Regras operacionais do Cascade (Windsurf) |
+| `.cursorrules` | Regras inegociáveis do Cursor Agent (fonte única) |
+| `docs/AI_OPERATIONS.md` | Manual operacional estendido (modelos IA, MCPs, scripts) |
 | `docs/EXITUS-SQLALCHEMY-001.md` | Padrões SQLAlchemy detalhados |

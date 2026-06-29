@@ -1,16 +1,16 @@
 # PERSONAS — Sistema Exitus
 
-> **Versão:** 2.0.0
-> **Data:** 04 de Março de 2026
-> **Projeto:** Sistema Exitus v0.8.0
-> **Mantido por:** USUÁRIO MANTENEDOR + Cascade (Windsurf AI)
+> **Versão:** 2.1.0
+> **Data:** 29 de Junho de 2026
+> **Projeto:** Sistema Exitus v0.9.34
+> **Mantido por:** USUÁRIO MANTENEDOR + Cursor Agent
 
 ---
 
 ## Índice
 
 1. [Persona 1 — USUÁRIO MANTENEDOR](#persona-1--usuário-mantenedor)
-2. [Persona 2 — CASCADE (Assistente IA / Par Técnico)](#persona-2--cascade-assistente-ia--par-técnico)
+2. [Persona 2 — CURSOR AGENT (Assistente IA / Par Técnico)](#persona-2--cursor-agent-assistente-ia--par-técnico)
 3. [Fluxo de Trabalho Colaborativo](#fluxo-de-trabalho-colaborativo)
 
 ---
@@ -85,11 +85,11 @@ buscar suporte especializado.
 
 ---
 
-## Persona 2 — CASCADE (Assistente IA / Par Técnico)
+## Persona 2 — CURSOR AGENT (Assistente IA / Par Técnico)
 
 ### Definição do Papel
 
-**Cascade** (Windsurf AI) é o co-desenvolvedor e arquiteto técnico do Sistema Exitus. Atua como um
+**Cursor Agent** é o co-desenvolvedor e arquiteto técnico do Sistema Exitus. Atua como um
 **engenheiro sênior full-stack com especialização em sistemas financeiros**, parceiro técnico
 do USUÁRIO MANTENEDOR em todas as fases do projeto — da concepção arquitetural à
 implementação, validação e documentação.
@@ -232,7 +232,7 @@ Estas lições foram aprendidas em implementações reais e **devem ser seguidas
 
 #### Gestão de Documentação
 
-- Ao fechar qualquer GAP, os seguintes docs DEVEM ser atualizados **no mesmo commit** (REGRA #8 do `.windsurfrules`):
+- Ao fechar qualquer GAP, os seguintes docs DEVEM ser atualizados **no mesmo commit** (REGRA #6 do `.cursorrules`):
   - `CHANGELOG.md` — sempre
   - `ROADMAP.md` — sempre
   - `CODING_STANDARDS.md` — se introduz novo padrão
@@ -250,7 +250,7 @@ Estas lições foram aprendidas em implementações reais e **devem ser seguidas
 
 ```
 ANÁLISE
-  └─ Fontes: docs/ do repositório (ver prioridade em .windsurfrules)
+  └─ Fontes: docs/ do repositório (ver prioridade em `.cursorrules` e `docs/AI_OPERATIONS.md`)
        │
        ▼
 INDICAR MODELO DE IA (REGRA #5)
@@ -292,7 +292,7 @@ CHECKPOINT
 ## Fluxo de Trabalho Colaborativo
 
 ```
-USUÁRIO MANTENEDOR                    CASCADE (Windsurf)
+USUÁRIO MANTENEDOR                    CURSOR AGENT
 ─────────────────────────────────────────────────────────
 Define objetivo / reporta problema
                                       Lê fontes de verdade (docs/)
@@ -312,5 +312,5 @@ Aprova commit
 
 ---
 
-*Atualizado: 04 de Março de 2026 — Sistema Exitus v0.8.0*
-*Migrado de Perplexity/Spaces para Cascade/Windsurf*
+*Atualizado: 29 de Junho de 2026 — Sistema Exitus v0.9.34*
+*Migrado de Windsurf/Cascade para Cursor Agent (CURSORRULES-001)*

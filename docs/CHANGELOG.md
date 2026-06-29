@@ -8,6 +8,28 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — CURSORRULES-001: Reestruturação v3.0 para Cursor (29/06/2026)
+
+**Problema:**
+- `.cursorrules` e `.windsurfrules` divergiam (556 vs 538 linhas)
+- Cabeçalho ainda citava Cascade/Windsurf; paths MCP desatualizados
+- Métricas stale (567/574) em múltiplos docs; REGRA #10 duplicada
+
+**Solução:**
+- `.cursorrules` v3.0 enxuto (~160 linhas) — regras inegociáveis para Cursor Agent
+- `docs/AI_OPERATIONS.md` criado — modelos IA, MCPs, scripts, checklists, migrations
+- `.windsurfrules` removido (substituído definitivamente por `.cursorrules`)
+- Refs atualizadas: PERSONAS, LESSONS_LEARNED (L-OPS-001), AUDITORIA_FUNCIONAL, PROJECT_STATUS
+- Métricas canônicas: 565 passed, 3 failed, 6 skipped
+
+**Arquivos:**
+- `.cursorrules` — reescrito
+- `docs/AI_OPERATIONS.md` — novo
+- `.windsurfrules` — removido
+- `docs/PERSONAS.md`, `docs/LESSONS_LEARNED.md`, `docs/AUDITORIA_FUNCIONAL.md`, `docs/PROJECT_STATUS.md`, `docs/ROADMAP.md`
+
+---
+
 ### Fix + Seed — SEED-MACRO-001 + VALUATION-002 + BUG-VAL-001: Valuation Dia 1 (29/06/2026)
 
 **Problema:**

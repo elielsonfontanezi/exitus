@@ -5,6 +5,7 @@
 > **Versão:** v0.9.34
 
 ### 🔧 Últimas correções (29/06/2026)
+- **CURSORRULES-001 ✅ CONCLUÍDO:** `.cursorrules` v3.0 enxuto (~160 linhas) para Cursor Agent; conteúdo extenso migrado para `docs/AI_OPERATIONS.md`; `.windsurfrules` removido; refs atualizadas em PERSONAS, LESSONS_LEARNED, AUDITORIA_FUNCIONAL; L-OPS-001 registrada.
 - **BUG-VAL-001 ✅ CONCLUÍDO:** Fórmulas Bazin/Graham/Gordon corrigidas em `calculos_blueprint.py`. Bazin: `dpa / 0.06` (threshold fixo Décio Bazin). Graham: `(eps * ...) * 4.4 / (k * 100)` (guard eps>0). Gordon: `dpa * (1+g)`. Tipo check estendido para `stock`, `stock_intl`, `unit`, `reit`. ITUB4 pt_medio: R$833 → R$49,89 ✅
 - **SEED-MACRO-001 ✅ CONCLUÍDO:** `seed_parametros_macro.py` reescrito — UPSERT idempotente, 5 mercados reais: BR/B3 (rf=10.5%, g=5%, wacc=12%), US/NYSE, US/NASDAQ, EU/Euronext, JP/Tokyo. Banco validado: 5 rows em `parametros_macro`.
 - **VALUATION-002 ✅ CONCLUÍDO:** `eps`/`fcf` reais populados para 15 ações BR + 6 US stocks via seed. Novas categorias: `ativos_intl_stocks` (ASML, SAP, MC, NESN, NOVO-B) + `ativos_cripto` (BTC, ETH, SOL, BNB). Total: 55 ativos seedados. Suite: **565 passed, 3 failed pré-existentes, 6 skipped**.
@@ -60,7 +61,7 @@
 | **Backend** | ✅ 87% | 48/54 GAPs, 508/546 testes (93.0%), 156 endpoints |
 | **Frontend V2.0** | � 36% | 13 OK, 23 PARCIAL, 0 QUEBRADO (36 telas auditadas) |
 | **Frontend UX Evolution** | � 36% | 13 OK, 23 PARCIAL, 0 QUEBRADO (36 telas auditadas) |
-| **Testes Backend** | ✅ 98.8% | 567/574 passando, 1 failed (dívida técnica: feature IR 2026+), 6 skipped |
+| **Testes Backend** | ✅ 98.4% | 565/574 passando, 3 failed (dívida técnica: circuit_breaker ×2 + IR 2026+), 6 skipped |
 | **Testes E2E** | 🟡 60% | v2: 127/127 ✅ Chromium (merged main 16/06) — v3 lógica negócio: 50 CTs planejados, specs criados (branch feature/testes-e2e-v3) |
 | **Auditoria Funcional** | � 36% | 13 OK, 23 PARCIAL, 0 QUEBRADO (36 telas auditadas em 27/06/2026) |
 | **Multi-tenancy** | ✅ 100% | MULTICLIENTE-001 concluído, 10 services + RLS (28 políticas) + isolamento via API |

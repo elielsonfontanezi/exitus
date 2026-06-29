@@ -1,8 +1,8 @@
 # Índice da Documentação — Sistema Exitus
 
 > **Total:** 11 arquivos ativos + archive  
-> **Última atualização:** 25/06/2026  
-> **Versão:** v0.9.25
+> **Última atualização:** 29/06/2026  
+> **Versão:** v0.9.34
 
 ---
 
@@ -34,6 +34,7 @@
 | **[API_REFERENCE.md](API_REFERENCE.md)** | Contratos da API, endpoints |
 | **[OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md)** | Scripts, troubleshooting, procedimentos |
 | **[PERSONAS.md](PERSONAS.md)** | Manual da IA, comportamento esperado |
+| **[AI_OPERATIONS.md](AI_OPERATIONS.md)** | Modelos IA, MCPs, scripts, checklists (extensão do `.cursorrules`) |
 | **[LESSONS_LEARNED.md](LESSONS_LEARNED.md)** | Erros reais, lições aprendidas |
 
 ### 🟡 Referência Técnica

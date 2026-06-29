@@ -902,7 +902,7 @@ Garantir um banco de dados bem desenhado, com relações corretas, seeds consist
 
 ### 📝 Documentação da Atividade
 
-Conforme as regras do `.windsurfrules`, os seguintes documentos foram atualizados no mesmo commit:
+Conforme as regras do `.cursorrules`, os seguintes documentos foram atualizados no mesmo commit:
 
 #### ✅ Obrigatórios (sempre)
 1. **CHANGELOG.md** — Entrada `EXITUS-DB-AUDIT-001` com detalhes da auditoria
