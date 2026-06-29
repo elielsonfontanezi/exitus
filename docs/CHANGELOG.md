@@ -8,6 +8,21 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — CURSORRULES-001.2: Alinhamento PERSONAS/INDEX e REGRA #2 (29/06/2026)
+
+**Problema:**
+- PERSONAS: tabela de prioridades e gestão de docs desalinhadas com `.cursorrules` v3.1
+- INDEX: `AUDITORIA_FUNCIONAL.md` ausente; seção IA ainda citava Cascade/Windsurf
+- REGRA #2 ausente (salto #1 → #3); validação <=170 linhas obsoleta; template commit perdido
+
+**Solução:**
+- `.cursorrules` v3.2: REGRA #2 Plan vs Agent
+- `PERSONAS.md`: prioridades P1 alinhadas; gestão docs → remissão REGRA #6
+- `INDEX.md`: AUDITORIA_FUNCIONAL + seção Cursor Agent
+- `AI_OPERATIONS.md` v1.2: nota modelos Cursor, § Formato de commit, validação <=200, checklist REGRA #2
+
+---
+
 ### Docs — CURSORRULES-001.1: Plano de controle e refs AUDITORIA_FUNCIONAL (29/06/2026)
 
 **Problema:**

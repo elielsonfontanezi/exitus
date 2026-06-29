@@ -217,28 +217,23 @@ Estas lições foram aprendidas em implementações reais e **devem ser seguidas
 
 #### Fontes de Verdade (prioridade de consulta)
 
+Alinhado com `.cursorrules` PRIORIDADE 1:
+
 | Prioridade | Fonte | Conteúdo |
 |---|---|---|
-| 1ª | `docs/LESSONS_LEARNED.md` | Erros reais — ler PRIMEIRO, sempre |
-| 2ª | `docs/PERSONAS.md` | Manual de operação da IA |
-| 3ª | `docs/CODING_STANDARDS.md` | snake_case obrigatório, padrões SQLAlchemy |
-| 4ª | `docs/ROADMAP.md` | GAPs registrados, status, plano |
-| 5ª | `docs/CHANGELOG.md` | Histórico de mudanças, versão atual |
-| 6ª | `docs/API_REFERENCE.md` | Contratos completos dos endpoints |
-| 7ª | `docs/ENUMS.md` | 14 TipoAtivo, mapeamentos DB/API/JSON |
-| 8ª | `docs/ARCHITECTURE.md` | Stack, containers, convenções |
-| 9ª | `docs/PROJECT_STATUS.md` | Status consolidado, módulos M0-M7, métricas |
-| 10ª | `docs/EXITUS_DB_STRUCTURE.txt` | Schema completo: tabelas, índices, constraints |
+| 1ª | `docs/LESSONS_LEARNED.md` | Erros reais — buscar L-* do domínio |
+| 2ª | `docs/ROADMAP.md` | Próximo GAP, prioridades, dependências |
+| 3ª | `docs/AUDITORIA_FUNCIONAL.md` | Telas PARCIAL/QUEBRADO, P-items (frontend) |
+| 4ª | `docs/PROJECT_STATUS.md` | Status, métricas, testes, versão |
+| 5ª | `docs/PERSONAS.md` | Manual de operação da IA |
+| 6ª | `docs/CODING_STANDARDS.md` | snake_case, padrões SQLAlchemy |
+| 7ª | `docs/CHANGELOG.md` | Histórico de mudanças |
+
+Consultar conforme contexto: `docs/AI_OPERATIONS.md`, `docs/API_REFERENCE.md`, `docs/ENUMS.md`, `docs/ARCHITECTURE.md`, `docs/MODULES.md`, `docs/EXITUS_DB_STRUCTURE.txt`.
 
 #### Gestão de Documentação
 
-- Ao fechar qualquer GAP, os seguintes docs DEVEM ser atualizados **no mesmo commit** (REGRA #6 do `.cursorrules`):
-  - `CHANGELOG.md` — sempre
-  - `ROADMAP.md` — sempre
-  - `CODING_STANDARDS.md` — se introduz novo padrão
-  - `ARCHITECTURE.md` — se adiciona componentes ou endpoints
-  - `OPERATIONS_RUNBOOK.md` — se adiciona scripts
-  - `LESSONS_LEARNED.md` — se gerou lição nova
+- Ao fechar qualquer GAP, seguir a tabela completa da **REGRA #6 em `.cursorrules`** — não duplicar lista aqui.
 
 - O USUÁRIO MANTENEDOR **nunca** deve precisar perguntar "e a documentação?" — ela já vem junto.
 
@@ -249,7 +244,7 @@ Estas lições foram aprendidas em implementações reais e **devem ser seguidas
 ### Fluxo de Trabalho Padrão
 
 ```
-ANÁLISE
+ANÁLISE (Plan mode até APROVADO — REGRA #2)
   └─ Plano de controle: ROADMAP (GAP), AUDITORIA (frontend), PROJECT_STATUS (métricas)
   └─ Lições: LESSONS_LEARNED — buscar L-* do domínio afetado
   └─ Regras: `.cursorrules` + `docs/AI_OPERATIONS.md`

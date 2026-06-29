@@ -1,6 +1,6 @@
 # Índice da Documentação — Sistema Exitus
 
-> **Total:** 11 arquivos ativos + archive  
+> **Total:** 14 arquivos ativos + archive  
 > **Última atualização:** 29/06/2026  
 > **Versão:** v0.9.34
 
@@ -20,13 +20,14 @@
 
 ---
 
-## 📁 Documentação (13 arquivos)
+## 📁 Documentação (14 arquivos)
 
 ### 🔴 Core Operacional
 
 | Arquivo | Descrição |
 |---------|-----------|
 | **[ROADMAP.md](ROADMAP.md)** | Roadmap consolidado — backend, frontend, testes, pendências |
+| **[AUDITORIA_FUNCIONAL.md](AUDITORIA_FUNCIONAL.md)** | Auditoria de 36 telas — OK/PARCIAL/QUEBRADO, P-items |
 | **[CHANGELOG.md](CHANGELOG.md)** | Histórico completo de mudanças |
 | **[PROJECT_STATUS.md](PROJECT_STATUS.md)** | Status consolidado do projeto |
 | **[ARCHITECTURE.md](ARCHITECTURE.md)** | Decisões arquiteturais, stack, containers |
@@ -65,16 +66,16 @@
 2. **SEEDS.md** — Credenciais e dados de teste
 3. **PROJECT_STATUS.md** — Status consolidado, módulos M0-M7
 
-### Para IA Assistente (Cascade/Windsurf)
-1. **LESSONS_LEARNED.md** — **Ler PRIMEIRO**
-2. **PERSONAS.md** — Manual de operação
-3. **CODING_STANDARDS.md** — Padrões (CRÍTICO)
-4. **API_REFERENCE.md** — Contratos
-5. **ENUMS.md** — Valores válidos
-6. **ROADMAP.md** — Status dos GAPs
-7. **PROJECT_STATUS.md** — Métricas e testes
+### Para IA Assistente (Cursor Agent)
+1. **LESSONS_LEARNED.md** — **Ler PRIMEIRO** (buscar L-* do domínio)
+2. **ROADMAP.md** — Próximo GAP e dependências
+3. **AUDITORIA_FUNCIONAL.md** — Status das telas (se frontend)
+4. **PROJECT_STATUS.md** — Métricas e versão
+5. **`.cursorrules`** + **AI_OPERATIONS.md** — Regras e procedimentos
+6. **PERSONAS.md** — Comportamento esperado
+7. **CODING_STANDARDS.md** — Padrões (CRÍTICO)
 
 ---
 
-*Atualizado: 25 de Junho de 2026*  
-*Versão: v0.9.25 — Documentação consolidada (11 arquivos)*
+*Atualizado: 29 de Junho de 2026*  
+*Versão: v0.9.34 — Documentação consolidada (14 arquivos)*

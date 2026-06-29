@@ -5,6 +5,7 @@
 > **Versão:** v0.9.34
 
 ### 🔧 Últimas correções (29/06/2026)
+- **CURSORRULES-001.2 ✅ CONCLUÍDO:** REGRA #2 Plan/Agent; PERSONAS/INDEX alinhados; AI_OPERATIONS v1.2 (commit template, nota modelos Cursor, validação <=200 linhas).
 - **CURSORRULES-001.1 ✅ CONCLUÍDO:** `.cursorrules` v3.1 — seção Plano de Controle (ROADMAP, AUDITORIA_FUNCIONAL, PROJECT_STATUS); REGRA #6 expandida; índices em AI_OPERATIONS; PERSONAS alinhado.
 - **CURSORRULES-001 ✅ CONCLUÍDO:** `.cursorrules` v3.0 enxuto (~160 linhas) para Cursor Agent; conteúdo extenso migrado para `docs/AI_OPERATIONS.md`; `.windsurfrules` removido; refs atualizadas em PERSONAS, LESSONS_LEARNED, AUDITORIA_FUNCIONAL; L-OPS-001 registrada.
 - **BUG-VAL-001 ✅ CONCLUÍDO:** Fórmulas Bazin/Graham/Gordon corrigidas em `calculos_blueprint.py`. Bazin: `dpa / 0.06` (threshold fixo Décio Bazin). Graham: `(eps * ...) * 4.4 / (k * 100)` (guard eps>0). Gordon: `dpa * (1+g)`. Tipo check estendido para `stock`, `stock_intl`, `unit`, `reit`. ITUB4 pt_medio: R$833 → R$49,89 ✅

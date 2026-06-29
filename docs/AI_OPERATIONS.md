@@ -2,7 +2,7 @@
 
 > **Propósito:** Manual operacional estendido para o Cursor Agent.  
 > **Fonte canônica de regras inegociáveis:** `.cursorrules` (raiz do repositório).  
-> **Versão:** 1.1 — 29/06/2026  
+> **Versão:** 1.2 — 29/06/2026  
 > **Nota:** `.windsurfrules` descontinuado (CURSORRULES-001); regras inegociáveis em `.cursorrules`.
 
 ---
@@ -53,6 +53,8 @@ Justificativa: [1 linha]
 
 **Regra:** "Modelo free" deve ser o melhor modelo gratuito para o cenário específico da tarefa.
 
+**Nota Cursor:** A tabela abaixo usa nomes de referência (Windsurf/Devin legacy). **Adaptar aos modelos disponíveis no Cursor** no momento da sessão — manter a estrutura do cabeçalho (free / recomendado / ideal).
+
 ### Tabela de Modelos Disponíveis
 
 **FREE (Custo Zero):** SWE-1.5, GLM 5.2, Kimi K2.5
@@ -75,6 +77,25 @@ Justificativa: [1 linha]
 | Contexto extenso | Kimi K2.5 | Gemini 3.5 Flash | Opus 1M |
 
 **Regra de ouro:** Começar com free ou menor custo adequado; escalar conforme impacto do código.
+
+---
+
+## Formato de commit (REGRA #5)
+
+Apresentar ao usuário antes de executar; aguardar aprovação explícita:
+
+```bash
+git add -A
+git commit -m "feat(módulo): EXITUS-XXX-000 — resumo em uma linha
+
+GAPs: EXITUS-XXX-000
+- Artefato A: descrição
+- Artefato B: descrição
+- docs: arquivos atualizados
+- Suite: N passed, M failed (pré-existentes), K skipped"
+```
+
+Tipos: `feat` / `fix` / `docs` / `refactor` / `test` — uma atividade por commit.
 
 ---
 
@@ -197,6 +218,7 @@ Após qualquer DDL: `./scripts/update_db_structure.sh`
 ## Checklist de início de atividade
 
 - [ ] Li `docs/LESSONS_LEARNED.md`?
+- [ ] Estou em Plan mode até "APROVADO"? (REGRA #2)
 - [ ] Indiquei modelo de IA? (REGRA #3)
 - [ ] Apresentei estratégia e aguardei "APROVADO"? (REGRA #4)
 - [ ] Sei quais docs atualizar? (REGRA #6)
@@ -254,12 +276,19 @@ Executar após CURSORRULES-001 para confirmar que referências operacionais fora
 # 1. Arquivo legado removido
 test ! -f .windsurfrules && echo "PASS: .windsurfrules removido"
 
-# 2. .cursorrules enxuto (v3.0)
+# 2. .cursorrules enxuto (v3.x)
 LINES=$(wc -l < .cursorrules)
-test "$LINES" -le 170 && echo "PASS: .cursorrules tem $LINES linhas (<= 170)"
+test "$LINES" -le 200 && echo "PASS: .cursorrules tem $LINES linhas (<= 200)"
 
-# 3. Zero refs operacionais fora de histórico (archive + CHANGELOG + este arquivo)
-REFS=$(rg '\.windsurfrules' --glob '!docs/archive/**' --glob '!docs/CHANGELOG.md' --glob '!docs/AI_OPERATIONS.md' -c 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
+# 3. Zero refs operacionais fora de histórico (archive + CHANGELOG + LESSONS + ROADMAP + PROJECT_STATUS + este arquivo)
+REFS=$(rg '\.windsurfrules' \
+  --glob '!docs/archive/**' \
+  --glob '!docs/CHANGELOG.md' \
+  --glob '!docs/AI_OPERATIONS.md' \
+  --glob '!docs/LESSONS_LEARNED.md' \
+  --glob '!docs/ROADMAP.md' \
+  --glob '!docs/PROJECT_STATUS.md' \
+  -c 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
 test "$REFS" -eq 0 && echo "PASS: 0 refs operacionais a .windsurfrules" || echo "FAIL: $REFS refs restantes"
 
 # 4. Novo caminho presente nos docs operacionais

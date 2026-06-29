@@ -1,6 +1,6 @@
 # .cursorrules — Sistema Exitus
 ## Regras para Cursor Agent (Exitus AI Assistant)
-### Versão: 3.1 — 29/06/2026 (conteúdo extenso em docs/AI_OPERATIONS.md)
+### Versão: 3.2 — 29/06/2026 (conteúdo extenso em docs/AI_OPERATIONS.md)
 
 ---
 
@@ -59,6 +59,14 @@ Detalhes e índices por domínio: **`docs/AI_OPERATIONS.md` § Plano de Controle
 
 ---
 
+## REGRA #2 — MODOS CURSOR (Plan vs Agent)
+
+- **Plan mode:** analisar, diagnosticar e propor estratégia — **não editar código** até "APROVADO"
+- **Agent mode:** implementar após APROVADO explícito; testar; documentar; apresentar commit
+- Iteração do usuário durante Plan mode **refina o plano**, não autoriza implementação
+
+---
+
 ## REGRA #3 — MODELO DE IA
 
 Cabeçalho obrigatório ao iniciar GAP. Detalhes: **`docs/AI_OPERATIONS.md` § Modelos IA**.
@@ -80,6 +88,7 @@ Cabeçalho obrigatório ao iniciar GAP. Detalhes: **`docs/AI_OPERATIONS.md` § M
 - Uma atividade por commit — nunca agrupar GAPs distintos
 - Apresentar comando antes de executar; aguardar aprovação
 - Tipos: `feat` / `fix` / `docs` / `refactor` / `test`
+- Template completo: **`docs/AI_OPERATIONS.md` § Formato de commit**
 
 ---
 

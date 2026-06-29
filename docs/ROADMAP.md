@@ -208,6 +208,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | **CLEANUP-MIGRATIONS-001** | Remover diretório alembic/ duplicado (dívida técnica) | 📋 Planejado |
 | **CURSORRULES-001** | Reestruturar `.cursorrules` v3.0 + `docs/AI_OPERATIONS.md`; remover `.windsurfrules` | ✅ Concluído (29/06/2026) |
 | **CURSORRULES-001.1** | Plano de controle: ROADMAP + AUDITORIA_FUNCIONAL + índice LESSONS | ✅ Concluído (29/06/2026) |
+| **CURSORRULES-001.2** | REGRA #2 Plan/Agent; PERSONAS/INDEX; commit template; validação | ✅ Concluído (29/06/2026) |
 | **SEED-MACRO-001** | Popular tabela parametros_macro com valores reais BR/US | ✅ Concluído (29/06/2026) |
 | **VALUATION-002** | Popular EPS/FCF reais no banco (yfinance ou seed) | ✅ Concluído (29/06/2026) |
 | **BUG-VAL-001** | Corrigir fórmulas Bazin/Gordon/Graham (bugs estruturais) | ✅ Concluído (29/06/2026) |
