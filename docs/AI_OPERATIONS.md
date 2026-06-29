@@ -2,8 +2,40 @@
 
 > **Propósito:** Manual operacional estendido para o Cursor Agent.  
 > **Fonte canônica de regras inegociáveis:** `.cursorrules` (raiz do repositório).  
-> **Versão:** 1.0 — 29/06/2026  
-> **Nota:** `.windsurfrules` foi descontinuado em CURSORRULES-001; usar `.cursorrules`.
+> **Versão:** 1.1 — 29/06/2026  
+> **Nota:** `.windsurfrules` descontinuado (CURSORRULES-001); regras inegociáveis em `.cursorrules`.
+
+---
+
+## Plano de controle (próximas atualizações)
+
+Consultar estes docs para **o que fazer** — não duplicar conteúdo aqui.
+
+| Documento | Pergunta | Quando |
+|-----------|----------|--------|
+| `docs/ROADMAP.md` | Qual GAP vem agora? Dependências? | Início de sessão; antes de propor implementação |
+| `docs/AUDITORIA_FUNCIONAL.md` | Quais telas PARCIAL/QUEBRADO? P-items? | Tarefa frontend, UX, integração de tela |
+| `docs/PROJECT_STATUS.md` | Versão, testes, progresso geral? | Checkpoint, métricas, commit |
+| `docs/CHANGELOG.md` | O que já foi entregue? | Contexto histórico |
+
+Atualizar `AUDITORIA_FUNCIONAL.md` no commit quando resolver P-item ou mudar status de tela (REGRA #6).
+
+---
+
+## Índice de lições por domínio
+
+Consultar `docs/LESSONS_LEARNED.md` — **nunca duplicar** lições neste arquivo.
+
+| Domínio | IDs relevantes |
+|---------|----------------|
+| Frontend / API URL | L-FE-011, L-FE-010, L-FE-009 |
+| Frontend / templates | L-FE-001 a L-FE-008, L-FE-012 |
+| Database / migrations | L-DB-015, L-MIG-001, L-DB-008, L-DB-014 |
+| Backend / services | L-BE-001, L-SA-001 |
+| Testes | L-TEST-001 a L-TEST-005 |
+| Documentação | L-DOCS-001 |
+| Multi-tenant / segurança | L-SEC-001 |
+| Operações IA | L-OPS-001 |
 
 ---
 
@@ -226,8 +258,8 @@ test ! -f .windsurfrules && echo "PASS: .windsurfrules removido"
 LINES=$(wc -l < .cursorrules)
 test "$LINES" -le 170 && echo "PASS: .cursorrules tem $LINES linhas (<= 170)"
 
-# 3. Zero refs ativas fora de histórico (archive + CHANGELOG)
-REFS=$(rg '\.windsurfrules' --glob '!docs/archive/**' --glob '!docs/CHANGELOG.md' -c 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
+# 3. Zero refs operacionais fora de histórico (archive + CHANGELOG + este arquivo)
+REFS=$(rg '\.windsurfrules' --glob '!docs/archive/**' --glob '!docs/CHANGELOG.md' --glob '!docs/AI_OPERATIONS.md' -c 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
 test "$REFS" -eq 0 && echo "PASS: 0 refs operacionais a .windsurfrules" || echo "FAIL: $REFS refs restantes"
 
 # 4. Novo caminho presente nos docs operacionais

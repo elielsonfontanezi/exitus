@@ -8,6 +8,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — CURSORRULES-001.1: Plano de controle e refs AUDITORIA_FUNCIONAL (29/06/2026)
+
+**Problema:**
+- v3.0 não citava `AUDITORIA_FUNCIONAL.md` no plano de controle
+- REGRA #6 incompleta; PERSONAS com numeração de REGRAs desalinhada
+- Lições e GAPs devem ser consultados, não duplicados em `.cursorrules`
+
+**Solução:**
+- `.cursorrules` v3.1: seção PLANO DE CONTROLE; AUDITORIA na P1; REGRA #6 expandida; baseline testes
+- `docs/AI_OPERATIONS.md` v1.1: índice plano de controle + índice lições por domínio
+- `docs/PERSONAS.md`: fluxo alinhado com REGRA #3/#4/#5/#6/#9
+
+---
+
 ### Docs — CURSORRULES-001: Reestruturação v3.0 para Cursor (29/06/2026)
 
 **Problema:**

@@ -1,6 +1,6 @@
 # .cursorrules — Sistema Exitus
 ## Regras para Cursor Agent (Exitus AI Assistant)
-### Versão: 3.0 — 29/06/2026 (conteúdo extenso em docs/AI_OPERATIONS.md)
+### Versão: 3.1 — 29/06/2026 (conteúdo extenso em docs/AI_OPERATIONS.md)
 
 ---
 
@@ -10,15 +10,16 @@ Consultar ANTES de gerar qualquer código ou proposta:
 
 ```
 PRIORIDADE 1 — Ler antes de qualquer ação:
-├── docs/LESSONS_LEARNED.md      # Erros reais — ler PRIMEIRO
-├── docs/PROJECT_STATUS.md       # Status, métricas, testes
+├── docs/LESSONS_LEARNED.md      # Erros reais — ler PRIMEIRO; buscar L-* do domínio
+├── docs/ROADMAP.md              # Próximo GAP, prioridades, dependências
+├── docs/AUDITORIA_FUNCIONAL.md  # Telas PARCIAL/QUEBRADO, P-items (frontend)
+├── docs/PROJECT_STATUS.md       # Status, métricas, testes, versão
 ├── docs/PERSONAS.md             # Comportamento da IA
 ├── docs/CODING_STANDARDS.md     # snake_case, SQLAlchemy
-├── docs/ROADMAP.md              # GAPs e plano
 ├── docs/CHANGELOG.md            # Histórico, versão atual
 
 PRIORIDADE 2 — Conforme contexto:
-├── docs/AI_OPERATIONS.md        # Modelos IA, MCPs, scripts, checklists
+├── docs/AI_OPERATIONS.md        # Modelos IA, MCPs, scripts, índices de controle
 ├── MCP PostgreSQL               # Schema real (project-0-exitus-postgres)
 ├── docs/API_REFERENCE.md
 ├── docs/ENUMS.md
@@ -31,14 +32,28 @@ PRIORIDADE 2 — Conforme contexto:
 
 ---
 
+## PLANO DE CONTROLE (não duplicar conteúdo aqui)
+
+| Documento | Pergunta | Quando consultar |
+|---|---|---|
+| `docs/ROADMAP.md` | Qual GAP vem agora? | Início de sessão; antes de propor trabalho |
+| `docs/AUDITORIA_FUNCIONAL.md` | O que falta no frontend? | Tarefa de tela, UX, integração frontend |
+| `docs/PROJECT_STATUS.md` | Qual versão e métricas atuais? | Checkpoint, commit, status |
+| `docs/CHANGELOG.md` | O que já foi entregue? | Contexto histórico |
+| `docs/LESSONS_LEARNED.md` | Que erro evitar? | Antes de tocar no domínio (L-FE-*, L-DB-*, L-BE-*) |
+
+Detalhes e índices por domínio: **`docs/AI_OPERATIONS.md` § Plano de Controle**.
+
+---
+
 ## REGRA #1 — NUNCA IMPLEMENTAR SEM APROVAÇÃO EXPLÍCITA
 
-1. Analisar → ler fontes de verdade relevantes
+1. Analisar → fontes P1; `LESSONS_LEARNED` por domínio; `ROADMAP` para GAP ativo; `AUDITORIA_FUNCIONAL` se frontend
 2. Indicar modelo de IA (REGRA #3 — ver `docs/AI_OPERATIONS.md`)
 3. Apresentar estratégia (REGRA #4)
 4. Aguardar **"APROVADO"** do usuário
 5. Implementar — código completo, sem omissões (`...`)
-6. Testar — `podman exec exitus-backend python -m pytest --no-cov -q`; métricas em `PROJECT_STATUS.md`
+6. Testar — `podman exec exitus-backend python -m pytest --no-cov -q`; não introduzir novas falhas (baseline: 565 passed, 3 failed pré-existentes — ver `PROJECT_STATUS.md`)
 7. Documentar — mesma sessão, mesmo commit (REGRA #6)
 8. Apresentar comando de commit e aguardar aprovação — **nunca executar `git commit` sem OK explícito**
 
@@ -46,7 +61,7 @@ PRIORIDADE 2 — Conforme contexto:
 
 ## REGRA #3 — MODELO DE IA
 
-Cabeçalho obrigatório ao iniciar GAP. Detalhes, tabela de modelos e recomendações por tarefa: **`docs/AI_OPERATIONS.md` § Modelos IA**.
+Cabeçalho obrigatório ao iniciar GAP. Detalhes: **`docs/AI_OPERATIONS.md` § Modelos IA**.
 
 ---
 
@@ -75,9 +90,14 @@ Cabeçalho obrigatório ao iniciar GAP. Detalhes, tabela de modelos e recomenda�
 | `docs/CHANGELOG.md` | Sempre |
 | `docs/ROADMAP.md` | Sempre |
 | `docs/PROJECT_STATUS.md` | Sempre |
+| `docs/AUDITORIA_FUNCIONAL.md` | Se P-item ou status de tela mudou |
 | `docs/LESSONS_LEARNED.md` | Se lição nova |
 | `docs/API_REFERENCE.md` | Se endpoint mudou |
+| `docs/MODULES.md` | Se endpoint/blueprint mudou |
 | `docs/ARCHITECTURE.md` | Se mudança estrutural |
+| `docs/CODING_STANDARDS.md` | Se novo padrão |
+| `docs/OPERATIONS_RUNBOOK.md` | Se script/procedimento novo |
+| `docs/FRONTEND_INTEGRATION_PLAN.md` | Se nova tela frontend |
 | `.cursorrules` | Se regras mudarem |
 
 O usuário nunca deve perguntar "e a documentação?" — ela já vem junto.
@@ -92,12 +112,12 @@ Verificar referências em routes/templates/imports antes de remover. Nunca remov
 
 ## REGRA #8 — FERRAMENTAS E MCPs
 
-**Postgres:** `.cursor/mcp.json` — server `project-0-exitus-postgres`, porta host **5433**  
+**Postgres:** `.cursor/mcp.json` (chave `postgres`; exposto como `project-0-exitus-postgres`), porta host **5433**  
 **Browser:** `cursor-ide-browser` (E2E, debug frontend)  
 **Testes:** `podman exec exitus-backend python -m pytest --no-cov -q`  
 **Restart backend:** `bash scripts/restart_backend.sh`
 
-Catálogo completo de scripts e MCPs: **`docs/AI_OPERATIONS.md`**
+Catálogo completo: **`docs/AI_OPERATIONS.md`**
 
 ---
 
@@ -108,7 +128,7 @@ Catálogo completo de scripts e MCPs: **`docs/AI_OPERATIONS.md`**
 ```
 
 Migration dev: `podman exec exitus-backend flask db upgrade`  
-Diretório ativo: `backend/migrations/versions/` (L-DB-015)
+Diretório ativo: `backend/migrations/versions/` (ver L-DB-015 em LESSONS_LEARNED)
 
 ---
 
@@ -148,13 +168,15 @@ exitus-frontend:8080                        HTMX + Tailwind + Alpine.js
 - Técnico, denso e direto — sem cerimônia
 - Proativo — identificar problemas antes de ser perguntado
 - Não achutar — propor verificação se incerto
-- Código completo, imports no topo (L-SA-001)
+- Código completo, imports no topo (ver L-SA-001 em LESSONS_LEARNED)
 - Não alterar padrões estruturais sem proposta aprovada
+- **Não duplicar** GAPs, bugs ou lições neste arquivo — consultar plano de controle e LESSONS_LEARNED
 
 ---
 
 ## RESUMO DOCUMENTAÇÃO
 
-1. **Sempre:** CHANGELOG, ROADMAP, PROJECT_STATUS
-2. **Se aplicável:** LESSONS_LEARNED, API_REFERENCE, ARCHITECTURE, AI_OPERATIONS
-3. **MCPs:** Postgres (banco), cursor-ide-browser (frontend)
+1. **Controle:** ROADMAP (próximo), AUDITORIA_FUNCIONAL (frontend), PROJECT_STATUS (métricas)
+2. **Sempre no commit:** CHANGELOG, ROADMAP, PROJECT_STATUS
+3. **Lições:** LESSONS_LEARNED (consultar, não copiar)
+4. **Operação:** AI_OPERATIONS, MCPs Postgres + cursor-ide-browser

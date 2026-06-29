@@ -1576,7 +1576,9 @@ psycopg2.errors.UndefinedColumn: column "assessora_id" of relation "usuario" doe
 
 **Correto:**
 - **Fonte única:** `.cursorrules` na raiz (carregado automaticamente pelo Cursor)
-- **Conteúdo extenso:** `docs/AI_OPERATIONS.md` (modelos IA, scripts, checklists)
+- **Conteúdo extenso:** `docs/AI_OPERATIONS.md` (modelos IA, scripts, plano de controle)
+- **Próximo trabalho:** `docs/ROADMAP.md` + `docs/AUDITORIA_FUNCIONAL.md` — consultar, não duplicar
+- **Lições:** `docs/LESSONS_LEARNED.md` — consultar por domínio (L-*), nunca copiar inline
 - **`.windsurfrules`:** removido — não recriar
 
 **Validação pós-mudança:**

@@ -34,7 +34,7 @@
 | **[API_REFERENCE.md](API_REFERENCE.md)** | Contratos da API, endpoints |
 | **[OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md)** | Scripts, troubleshooting, procedimentos |
 | **[PERSONAS.md](PERSONAS.md)** | Manual da IA, comportamento esperado |
-| **[AI_OPERATIONS.md](AI_OPERATIONS.md)** | Modelos IA, MCPs, scripts, checklists (extensão do `.cursorrules`) |
+| **[AI_OPERATIONS.md](AI_OPERATIONS.md)** | Plano de controle, modelos IA, MCPs, índice LESSONS |
 | **[LESSONS_LEARNED.md](LESSONS_LEARNED.md)** | Erros reais, lições aprendidas |
 
 ### 🟡 Referência Técnica

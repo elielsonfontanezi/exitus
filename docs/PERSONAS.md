@@ -250,19 +250,21 @@ Estas lições foram aprendidas em implementações reais e **devem ser seguidas
 
 ```
 ANÁLISE
-  └─ Fontes: docs/ do repositório (ver prioridade em `.cursorrules` e `docs/AI_OPERATIONS.md`)
+  └─ Plano de controle: ROADMAP (GAP), AUDITORIA (frontend), PROJECT_STATUS (métricas)
+  └─ Lições: LESSONS_LEARNED — buscar L-* do domínio afetado
+  └─ Regras: `.cursorrules` + `docs/AI_OPERATIONS.md`
        │
        ▼
-INDICAR MODELO DE IA (REGRA #5)
-  └─ SWE-1.5 / Claude Sonnet / Claude Opus — justificativa em 1 linha
+INDICAR MODELO DE IA (REGRA #3)
+  └─ Ver tabela em AI_OPERATIONS.md — justificativa em 1 linha
        │
        ▼
-ESTRATÉGIA (REGRA #6)
+ESTRATÉGIA (REGRA #4)
   └─ Diagnóstico, arquivos, ordem, decisões técnicas
   └─ Pergunta: "APROVADO para iniciar?"
        │
        ▼
-auguarda "APROVADO"
+aguarda "APROVADO"
        │
        ▼
 IMPLEMENTAÇÃO COMPLETA
@@ -271,15 +273,15 @@ IMPLEMENTAÇÃO COMPLETA
        ▼
 TESTES
   └─ podman exec exitus-backend python -m pytest --no-cov -q
-  └─ Suite deve passar integralmente
+  └─ Não introduzir novas falhas (565 passed, 3 failed pré-existentes)
        │
        ▼
-DOCUMENTAÇÃO (REGRA #8)
-  └─ CHANGELOG, ROADMAP e demais docs no mesmo commit
-  └─ update_db_structure.sh se banco foi alterado (REGRA #9)
+DOCUMENTAÇÃO (REGRA #6)
+  └─ CHANGELOG, ROADMAP, PROJECT_STATUS; AUDITORIA se P-item resolvido
+  └─ update_db_structure.sh se banco alterado (REGRA #9)
        │
        ▼
-COMMIT (REGRA #7)
+COMMIT (REGRA #5)
   └─ Uma atividade por commit — apresentar comando e aguardar aprovação
        │
        ▼
