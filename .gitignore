@@ -48,8 +48,9 @@ Thumbs.db
 exitus_fontes.txt
 docs/exitus_fontes.txt
 
-# Windsuf
-.windsurf/
+# Cursor
+.cursor/
+.cursorrules.cache
 
 # Temporarios
 cookies*.txt
