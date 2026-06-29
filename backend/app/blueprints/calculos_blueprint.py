@@ -66,13 +66,14 @@ def calcular_preco_teto(ticker):
 
     metodos = {}
 
-    if tipo in ['acao', 'acoes']:
+    if tipo in ['acao', 'acoes', 'stock', 'stock_intl', 'unit']:
         # Ações: 4 métodos com parâmetros regionais
         eps = float(ativo.eps) if ativo.eps is not None else 2.50
-        pt_bazin = (dy / (k - g)) if (k > g) else 0
-        pt_graham = (eps * (8.5 + 2 * g * 100)) * 4.4 / k
-        d1 = dy * (1 + g)
-        pt_gordon = d1 / (k - g) if (k > g) else 0
+        dpa = dy * preco_atual                                          # dividendo por ação (R$/USD)
+        pt_bazin = dpa / 0.06 if dy > 0 else 0.0                      # Bazin: DPA / 6% (threshold fixo Décio Bazin)
+        pt_graham = (eps * (8.5 + 2 * g * 100)) * 4.4 / (k * 100) if eps > 0 else 0.0  # Graham: k em % (não decimal)
+        d1 = dpa * (1 + g)                                             # Gordon: crescimento sobre DPA
+        pt_gordon = d1 / (k - g) if (k > g and dy > 0) else 0.0
 
         fcf = float(ativo.fcf) if ativo.fcf is not None else 5.0
         anos = 5
@@ -89,7 +90,7 @@ def calcular_preco_teto(ticker):
         }
         pt_medio = sum([v["pt"] for v in metodos.values()]) / 4
 
-    elif 'fii' in tipo.lower():
+    elif tipo in ['fii', 'reit']:
         # FIIs: Cap Rate regional
         cap_rate = params['cap_rate_fii']
         pt_cap_rate = 1 / cap_rate

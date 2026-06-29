@@ -8,6 +8,40 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix + Seed — SEED-MACRO-001 + VALUATION-002 + BUG-VAL-001: Valuation Dia 1 (29/06/2026)
+
+**Problema:**
+- `parametros_macro` estava vazia → formulas usavam hardcoded defaults (Selic 10.5% era padrão silencioso)
+- `eps`/`fcf` NULL no banco → fallback eps=2.50, fcf=5.0 → valuation incorreto
+- Fórmulas estruturalmente erradas: Bazin usava Gordon em vez de threshold fixo; Graham dividia por `k` decimal em vez de `k*100`; Gordon usava yield decimal em vez de dividendo por ação
+- Resultado ITUB4 (antes): Bazin R$1,09, Graham R$3.232, Gordon R$1,15, pt_medio R$833
+
+**Solução:**
+- **SEED-MACRO-001:** Reescrito `seed_parametros_macro.py` — UPSERT idempotente, estrutura correta (`create_app()` dentro da função), 5 mercados com valores reais: BR/B3 (Selic 10.5%), US/NYSE, US/NASDAQ, EU/Euronext, JP/Tokyo
+- **VALUATION-002:** Adicionados `eps`/`fcf` reais ao JSON `ativos_fundamentalistas.json` para 15 ações BR + 6 US stocks; adicionadas seções `ativos_intl_stocks` (ASML, SAP, MC, NESN, NOVO-B) e `ativos_cripto` (BTC, ETH, SOL, BNB); `seed_ativos_fundamentalistas.py` atualizado com CATEGORY_MAP estendido (STOCK_INTL, CRIPTO) e campos eps/fcf nos blocos update/create
+- **BUG-VAL-001:** Corrigidas 3 fórmulas em `calculos_blueprint.py`:
+  - Bazin: `dpa / 0.06` (threshold fixo Décio Bazin, não Gordon)
+  - Graham: `(eps * (...)) * 4.4 / (k * 100)` (k em %, não decimal); guard `if eps > 0`
+  - Gordon: `(dy * preco_atual) * (1 + g)` → dividendo por ação real
+  - Tipo check estendido: `stock`, `stock_intl`, `unit` + `reit`
+
+**Validação (ITUB4 — EPS=4.17, DY=6.8%, preço=R$28.45):**
+- Bazin: R$1,09 → **R$32,24** ✅
+- Graham: R$3.232 → **R$32,33** ✅
+- Gordon: R$1,15 → **R$36,93** ✅
+- pt_medio: R$833 → **R$49,89** ✅ (alvo: R$40-50)
+- Suite: 565 passed, 3 failed (pré-existentes: circuit_breaker × 2 + IR 2026), 6 skipped
+
+**Arquivos modificados:**
+- `backend/app/seeds/seed_parametros_macro.py` — reescrito completo
+- `backend/app/seeds/data/ativos_fundamentalistas.json` — eps/fcf + INTL + Cripto
+- `backend/app/seeds/seed_ativos_fundamentalistas.py` — CATEGORY_MAP + eps/fcf
+- `backend/app/blueprints/calculos_blueprint.py` — fórmulas Bazin/Graham/Gordon
+
+**Modelo IA utilizado:** Claude Sonnet 4.6 Thinking ($$)
+
+---
+
 ### Feature — VALUATION-001: Campos EPS e FCF no modelo Ativo (28/06/2026)
 
 **Problema:**

@@ -1,9 +1,9 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 48/54 GAPs (87%) + 1 débito técnico (HIST-001) + HIST-002 planejado | **Testes:** 567/574 passando (98.8%) 🟡 — 1 failed (feature 2026+), 6 skipped  
+> **Progresso Backend:** 51/54 GAPs (94%) + 1 débito técnico (HIST-001) + HIST-002 planejado | **Testes:** 565/574 passando (98.4%) 🟡 — 3 failed pré-existentes, 6 skipped  
 > **Frontend V2.0:** 13 OK, 23 PARCIAL, 0 QUEBRADO (64%) � | **UX Evolution:** 13 OK, 23 PARCIAL, 0 QUEBRADO (64%) � | **Frontend API-Driven:** ✅ 8/8 Sprints Concluídos (09/06/2026) | **UI Consistency:** ✅ Menu limpo (15/06/2026)  
-> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.28 | **Última atualização:** 27/06/2026
+> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.34 | **Última atualização:** 29/06/2026
 
 ---
 
@@ -206,9 +206,9 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 |--------|---------------|--------|
 | **VALUATION-001** | Adicionar EPS e FCF ao modelo Ativo | ✅ Concluído (28/06/2026) |
 | **CLEANUP-MIGRATIONS-001** | Remover diretório alembic/ duplicado (dívida técnica) | 📋 Planejado |
-| **SEED-MACRO-001** | Popular tabela parametros_macro com valores reais BR/US | 🔴 Pré-requisito |
-| **VALUATION-002** | Popular EPS/FCF reais no banco (yfinance ou seed) | 🔴 Alta |
-| **BUG-VAL-001** | Corrigir fórmulas Bazin/Gordon/Graham (bugs estruturais) | 🔴 Alta |
+| **SEED-MACRO-001** | Popular tabela parametros_macro com valores reais BR/US | ✅ Concluído (29/06/2026) |
+| **VALUATION-002** | Popular EPS/FCF reais no banco (yfinance ou seed) | ✅ Concluído (29/06/2026) |
+| **BUG-VAL-001** | Corrigir fórmulas Bazin/Gordon/Graham (bugs estruturais) | ✅ Concluído (29/06/2026) |
 | **BUG-VAL-002** | Valor Justo Médio: usar mediana (absorvido por BUG-VAL-005) | ♻️ Absorvido |
 | **BUG-VAL-003** | Componente Margem do Score incoerente (resolvido por BUG-VAL-004) | ♻️ Absorvido |
 | **BUG-VAL-004** | Unificar preco_teto (estático) e pt_medio (calculado) | 🔴 Alta |

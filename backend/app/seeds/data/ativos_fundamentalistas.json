@@ -6,21 +6,21 @@
     "nota": "Valores baseados em dados públicos reais aproximados (não são recomendação de investimento)"
   },
   "ativos_br_acoes": [
-    {"ticker": "PETR4",  "nome": "Petrobras PN",           "setor": "Petróleo e Gás",          "preco_atual": 38.50,  "dividend_yield": 0.1420, "p_l": 4.80,   "p_vp": 1.15, "roe": 0.2530, "beta": 1.25, "preco_teto": 45.00},
-    {"ticker": "VALE3",  "nome": "Vale ON",                 "setor": "Mineração",               "preco_atual": 62.80,  "dividend_yield": 0.0920, "p_l": 5.60,   "p_vp": 1.45, "roe": 0.2780, "beta": 1.10, "preco_teto": 75.00},
-    {"ticker": "ITUB4",  "nome": "Itaú Unibanco PN",        "setor": "Bancos",                  "preco_atual": 28.45,  "dividend_yield": 0.0680, "p_l": 8.20,   "p_vp": 1.72, "roe": 0.2100, "beta": 0.85, "preco_teto": 34.00},
-    {"ticker": "BBDC4",  "nome": "Bradesco PN",             "setor": "Bancos",                  "preco_atual": 13.20,  "dividend_yield": 0.0520, "p_l": 9.50,   "p_vp": 1.05, "roe": 0.1120, "beta": 0.95, "preco_teto": 18.00},
-    {"ticker": "BBAS3",  "nome": "Banco do Brasil ON",      "setor": "Bancos",                  "preco_atual": 25.60,  "dividend_yield": 0.0980, "p_l": 4.50,   "p_vp": 0.82, "roe": 0.1850, "beta": 0.90, "preco_teto": 32.00},
-    {"ticker": "MGLU3",  "nome": "Magazine Luiza ON",        "setor": "Varejo",                  "preco_atual": 8.75,   "dividend_yield": 0.0020, "p_l": -15.30, "p_vp": 2.80, "roe": -0.1850, "beta": 2.10, "preco_teto": 6.00},
-    {"ticker": "WEGE3",  "nome": "WEG ON",                  "setor": "Máquinas e Equipamentos", "preco_atual": 42.30,  "dividend_yield": 0.0150, "p_l": 35.20,  "p_vp": 9.50, "roe": 0.2750, "beta": 0.75, "preco_teto": 38.00},
-    {"ticker": "RENT3",  "nome": "Localiza ON",             "setor": "Locação de Veículos",     "preco_atual": 56.90,  "dividend_yield": 0.0210, "p_l": 18.70,  "p_vp": 3.20, "roe": 0.1720, "beta": 1.15, "preco_teto": 52.00},
-    {"ticker": "RAIL3",  "nome": "Rumo ON",                 "setor": "Transporte",              "preco_atual": 18.45,  "dividend_yield": 0.0100, "p_l": 22.50,  "p_vp": 2.10, "roe": 0.0950, "beta": 1.05, "preco_teto": 22.00},
-    {"ticker": "SUZB3",  "nome": "Suzano ON",               "setor": "Papel e Celulose",        "preco_atual": 52.80,  "dividend_yield": 0.0250, "p_l": 8.90,   "p_vp": 1.60, "roe": 0.1820, "beta": 1.20, "preco_teto": 60.00},
-    {"ticker": "KLBN11", "nome": "Klabin Units",            "setor": "Papel e Celulose",        "preco_atual": 22.15,  "dividend_yield": 0.0480, "p_l": 12.30,  "p_vp": 2.30, "roe": 0.1900, "beta": 0.95, "preco_teto": 26.00},
-    {"ticker": "ELET3",  "nome": "Eletrobras ON",           "setor": "Energia Elétrica",        "preco_atual": 42.10,  "dividend_yield": 0.0350, "p_l": 7.80,   "p_vp": 0.90, "roe": 0.1150, "beta": 0.80, "preco_teto": 50.00},
-    {"ticker": "CMIG4",  "nome": "Cemig PN",                "setor": "Energia Elétrica",        "preco_atual": 10.85,  "dividend_yield": 0.1050, "p_l": 5.20,   "p_vp": 1.10, "roe": 0.2120, "beta": 0.70, "preco_teto": 14.00},
-    {"ticker": "CPLE6",  "nome": "Copel PNB",               "setor": "Energia Elétrica",        "preco_atual": 8.95,   "dividend_yield": 0.0780, "p_l": 6.40,   "p_vp": 0.95, "roe": 0.1480, "beta": 0.65, "preco_teto": 12.00},
-    {"ticker": "ABEV3",  "nome": "Ambev ON",                "setor": "Bebidas",                 "preco_atual": 11.20,  "dividend_yield": 0.0580, "p_l": 14.50,  "p_vp": 2.60, "roe": 0.1800, "beta": 0.55, "preco_teto": 14.00}
+    {"ticker": "PETR4",  "nome": "Petrobras PN",           "setor": "Petróleo e Gás",          "preco_atual": 38.50,  "dividend_yield": 0.1420, "p_l": 4.80,   "p_vp": 1.15, "roe": 0.2530, "beta": 1.25, "preco_teto": 45.00,  "eps":  8.02, "fcf": 12.50},
+    {"ticker": "VALE3",  "nome": "Vale ON",                 "setor": "Mineração",               "preco_atual": 62.80,  "dividend_yield": 0.0920, "p_l": 5.60,   "p_vp": 1.45, "roe": 0.2780, "beta": 1.10, "preco_teto": 75.00,  "eps": 11.21, "fcf": 15.80},
+    {"ticker": "ITUB4",  "nome": "Itaú Unibanco PN",        "setor": "Bancos",                  "preco_atual": 28.45,  "dividend_yield": 0.0680, "p_l": 8.20,   "p_vp": 1.72, "roe": 0.2100, "beta": 0.85, "preco_teto": 34.00,  "eps":  4.17, "fcf":  8.50},
+    {"ticker": "BBDC4",  "nome": "Bradesco PN",             "setor": "Bancos",                  "preco_atual": 13.20,  "dividend_yield": 0.0520, "p_l": 9.50,   "p_vp": 1.05, "roe": 0.1120, "beta": 0.95, "preco_teto": 18.00,  "eps":  1.39, "fcf":  2.80},
+    {"ticker": "BBAS3",  "nome": "Banco do Brasil ON",      "setor": "Bancos",                  "preco_atual": 25.60,  "dividend_yield": 0.0980, "p_l": 4.50,   "p_vp": 0.82, "roe": 0.1850, "beta": 0.90, "preco_teto": 32.00,  "eps":  5.69, "fcf":  9.20},
+    {"ticker": "MGLU3",  "nome": "Magazine Luiza ON",        "setor": "Varejo",                  "preco_atual":  8.75,  "dividend_yield": 0.0020, "p_l": -15.30, "p_vp": 2.80, "roe": -0.1850, "beta": 2.10, "preco_teto":  6.00,  "eps": -0.57, "fcf":  0.50},
+    {"ticker": "WEGE3",  "nome": "WEG ON",                  "setor": "Máquinas e Equipamentos", "preco_atual": 42.30,  "dividend_yield": 0.0150, "p_l": 35.20,  "p_vp": 9.50, "roe": 0.2750, "beta": 0.75, "preco_teto": 38.00,  "eps":  1.20, "fcf":  1.80},
+    {"ticker": "RENT3",  "nome": "Localiza ON",             "setor": "Locação de Veículos",     "preco_atual": 56.90,  "dividend_yield": 0.0210, "p_l": 18.70,  "p_vp": 3.20, "roe": 0.1720, "beta": 1.15, "preco_teto": 52.00,  "eps":  3.04, "fcf":  4.50},
+    {"ticker": "RAIL3",  "nome": "Rumo ON",                 "setor": "Transporte",              "preco_atual": 18.45,  "dividend_yield": 0.0100, "p_l": 22.50,  "p_vp": 2.10, "roe": 0.0950, "beta": 1.05, "preco_teto": 22.00,  "eps":  0.82, "fcf":  1.50},
+    {"ticker": "SUZB3",  "nome": "Suzano ON",               "setor": "Papel e Celulose",        "preco_atual": 52.80,  "dividend_yield": 0.0250, "p_l": 8.90,   "p_vp": 1.60, "roe": 0.1820, "beta": 1.20, "preco_teto": 60.00,  "eps":  5.93, "fcf":  8.20},
+    {"ticker": "KLBN11", "nome": "Klabin Units",            "setor": "Papel e Celulose",        "preco_atual": 22.15,  "dividend_yield": 0.0480, "p_l": 12.30,  "p_vp": 2.30, "roe": 0.1900, "beta": 0.95, "preco_teto": 26.00,  "eps":  1.80, "fcf":  3.20},
+    {"ticker": "ELET3",  "nome": "Eletrobras ON",           "setor": "Energia Elétrica",        "preco_atual": 42.10,  "dividend_yield": 0.0350, "p_l": 7.80,   "p_vp": 0.90, "roe": 0.1150, "beta": 0.80, "preco_teto": 50.00,  "eps":  5.40, "fcf":  7.50},
+    {"ticker": "CMIG4",  "nome": "Cemig PN",                "setor": "Energia Elétrica",        "preco_atual": 10.85,  "dividend_yield": 0.1050, "p_l": 5.20,   "p_vp": 1.10, "roe": 0.2120, "beta": 0.70, "preco_teto": 14.00,  "eps":  2.09, "fcf":  3.80},
+    {"ticker": "CPLE6",  "nome": "Copel PNB",               "setor": "Energia Elétrica",        "preco_atual":  8.95,  "dividend_yield": 0.0780, "p_l": 6.40,   "p_vp": 0.95, "roe": 0.1480, "beta": 0.65, "preco_teto": 12.00,  "eps":  1.40, "fcf":  2.50},
+    {"ticker": "ABEV3",  "nome": "Ambev ON",                "setor": "Bebidas",                 "preco_atual": 11.20,  "dividend_yield": 0.0580, "p_l": 14.50,  "p_vp": 2.60, "roe": 0.1800, "beta": 0.55, "preco_teto": 14.00,  "eps":  0.77, "fcf":  1.20}
   ],
   "ativos_br_fiis": [
     {"ticker": "HGLG11", "nome": "CSHG Logística FII",                  "segmento": "Logística",          "preco_atual": 152.30, "dividend_yield": 0.0820, "p_vp": 0.98, "cap_rate": 0.0890, "preco_teto": 165.00},
@@ -35,12 +35,12 @@
     {"ticker": "GGRC11", "nome": "GGR Covepi Renda FII",                 "segmento": "Lajes Corporativas", "preco_atual": 105.40, "dividend_yield": 0.0880, "p_vp": 0.94, "cap_rate": 0.0920, "preco_teto": 114.00}
   ],
   "ativos_us_stocks": [
-    {"ticker": "AAPL",  "nome": "Apple Inc.",                "setor": "Technology",        "preco_atual": 175.50, "dividend_yield": 0.0055, "p_l": 28.50,  "p_vp": 45.20, "roe": 1.6000, "beta": 1.20, "preco_teto": 160.00},
-    {"ticker": "MSFT",  "nome": "Microsoft Corporation",     "setor": "Technology",        "preco_atual": 380.25, "dividend_yield": 0.0075, "p_l": 35.40,  "p_vp": 12.80, "roe": 0.3650, "beta": 0.95, "preco_teto": 350.00},
-    {"ticker": "GOOGL", "nome": "Alphabet Inc. Class A",     "setor": "Technology",        "preco_atual": 140.30, "dividend_yield": 0.0050, "p_l": 25.20,  "p_vp": 6.50,  "roe": 0.2580, "beta": 1.05, "preco_teto": 130.00},
-    {"ticker": "AMZN",  "nome": "Amazon.com Inc.",           "setor": "Consumer Cyclical", "preco_atual": 155.80, "dividend_yield": 0.0000, "p_l": 58.90,  "p_vp": 8.70,  "roe": 0.1480, "beta": 1.15, "preco_teto": 140.00},
-    {"ticker": "NVDA",  "nome": "NVIDIA Corporation",        "setor": "Technology",        "preco_atual": 720.45, "dividend_yield": 0.0004, "p_l": 65.30,  "p_vp": 38.50, "roe": 0.5900, "beta": 1.65, "preco_teto": 600.00},
-    {"ticker": "TSLA",  "nome": "Tesla Inc.",                "setor": "Automotive",        "preco_atual": 245.60, "dividend_yield": 0.0000, "p_l": 72.50,  "p_vp": 15.80, "roe": 0.2180, "beta": 2.05, "preco_teto": 180.00}
+    {"ticker": "AAPL",  "nome": "Apple Inc.",                "setor": "Technology",        "preco_atual": 175.50, "dividend_yield": 0.0055, "p_l": 28.50,  "p_vp": 45.20, "roe": 1.6000, "beta": 1.20, "preco_teto": 160.00, "eps":  6.16, "fcf":  7.50},
+    {"ticker": "MSFT",  "nome": "Microsoft Corporation",     "setor": "Technology",        "preco_atual": 380.25, "dividend_yield": 0.0075, "p_l": 35.40,  "p_vp": 12.80, "roe": 0.3650, "beta": 0.95, "preco_teto": 350.00, "eps": 10.75, "fcf": 12.30},
+    {"ticker": "GOOGL", "nome": "Alphabet Inc. Class A",     "setor": "Technology",        "preco_atual": 140.30, "dividend_yield": 0.0050, "p_l": 25.20,  "p_vp": 6.50,  "roe": 0.2580, "beta": 1.05, "preco_teto": 130.00, "eps":  5.56, "fcf":  6.80},
+    {"ticker": "AMZN",  "nome": "Amazon.com Inc.",           "setor": "Consumer Cyclical", "preco_atual": 155.80, "dividend_yield": 0.0000, "p_l": 58.90,  "p_vp": 8.70,  "roe": 0.1480, "beta": 1.15, "preco_teto": 140.00, "eps":  2.64, "fcf":  4.50},
+    {"ticker": "NVDA",  "nome": "NVIDIA Corporation",        "setor": "Technology",        "preco_atual": 720.45, "dividend_yield": 0.0004, "p_l": 65.30,  "p_vp": 38.50, "roe": 0.5900, "beta": 1.65, "preco_teto": 600.00, "eps": 11.04, "fcf":  9.80},
+    {"ticker": "TSLA",  "nome": "Tesla Inc.",                "setor": "Automotive",        "preco_atual": 245.60, "dividend_yield": 0.0000, "p_l": 72.50,  "p_vp": 15.80, "roe": 0.2180, "beta": 2.05, "preco_teto": 180.00, "eps":  3.39, "fcf":  4.20}
   ],
   "ativos_us_reits": [
     {"ticker": "O",   "nome": "Realty Income Corporation", "setor": "Retail REIT",    "preco_atual": 58.75,  "dividend_yield": 0.0520, "p_l": 45.60,  "p_vp": 1.35, "roe": 0.0300, "beta": 0.65, "preco_teto": 65.00, "cap_rate": 0.0550},
@@ -62,5 +62,18 @@
     {"ticker": "TESOURO_PRE_2028",    "nome": "Tesouro Prefixado 2028",      "preco_atual": 720.30,   "dividend_yield": 0.1180},
     {"ticker": "CDB_INTER_2026",      "nome": "CDB Banco Inter 120% CDI",    "preco_atual": 1000.00,  "dividend_yield": 0.1600},
     {"ticker": "LCI_CAIXA_2027",      "nome": "LCI Caixa 95% CDI",           "preco_atual": 1000.00,  "dividend_yield": 0.1270}
+  ],
+  "ativos_intl_stocks": [
+    {"ticker": "ASML",   "nome": "ASML Holding NV",       "setor": "Technology",       "preco_atual": 895.00,  "dividend_yield": 0.0080, "p_l": 44.80,  "p_vp": 22.50, "roe": 0.6800, "beta": 1.15, "preco_teto": 820.00, "eps": 19.95, "fcf": 28.50},
+    {"ticker": "SAP",    "nome": "SAP SE",                "setor": "Technology",       "preco_atual": 225.00,  "dividend_yield": 0.0130, "p_l": 35.00,  "p_vp":  8.50, "roe": 0.1800, "beta": 0.85, "preco_teto": 200.00, "eps":  6.43, "fcf":  9.80},
+    {"ticker": "MC",     "nome": "LVMH Moët Hennessy",    "setor": "Consumer Goods",   "preco_atual": 780.00,  "dividend_yield": 0.0180, "p_l": 22.00,  "p_vp":  5.20, "roe": 0.2000, "beta": 0.95, "preco_teto": 720.00, "eps": 35.45, "fcf": 42.00},
+    {"ticker": "NESN",   "nome": "Nestlé SA",             "setor": "Consumer Staples", "preco_atual":  88.00,  "dividend_yield": 0.0320, "p_l": 24.00,  "p_vp":  6.80, "roe": 0.3500, "beta": 0.55, "preco_teto":  90.00, "eps":  3.67, "fcf":  5.20},
+    {"ticker": "NOVO-B", "nome": "Novo Nordisk A/S",      "setor": "Healthcare",       "preco_atual": 128.00,  "dividend_yield": 0.0110, "p_l": 42.00,  "p_vp": 38.00, "roe": 0.8500, "beta": 0.85, "preco_teto": 120.00, "eps":  3.05, "fcf":  4.20}
+  ],
+  "ativos_cripto": [
+    {"ticker": "BTC", "nome": "Bitcoin",       "setor": "Cripto", "preco_atual": 61500.00, "dividend_yield": 0.0000, "beta": 1.80, "preco_teto": null, "eps": null, "fcf": null},
+    {"ticker": "ETH", "nome": "Ethereum",      "setor": "Cripto", "preco_atual":  3350.00, "dividend_yield": 0.0000, "beta": 1.70, "preco_teto": null, "eps": null, "fcf": null},
+    {"ticker": "SOL", "nome": "Solana",        "setor": "Cripto", "preco_atual":   155.00, "dividend_yield": 0.0000, "beta": 2.10, "preco_teto": null, "eps": null, "fcf": null},
+    {"ticker": "BNB", "nome": "BNB (Binance)", "setor": "Cripto", "preco_atual":   585.00, "dividend_yield": 0.0000, "beta": 1.90, "preco_teto": null, "eps": null, "fcf": null}
   ]
 }

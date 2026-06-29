@@ -23,12 +23,14 @@ DATA_FILE = Path(__file__).parent / 'data' / 'ativos_fundamentalistas.json'
 
 # Mapeamento de categorias JSON → (TipoAtivo, ClasseAtivo, mercado, moeda)
 CATEGORY_MAP = {
-    'ativos_br_acoes':       ('ACAO',           'RENDA_VARIAVEL', 'BR', 'BRL'),
-    'ativos_br_fiis':        ('FII',            'RENDA_VARIAVEL', 'BR', 'BRL'),
-    'ativos_us_stocks':      ('STOCK',          'RENDA_VARIAVEL', 'US', 'USD'),
-    'ativos_us_reits':       ('REIT',           'RENDA_VARIAVEL', 'US', 'USD'),
-    'ativos_us_etfs':        ('ETF',            'RENDA_VARIAVEL', 'US', 'USD'),
-    'ativos_br_renda_fixa':  ('TESOURO_DIRETO', 'RENDA_FIXA',    'BR', 'BRL'),
+    'ativos_br_acoes':       ('ACAO',        'RENDA_VARIAVEL', 'BR', 'BRL'),
+    'ativos_br_fiis':        ('FII',         'RENDA_VARIAVEL', 'BR', 'BRL'),
+    'ativos_us_stocks':      ('STOCK',       'RENDA_VARIAVEL', 'US', 'USD'),
+    'ativos_us_reits':       ('REIT',        'RENDA_VARIAVEL', 'US', 'USD'),
+    'ativos_us_etfs':        ('ETF',         'RENDA_VARIAVEL', 'US', 'USD'),
+    'ativos_br_renda_fixa':  ('TESOURO_DIRETO', 'RENDA_FIXA',  'BR', 'BRL'),
+    'ativos_intl_stocks':    ('STOCK_INTL',  'RENDA_VARIAVEL', 'EU', 'EUR'),
+    'ativos_cripto':         ('CRIPTO',      'CRIPTO',         'US', 'USD'),
 }
 
 
@@ -89,11 +91,13 @@ def seed_ativos_fundamentalistas(force=False):
                     ativo.beta = _dec(item.get('beta'))
                     ativo.preco_teto = _dec(item.get('preco_teto'))
                     ativo.cap_rate = _dec(item.get('cap_rate'))
+                    ativo.eps = _dec(item.get('eps'))
+                    ativo.fcf = _dec(item.get('fcf'))
                     setor = item.get('setor') or item.get('segmento', '')
                     if setor:
                         ativo.observacoes = f"Setor: {setor}"
                     total_updated += 1
-                    print(f"  🔄 {ticker:12} atualizado (DY={item.get('dividend_yield')}, P/L={item.get('p_l')}, ROE={item.get('roe')})")
+                    print(f"  🔄 {ticker:12} atualizado (DY={item.get('dividend_yield')}, EPS={item.get('eps')}, P/L={item.get('p_l')})")
                 else:
                     # Criar novo ativo
                     setor = item.get('setor') or item.get('segmento', '')
@@ -112,6 +116,8 @@ def seed_ativos_fundamentalistas(force=False):
                         beta=_dec(item.get('beta')),
                         preco_teto=_dec(item.get('preco_teto')),
                         cap_rate=_dec(item.get('cap_rate')),
+                        eps=_dec(item.get('eps')),
+                        fcf=_dec(item.get('fcf')),
                         observacoes=f"Setor: {setor}" if setor else None,
                         ativo=True,
                     )
