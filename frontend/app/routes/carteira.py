@@ -26,6 +26,20 @@ def posicoes():
     return render_template('carteira/posicoes.html')
 
 
+@bp.route('/posicoes/<posicao_id>')
+@login_required
+def posicao_detalhe(posicao_id):
+    """Carteira — Detalhe de posição (API: GET /api/posicoes/<id>) — NEW-10"""
+    return render_template('carteira/posicao_detalhe_v2.html', posicao_id=posicao_id)
+
+
+@bp.route('/cambio')
+@login_required
+def cambio():
+    """Carteira — Câmbio e conversão (API: /api/cambio/*) — NEW-05"""
+    return render_template('carteira/cambio_v2.html')
+
+
 @bp.route('/movimentacoes')
 @login_required
 def movimentacoes():

@@ -1,0 +1,141 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Detalhe da Posição{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Informações completas da posição aberta</p>{% endblock %}
+
+{% block page_actions %}
+<a href="/carteira/posicoes" class="btn-exitus btn-exitus-ghost"><i class="fas fa-arrow-left"></i> Voltar</a>
+<button class="btn-exitus btn-exitus-outline" @click="loadData()" :disabled="loading">
+    <i class="fas fa-sync-alt" :class="{'fa-spin': loading}"></i> Atualizar
+</button>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="posicao && !loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Quantidade</div>
+        <div class="kpi-card-value" x-text="posicao.quantidade || 0"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Preço Médio</div>
+        <div class="kpi-card-value" x-text="formatMoney(posicao.preco_medio)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Custo Total</div>
+        <div class="kpi-card-value" x-text="formatMoney(posicao.custo_total)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Valor Atual</div>
+        <div class="kpi-card-value" x-text="formatMoney(posicao.valor_atual)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">L/P Não Realizado</div>
+        <div class="kpi-card-value" :class="(posicao.lucro_prejuizo_nao_realizado || 0) >= 0 ? 'positivo' : 'negativo'"
+             x-text="formatMoney(posicao.lucro_prejuizo_nao_realizado)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">L/P Realizado</div>
+        <div class="kpi-card-value" :class="(posicao.lucro_prejuizo_realizado || 0) >= 0 ? 'positivo' : 'negativo'"
+             x-text="formatMoney(posicao.lucro_prejuizo_realizado)"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="posicao && !loading" x-cloak>
+    <div class="section-box-title"><i class="fas fa-info-circle"></i> Ativo e Corretora</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:1rem;">
+        <div>
+            <div style="font-size:0.8rem; color:var(--exitus-text-muted);">Ativo</div>
+            <div style="font-size:1.25rem; font-weight:700;" x-text="posicao.ativo?.ticker || '-'"></div>
+            <div style="color:var(--exitus-text-muted);" x-text="posicao.ativo?.nome || ''"></div>
+            <div style="margin-top:0.5rem; font-size:0.85rem;">
+                <span class="badge badge-primary" x-text="tipoLabel(posicao.ativo?.tipo)"></span>
+                <span style="margin-left:0.5rem;" x-text="posicao.ativo?.mercado || ''"></span>
+            </div>
+        </div>
+        <div>
+            <div style="font-size:0.8rem; color:var(--exitus-text-muted);">Corretora</div>
+            <div style="font-size:1.1rem; font-weight:600;" x-text="posicao.corretora?.nome || '-'"></div>
+            <div style="font-size:0.85rem; color:var(--exitus-text-muted);" x-text="posicao.corretora?.pais || ''"></div>
+        </div>
+    </div>
+</div>
+
+<div class="section-box" x-show="posicao && !loading" x-cloak>
+    <div class="section-box-title"><i class="fas fa-calculator"></i> Detalhes Financeiros</div>
+    <table class="data-table" style="margin-top:1rem;">
+        <tbody>
+            <tr><td>Preço Atual</td><td class="col-right cell-money" x-text="formatMoney(posicao.ativo?.preco_atual)"></td></tr>
+            <tr><td>Taxas Acumuladas</td><td class="col-right cell-money" x-text="formatMoney(posicao.taxas_acumuladas)"></td></tr>
+            <tr><td>Impostos Acumulados</td><td class="col-right cell-money" x-text="formatMoney(posicao.impostos_acumulados)"></td></tr>
+            <tr><td>Primeira Compra</td><td class="col-right" x-text="formatDate(posicao.data_primeira_compra)"></td></tr>
+            <tr><td>Última Atualização</td><td class="col-right" x-text="formatDateTime(posicao.data_ultima_atualizacao)"></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="posicao && !loading" style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+    <a class="btn-exitus btn-exitus-primary" :href="'/dashboard/ativo/' + posicao.ativo?.ticker">
+        <i class="fas fa-chart-line"></i> Análise do Ativo
+    </a>
+    <a class="btn-exitus btn-exitus-outline" :href="'/operacoes/?ticker=' + posicao.ativo?.ticker">
+        <i class="fas fa-plus"></i> Nova Operação
+    </a>
+    <button class="btn-exitus btn-exitus-outline" @click="abrirResumoAtivo()" x-show="posicao.ativo_id">
+        <i class="fas fa-chart-pie"></i> Resumo Transações
+    </button>
+</div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle text-red-500"></i></div>
+        <div class="empty-state-title">Erro ao carregar posição</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <a href="/carteira/posicoes" class="btn-exitus btn-exitus-primary" style="margin-top:1rem;">Voltar às Posições</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+const POSICAO_ID = '{{ posicao_id }}';
+
+function pageDataExtend() {
+    return {
+        posicao: null,
+
+        async loadData() {
+            this.error = null;
+            try {
+                const res = await this.apiFetch('/api/posicoes/' + POSICAO_ID);
+                this.posicao = res?.data || null;
+                if (!this.posicao) throw new Error('Posição não encontrada');
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar posição';
+                this.posicao = null;
+            }
+        },
+
+        tipoLabel(tipo) {
+            const map = {
+                'acao': 'Ação', 'fii': 'FII', 'etf': 'ETF', 'stock': 'Stock',
+                'reit': 'REIT', 'bdr': 'BDR', 'renda_fixa': 'RF', 'cripto': 'Cripto'
+            };
+            return map[tipo] || tipo || '-';
+        },
+
+        formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleString('pt-BR');
+        },
+
+        abrirResumoAtivo() {
+            if (this.posicao?.ativo_id) {
+                window.location.href = '/operacoes/historico?ticker=' + (this.posicao.ativo?.ticker || '');
+            }
+        }
+    };
+}
+</script>
+{% endblock %}
