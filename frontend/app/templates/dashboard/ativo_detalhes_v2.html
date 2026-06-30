@@ -20,8 +20,8 @@
              x-text="cotacao?.variacao_percentual != null ? (cotacao.variacao_percentual >= 0 ? '+' : '') + cotacao.variacao_percentual.toFixed(2) + '%' : '-'"></div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-card-label">Preço Teto</div>
-        <div class="kpi-card-value" x-text="ativo?.preco_teto ? formatMoney(parseFloat(ativo.preco_teto)) : 'N/D'"></div>
+        <div class="kpi-card-label">Teto (Usuário)</div>
+        <div class="kpi-card-value" x-text="ativo?.preco_teto_usuario ? formatMoney(parseFloat(ativo.preco_teto_usuario)) : 'N/D'"></div>
     </div>
     <div class="kpi-card">
         <div class="kpi-card-label">Buy Score</div>
@@ -100,10 +100,10 @@
                         <span style="color:#6b7280;">Margem Seg.:</span>
                         <strong :class="margem >= 0 ? 'positivo' : 'negativo'" x-text="margem?.toFixed(2) + '%'"></strong>
                     </div>
-                    <!-- Preço Teto vs Atual -->
-                    <div style="font-size:0.85rem; margin-top:0.25rem;" x-show="ativo?.preco_teto">
-                        <span style="color:#6b7280;">Teto:</span>
-                        <span x-text="formatMoney(parseFloat(ativo?.preco_teto || 0))"></span>
+                    <!-- Teto do Usuário vs Atual -->
+                    <div style="font-size:0.85rem; margin-top:0.25rem;" x-show="ativo?.preco_teto_usuario">
+                        <span style="color:#6b7280;">Teto (usuário):</span>
+                        <span x-text="formatMoney(parseFloat(ativo?.preco_teto_usuario || 0))"></span>
                         <span style="margin-left:0.5rem; color:#6b7280;">Atual:</span>
                         <span x-text="formatMoney(parseFloat(ativo?.preco_atual || 0))"></span>
                     </div>

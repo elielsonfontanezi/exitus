@@ -3,7 +3,7 @@
 Exitus - EXITUS-ASSETS-001: Seed/Enriquecimento de Ativos com Dados Fundamentalistas
 
 Enriquece ativos existentes (ou cria novos) com dados fundamentalistas:
-- preco_atual, dividend_yield, p_l, p_vp, roe, beta, preco_teto, cap_rate
+- preco_atual, dividend_yield, p_l, p_vp, roe, beta, preco_teto_usuario, cap_rate
 
 Uso:
     python -m app.seeds.seed_ativos_fundamentalistas          # interativo
@@ -89,7 +89,7 @@ def seed_ativos_fundamentalistas(force=False):
                     ativo.p_vp = _dec(item.get('p_vp'))
                     ativo.roe = _dec(item.get('roe'))
                     ativo.beta = _dec(item.get('beta'))
-                    ativo.preco_teto = _dec(item.get('preco_teto'))
+                    ativo.preco_teto_usuario = _dec(item.get('preco_teto_usuario') or item.get('preco_teto'))
                     ativo.cap_rate = _dec(item.get('cap_rate'))
                     ativo.eps = _dec(item.get('eps'))
                     ativo.fcf = _dec(item.get('fcf'))
@@ -114,7 +114,7 @@ def seed_ativos_fundamentalistas(force=False):
                         p_vp=_dec(item.get('p_vp')),
                         roe=_dec(item.get('roe')),
                         beta=_dec(item.get('beta')),
-                        preco_teto=_dec(item.get('preco_teto')),
+                        preco_teto_usuario=_dec(item.get('preco_teto_usuario') or item.get('preco_teto')),
                         cap_rate=_dec(item.get('cap_rate')),
                         eps=_dec(item.get('eps')),
                         fcf=_dec(item.get('fcf')),

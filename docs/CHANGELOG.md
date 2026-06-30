@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — BUG-VAL-004: Unificar semântica preco_teto → preco_teto_usuario vs valor_justo (30/06/2026)
+
+**Problema:**
+- Coluna `preco_teto` na tabela `ativo` era ambígua: usada tanto para teto definido pelo usuário quanto como referência de cálculo
+- APIs expunham alias `preco_teto: valor_justo` misturando campo estático com campo calculado
+- Frontend exibia "Preço Teto" sem distinção da fonte (usuário vs. sistema)
+
+**Solução:**
+- **Migration DDL** `20260630_1100`: `ALTER TABLE ativo RENAME COLUMN preco_teto TO preco_teto_usuario`
+- Paridade `exitusdb` + `exitusdb_test` verificada após migration
+- `ativo.py` model: campo `preco_teto_usuario` com docstring explicativa
+- `ativo_schema.py`: `preco_teto_usuario` em todos os schemas (create/update/response)
+- `seed_ativos_fundamentalistas.py` + `ativos_fundamentalistas.json`: chave renomeada com fallback
+- `buy_signals_service.py`: watchlist agora expõe `valor_justo` + `preco_teto_usuario` separados
+- `buy_signals_blueprint.py`: removido alias confuso `preco_teto = valor_justo`; passa `preco_teto_usuario` real
+- Frontend: label "Teto (Usuário)" em `ativo_detalhes_v2.html`; watchlist usa `item.valor_justo`
+
+**Resultado:** semântica explícita — `preco_teto_usuario` (estático, do usuário) ≠ `valor_justo` (calculado pelo sistema)
+
+---
+
 ### Feat — BUG-VAL-005: valuation_service.py — agregação padrão de mercado (30/06/2026)
 
 **Problema:**

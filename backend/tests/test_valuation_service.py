@@ -40,7 +40,7 @@ class AtivoFake:
             'p_vp': None,
             'ffo_por_cota': None,
             'affo_por_cota': None,
-            'preco_teto': Decimal('38.00'),  # campo estático — NÃO deve influenciar
+            'preco_teto_usuario': Decimal('38.00'),  # campo estático do usuário — NÃO deve influenciar
         }
         defaults.update(kwargs)
         for k, v in defaults.items():
@@ -232,16 +232,16 @@ class TestCalcularValorJustoAcoes:
     @patch('app.services.valuation_service.get_parametros_macro', return_value=_PARAMS_BR)
     def test_preco_teto_usuario_nao_influencia(self, mock_params):
         """
-        preco_teto (campo estático do usuário) NÃO deve alterar valor_justo.
-        Dois ativos idênticos com preco_teto diferentes → mesmo valor_justo.
+        preco_teto_usuario (campo estático do usuário) NÃO deve alterar valor_justo.
+        Dois ativos idênticos com preco_teto_usuario diferentes → mesmo valor_justo.
         """
         base = dict(
             ticker='TEST3', tipo=_TipoFake('acao'),
             preco_atual=Decimal('42.24'), dividend_yield=Decimal('0.065'),
             eps=Decimal('4.17'), fcf=Decimal('5.50'), p_l=Decimal('10.5'),
         )
-        a1 = AtivoFake(**base, preco_teto=Decimal('38.00'))
-        a2 = AtivoFake(**base, preco_teto=Decimal('200.00'))
+        a1 = AtivoFake(**base, preco_teto_usuario=Decimal('38.00'))
+        a2 = AtivoFake(**base, preco_teto_usuario=Decimal('200.00'))
         r1 = calcular_valor_justo(a1)
         r2 = calcular_valor_justo(a2)
         assert r1['valor_justo'] == r2['valor_justo']

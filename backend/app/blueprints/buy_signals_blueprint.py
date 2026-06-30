@@ -28,11 +28,11 @@ def margem_seguranca(ticker):
                 "margem_seguranca": round(margem, 2),
                 "sinal": sinal,
                 "valor_justo": round(valor_justo, 2),
-                "preco_teto": round(valor_justo, 2),   # alias retrocompat
                 "faixa_min": vj['faixa_min'],
                 "faixa_max": vj['faixa_max'],
                 "perfil": vj['perfil'],
                 "preco_atual": round(preco_atual, 2),
+                "preco_teto_usuario": float(ativo.preco_teto_usuario) if ativo.preco_teto_usuario else None,
             },
             "message": f"Margem de segurança: {margem:.2f}% vs Valor Justo R${valor_justo:.2f}"
         })
@@ -112,11 +112,11 @@ def analisar_ativo(ticker):
             "z_score": z_score,
             "sinal": sinal,
             "preco_atual": vj['preco_atual'],
-            "preco_teto": round(valor_justo, 2),    # alias retrocompat
             "valor_justo": round(valor_justo, 2),
             "faixa_min": vj['faixa_min'],
             "faixa_max": vj['faixa_max'],
             "perfil_valuation": vj['perfil'],
+            "preco_teto_usuario": float(ativo.preco_teto_usuario) if ativo.preco_teto_usuario else None,
             "dy": float(ativo.dividend_yield) if ativo.dividend_yield else 0.0,
             "pl": float(ativo.p_l) if ativo.p_l else 0.0,
             "pvp": float(ativo.p_vp) if ativo.p_vp else 0.0,

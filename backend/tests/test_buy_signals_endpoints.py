@@ -28,7 +28,7 @@ class TestBuySignalsEndpoints:
         assert 'sinal' in resultado
         assert resultado['sinal'] in ['COMPRAR', 'AGUARDAR', 'VENDER']
         assert 'preco_atual' in resultado
-        assert 'preco_teto' in resultado
+        assert 'valor_justo' in resultado
         assert 'dy' in resultado
         assert 'pl' in resultado
         assert 'pvp' in resultado
@@ -69,7 +69,7 @@ class TestBuySignalsEndpoints:
             )
             db.session.add(ativo)
         ativo.preco_atual = Decimal('75.50')
-        ativo.preco_teto = Decimal('90.00')
+        ativo.preco_teto_usuario = Decimal('90.00')
         ativo.dividend_yield = Decimal('0.085')
         ativo.p_l = Decimal('5.2')
         ativo.p_vp = Decimal('1.8')
@@ -114,7 +114,7 @@ class TestBuySignalsEndpoints:
             )
             db.session.add(ativo)
         ativo.preco_atual = Decimal('10.00')
-        ativo.preco_teto = Decimal('50.00')  # campo estático do usuário — não influencia mais
+        ativo.preco_teto_usuario = Decimal('50.00')  # campo estático do usuário — não influencia mais
         ativo.dividend_yield = Decimal('0.10')  # DY alto
         ativo.beta = Decimal('0.8')  # Beta baixo
         db.session.commit()
@@ -155,7 +155,7 @@ class TestBuySignalsEndpoints:
                 )
                 db.session.add(ativo)
             ativo.preco_atual = Decimal('20.00')
-            ativo.preco_teto = Decimal('30.00')
+            ativo.preco_teto_usuario = Decimal('30.00')
         db.session.commit()
         
         response = client.get('/api/buy-signals/watchlist-top')
@@ -180,7 +180,7 @@ def seed_ativo_petr4(app):
     if existing:
         # Atualizar campos necessários para os testes de buy signals
         existing.preco_atual = Decimal('38.50')
-        existing.preco_teto = Decimal('45.00')
+        existing.preco_teto_usuario = Decimal('45.00')
         existing.dividend_yield = Decimal('0.125')
         existing.p_l = Decimal('4.2')
         existing.p_vp = Decimal('0.9')
@@ -198,7 +198,7 @@ def seed_ativo_petr4(app):
         mercado='BR',
         moeda='BRL',
         preco_atual=Decimal('38.50'),
-        preco_teto=Decimal('45.00'),
+        preco_teto_usuario=Decimal('45.00'),
         dividend_yield=Decimal('0.125'),
         p_l=Decimal('4.2'),
         p_vp=Decimal('0.9'),

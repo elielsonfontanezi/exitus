@@ -26,9 +26,9 @@ class AtivoCreateSchema(Schema):
     p_vp = fields.Decimal(required=False, as_string=True, allow_none=True)
     roe = fields.Decimal(required=False, as_string=True, allow_none=True)
     beta = fields.Decimal(required=False, as_string=True, allow_none=True)
-    preco_teto = fields.Decimal(required=False, as_string=True, allow_none=True)
+    preco_teto_usuario = fields.Decimal(required=False, as_string=True, allow_none=True)
     cap_rate = fields.Decimal(required=False, as_string=True, allow_none=True)
-    
+
     # Status
     ativo = fields.Bool(required=False, default=True)
     deslistado = fields.Bool(required=False, default=False)
@@ -83,9 +83,9 @@ class AtivoUpdateSchema(Schema):
     p_vp = fields.Decimal(required=False, as_string=True, allow_none=True)
     roe = fields.Decimal(required=False, as_string=True, allow_none=True)
     beta = fields.Decimal(required=False, as_string=True, allow_none=True)
-    preco_teto = fields.Decimal(required=False, as_string=True, allow_none=True)
+    preco_teto_usuario = fields.Decimal(required=False, as_string=True, allow_none=True)
     cap_rate = fields.Decimal(required=False, as_string=True, allow_none=True)
-    
+
     ativo = fields.Bool(required=False)
     deslistado = fields.Bool(required=False)
     data_deslistagem = fields.Date(required=False, allow_none=True)
@@ -124,7 +124,7 @@ class AtivoResponseSchema(SQLAlchemyAutoSchema):
     p_vp = fields.Decimal(as_string=True)
     roe = fields.Decimal(as_string=True)
     beta = fields.Decimal(as_string=True)
-    preco_teto = fields.Decimal(as_string=True)
+    preco_teto_usuario = fields.Decimal(as_string=True)
     cap_rate = fields.Decimal(as_string=True)
     
     def get_tipo_str(self, obj):

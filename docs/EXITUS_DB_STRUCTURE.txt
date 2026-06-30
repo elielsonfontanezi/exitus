@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-06-28 18:40:16
+Gerado em: 2026-06-30 10:56:50
 ================================================================================
 
 ================================================================================
@@ -327,7 +327,7 @@ TABELA: ativo
  p_vp                | numeric(10,2)               |           |          |         | main     |             |              | 
  roe                 | numeric(5,4)                |           |          |         | main     |             |              | 
  beta                | numeric(5,2)                |           |          |         | main     |             |              | 
- preco_teto          | numeric(15,2)               |           |          |         | main     |             |              | 
+ preco_teto_usuario  | numeric(15,2)               |           |          |         | main     |             |              | 
  cap_rate            | numeric(8,4)                |           |          |         | main     |             |              | 
  taxa_cupom          | numeric(8,6)                |           |          |         | main     |             |              | 
  valor_nominal       | numeric(15,2)               |           |          |         | main     |             |              | 
@@ -383,7 +383,7 @@ Access method: heap
   11 | p_vp                | numeric                     |         | YES   | 
   12 | roe                 | numeric                     |         | YES   | 
   13 | beta                | numeric                     |         | YES   | 
-  14 | preco_teto          | numeric                     |         | YES   | 
+  14 | preco_teto_usuario  | numeric                     |         | YES   | 
   15 | cap_rate            | numeric                     |         | YES   | 
   16 | taxa_cupom          | numeric                     |         | YES   | 
   17 | valor_nominal       | numeric                     |         | YES   | 

@@ -121,7 +121,10 @@ class Ativo(db.Model):
     beta = Column(Numeric(5, 2), nullable=True)
     
     # Indicadores para Valuation
-    preco_teto = Column(Numeric(15, 2), nullable=True)
+    # preco_teto_usuario: teto/preço justo definido MANUALMENTE pelo usuário (campo opcional)
+    # NÃO é usado no Buy Score nem na margem — apenas referência pessoal.
+    # valor_justo calculado em tempo real pelo valuation_service (não persistido).
+    preco_teto_usuario = Column(Numeric(15, 2), nullable=True)
     cap_rate = Column(Numeric(8, 4), nullable=True)  # Para FIIs/REITs
     eps = Column(Numeric(10, 4), nullable=True)       # Earnings Per Share (VALUATION-001)
     fcf = Column(Numeric(15, 2), nullable=True)       # Free Cash Flow (VALUATION-001)
@@ -171,7 +174,7 @@ class Ativo(db.Model):
             'p_vp': float(self.p_vp) if self.p_vp else None,
             'roe': float(self.roe) if self.roe else None,
             'beta': float(self.beta) if self.beta else None,
-            'preco_teto': float(self.preco_teto) if self.preco_teto else None,
+            'preco_teto_usuario': float(self.preco_teto_usuario) if self.preco_teto_usuario else None,
             'cap_rate': float(self.cap_rate) if self.cap_rate else None,
             'eps': float(self.eps) if self.eps else None,
             'fcf': float(self.fcf) if self.fcf else None,

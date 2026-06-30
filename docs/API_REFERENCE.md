@@ -584,7 +584,7 @@ Response 200:
 {
   "success": true,
   "data": [
-    { "ticker": "PETR4", "buy_score": 78, "preco_atual": 36.5, "preco_teto": 42.0 }
+    { "ticker": "PETR4", "buy_score": 78, "preco_atual": 36.5, "valor_justo": 42.0, "preco_teto_usuario": null }
   ]
 }
 ```

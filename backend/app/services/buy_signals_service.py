@@ -17,7 +17,7 @@ def calcular_margem_seguranca(ticker_or_ativo):
     Calcula margem de segurança via valuation_service (BUG-VAL-005).
 
     Usa valor_justo calculado (Bazin/Graham/Gordon/DCF/Cap Rate + IQR + ponderação)
-    como preço de referência — NÃO usa ativo.preco_teto (campo estático do usuário).
+    como preço de referência — NÃO usa ativo.preco_teto_usuario (campo estático do usuário).
 
     Aceita ticker (str) ou objeto Ativo.
     Retorna (margem_percentual, valor_justo).
@@ -153,11 +153,15 @@ def obter_watchlist_top():
         try:
             score_result = calcular_buy_score(ativo.ticker)
             score = score_result['score'] if isinstance(score_result, dict) else score_result
+            vj = calcular_valor_justo(ativo)
             resultado.append({
                 "ticker": ativo.ticker,
                 "buy_score": score,
                 "preco_atual": float_safe(ativo.preco_atual),
-                "preco_teto": float_safe(ativo.preco_teto)
+                "valor_justo": vj['valor_justo'],
+                "faixa_min": vj['faixa_min'],
+                "faixa_max": vj['faixa_max'],
+                "preco_teto_usuario": float_safe(ativo.preco_teto_usuario),
             })
         except:
             continue

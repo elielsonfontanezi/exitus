@@ -5,12 +5,13 @@
     - ticker: string - código do ativo
     - nome: string - nome do ativo
     - preco_atual: string - preço atual
-    - preco_teto: string - preço teto
+    - valor_justo: string - valor justo calculado pelo sistema
+    - preco_teto_usuario: string - preço teto definido pelo usuário (opcional)
     - desconto: number - desconto percentual
     - score: number - score 0-100
     - mercado: string - mercado (BR, US, INTL)
   Uso:
-    {% include 'components/cards/opportunity_card.html' with ticker='VALE3' nome='Vale ON' preco_atual='R$ 72.00' preco_teto='R$ 85.00' desconto=15.3 score=88 mercado='BR' %}
+    {% include 'components/cards/opportunity_card.html' with ticker='VALE3' nome='Vale ON' preco_atual='R$ 72.00' valor_justo='R$ 85.00' desconto=15.3 score=88 mercado='BR' %}
 #}
 
 <div class="bg-white rounded-lg shadow-sm border-2 border-green-200 p-5 hover:shadow-md transition-shadow">
@@ -32,7 +33,7 @@
     </div>
     <div>
       <p class="text-xs text-gray-500 mb-1">Preço Teto</p>
-      <p class="text-lg font-semibold text-blue-600">{{ preco_teto }}</p>
+      <p class="text-lg font-semibold text-blue-600">{{ valor_justo }}</p>
     </div>
   </div>
   

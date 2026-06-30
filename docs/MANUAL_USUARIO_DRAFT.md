@@ -325,7 +325,7 @@ O painel "Preço vs Valor Justo" exibe:
 
 | Problema | Impacto na tela | Status |
 |---|---|---|
-| Dois conceitos de "preço teto" (`preco_teto_usuario` estático vs `valor_justo` calculado) | Labels ainda mostram "Preço Teto" em alguns pontos da UI | Em correção: BUG-VAL-004 (rename DDL + unificação labels) |
+| Dois conceitos de "preço teto" (`preco_teto_usuario` estático vs `valor_justo` calculado) | Labels agora distinguem "Teto (Usuário)" de "Valor Justo" | ✅ Corrigido (BUG-VAL-004 — 30/06/2026): rename DDL + labels frontend |
 | EPS/FCF não populados para todos os ativos | Graham e DCF usam valores fallback (EPS=2.50, FCF=5.0) | Em correção: integração com yfinance |
 | Fórmula de FII `1 / cap_rate` | Resultado dimensionalmente incorreto | ✅ Corrigido (BUG-VAL-006 — 30/06/2026) |
 | Média simples dos métodos | Podia ser distorcida por outliers | ✅ Corrigido (BUG-VAL-005 — 30/06/2026): mediana ponderada + ratio IQR |

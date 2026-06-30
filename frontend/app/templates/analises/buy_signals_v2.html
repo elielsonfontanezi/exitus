@@ -326,10 +326,10 @@
                                x-text="item.ticker" style="text-decoration:none; font-weight:700;"></a>
                         </td>
                         <td class="col-right" x-text="formatMoney(item.preco_atual)"></td>
-                        <td class="col-right" x-text="formatMoney(item.preco_teto)"></td>
+                        <td class="col-right" x-text="formatMoney(item.valor_justo)"></td>
                         <td class="col-right">
-                            <span :class="item.preco_teto > item.preco_atual ? 'positivo' : 'negativo'"
-                                  x-text="item.preco_teto && item.preco_atual ? ((item.preco_teto - item.preco_atual) / item.preco_atual * 100).toFixed(1) + '%' : '-'"></span>
+                            <span :class="item.valor_justo > item.preco_atual ? 'positivo' : 'negativo'"
+                                  x-text="item.valor_justo && item.preco_atual ? ((item.valor_justo - item.preco_atual) / item.preco_atual * 100).toFixed(1) + '%' : '-'"></span>
                         </td>
                         <td class="col-center">
                             <span style="font-weight:700; font-size:1.1rem;"
@@ -483,10 +483,10 @@ function pageDataExtend() {
                 };
             }
 
-            if (this.margemResultado && this.margemResultado.preco_teto) {
+            if (this.margemResultado && this.margemResultado.valor_justo) {
                 return {
                     preco_atual: this.margemResultado.preco_atual,
-                    preco_teto: this.margemResultado.preco_teto,
+                    preco_teto: this.margemResultado.valor_justo,
                     margem: this.margemResultado.margem_seguranca,
                     sinal: this.margemResultado.sinal
                 };
