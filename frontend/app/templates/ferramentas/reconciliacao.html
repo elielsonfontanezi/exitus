@@ -90,10 +90,11 @@
                 <th class="col-right">Esperado</th>
                 <th class="col-right">Encontrado</th>
                 <th class="col-right">Diferença</th>
+                <th class="col-center">Ações</th>
             </tr>
         </thead>
         <tbody>
-            <template x-for="div in divergenciasFiltradas" :key="div.mensagem + div.tipo">
+            <template x-for="div in divergenciasFiltradas" :key="div.mensagem + div.tipo + (div.ativo_id || '')">
                 <tr>
                     <td>
                         <span class="badge" :class="div.severidade === 'ERROR' ? 'badge-danger' : 'badge-warning'"
@@ -114,6 +115,13 @@
                     <td class="col-right">
                         <span class="badge-negativo" x-text="formatDiferenca(div)"></span>
                     </td>
+                    <td class="col-center">
+                        <button class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.2rem 0.5rem;"
+                                x-show="div.ativo_id"
+                                @click="detalharAtivo(div)">
+                            <i class="fas fa-search"></i> Detalhar
+                        </button>
+                    </td>
                 </tr>
             </template>
         </tbody>
@@ -129,6 +137,48 @@
         <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="executarVerificacao()">
             <i class="fas fa-redo"></i> Tentar novamente
         </button>
+    </div>
+</div>
+
+<!-- Painel drill-down por ativo (NEW-22) -->
+<div x-show="showDetalheAtivo" x-cloak @click="fecharDetalheAtivo()"
+     style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9998;"></div>
+<div x-show="showDetalheAtivo" x-cloak @click.stop
+     style="position:fixed; top:0; right:0; width:100%; max-width:480px; height:100%; background:white; box-shadow:-4px 0 24px rgba(0,0,0,0.15); z-index:9999; overflow-y:auto;">
+    <div style="padding:1.5rem; border-bottom:1px solid var(--exitus-border); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <div style="font-weight:700; font-size:1.1rem;" x-text="detalheAtivoLabel"></div>
+            <div style="font-size:0.8rem; color:var(--exitus-text-muted);">Reconciliação por corretora</div>
+        </div>
+        <button class="btn-exitus btn-exitus-ghost" @click="fecharDetalheAtivo()"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="padding:1.5rem;" x-show="carregandoDetalhe">
+        <div class="skeleton-line medium"></div>
+        <div class="skeleton-line"></div>
+    </div>
+    <div style="padding:1.5rem;" x-show="!carregandoDetalhe && detalheAtivo">
+        <template x-for="c in detalheAtivo.corretoras || []" :key="c.corretora_id">
+            <div class="section-box" style="margin-bottom:1rem; padding:1rem;">
+                <div style="font-weight:600; margin-bottom:0.5rem;" x-text="c.corretora_nome"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.85rem;">
+                    <div>Qtd Posição: <strong x-text="c.quantidade_posicao"></strong></div>
+                    <div>Qtd Calculada: <strong x-text="c.quantidade_calculada"></strong></div>
+                    <div>Diferença: <strong :class="c.status === 'OK' ? 'positivo' : 'negativo'" x-text="c.diferenca"></strong></div>
+                    <div>Status: <span class="badge" :class="c.status === 'OK' ? 'badge-success' : 'badge-danger'" x-text="c.status"></span></div>
+                </div>
+            </div>
+        </template>
+        <div x-show="!(detalheAtivo.corretoras || []).length" class="empty-state" style="padding:1rem;">
+            <div class="empty-state-text">Nenhuma posição encontrada para este ativo</div>
+        </div>
+        <div x-show="(detalheAtivo.divergencias || []).length > 0" style="margin-top:1rem;">
+            <div style="font-weight:600; margin-bottom:0.5rem; color:var(--exitus-danger);">Divergências</div>
+            <template x-for="d in detalheAtivo.divergencias" :key="d.tipo + d.corretora">
+                <div style="padding:0.5rem; background:#fef2f2; border-radius:6px; margin-bottom:0.5rem; font-size:0.85rem;">
+                    <span x-text="d.tipo"></span> — <span x-text="d.corretora"></span>: diff <span x-text="d.diferenca"></span>
+                </div>
+            </template>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -148,6 +198,10 @@ function pageDataExtend() {
         divIntegridade: [],
         divergenciasFiltradas: [],
         abaAtiva: 'todos',
+        showDetalheAtivo: false,
+        carregandoDetalhe: false,
+        detalheAtivo: null,
+        detalheAtivoLabel: '',
 
         async loadData() {
             // Não executa automaticamente — espera o botão
@@ -225,6 +279,31 @@ function pageDataExtend() {
             if (div.diferenca == null) return '-';
             if (div.tipo === 'POSICAO_QUANTIDADE') return div.diferenca;
             return this.formatMoney(div.diferenca);
+        },
+
+        async detalharAtivo(div) {
+            if (!div.ativo_id) return;
+            this.showDetalheAtivo = true;
+            this.carregandoDetalhe = true;
+            this.detalheAtivo = null;
+            this.detalheAtivoLabel = div.ativo_ticker || div.ativo_id;
+            try {
+                let url = '/api/reconciliacao/ativo/' + div.ativo_id;
+                if (div.corretora_id) url += '?corretora_id=' + div.corretora_id;
+                const res = await this.apiFetch(url);
+                this.detalheAtivo = res;
+            } catch (e) {
+                console.error('Erro drill-down:', e);
+                alert('Erro ao carregar detalhe do ativo.');
+                this.fecharDetalheAtivo();
+            } finally {
+                this.carregandoDetalhe = false;
+            }
+        },
+
+        fecharDetalheAtivo() {
+            this.showDetalheAtivo = false;
+            this.detalheAtivo = null;
         }
     };
 }
