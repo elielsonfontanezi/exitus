@@ -48,6 +48,13 @@ def compra_lista():
     return render_template('estrategia/planos_v2.html')
 
 
+@bp.route('/dashboard')
+@login_required
+def compra_dashboard():
+    """Dashboard de planos de compra — mesma tela com KPIs via API dashboard."""
+    return render_template('estrategia/planos_v2.html')
+
+
 @bp.route('/<plano_id>')
 @login_required
 def compra_detalhe(plano_id):

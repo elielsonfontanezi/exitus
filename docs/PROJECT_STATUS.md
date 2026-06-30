@@ -1,10 +1,11 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 30/06/2026
-> **Status:** ✅ **NEW-03 — Distribuição detalhada em alocacao_v2 concluída**
-> **Versão:** v0.9.37
+> **Status:** ✅ **NEW-13 — Dashboard Planos de Compra concluído**
+> **Versão:** v0.9.38
 
 ### 🔧 Últimas entregas (30/06/2026)
+- **NEW-13 ✅ CONCLUÍDO:** `planos_v2.html` integrado com `GET /api/plano-compra/dashboard` — KPIs (planos ativos, aporte mensal, total investido, progresso médio, desvio da meta), painel Próximos Aportes, fallback para listagem. Backend: `progresso_medio` + `desvio_meta_percentual` no resumo. Rota `/planos-compra/dashboard`. 2 novos testes. Suite: **621 passed** (baseline +2).
 - **NEW-03 ✅ CONCLUÍDO:** `get_distribuicao_classes()` e `get_distribuicao_setores()` implementados em `portfolio_service.py` (endpoints existiam sem service). `alocacao_v2.html` com abas Por Classe | Por Segmento. 7 novos testes. Suite: **619 passed** (baseline +7).
 - **REBALANCE-001 ✅ CONCLUÍDO:** Tabela `meta_alocacao` (migration `20260630_1200`) + model + schema. `rebalance_service.py`: metas (upsert), desvio (atual vs target), sugestões (comprar/vender). 3 endpoints novos em `portfolio_blueprint`: `GET/PUT /api/portfolios/meta-alocacao`, `GET /api/portfolios/rebalanceamento/sugestao`. `analise_service.analisar_performance_portfolio` delega para `rebalance_service` — `/api/performance/desvio-alocacao` retorna dados reais. `alocacao_v2.html` reformulada: editor de metas, barras com marcador de target, tabela com Desvio/Ajuste R$, painel sugestões. 19 novos testes. Suite: **612 passed, 3 failed pré-existentes, 6 skipped**.
 - **BUG-VAL-004 ✅ CONCLUÍDO:** Migration DDL `20260630_1100` renomeia coluna `preco_teto → preco_teto_usuario`. Paridade `exitusdb + exitusdb_test` verificada. Model, schemas, seeds, blueprints, service e frontend atualizados. Alias confuso `preco_teto = valor_justo` removido das APIs. Labels frontend: "Teto (Usuário)" em detalhe de ativo; watchlist usa `valor_justo`. Suite: **593 passed, 3 failed pré-existentes, 6 skipped — sem regressão**.

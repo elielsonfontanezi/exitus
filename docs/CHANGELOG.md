@@ -8,6 +8,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — NEW-13: Dashboard de Planos de Compra (30/06/2026)
+
+**Problema:** `GET /api/plano-compra/dashboard` existia no backend mas não era consumido pelo frontend.
+
+**Solução:**
+- `planos_v2.html` consome `/api/plano-compra/dashboard` na aba Compra — KPIs (ativos, aporte mensal, investido, progresso médio, desvio da meta) e tabela **Próximos Aportes**
+- Backend: campos `progresso_medio` e `desvio_meta_percentual` no `resumo`; correção de cálculo `total_investido`
+- Rota alias `/planos-compra/dashboard`
+- 2 testes em `test_plano_compra_dashboard.py`
+
+---
+
 ### Feat — NEW-03: Distribuição detalhada em alocacao_v2 (30/06/2026)
 
 **Problema:** Endpoints `/api/portfolios/distribuicao/classes` e `/setores` existiam no blueprint mas `PortfolioService.get_distribuicao_*` não estavam implementados.

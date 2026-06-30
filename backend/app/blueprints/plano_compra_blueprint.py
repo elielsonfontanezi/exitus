@@ -203,8 +203,18 @@ def dashboard_planos():
         planos_concluidos = len([p for p in planos if p.status.value == 'concluido'])
         
         # Calcular valores
-        total_aporte_mensal = sum(float(p.valor_aporte_mensal) for p in planos if p.status.value == 'ativo')
-        total_investido = sum(float(p.quantidade_acumulada * p.ativo.preco_atual or 0) for p in planos if p.ativo.preco_atual)
+        planos_ativos_list = [p for p in planos if p.status.value == 'ativo']
+        total_aporte_mensal = sum(float(p.valor_aporte_mensal) for p in planos_ativos_list)
+        total_investido = sum(
+            float(p.quantidade_acumulada) * float(p.ativo.preco_atual or 0)
+            for p in planos if p.ativo
+        )
+        progressos = [
+            p.calcular_progresso() for p in planos_ativos_list
+            if float(p.quantidade_alvo) > 0
+        ]
+        progresso_medio = round(sum(progressos) / len(progressos), 2) if progressos else 0.0
+        desvio_meta_percentual = round(100 - progresso_medio, 2) if progressos else 0.0
         
         # Próximos aportes
         proximos_aportes = []
@@ -228,7 +238,9 @@ def dashboard_planos():
                 'planos_pausados': planos_pausados,
                 'planos_concluidos': planos_concluidos,
                 'total_aporte_mensal': total_aporte_mensal,
-                'total_investido': total_investido
+                'total_investido': total_investido,
+                'progresso_medio': progresso_medio,
+                'desvio_meta_percentual': desvio_meta_percentual
             },
             'proximos_aportes': proximos_aportes,
             'planos': [plano.to_dict() for plano in planos]

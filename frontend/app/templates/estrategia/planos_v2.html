@@ -4,7 +4,29 @@
 {% block page_subtitle %}<p class="page-subtitle">Planos de compra e venda programados — gestão disciplinada</p>{% endblock %}
 
 {% block kpi_bar %}
-<div class="kpi-bar" x-show="planosCompra.length > 0 || planosVenda.length > 0">
+<div class="kpi-bar" x-show="tab === 'compra' && dashboardCompra.resumo">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Planos Ativos</div>
+        <div class="kpi-card-value positivo" x-text="dashboardCompra.resumo?.planos_ativos || 0"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Aporte Mensal</div>
+        <div class="kpi-card-value" x-text="formatMoney(dashboardCompra.resumo?.total_aporte_mensal || 0)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Total Investido</div>
+        <div class="kpi-card-value" x-text="formatMoney(dashboardCompra.resumo?.total_investido || 0)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Progresso Médio</div>
+        <div class="kpi-card-value" x-text="(dashboardCompra.resumo?.progresso_medio || 0).toFixed(1) + '%'"></div>
+    </div>
+    <div class="kpi-card" x-show="(dashboardCompra.resumo?.desvio_meta_percentual || 0) > 0">
+        <div class="kpi-card-label">Desvio da Meta</div>
+        <div class="kpi-card-value" style="color:#dc2626;" x-text="(dashboardCompra.resumo?.desvio_meta_percentual || 0).toFixed(1) + '%'"></div>
+    </div>
+</div>
+<div class="kpi-bar" x-show="tab === 'venda' && (planosVenda.length > 0 || planosCompra.length > 0)">
     <div class="kpi-card">
         <div class="kpi-card-label">Planos de Compra</div>
         <div class="kpi-card-value" x-text="planosCompra.length"></div>
@@ -40,6 +62,33 @@
 {% block page_content %}
 <!-- PLANOS DE COMPRA -->
 <div x-show="tab === 'compra'" x-cloak>
+    <!-- Próximos aportes -->
+    <div class="section-box" x-show="dashboardCompra.proximos_aportes?.length > 0" style="margin-bottom:1.5rem;">
+        <div class="section-box-title"><i class="fas fa-calendar-alt"></i> Próximos Aportes</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Plano</th>
+                    <th>Ativo</th>
+                    <th class="col-center">Data</th>
+                    <th class="col-right">Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="a in dashboardCompra.proximos_aportes" :key="a.plano_id">
+                    <tr>
+                        <td x-text="a.nome"></td>
+                        <td>
+                            <a :href="'/dashboard/ativo/' + a.ativo_ticker" style="text-decoration:none; font-weight:700; color:#a38c65;" x-text="a.ativo_ticker || '-'"></a>
+                        </td>
+                        <td class="col-center" x-text="formatDate(a.data)"></td>
+                        <td class="col-right" x-text="formatMoney(a.valor || 0)"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+
     <div class="section-box" x-show="compraFiltrados().length > 0">
         <div class="section-box-title"><i class="fas fa-shopping-cart"></i> Planos de Compra</div>
         <table class="data-table">
@@ -289,6 +338,7 @@ function pageDataExtend() {
         tab: 'compra',
         planosCompra: [],
         planosVenda: [],
+        dashboardCompra: { resumo: null, proximos_aportes: [] },
         filtro: '',
         showModal: false,
         planoDetalhe: {},
@@ -306,12 +356,22 @@ function pageDataExtend() {
         },
 
         async loadData() {
-            const [compraRes, vendaRes] = await Promise.allSettled([
-                this.apiFetch('/api/plano-compra/'),
+            const [dashRes, vendaRes] = await Promise.allSettled([
+                this.apiFetch('/api/plano-compra/dashboard'),
                 this.apiFetch('/api/plano-venda')
             ]);
-            if (compraRes.status === 'fulfilled' && compraRes.value?.data) {
-                this.planosCompra = Array.isArray(compraRes.value.data) ? compraRes.value.data : compraRes.value.data.planos || [];
+            if (dashRes.status === 'fulfilled' && dashRes.value?.data) {
+                const dash = dashRes.value.data;
+                this.dashboardCompra = {
+                    resumo: dash.resumo || null,
+                    proximos_aportes: dash.proximos_aportes || []
+                };
+                this.planosCompra = Array.isArray(dash.planos) ? dash.planos : [];
+            } else {
+                const fallback = await this.apiFetch('/api/plano-compra/');
+                if (fallback?.data) {
+                    this.planosCompra = Array.isArray(fallback.data) ? fallback.data : fallback.data.planos || [];
+                }
             }
             if (vendaRes.status === 'fulfilled' && vendaRes.value?.data) {
                 this.planosVenda = Array.isArray(vendaRes.value.data) ? vendaRes.value.data : vendaRes.value.data.planos || [];

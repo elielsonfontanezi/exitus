@@ -74,7 +74,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 31 | Ferramentas — Calculadora IR | `/ferramentas/calculadora-ir` | 🟡 | Carrega dados ✅ | Baixa |
 | 32 | Ferramentas — Simulador | `/ferramentas/simulador` | 🟡 | Carrega dados ✅ | Baixa |
 | 33 | Ferramentas — Reconciliação | `/ferramentas/reconciliacao` | 🟡 | Carrega dados ✅ | Baixa |
-| 34 | Estratégia — Planos | `/planos-compra/` | ✅ | Acessível por URL direta e via menu (BUG-011 RESOLVIDO: dropdown Estratégia adicionado ao menu horizontal com Planos de Compra/Venda) | — |
+| 34 | Estratégia — Planos | `/planos-compra/` | ✅ | Dashboard KPIs + Próximos Aportes via `/api/plano-compra/dashboard` (NEW-13); abas compra/venda; modal detalhe | — |
 | 35 | Alertas | `/alertas/` | 🟡 | Acessível pelo menu; lista de alertas carrega ✅ | Baixa |
 
 ---
@@ -572,14 +572,15 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 
 **O que funciona (código):**
 - Rota `/planos-compra/` renderiza `estrategia/planos_v2.html` ✅
+- Rota `/planos-compra/dashboard` — alias com KPIs via API dashboard ✅ **NEW-13**
+- Aba Compra consome `GET /api/plano-compra/dashboard` — KPIs + Próximos Aportes + listagem ✅ **NEW-13**
 - Rota `/planos-venda/` também renderiza o mesmo template ✅
-- Sub-rota `/<plano_id>` redireciona para lista (sem tela de detalhe dedicada) ✅
+- Sub-rota `/<plano_id>` redireciona para lista (modal de detalhe na lista) ✅
 - Blueprint usa `Config.BACKEND_API_URL` ✅
 
 **Problemas encontrados:**
 1. 🔴 **BUG-001**
-2. 🔴 **URL incorreta no menu** — tabela usa `/estrategia/planos` mas blueprint registrado como `/planos-compra`. Link no menu pode gerar 404.
-3. 🟡 **Sem tela de detalhe do plano** — `/planos-compra/<id>` apenas redireciona para lista.
+2. 🟡 **Sem formulário de criação/edição de plano** — modal de detalhe existe; botão Editar é stub.
 
 ---
 
@@ -1164,7 +1165,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 | NEW-10 | **Detalhe de Posição** | `/carteira/posicoes/<id>` | `/api/posicoes/<posicao_id>` | Histórico de preço médio, eventos, proventos recebidos por posição individual |
 | NEW-11 | **Calculadora de Preço Teto** | Expandir `/ferramentas/calculadora-ir` ou nova `/ferramentas/preco-teto` | `/api/calculos/preco_teto`, `/api/calculos/fii`, `/api/calculos/portfolio` | Calcular preço teto por Bazin, Graham, FII Yield |
 | NEW-12 | **Resumo por Ativo** | Expandir `/operacoes/historico` | `/api/transacoes/resumo-ativo` | Ver todas as transações agrupadas por ativo com P&L acumulado |
-| NEW-13 | **Dashboard de Planos de Compra** | `/estrategia/planos-compra/dashboard` | `/api/plano-compra/dashboard` | KPIs consolidados: planos ativos, total aportado, desvio da meta — **API existe, não usada** |
+| ~~NEW-13~~ | ~~**Dashboard de Planos de Compra**~~ | `/planos-compra/` (aba Compra) | `/api/plano-compra/dashboard` | **✅ RESOLVIDO (30/06/2026):** KPIs + Próximos Aportes em `planos_v2.html`; alias `/planos-compra/dashboard` |
 | NEW-14 | **Plano de Venda — Dashboard + Gatilhos** | `/estrategia/planos-venda` | `/api/plano-venda/dashboard`, `/api/plano-venda/verificar-gatilhos`, `/api/plano-venda/estatisticas`, `/api/plano-venda/simular-venda` | Monitorar stop-gain/stop-loss, simular venda parcial — backend completo, sem tela |
 | NEW-15 | **Correlação entre Ativos** | `/analises/correlacao` | `/api/performance/correlacao` | Matriz de correlação entre ativos da carteira — ver quais ativos se movem juntos ou ao contrário |
 | NEW-16 | **Comparação com Benchmark** | Expandir `/analises/rentabilidade/periodo` | `/api/performance/benchmark` | Comparar rentabilidade da carteira vs CDI, Ibovespa, IPCA — API existe separada do filtro atual |
