@@ -97,11 +97,15 @@ def importar_b3():
                 'transacoes_criadas': resultado.get('transacoes_criadas', 0),
                 'proventos_criados': resultado.get('proventos_criados', 0),
                 'eventos_criados': resultado.get('eventos_criados', 0),
+                'ativos_criados': resultado.get('ativos_criados', 0),
+                'tickers_importados': resultado.get('tickers_importados', []),
+                'ativos_novos': resultado.get('ativos_novos', []),
                 'erros': resultado.get('erros', []),
                 'avisos': resultado.get('avisos', []),
                 'resumo': {
                     'processadas': resultado.get('processadas', 0),
-                    'ignoradas': resultado.get('ignoradas', 0)
+                    'ignoradas': resultado.get('ignoradas', 0),
+                    'total_linhas': resultado.get('processadas', 0) + resultado.get('ignoradas', 0),
                 }
             }
         }), 200

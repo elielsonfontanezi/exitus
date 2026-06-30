@@ -8,6 +8,18 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — FEAT-009: Import B3 lista tickers importados (30/06/2026)
+
+**Problema:** Resultado do import exibia apenas totais numéricos — usuário não sabia quais tickers foram importados ou criados.
+
+**Solução:**
+- `import_b3_service.py`: rastreamento de `tickers_importados` e `ativos_novos` durante importação; resposta consolidada via `_consolidar_resposta()`
+- `import_b3_blueprint.py`: expõe listas + `ativos_criados` + `total_linhas` no JSON
+- `operacoes_v2.html`: badges de tickers importados, ativos novos (destaque verde), erros e avisos
+- 3 testes em `test_import_b3_idempotencia.py`
+
+---
+
 ### Feat — NEW-14: Dashboard Planos de Venda + gatilhos (30/06/2026)
 
 **Problema:** APIs `/api/plano-venda/dashboard`, `/verificar-gatilhos` e `/estatisticas` existiam no backend mas não eram consumidas pelo frontend.

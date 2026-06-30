@@ -1,11 +1,12 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 30/06/2026
-> **Status:** ✅ **NEW-14 — Dashboard Planos de Venda + gatilhos concluído**
-> **Versão:** v0.9.39
+> **Status:** ✅ **FEAT-009 — Import B3 lista tickers importados concluído**
+> **Versão:** v0.9.40
 
 ### 🔧 Últimas entregas (30/06/2026)
-- **NEW-14 ✅ CONCLUÍDO:** Aba Venda em `planos_v2.html` integrada com `GET /api/plano-venda/dashboard`, `/verificar-gatilhos` e `/estatisticas` — KPIs, gatilhos disparados, próximas datas limite, breakdown por tipo. Rota `/planos-venda/dashboard`. 5 novos testes. Suite: **626 passed** (baseline +5).
+- **FEAT-009 ✅ CONCLUÍDO:** Import B3 retorna `tickers_importados` e `ativos_novos` na API; `operacoes_v2.html` exibe badges clicáveis + ativos criados automaticamente. 3 novos testes. Suite: **629 passed** (baseline +3).
+- **NEW-14 ✅ CONCLUÍDO:** Aba Venda em `planos_v2.html` integrada com dashboard, gatilhos e estatísticas. 5 novos testes. Suite: **626 passed**.
 - **NEW-13 ✅ CONCLUÍDO:** `planos_v2.html` integrado com `GET /api/plano-compra/dashboard` — KPIs (planos ativos, aporte mensal, total investido, progresso médio, desvio da meta), painel Próximos Aportes, fallback para listagem. Backend: `progresso_medio` + `desvio_meta_percentual` no resumo. Rota `/planos-compra/dashboard`. 2 novos testes. Suite: **621 passed** (baseline +2).
 - **NEW-03 ✅ CONCLUÍDO:** `get_distribuicao_classes()` e `get_distribuicao_setores()` implementados em `portfolio_service.py` (endpoints existiam sem service). `alocacao_v2.html` com abas Por Classe | Por Segmento. 7 novos testes. Suite: **619 passed** (baseline +7).
 - **REBALANCE-001 ✅ CONCLUÍDO:** Tabela `meta_alocacao` (migration `20260630_1200`) + model + schema. `rebalance_service.py`: metas (upsert), desvio (atual vs target), sugestões (comprar/vender). 3 endpoints novos em `portfolio_blueprint`: `GET/PUT /api/portfolios/meta-alocacao`, `GET /api/portfolios/rebalanceamento/sugestao`. `analise_service.analisar_performance_portfolio` delega para `rebalance_service` — `/api/performance/desvio-alocacao` retorna dados reais. `alocacao_v2.html` reformulada: editor de metas, barras com marcador de target, tabela com Desvio/Ajuste R$, painel sugestões. 19 novos testes. Suite: **612 passed, 3 failed pré-existentes, 6 skipped**.

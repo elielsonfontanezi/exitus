@@ -59,6 +59,54 @@ class ImportB3Service:
             'Venda': TipoTransacao.VENDA
         }
 
+    def _init_resultado_tracking(self, resultado: Dict) -> None:
+        resultado.setdefault('tickers_importados', [])
+        resultado.setdefault('ativos_novos', [])
+        resultado.setdefault('avisos', [])
+
+    def _registrar_ticker_importado(self, resultado: Dict, ticker: str) -> None:
+        self._init_resultado_tracking(resultado)
+        ticker = (ticker or '').upper().strip()
+        if ticker and ticker not in resultado['tickers_importados']:
+            resultado['tickers_importados'].append(ticker)
+
+    def _merge_tracking(self, dest: Dict, src: Dict) -> None:
+        self._init_resultado_tracking(dest)
+        if not src:
+            return
+        self._init_resultado_tracking(src)
+        for ticker in src.get('tickers_importados', []):
+            self._registrar_ticker_importado(dest, ticker)
+        for ticker in src.get('ativos_novos', []):
+            if ticker not in dest['ativos_novos']:
+                dest['ativos_novos'].append(ticker)
+        for aviso in src.get('avisos', []):
+            if aviso not in dest['avisos']:
+                dest['avisos'].append(aviso)
+
+    def _consolidar_resposta(self, resultado: Dict, **campos) -> Dict:
+        """Monta dict de resposta padronizado para API e frontend."""
+        self._init_resultado_tracking(resultado)
+        processadas = campos.get('processadas', resultado.get('processadas', 0))
+        ignoradas = campos.get('ignoradas', resultado.get('ignoradas', 0))
+        avisos = list(campos.get('avisos', resultado.get('avisos', [])))
+        duplicatas = resultado.get('duplicatas_lista', [])
+        for msg in duplicatas[:5]:
+            if msg not in avisos:
+                avisos.append(msg)
+        return {
+            'transacoes_criadas': campos.get('transacoes_criadas', 0),
+            'proventos_criados': campos.get('proventos_criados', 0),
+            'eventos_criados': campos.get('eventos_criados', 0),
+            'ativos_criados': resultado.get('ativos_criados', 0),
+            'tickers_importados': sorted(resultado.get('tickers_importados', [])),
+            'ativos_novos': sorted(resultado.get('ativos_novos', [])),
+            'erros': resultado.get('erros_lista', []),
+            'avisos': avisos[:10],
+            'processadas': processadas,
+            'ignoradas': ignoradas,
+        }
+
     def processar_arquivo(self, file_path: str, usuario_id: str) -> Dict:
         """
         Método unificado que detecta o tipo de arquivo B3 e processa automaticamente.
@@ -94,30 +142,25 @@ class ImportB3Service:
                     negociacoes = self._parse_negociacoes_formato_movimentacoes(file_path)
                     resultado = self.importar_negociacoes(negociacoes, sobrescrever=True, dry_run=False)
                     
-                    return {
-                        'transacoes_criadas': resultado['sucesso'],
-                        'proventos_criados': 0,
-                        'eventos_criados': 0,
-                        'erros': resultado.get('erros_lista', []),
-                        'avisos': resultado.get('duplicatas_lista', [])[:5],
-                        'processadas': resultado['sucesso'],
-                        'ignoradas': resultado.get('duplicatas_ignoradas', 0)
-                    }
+                    return self._consolidar_resposta(
+                        resultado,
+                        transacoes_criadas=resultado['sucesso'],
+                        processadas=resultado['sucesso'],
+                        ignoradas=resultado.get('duplicatas_ignoradas', 0),
+                    )
                 else:
                     # Arquivo de Movimentações (Proventos)
                     logger.info("Tipo detectado: Movimentações (Proventos)")
                     movimentacoes = self.parse_movimentacoes(file_path)
                     resultado = self.importar_movimentacoes(movimentacoes, sobrescrever=True, dry_run=False)
                 
-                return {
-                    'transacoes_criadas': 0,
-                    'proventos_criados': resultado['proventos']['sucesso'],
-                    'eventos_criados': resultado['eventos_custodia']['sucesso'],
-                    'erros': resultado.get('erros_lista', []),
-                    'avisos': resultado.get('duplicatas_lista', [])[:5],  # Limitar avisos
-                    'processadas': resultado['sucesso'],
-                    'ignoradas': resultado.get('duplicatas_ignoradas', 0)
-                }
+                return self._consolidar_resposta(
+                    resultado,
+                    proventos_criados=resultado['proventos']['sucesso'],
+                    eventos_criados=resultado['eventos_custodia']['sucesso'],
+                    processadas=resultado['sucesso'],
+                    ignoradas=resultado.get('duplicatas_ignoradas', 0),
+                )
                 
             elif 'Tipo de Movimentação' in colunas or 'Código de Negociação' in colunas:
                 # Arquivo de Negociações (Transações)
@@ -125,15 +168,12 @@ class ImportB3Service:
                 negociacoes = self.parse_negociacoes(file_path)
                 resultado = self.importar_negociacoes(negociacoes, sobrescrever=True, dry_run=False)
                 
-                return {
-                    'transacoes_criadas': resultado['sucesso'],
-                    'proventos_criados': 0,
-                    'eventos_criados': 0,
-                    'erros': resultado.get('erros_lista', []),
-                    'avisos': resultado.get('duplicatas_lista', [])[:5],
-                    'processadas': resultado['sucesso'],
-                    'ignoradas': resultado.get('duplicatas_ignoradas', 0)
-                }
+                return self._consolidar_resposta(
+                    resultado,
+                    transacoes_criadas=resultado['sucesso'],
+                    processadas=resultado['sucesso'],
+                    ignoradas=resultado.get('duplicatas_ignoradas', 0),
+                )
             else:
                 raise ValueError(f"Tipo de arquivo não reconhecido. Colunas encontradas: {colunas}")
                 
@@ -346,7 +386,10 @@ class ImportB3Service:
             'proventos': {'sucesso': 0, 'erros': 0, 'erros_lista': [], 'duplicatas_ignoradas': 0, 'duplicatas_lista': []},
             'eventos_custodia': {'sucesso': 0, 'erros': 0, 'erros_lista': [], 'duplicatas_ignoradas': 0},
             'ativos_criados': 0,
-            'corretoras_criadas': 0
+            'corretoras_criadas': 0,
+            'tickers_importados': [],
+            'ativos_novos': [],
+            'avisos': [],
         }
         
         try:
@@ -382,7 +425,14 @@ class ImportB3Service:
                 resultado['proventos'].get('duplicatas_ignoradas', 0) +
                 resultado['eventos_custodia'].get('duplicatas_ignoradas', 0)
             )
+            resultado['duplicatas_lista'] = (
+                resultado['proventos'].get('duplicatas_lista', []) +
+                resultado['eventos_custodia'].get('duplicatas_lista', [])
+            )
             resultado['dry_run'] = dry_run
+
+            self._merge_tracking(resultado, resultado.get('proventos', {}))
+            self._merge_tracking(resultado, resultado.get('eventos_custodia', {}))
 
             if dry_run:
                 db.session.rollback()
@@ -415,6 +465,9 @@ class ImportB3Service:
             'duplicatas_lista': [],
             'ativos_criados': 0,
             'corretoras_criadas': 0,
+            'tickers_importados': [],
+            'ativos_novos': [],
+            'avisos': [],
             'dry_run': dry_run
         }
 
@@ -477,6 +530,7 @@ class ImportB3Service:
 
                     db.session.add(transacao)
                     resultado['sucesso'] += 1
+                    self._registrar_ticker_importado(resultado, ticker)
 
                 except Exception as e:
                     resultado['erros'] += 1
@@ -639,6 +693,9 @@ class ImportB3Service:
             db.session.add(ativo)
             db.session.flush()  # Obter ID sem commit
             resultado['ativos_criados'] += 1
+            self._init_resultado_tracking(resultado)
+            if ticker not in resultado['ativos_novos']:
+                resultado['ativos_novos'].append(ticker)
 
             # Propagar aviso de revisão (quando heurística é incerta)
             if classificacao.get('aviso'):
@@ -691,7 +748,10 @@ class ImportB3Service:
             'duplicatas_ignoradas': 0,
             'duplicatas_lista': [],
             'ativos_criados': 0,
-            'corretoras_criadas': 0
+            'corretoras_criadas': 0,
+            'tickers_importados': [],
+            'ativos_novos': [],
+            'avisos': [],
         }
 
         try:
@@ -745,6 +805,7 @@ class ImportB3Service:
 
                     db.session.add(provento)
                     resultado['sucesso'] += 1
+                    self._registrar_ticker_importado(resultado, ticker)
 
                 except Exception as e:
                     resultado['erros'] += 1
@@ -764,7 +825,12 @@ class ImportB3Service:
         resultado = {
             'sucesso': 0,
             'erros': 0,
-            'erros_lista': []
+            'erros_lista': [],
+            'ativos_criados': 0,
+            'corretoras_criadas': 0,
+            'tickers_importados': [],
+            'ativos_novos': [],
+            'avisos': [],
         }
         
         tipos_custodia = ['Transferência - Liquidação']
@@ -793,6 +859,7 @@ class ImportB3Service:
                     
                     db.session.add(evento)
                     resultado['sucesso'] += 1
+                    self._registrar_ticker_importado(resultado, ticker)
                     logger.info(f"Evento de custódia criado: {ticker} - {mov['data']}")
                     
                 except Exception as e:

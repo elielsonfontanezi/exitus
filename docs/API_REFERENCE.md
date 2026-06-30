@@ -1222,7 +1222,31 @@ Verifica reconciliação de um ativo específico.
 | `file` | File | Arquivo `.xlsx` ou `.csv` exportado do Portal B3 |
 | `dry_run` | bool | `true` = preview sem persistir (default: `false`) |
 
-**Resposta importação movimentações:**
+| POST | `/api/import/b3` | Import unificado (detecta negociações ou movimentações automaticamente) |
+
+**Resposta `POST /api/import/b3`:**
+```json
+{
+  "success": true,
+  "data": {
+    "transacoes_criadas": 2,
+    "proventos_criados": 0,
+    "eventos_criados": 0,
+    "ativos_criados": 1,
+    "tickers_importados": ["PETR4", "VALE3"],
+    "ativos_novos": ["VALE3"],
+    "erros": [],
+    "avisos": [],
+    "resumo": {
+      "processadas": 2,
+      "ignoradas": 0,
+      "total_linhas": 2
+    }
+  }
+}
+```
+
+**Resposta importação movimentações (legado `/api/import/movimentacoes`):**
 ```json
 {
   "success": true,

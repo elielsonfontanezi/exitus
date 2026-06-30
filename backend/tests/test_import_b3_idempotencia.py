@@ -322,3 +322,65 @@ class TestSanitizacaoNaImportacao:
             assert True
         finally:
             _cleanup_por_hash(hash_val)
+
+
+# ---------------------------------------------------------------------------
+# Testes: FEAT-009 — tracking de tickers importados
+# ---------------------------------------------------------------------------
+
+class TestTrackingTickersImportados:
+    def test_negociacao_registra_ticker(self, app):
+        svc = _service('track_neg.xlsx', app)
+        codigo = f'ABCD{uuid.uuid4().int % 10}'
+        neg = _make_negociacao(codigo=codigo)
+        hash_val = svc._gerar_hash_linha(neg)
+
+        try:
+            r = svc.importar_negociacoes([neg])
+            assert r['sucesso'] == 1
+            assert codigo in r['tickers_importados']
+            resp = svc._consolidar_resposta(
+                r,
+                transacoes_criadas=r['sucesso'],
+                processadas=r['sucesso'],
+                ignoradas=r.get('duplicatas_ignoradas', 0),
+            )
+            assert codigo in resp['tickers_importados']
+        finally:
+            _cleanup_por_hash(hash_val)
+            Ativo.query.filter_by(ticker=codigo).delete()
+            _db.session.commit()
+
+    def test_provento_registra_ativo_novo(self, app):
+        svc = _service('track_prov.xlsx', app)
+        ticker = f'WXYZ{uuid.uuid4().int % 9 + 1}'
+        mov = _make_movimentacao(produto=ticker)
+        hash_val = svc._gerar_hash_linha(mov)
+
+        try:
+            Ativo.query.filter_by(ticker=ticker).delete()
+            _db.session.commit()
+            r = svc.importar_movimentacoes([mov])
+            assert r['proventos']['sucesso'] == 1
+            assert ticker in r['tickers_importados']
+            assert ticker in r['ativos_novos']
+            assert r['ativos_criados'] >= 1
+        finally:
+            _cleanup_por_hash(hash_val)
+            Ativo.query.filter_by(ticker=ticker).delete()
+            _db.session.commit()
+
+    def test_duplicata_nao_repete_ticker(self, app):
+        svc = _service('track_dup.xlsx', app)
+        neg = _make_negociacao(codigo=f'DUP{uuid.uuid4().int % 10}')
+        hash_val = svc._gerar_hash_linha(neg)
+
+        try:
+            r1 = svc.importar_negociacoes([neg])
+            r2 = svc.importar_negociacoes([neg])
+            assert r1['sucesso'] == 1
+            assert r2['sucesso'] == 0
+            assert len(r1['tickers_importados']) == 1
+            assert r2['tickers_importados'] == []
+        finally:
+            _cleanup_por_hash(hash_val)
