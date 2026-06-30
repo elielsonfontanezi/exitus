@@ -1,7 +1,7 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 51/54 GAPs (94%) + 1 débito técnico (HIST-001) + HIST-002 planejado | **Testes:** 565/574 passando (98.4%) 🟡 — 3 failed pré-existentes, 6 skipped  
+> **Progresso Backend:** 51/54 GAPs (94%) + 1 débito técnico (HIST-001) + HIST-002 planejado | **Testes:** 567/574 passando (98.8%) 🟡 — 3 failed pré-existentes, 6 skipped  
 > **Frontend V2.0:** 13 OK, 23 PARCIAL, 0 QUEBRADO (64%) � | **UX Evolution:** 13 OK, 23 PARCIAL, 0 QUEBRADO (64%) � | **Frontend API-Driven:** ✅ 8/8 Sprints Concluídos (09/06/2026) | **UI Consistency:** ✅ Menu limpo (15/06/2026)  
 > **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.34 | **Última atualização:** 29/06/2026
 
@@ -217,7 +217,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | **BUG-VAL-003** | Componente Margem do Score incoerente (resolvido por BUG-VAL-004) | ♻️ Absorvido |
 | **BUG-VAL-004** | Unificar preco_teto (estático) e pt_medio (calculado) | 🔴 Alta |
 | **BUG-VAL-005** | Metodologia de agregação: padrão de mercado (valuation_service.py) | 🔴 Alta |
-| **BUG-VAL-006** | FII: fórmula cap_rate incorreta (1/cap_rate) | 🔴 Alta |
+| **BUG-VAL-006** | FII: fórmula cap_rate incorreta (1/cap_rate) | ✅ Concluído (30/06/2026) |
 | REBALANCE-001 | Rebalanceamento automático | 📋 Planejado |
 | CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
@@ -557,26 +557,22 @@ Todas as abordagens de mercado chegam a **R$ 46-47** — valor razoável para IT
 
 ---
 
-### BUG-VAL-006 — FII: fórmula cap_rate incorreta (🔴 Alta)
+### BUG-VAL-006 — FII: fórmula cap_rate corrigida (✅ Concluído 30/06/2026)
 
-**Problema identificado (28/06/2026 — análise crítica do plano de valuation):**
-- Linha 95 em `calculos_blueprint.py`: `pt_cap_rate = 1 / cap_rate`
-- Para `cap_rate = 0.089` → resultado = R$ 11,24 (sem sentido dimensional)
-- A fórmula `1/cap_rate` não tem relação com o preço por cota do FII
+**Problema (identificado 28/06/2026):**
+- `calculos_blueprint.py`: `pt_cap_rate = 1 / cap_rate` → para cap=0.089 gerava R$ 11,24 (sem dimensão)
 
-**Fórmula correta:**
+**Solução aplicada (30/06/2026):**
 ```python
-# Preço teto via Cap Rate (padrão de mercado para FIIs)
 dy_anual = dy * preco_atual          # dividendo anual por cota (R$)
 pt_cap_rate = dy_anual / cap_rate    # preço teto implícito
-# Ex: HGLG11 → dy=8,2%, preco=152,30, cap=8,9%
-# pt = (0.082 × 152.30) / 0.089 = 12.49 / 0.089 = R$ 140,22
+# HGLG11: dy=8,2%, preco=152,30, cap=8,9% → pt=R$ 140,22 ✅
 ```
+- Guard adicionado: `if cap_rate > 0 and dy > 0` (pt=0 se dados ausentes)
+- 2 novos testes em `tests/test_calculos.py` (regressão FII + edge-case dy=None)
+- Suíte completa: **567 passed, 3 failed (pré-existentes), 6 skipped** — sem regressão
 
-**Arquivo a modificar:**
-- `backend/app/blueprints/calculos_blueprint.py:94-100`
-
-**Prioridade:** Alta | **Risco:** Baixo (FIIs não afetam cálculos de ações)
+**Próximo:** BUG-VAL-005 (valuation_service.py) → BUG-VAL-004 (unificação preco_teto)
 
 | **DIVCALENDAR-001** | Calendário de dividendos | ✅ Concluído (10/03/2026) |
 | **BLUEPRINT-CONSOLIDATION-001** | Consolidação de blueprints | ✅ Concluído (10/03/2026) |
@@ -774,5 +770,5 @@ Documentos históricos de roadmaps anteriores estão em `docs/archive/`:
 ---
 
 *Última atualização: 29/06/2026*  
-*Próxima revisão: Após BUG-VAL-006/005/004*  
+*Próxima revisão: Após BUG-VAL-005/004*  
 *Responsável: Elielson Fontanezi + Cursor Agent*

@@ -264,7 +264,7 @@ A metodologia de valuation do Exitus está em transição para alinhar com o pad
 | Dois conceitos de "preço teto" (`ativo.preco_teto` estático vs `pt_medio` calculado) | Podem aparecer duas margens diferentes | Em correção: unificação para usar sempre `pt_medio` |
 | EPS/FCF não populados para todos os ativos | Graham e DCF usam valores fallback (2,50/5,0) | Em correção: integração com yfinance |
 | `parametros_macro` vazia | Todos os mercados usam parâmetros hardcoded | Em correção: seed de parâmetros por mercado |
-| Fórmula de FII `1 / cap_rate` | Resultado dimensionalmente incorreto | Em correção: `dividendo_anual / cap_rate` |
+| Fórmula de FII `1 / cap_rate` | Resultado dimensionalmente incorreto | ✅ Corrigido (BUG-VAL-006 — 30/06/2026): `dy_anual / cap_rate` |
 | Média simples dos métodos | Pode ser distorcida por outliers | Em correção: mediana ponderada + IQR |
 
 > **Recomendação:** use o card de "Valor Justo" como referência principal, mas sempre confira a tabela de métodos para identificar outliers. Um valor justo muito distante do preço atual (ex: ITUB4 com valor justo R$ 499 vs preço R$ 42) indica que algum método está usando dados incorretos — geralmente EPS/FCF em branco.

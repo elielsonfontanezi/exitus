@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — BUG-VAL-006: Corrigir fórmula Cap Rate para FIIs/REITs (30/06/2026)
+
+**Problema:**
+- `calculos_blueprint.py` usava `pt_cap_rate = 1 / cap_rate` para FIIs/REITs
+- Para `cap_rate=0.089`: resultado era R$ 11,24 — sem dimensão financeira (não é preço por cota)
+
+**Solução:**
+- Fórmula corrigida: `dy_anual = dy * preco_atual; pt_cap_rate = dy_anual / cap_rate`
+- Guard defensivo: `if cap_rate > 0 and dy > 0` (retorna `0.0` se dados ausentes)
+- 2 novos testes em `tests/test_calculos.py`:
+  - `test_preco_teto_fii_formula_dy_anual`: valida pt_medio coerente com `dy_anual/cap_rate`
+  - `test_preco_teto_fii_sem_dividend_yield`: documenta comportamento com dy=None (fallback 0.06)
+- Suíte completa: 567 passed, 3 failed pré-existentes, 6 skipped (sem regressão)
+- Escopo limitado: ações, RF e cripto não alterados; BUG-VAL-004/005 continuam abertos
+
+**Arquivos:**
+- `backend/app/blueprints/calculos_blueprint.py`
+- `backend/tests/test_calculos.py`
+
+---
+
 ### Docs — CURSORRULES-001.3: Fechamento migração Cursor (29/06/2026)
 
 **Problema:**

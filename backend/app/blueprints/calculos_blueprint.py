@@ -91,9 +91,15 @@ def calcular_preco_teto(ticker):
         pt_medio = sum([v["pt"] for v in metodos.values()]) / 4
 
     elif tipo in ['fii', 'reit']:
-        # FIIs: Cap Rate regional
+        # FIIs/REITs: Preço Teto = dividendo anual por cota / cap_rate regional
+        # Fórmula: pt = (dy * preco_atual) / cap_rate_fii
+        # Exemplo: HGLG11 dy=8,2% preco=152,30 cap=8,9% → pt=(0.082×152.30)/0.089=R$140,22
         cap_rate = params['cap_rate_fii']
-        pt_cap_rate = 1 / cap_rate
+        if cap_rate > 0 and dy > 0:
+            dy_anual = dy * preco_atual
+            pt_cap_rate = dy_anual / cap_rate
+        else:
+            pt_cap_rate = 0.0
 
         metodos = {
             "cap_rate": {"pt": round(pt_cap_rate, 2), "cap_rate": f"{cap_rate:.1%}"}

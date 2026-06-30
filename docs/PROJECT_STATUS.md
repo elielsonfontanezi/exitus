@@ -1,10 +1,13 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 29/06/2026
-> **Status:** ✅ **BUG-VAL-001 + SEED-MACRO-001 + VALUATION-002 — Valuation Dia 1 Concluído**
-> **Versão:** v0.9.34
+> **Data:** 30/06/2026
+> **Status:** ✅ **BUG-VAL-006 — Fórmula Cap Rate FII corrigida (dy_anual/cap_rate)**
+> **Versão:** v0.9.35
 
-### 🔧 Últimas correções (29/06/2026)
+### 🔧 Últimas correções (30/06/2026)
+- **BUG-VAL-006 ✅ CONCLUÍDO:** Fórmula `1/cap_rate` substituída por `dy_anual/cap_rate` para FIIs/REITs em `calculos_blueprint.py`. Guard defensivo adicionado. 2 novos testes em `test_calculos.py`. Suite: **567 passed, 3 failed pré-existentes, 6 skipped**.
+
+### 🔧 Correções anteriores (29/06/2026)
 - **CURSORRULES-001.3 ✅ CONCLUÍDO:** `docs/MODULES.md` stub; links mortos corrigidos; PERSONAS deduplicado; AI_OPERATIONS v1.3 modelos Cursor; INDEX + MULTICLIENTE; limpeza refs legacy.
 - **CURSORRULES-001.2 ✅ CONCLUÍDO:** REGRA #2 Plan/Agent; PERSONAS/INDEX alinhados; AI_OPERATIONS v1.2 (commit template, nota modelos Cursor, validação <=200 linhas).
 - **CURSORRULES-001.1 ✅ CONCLUÍDO:** `.cursorrules` v3.1 — seção Plano de Controle (ROADMAP, AUDITORIA_FUNCIONAL, PROJECT_STATUS); REGRA #6 expandida; índices em AI_OPERATIONS; PERSONAS alinhado.
