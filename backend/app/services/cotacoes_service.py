@@ -576,3 +576,67 @@ class CotacoesService:
             cb.record_failure()
             logger.warning("⚠️ yfinance historico falhou: %s", e)
             return []
+
+    @staticmethod
+    def get_saude_cotacoes(ttl_minutes: int = 15, limite_lista: int = 100) -> dict:
+        """NEW-04: diagnóstico de cotações desatualizadas ou ausentes."""
+        from app.models.ativo import Ativo
+
+        now = datetime.now()
+        ttl_seconds = ttl_minutes * 60
+        ativos = Ativo.query.filter(Ativo.ativo.is_(True)).order_by(Ativo.ticker).all()
+
+        atualizados = 0
+        desatualizados = []
+        sem_cotacao = []
+
+        for ativo in ativos:
+            item = {
+                'ticker': ativo.ticker,
+                'nome': ativo.nome,
+                'mercado': ativo.mercado,
+                'preco_atual': float(ativo.preco_atual) if ativo.preco_atual else None,
+                'data_ultima_cotacao': (
+                    ativo.data_ultima_cotacao.isoformat() if ativo.data_ultima_cotacao else None
+                ),
+            }
+            if not ativo.preco_atual or float(ativo.preco_atual) <= 0:
+                sem_cotacao.append(item)
+                continue
+
+            if not ativo.data_ultima_cotacao:
+                desatualizados.append({**item, 'motivo': 'nunca_atualizado', 'idade_minutos': None})
+                continue
+
+            delta = now - ativo.data_ultima_cotacao.replace(tzinfo=None)
+            idade_min = int(delta.total_seconds() / 60)
+            if delta.total_seconds() > ttl_seconds:
+                desatualizados.append({
+                    **item,
+                    'motivo': 'cache_expirado',
+                    'idade_minutos': idade_min,
+                })
+            else:
+                atualizados += 1
+
+        total = len(ativos)
+        problemas = len(desatualizados) + len(sem_cotacao)
+        if total == 0 or problemas == 0:
+            status = 'ok'
+        elif total > 0 and problemas / total >= 0.5:
+            status = 'critical'
+        else:
+            status = 'degraded'
+
+        return {
+            'status': status,
+            'cache_ttl_minutos': ttl_minutes,
+            'resumo': {
+                'total_ativos': total,
+                'atualizados': atualizados,
+                'desatualizados': len(desatualizados),
+                'sem_cotacao': len(sem_cotacao),
+            },
+            'desatualizados': desatualizados[:limite_lista],
+            'sem_cotacao': sem_cotacao[:limite_lista],
+        }

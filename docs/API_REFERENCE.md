@@ -835,17 +835,42 @@ Response 200:
 ```
 
 ### GET /api/cotacoes/health
-Health check do módulo de cotações (não requer JWT).
+Health check do módulo de cotações (não requer JWT). Query opcional: `ttl_minutos` (padrão 15).
 
 Response 200:
 ```json
 {
   "status": "ok",
   "module": "cotacoes_m7.5",
-  "cache_ttl": "15 minutos",
-  "providers": ["brapi.dev (FREE tier)", "yfinance", "alphavantage", "database_cache"]
+  "cache_ttl": "15 minutos (Prompt Mestre)",
+  "providers": ["brapi.dev (FREE tier)", "yfinance", "alphavantage", "database_cache"],
+  "resumo": {
+    "total_ativos": 55,
+    "atualizados": 40,
+    "desatualizados": 10,
+    "sem_cotacao": 5
+  },
+  "desatualizados": [
+    {
+      "ticker": "PETR4",
+      "nome": "Petrobras PN",
+      "mercado": "BR",
+      "preco_atual": 36.5,
+      "data_ultima_cotacao": "2026-06-30T10:00:00",
+      "motivo": "cache_expirado",
+      "idade_minutos": 120
+    }
+  ],
+  "sem_cotacao": []
 }
 ```
+
+`status`: `ok` | `degraded` | `critical` (≥50% dos ativos com problemas).
+
+### GET /api/cotacoes/anomalias
+Detecta variações de preço ≥ limiar sem evento corporativo. Requer JWT.
+
+Query params: `limiar` (percentual, padrão 20), `ativo_id`, `data_ref` (YYYY-MM-DD).
 
 ---
 

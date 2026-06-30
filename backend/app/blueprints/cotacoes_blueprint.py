@@ -180,11 +180,18 @@ def listar_anomalias():
 
 @cotacoes_bp.route('/health', methods=['GET'])
 def cotacoes_health():
+    ttl = request.args.get('ttl_minutos', 15, type=int)
+    if ttl < 1 or ttl > 1440:
+        ttl = 15
+    saude = CotacoesService.get_saude_cotacoes(ttl_minutes=ttl)
     return jsonify({
-        'status': 'ok',
+        'status': saude['status'],
         'module': 'cotacoes_m7.5',
-        'cache_ttl': '15 minutos (Prompt Mestre)',
+        'cache_ttl': f'{ttl} minutos (Prompt Mestre)',
         'providers': ['brapi.dev (FREE tier)', 'yfinance', 'alphavantage', 'database_cache'],
         'update_trigger': 'on_demand (somente quando usuário acessa tela)',
         'anomaly_detection': 'EXITUS-ANOMALY-001 — GET /api/cotacoes/anomalias',
+        'resumo': saude['resumo'],
+        'desatualizados': saude['desatualizados'],
+        'sem_cotacao': saude['sem_cotacao'],
     })

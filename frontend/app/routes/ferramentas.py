@@ -46,3 +46,10 @@ def reconciliacao():
 def screener():
     """Screener de Ativos — Alpine.js API-driven"""
     return render_template('ferramentas/screener_v2.html')
+
+
+@bp.route('/cotacoes', methods=['GET'])
+@login_required
+def cotacoes_saude():
+    """Saúde das Cotações — APIs: GET /api/cotacoes/health, /anomalias"""
+    return render_template('ferramentas/cotacoes_v2.html')

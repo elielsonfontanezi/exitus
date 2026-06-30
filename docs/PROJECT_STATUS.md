@@ -1,11 +1,12 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 30/06/2026
-> **Status:** ✅ **FEAT-009 — Import B3 lista tickers importados concluído**
-> **Versão:** v0.9.40
+> **Status:** ✅ **NEW-04 — Saúde das Cotações concluído**
+> **Versão:** v0.9.41
 
 ### 🔧 Últimas entregas (30/06/2026)
-- **FEAT-009 ✅ CONCLUÍDO:** Import B3 retorna `tickers_importados` e `ativos_novos` na API; `operacoes_v2.html` exibe badges clicáveis + ativos criados automaticamente. 3 novos testes. Suite: **629 passed** (baseline +3).
+- **NEW-04 ✅ CONCLUÍDO:** Tela `/ferramentas/cotacoes` com health enriquecido + anomalias; KPIs, abas desatualizados/sem cotação/anomalias; refresh por ticker. 3 novos testes. Suite: **632 passed** (baseline +3).
+- **FEAT-009 ✅ CONCLUÍDO:** Import B3 retorna `tickers_importados` e `ativos_novos`; badges em `operacoes_v2.html`. 3 novos testes. Suite: **629 passed**.
 - **NEW-14 ✅ CONCLUÍDO:** Aba Venda em `planos_v2.html` integrada com dashboard, gatilhos e estatísticas. 5 novos testes. Suite: **626 passed**.
 - **NEW-13 ✅ CONCLUÍDO:** `planos_v2.html` integrado com `GET /api/plano-compra/dashboard` — KPIs (planos ativos, aporte mensal, total investido, progresso médio, desvio da meta), painel Próximos Aportes, fallback para listagem. Backend: `progresso_medio` + `desvio_meta_percentual` no resumo. Rota `/planos-compra/dashboard`. 2 novos testes. Suite: **621 passed** (baseline +2).
 - **NEW-03 ✅ CONCLUÍDO:** `get_distribuicao_classes()` e `get_distribuicao_setores()` implementados em `portfolio_service.py` (endpoints existiam sem service). `alocacao_v2.html` com abas Por Classe | Por Segmento. 7 novos testes. Suite: **619 passed** (baseline +7).

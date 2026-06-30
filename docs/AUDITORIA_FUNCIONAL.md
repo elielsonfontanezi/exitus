@@ -1158,7 +1158,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 | NEW-01 | **Projeções Patrimoniais** | `/analises/projecoes` | `/api/projecoes/*` | Simular crescimento do patrimônio com aportes, juros e inflação — substitui o Simulador client-side atual |
 | NEW-02 | **Métricas de Risco** | `/analises/risco` | `/api/portfolios/metricas-risco`, `/api/performance/*` | Sharpe, Drawdown máximo, VaR, correlação entre ativos |
 | ~~NEW-03~~ | ~~**Distribuição Detalhada**~~ | Expandir `/analises/alocacao` | `/api/portfolios/distribuicao/classes`, `/api/portfolios/distribuicao/setores` | ✅ IMPLEMENTADO (30/06/2026) — abas classe/segmento em alocacao_v2 |
-| NEW-04 | **Saúde das Cotações** | `/ferramentas/cotacoes` | `/api/cotacoes/anomalias`, `/api/cotacoes/health` | Detectar ativos com cotações desatualizadas ou inconsistentes |
+| ~~NEW-04~~ | ~~**Saúde das Cotações**~~ | `/ferramentas/cotacoes` | `/api/cotacoes/anomalias`, `/api/cotacoes/health` | **✅ RESOLVIDO (30/06/2026):** KPIs + abas desatualizados/anomalias; health enriquecido com listas |
 | NEW-05 | **Câmbio e Multimoeda** | Expandir Dashboard ou `/carteira/cambio` | `/api/cambio/converter`, `/api/cambio/historico`, `/api/cambio/pares` | Visualizar patrimônio em USD/EUR; histórico de taxas |
 | NEW-06 | **Indicadores Macroeconômicos** | Expandir Dashboard | `/api/parametros-macro/*` | CDI, Ibovespa, IPCA, Selic dinâmicos — resolve BUG-005 |
 | NEW-07 | **Fontes de Dados** | `/configuracoes/fontes-dados` | `/api/fontes-dados/*` | Gerenciar provedores de cotação (B3, Yahoo, etc.) — tela administrativa |

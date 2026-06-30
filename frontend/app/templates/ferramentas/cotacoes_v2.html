@@ -1,0 +1,295 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Saúde das Cotações{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Monitoramento de cotações desatualizadas e variações anômalas de preço</p>{% endblock %}
+
+{% block page_actions %}
+<button class="btn-exitus btn-exitus-primary" @click="atualizar()" :disabled="loading">
+    <i class="fas fa-sync-alt" :class="{'fa-spin': loading}"></i>
+    <span x-text="loading ? 'Atualizando...' : 'Atualizar'"></span>
+</button>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading && saude.resumo">
+    <div class="kpi-card" :style="saude.status === 'ok' ? 'border-left:3px solid #16a34a' : saude.status === 'critical' ? 'border-left:3px solid #dc2626' : 'border-left:3px solid #d97706'">
+        <div class="kpi-card-label">Status</div>
+        <div class="kpi-card-value" x-text="labelStatus(saude.status)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos Monitorados</div>
+        <div class="kpi-card-value" x-text="saude.resumo?.total_ativos || 0"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Atualizados</div>
+        <div class="kpi-card-value positivo" x-text="saude.resumo?.atualizados || 0"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Desatualizados</div>
+        <div class="kpi-card-value" :class="(saude.resumo?.desatualizados || 0) > 0 ? 'negativo' : ''" x-text="saude.resumo?.desatualizados || 0"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Sem Cotação</div>
+        <div class="kpi-card-value" :class="(saude.resumo?.sem_cotacao || 0) > 0 ? 'negativo' : ''" x-text="saude.resumo?.sem_cotacao || 0"></div>
+    </div>
+    <div class="kpi-card" x-show="anomalias.total > 0">
+        <div class="kpi-card-label">Anomalias</div>
+        <div class="kpi-card-value negativo" x-text="anomalias.total"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <span class="filter-label">Visualizar:</span>
+    <button class="btn-exitus" :class="tab === 'desatualizados' ? 'btn-exitus-primary' : 'btn-exitus-ghost'" @click="tab='desatualizados'">
+        Desatualizados (<span x-text="listaDesatualizados().length"></span>)
+    </button>
+    <button class="btn-exitus" :class="tab === 'sem_cotacao' ? 'btn-exitus-primary' : 'btn-exitus-ghost'" @click="tab='sem_cotacao'">
+        Sem Cotação (<span x-text="listaSemCotacao().length"></span>)
+    </button>
+    <button class="btn-exitus" :class="tab === 'anomalias' ? 'btn-exitus-primary' : 'btn-exitus-ghost'" @click="tab='anomalias'">
+        Anomalias (<span x-text="anomalias.total || 0"></span>)
+    </button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:0.5rem;">
+        <label class="filter-label">Limiar anomalia (%):</label>
+        <input type="number" class="filter-input" x-model="limiar" min="5" max="100" step="5" style="max-width:70px;" @change="carregarAnomalias()">
+    </div>
+    <input type="text" class="filter-input" placeholder="Buscar ticker..." x-model="filtro" style="max-width:160px;">
+</div>
+{% endblock %}
+
+{% block page_content %}
+
+<!-- Desatualizados -->
+<div x-show="tab === 'desatualizados'" x-cloak>
+    <div class="section-box" x-show="listaDesatualizados().length > 0">
+        <div class="section-box-title"><i class="fas fa-clock"></i> Cotações Desatualizadas</div>
+        <p style="font-size:0.8rem; color:#6b7280; margin-bottom:1rem;">TTL do cache: 15 minutos — atualização on-demand ao acessar o ativo.</p>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ativo</th>
+                    <th class="col-center">Mercado</th>
+                    <th class="col-right">Preço</th>
+                    <th class="col-center">Última Atualização</th>
+                    <th class="col-right">Idade (min)</th>
+                    <th class="col-center">Motivo</th>
+                    <th class="col-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="a in listaDesatualizados()" :key="a.ticker">
+                    <tr>
+                        <td>
+                            <a :href="'/dashboard/ativo/' + a.ticker" style="text-decoration:none; font-weight:700; color:#a38c65;" x-text="a.ticker"></a>
+                            <div style="font-size:0.75rem; color:#6b7280;" x-text="a.nome"></div>
+                        </td>
+                        <td class="col-center" x-text="a.mercado"></td>
+                        <td class="col-right" x-text="a.preco_atual ? formatMoney(a.preco_atual) : '-'"></td>
+                        <td class="col-center" x-text="formatDateTime(a.data_ultima_cotacao)"></td>
+                        <td class="col-right" x-text="a.idade_minutos != null ? a.idade_minutos : '-'"></td>
+                        <td class="col-center">
+                            <span class="badge badge-warning" style="font-size:0.7rem;" x-text="labelMotivo(a.motivo)"></span>
+                        </td>
+                        <td class="col-center">
+                            <button @click="atualizarTicker(a.ticker)" class="btn-exitus btn-exitus-ghost btn-sm" :disabled="atualizandoTicker === a.ticker">
+                                <i class="fas fa-sync-alt" :class="atualizandoTicker === a.ticker ? 'fa-spin' : ''"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+    <div class="section-box" x-show="listaDesatualizados().length === 0 && !loading">
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="empty-state-title">Nenhuma cotação desatualizada</div>
+            <div class="empty-state-text">Todos os ativos com preço estão dentro do TTL de 15 minutos.</div>
+        </div>
+    </div>
+</div>
+
+<!-- Sem cotação -->
+<div x-show="tab === 'sem_cotacao'" x-cloak>
+    <div class="section-box" x-show="listaSemCotacao().length > 0">
+        <div class="section-box-title"><i class="fas fa-exclamation-triangle"></i> Ativos Sem Cotação</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ativo</th>
+                    <th class="col-center">Mercado</th>
+                    <th class="col-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="a in listaSemCotacao()" :key="a.ticker">
+                    <tr>
+                        <td>
+                            <a :href="'/dashboard/ativo/' + a.ticker" style="text-decoration:none; font-weight:700; color:#a38c65;" x-text="a.ticker"></a>
+                            <div style="font-size:0.75rem; color:#6b7280;" x-text="a.nome"></div>
+                        </td>
+                        <td class="col-center" x-text="a.mercado"></td>
+                        <td class="col-center">
+                            <button @click="atualizarTicker(a.ticker)" class="btn-exitus btn-exitus-ghost btn-sm" :disabled="atualizandoTicker === a.ticker">
+                                <i class="fas fa-sync-alt" :class="atualizandoTicker === a.ticker ? 'fa-spin' : ''"></i> Buscar
+                            </button>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+    <div class="section-box" x-show="listaSemCotacao().length === 0 && !loading">
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="empty-state-title">Todos os ativos têm cotação</div>
+        </div>
+    </div>
+</div>
+
+<!-- Anomalias -->
+<div x-show="tab === 'anomalias'" x-cloak>
+    <div class="section-box" x-show="listaAnomalias().length > 0">
+        <div class="section-box-title"><i class="fas fa-chart-line"></i> Variações Anômalas</div>
+        <p style="font-size:0.8rem; color:#6b7280; margin-bottom:1rem;">
+            Variação ≥ <span x-text="limiar"></span>% entre dois fechamentos consecutivos em historico_preco, sem evento corporativo na janela.
+        </p>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ativo</th>
+                    <th class="col-center">Direção</th>
+                    <th class="col-right">Variação</th>
+                    <th class="col-right">Preço Anterior</th>
+                    <th class="col-right">Preço Atual</th>
+                    <th class="col-center">Data Ref.</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="a in listaAnomalias()" :key="a.ticker + a.data_referencia">
+                    <tr>
+                        <td>
+                            <a :href="'/dashboard/ativo/' + a.ticker" style="text-decoration:none; font-weight:700; color:#a38c65;" x-text="a.ticker"></a>
+                            <div style="font-size:0.75rem; color:#6b7280;" x-text="a.nome"></div>
+                        </td>
+                        <td class="col-center">
+                            <span class="badge" :class="a.direcao === 'alta' ? 'badge-success' : 'badge-danger'" x-text="a.direcao"></span>
+                        </td>
+                        <td class="col-right" style="font-weight:600;" x-text="a.variacao_pct.toFixed(1) + '%'"></td>
+                        <td class="col-right" x-text="formatMoney(a.preco_anterior)"></td>
+                        <td class="col-right" x-text="formatMoney(a.preco_atual)"></td>
+                        <td class="col-center" x-text="formatDate(a.data_referencia)"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+    <div class="section-box" x-show="listaAnomalias().length === 0 && !loading">
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="empty-state-title">Nenhuma anomalia detectada</div>
+            <div class="empty-state-text">Nenhum ativo com variação acima do limiar sem evento corporativo correspondente.</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        tab: 'desatualizados',
+        saude: {},
+        anomalias: { anomalias: [], total: 0 },
+        limiar: 20,
+        filtro: '',
+        atualizandoTicker: null,
+
+        labelStatus(s) {
+            return { ok: 'OK', degraded: 'Atenção', critical: 'Crítico' }[s] || s || '-';
+        },
+
+        labelMotivo(m) {
+            return { cache_expirado: 'Cache expirado', nunca_atualizado: 'Nunca atualizado' }[m] || m || '-';
+        },
+
+        listaDesatualizados() {
+            const q = (this.filtro || '').toUpperCase();
+            let lista = this.saude.desatualizados || [];
+            if (q) lista = lista.filter(a => (a.ticker || '').includes(q) || (a.nome || '').toUpperCase().includes(q));
+            return lista;
+        },
+
+        listaSemCotacao() {
+            const q = (this.filtro || '').toUpperCase();
+            let lista = this.saude.sem_cotacao || [];
+            if (q) lista = lista.filter(a => (a.ticker || '').includes(q) || (a.nome || '').toUpperCase().includes(q));
+            return lista;
+        },
+
+        listaAnomalias() {
+            const q = (this.filtro || '').toUpperCase();
+            let lista = this.anomalias.anomalias || [];
+            if (q) lista = lista.filter(a => (a.ticker || '').includes(q) || (a.nome || '').toUpperCase().includes(q));
+            return lista;
+        },
+
+        formatDate(d) {
+            if (!d) return '-';
+            const parts = d.split('T')[0].split('-');
+            if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+            return d;
+        },
+
+        formatDateTime(d) {
+            if (!d) return 'Nunca';
+            const dt = d.split('T');
+            if (dt.length === 2) return this.formatDate(dt[0]) + ' ' + dt[1].substring(0, 5);
+            return this.formatDate(d);
+        },
+
+        async loadData() {
+            await Promise.all([this.carregarSaude(), this.carregarAnomalias()]);
+        },
+
+        async carregarSaude() {
+            const resp = await this.apiFetch('/api/cotacoes/health');
+            if (resp) {
+                this.saude = resp;
+            }
+        },
+
+        async carregarAnomalias() {
+            const resp = await this.apiFetch(`/api/cotacoes/anomalias?limiar=${this.limiar}`);
+            if (resp?.data) {
+                this.anomalias = resp.data;
+            }
+        },
+
+        async atualizar() {
+            this.loading = true;
+            try {
+                await this.loadData();
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async atualizarTicker(ticker) {
+            this.atualizandoTicker = ticker;
+            try {
+                await this.apiFetch('/api/cotacoes/' + ticker);
+                await this.carregarSaude();
+            } catch (e) {
+                console.error('Erro ao atualizar cotação:', e);
+            } finally {
+                this.atualizandoTicker = null;
+            }
+        }
+    };
+}
+</script>
+{% endblock %}

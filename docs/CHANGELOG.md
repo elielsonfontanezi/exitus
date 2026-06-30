@@ -8,6 +8,19 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — NEW-04: Saúde das Cotações (30/06/2026)
+
+**Problema:** APIs `/api/cotacoes/health` e `/anomalias` existiam mas não havia tela para monitorar cotações desatualizadas ou inconsistentes.
+
+**Solução:**
+- `CotacoesService.get_saude_cotacoes()` — classifica ativos: atualizados, desatualizados (TTL 15min), sem cotação
+- `GET /api/cotacoes/health` enriquecido com `resumo`, `desatualizados`, `sem_cotacao`
+- `ferramentas/cotacoes_v2.html` — KPIs, abas Desatualizados / Sem Cotação / Anomalias, botão atualizar cotação por ticker
+- Rota `/ferramentas/cotacoes` + item no menu Ferramentas
+- 3 testes em `test_cotacoes_health.py`
+
+---
+
 ### Feat — FEAT-009: Import B3 lista tickers importados (30/06/2026)
 
 **Problema:** Resultado do import exibia apenas totais numéricos — usuário não sabia quais tickers foram importados ou criados.
