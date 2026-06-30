@@ -1,0 +1,121 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Projeções de Renda Passiva{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Cenários conservador, moderado e otimista com base nos proventos recebidos</p>{% endblock %}
+
+{% block page_actions %}
+<button class="btn-exitus btn-exitus-primary" @click="recalcular()" :disabled="recalculando">
+    <i class="fas fa-sync-alt" :class="{'fa-spin': recalculando}"></i>
+    <span x-text="recalculando ? 'Recalculando...' : 'Recalcular 12 meses'"></span>
+</button>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="cenarios && !loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Média Histórica (12m)</div>
+        <div class="kpi-card-value" x-text="formatMoney(cenarios.media_mensal_historica)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Conservador (80%)</div>
+        <div class="kpi-card-value" x-text="formatMoney(cenarios.conservador?.renda_mensal)"></div>
+        <div class="kpi-card-change" x-text="'Anual: ' + formatMoney(cenarios.conservador?.renda_anual)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Moderado</div>
+        <div class="kpi-card-value positivo" x-text="formatMoney(cenarios.moderado?.renda_mensal)"></div>
+        <div class="kpi-card-change" x-text="'Anual: ' + formatMoney(cenarios.moderado?.renda_anual)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Otimista (120%)</div>
+        <div class="kpi-card-value" x-text="formatMoney(cenarios.otimista?.renda_mensal)"></div>
+        <div class="kpi-card-change" x-text="'Anual: ' + formatMoney(cenarios.otimista?.renda_anual)"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="projecoes.length > 0 && !loading" x-cloak>
+    <div class="section-box-title"><i class="fas fa-calendar-alt"></i> Projeção Mensal (persistida)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Mês/Ano</th>
+                <th class="col-right">Dividendos</th>
+                <th class="col-right">JCP</th>
+                <th class="col-right">Rendimentos</th>
+                <th class="col-right">Total Mês</th>
+                <th class="col-right">Anual Projetado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="p in projecoes" :key="p.id || p.mes_ano">
+                <tr>
+                    <td x-text="p.mes_ano"></td>
+                    <td class="col-right cell-money" x-text="formatMoney(p.renda_dividendos_projetada)"></td>
+                    <td class="col-right cell-money" x-text="formatMoney(p.renda_jcp_projetada)"></td>
+                    <td class="col-right cell-money" x-text="formatMoney(p.renda_rendimentos_projetada)"></td>
+                    <td class="col-right cell-money" style="font-weight:600;" x-text="formatMoney(p.renda_total_mes)"></td>
+                    <td class="col-right cell-money" x-text="formatMoney(p.renda_anual_projetada)"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="!loading && projecoes.length === 0 && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-coins"></i></div>
+        <div class="empty-state-title">Nenhuma projeção persistida</div>
+        <div class="empty-state-text">Clique em <strong>Recalcular 12 meses</strong> para gerar projeções com base nos proventos históricos.</div>
+    </div>
+</div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-title">Erro</div>
+        <div class="empty-state-text" x-text="error"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        cenarios: null,
+        projecoes: [],
+        recalculando: false,
+
+        async loadData() {
+            this.error = null;
+            try {
+                const [cen, rend] = await Promise.all([
+                    this.apiFetch('/api/projecoes/cenarios'),
+                    this.apiFetch('/api/projecoes/renda')
+                ]);
+                this.cenarios = cen;
+                this.projecoes = rend?.projecoes || [];
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar projeções';
+            }
+        },
+
+        async recalcular() {
+            this.recalculando = true;
+            try {
+                await this.apiFetch('/api/projecoes/recalcular', {
+                    method: 'POST',
+                    body: JSON.stringify({})
+                });
+                await this.loadData();
+            } catch (e) {
+                alert('Erro ao recalcular: ' + (e.message || e));
+            } finally {
+                this.recalculando = false;
+            }
+        }
+    };
+}
+</script>
+{% endblock %}

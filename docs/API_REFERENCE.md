@@ -935,7 +935,24 @@ CRUD completo. **POST/PUT/DELETE requerem role `admin`.**
 
 ## 15–20. Demais Módulos
 
-As APIs de Cálculos Financeiros, Fontes de Dados, Relatórios, Projeções e Performance
+### 19. Projeções de Renda (NEW-17)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/projecoes/renda` | Lista projeções mensais persistidas (12 meses) |
+| GET | `/api/projecoes/cenarios` | Cenários conservador (0.8×), moderado (1.0×), otimista (1.2×) sobre média mensal de proventos dos últimos 12 meses |
+| POST | `/api/projecoes/recalcular` | Persiste/atualiza 12 meses futuros em `projecoes_renda` |
+
+**Resposta `GET /api/projecoes/cenarios` (campos principais):**
+- `media_mensal_historica` (float) — média mensal de proventos líquidos (12 meses)
+- `conservador` / `moderado` / `otimista` — cada um com `renda_mensal` e `renda_anual`
+
+**Resposta `POST /api/projecoes/recalcular`:**
+- `status`: `"ok"`
+- `recalculadas`: `12`
+- `media_mensal_base` (float)
+
+As demais APIs de Cálculos Financeiros, Fontes de Dados, Relatórios e Performance
 seguem o mesmo contrato padrão:
 - **Auth**: Bearer JWT obrigatório.
 - **Response sucesso**: `{"success": true, "data": {...}, "message": "..."}`.

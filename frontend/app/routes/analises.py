@@ -147,6 +147,13 @@ def correlacao():
     return render_template('analises/correlacao_v2.html')
 
 
+@bp.route('/projecoes/renda', methods=['GET'])
+@login_required
+def projecoes_renda():
+    """Projeções de renda passiva — NEW-17"""
+    return render_template('analises/projecoes_renda_v2.html')
+
+
 @bp.route('/buy-signals', methods=['GET'])
 @login_required
 def buy_signals():
