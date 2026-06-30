@@ -12,7 +12,7 @@
 - **NEW-07 ✅ CONCLUÍDO:** `/configuracoes/fontes-dados` — CRUD fontes externas.
 - **NEW-21 ✅ RESOLVIDO (stale):** editar/excluir já em histórico.
 - Suite: **642 passed**, 3 failed pré-existentes, 6 skipped.
-- **OPS-GIT-HTTPS-001 🟡 PENDENTE:** Lote 3 commitado localmente (5 commits: `363ed9f`…`08d040b`); push para `origin` bloqueado por HTTP 401 — autenticação Git HTTPS/SSH registrada como **ajuste posterior** (ver L-OPS-002).
+- **OPS-GIT-HTTPS-001 ✅ RESOLVIDO:** push de 6 commits (Lote 3 + docs ops) publicado em `origin/feature/frontend-bug-fixes` via PAT HTTPS (30/06/2026).
 
 ### 🔧 Entregas anteriores (30/06/2026 — Lote 2)
 - **NEW-06 + FEAT-010 ✅ CONCLUÍDO:** `GET /api/indicadores/dashboard`; Dashboard consome CDI/IPCA/SELIC dinamicamente. 3 novos testes. Suite: **634 passed**.

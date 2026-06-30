@@ -1631,6 +1631,8 @@ git push origin feature/frontend-bug-fixes   # deve concluir sem 401
 
 **Referência operacional:** `docs/OPERATIONS_RUNBOOK.md` § Push / Autenticação Git.
 
+**Resolução (30/06/2026):** novo PAT GitHub configurado via `credential.helper=store`; push de `feature/frontend-bug-fixes` concluído com sucesso.
+
 ---
 
 ### L-DB-009 — Alterações DDL devem ser aplicadas em AMBOS os bancos
