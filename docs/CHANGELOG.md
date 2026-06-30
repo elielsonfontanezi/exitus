@@ -8,6 +8,16 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — Sincronização AUDITORIA_FUNCIONAL (30/06/2026)
+
+- **FEAT-026** marcada como resolvida (padrão `~~FEAT-026~~` + REBALANCE-001)
+- Contagens atualizadas: **14 OK, 22 PARCIAL**; features pendentes: 40
+- Telas 12 e 18 alinhadas com BUG-VAL-004/005/006
+- Nova seção **Correções de Valuation — BUG-VAL**
+- `AI_OPERATIONS.md`: AUDITORIA como backlog operacional de frontend até esgotamento
+
+---
+
 ### Feat — REBALANCE-001: Rebalanceamento automático por classe (30/06/2026)
 
 **Problema:**

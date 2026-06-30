@@ -1,12 +1,14 @@
 # Auditoria Funcional — Sistema Exitus
 **Data:** 18/06/2026  
-**Revalidado:** 27/06/2026  
+**Revalidado:** 30/06/2026  
 **Auditor:** Cascade (análise de código + browser) — *registro histórico; operação atual via Cursor Agent (CURSORRULES-001)*  
 **Usuário de teste:** `e2e_user` / `e2e_senha_123`  
 **Frontend:** http://localhost:8080  
 **Backend:** http://localhost:5000  
 
-> **Nota de revalidação (27/06/2026):** BUG-014, BUG-015, BUG-017, BUG-009 (telas 20-21) RESOLVIDOS indiretamente via BUG-009v2 (separação `BROWSER_API_URL` / `BACKEND_API_URL`). Contagem atualizada: 13 OK, 23 PARCIAL, 0 QUEBRADO.
+> **Nota de revalidação (27/06/2026):** BUG-014, BUG-015, BUG-017, BUG-009 (telas 20-21) RESOLVIDOS indiretamente via BUG-009v2 (separação `BROWSER_API_URL` / `BACKEND_API_URL`).
+>
+> **Nota de revalidação (30/06/2026):** BUG-VAL-004/005/006 (valuation — telas 12, 18); REBALANCE-001 + ~~FEAT-026~~ (Tela 17 → OK). Contagem: **14 OK, 22 PARCIAL**, 0 QUEBRADO. Este arquivo é o **backlog operacional de frontend** enquanto houver telas PARCIAL ou P-items abertos (ver `AI_OPERATIONS.md` § Plano de controle).
 
 **Legenda de status:**
 - ✅ `OK` — funciona conforme esperado
@@ -20,8 +22,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 13 |
-| 🟡 PARCIAL | 23 |
+| ✅ OK | 14 |
+| 🟡 PARCIAL | 22 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -49,13 +51,13 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 9 | Carteira — Posições | `/carteira/posicoes` | ✅ | Validado visualmente: KPIs, filtros (ticker/tipo/mercado) e botão Recalcular funcionam | — |
 | 10 | Carteira — Movimentações | `/carteira/movimentacoes` | 🟡 | BUG-021 resolvido: API e tabela exibem movimentações ✅. BUG-013 resolvido (25/06/2026): `x-model.lazy` nos filtros de data — sem piscar ao digitar ✅. Badge cor corrigido (aporte/resgate) ✅ | — |
 | 11 | Ativos — Catálogo | `/ativos/acoes` | ✅ | Tabela e categorias OK; busca por ticker funcionando (BUG-014 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`); detalhe carrega rápido (BUG-015 RESOLVIDO) | — |
-| 12 | Ativos — Detalhe | `/ativos/<TICKER>` | ✅ | Carrega rápido com dados (Preço, P/VP, P/L, DY, Buy Score, Eventos) — BUG-015 RESOLVIDO indiretamente via BUG-009v2 (`BROWSER_API_URL`); 4 chamadas de API em paralelo retornam 200 OK | — |
+| 12 | Ativos — Detalhe | `/ativos/<TICKER>` | ✅ | KPI "Teto (Usuário)" = `preco_teto_usuario` manual; margem/Buy Score usam `valor_justo` calculado (BUG-VAL-004/005) | — |
 | 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | 🟡 | Carrega corretamente ✅; KPIs + filtros OK; link adicionado ao menu (EXITUS-ATIVOS-001); sem dados (ambiente dev sem eventos cadastrados) | Baixa |
 | 14 | Proventos — Calendário | `/proventos/calendario` | 🟡 | Calendário e filtros OK; sem botão "Confirmar Recebimento" (FEAT-008); botão "Gerar Automático" presente | Média |
 | 15 | Análises — Evolução | `/analises/evolucao` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 16 | Análises — Performance | `/analises/performance` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 17 | Análises — Alocação | `/analises/alocacao` | ✅ | Metas + desvio + sugestões (REBALANCE-001) ✅ | — |
-| 18 | Análises — Buy Signals | `/analises/buy-signals` | ✅ | Carrega dados ✅; busca por ticker funcionando (BUG-017 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`) | — |
+| 18 | Análises — Buy Signals | `/analises/buy-signals` | ✅ | Watchlist com `valor_justo`, faixa min/max, perfil; margem coerente (BUG-VAL-004/005); busca ticker OK (BUG-017) | — |
 | 19 | Análises — Rentabilidade (legacy) | `/analises/rentabilidade` | 🟡 | Redirect para `/periodo` ✅ (EXITUS-ANALISES-001); código morto removido | — |
 | 19b | Análises — Rentabilidade por Período | `/analises/rentabilidade/periodo` | 🟡 | Acessível pelo menu como "Rentabilidade"; filtros de período OK; benchmark sem validação | Média |
 | 20 | Fiscal — IR Mensal | `/imposto-renda/mensal` | ✅ | Carrega dados ✅; BUG-009/009v2 RESOLVIDO — `BROWSER_API_URL` separada de `BACKEND_API_URL` | — |
@@ -80,7 +82,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 ## 🧭 Análise de Sessão — 27/06/2026 (BUG-014/015/017 ✅ RESOLVIDOS)
 
 ### Contexto
-- AUDITORIA_FUNCIONAL: status geral ✅ (13 OK, 23 PARCIAL, 0 QUEBRADO).
+- AUDITORIA_FUNCIONAL: status geral ✅ (14 OK, 22 PARCIAL, 0 QUEBRADO — atualizado 30/06/2026).
 - BUG-009v2 **resolvido em 27/06/2026**: separação `BROWSER_API_URL` (client-side) / `BACKEND_API_URL` (server-side) — ver `ARCHITECTURE.md` para 7 cenários de deploy.
 - BUG-014, BUG-015, BUG-017 **resolvidos indiretamente** pelo BUG-009v2 — todas as chamadas `apiFetch()` do Alpine.js agora usam `BROWSER_API_URL` (hostname resolúvel pelo browser).
 - Telas 20-21 (Fiscal IR Mensal/DARFs) também confirmadas como RESOLVIDAS.
@@ -343,22 +345,27 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 ---
 
 ### Tela 12 — Ativos — Detalhe (`/ativos/<TICKER>`)
-**Status:** ✅ OK
+**Status:** ✅ OK — valuation atualizado (BUG-VAL-004/005 — 30/06/2026)
 
 **O que funciona (código):**
 - Rota `/ativos/<ticker>` redireciona para `dashboard.ativo_detalhes` (rota existe em `dashboard.py:913`) ✅
 - Template `ativo_detalhes_v2.html` herda `base_interna.html` ✅
-- KPIs: Preço Atual, Variação, Preço Teto, Buy Score ✅
+- KPIs: Preço Atual, Variação, **Teto (Usuário)** (`preco_teto_usuario` — campo manual opcional), Buy Score ✅
+- Margem de segurança e Buy Score usam **`valor_justo`** calculado por `valuation_service` (não o teto manual) ✅
 - Indicadores fundamentalistas via Alpine.js ✅
 
-**Problemas encontrados:**
-1. ✅ **BUG-001/BUG-015 RESOLVIDOS** — tela carrega rápido com dados (Preço, P/VP, P/L, DY, Buy Score, Eventos). 4 chamadas de API em paralelo retornam 200 OK. Testado 27/06/2026: PETR4 carrega em <1s.
-2. 🟡 **Dois caminhos para a mesma tela** — `/ativos/<ticker>` faz redirect para `/dashboard/ativo/<ticker>`. Links internos usam diretamente a rota do dashboard.
+**Correções aplicadas (BUG-VAL-004/005 — 30/06/2026):**
+1. ✅ Label **"Teto (Usuário)"** distingue referência manual de **Valor Justo** calculado
+2. ✅ Rename DDL `preco_teto → preco_teto_usuario` — sem ambiguidade semântica na API
 
-**Validação visual (27/06/2026):**
+**Problemas encontrados (menores):**
+1. ✅ **BUG-001/BUG-015 RESOLVIDOS** — tela carrega rápido com dados. Testado 27/06/2026: PETR4 carrega em <1s.
+2. 🟡 **Dois caminhos para a mesma tela** — `/ativos/<ticker>` faz redirect para `/dashboard/ativo/<ticker>`.
+
+**Validação visual (30/06/2026):**
 - [x] Tela abre via botão "Ver" no catálogo ✅
-- [x] **Carrega rápido** ✅ — 4 chamadas de API em paralelo (cotacao, buy-score, margem-seguranca, eventos-corporativos) retornam 200 OK em <1s
-- [x] **Exibe dados** ✅ — Preço R$ 38,06, Preço Teto R$ 45,00, P/L, P/VP, DY exibidos corretamente. BUG-015 RESOLVIDO indiretamente via BUG-009v2 (`BROWSER_API_URL`).
+- [x] **Carrega rápido** ✅ — 4 chamadas de API em paralelo retornam 200 OK em <1s
+- [x] **Exibe dados** ✅ — Preço, P/L, P/VP, DY, Teto (Usuário), Buy Score
 
 ---
 
@@ -451,19 +458,25 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 ---
 
 ### Tela 18 — Análises — Buy Signals (`/analises/buy-signals`)
-**Status:** 🟡 PARCIAL
+**Status:** ✅ OK — valuation atualizado (BUG-VAL-004/005 — 30/06/2026)
 
 **O que funciona (código):**
 - Rota existe, renderiza `analises/buy_signals_v2.html` ✅
 - Alpine.js API-driven ✅
+- Card **Valor Justo** exibe `valor_justo` com faixa `faixa_min`/`faixa_max` e `perfil` do ativo ✅
+- Watchlist usa `valor_justo` calculado (não `preco_teto_usuario` estático) ✅
+- Margem de segurança coerente com valor justo agregado (BUG-VAL-003 absorvido por BUG-VAL-004) ✅
+- **Busca por ticker funcionando** — BUG-017 RESOLVIDO via BUG-009v2 (`BROWSER_API_URL`) ✅
 
-**Problemas encontrados:**
-1. � BUG-001 não afeta esta tela na prática — dados carregam normalmente
-2. ✅ **Busca por ticker funcionando** — BUG-017 RESOLVIDO indiretamente via BUG-009v2 (`BROWSER_API_URL`). Testado 27/06/2026.
+**Correções aplicadas (BUG-VAL-004/005/006 — 30/06/2026):**
+1. ✅ `valuation_service.py` — mediana ponderada + remoção de outliers (ratio)
+2. ✅ FIIs: fórmula cap rate corrigida `dy_anual/cap_rate` (BUG-VAL-006)
+3. ✅ API expõe `preco_teto_usuario` (manual) separado de `valor_justo` (calculado)
 
-**Validação visual (27/06/2026):**
+**Validação visual (30/06/2026):**
 - [x] Carrega dados ✅
-- [x] **Busca por ticker funciona** ✅ — BUG-017 RESOLVIDO indiretamente via BUG-009v2 (`BROWSER_API_URL`).
+- [x] **Busca por ticker funciona** ✅
+- [x] **Valor Justo + faixa exibidos** ✅
 
 ---
 
@@ -588,10 +601,25 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 
 ---
 
+## ✅ Correções de Valuation — BUG-VAL (30/06/2026)
+
+| ID | Problema | Telas afetadas | Status |
+|----|----------|----------------|--------|
+| ~~BUG-VAL-001~~ | Fórmulas Bazin/Graham/Gordon incorretas | 18, ferramentas/calculadora | ✅ Concluído (28-29/06) |
+| ~~BUG-VAL-002~~ | Média simples distorcida por outliers | 18 | ♻️ Absorvido por BUG-VAL-005 |
+| ~~BUG-VAL-003~~ | Componente Margem incoerente no Buy Score | 18 | ♻️ Absorvido por BUG-VAL-004 |
+| ~~BUG-VAL-004~~ | Ambiguidade `preco_teto` vs `valor_justo` | 12, 18, watchlist | ✅ Concluído — rename DDL `preco_teto_usuario` |
+| ~~BUG-VAL-005~~ | Agregação sem padrão de mercado | 18, `/api/calculos/preco_teto` | ✅ Concluído — `valuation_service.py` |
+| ~~BUG-VAL-006~~ | FII cap rate `1/cap_rate` incorreto | 18, calculadora FII | ✅ Concluído — `dy_anual/cap_rate` |
+
+Detalhes de fórmulas: `docs/MANUAL_USUARIO_DRAFT.md` § Valuation.
+
+---
+
 ## Backlog de Correções
 
 > Todos os bugs críticos e importantes foram resolvidos.  
-> Nenhum bug pendente no momento - apenas features a implementar (FEAT-005 a FEAT-049).
+> Nenhum bug crítico/importante pendente. Backlog de features: FEAT-009 a FEAT-049 (exceto resolvidas ~~FEAT-001~~ a ~~FEAT-008~~, ~~FEAT-026~~).
 
 ### 🔴 Críticos (bloqueiam uso)
 *Nenhum bug crítico pendente*
@@ -629,7 +657,7 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 | FEAT-023 | **Relatórios por corretora** — extrato de movimentações, posição consolidada, IR retido; exportação PDF/Excel | 4 |
 | FEAT-024 | **Status avançado da corretora** — indicadores de conexão/API ativa; última sincronização; erros de integração | 4 |
 | FEAT-025 | **Metas de patrimônio por período** — configurar metas anuais, trimestrais, mensais com projeções automáticas baseadas em aportes esperados | 2 |
-| FEAT-026 | **Metas por classe de ativo** — ✅ IMPLEMENTADO (REBALANCE-001) — editor de metas, desvio, sugestões comprar/vender | — |
+| ~~FEAT-026~~ | ~~Metas por classe de ativo — definir percentuais-alvo por classe; alertas de desvio~~ | 17 | **RESOLVIDA em REBALANCE-001 (30/06/2026)**: tabela `meta_alocacao`, `rebalance_service.py`, editor de metas em `alocacao_v2.html`, painel sugestões comprar/vender por classe |
 | FEAT-027 | **Alertas de progresso de meta** — notificar quando atingir X% da meta ou quando atrasar em relação ao planejado | 2 |
 | FEAT-028 | **Comparativo visual meta vs. realizado** — gráfico de linha mostrando projeção vs. patrimônio real ao longo do tempo | 2 |
 | FEAT-029 | **Migração automática template venda.html** — redirecionar para operacoes_v2.html com parâmetros ?tipo=venda&ticker=PETR4 | 7 |
@@ -1196,7 +1224,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 | Tela | URL | Motivo |
 |------|-----|--------|
-| 10 | `/carteira/movimentacoes` | **BUG-021** — Dados não aparecem: fluxo de caixa realista (154 aportes + 12 resgates) implementado em 24/06/2026 não está sendo exibido na tela. Dados existem no banco mas não chegam ao frontend. |
+| ~~10~~ | ~~`/carteira/movimentacoes`~~ | ~~BUG-021~~ → **RESOLVIDO (24/06/2026)**: API e tela exibem movimentações (aporte/resgate) |
 | ~~5~~ | ~~`/operacoes/` Import B3~~ | ~~Import não exibe registros~~ → **FALSO POSITIVO** — idempotente por design; revalidado com dados novos: Transações=2 |
 | ~~6, 7~~ | ~~`/operacoes/` Compra/Venda~~ | ~~Toggle inoperante~~ → **RESOLVIDO** EXITUS-OPERACOES-001 |
 | ~~13~~ | ~~`/ativos/eventos-corporativos`~~ | ~~NOT FOUND~~ → **FALSO POSITIVO** — carrega OK com token válido |
@@ -1206,9 +1234,9 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 | Prioridade | Quantidade |
 |------------|-----------|
-| 🔴 Crítico | 1 (BUG-021) | **Novo bug crítico identificado em 24/06/2026** |
+| 🔴 Crítico | 0 — BUG-021 resolvido (24/06/2026) |
 | 🟡 Importante | 0 — todos os bugs importantes foram resolvidos ou reclassificados |
-| ⬛ Feature ausente | 41 (FEAT-009 a FEAT-049) |
+| ⬛ Feature ausente | 40 (FEAT-009 a FEAT-049, exc. ~~FEAT-026~~ resolvida) |
 
 ### Impacto do BUG-001
 

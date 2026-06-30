@@ -14,11 +14,11 @@ Consultar estes docs para **o que fazer** — não duplicar conteúdo aqui.
 | Documento | Pergunta | Quando |
 |-----------|----------|--------|
 | `docs/ROADMAP.md` | Qual GAP vem agora? Dependências? | Início de sessão; antes de propor implementação |
-| `docs/AUDITORIA_FUNCIONAL.md` | Quais telas PARCIAL/QUEBRADO? P-items? | Tarefa frontend, UX, integração de tela |
-| `docs/PROJECT_STATUS.md` | Versão, testes, progresso geral? | Checkpoint, métricas, commit |
-| `docs/CHANGELOG.md` | O que já foi entregue? | Contexto histórico |
+| `docs/AUDITORIA_FUNCIONAL.md` | Quais telas PARCIAL/QUEBRADO? P-items/FEAT/NEW pendentes? | **Início de sessão com frontend**; toda tarefa de tela, UX ou integração; **atualizar no mesmo commit** quando status de tela ou P-item mudar |
 
-Atualizar `AUDITORIA_FUNCIONAL.md` no commit quando resolver P-item ou mudar status de tela (REGRA #6).
+**`AUDITORIA_FUNCIONAL.md` é backlog operacional de frontend** enquanto existirem telas 🟡 PARCIAL ou itens FEAT/NEW abertos. Consultar junto com `ROADMAP.md` antes de propor trabalho. Quando todas as 36 telas forem ✅ OK e o backlog FEAT/NEW estiver esgotado, o arquivo pode ser arquivado (ver `docs/archive/`).
+
+Atualizar `AUDITORIA_FUNCIONAL.md` no commit quando resolver P-item, FEAT, mudar status de tela ou corrigir bug de frontend (REGRA #6).
 
 ---
 
