@@ -26,22 +26,26 @@
         <div class="kpi-card-value" style="color:#dc2626;" x-text="(dashboardCompra.resumo?.desvio_meta_percentual || 0).toFixed(1) + '%'"></div>
     </div>
 </div>
-<div class="kpi-bar" x-show="tab === 'venda' && (planosVenda.length > 0 || planosCompra.length > 0)">
+<div class="kpi-bar" x-show="tab === 'venda' && dashboardVenda.resumo">
     <div class="kpi-card">
-        <div class="kpi-card-label">Planos de Compra</div>
-        <div class="kpi-card-value" x-text="planosCompra.length"></div>
+        <div class="kpi-card-label">Planos Ativos</div>
+        <div class="kpi-card-value positivo" x-text="dashboardVenda.resumo?.planos_ativos || 0"></div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-card-label">Planos de Venda</div>
-        <div class="kpi-card-value" x-text="planosVenda.length"></div>
+        <div class="kpi-card-label">Qtd a Vender</div>
+        <div class="kpi-card-value" x-text="(dashboardVenda.resumo?.quantidade_total_vender || 0).toFixed(0)"></div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-card-label">Ativos (Compra)</div>
-        <div class="kpi-card-value positivo" x-text="planosCompra.filter(p => p.status === 'ativo').length"></div>
+        <div class="kpi-card-label">Qtd Vendida</div>
+        <div class="kpi-card-value" x-text="(dashboardVenda.resumo?.quantidade_total_vendida || 0).toFixed(0)"></div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-card-label">Ativos (Venda)</div>
-        <div class="kpi-card-value positivo" x-text="planosVenda.filter(p => p.status === 'ativo').length"></div>
+        <div class="kpi-card-label">Progresso Geral</div>
+        <div class="kpi-card-value" x-text="(dashboardVenda.resumo?.progresso_geral || 0).toFixed(1) + '%'"></div>
+    </div>
+    <div class="kpi-card" x-show="gatilhosDisparo.total > 0">
+        <div class="kpi-card-label">Gatilhos Disparados</div>
+        <div class="kpi-card-value" style="color:#dc2626;" x-text="gatilhosDisparo.total"></div>
     </div>
 </div>
 {% endblock %}
@@ -149,6 +153,80 @@
 
 <!-- PLANOS DE VENDA -->
 <div x-show="tab === 'venda'" x-cloak>
+    <!-- Gatilhos disparados -->
+    <div class="section-box" x-show="gatilhosDisparo.disparos?.length > 0" style="margin-bottom:1.5rem; border-left:4px solid #dc2626;">
+        <div class="section-box-title" style="display:flex; align-items:center; justify-content:space-between;">
+            <span><i class="fas fa-bell"></i> Gatilhos para Disparo</span>
+            <button @click="verificarGatilhos()" class="btn-exitus btn-exitus-ghost btn-sm" :disabled="loadingGatilhos">
+                <i class="fas fa-sync-alt" :class="loadingGatilhos ? 'fa-spin' : ''"></i> Atualizar
+            </button>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Plano</th>
+                    <th>Ativo</th>
+                    <th class="col-center">Gatilho</th>
+                    <th class="col-right">Qtd</th>
+                    <th class="col-right">Preço Atual</th>
+                    <th>Motivo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="g in gatilhosDisparo.disparos" :key="g.plano_id">
+                    <tr>
+                        <td x-text="g.plano_nome"></td>
+                        <td>
+                            <a :href="'/dashboard/ativo/' + g.ativo_ticker" style="text-decoration:none; font-weight:700; color:#a38c65;" x-text="g.ativo_ticker || '-'"></a>
+                        </td>
+                        <td class="col-center">
+                            <span class="badge badge-warning" style="text-transform:capitalize; font-size:0.7rem;" x-text="(g.tipo_gatilho || '').replace(/_/g, ' ')"></span>
+                        </td>
+                        <td class="col-right" x-text="g.quantidade?.toFixed(0) || '-'"></td>
+                        <td class="col-right" x-text="formatMoney(g.preco_atual || 0)"></td>
+                        <td style="font-size:0.85rem; color:#374151;" x-text="g.motivo"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Próximos gatilhos por data -->
+    <div class="section-box" x-show="dashboardVenda.proximos_gatilhos?.length > 0" style="margin-bottom:1.5rem;">
+        <div class="section-box-title"><i class="fas fa-calendar-alt"></i> Próximos Gatilhos (Data Limite)</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Plano</th>
+                    <th class="col-center">Data Limite</th>
+                    <th class="col-right">Dias Restantes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="g in dashboardVenda.proximos_gatilhos" :key="g.plano_nome + g.data_limite">
+                    <tr>
+                        <td x-text="g.plano_nome"></td>
+                        <td class="col-center" x-text="formatDate(g.data_limite)"></td>
+                        <td class="col-right" :style="g.dias_restantes <= 7 ? 'color:#dc2626; font-weight:600;' : ''" x-text="g.dias_restantes + ' dias'"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Estatísticas por tipo de gatilho -->
+    <div class="section-box" x-show="estatisticasVenda.por_gatilho && Object.keys(estatisticasVenda.por_gatilho).some(k => estatisticasVenda.por_gatilho[k] > 0)" style="margin-bottom:1.5rem;">
+        <div class="section-box-title"><i class="fas fa-chart-pie"></i> Planos por Tipo de Gatilho</div>
+        <div style="display:flex; flex-wrap:wrap; gap:1rem; padding:0.5rem 0;">
+            <template x-for="[tipo, qtd] in Object.entries(estatisticasVenda.por_gatilho || {}).filter(([,v]) => v > 0)" :key="tipo">
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.75rem 1.25rem; min-width:140px;">
+                    <div style="font-size:0.75rem; color:#6b7280; text-transform:capitalize;" x-text="tipo.replace(/_/g, ' ')"></div>
+                    <div style="font-size:1.25rem; font-weight:700; color:#1e293b;" x-text="qtd"></div>
+                </div>
+            </template>
+        </div>
+    </div>
+
     <div class="section-box" x-show="vendaFiltrados().length > 0">
         <div class="section-box-title"><i class="fas fa-hand-holding-usd"></i> Planos de Venda</div>
         <table class="data-table">
@@ -339,6 +417,10 @@ function pageDataExtend() {
         planosCompra: [],
         planosVenda: [],
         dashboardCompra: { resumo: null, proximos_aportes: [] },
+        dashboardVenda: { resumo: null, proximos_gatilhos: [] },
+        gatilhosDisparo: { disparos: [], total: 0 },
+        estatisticasVenda: {},
+        loadingGatilhos: false,
         filtro: '',
         showModal: false,
         planoDetalhe: {},
@@ -356,12 +438,16 @@ function pageDataExtend() {
         },
 
         async loadData() {
-            const [dashRes, vendaRes] = await Promise.allSettled([
+            const [dashCompra, dashVenda, gatilhos, stats, listaVenda] = await Promise.allSettled([
                 this.apiFetch('/api/plano-compra/dashboard'),
+                this.apiFetch('/api/plano-venda/dashboard'),
+                this.apiFetch('/api/plano-venda/verificar-gatilhos'),
+                this.apiFetch('/api/plano-venda/estatisticas'),
                 this.apiFetch('/api/plano-venda')
             ]);
-            if (dashRes.status === 'fulfilled' && dashRes.value?.data) {
-                const dash = dashRes.value.data;
+
+            if (dashCompra.status === 'fulfilled' && dashCompra.value?.data) {
+                const dash = dashCompra.value.data;
                 this.dashboardCompra = {
                     resumo: dash.resumo || null,
                     proximos_aportes: dash.proximos_aportes || []
@@ -373,8 +459,47 @@ function pageDataExtend() {
                     this.planosCompra = Array.isArray(fallback.data) ? fallback.data : fallback.data.planos || [];
                 }
             }
-            if (vendaRes.status === 'fulfilled' && vendaRes.value?.data) {
-                this.planosVenda = Array.isArray(vendaRes.value.data) ? vendaRes.value.data : vendaRes.value.data.planos || [];
+
+            if (dashVenda.status === 'fulfilled' && dashVenda.value?.data) {
+                const dv = dashVenda.value.data;
+                this.dashboardVenda = {
+                    resumo: dv.resumo || null,
+                    proximos_gatilhos: dv.proximos_gatilhos || []
+                };
+            }
+
+            if (gatilhos.status === 'fulfilled' && gatilhos.value?.data) {
+                this.gatilhosDisparo = {
+                    disparos: gatilhos.value.data.disparos || [],
+                    total: gatilhos.value.data.total || 0
+                };
+            }
+
+            if (stats.status === 'fulfilled' && stats.value?.data) {
+                this.estatisticasVenda = stats.value.data;
+            }
+
+            if (listaVenda.status === 'fulfilled' && listaVenda.value?.data) {
+                this.planosVenda = Array.isArray(listaVenda.value.data)
+                    ? listaVenda.value.data
+                    : listaVenda.value.data.planos || [];
+            }
+        },
+
+        async verificarGatilhos() {
+            this.loadingGatilhos = true;
+            try {
+                const resp = await this.apiFetch('/api/plano-venda/verificar-gatilhos');
+                if (resp?.data) {
+                    this.gatilhosDisparo = {
+                        disparos: resp.data.disparos || [],
+                        total: resp.data.total || 0
+                    };
+                }
+            } catch (e) {
+                console.error('Erro ao verificar gatilhos:', e);
+            } finally {
+                this.loadingGatilhos = false;
             }
         },
 

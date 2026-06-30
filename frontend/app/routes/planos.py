@@ -71,3 +71,10 @@ bp_venda = Blueprint('planos_venda', __name__, url_prefix='/planos-venda')
 def venda_lista():
     """Planos disciplinados — aba venda via Alpine.js"""
     return render_template('estrategia/planos_v2.html')
+
+
+@bp_venda.route('/dashboard')
+@login_required
+def venda_dashboard():
+    """Dashboard de planos de venda — mesma tela com KPIs e gatilhos."""
+    return render_template('estrategia/planos_v2.html')

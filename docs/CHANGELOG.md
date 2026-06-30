@@ -8,6 +8,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — NEW-14: Dashboard Planos de Venda + gatilhos (30/06/2026)
+
+**Problema:** APIs `/api/plano-venda/dashboard`, `/verificar-gatilhos` e `/estatisticas` existiam no backend mas não eram consumidas pelo frontend.
+
+**Solução:**
+- `planos_v2.html` aba Venda: KPIs do dashboard, painel **Gatilhos para Disparo** (com botão Atualizar), **Próximos Gatilhos (Data Limite)**, breakdown por tipo de gatilho
+- Consome também `GET /api/plano-venda` para listagem da tabela
+- Rota alias `/planos-venda/dashboard`
+- 5 testes em `test_plano_venda_dashboard.py`
+
+**Nota:** `POST /api/plano-venda/simular-venda` permanece disponível para integração futura (requer `posicao_id`).
+
+---
+
 ### Feat — NEW-13: Dashboard de Planos de Compra (30/06/2026)
 
 **Problema:** `GET /api/plano-compra/dashboard` existia no backend mas não era consumido pelo frontend.
