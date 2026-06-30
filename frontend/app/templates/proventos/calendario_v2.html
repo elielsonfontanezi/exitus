@@ -1,17 +1,27 @@
 {% extends "components/base_interna.html" %}
 
 {% block page_title %}Calendário de Proventos{% endblock %}
-{% block page_subtitle %}<p class="page-subtitle">Proventos previstos e confirmados — geração automática e confirmação de pagamento</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Calendário automático e registro manual de proventos recebidos</p>{% endblock %}
+
+{% block tabs %}
+<div class="tab-bar">
+    <button type="button" class="tab-item" :class="{ active: abaAtiva === 'calendario' }" @click="abaAtiva = 'calendario'">Calendário</button>
+    <button type="button" class="tab-item" :class="{ active: abaAtiva === 'registrados' }" @click="mudarAba('registrados')">Proventos Registrados</button>
+</div>
+{% endblock %}
 
 {% block page_actions %}
-<button class="btn-exitus btn-exitus-primary" @click="gerarCalendario()" :disabled="gerando">
+<button x-show="abaAtiva === 'calendario'" class="btn-exitus btn-exitus-primary" @click="gerarCalendario()" :disabled="gerando">
     <i class="fas" :class="gerando ? 'fa-spinner fa-spin' : 'fa-magic'"></i>
     <span x-text="gerando ? 'Gerando...' : 'Gerar Automático'"></span>
+</button>
+<button x-show="abaAtiva === 'registrados'" class="btn-exitus btn-exitus-primary" @click="abrirModalProvento()">
+    <i class="fas fa-plus"></i> Novo Provento
 </button>
 {% endblock %}
 
 {% block kpi_bar %}
-<div class="kpi-bar" x-show="itens.length > 0 || resumo">
+<div class="kpi-bar" x-show="abaAtiva === 'calendario' && (itens.length > 0 || resumo)">
     <div class="kpi-card">
         <div class="kpi-card-label">Total de Itens</div>
         <div class="kpi-card-value" x-text="resumo?.total_itens || itens.length"></div>
@@ -32,7 +42,7 @@
 {% endblock %}
 
 {% block filters %}
-<div class="filter-bar" x-show="itens.length > 0">
+<div class="filter-bar" x-show="abaAtiva === 'calendario' && itens.length > 0">
     <span class="filter-label">Filtrar:</span>
     <input type="text" class="filter-input" placeholder="Buscar ticker..."
            x-model="filtroTicker" @input.debounce.300ms="filtrar()">
@@ -51,7 +61,8 @@
 {% endblock %}
 
 {% block page_content %}
-<!-- Tabela de Proventos -->
+<!-- Aba Calendário -->
+<div x-show="abaAtiva === 'calendario'">
 <div class="section-box" x-show="itensFiltrados.length > 0">
     <table class="data-table">
         <thead>
@@ -105,7 +116,6 @@
     </table>
 </div>
 
-<!-- Empty State -->
 <div class="section-box" x-show="!loading && itens.length === 0 && !error">
     <div class="empty-state">
         <div class="empty-state-icon"><i class="fas fa-calendar-alt"></i></div>
@@ -115,9 +125,139 @@
         </div>
     </div>
 </div>
+</div>
 
-<!-- Error State -->
-<div class="section-box" x-show="error" x-cloak>
+<!-- Aba Proventos Registrados -->
+<div x-show="abaAtiva === 'registrados'" x-cloak>
+    <div class="section-box" x-show="proventosRegistrados.length > 0">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Data Pagamento</th>
+                    <th>Ativo</th>
+                    <th>Tipo</th>
+                    <th class="col-right">Qtd</th>
+                    <th class="col-right">Valor Líquido</th>
+                    <th class="col-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="p in proventosRegistrados" :key="p.id">
+                    <tr>
+                        <td x-text="formatDate(p.data_pagamento)"></td>
+                        <td>
+                            <span class="badge badge-neutro" x-text="p.ativo?.ticker || '-'"></span>
+                            <div style="font-size:0.75rem; color:#6b7280;" x-text="p.ativo?.nome || ''"></div>
+                        </td>
+                        <td style="text-transform:capitalize;" x-text="p.tipo_provento || '-'"></td>
+                        <td class="col-right" x-text="p.quantidade_ativos || '-'"></td>
+                        <td class="col-right positivo" x-text="formatMoney(p.valor_liquido)"></td>
+                        <td class="col-center">
+                            <div class="action-menu" x-data="{ open: false }">
+                                <button class="action-menu-btn" @click="open = !open" @click.away="open = false">⋯</button>
+                                <div class="action-menu-dropdown" :class="{ show: open }">
+                                    <button class="action-menu-item" @click="editarProvento(p)" :disabled="p.editando">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button class="action-menu-item action-menu-danger" @click="excluirProvento(p)" :disabled="p.excluindo">
+                                        <i class="fas fa-trash"></i> Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-box" x-show="!loadingRegistrados && proventosRegistrados.length === 0 && !errorRegistrados">
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-hand-holding-usd"></i></div>
+            <div class="empty-state-title">Nenhum provento registrado</div>
+            <div class="empty-state-text">Cadastre manualmente dividendos, JCP e rendimentos recebidos.</div>
+            <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="abrirModalProvento()">
+                <i class="fas fa-plus"></i> Novo Provento
+            </button>
+        </div>
+    </div>
+
+    <div class="section-box" x-show="errorRegistrados" x-cloak>
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="empty-state-title">Erro ao carregar proventos</div>
+            <div class="empty-state-text" x-text="errorRegistrados"></div>
+            <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadProventosRegistrados()">
+                <i class="fas fa-redo"></i> Tentar novamente
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo/Editar Provento -->
+<div x-show="showModalProvento" x-cloak
+     style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;">
+    <div @click.away="fecharModalProvento()" style="background:white; padding:2rem; border-radius:8px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto;">
+        <h3 style="margin:0 0 1.5rem 0;" x-text="editandoProvento ? 'Editar Provento' : 'Novo Provento'"></h3>
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div>
+                <label class="filter-label">Ticker</label>
+                <input type="text" class="filter-input" x-model="formProvento.ticker" style="width:100%; text-transform:uppercase;"
+                       @input.debounce.400ms="buscarAtivoProvento()" placeholder="Ex: PETR4">
+                <small x-show="formProvento.ativo_nome" style="color:#6b7280;" x-text="formProvento.ativo_nome"></small>
+            </div>
+            <div>
+                <label class="filter-label">Tipo</label>
+                <select class="filter-input" x-model="formProvento.tipo_provento" style="width:100%;">
+                    <option value="dividendo">Dividendo</option>
+                    <option value="jcp">JCP</option>
+                    <option value="rendimento">Rendimento</option>
+                    <option value="amortizacao">Amortização</option>
+                </select>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div>
+                    <label class="filter-label">Data Com</label>
+                    <input type="date" class="filter-input" x-model="formProvento.data_com" style="width:100%;">
+                </div>
+                <div>
+                    <label class="filter-label">Data Pagamento</label>
+                    <input type="date" class="filter-input" x-model="formProvento.data_pagamento" style="width:100%;">
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div>
+                    <label class="filter-label">Valor por Ação/Cota</label>
+                    <input type="number" step="0.0001" class="filter-input" x-model="formProvento.valor_por_acao" style="width:100%;" @input="calcularValoresProvento()">
+                </div>
+                <div>
+                    <label class="filter-label">Quantidade</label>
+                    <input type="number" step="0.01" class="filter-input" x-model="formProvento.quantidade_ativos" style="width:100%;" @input="calcularValoresProvento()">
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div>
+                    <label class="filter-label">Imposto Retido</label>
+                    <input type="number" step="0.01" class="filter-input" x-model="formProvento.imposto_retido" style="width:100%;" @input="calcularValoresProvento()">
+                </div>
+                <div>
+                    <label class="filter-label">Valor Líquido</label>
+                    <input type="number" step="0.01" class="filter-input" x-model="formProvento.valor_liquido" style="width:100%;" readonly>
+                </div>
+            </div>
+            <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:0.5rem;">
+                <button class="btn-exitus btn-exitus-ghost" @click="fecharModalProvento()">Cancelar</button>
+                <button class="btn-exitus btn-exitus-primary" @click="salvarProvento()" :disabled="salvandoProvento">
+                    <i class="fas" :class="salvandoProvento ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+                    <span x-text="salvandoProvento ? 'Salvando...' : 'Salvar'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error State Calendário -->
+<div class="section-box" x-show="abaAtiva === 'calendario' && error" x-cloak>
     <div class="empty-state">
         <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
         <div class="empty-state-title">Erro ao carregar dados</div>
@@ -153,6 +293,191 @@ function pageDataExtend() {
         gerando: false,
         feedbackMsg: '',
         feedbackType: 'success',
+        abaAtiva: 'calendario',
+        proventosRegistrados: [],
+        loadingRegistrados: false,
+        errorRegistrados: '',
+        showModalProvento: false,
+        editandoProvento: false,
+        salvandoProvento: false,
+        proventoEditId: null,
+        formProvento: {
+            ticker: '',
+            ativo_id: '',
+            ativo_nome: '',
+            tipo_provento: 'dividendo',
+            data_com: '',
+            data_pagamento: '',
+            valor_por_acao: '',
+            quantidade_ativos: '',
+            imposto_retido: '0',
+            valor_bruto: '0',
+            valor_liquido: '0',
+        },
+
+        mudarAba(aba) {
+            this.abaAtiva = aba;
+            if (aba === 'registrados' && this.proventosRegistrados.length === 0) {
+                this.loadProventosRegistrados();
+            }
+        },
+
+        async loadProventosRegistrados() {
+            this.loadingRegistrados = true;
+            this.errorRegistrados = '';
+            try {
+                const res = await this.apiFetch('/api/proventos?per_page=100');
+                const data = res?.data || res;
+                this.proventosRegistrados = data.proventos || [];
+            } catch (e) {
+                this.errorRegistrados = e.message || 'Erro ao carregar proventos';
+            } finally {
+                this.loadingRegistrados = false;
+            }
+        },
+
+        resetFormProvento() {
+            const hoje = new Date().toISOString().slice(0, 10);
+            this.formProvento = {
+                ticker: '',
+                ativo_id: '',
+                ativo_nome: '',
+                tipo_provento: 'dividendo',
+                data_com: hoje,
+                data_pagamento: hoje,
+                valor_por_acao: '',
+                quantidade_ativos: '',
+                imposto_retido: '0',
+                valor_bruto: '0',
+                valor_liquido: '0',
+            };
+            this.proventoEditId = null;
+            this.editandoProvento = false;
+        },
+
+        abrirModalProvento() {
+            this.resetFormProvento();
+            this.showModalProvento = true;
+        },
+
+        fecharModalProvento() {
+            this.showModalProvento = false;
+            this.resetFormProvento();
+        },
+
+        editarProvento(p) {
+            this.editandoProvento = true;
+            this.proventoEditId = p.id;
+            this.formProvento = {
+                ticker: p.ativo?.ticker || '',
+                ativo_id: p.ativo_id,
+                ativo_nome: p.ativo?.nome || '',
+                tipo_provento: p.tipo_provento || 'dividendo',
+                data_com: p.data_com || '',
+                data_pagamento: p.data_pagamento || '',
+                valor_por_acao: p.valor_por_acao || '',
+                quantidade_ativos: p.quantidade_ativos || '',
+                imposto_retido: p.imposto_retido || '0',
+                valor_bruto: p.valor_bruto || '0',
+                valor_liquido: p.valor_liquido || '0',
+            };
+            this.showModalProvento = true;
+        },
+
+        calcularValoresProvento() {
+            const vpa = parseFloat(this.formProvento.valor_por_acao) || 0;
+            const qtd = parseFloat(this.formProvento.quantidade_ativos) || 0;
+            const imposto = parseFloat(this.formProvento.imposto_retido) || 0;
+            const bruto = Math.round(vpa * qtd * 100) / 100;
+            this.formProvento.valor_bruto = bruto.toFixed(2);
+            this.formProvento.valor_liquido = Math.max(0, bruto - imposto).toFixed(2);
+        },
+
+        async buscarAtivoProvento() {
+            const q = (this.formProvento.ticker || '').trim();
+            if (q.length < 2) {
+                this.formProvento.ativo_id = '';
+                this.formProvento.ativo_nome = '';
+                return;
+            }
+            try {
+                const res = await this.apiFetch('/api/ativos?search=' + encodeURIComponent(q) + '&per_page=5');
+                const lista = res?.data?.ativos || res?.ativos || res?.data || [];
+                const match = lista.find(a => (a.ticker || '').toUpperCase() === q.toUpperCase()) || lista[0];
+                if (match) {
+                    this.formProvento.ativo_id = match.id;
+                    this.formProvento.ticker = match.ticker;
+                    this.formProvento.ativo_nome = match.nome;
+                }
+            } catch (e) {
+                /* ignore search errors */
+            }
+        },
+
+        async salvarProvento() {
+            if (!this.formProvento.ativo_id) {
+                this.showFeedback('Selecione um ativo válido pelo ticker', 'error');
+                return;
+            }
+            this.calcularValoresProvento();
+            const payload = {
+                ativo_id: this.formProvento.ativo_id,
+                tipo_provento: this.formProvento.tipo_provento,
+                data_com: this.formProvento.data_com,
+                data_pagamento: this.formProvento.data_pagamento,
+                valor_por_acao: String(this.formProvento.valor_por_acao),
+                quantidade_ativos: String(this.formProvento.quantidade_ativos),
+                valor_bruto: this.formProvento.valor_bruto,
+                imposto_retido: String(this.formProvento.imposto_retido || '0'),
+                valor_liquido: this.formProvento.valor_liquido,
+            };
+            this.salvandoProvento = true;
+            try {
+                let res;
+                if (this.editandoProvento && this.proventoEditId) {
+                    res = await this.apiFetch('/api/proventos/' + this.proventoEditId, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+                } else {
+                    res = await this.apiFetch('/api/proventos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+                }
+                if (res?.success !== false) {
+                    this.showFeedback(this.editandoProvento ? 'Provento atualizado' : 'Provento criado', 'success');
+                    this.fecharModalProvento();
+                    await this.loadProventosRegistrados();
+                } else {
+                    this.showFeedback(res?.error || res?.message || 'Erro ao salvar', 'error');
+                }
+            } catch (e) {
+                this.showFeedback(e.message || 'Erro de conexão', 'error');
+            } finally {
+                this.salvandoProvento = false;
+            }
+        },
+
+        async excluirProvento(p) {
+            if (!confirm('Excluir provento de ' + (p.ativo?.ticker || '') + '?')) return;
+            p.excluindo = true;
+            try {
+                const res = await this.apiFetch('/api/proventos/' + p.id, { method: 'DELETE' });
+                if (res?.success !== false) {
+                    this.showFeedback('Provento excluído', 'success');
+                    await this.loadProventosRegistrados();
+                } else {
+                    this.showFeedback(res?.error || res?.message || 'Erro ao excluir', 'error');
+                }
+            } catch (e) {
+                this.showFeedback(e.message || 'Erro de conexão', 'error');
+            } finally {
+                p.excluindo = false;
+            }
+        },
 
         async loadData() {
             try {
