@@ -1,10 +1,19 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 30/06/2026
-> **Status:** ✅ **Lote 2 FEAT-010+ concluído (NEW-05/06/10/12/22 + FEAT-010)**
-> **Versão:** v0.9.46
+> **Status:** ✅ **Lote 3 Frontend concluído (NEW-11/15/17/18/07)**
+> **Versão:** v0.9.47
 
-### 🔧 Últimas entregas (30/06/2026 — Lote 2)
+### 🔧 Últimas entregas (30/06/2026 — Lote 3)
+- **NEW-11 ✅ CONCLUÍDO:** `/ferramentas/preco-teto` — calculadora valor justo + métodos + FII.
+- **NEW-15 ✅ CONCLUÍDO:** `/analises/correlacao` — matriz heatmap; 2 testes endpoint.
+- **NEW-17 ✅ CONCLUÍDO:** `ProjecaoService` real + `/analises/projecoes/renda`; 4 testes.
+- **NEW-18 ✅ CONCLUÍDO:** Aba CRUD proventos em `calendario_v2.html`.
+- **NEW-07 ✅ CONCLUÍDO:** `/configuracoes/fontes-dados` — CRUD fontes externas.
+- **NEW-21 ✅ RESOLVIDO (stale):** editar/excluir já em histórico.
+- Suite: **642 passed**, 3 failed pré-existentes, 6 skipped.
+
+### 🔧 Entregas anteriores (30/06/2026 — Lote 2)
 - **NEW-06 + FEAT-010 ✅ CONCLUÍDO:** `GET /api/indicadores/dashboard`; Dashboard consome CDI/IPCA/SELIC dinamicamente. 3 novos testes. Suite: **634 passed**.
 - **NEW-12 ✅ CONCLUÍDO:** Drawer resumo por ativo em `historico.html` via `/api/transacoes/resumo-ativo/<id>`.
 - **NEW-10 ✅ CONCLUÍDO:** Rota `/carteira/posicoes/<id>` + `posicao_detalhe_v2.html`.

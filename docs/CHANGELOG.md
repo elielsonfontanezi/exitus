@@ -8,6 +8,33 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Lote 3 Frontend NEW-11/15/17/18/07 (30/06/2026)
+
+**NEW-11 — Calculadora Preço Teto**
+- Rota `/ferramentas/preco-teto` + `preco_teto_v2.html` — KPIs, tabela de métodos (Bazin/Graham/Gordon/DCF), branch FII
+- Link no menu Ferramentas
+
+**NEW-15 — Matriz de Correlação**
+- Rota `/analises/correlacao` + `correlacao_v2.html` — heatmap via `GET /api/performance/correlacao`
+- `test_correlacao_endpoint.py` — auth + estrutura resposta
+
+**NEW-17 — Projeções de Renda Passiva**
+- `ProjecaoService` enriquecido: média mensal 12m de proventos; cenários 0.8×/1.0×/1.2×; `recalcular_projecoes` persiste 12 meses
+- Rota `/analises/projecoes/renda` + `projecoes_renda_v2.html`
+- `test_projecoes_renda.py` — 4 casos
+
+**NEW-18 — CRUD Proventos no Calendário**
+- Abas Calendário | Proventos Registrados em `calendario_v2.html`
+- CRUD via `GET/POST/PUT/DELETE /api/proventos` com modal criar/editar
+
+**NEW-07 — Fontes de Dados**
+- Rota `/configuracoes/fontes-dados` + `fontes_dados_v2.html` — CRUD, toggle ativa, health/taxa sucesso
+- Tab bar Configurações: Perfil | Corretoras | Fontes de Dados
+
+**NEW-21 — Resolvido (stale):** editar/excluir transação já em `historico.html` (FEAT-003)
+
+---
+
 ### Feat — Lote 2 Frontend FEAT-010+ (30/06/2026)
 
 **NEW-06 + FEAT-010 — Indicadores macro dinâmicos no Dashboard**

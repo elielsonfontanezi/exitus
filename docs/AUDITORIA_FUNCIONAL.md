@@ -8,7 +8,7 @@
 
 > **Nota de revalidação (27/06/2026):** BUG-014, BUG-015, BUG-017, BUG-009 (telas 20-21) RESOLVIDOS indiretamente via BUG-009v2 (separação `BROWSER_API_URL` / `BACKEND_API_URL`).
 >
-> **Nota de revalidação (30/06/2026):** BUG-VAL-004/005/006 (valuation — telas 12, 18); REBALANCE-001 + ~~FEAT-026~~ (Tela 17 → OK). Contagem: **14 OK, 22 PARCIAL**, 0 QUEBRADO. Este arquivo é o **backlog operacional de frontend** enquanto houver telas PARCIAL ou P-items abertos (ver `AI_OPERATIONS.md` § Plano de controle).
+> **Nota de revalidação (30/06/2026):** Lote 3 Frontend (NEW-11/15/17/18/07). Contagem: **19 OK, 21 PARCIAL**, 0 QUEBRADO. Este arquivo é o **backlog operacional de frontend** enquanto houver telas PARCIAL ou P-items abertos (ver `AI_OPERATIONS.md` § Plano de controle).
 
 **Legenda de status:**
 - ✅ `OK` — funciona conforme esperado
@@ -47,13 +47,13 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 5 | Operações — Import B3 | `/operacoes/` | ✅ | Import + lista de tickers importados e ativos novos (FEAT-009) | — |
 | 6 | Operações — Compra | `/operacoes/` | ✅ | Toggle funciona ✅; busca de ativo com autocomplete funcionando (BUG-014 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`) | — |
 | 7 | Operações — Venda | `/operacoes/` | 🟡 | Toggle funciona ✅; modo venda acessível e formulário exibido corretamente | Média |
-| 8 | Operações — Histórico | `/operacoes/historico` | 🟡 | Filtro por data com bug; filtro ticker OK; sem editar/excluir | Média |
+| 8 | Operações — Histórico | `/operacoes/historico` | 🟡 | Filtro por data com bug; filtro ticker OK; editar/excluir via menu ações ✅ (NEW-21/FEAT-003) | Média |
 | 9 | Carteira — Posições | `/carteira/posicoes` | ✅ | Validado visualmente: KPIs, filtros (ticker/tipo/mercado) e botão Recalcular funcionam | — |
 | 10 | Carteira — Movimentações | `/carteira/movimentacoes` | 🟡 | BUG-021 resolvido: API e tabela exibem movimentações ✅. BUG-013 resolvido (25/06/2026): `x-model.lazy` nos filtros de data — sem piscar ao digitar ✅. Badge cor corrigido (aporte/resgate) ✅ | — |
 | 11 | Ativos — Catálogo | `/ativos/acoes` | ✅ | Tabela e categorias OK; busca por ticker funcionando (BUG-014 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`); detalhe carrega rápido (BUG-015 RESOLVIDO) | — |
 | 12 | Ativos — Detalhe | `/ativos/<TICKER>` | ✅ | KPI "Teto (Usuário)" = `preco_teto_usuario` manual; margem/Buy Score usam `valor_justo` calculado (BUG-VAL-004/005) | — |
 | 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | 🟡 | Carrega corretamente ✅; KPIs + filtros OK; link adicionado ao menu (EXITUS-ATIVOS-001); sem dados (ambiente dev sem eventos cadastrados) | Baixa |
-| 14 | Proventos — Calendário | `/proventos/calendario` | 🟡 | Calendário e filtros OK; sem botão "Confirmar Recebimento" (FEAT-008); botão "Gerar Automático" presente | Média |
+| 14 | Proventos — Calendário | `/proventos/calendario` | ✅ | Abas Calendário + Proventos Registrados; CRUD manual (NEW-18); Gerar Automático + Confirmar ✅ | — |
 | 15 | Análises — Evolução | `/analises/evolucao` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 16 | Análises — Performance | `/analises/performance` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 17 | Análises — Alocação | `/analises/alocacao` | ✅ | Metas + desvio + sugestões (REBALANCE-001) + distribuição por segmento (NEW-03) ✅ | — |
@@ -76,13 +76,17 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 33 | Ferramentas — Reconciliação | `/ferramentas/reconciliacao` | 🟡 | Carrega dados ✅ | Baixa |
 | 34 | Estratégia — Planos | `/planos-compra/` | ✅ | Dashboard compra (NEW-13) + venda/gatilhos (NEW-14); abas compra/venda; modal detalhe | — |
 | 35 | Alertas | `/alertas/` | 🟡 | Acessível pelo menu; lista de alertas carrega ✅ | Baixa |
+| 36 | Ferramentas — Preço Teto | `/ferramentas/preco-teto` | ✅ | NEW-11 — KPIs, métodos Bazin/Graham/Gordon/DCF, branch FII | — |
+| 37 | Análises — Correlação | `/analises/correlacao` | ✅ | NEW-15 — heatmap matriz de correlação da carteira | — |
+| 38 | Análises — Projeções Renda | `/analises/projecoes/renda` | ✅ | NEW-17 — cenários conservador/moderado/otimista + recalcular 12 meses | — |
+| 39 | Configurações — Fontes de Dados | `/configuracoes/fontes-dados` | ✅ | NEW-07 — CRUD fontes externas, health, taxa sucesso | — |
 
 ---
 
 ## 🧭 Análise de Sessão — 27/06/2026 (BUG-014/015/017 ✅ RESOLVIDOS)
 
 ### Contexto
-- AUDITORIA_FUNCIONAL: status geral ✅ (14 OK, 22 PARCIAL, 0 QUEBRADO — atualizado 30/06/2026).
+- AUDITORIA_FUNCIONAL: status geral ✅ (19 OK, 21 PARCIAL, 0 QUEBRADO — atualizado 30/06/2026).
 - BUG-009v2 **resolvido em 27/06/2026**: separação `BROWSER_API_URL` (client-side) / `BACKEND_API_URL` (server-side) — ver `ARCHITECTURE.md` para 7 cenários de deploy.
 - BUG-014, BUG-015, BUG-017 **resolvidos indiretamente** pelo BUG-009v2 — todas as chamadas `apiFetch()` do Alpine.js agora usam `BROWSER_API_URL` (hostname resolúvel pelo browser).
 - Telas 20-21 (Fiscal IR Mensal/DARFs) também confirmadas como RESOLVIDAS.
@@ -1464,14 +1468,17 @@ As seguintes novas telas propostas (NEW-XX) **não têm pré-requisito técnico*
 | ~~NEW-04~~ | Saúde das Cotações | ✅ `/ferramentas/cotacoes` implementado |
 | ~~NEW-05~~ | Câmbio e Multimoeda | ✅ `/carteira/cambio` implementado |
 | ~~NEW-06~~ | Indicadores Macroeconômicos | ✅ `GET /api/indicadores/dashboard` |
-| NEW-07 | Fontes de Dados | API `/api/fontes-dados/*` existe |
+| ~~NEW-07~~ | Fontes de Dados | ✅ `/configuracoes/fontes-dados` implementado |
 | NEW-09 | Relatório Consolidado | API `/api/relatorios` existe |
 | ~~NEW-10~~ | Detalhe de Posição | ✅ `/carteira/posicoes/<id>` implementado |
-| NEW-11 | Calculadora Preço Teto | APIs `/api/calculos/preco_teto`, `/api/calculos/fii` existem |
+| ~~NEW-11~~ | Calculadora Preço Teto | ✅ `/ferramentas/preco-teto` implementado |
 | ~~NEW-12~~ | Resumo por Ativo | ✅ drawer em historico.html |
+| ~~NEW-15~~ | Correlação entre Ativos | ✅ `/analises/correlacao` implementado |
+| ~~NEW-17~~ | Projeções de Renda Passiva | ✅ `/analises/projecoes/renda` + ProjecaoService enriquecido |
+| ~~NEW-18~~ | Gerenciamento de Proventos | ✅ CRUD em calendario_v2.html |
 | NEW-19 | Gerenciamento de Portfólios | CRUD `/api/portfolios` completo |
 | NEW-20 | Gerenciamento de Usuários | CRUD `/api/usuarios` completo |
-| NEW-21 | Editar/Excluir Transação | APIs PUT/DELETE `/api/transacoes/<id>` existem (FEAT-003 já foi resolvida) |
+| ~~NEW-21~~ | Editar/Excluir Transação | ✅ RESOLVIDO — menu ações em historico.html (FEAT-003) |
 | ~~NEW-22~~ | Saúde da Reconciliação por Ativo | ✅ drill-down em reconciliacao.html |
 
 ### Sequência recomendada para desbloqueio geral

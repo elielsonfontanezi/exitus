@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Exitus Frontend - Blueprint Configurações
-Rotas: /configuracoes/perfil, /configuracoes/corretoras
+Rotas: /configuracoes/perfil, /configuracoes/corretoras, /configuracoes/fontes-dados
 Fase 3 — Telas novas usando base_interna.html
 """
 from functools import wraps
@@ -31,3 +31,10 @@ def perfil():
 def corretoras():
     """Configurações — Minhas Corretoras (API: GET /api/corretoras)"""
     return render_template('configuracoes/corretoras.html')
+
+
+@bp.route('/fontes-dados')
+@login_required
+def fontes_dados():
+    """Configurações — Fontes de Dados (API: GET /api/fontes-dados)"""
+    return render_template('configuracoes/fontes_dados_v2.html')
