@@ -221,7 +221,7 @@
                     📊 Benchmark
                     <span class="tooltip-container">
                         <span class="tooltip-icon">ℹ️</span>
-                        <span class="tooltip-text">Sua rentabilidade vs CDI e Ibovespa</span>
+                        <span class="tooltip-text">Sua rentabilidade vs CDI, Ibovespa, IPCA e SELIC</span>
                     </span>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:8px;">
@@ -231,16 +231,27 @@
                     </div>
                     <div class="dash-row">
                         <span>CDI (12m)</span>
-                        <span class="badge-neutro">{{ indicadores.cdi_anual }}%</span>
+                        <span class="badge-neutro" x-text="indicadores.cdi_anual.toFixed(2) + '%'"></span>
                     </div>
                     <div class="dash-row">
                         <span>Ibovespa (12m)</span>
-                        <span class="badge-neutro">{{ indicadores.ibovespa_anual }}%</span>
+                        <span class="badge-neutro" x-text="indicadores.ibovespa_anual.toFixed(2) + '%'"></span>
+                    </div>
+                    <div class="dash-row">
+                        <span>IPCA (12m)</span>
+                        <span class="badge-neutro" x-text="indicadores.ipca_anual.toFixed(2) + '%'"></span>
+                    </div>
+                    <div class="dash-row">
+                        <span>SELIC (ref.)</span>
+                        <span class="badge-neutro" x-text="indicadores.selic_anual.toFixed(2) + '%'"></span>
                     </div>
                     <div style="margin-top:4px; padding-top:8px; border-top:1px solid var(--exitus-border); text-align:center; font-size:0.875rem;"
-                         :class="dados.resumo.rentabilidade_geral > {{ indicadores.cdi_anual }} ? 'badge-positivo' : 'badge-neutro'">
-                        <span x-show="dados.resumo.rentabilidade_geral > {{ indicadores.cdi_anual }}">🎉 Acima do CDI!</span>
-                        <span x-show="dados.resumo.rentabilidade_geral <= {{ indicadores.cdi_anual }}">📈 Meta: superar o CDI</span>
+                         :class="dados.resumo.rentabilidade_geral > indicadores.cdi_anual ? 'badge-positivo' : 'badge-neutro'">
+                        <span x-show="dados.resumo.rentabilidade_geral > indicadores.cdi_anual">🎉 Acima do CDI!</span>
+                        <span x-show="dados.resumo.rentabilidade_geral <= indicadores.cdi_anual">📈 Meta: superar o CDI</span>
+                    </div>
+                    <div x-show="indicadores.fontes?.cdi === 'parametros_macro'" style="font-size:0.7rem; color:var(--exitus-text-muted); text-align:center;">
+                        Indicadores via parâmetros macro
                     </div>
                 </div>
             </div>
@@ -303,6 +314,13 @@ function dashboardV2() {
         chartAlocacao: null,
         dadosCarregados: false,
         user: null,
+        indicadores: {
+            cdi_anual: 11.75,
+            ibovespa_anual: 8.32,
+            ipca_anual: 4.5,
+            selic_anual: 10.5,
+            fontes: {}
+        },
 
         async init() {
             await this.carregarDados();
@@ -343,6 +361,20 @@ function dashboardV2() {
                     const d = await r.json();
                     if (d.success) this.transacoes = d.data.items || [];
                 } catch (e) { console.warn('transacoes:', e); }
+
+                try {
+                    const r = await fetch(`${base}/api/indicadores/dashboard`, { headers: h });
+                    const d = await r.json();
+                    if (d.success && d.data) {
+                        this.indicadores = {
+                            cdi_anual: parseFloat(d.data.cdi_anual) || 11.75,
+                            ibovespa_anual: parseFloat(d.data.ibovespa_anual) || 8.32,
+                            ipca_anual: parseFloat(d.data.ipca_anual) || 4.5,
+                            selic_anual: parseFloat(d.data.selic_anual) || 10.5,
+                            fontes: d.data.fontes || {}
+                        };
+                    }
+                } catch (e) { console.warn('indicadores:', e); }
 
                 try {
                     const r = await fetch(`${base}/api/calendario-dividendos/?dias=30&limit=5`, { headers: h });

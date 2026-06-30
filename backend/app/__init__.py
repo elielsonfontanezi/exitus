@@ -308,6 +308,13 @@ def create_app(testing=False):
     except ImportError as e:
         print(f"⚠️  Câmbio blueprint não encontrado: {e}")
 
+    try:
+        from .blueprints.indicadores_blueprint import indicadores_bp
+        app.register_blueprint(indicadores_bp)
+        print("✅ Indicadores blueprint registrado: /api/indicadores/*")
+    except ImportError as e:
+        print(f"⚠️  Indicadores blueprint não encontrado: {e}")
+
     # ============================================
     # M6 - Reconciliação (EXITUS-RECONCILIACAO-001)
     # ============================================

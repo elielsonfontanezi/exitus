@@ -24,12 +24,8 @@ def login_required(f):
 @bp.route('/', methods=['GET'])
 @login_required
 def index():
-    """Dashboard principal — Alpine.js API-driven"""
-    indicadores = {
-        'cdi_anual': Config.CDI_ANUAL,
-        'ibovespa_anual': Config.IBOVESPA_ANUAL,
-    }
-    return render_template('dashboard/index_v2.html', indicadores=indicadores)
+    """Dashboard principal — Alpine.js API-driven (indicadores via /api/indicadores/dashboard)"""
+    return render_template('dashboard/index_v2.html')
 
 
 # --- Rotas Restauradas do Módulo 6 ---
