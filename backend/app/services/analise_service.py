@@ -25,59 +25,58 @@ class AnaliseService:
                                        portfolio_id: UUID = None) -> Dict:
         """
         Analisa performance do portfólio com dados reais.
-        Retorna alocação atual por classe, total de posições e patrimônio.
+        Delega para RebalanceService.calcular_desvio() para incluir metas e desvios.
+        Mantém retrocompatibilidade do contrato de resposta.
         """
-        posicoes = Posicao.query.filter_by(usuario_id=usuario_id).all()
-
-        if not posicoes:
+        from app.services.rebalance_service import RebalanceService
+        try:
+            return RebalanceService.calcular_desvio(usuario_id)
+        except Exception as e:
+            logger.warning(f"rebalance_service falhou, usando fallback: {e}")
+            posicoes = Posicao.query.filter_by(usuario_id=usuario_id).all()
+            if not posicoes:
+                return {
+                    "total_posicoes": 0,
+                    "patrimonio_total": 0.0,
+                    "alocacao_atual": {},
+                    "alocacao_target": {},
+                    "desvios": {},
+                }
+            alocacao = {}
+            total = 0.0
+            for pos in posicoes:
+                ativo = pos.ativo
+                if not ativo:
+                    continue
+                preco = float(ativo.preco_atual or pos.preco_medio or 0)
+                qtd = float(pos.quantidade or 0)
+                moeda = getattr(ativo, 'moeda', 'BRL') or 'BRL'
+                valor = qtd * preco
+                if moeda.upper() != 'BRL':
+                    try:
+                        convertido = CambioService.converter_para_brl(
+                            Decimal(str(valor)), moeda
+                        )
+                        valor = float(convertido) if convertido is not None else valor
+                    except Exception:
+                        pass
+                total += valor
+                classe = (
+                    ativo.classe.value
+                    if hasattr(ativo.classe, 'value') else str(ativo.classe)
+                )
+                alocacao[classe] = alocacao.get(classe, 0.0) + valor
+            alocacao_pct = {
+                cls: round(val / total * 100, 2) if total > 0 else 0.0
+                for cls, val in alocacao.items()
+            }
             return {
-                "total_posicoes": 0,
-                "patrimonio_total": 0.0,
-                "alocacao_atual": {},
+                "total_posicoes": len(posicoes),
+                "patrimonio_total": round(total, 2),
+                "alocacao_atual": alocacao_pct,
                 "alocacao_target": {},
                 "desvios": {},
             }
-
-        alocacao = {}
-        total = 0.0
-
-        for pos in posicoes:
-            ativo = pos.ativo
-            if not ativo:
-                continue
-
-            preco = float(ativo.preco_atual or pos.preco_medio or 0)
-            qtd = float(pos.quantidade or 0)
-            moeda = getattr(ativo, 'moeda', 'BRL') or 'BRL'
-
-            valor = qtd * preco
-            if moeda.upper() != 'BRL':
-                try:
-                    convertido = CambioService.converter_para_brl(
-                        Decimal(str(valor)), moeda
-                    )
-                    valor = float(convertido) if convertido is not None else valor
-                except Exception:
-                    pass
-
-            total += valor
-            classe = (
-                ativo.classe.value
-                if hasattr(ativo.classe, 'value') else str(ativo.classe)
-            )
-            alocacao[classe] = alocacao.get(classe, 0.0) + valor
-
-        alocacao_pct = {}
-        for cls, val in alocacao.items():
-            alocacao_pct[cls] = round(val / total * 100, 2) if total > 0 else 0.0
-
-        return {
-            "total_posicoes": len(posicoes),
-            "patrimonio_total": round(total, 2),
-            "alocacao_atual": alocacao_pct,
-            "alocacao_target": {},
-            "desvios": {},
-        }
 
     @staticmethod
     def comparar_com_benchmark(usuario_id: UUID, benchmark: str = 'CDI',

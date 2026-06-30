@@ -2,7 +2,7 @@
 EXITUS - ESTRUTURA DO BANCO DE DADOS
 ================================================================================
 Database: exitusdb
-Gerado em: 2026-06-30 10:56:50
+Gerado em: 2026-06-30 12:19:34
 ================================================================================
 
 ================================================================================
@@ -27,6 +27,7 @@ TABELAS DO BANCO EXITUS
  public | historico_patrimonio      | exitus
  public | historico_preco           | exitus
  public | log_auditoria             | exitus
+ public | meta_alocacao             | exitus
  public | movimentacao_caixa        | exitus
  public | parametros_macro          | exitus
  public | plano_compra              | exitus
@@ -42,7 +43,7 @@ TABELAS DO BANCO EXITUS
  public | taxa_cambio               | exitus
  public | transacao                 | exitus
  public | usuario                   | exitus
-(31 rows)
+(32 rows)
 
 
 ================================================================================
@@ -230,6 +231,7 @@ Referenced by:
     TABLE "evento_corporativo" CONSTRAINT "evento_corporativo_assessora_id_fkey" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     TABLE "historico_preco" CONSTRAINT "historico_preco_assessora_id_fkey" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     TABLE "log_auditoria" CONSTRAINT "log_auditoria_assessora_id_fkey" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    TABLE "meta_alocacao" CONSTRAINT "meta_alocacao_assessora_id_fkey" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_assessora_id_fkey" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     TABLE "plano_compra" CONSTRAINT "plano_compra_assessora_id_fkey" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
     TABLE "plano_venda" CONSTRAINT "plano_venda_assessora_id_fkey" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
@@ -1497,6 +1499,84 @@ Unique Constraints:
  ix_log_auditoria_assessora_id | CREATE INDEX ix_log_auditoria_assessora_id ON public.log_auditoria USING btree (assessora_id)
  ix_log_auditoria_timestamp    | CREATE INDEX ix_log_auditoria_timestamp ON public.log_auditoria USING btree ("timestamp")
 (9 rows)
+
+
+________________________________________________________________________________
+
+
+################################################################################
+TABELA: meta_alocacao
+################################################################################
+
+                                                                               Table "public.meta_alocacao"
+      Column       |           Type           | Collation | Nullable |      Default      | Storage  | Compression | Stats target |                       Description                       
+-------------------+--------------------------+-----------+----------+-------------------+----------+-------------+--------------+---------------------------------------------------------
+ id                | uuid                     |           | not null | gen_random_uuid() | plain    |             |              | Identificador único
+ usuario_id        | uuid                     |           | not null |                   | plain    |             |              | Usuário proprietário da meta
+ assessora_id      | uuid                     |           |          |                   | plain    |             |              | Assessora (multi-tenancy)
+ classe            | character varying(30)    |           | not null |                   | extended |             |              | Classe de ativo: renda_variavel | renda_fixa | cripto
+ percentual_target | numeric(5,2)             |           | not null |                   | main     |             |              | Percentual-alvo desta classe (0–100)
+ tolerancia_pct    | numeric(4,2)             |           | not null | 2.00              | main     |             |              | Tolerância em pp antes de sinalizar desvio (default 2%)
+ created_at        | timestamp with time zone |           | not null | now()             | plain    |             |              | 
+ updated_at        | timestamp with time zone |           | not null | now()             | plain    |             |              | 
+Indexes:
+    "meta_alocacao_pkey" PRIMARY KEY, btree (id)
+    "ix_meta_alocacao_assessora_id" btree (assessora_id)
+    "ix_meta_alocacao_usuario_id" btree (usuario_id)
+    "uq_meta_alocacao_usuario_classe" UNIQUE CONSTRAINT, btree (usuario_id, classe)
+Check constraints:
+    "chk_meta_alocacao_classe_valida" CHECK (classe::text = ANY (ARRAY['renda_variavel'::character varying, 'renda_fixa'::character varying, 'cripto'::character varying]::text[]))
+    "chk_meta_alocacao_percentual_valido" CHECK (percentual_target >= 0::numeric AND percentual_target <= 100::numeric)
+    "chk_meta_alocacao_tolerancia_valida" CHECK (tolerancia_pct >= 0::numeric AND tolerancia_pct <= 50::numeric)
+Foreign-key constraints:
+    "meta_alocacao_assessora_id_fkey" FOREIGN KEY (assessora_id) REFERENCES assessora(id) ON DELETE CASCADE
+    "meta_alocacao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+Access method: heap
+
+ Pos |      Coluna       |           Tipo           | Tamanho | Null? |      Default      
+-----+-------------------+--------------------------+---------+-------+-------------------
+   1 | id                | uuid                     |         | NO    | gen_random_uuid()
+   2 | usuario_id        | uuid                     |         | NO    | 
+   3 | assessora_id      | uuid                     |         | YES   | 
+   4 | classe            | character varying        | (30)    | NO    | 
+   5 | percentual_target | numeric                  |         | NO    | 
+   6 | tolerancia_pct    | numeric                  |         | NO    | 2.00
+   7 | created_at        | timestamp with time zone |         | NO    | now()
+   8 | updated_at        | timestamp with time zone |         | NO    | now()
+(8 rows)
+
+
+Foreign Keys:
+             Nome FK             |    Coluna    | Tabela Referenciada | Coluna Referenciada 
+---------------------------------+--------------+---------------------+---------------------
+ meta_alocacao_usuario_id_fkey   | usuario_id   | usuario             | id
+ meta_alocacao_assessora_id_fkey | assessora_id | assessora           | id
+(2 rows)
+
+
+Primary Keys:
+      Nome PK       | Coluna 
+--------------------+--------
+ meta_alocacao_pkey | id
+(1 row)
+
+
+Unique Constraints:
+         Nome Constraint         |   Coluna   
+---------------------------------+------------
+ uq_meta_alocacao_usuario_classe | usuario_id
+ uq_meta_alocacao_usuario_classe | classe
+(2 rows)
+
+
+Índices:
+         Nome do Índice          |                                                  Definição                                                   
+---------------------------------+--------------------------------------------------------------------------------------------------------------
+ meta_alocacao_pkey              | CREATE UNIQUE INDEX meta_alocacao_pkey ON public.meta_alocacao USING btree (id)
+ uq_meta_alocacao_usuario_classe | CREATE UNIQUE INDEX uq_meta_alocacao_usuario_classe ON public.meta_alocacao USING btree (usuario_id, classe)
+ ix_meta_alocacao_usuario_id     | CREATE INDEX ix_meta_alocacao_usuario_id ON public.meta_alocacao USING btree (usuario_id)
+ ix_meta_alocacao_assessora_id   | CREATE INDEX ix_meta_alocacao_assessora_id ON public.meta_alocacao USING btree (assessora_id)
+(4 rows)
 
 
 ________________________________________________________________________________
@@ -2798,6 +2878,7 @@ Referenced by:
     TABLE "evento_custodia" CONSTRAINT "evento_custodia_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
     TABLE "historico_patrimonio" CONSTRAINT "historico_patrimonio_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "log_auditoria" CONSTRAINT "log_auditoria_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL
+    TABLE "meta_alocacao" CONSTRAINT "meta_alocacao_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "movimentacao_caixa" CONSTRAINT "movimentacao_caixa_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "plano_compra" CONSTRAINT "plano_compra_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
     TABLE "plano_venda" CONSTRAINT "plano_venda_usuario_id_fkey" FOREIGN KEY (usuario_id) REFERENCES usuario(id)
@@ -2866,7 +2947,7 @@ RESUMO GERAL
 Total de Tabelas:
  Total 
 -------
-    31
+    32
 (1 row)
 
 
@@ -2889,6 +2970,7 @@ Total de Colunas por Tabela:
  historico_patrimonio      |           8
  historico_preco           |          11
  log_auditoria             |          13
+ meta_alocacao             |           8
  movimentacao_caixa        |          14
  parametros_macro          |          12
  plano_compra              |          16
@@ -2904,7 +2986,7 @@ Total de Colunas por Tabela:
  taxa_cambio               |           8
  transacao                 |          22
  usuario                   |          11
-(31 rows)
+(32 rows)
 
 
 Total de Foreign Keys por Tabela:
@@ -2920,6 +3002,7 @@ Total de Foreign Keys por Tabela:
  historico_patrimonio   |       1
  historico_preco        |       2
  log_auditoria          |       2
+ meta_alocacao          |       2
  movimentacao_caixa     |       5
  plano_compra           |       3
  plano_venda            |       3
@@ -2932,7 +3015,7 @@ Total de Foreign Keys por Tabela:
  saldo_prejuizo         |       2
  transacao              |       4
  usuario                |       1
-(22 rows)
+(23 rows)
 
 
 ================================================================================

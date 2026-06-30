@@ -370,3 +370,66 @@ def delete_portfolio(portfolio_id):
     except Exception as e:
         logger.error(f"Erro ao deletar portfolio: {e}")
         return error_response(str(e), 500)  # CORREÇÃO
+
+
+# ============================================================================
+# REBALANCE-001 — Metas de alocação e rebalanceamento
+# ============================================================================
+
+@portfolio_bp.route('/meta-alocacao', methods=['GET'])
+@jwt_required()
+def get_meta_alocacao():
+    """Retorna metas percentuais por classe de ativo do usuário."""
+    try:
+        from app.services.rebalance_service import RebalanceService
+        usuario_id = UUID(get_jwt_identity())
+        metas = RebalanceService.obter_metas(usuario_id)
+        return success_response(data={'metas': metas}, message="Metas de alocação")
+    except Exception as e:
+        logger.error(f"Erro ao obter metas de alocação: {e}")
+        return error_response(str(e), 500)
+
+
+@portfolio_bp.route('/meta-alocacao', methods=['PUT'])
+@jwt_required()
+def put_meta_alocacao():
+    """
+    Salva metas percentuais por classe.
+    Body: {"metas": [{"classe": "renda_variavel", "percentual_target": 60, "tolerancia_pct": 2}]}
+    Regras: soma dos targets ≤ 100%; cada classe em (renda_variavel, renda_fixa, cripto).
+    """
+    from marshmallow import ValidationError as MaValidationError
+    from app.services.rebalance_service import RebalanceService
+    from app.schemas.meta_alocacao_schema import MetaAlocacaoBulkSchema
+
+    try:
+        usuario_id = UUID(get_jwt_identity())
+        data = request.get_json() or {}
+        schema = MetaAlocacaoBulkSchema()
+        validated = schema.load(data)
+        salvos = RebalanceService.salvar_metas(usuario_id, validated['metas'])
+        return success_response(data={'metas': salvos}, message="Metas salvas com sucesso")
+    except MaValidationError as e:
+        return error_response(str(e.messages), 400)
+    except ValueError as e:
+        return error_response(str(e), 400)
+    except Exception as e:
+        logger.error(f"Erro ao salvar metas de alocação: {e}")
+        return error_response(str(e), 500)
+
+
+@portfolio_bp.route('/rebalanceamento/sugestao', methods=['GET'])
+@jwt_required()
+def get_sugestao_rebalanceamento():
+    """
+    Calcula sugestões de rebalanceamento comparando alocação atual com metas.
+    Retorna apenas classes fora da tolerância com valor_brl a ajustar.
+    """
+    try:
+        from app.services.rebalance_service import RebalanceService
+        usuario_id = UUID(get_jwt_identity())
+        sugestao = RebalanceService.sugerir_rebalanceamento(usuario_id)
+        return success_response(data=sugestao, message="Sugestão de rebalanceamento calculada")
+    except Exception as e:
+        logger.error(f"Erro ao calcular sugestão de rebalanceamento: {e}")
+        return error_response(str(e), 500)

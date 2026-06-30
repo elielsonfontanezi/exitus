@@ -55,6 +55,9 @@ from .plano_compra import PlanoCompra, StatusPlanoCompra
 # Fase 4 - Planos de Venda
 from .plano_venda import PlanoVenda, StatusPlanoVenda, TipoGatilho
 
+# REBALANCE-001 - Metas de alocação por classe
+from .meta_alocacao import MetaAlocacao
+
 __all__ = [
     # Core
     "Assessora",
@@ -114,4 +117,7 @@ __all__ = [
     "PlanoVenda",
     "StatusPlanoVenda",
     "TipoGatilho",
+
+    # REBALANCE-001
+    "MetaAlocacao",
 ]

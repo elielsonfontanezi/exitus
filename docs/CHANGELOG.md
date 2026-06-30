@@ -8,6 +8,30 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — REBALANCE-001: Rebalanceamento automático por classe (30/06/2026)
+
+**Problema:**
+- Tela de alocação mostrava apenas distribuição atual — sem metas, sem desvio, sem sugestão
+- `GET /api/performance/desvio-alocacao` retornava `alocacao_target: {}` e `desvios: {}` vazios
+- Botão "Rebalancear" em `dashboard/alocacao.html` era stub (`console.log`)
+
+**Solução:**
+- **Migration DDL** `20260630_1200`: tabela `meta_alocacao` (usuario_id + classe + percentual_target + tolerancia_pct); paridade `exitusdb + exitusdb_test` verificada
+- **`backend/app/models/meta_alocacao.py`** + **`backend/app/schemas/meta_alocacao_schema.py`**
+- **`backend/app/services/rebalance_service.py`** (novo): `obter_metas()`, `salvar_metas()` (upsert + validação soma ≤ 100%), `calcular_desvio()` (atual vs meta → valor_ajuste, precisa_rebalancear), `sugerir_rebalanceamento()` (acoes comprar/vender por classe)
+- **`analise_service.py`**: `analisar_performance_portfolio()` delega para `rebalance_service.calcular_desvio()` — `/api/performance/desvio-alocacao` agora retorna dados reais
+- **Novos endpoints** em `portfolio_blueprint.py`: `GET/PUT /api/portfolios/meta-alocacao`, `GET /api/portfolios/rebalanceamento/sugestao`
+- **`analises/alocacao_v2.html`**: editor de metas inline (% por classe + botão Salvar), barras com marcador de target, tabela com colunas Desvio e Ajuste R$, painel sugestões (comprar/vender com valor), empty state para "definir metas"
+- 19 novos testes em `test_rebalance_service.py` (metas, desvio, sugestão, multi-tenant, endpoints)
+- `MANUAL_USUARIO_DRAFT.md`: Fluxo 4 detalhado com fórmulas de desvio e ajuste
+
+**Fórmulas:**
+- `desvio_pct = percentual_atual - percentual_target` (positivo = sobrealoc → vender)
+- `valor_ajuste = patrimonio * target/100 - valor_atual` (positivo = comprar)
+- Sinaliza rebalanceamento quando `|desvio_pct| > tolerancia_pct` (default 2pp)
+
+---
+
 ### Feat — BUG-VAL-004: Unificar semântica preco_teto → preco_teto_usuario vs valor_justo (30/06/2026)
 
 **Problema:**

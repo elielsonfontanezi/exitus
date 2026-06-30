@@ -54,7 +54,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 14 | Proventos — Calendário | `/proventos/calendario` | 🟡 | Calendário e filtros OK; sem botão "Confirmar Recebimento" (FEAT-008); botão "Gerar Automático" presente | Média |
 | 15 | Análises — Evolução | `/analises/evolucao` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 16 | Análises — Performance | `/analises/performance` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
-| 17 | Análises — Alocação | `/analises/alocacao` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
+| 17 | Análises — Alocação | `/analises/alocacao` | ✅ | Metas + desvio + sugestões (REBALANCE-001) ✅ | — |
 | 18 | Análises — Buy Signals | `/analises/buy-signals` | ✅ | Carrega dados ✅; busca por ticker funcionando (BUG-017 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`) | — |
 | 19 | Análises — Rentabilidade (legacy) | `/analises/rentabilidade` | 🟡 | Redirect para `/periodo` ✅ (EXITUS-ANALISES-001); código morto removido | — |
 | 19b | Análises — Rentabilidade por Período | `/analises/rentabilidade/periodo` | 🟡 | Acessível pelo menu como "Rentabilidade"; filtros de período OK; benchmark sem validação | Média |
@@ -434,17 +434,19 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 ---
 
 ### Tela 17 — Análises — Alocação (`/analises/alocacao`)
-**Status:** 🟡 PARCIAL
+**Status:** ✅ OK (REBALANCE-001 — 30/06/2026)
 
 **O que funciona (código):**
 - Rota existe, renderiza `analises/alocacao_v2.html` ✅
 - Alpine.js API-driven ✅
+- **Editor de metas** inline (% por classe + tolerância + Salvar) ✅
+- **Barras de alocação** com marcador de target e desvio em pp ✅
+- **Tabela** com colunas Desvio (pp) e Ajuste (R$) ✅
+- **Painel sugestões** comprar/vender com valor em R$ ✅
+- `GET/PUT /api/portfolios/meta-alocacao` integrados ✅
+- `GET /api/portfolios/rebalanceamento/sugestao` integrado ✅
 
-**Problemas encontrados:**
-1. � BUG-001 não afeta esta tela na prática — dados carregam normalmente
-
-**Validação visual (18/06/2026):**
-- [x] Carrega dados e gráficos ✅
+**P-items resolvidos:** FEAT-026 (Metas por classe) ✅
 
 ---
 
@@ -627,7 +629,7 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 | FEAT-023 | **Relatórios por corretora** — extrato de movimentações, posição consolidada, IR retido; exportação PDF/Excel | 4 |
 | FEAT-024 | **Status avançado da corretora** — indicadores de conexão/API ativa; última sincronização; erros de integração | 4 |
 | FEAT-025 | **Metas de patrimônio por período** — configurar metas anuais, trimestrais, mensais com projeções automáticas baseadas em aportes esperados | 2 |
-| FEAT-026 | **Metas por classe de ativo** — definir percentuais-alvo para ações, FIIs, Tesouro, renda fixa; alertas de desvio | 2 |
+| FEAT-026 | **Metas por classe de ativo** — ✅ IMPLEMENTADO (REBALANCE-001) — editor de metas, desvio, sugestões comprar/vender | — |
 | FEAT-027 | **Alertas de progresso de meta** — notificar quando atingir X% da meta ou quando atrasar em relação ao planejado | 2 |
 | FEAT-028 | **Comparativo visual meta vs. realizado** — gráfico de linha mostrando projeção vs. patrimônio real ao longo do tempo | 2 |
 | FEAT-029 | **Migração automática template venda.html** — redirecionar para operacoes_v2.html com parâmetros ?tipo=venda&ticker=PETR4 | 7 |

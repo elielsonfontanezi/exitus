@@ -1224,13 +1224,46 @@ GET /api/relatorios/{id}/download
 4. **Exportar Relatório** → Para declaração anual
 5. **Acompanhar Prejuízos** → Saldo para compensação futura
 
-### Fluxo 4: Rebalanceamento
+### Fluxo 4: Rebalanceamento (REBALANCE-001 — implementado 30/06/2026)
 
-1. **Alocação** → Visualizar distribuição atual
-2. **Comparar com Meta** → Identificar desvios
-3. **Planos de Venda** → Vender ativos sobreposicionados
-4. **Planos de Compra** → Comprar ativos subposicionados
-5. **Monitorar** → Acompanhar execução
+O sistema sugere rebalanceamento por **classe de ativo** (não executa — apenas orienta).
+
+#### Passos
+
+1. **Definir metas** em _Análises → Alocação_: informe o % desejado para cada classe
+   - Renda Variável (ações, FIIs, ETFs)
+   - Renda Fixa (Tesouro Direto, CDB, LCI, LCA)
+   - Criptoativos
+   - A soma dos targets pode ser ≤ 100% (o restante fica "sem meta")
+   - Tolerância configurável (default 2pp)
+2. **Visualizar desvio**: barras mostram % atual vs % meta com marcador visual
+3. **Ler sugestões**: o painel exibe ações comprar/vender por classe com valor em R$
+4. **Executar via Planos**: use Planos de Compra e Venda para ativos específicos dentro da classe
+5. **Monitorar**: recarregue a tela para ver o progresso após as transações
+
+#### Cálculos aplicados
+
+```
+Desvio (pp) = percentual_atual - percentual_target
+
+  positivo (+) → sobreposicionado → VENDER
+  negativo (-) → subposicionado   → COMPRAR
+
+Valor de ajuste (R$) = patrimônio_total × (target/100) − valor_atual
+
+  positivo → comprar esse valor
+  negativo → vender esse valor (abs)
+
+Sinaliza rebalanceamento quando: |desvio_pp| > tolerancia_pct
+  default tolerância: 2pp por classe
+```
+
+**Exemplo:** carteira de R$ 100.000
+- Renda Variável atual: 75% (R$ 75.000) | meta: 60% | desvio: +15pp → **vender R$ 15.000**
+- Renda Fixa atual: 20% (R$ 20.000) | meta: 30% | desvio: −10pp → **comprar R$ 10.000**
+- Cripto atual: 5% (R$ 5.000) | meta: 10% | desvio: −5pp → **comprar R$ 5.000**
+
+> **Nota:** A sugestão é por classe — não indica quais ativos vender/comprar. Use o bom senso e os indicadores de Buy Score para selecionar os ativos dentro de cada classe.
 
 ---
 

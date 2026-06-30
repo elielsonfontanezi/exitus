@@ -207,12 +207,81 @@ Para referência completa dos enums, consulte `ENUMS.md`.
 ---
 
 ## 5. Portfólios
-APIs de dashboard, alocação, performance e carteiras customizadas:
+APIs de dashboard, alocação, performance, rebalanceamento e carteiras customizadas:
 - `GET /api/portfolios/dashboard` - Dashboard consolidado com dados por mercado
 - `GET /api/portfolio/alocacao`
 - `GET /api/portfolio/performance`
 - `GET /api/portfolio/evolucao`
 - CRUD de `/api/portfolios`
+- `GET /api/portfolios/meta-alocacao` — metas percentuais por classe (REBALANCE-001)
+- `PUT /api/portfolios/meta-alocacao` — salvar/atualizar metas (REBALANCE-001)
+- `GET /api/portfolios/rebalanceamento/sugestao` — sugestões comprar/vender por classe (REBALANCE-001)
+
+### GET /api/portfolios/meta-alocacao
+Retorna as metas percentuais de alocação por classe do usuário autenticado. Sempre retorna as 3 classes (`renda_variavel`, `renda_fixa`, `cripto`); classes sem meta têm `percentual_target=0`.
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "metas": [
+      {"classe": "renda_variavel", "percentual_target": 60.0, "tolerancia_pct": 2.0},
+      {"classe": "renda_fixa", "percentual_target": 30.0, "tolerancia_pct": 2.0},
+      {"classe": "cripto", "percentual_target": 10.0, "tolerancia_pct": 2.0}
+    ]
+  }
+}
+```
+
+### PUT /api/portfolios/meta-alocacao
+Salva ou atualiza metas por classe (upsert). Soma dos `percentual_target` não pode exceder 100%.
+
+**Body:**
+```json
+{
+  "metas": [
+    {"classe": "renda_variavel", "percentual_target": 60.0, "tolerancia_pct": 2.0},
+    {"classe": "renda_fixa", "percentual_target": 30.0}
+  ]
+}
+```
+
+**Regras de validação:**
+- `classe` ∈ `{renda_variavel, renda_fixa, cripto}`
+- `percentual_target` ∈ [0, 100]
+- `tolerancia_pct` ∈ [0, 50] (default 2)
+- Soma total dos targets ≤ 100%
+
+### GET /api/portfolios/rebalanceamento/sugestao
+Compara alocação atual (via `PortfolioService.get_alocacao`) com metas. Retorna classes fora da tolerância com direção (comprar/vender) e valor em R$.
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "patrimonio_total": 100000.0,
+    "carteira_balanceada": false,
+    "total_acoes": 2,
+    "classes_fora_tolerancia": ["renda_variavel", "renda_fixa"],
+    "resumo": "2 classe(s) fora da tolerância: Renda Variável, Renda Fixa",
+    "acoes": [
+      {
+        "classe": "renda_variavel",
+        "label": "Renda Variável",
+        "direcao": "vender",
+        "valor_brl": 15000.0,
+        "desvio_pct": 15.0,
+        "percentual_atual": 75.0,
+        "percentual_target": 60.0
+      }
+    ]
+  }
+}
+```
+
+**Nota:** Sugestão por classe — utilizar Planos de Compra/Venda para ativos específicos.
 
 ### GET /api/portfolios/dashboard
 Retorna dashboard consolidado do portfólio com agrupamento por mercado (BR, US, INTL).

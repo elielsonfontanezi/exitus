@@ -22,10 +22,63 @@
         <div class="kpi-card-label">Classes de Ativos</div>
         <div class="kpi-card-value" x-text="classesAtivas()"></div>
     </div>
+    <div class="kpi-card" x-show="sugestao?.total_acoes > 0">
+        <div class="kpi-card-label">Fora da Meta</div>
+        <div class="kpi-card-value" style="color:#dc2626;" x-text="(sugestao?.total_acoes || 0) + ' classe(s)'"></div>
+    </div>
+    <div class="kpi-card" x-show="sugestao?.carteira_balanceada">
+        <div class="kpi-card-label">Status</div>
+        <div class="kpi-card-value" style="color:#16a34a;">Balanceada</div>
+    </div>
 </div>
 {% endblock %}
 
 {% block page_content %}
+
+<!-- Editor de metas -->
+<div class="section-box" style="margin-bottom:1.5rem;">
+    <div class="section-box-title">
+        <i class="fas fa-sliders-h"></i> Metas de Alocação
+        <span style="font-size:0.75rem; color:#6b7280; margin-left:0.5rem;">
+            — defina os percentuais-alvo por classe
+        </span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:1.5rem; align-items:flex-end; padding:0.5rem 0;">
+        <template x-for="meta in metas" :key="meta.classe">
+            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                <label style="font-size:0.8rem; font-weight:500; color:#374151;" x-text="labelClasse(meta.classe)"></label>
+                <div style="display:flex; align-items:center; gap:0.4rem;">
+                    <input type="number" min="0" max="100" step="0.5"
+                           x-model.number="meta.percentual_target"
+                           style="width:80px; border:1px solid #d1d5db; border-radius:6px; padding:0.35rem 0.5rem; font-size:0.9rem; text-align:right;"
+                           :style="somaTargets() > 100 ? 'border-color:#dc2626;' : ''" />
+                    <span style="color:#6b7280; font-size:0.85rem;">%</span>
+                </div>
+            </div>
+        </template>
+        <div style="display:flex; flex-direction:column; gap:0.25rem;">
+            <label style="font-size:0.8rem; color:#6b7280;">Soma</label>
+            <div style="padding:0.35rem 0.75rem; border-radius:6px; font-weight:700; font-size:0.9rem;"
+                 :style="somaTargets() > 100 ? 'background:#fee2e2; color:#dc2626;' : somaTargets() === 100 ? 'background:#dcfce7; color:#16a34a;' : 'background:#f1f5f9; color:#374151;'"
+                 x-text="somaTargets().toFixed(1) + '%'"></div>
+        </div>
+        <button class="btn-exitus"
+                :disabled="somaTargets() > 100 || salvandoMetas"
+                @click="salvarMetas()"
+                style="padding:0.4rem 1rem; font-size:0.85rem;">
+            <i class="fas fa-save" style="margin-right:0.35rem;"></i>
+            <span x-text="salvandoMetas ? 'Salvando...' : 'Salvar metas'"></span>
+        </button>
+        <span x-show="metasSalvas" style="color:#16a34a; font-size:0.82rem; display:flex; align-items:center; gap:0.3rem;">
+            <i class="fas fa-check-circle"></i> Salvo
+        </span>
+        <span x-show="metasErro" style="color:#dc2626; font-size:0.82rem;" x-text="metasErro"></span>
+    </div>
+    <div x-show="somaTargets() > 100" style="margin-top:0.5rem; color:#dc2626; font-size:0.8rem;">
+        <i class="fas fa-exclamation-triangle"></i> Soma não pode ultrapassar 100%.
+    </div>
+</div>
+
 <!-- Barras de alocação -->
 <div class="section-box" x-show="alocacao && classesAtivas() > 0">
     <div class="section-box-title"><i class="fas fa-chart-pie"></i> Distribuição por Classe</div>
@@ -38,14 +91,29 @@
                             <i :class="'fas ' + cls.icon" style="font-size:0.75rem;" :style="'color:' + cls.color"></i>
                         </div>
                         <span style="font-weight:500;" x-text="cls.label"></span>
+                        <span x-show="cls.precisa_rebalancear"
+                              style="font-size:0.7rem; background:#fee2e2; color:#dc2626; border-radius:4px; padding:0.1rem 0.35rem; font-weight:600;">
+                            Fora da meta
+                        </span>
                     </div>
                     <div style="text-align:right;">
                         <span style="font-weight:700;" x-text="(cls.percentual || 0).toFixed(2) + '%'"></span>
                         <span style="color:#9ca3af; font-size:0.8rem; margin-left:0.5rem;" x-text="formatMoney(cls.valor || 0)"></span>
                     </div>
                 </div>
-                <div style="width:100%; background:#f1f5f9; border-radius:6px; height:12px;">
-                    <div style="height:12px; border-radius:6px; transition:width 0.5s;" :style="'width:' + (cls.percentual || 0) + '%; background:' + cls.color"></div>
+                <div style="position:relative; width:100%; background:#f1f5f9; border-radius:6px; height:12px;">
+                    <div style="height:12px; border-radius:6px; transition:width 0.5s;"
+                         :style="'width:' + (cls.percentual || 0) + '%; background:' + cls.color"></div>
+                    <!-- marcador de target -->
+                    <div x-show="cls.target > 0"
+                         style="position:absolute; top:-3px; width:2px; height:18px; background:#374151; border-radius:1px;"
+                         :style="'left:' + Math.min(cls.target, 100) + '%'"></div>
+                </div>
+                <div x-show="cls.target > 0" style="margin-top:0.2rem; font-size:0.72rem; color:#6b7280; display:flex; gap:1rem;">
+                    <span>Meta: <strong x-text="cls.target.toFixed(1) + '%'"></strong></span>
+                    <span :style="cls.desvio_pct > 2 ? 'color:#dc2626;' : cls.desvio_pct < -2 ? 'color:#1d4ed8;' : 'color:#16a34a;'">
+                        Desvio: <strong x-text="(cls.desvio_pct >= 0 ? '+' : '') + (cls.desvio_pct || 0).toFixed(1) + 'pp'"></strong>
+                    </span>
                 </div>
             </div>
         </template>
@@ -61,21 +129,26 @@
                 <th>Classe</th>
                 <th class="col-right">Valor</th>
                 <th class="col-right">% Atual</th>
-                <th class="col-right" x-show="desvio?.alocacao_target">% Target</th>
-                <th class="col-right" x-show="desvio?.alocacao_target">Desvio</th>
+                <th class="col-right" x-show="temMetas()">% Meta</th>
+                <th class="col-right" x-show="temMetas()">Desvio</th>
+                <th class="col-right" x-show="temMetas()">Ajuste (R$)</th>
             </tr>
         </thead>
         <tbody>
             <template x-for="cls in classesData()" :key="cls.key">
-                <tr>
+                <tr :style="cls.precisa_rebalancear ? 'background:#fff7ed;' : ''">
                     <td style="display:flex; align-items:center; gap:0.5rem; font-weight:500;">
                         <i :class="'fas ' + cls.icon" style="font-size:0.75rem;" :style="'color:' + cls.color"></i>
                         <span x-text="cls.label"></span>
+                        <span x-show="cls.precisa_rebalancear" style="font-size:0.65rem; color:#dc2626;">&#9650;</span>
                     </td>
                     <td class="col-right" style="font-weight:600;" x-text="formatMoney(cls.valor || 0)"></td>
                     <td class="col-right" style="font-weight:700;" :style="'color:' + cls.color" x-text="(cls.percentual || 0).toFixed(2) + '%'"></td>
-                    <td class="col-right" x-show="desvio?.alocacao_target" style="color:#6b7280;" x-text="(cls.target || 0).toFixed(1) + '%'"></td>
-                    <td class="col-right" x-show="desvio?.alocacao_target" :style="desvioStyle(cls)" x-text="desvioText(cls)"></td>
+                    <td class="col-right" x-show="temMetas()" style="color:#6b7280;" x-text="(cls.target || 0).toFixed(1) + '%'"></td>
+                    <td class="col-right" x-show="temMetas()" :style="desvioStyle(cls)" x-text="desvioText(cls)"></td>
+                    <td class="col-right" x-show="temMetas()"
+                        :style="cls.valor_ajuste > 0 ? 'color:#16a34a; font-weight:600;' : cls.valor_ajuste < 0 ? 'color:#dc2626; font-weight:600;' : 'color:#6b7280;'"
+                        x-text="cls.valor_ajuste != null ? (cls.valor_ajuste >= 0 ? '+' : '') + formatMoney(cls.valor_ajuste) : '-'"></td>
                 </tr>
             </template>
         </tbody>
@@ -84,18 +157,83 @@
                 <td style="font-weight:700;">Total</td>
                 <td class="col-right" style="font-weight:700;" x-text="formatMoney(desvio?.patrimonio_total || 0)"></td>
                 <td class="col-right" style="font-weight:700;">100%</td>
-                <td x-show="desvio?.alocacao_target" colspan="2"></td>
+                <td x-show="temMetas()" colspan="3"></td>
             </tr>
         </tfoot>
     </table>
 </div>
 
+<!-- Sugestões de rebalanceamento -->
+<div class="section-box" x-show="sugestao && sugestao.total_acoes > 0" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-balance-scale"></i> Sugestões de Rebalanceamento</div>
+    <p style="font-size:0.85rem; color:#6b7280; margin-bottom:1rem;" x-text="sugestao?.resumo"></p>
+    <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        <template x-for="acao in sugestao?.acoes || []" :key="acao.classe">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; border-radius:8px; border:1px solid #e5e7eb;"
+                 :style="acao.direcao === 'vender' ? 'background:#fff1f2; border-color:#fecdd3;' : 'background:#f0fdf4; border-color:#bbf7d0;'">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <div style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;"
+                         :style="acao.direcao === 'vender' ? 'background:#fca5a5;' : 'background:#86efac;'">
+                        <i :class="acao.direcao === 'vender' ? 'fas fa-arrow-down' : 'fas fa-arrow-up'"
+                           :style="acao.direcao === 'vender' ? 'color:#dc2626;' : 'color:#16a34a;'"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:600; font-size:0.9rem;" x-text="acao.label"></div>
+                        <div style="font-size:0.75rem; color:#6b7280;">
+                            <span x-text="acao.percentual_atual.toFixed(1) + '% atual'"></span>
+                            <span style="margin:0 0.3rem;">→</span>
+                            <span x-text="acao.percentual_target.toFixed(1) + '% meta'"></span>
+                            <span style="margin-left:0.4rem;"
+                                  :style="acao.desvio_pct > 0 ? 'color:#dc2626;' : 'color:#1d4ed8;'"
+                                  x-text="'(' + (acao.desvio_pct >= 0 ? '+' : '') + acao.desvio_pct.toFixed(1) + 'pp)'"></span>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-weight:700; font-size:1rem;"
+                         :style="acao.direcao === 'vender' ? 'color:#dc2626;' : 'color:#16a34a;'"
+                         x-text="(acao.direcao === 'vender' ? '- ' : '+ ') + formatMoney(acao.valor_brl)"></div>
+                    <div style="font-size:0.75rem; color:#6b7280; text-transform:uppercase;" x-text="acao.direcao"></div>
+                </div>
+            </div>
+        </template>
+    </div>
+    <p style="font-size:0.75rem; color:#9ca3af; margin-top:0.75rem;">
+        <i class="fas fa-info-circle"></i>
+        Sugestão por classe — utilize Planos de Compra/Venda para definir os ativos específicos.
+    </p>
+</div>
+
+<!-- Carteira balanceada -->
+<div class="section-box" x-show="sugestao?.carteira_balanceada && temMetas()" style="margin-top:1.5rem;">
+    <div style="display:flex; align-items:center; gap:0.75rem; padding:0.75rem;">
+        <i class="fas fa-check-circle" style="color:#16a34a; font-size:1.5rem;"></i>
+        <div>
+            <div style="font-weight:600; color:#16a34a;">Carteira balanceada</div>
+            <div style="font-size:0.82rem; color:#6b7280;">Todas as classes estão dentro da tolerância configurada.</div>
+        </div>
+    </div>
+</div>
+
+<!-- Empty state: sem dados -->
 <div class="section-box" x-show="!alocacao && !loading && !error">
     <div class="empty-state">
         <div class="empty-state-icon"><i class="fas fa-chart-pie"></i></div>
         <div class="empty-state-title">Nenhum dado de alocação disponível</div>
     </div>
 </div>
+
+<!-- Empty state: sem metas definidas -->
+<div class="section-box" x-show="alocacao && classesAtivas() > 0 && !temMetas()" style="margin-top:1.5rem; border:1px dashed #d1d5db;">
+    <div style="display:flex; align-items:center; gap:0.75rem; padding:0.5rem;">
+        <i class="fas fa-sliders-h" style="color:#9ca3af; font-size:1.25rem;"></i>
+        <div>
+            <div style="font-weight:500; color:#374151;">Defina suas metas de alocação</div>
+            <div style="font-size:0.82rem; color:#6b7280;">Configure os percentuais-alvo acima para ver desvios e sugestões de rebalanceamento.</div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block page_scripts %}
@@ -104,14 +242,75 @@ function pageDataExtend() {
     return {
         alocacao: null,
         desvio: null,
+        sugestao: null,
+        metas: [],
+        salvandoMetas: false,
+        metasSalvas: false,
+        metasErro: null,
 
         async loadData() {
-            const [r1, r2] = await Promise.all([
+            const [r1, r2, r3, r4] = await Promise.all([
                 this.apiFetch('/api/portfolios/alocacao'),
                 this.apiFetch('/api/performance/desvio-alocacao'),
+                this.apiFetch('/api/portfolios/rebalanceamento/sugestao'),
+                this.apiFetch('/api/portfolios/meta-alocacao'),
             ]);
             this.alocacao = r1 || {};
             this.desvio = r2 || {};
+            this.sugestao = r3?.data || r3 || null;
+            // Normalizar metas: pode vir em data.metas ou direto
+            const rawMetas = r4?.data?.metas || r4?.metas || r4 || [];
+            this.metas = Array.isArray(rawMetas) ? rawMetas : [];
+        },
+
+        somaTargets() {
+            return this.metas.reduce((s, m) => s + (parseFloat(m.percentual_target) || 0), 0);
+        },
+
+        temMetas() {
+            return this.metas.some(m => (parseFloat(m.percentual_target) || 0) > 0);
+        },
+
+        async salvarMetas() {
+            this.salvandoMetas = true;
+            this.metasSalvas = false;
+            this.metasErro = null;
+            try {
+                const payload = {
+                    metas: this.metas.map(m => ({
+                        classe: m.classe,
+                        percentual_target: parseFloat(m.percentual_target) || 0,
+                        tolerancia_pct: parseFloat(m.tolerancia_pct) || 2.0,
+                    }))
+                };
+                await this.apiFetch('/api/portfolios/meta-alocacao', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                this.metasSalvas = true;
+                setTimeout(() => this.metasSalvas = false, 3000);
+                // Recarregar desvio e sugestão após salvar
+                const [r2, r3] = await Promise.all([
+                    this.apiFetch('/api/performance/desvio-alocacao'),
+                    this.apiFetch('/api/portfolios/rebalanceamento/sugestao'),
+                ]);
+                this.desvio = r2 || {};
+                this.sugestao = r3?.data || r3 || null;
+            } catch (e) {
+                this.metasErro = e?.message || 'Erro ao salvar metas.';
+            } finally {
+                this.salvandoMetas = false;
+            }
+        },
+
+        labelClasse(classe) {
+            const map = {
+                renda_variavel: 'Renda Variável',
+                renda_fixa: 'Renda Fixa',
+                cripto: 'Criptoativos',
+            };
+            return map[classe] || classe;
         },
 
         classesAtivas() {
@@ -122,15 +321,25 @@ function pageDataExtend() {
         classesData() {
             const cfg = [
                 { key: 'renda_variavel', label: 'Renda Variável', color: '#3b82f6', icon: 'fa-chart-line' },
-                { key: 'renda_fixa', label: 'Renda Fixa', color: '#10b981', icon: 'fa-university' },
-                { key: 'cripto', label: 'Criptoativos', color: '#f59e0b', icon: 'fa-coins' },
+                { key: 'renda_fixa',     label: 'Renda Fixa',     color: '#10b981', icon: 'fa-university' },
+                { key: 'cripto',         label: 'Criptoativos',   color: '#f59e0b', icon: 'fa-coins' },
             ];
-            return cfg.filter(c => this.alocacao?.[c.key]).map(c => ({
-                ...c,
-                percentual: this.alocacao[c.key]?.percentual || 0,
-                valor: this.alocacao[c.key]?.valor || 0,
-                target: this.desvio?.alocacao_target?.[c.key] || 0,
-            }));
+            // desvio.classes vem do rebalance_service (contém valor_ajuste, desvio_pct, precisa_rebalancear)
+            const classeDetalhe = {};
+            (this.desvio?.classes || []).forEach(c => { classeDetalhe[c.classe] = c; });
+
+            return cfg.filter(c => this.alocacao?.[c.key]).map(c => {
+                const det = classeDetalhe[c.key] || {};
+                return {
+                    ...c,
+                    percentual: this.alocacao[c.key]?.percentual || 0,
+                    valor: this.alocacao[c.key]?.valor || 0,
+                    target: det.percentual_target || this.desvio?.alocacao_target?.[c.key] || 0,
+                    desvio_pct: det.desvio_pct ?? null,
+                    valor_ajuste: det.valor_ajuste ?? null,
+                    precisa_rebalancear: det.precisa_rebalancear || false,
+                };
+            });
         },
 
         desvioStyle(cls) {

@@ -1,10 +1,11 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 30/06/2026
-> **Status:** ✅ **BUG-VAL-004 — Rename DDL preco_teto → preco_teto_usuario + limpeza semântica**
-> **Versão:** v0.9.35
+> **Status:** ✅ **REBALANCE-001 — Rebalanceamento automático por classe concluído**
+> **Versão:** v0.9.36
 
-### 🔧 Últimas correções (30/06/2026)
+### 🔧 Últimas entregas (30/06/2026)
+- **REBALANCE-001 ✅ CONCLUÍDO:** Tabela `meta_alocacao` (migration `20260630_1200`) + model + schema. `rebalance_service.py`: metas (upsert), desvio (atual vs target), sugestões (comprar/vender). 3 endpoints novos em `portfolio_blueprint`: `GET/PUT /api/portfolios/meta-alocacao`, `GET /api/portfolios/rebalanceamento/sugestao`. `analise_service.analisar_performance_portfolio` delega para `rebalance_service` — `/api/performance/desvio-alocacao` retorna dados reais. `alocacao_v2.html` reformulada: editor de metas, barras com marcador de target, tabela com Desvio/Ajuste R$, painel sugestões. 19 novos testes. Suite: **612 passed, 3 failed pré-existentes, 6 skipped**.
 - **BUG-VAL-004 ✅ CONCLUÍDO:** Migration DDL `20260630_1100` renomeia coluna `preco_teto → preco_teto_usuario`. Paridade `exitusdb + exitusdb_test` verificada. Model, schemas, seeds, blueprints, service e frontend atualizados. Alias confuso `preco_teto = valor_justo` removido das APIs. Labels frontend: "Teto (Usuário)" em detalhe de ativo; watchlist usa `valor_justo`. Suite: **593 passed, 3 failed pré-existentes, 6 skipped — sem regressão**.
 - **BUG-VAL-005 ✅ CONCLUÍDO:** `valuation_service.py` criado (fonte única de valuation). Agregação: perfil + IQR ratio + mediana ponderada. API expõe `faixa_min/faixa_max/perfil`. `buy_signals_service` usa `valor_justo` calculado (não `preco_teto_usuario` estático). Frontend exibe faixa. 26 novos testes. Suite: **593 passed, 3 failed pré-existentes, 6 skipped**.
 - **BUG-VAL-006 ✅ CONCLUÍDO:** Fórmula `1/cap_rate` substituída por `dy_anual/cap_rate` para FIIs/REITs. Guard defensivo adicionado. 2 novos testes em `test_calculos.py`. Suite: **567 passed**.
