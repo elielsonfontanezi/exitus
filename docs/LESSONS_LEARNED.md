@@ -2,7 +2,7 @@
 
 > **Propósito:** Regras ativas derivadas de erros reais em produção/desenvolvimento.  
 > Consultado pela IA **antes de qualquer ação** para evitar repetição de erros.  
-> **Atualizado:** 29/06/2026 — L-OPS-001 adicionada (migração `.windsurfrules` → `.cursorrules`)
+> **Atualizado:** 30/06/2026 — L-OPS-002 adicionada (git push HTTPS 401)
 > **Atualizado:** 28/06/2026 — L-DB-015 adicionada (diretórios duplicados de migration — alembic/ vs migrations/)
 > **Ver também:** `docs/CODING_STANDARDS.md`, `.codeium.rules`
 
@@ -1608,6 +1608,28 @@ rg 'Cascade AI|Para Próxima Sessão Cascade' docs/ \
 rg '\.cursorrules' docs/PERSONAS.md docs/LESSONS_LEARNED.md docs/AUDITORIA_FUNCIONAL.md -q \
   && echo "PASS: .cursorrules referenciado nos docs operacionais"
 ```
+
+---
+
+### L-OPS-002 — `git push` HTTPS retorna HTTP 401 no WSL
+**Origem:** OPS-GIT-HTTPS-001 — push Lote 3 bloqueado | **Data:** 30/06/2026
+
+**Erro:** `git push origin <branch>` via remote HTTPS (`https://github.com/elielsonfontanezi/exitus.git`) retorna `HTTP 401` / `RPC failed; curl 22` quando credencial GitHub não está configurada no ambiente (WSL).
+
+**Impacto:** commits permanecem apenas locais; `origin` e CI não recebem o código até o push ser concluído manualmente.
+
+**Correto (ajuste posterior — escolher uma opção):**
+- **HTTPS + PAT:** Personal Access Token via `gh auth login` ou credential helper (`git-credential-manager`)
+- **SSH:** `git remote set-url origin git@github.com:elielsonfontanezi/exitus.git` + chave SSH em `~/.ssh` (adicionada ao GitHub)
+
+**Validação:**
+```bash
+git status -sb
+git log origin/feature/frontend-bug-fixes..HEAD --oneline
+git push origin feature/frontend-bug-fixes   # deve concluir sem 401
+```
+
+**Referência operacional:** `docs/OPERATIONS_RUNBOOK.md` § Push / Autenticação Git.
 
 ---
 

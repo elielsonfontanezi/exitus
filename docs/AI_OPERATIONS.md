@@ -35,7 +35,7 @@ Consultar `docs/LESSONS_LEARNED.md` — **nunca duplicar** lições neste arquiv
 | Testes | L-TEST-001 a L-TEST-005 |
 | Documentação | L-DOCS-001 |
 | Multi-tenant / segurança | L-SEC-001 |
-| Operações IA | L-OPS-001 |
+| Operações IA | L-OPS-001, L-OPS-002 |
 
 ---
 

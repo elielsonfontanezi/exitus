@@ -58,6 +58,7 @@
 | **MONITOR-001** | Monitoramento e alertas | 🟡 Média | 📋 Planejado | Prometheus + Grafana vs DataDog |
 | **RATELIMIT-001** | Rate limiting | 🟡 Média | 📋 Planejado | — |
 | **CICD-001** | CI/CD + deploy | 🟡 Média | 📋 Planejado | GitHub Actions vs GitLab CI |
+| **OPS-GIT-HTTPS-001** | Autenticação Git para `git push` (HTTPS PAT ou SSH) no WSL | 🟡 Baixa | 🟡 Pendente — ajuste posterior | 5 commits Lote 3 locais aguardam push; ver L-OPS-002 |
 | **HIST-002** | Histórico de preços — fallback multi-provider | 🟡 Média | ✅ Implementado (28/06/2026) | `buscar_historico()` agora segue o padrão de cascata por mercado (Brapi/Twelve/Alpha/YF para BR; Alpha/Twelve/Finnhub/YF para US). Ver detalhe abaixo |
 
 ### MULTICLIENTE-001 — Concluído (03/04/2026)

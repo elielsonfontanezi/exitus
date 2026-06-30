@@ -99,6 +99,43 @@ ls -la
 
 ---
 
+### Push / Autenticação Git (OPS-GIT-HTTPS-001)
+
+**Remote padrão:** `https://github.com/elielsonfontanezi/exitus.git`
+
+**Sintoma:** push falha com `HTTP 401`, `RPC failed; curl 22` ou `fatal: the remote end hung up unexpectedly`.
+
+**Causa:** credencial GitHub ausente ou inválida no ambiente (comum no WSL com remote HTTPS).
+
+**Correção (ajuste posterior — escolher uma opção):**
+
+```bash
+# Opção A — HTTPS com Personal Access Token (PAT)
+gh auth login
+# ou configurar git-credential-manager / credential helper do sistema
+
+# Opção B — migrar remote para SSH
+git remote set-url origin git@github.com:elielsonfontanezi/exitus.git
+# garantir chave em ~/.ssh e cadastrada no GitHub
+```
+
+**Verificar commits locais aguardando publicação:**
+
+```bash
+git status -sb
+git log origin/feature/frontend-bug-fixes..HEAD --oneline
+```
+
+**Publicar após autenticação configurada:**
+
+```bash
+git push origin feature/frontend-bug-fixes
+```
+
+**Lição:** L-OPS-002 em `docs/LESSONS_LEARNED.md`.
+
+---
+
 ### Configuração de Variáveis (.env)
 
 #### 1. Copiar Arquivo de Exemplo

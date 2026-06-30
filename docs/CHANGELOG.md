@@ -8,6 +8,14 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Ops — OPS-GIT-HTTPS-001 (30/06/2026)
+
+- Push do Lote 3 bloqueado por HTTP 401 (credencial HTTPS ausente no WSL)
+- 5 commits locais em `feature/frontend-bug-fixes` aguardam publicação (`363ed9f`…`08d040b`)
+- Autenticação Git (HTTPS PAT ou SSH) registrada como ajuste posterior — L-OPS-002, `OPERATIONS_RUNBOOK.md`
+
+---
+
 ### Feat — Lote 3 Frontend NEW-11/15/17/18/07 (30/06/2026)
 
 **NEW-11 — Calculadora Preço Teto**
