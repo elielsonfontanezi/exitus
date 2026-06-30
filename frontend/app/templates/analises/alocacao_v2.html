@@ -1,7 +1,7 @@
 {% extends "components/base_interna.html" %}
 
 {% block page_title %}Alocação de Ativos{% endblock %}
-{% block page_subtitle %}<p class="page-subtitle">Distribuição da carteira por classe de ativo</p>{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Distribuição da carteira por classe e segmento (tipo de ativo)</p>{% endblock %}
 
 {% block page_actions %}
 <a href="/analises/rentabilidade/periodo" class="btn-exitus btn-exitus-ghost"><i class="fas fa-chart-line"></i> Rentabilidade</a>
@@ -79,8 +79,29 @@
     </div>
 </div>
 
+<!-- Seletor de visão -->
+<div class="section-box" x-show="alocacao && (classesAtivas() > 0 || segmentosAtivos() > 0)" style="margin-bottom:1rem; padding:0.75rem 1rem;">
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <button class="btn-exitus"
+                :class="visaoAtiva === 'macro' ? 'btn-exitus-primary' : 'btn-exitus-ghost'"
+                @click="visaoAtiva = 'macro'"
+                style="font-size:0.85rem;">
+            <i class="fas fa-layer-group"></i> Por Classe (macro)
+        </button>
+        <button class="btn-exitus"
+                :class="visaoAtiva === 'segmento' ? 'btn-exitus-primary' : 'btn-exitus-ghost'"
+                @click="visaoAtiva = 'segmento'"
+                style="font-size:0.85rem;">
+            <i class="fas fa-th-large"></i> Por Segmento (tipo)
+        </button>
+    </div>
+    <p x-show="visaoAtiva === 'segmento'" style="font-size:0.75rem; color:#6b7280; margin-top:0.5rem; margin-bottom:0;">
+        Segmento = tipo do ativo (Ações, FIIs, CDB, etc.) — agrupamento disponível enquanto setor fundamentalista não estiver no cadastro.
+    </p>
+</div>
+
 <!-- Barras de alocação -->
-<div class="section-box" x-show="alocacao && classesAtivas() > 0">
+<div class="section-box" x-show="visaoAtiva === 'macro' && alocacao && classesAtivas() > 0">
     <div class="section-box-title"><i class="fas fa-chart-pie"></i> Distribuição por Classe</div>
     <div style="display:flex; flex-direction:column; gap:1.25rem; padding:0.5rem 0;">
         <template x-for="cls in classesData()" :key="cls.key">
@@ -120,8 +141,37 @@
     </div>
 </div>
 
-<!-- Tabela detalhada -->
-<div class="section-box" x-show="alocacao && classesAtivas() > 0" style="margin-top:1.5rem;">
+<!-- Barras por segmento (tipo) — NEW-03 -->
+<div class="section-box" x-show="visaoAtiva === 'segmento' && segmentosAtivos() > 0">
+    <div class="section-box-title"><i class="fas fa-th-large"></i> Distribuição por Segmento</div>
+    <div style="display:flex; flex-direction:column; gap:1.25rem; padding:0.5rem 0;">
+        <template x-for="(seg, idx) in segmentosData()" :key="seg.segmento">
+            <div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <div style="width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;"
+                             :style="'background:' + seg.color + '20'">
+                            <i class="fas fa-tag" style="font-size:0.75rem;" :style="'color:' + seg.color"></i>
+                        </div>
+                        <span style="font-weight:500;" x-text="seg.label"></span>
+                        <span style="font-size:0.7rem; color:#6b7280;" x-text="'(' + labelClasse(seg.classe) + ')'"></span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="font-weight:700;" x-text="(seg.percentual || 0).toFixed(2) + '%'"></span>
+                        <span style="color:#9ca3af; font-size:0.8rem; margin-left:0.5rem;" x-text="formatMoney(seg.valor || 0)"></span>
+                    </div>
+                </div>
+                <div style="width:100%; background:#f1f5f9; border-radius:6px; height:12px;">
+                    <div style="height:12px; border-radius:6px; transition:width 0.5s;"
+                         :style="'width:' + (seg.percentual || 0) + '%; background:' + seg.color"></div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+
+<!-- Tabela detalhada macro -->
+<div class="section-box" x-show="visaoAtiva === 'macro' && alocacao && classesAtivas() > 0" style="margin-top:1.5rem;">
     <div class="section-box-title"><i class="fas fa-table"></i> Detalhamento</div>
     <table class="data-table">
         <thead>
@@ -158,6 +208,44 @@
                 <td class="col-right" style="font-weight:700;" x-text="formatMoney(desvio?.patrimonio_total || 0)"></td>
                 <td class="col-right" style="font-weight:700;">100%</td>
                 <td x-show="temMetas()" colspan="3"></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- Tabela segmentos — NEW-03 -->
+<div class="section-box" x-show="visaoAtiva === 'segmento' && segmentosAtivos() > 0" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-table"></i> Detalhamento por Segmento</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Segmento</th>
+                <th>Classe</th>
+                <th class="col-right">Posições</th>
+                <th class="col-right">Valor</th>
+                <th class="col-right">% Carteira</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="seg in segmentosData()" :key="seg.segmento">
+                <tr>
+                    <td style="font-weight:500;">
+                        <span :style="'color:' + seg.color" x-text="seg.label"></span>
+                    </td>
+                    <td style="color:#6b7280; font-size:0.85rem;" x-text="labelClasse(seg.classe)"></td>
+                    <td class="col-right" x-text="seg.qtd_posicoes || 0"></td>
+                    <td class="col-right" style="font-weight:600;" x-text="formatMoney(seg.valor || 0)"></td>
+                    <td class="col-right" style="font-weight:700;" :style="'color:' + seg.color"
+                        x-text="(seg.percentual || 0).toFixed(2) + '%'"></td>
+                </tr>
+            </template>
+        </tbody>
+        <tfoot x-show="distribSetores?.patrimonio_total || desvio?.patrimonio_total">
+            <tr style="border-top:2px solid #e5e7eb; background:#f9fafb;">
+                <td style="font-weight:700;" colspan="3">Total</td>
+                <td class="col-right" style="font-weight:700;"
+                    x-text="formatMoney(distribClasses?.patrimonio_total || desvio?.patrimonio_total || 0)"></td>
+                <td class="col-right" style="font-weight:700;">100%</td>
             </tr>
         </tfoot>
     </table>
@@ -244,23 +332,29 @@ function pageDataExtend() {
         desvio: null,
         sugestao: null,
         metas: [],
+        distribClasses: null,
+        distribSetores: [],
+        visaoAtiva: 'macro',
         salvandoMetas: false,
         metasSalvas: false,
         metasErro: null,
 
         async loadData() {
-            const [r1, r2, r3, r4] = await Promise.all([
+            const [r1, r2, r3, r4, r5, r6] = await Promise.all([
                 this.apiFetch('/api/portfolios/alocacao'),
                 this.apiFetch('/api/performance/desvio-alocacao'),
                 this.apiFetch('/api/portfolios/rebalanceamento/sugestao'),
                 this.apiFetch('/api/portfolios/meta-alocacao'),
+                this.apiFetch('/api/portfolios/distribuicao/classes'),
+                this.apiFetch('/api/portfolios/distribuicao/setores'),
             ]);
             this.alocacao = r1 || {};
             this.desvio = r2 || {};
             this.sugestao = r3?.data || r3 || null;
-            // Normalizar metas: pode vir em data.metas ou direto
             const rawMetas = r4?.data?.metas || r4?.metas || r4 || [];
             this.metas = Array.isArray(rawMetas) ? rawMetas : [];
+            this.distribClasses = r5?.data || r5 || null;
+            this.distribSetores = r6?.data?.setores || r6?.setores || [];
         },
 
         somaTargets() {
@@ -352,7 +446,22 @@ function pageDataExtend() {
         desvioText(cls) {
             const dev = (cls.percentual || 0) - (cls.target || 0);
             return (dev > 0 ? '+' : '') + dev.toFixed(1) + '%';
-        }
+        },
+
+        segmentosAtivos() {
+            return (this.distribSetores || []).length;
+        },
+
+        segmentosData() {
+            const palette = [
+                '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899',
+                '#06b6d4', '#84cc16', '#f97316', '#6366f1', '#14b8a6',
+            ];
+            return (this.distribSetores || []).map((seg, idx) => ({
+                ...seg,
+                color: palette[idx % palette.length],
+            }));
+        },
     };
 }
 </script>

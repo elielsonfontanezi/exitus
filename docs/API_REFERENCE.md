@@ -283,6 +283,50 @@ Compara alocação atual (via `PortfolioService.get_alocacao`) com metas. Retorn
 
 **Nota:** Sugestão por classe — utilizar Planos de Compra/Venda para ativos específicos.
 
+### GET /api/portfolios/distribuicao/classes
+Distribuição detalhada por `ClasseAtivo` (NEW-03).
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "patrimonio_total": 3500.0,
+    "itens": [
+      {
+        "chave": "renda_variavel",
+        "label": "Renda Variável",
+        "valor": 1500.0,
+        "percentual": 42.86,
+        "qtd_posicoes": 2
+      }
+    ]
+  }
+}
+```
+
+### GET /api/portfolios/distribuicao/setores
+Distribuição por segmento (`TipoAtivo`: Ações, FIIs, CDB, etc.) — proxy de setor até coluna `setor` no model.
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "setores": [
+      {
+        "segmento": "acao",
+        "label": "Ações",
+        "classe": "renda_variavel",
+        "valor": 1000.0,
+        "percentual": 28.57,
+        "qtd_posicoes": 1
+      }
+    ]
+  }
+}
+```
+
 ### GET /api/portfolios/dashboard
 Retorna dashboard consolidado do portfólio com agrupamento por mercado (BR, US, INTL).
 

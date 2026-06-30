@@ -56,7 +56,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 14 | Proventos — Calendário | `/proventos/calendario` | 🟡 | Calendário e filtros OK; sem botão "Confirmar Recebimento" (FEAT-008); botão "Gerar Automático" presente | Média |
 | 15 | Análises — Evolução | `/analises/evolucao` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
 | 16 | Análises — Performance | `/analises/performance` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
-| 17 | Análises — Alocação | `/analises/alocacao` | ✅ | Metas + desvio + sugestões (REBALANCE-001) ✅ | — |
+| 17 | Análises — Alocação | `/analises/alocacao` | ✅ | Metas + desvio + sugestões (REBALANCE-001) + distribuição por segmento (NEW-03) ✅ | — |
 | 18 | Análises — Buy Signals | `/analises/buy-signals` | ✅ | Watchlist com `valor_justo`, faixa min/max, perfil; margem coerente (BUG-VAL-004/005); busca ticker OK (BUG-017) | — |
 | 19 | Análises — Rentabilidade (legacy) | `/analises/rentabilidade` | 🟡 | Redirect para `/periodo` ✅ (EXITUS-ANALISES-001); código morto removido | — |
 | 19b | Análises — Rentabilidade por Período | `/analises/rentabilidade/periodo` | 🟡 | Acessível pelo menu como "Rentabilidade"; filtros de período OK; benchmark sem validação | Média |
@@ -453,7 +453,7 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 - `GET/PUT /api/portfolios/meta-alocacao` integrados ✅
 - `GET /api/portfolios/rebalanceamento/sugestao` integrado ✅
 
-**P-items resolvidos:** FEAT-026 (Metas por classe) ✅
+**P-items resolvidos:** FEAT-026 (Metas por classe) ✅, NEW-03 (Distribuição detalhada) ✅
 
 ---
 
@@ -1154,7 +1154,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 |----|---------------|---------------------|-----------------|----------------------|
 | NEW-01 | **Projeções Patrimoniais** | `/analises/projecoes` | `/api/projecoes/*` | Simular crescimento do patrimônio com aportes, juros e inflação — substitui o Simulador client-side atual |
 | NEW-02 | **Métricas de Risco** | `/analises/risco` | `/api/portfolios/metricas-risco`, `/api/performance/*` | Sharpe, Drawdown máximo, VaR, correlação entre ativos |
-| NEW-03 | **Distribuição Detalhada** | Expandir `/analises/alocacao` | `/api/portfolios/distribuicao/classes`, `/api/portfolios/distribuicao/setores` | Alocação por setor, segmento e classe com desvio da meta |
+| ~~NEW-03~~ | ~~**Distribuição Detalhada**~~ | Expandir `/analises/alocacao` | `/api/portfolios/distribuicao/classes`, `/api/portfolios/distribuicao/setores` | ✅ IMPLEMENTADO (30/06/2026) — abas classe/segmento em alocacao_v2 |
 | NEW-04 | **Saúde das Cotações** | `/ferramentas/cotacoes` | `/api/cotacoes/anomalias`, `/api/cotacoes/health` | Detectar ativos com cotações desatualizadas ou inconsistentes |
 | NEW-05 | **Câmbio e Multimoeda** | Expandir Dashboard ou `/carteira/cambio` | `/api/cambio/converter`, `/api/cambio/historico`, `/api/cambio/pares` | Visualizar patrimônio em USD/EUR; histórico de taxas |
 | NEW-06 | **Indicadores Macroeconômicos** | Expandir Dashboard | `/api/parametros-macro/*` | CDI, Ibovespa, IPCA, Selic dinâmicos — resolve BUG-005 |
@@ -1456,7 +1456,7 @@ As seguintes novas telas propostas (NEW-XX) **não têm pré-requisito técnico*
 
 | ID | Tela | Motivo de independência |
 |----|------|------------------------|
-| NEW-03 | Distribuição Detalhada | Expandir alocacao_v2.html; APIs `/distribuicao/classes` e `/setores` existem |
+| ~~NEW-03~~ | Distribuição Detalhada | ✅ alocacao_v2.html — abas classe macro + segmento (tipo); APIs implementadas |
 | NEW-04 | Saúde das Cotações | APIs `/cotacoes/anomalias` e `/cotacoes/health` existem |
 | NEW-05 | Câmbio e Multimoeda | APIs `/cambio/converter`, `/cambio/historico` existem |
 | NEW-06 | Indicadores Macroeconômicos | API `/api/parametros-macro/*` existe; resolve BUG-005 (CDI/Ibovespa hardcoded) |

@@ -381,6 +381,134 @@ class PortfolioService:
                 resultado[classe] = {"valor": 0.0, "percentual": 0.0}
         
         return resultado
+
+    @staticmethod
+    def _iter_posicoes_valor_brl(usuario_id):
+        """Itera posições do usuário com valor de mercado convertido para BRL."""
+        from app.services.cambio_service import CambioService
+
+        posicoes = Posicao.query.filter_by(usuario_id=usuario_id).all()
+        for posicao in posicoes:
+            ativo = posicao.ativo
+            if not ativo:
+                continue
+            preco = (
+                Decimal(str(ativo.preco_atual))
+                if ativo.preco_atual
+                else Decimal(str(posicao.preco_medio))
+            )
+            valor_moeda = Decimal(str(posicao.quantidade)) * preco
+            moeda = getattr(ativo, 'moeda', 'BRL') or 'BRL'
+            if moeda.upper() != 'BRL':
+                convertido = CambioService.converter_para_brl(valor_moeda, moeda)
+                valor_brl = float(convertido) if convertido is not None else float(valor_moeda)
+            else:
+                valor_brl = float(valor_moeda)
+            yield posicao, ativo, valor_brl
+
+    _CLASSE_LABELS = {
+        'renda_variavel': 'Renda Variável',
+        'renda_fixa': 'Renda Fixa',
+        'cripto': 'Criptoativos',
+        'commodity': 'Commodities',
+        'hibrido': 'Híbrido',
+    }
+
+    _TIPO_LABELS = {
+        'acao': 'Ações',
+        'fii': 'FIIs',
+        'cdb': 'CDB',
+        'lci_lca': 'LCI/LCA',
+        'tesouro_direto': 'Tesouro Direto',
+        'debenture': 'Debêntures',
+        'stock': 'Stocks (US)',
+        'reit': 'REITs',
+        'bond': 'Bonds',
+        'etf': 'ETFs',
+        'stock_intl': 'Ações Internacionais',
+        'etf_intl': 'ETFs Internacionais',
+        'unit': 'Units',
+        'cripto': 'Criptoativos',
+        'outro': 'Outros',
+    }
+
+    @staticmethod
+    def get_distribuicao_classes(usuario_id) -> Dict:
+        """
+        Distribuição detalhada por classe de ativo (ClasseAtivo).
+        NEW-03 — complementa get_alocacao() com breakdown expandido.
+        """
+        buckets = {}
+        total = 0.0
+
+        for posicao, ativo, valor_brl in PortfolioService._iter_posicoes_valor_brl(usuario_id):
+            if hasattr(ativo.classe, 'value'):
+                chave = ativo.classe.value
+            else:
+                chave = str(ativo.classe).lower().replace('classeativo.', '')
+
+            if chave not in buckets:
+                buckets[chave] = {'valor': 0.0, 'qtd_posicoes': 0}
+            buckets[chave]['valor'] += valor_brl
+            buckets[chave]['qtd_posicoes'] += 1
+            total += valor_brl
+
+        itens = []
+        for chave, dados in sorted(buckets.items(), key=lambda x: x[1]['valor'], reverse=True):
+            pct = (dados['valor'] / total * 100) if total > 0 else 0.0
+            itens.append({
+                'chave': chave,
+                'label': PortfolioService._CLASSE_LABELS.get(chave, chave.replace('_', ' ').title()),
+                'valor': round(dados['valor'], 2),
+                'percentual': round(pct, 2),
+                'qtd_posicoes': dados['qtd_posicoes'],
+            })
+
+        return {
+            'itens': itens,
+            'patrimonio_total': round(total, 2),
+        }
+
+    @staticmethod
+    def get_distribuicao_setores(usuario_id) -> List[Dict]:
+        """
+        Distribuição por segmento (TipoAtivo).
+        Campo 'segmento' usa tipo do ativo — proxy de setor até haver coluna setor no model.
+        NEW-03.
+        """
+        buckets = {}
+        total = 0.0
+
+        for posicao, ativo, valor_brl in PortfolioService._iter_posicoes_valor_brl(usuario_id):
+            if hasattr(ativo.tipo, 'value'):
+                chave = ativo.tipo.value
+            else:
+                chave = str(ativo.tipo).lower().replace('tipoativo.', '')
+
+            if hasattr(ativo.classe, 'value'):
+                classe = ativo.classe.value
+            else:
+                classe = str(ativo.classe).lower().replace('classeativo.', '')
+
+            if chave not in buckets:
+                buckets[chave] = {'valor': 0.0, 'qtd_posicoes': 0, 'classe': classe}
+            buckets[chave]['valor'] += valor_brl
+            buckets[chave]['qtd_posicoes'] += 1
+            total += valor_brl
+
+        itens = []
+        for chave, dados in sorted(buckets.items(), key=lambda x: x[1]['valor'], reverse=True):
+            pct = (dados['valor'] / total * 100) if total > 0 else 0.0
+            itens.append({
+                'segmento': chave,
+                'label': PortfolioService._TIPO_LABELS.get(chave, chave.replace('_', ' ').title()),
+                'classe': dados['classe'],
+                'valor': round(dados['valor'], 2),
+                'percentual': round(pct, 2),
+                'qtd_posicoes': dados['qtd_posicoes'],
+            })
+
+        return itens
     
     @staticmethod
     def get_evolucao_patrimonio(usuario_id: UUID, meses: int = 0) -> List[Dict]:

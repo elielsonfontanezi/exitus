@@ -8,6 +8,20 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — NEW-03: Distribuição detalhada em alocacao_v2 (30/06/2026)
+
+**Problema:** Endpoints `/api/portfolios/distribuicao/classes` e `/setores` existiam no blueprint mas `PortfolioService.get_distribuicao_*` não estavam implementados.
+
+**Solução:**
+- `get_distribuicao_classes()` — breakdown por `ClasseAtivo` com valor, % e qtd posições
+- `get_distribuicao_setores()` — breakdown por `TipoAtivo` (segmento: Ações, FIIs, CDB…) com classe pai
+- `alocacao_v2.html` — abas **Por Classe (macro)** | **Por Segmento (tipo)** com barras e tabela
+- 7 testes em `test_portfolio_distribuicao.py`
+
+**Nota:** Segmento usa `tipo` do ativo como proxy de setor até coluna `setor` existir no model `Ativo`.
+
+---
+
 ### Docs — Sincronização AUDITORIA_FUNCIONAL (30/06/2026)
 
 - **FEAT-026** marcada como resolvida (padrão `~~FEAT-026~~` + REBALANCE-001)
