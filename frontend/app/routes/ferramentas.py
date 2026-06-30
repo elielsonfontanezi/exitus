@@ -53,3 +53,10 @@ def screener():
 def cotacoes_saude():
     """Saúde das Cotações — APIs: GET /api/cotacoes/health, /anomalias"""
     return render_template('ferramentas/cotacoes_v2.html')
+
+
+@bp.route('/preco-teto', methods=['GET'])
+@login_required
+def preco_teto():
+    """Calculadora Preço Teto — APIs: GET /api/calculos/preco_teto/<ticker>, /fii/<ticker> — NEW-11"""
+    return render_template('ferramentas/preco_teto_v2.html')

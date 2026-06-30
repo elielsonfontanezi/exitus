@@ -1,0 +1,193 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Calculadora Preço Teto{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Valor justo por Bazin, Graham, Gordon, DCF e indicadores FII</p>{% endblock %}
+
+{% block page_css %}
+<style>
+    .valor-justo-card {
+        background: #f8fafc; border: 1px solid var(--exitus-border);
+        border-radius: 0.75rem; padding: 1.25rem; margin-top: 1rem;
+    }
+    .metodos-table { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.85rem; margin-top: 1rem; }
+    .metodos-row {
+        display: grid; grid-template-columns: 1.2fr 0.9fr 1fr 0.8fr;
+        padding: 0.45rem 0.25rem; border-bottom: 1px dashed var(--exitus-border);
+    }
+    .metodos-header { font-weight: 700; color: var(--exitus-text-muted); border-bottom: 1px solid var(--exitus-border); }
+    .corr-positivo { background: rgba(22, 163, 74, 0.15); color: #16a34a; font-weight: 600; }
+    .corr-negativo { background: rgba(239, 68, 68, 0.15); color: #ef4444; font-weight: 600; }
+    .corr-neutro { background: rgba(107, 114, 128, 0.12); }
+</style>
+{% endblock %}
+
+{% block filters %}
+<div class="filter-bar">
+    <span class="filter-label">Ticker:</span>
+    <input type="text" class="filter-input" placeholder="Ex: PETR4, ITUB4, HGLG11"
+           x-model="ticker" @keydown.enter="calcular()" style="max-width:180px; text-transform:uppercase;">
+    <button class="btn-exitus btn-exitus-primary" @click="calcular()" :disabled="calculando || !ticker">
+        <i class="fas" :class="calculando ? 'fa-spinner fa-spin' : 'fa-calculator'"></i> Calcular
+    </button>
+</div>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="resultado && !calculando">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Preço Atual</div>
+        <div class="kpi-card-value" x-text="formatMoney(resultado.preco_atual)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Valor Justo</div>
+        <div class="kpi-card-value positivo" x-text="formatMoney(resultado.valor_justo || resultado.pt_medio)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Margem Segurança</div>
+        <div class="kpi-card-value" :class="(resultado.margem_seguranca || 0) >= 0 ? 'positivo' : 'negativo'"
+             x-text="(resultado.margem_seguranca != null ? resultado.margem_seguranca.toFixed(1) : '—') + '%'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Sinal</div>
+        <div class="kpi-card-value" x-text="resultado.sinal || '—'"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="resultado && !calculando" x-cloak>
+    <div class="section-box-title"><i class="fas fa-bullseye"></i> Faixa de Valuation — <span x-text="resultado.ativo"></span></div>
+    <div class="valor-justo-card">
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;">
+            <div>
+                <div style="font-size:0.75rem; color:var(--exitus-text-muted);">Faixa Mín</div>
+                <div style="font-weight:700;" x-text="formatMoney(resultado.faixa_min)"></div>
+            </div>
+            <div>
+                <div style="font-size:0.75rem; color:var(--exitus-text-muted);">Valor Justo</div>
+                <div style="font-weight:700; font-size:1.2rem; color:var(--exitus-primary);" x-text="formatMoney(resultado.valor_justo)"></div>
+            </div>
+            <div>
+                <div style="font-size:0.75rem; color:var(--exitus-text-muted);">Faixa Máx</div>
+                <div style="font-weight:700;" x-text="formatMoney(resultado.faixa_max)"></div>
+            </div>
+        </div>
+        <div style="margin-top:0.75rem; font-size:0.85rem; color:var(--exitus-text-muted);">
+            Perfil: <strong x-text="resultado.perfil || '—'"></strong> · Mercado: <span x-text="resultado.mercado || '—'"></span>
+        </div>
+    </div>
+
+    <div class="metodos-table" x-show="metodosLista.length > 0">
+        <div class="metodos-row metodos-header">
+            <span>Método</span><span>Preço Teto</span><span>Parâmetros</span><span>Peso</span>
+        </div>
+        <template x-for="m in metodosLista" :key="m.nome">
+            <div class="metodos-row">
+                <span x-text="m.nome"></span>
+                <span x-text="formatMoney(m.valor)"></span>
+                <span style="font-size:0.75rem; color:var(--exitus-text-muted);" x-text="m.params || '—'"></span>
+                <span x-text="m.peso != null ? m.peso + '%' : '—'"></span>
+            </div>
+        </template>
+    </div>
+</div>
+
+<div class="section-box" x-show="fiiResultado && !calculando" x-cloak>
+    <div class="section-box-title"><i class="fas fa-building"></i> Indicadores FII/REIT</div>
+    <div class="kpi-bar" style="grid-template-columns:repeat(4,1fr); margin-top:0.5rem;">
+        <div class="kpi-card">
+            <div class="kpi-card-label">Cap Rate Impl.</div>
+            <div class="kpi-card-value" x-text="fiiPct(fiiResultado.cap_rate_implicito)"></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-card-label">DY Anual</div>
+            <div class="kpi-card-value" x-text="fiiPct(fiiResultado.dividend_yield_anual)"></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-card-label">P/VP</div>
+            <div class="kpi-card-value" x-text="fiiResultado.p_vp != null ? Number(fiiResultado.p_vp).toFixed(2) : '—'"></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-card-label">Preço Teto FII</div>
+            <div class="kpi-card-value positivo" x-text="formatMoney(fiiResultado.preco_teto_fii)"></div>
+        </div>
+    </div>
+</div>
+
+<div class="section-box" x-show="!calculando && !resultado && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-calculator"></i></div>
+        <div class="empty-state-title">Informe um ticker</div>
+        <div class="empty-state-text">Calcule o preço teto com múltiplos métodos de valuation.</div>
+    </div>
+</div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle text-red-500"></i></div>
+        <div class="empty-state-title">Erro no cálculo</div>
+        <div class="empty-state-text" x-text="error"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        ticker: '',
+        calculando: false,
+        resultado: null,
+        fiiResultado: null,
+        metodosLista: [],
+
+        async calcular() {
+            const t = (this.ticker || '').trim().toUpperCase();
+            if (!t) return;
+            this.calculando = true;
+            this.error = null;
+            this.resultado = null;
+            this.fiiResultado = null;
+            this.metodosLista = [];
+            try {
+                const res = await this.apiFetch('/api/calculos/preco_teto/' + t);
+                this.resultado = res;
+                this.montarMetodos(res);
+                try {
+                    const fii = await this.apiFetch('/api/calculos/fii/' + t);
+                    this.fiiResultado = fii;
+                } catch (e) { /* FII opcional */ }
+            } catch (e) {
+                this.error = e.message || 'Ativo não encontrado ou erro no cálculo';
+            } finally {
+                this.calculando = false;
+            }
+        },
+
+        montarMetodos(res) {
+            const lista = [];
+            const metodos = res.metodos || res.metodos_agregados || {};
+            if (Array.isArray(metodos)) {
+                metodos.forEach(m => lista.push({
+                    nome: m.nome || m.metodo,
+                    valor: m.valor || m.preco_teto,
+                    params: m.parametros ? JSON.stringify(m.parametros) : '',
+                    peso: m.peso
+                }));
+            } else {
+                Object.entries(metodos).forEach(([nome, val]) => {
+                    const v = typeof val === 'object' ? (val.valor || val.preco_teto) : val;
+                    lista.push({ nome, valor: v, params: typeof val === 'object' ? (val.formula || '') : '', peso: null });
+                });
+            }
+            this.metodosLista = lista;
+        },
+
+        fiiPct(v) {
+            if (v == null) return '—';
+            return (Number(v) * 100).toFixed(2) + '%';
+        }
+    };
+}
+</script>
+{% endblock %}
