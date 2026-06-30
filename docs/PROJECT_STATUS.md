@@ -1,11 +1,12 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 30/06/2026
-> **Status:** ✅ **BUG-VAL-006 — Fórmula Cap Rate FII corrigida (dy_anual/cap_rate)**
-> **Versão:** v0.9.35
+> **Status:** ✅ **BUG-VAL-005 — valuation_service.py com IQR + mediana ponderada + faixa**
+> **Versão:** v0.9.36
 
 ### 🔧 Últimas correções (30/06/2026)
-- **BUG-VAL-006 ✅ CONCLUÍDO:** Fórmula `1/cap_rate` substituída por `dy_anual/cap_rate` para FIIs/REITs em `calculos_blueprint.py`. Guard defensivo adicionado. 2 novos testes em `test_calculos.py`. Suite: **567 passed, 3 failed pré-existentes, 6 skipped**.
+- **BUG-VAL-005 ✅ CONCLUÍDO:** `valuation_service.py` criado (fonte única de valuation). Agregação: perfil + IQR ratio + mediana ponderada. API expõe `faixa_min/faixa_max/perfil`. `buy_signals_service` usa `valor_justo` calculado (não `preco_teto` estático). Frontend exibe faixa. 26 novos testes. Suite: **593 passed, 3 failed pré-existentes, 6 skipped**.
+- **BUG-VAL-006 ✅ CONCLUÍDO:** Fórmula `1/cap_rate` substituída por `dy_anual/cap_rate` para FIIs/REITs. Guard defensivo adicionado. 2 novos testes em `test_calculos.py`. Suite: **567 passed**.
 
 ### 🔧 Correções anteriores (29/06/2026)
 - **CURSORRULES-001.3 ✅ CONCLUÍDO:** `docs/MODULES.md` stub; links mortos corrigidos; PERSONAS deduplicado; AI_OPERATIONS v1.3 modelos Cursor; INDEX + MULTICLIENTE; limpeza refs legacy.

@@ -200,74 +200,135 @@ Z-Score = (Preço Atual - Média_252d) / Desvio_Padrão_252d
 - **Z -1 a 0:** Abaixo da média (neutro)
 - **Z > 0:** Acima da média (relativamente caro)
 
-**3. Valor Justo / Preço Teto** (`/api/calculos/preco_teto/<ticker>`)
+**3. Valor Justo / Preço Teto** (`/api/calculos/preco_teto/<ticker>`) — ✅ BUG-VAL-005 (30/06/2026)
 
-O valor justo exibido é calculado no backend por **métodos de valuation reconhecidos no mercado**. Os parâmetros macroeconômicos (taxa livre de risco, crescimento médio, WACC, cap rate) são obtidos do `ParametrosMacroService` e diferem por mercado (ex: Brasil vs EUA).
+O valor justo é calculado pelo `valuation_service` seguindo um pipeline de 6 etapas inspirado em Investidor10, Status Invest, GuruFocus e Simply Wall St:
 
-##### Para Ações (Tipo "ACAO")
+```
+1. Parâmetros regionais   → taxa livre de risco, crescimento, WACC, cap rate (por mercado)
+2. Classificação de perfil → define quais métodos e pesos aplicar ao ativo
+3. Cálculo dos métodos     → apenas métodos aplicáveis ao perfil
+4. Filtro de inválidos     → descarta métodos com pt ≤ 0
+5. Remoção de outliers     → método por ratio em torno da mediana (ratio_max=4×)
+6. Mediana ponderada       → valor_justo + faixa min/max
+```
 
-São calculados 4 preços teto, cada um por um método diferente. Depois o sistema remove outliers (IQR) e apresenta uma **faixa de valor justo** com min, max e mediana ponderada.
+##### Dois conceitos distintos — entenda a diferença
+
+| Conceito | O que é | Quem define | Usado no Buy Score? |
+|----------|---------|-------------|---------------------|
+| **`valor_justo`** (calculado) | Estimativa automática pelos métodos abaixo | Sistema (valuation_service) | ✅ Sim — fonte de verdade |
+| **`preco_teto_usuario`** | Teto/preço justo conforme julgamento pessoal | Você (campo opcional) | ❌ Não — apenas referência |
+
+O `preco_teto_usuario` é um campo que você pode preencher com o valor que considera justo para o ativo. Ele aparece na tela como anotação pessoal, mas **não influencia** o Buy Score, a margem de segurança nem o card "Valor Justo". O sistema sempre usa o valor calculado automaticamente.
+
+##### Perfil de valuation
+
+O sistema classifica cada ativo em um perfil e aplica pesos diferentes por método:
+
+| Perfil | Quando é aplicado | Bazin | Gordon | Graham | DCF |
+|--------|--------------------|-------|--------|--------|-----|
+| **dividendos** | Ação BR (padrão) | 35% | 25% | 20% | 20% |
+| **bancos** | ITUB, BBDC, BBAS, SANB, BPAC, BRSR, BMGB | 35% | 25% | 20% | 20% |
+| **value** | Ação com P/L < 8 | 10% | 15% | 40% | 35% |
+| **growth** | Stock US (mercado=US) | 10% | 10% | 30% | 50% |
+| **fii** | FII/REIT | Cap Rate 50%, FFO 30%, AFFO 20% (ver abaixo) |
+| **padrão** | Outros tipos | 25% | 25% | 25% | 25% |
+
+##### Para Ações
+
+São calculados 4 métodos. O sistema remove outliers extremos (valores > 4× ou < 1/4× da mediana dos outros métodos) antes de agregar.
 
 | Método | Fórmula | O que mede |
 |--------|---------|------------|
-| **Bazin** | `Dividendo Anual / 0.06` | Preço teto para quem busca 6% de DY mínimo (threshold fixo de Décio Bazin) |
-| **Graham** | `EPS × (8.5 + 2g) × 4.4 / Y` | Valor justo de Benjamin Graham, baseado em lucro e crescimento esperado |
-| **Gordon** | `D₁ / (k - g)` | Valor presente de dividendos crescentes perpetuamente |
-| **DCF** | `Σ FCFₜ / (1 + WACC)ᵗ + Valor Terminal / (1 + WACC)⁵` | Valor presente do fluxo de caixa livre da empresa |
+| **Bazin** | `(DY × Preço Atual) / 0.06` | Preço máximo para obter ≥ 6% de dividendo anual (threshold fixo de Décio Bazin) |
+| **Graham** | `EPS × (8.5 + 2g%) × 4.4 / Y%` | Valor justo de Benjamin Graham, baseado em lucro e crescimento esperado |
+| **Gordon** | `D₁ / (k − g)` | Valor presente de dividendos crescentes perpétuos |
+| **DCF** | `Σ FCFₜ / (1+WACC)ᵗ + Terminal / (1+WACC)⁵` | Valor presente do fluxo de caixa livre |
 
-Onde:
-- **Dividendo Anual** = `DY × Preço Atual` (R$ por ação)
-- **D₁** = `Dividendo Anual × (1 + g)` (próximo dividendo estimado)
-- **EPS** = Lucro por ação (LPA) do ativo
-- **g** = crescimento médio esperado da empresa (decimal, ex: 0.05 = 5%)
-- **Y** = taxa livre de risco em percentual (ex: 10.5 para 10,5%)
+Variáveis:
+- **DY** = Dividend Yield do ativo (decimal, ex: 0.065 = 6,5%)
+- **D₁** = `(DY × Preço Atual) × (1 + g)` — próximo dividendo estimado
+- **EPS** = Lucro por ação cadastrado no ativo
+- **g** = crescimento médio regional (decimal)
+- **Y** = taxa livre de risco em percentual (ex: 10.5)
 - **k** = taxa livre de risco em decimal (ex: 0.105)
 - **WACC** = custo médio ponderado de capital (decimal)
-- **FCF** = Free Cash Flow por ação
+- **FCF** = Free Cash Flow por ação cadastrado no ativo
+- **Terminal** = `FCF₅ × 1.03 / (WACC − 0.03)` — valor residual após 5 anos
 
-##### Sobre `preco_teto_usuario` (campo opcional)
+**Exemplo numérico (ITUB4):** EPS=4.17, DY=6.5%, Preço=42.24, parâmetros BR (k=10.5%, g=5%, WACC=12%)
 
-O sistema permite que você cadastre um **teto manual** para o ativo. Ele aparece na tela como referência, mas **não é usado no cálculo do Buy Score**. O score sempre usa o valor justo calculado em tempo real pelos métodos de valuation.
+| Método | Resultado |
+|--------|-----------|
+| Bazin | ~R$ 46 |
+| Graham | ~R$ 32 |
+| Gordon | ~R$ 48 |
+| DCF | ~R$ 58 |
+| **Valor Justo (mediana ponderada)** | **~R$ 47** |
+| **Faixa** | **R$ 32 – R$ 58** |
 
-##### Para FIIs/REITs
+Antes do BUG-VAL-005, a média simples retornava R$ 499 quando EPS vinha em branco (usava fallback EPS=2.50). Agora, com IQR e ponderação, valores discrepantes são filtrados e o resultado fica coerente.
 
-Usa Cap Rate regional. O cap rate reflete o retorno anual esperado pelo mercado para imóveis/fundo desse segmento.
+##### Para FIIs/REITs — ✅ BUG-VAL-005 e BUG-VAL-006 (30/06/2026)
+
+Para fundos imobiliários, o sistema calcula até 3 métodos de Cap Rate, dependendo dos dados disponíveis no cadastro do ativo:
+
+| Método | Fórmula | Condição para calcular |
+|--------|---------|------------------------|
+| **Cap Rate (via DY)** | `(DY × Preço Atual) / cap_rate_regional` | Sempre (DY > 0) |
+| **Cap Rate via FFO** | `ffo_por_cota / cap_rate_regional` | Quando `ffo_por_cota` estiver preenchido |
+| **Cap Rate via AFFO** | `affo_por_cota / cap_rate_regional` | Quando `affo_por_cota` estiver preenchido |
+
+- **cap_rate_regional** = retorno anual esperado pelo mercado para imóveis desse segmento (obtido de `parametros_macro`; default BR = 8%)
+- **FFO** (Funds from Operations) = lucro operacional do fundo, sem depreciação de imóveis
+- **AFFO** (Adjusted FFO) = FFO ajustado por despesas de manutenção — mais conservador
+
+**Exemplo numérico (HGLG11):** DY=8.2%, Preço=R$152.30, cap_rate=8.9%
+```
+dy_anual  = 0.082 × 152.30 = R$ 12.49
+valor_justo = 12.49 / 0.089 = R$ 140.22
+```
+
+Antes do BUG-VAL-006, o sistema usava `1 / cap_rate = 1 / 0.089 = R$ 11.24` — sem relação dimensional com preço por cota. Corrigido em 30/06/2026.
+
+##### Remoção de outliers
+
+O sistema usa filtragem por ratio em torno da mediana:
+- Um método é descartado se seu resultado for **mais de 4× acima** ou **menos de 1/4× abaixo** da mediana dos demais
+- Com ≤ 2 métodos disponíveis, nenhum é removido (sem referência suficiente)
+- O campo `outliers_removidos` na resposta da API informa quais métodos foram descartados
+
+##### Margem de segurança
 
 ```
-Valor Justo = Dividendo Anual por Cota / Cap Rate
+Margem = (Valor Justo − Preço Atual) / Valor Justo × 100
 ```
-
-##### Para demais tipos
-
-Fallback conservador: 10% acima do preço atual, até que cada tipo tenha modelo dedicado.
+- **> 20%** → 🟢 COMPRA
+- **0% a 20%** → 🟡 NEUTRO
+- **< 0%** → 🔴 VENDA
 
 ##### O que a tela mostra
 
 O painel "Preço vs Valor Justo" exibe:
 1. Preço atual (última cotação)
-2. **Faixa de valor justo** — mínimo e máximo entre os métodos
-3. **Mediana / valor central** — usado para calcular a margem
-4. Margem de segurança com base no valor central
-5. Tabela "Métodos de Valuation" com cada método, resultado e parâmetros usados
-6. Parâmetros regionais aplicados (taxa livre de risco, crescimento, WACC)
-
-Isso permite ao usuário validar rapidamente o racional e perceber quando um método produz um valor discrepante (outlier).
+2. **Valor Justo** (mediana ponderada após IQR)
+3. **Faixa** — mínimo e máximo dos métodos que passaram pelo filtro de outliers
+4. **Perfil** — indica qual conjunto de pesos foi usado (ex: dividendos, bancos, fii)
+5. Margem de segurança com sinal
+6. Tabela expansível "Métodos de Valuation" com valor e parâmetros de cada método
+7. Parâmetros regionais aplicados
 
 **Requer:** mínimo de 30 registros de histórico de preços no banco (`historico_preco`) para o Z-Score. Se indisponível, o Z-Score fica indisponível.
 
-**⚠️ Limitações conhecidas e em correção**
-
-A metodologia de valuation do Exitus está em transição para alinhar com o padrão de mercado. Atualmente existem algumas inconsistências que estão sendo corrigidas:
+**⚠️ Limitações conhecidas**
 
 | Problema | Impacto na tela | Status |
 |---|---|---|
-| Dois conceitos de "preço teto" (`ativo.preco_teto` estático vs `pt_medio` calculado) | Podem aparecer duas margens diferentes | Em correção: unificação para usar sempre `pt_medio` |
-| EPS/FCF não populados para todos os ativos | Graham e DCF usam valores fallback (2,50/5,0) | Em correção: integração com yfinance |
-| `parametros_macro` vazia | Todos os mercados usam parâmetros hardcoded | Em correção: seed de parâmetros por mercado |
-| Fórmula de FII `1 / cap_rate` | Resultado dimensionalmente incorreto | ✅ Corrigido (BUG-VAL-006 — 30/06/2026): `dy_anual / cap_rate` |
-| Média simples dos métodos | Pode ser distorcida por outliers | Em correção: mediana ponderada + IQR |
-
-> **Recomendação:** use o card de "Valor Justo" como referência principal, mas sempre confira a tabela de métodos para identificar outliers. Um valor justo muito distante do preço atual (ex: ITUB4 com valor justo R$ 499 vs preço R$ 42) indica que algum método está usando dados incorretos — geralmente EPS/FCF em branco.
+| Dois conceitos de "preço teto" (`preco_teto_usuario` estático vs `valor_justo` calculado) | Labels ainda mostram "Preço Teto" em alguns pontos da UI | Em correção: BUG-VAL-004 (rename DDL + unificação labels) |
+| EPS/FCF não populados para todos os ativos | Graham e DCF usam valores fallback (EPS=2.50, FCF=5.0) | Em correção: integração com yfinance |
+| Fórmula de FII `1 / cap_rate` | Resultado dimensionalmente incorreto | ✅ Corrigido (BUG-VAL-006 — 30/06/2026) |
+| Média simples dos métodos | Podia ser distorcida por outliers | ✅ Corrigido (BUG-VAL-005 — 30/06/2026): mediana ponderada + ratio IQR |
 
 ---
 

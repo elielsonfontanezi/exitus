@@ -2,6 +2,7 @@ import numpy as np
 import logging
 from app.models.ativo import Ativo
 from app.models.historico_preco import HistoricoPreco
+from app.services.valuation_service import calcular_valor_justo
 
 logger = logging.getLogger(__name__)
 
@@ -12,22 +13,31 @@ def float_safe(value):
     return float(value)
 
 def calcular_margem_seguranca(ticker_or_ativo):
-    """Calcula margem de segurança. Aceita ticker (str) ou objeto Ativo."""
+    """
+    Calcula margem de segurança via valuation_service (BUG-VAL-005).
+
+    Usa valor_justo calculado (Bazin/Graham/Gordon/DCF/Cap Rate + IQR + ponderação)
+    como preço de referência — NÃO usa ativo.preco_teto (campo estático do usuário).
+
+    Aceita ticker (str) ou objeto Ativo.
+    Retorna (margem_percentual, valor_justo).
+    """
     if isinstance(ticker_or_ativo, str):
         ativo = Ativo.query.filter_by(ticker=ticker_or_ativo.upper()).first()
         if not ativo:
             raise ValueError("Ativo não encontrado.")
     else:
         ativo = ticker_or_ativo
-    
-    preco_atual = float_safe(ativo.preco_atual)
-    preco_teto = float_safe(ativo.preco_teto)
-    
-    if preco_teto == 0:
-        raise ValueError("Preço teto inválido.")
-    
-    margem = (preco_teto - preco_atual) / preco_teto * 100
-    return margem, preco_teto
+
+    vj = calcular_valor_justo(ativo)
+    valor_justo = vj['valor_justo']
+    preco_atual = vj['preco_atual']
+
+    if valor_justo <= 0:
+        raise ValueError("Valor justo inválido — verifique os dados do ativo.")
+
+    margem = (valor_justo - preco_atual) / valor_justo * 100
+    return margem, valor_justo
 
 def calcular_buy_score(ticker_or_ativo):
     """Calcula buy score. Aceita ticker (str) ou objeto Ativo.

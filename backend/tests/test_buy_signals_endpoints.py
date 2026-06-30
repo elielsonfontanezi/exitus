@@ -89,10 +89,19 @@ class TestBuySignalsEndpoints:
         assert resultado['pvp'] == 1.8
         assert resultado['roe'] == 0.25
         assert resultado['buyscore'] > 0
-        assert resultado['margem'] > 0
-    
+        # BUG-VAL-005: margem calculada via valuation_service (não preco_teto estático).
+        # Com p_l=5.2 (valor stock) e dy=0.085, o valor_justo calculado pode ser
+        # menor ou maior que preco_atual dependendo dos parâmetros macro.
+        # Garantia: campo margem presente e é um número (pode ser negativo em cenário desfavorável).
+        assert 'margem' in resultado
+        assert isinstance(resultado['margem'], (int, float))
+        # Novos campos BUG-VAL-005 devem estar presentes
+        assert 'faixa_min' in resultado
+        assert 'faixa_max' in resultado
+        assert 'valor_justo' in resultado
+
     def test_analisar_ativo_sinal_comprar(self, client, app):
-        """Deve retornar análise para ativo com métricas favoráveis"""
+        """Deve retornar análise para ativo com métricas favoráveis (valuation calculado)"""
         ativo = Ativo.query.filter_by(ticker='TEST1').first()
         if not ativo:
             ativo = Ativo(
@@ -105,20 +114,30 @@ class TestBuySignalsEndpoints:
             )
             db.session.add(ativo)
         ativo.preco_atual = Decimal('10.00')
-        ativo.preco_teto = Decimal('50.00')  # Margem alta (80%)
+        ativo.preco_teto = Decimal('50.00')  # campo estático do usuário — não influencia mais
         ativo.dividend_yield = Decimal('0.10')  # DY alto
         ativo.beta = Decimal('0.8')  # Beta baixo
         db.session.commit()
-        
+
         response = client.get('/api/buy-signals/analisar/TEST1')
-        
+
         assert response.status_code == 200
         data = response.get_json()
-        
-        # Verificar que retorna análise completa (sem histórico, z_score será 0)
+
+        # BUG-VAL-005: margem agora é calculada via valuation_service.
+        # preco_teto estático (50.00) NÃO é mais usado para margem.
+        # Com preco_atual=10, dy=0.10, os métodos de valuation retornam valor_justo >> 10,
+        # portanto a margem deve ser positiva (ativo barato).
         assert data['data']['buyscore'] > 0
-        assert data['data']['margem'] == 80.0  # (50-10)/50 * 100
+        assert data['data']['margem'] > 0, (
+            f"Ativo com preco_atual=10 e dy=10% deve ter margem positiva, "
+            f"obteve {data['data']['margem']}"
+        )
         assert data['data']['sinal'] in ['COMPRAR', 'AGUARDAR', 'VENDER']
+        # Novos campos BUG-VAL-005
+        assert 'faixa_min' in data['data']
+        assert 'faixa_max' in data['data']
+        assert 'valor_justo' in data['data']
     
     def test_watchlist_top(self, client, seed_ativo_petr4, app):
         """Deve retornar top 10 ativos por buy_score"""

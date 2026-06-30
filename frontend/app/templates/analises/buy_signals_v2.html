@@ -195,8 +195,19 @@
                             <div class="vj-value" x-text="formatMoney(precoJustoInfo().preco_atual)"></div>
                         </div>
                         <div>
-                            <div class="vj-label">Valor Justo Médio</div>
+                            <div class="vj-label">Valor Justo</div>
                             <div class="vj-value" x-text="formatMoney(precoJustoInfo().preco_teto)"></div>
+                            <!-- Faixa min–max (BUG-VAL-005) -->
+                            <div x-show="precoTetoDetalhes?.faixa_min != null && precoTetoDetalhes?.faixa_max != null"
+                                 style="font-size:0.7rem; color:#6b7280; margin-top:0.15rem;">
+                                Faixa: <span x-text="formatMoney(precoTetoDetalhes?.faixa_min)"></span>
+                                &ndash;
+                                <span x-text="formatMoney(precoTetoDetalhes?.faixa_max)"></span>
+                                <template x-if="precoTetoDetalhes?.perfil">
+                                    <span style="margin-left:0.3rem; font-size:0.65rem; text-transform:uppercase; color:#9ca3af;"
+                                          x-text="'(' + (precoTetoDetalhes?.perfil || '') + ')'"></span>
+                                </template>
+                            </div>
                         </div>
                     </div>
                     <!-- Margem com badge inline -->

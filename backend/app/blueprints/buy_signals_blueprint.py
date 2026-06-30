@@ -5,6 +5,7 @@ from app.services.buy_signals_service import (
     calcular_zscore,
     obter_watchlist_top
 )
+from app.services.valuation_service import calcular_valor_justo
 
 buy_signals_bp = Blueprint('buy_signals_bp', __name__)
 
@@ -15,19 +16,25 @@ def margem_seguranca(ticker):
     if not ativo:
         return jsonify({"success": False, "error": f"Ativo {ticker} não encontrado"}), 404
     try:
-        margem, preco_teto = calcular_margem_seguranca(ticker)
-        preco_atual = float(ativo.preco_atual) if ativo.preco_atual else 0.0
+        vj = calcular_valor_justo(ativo)
+        margem = vj['margem_seguranca']
+        valor_justo = vj['valor_justo']
+        preco_atual = vj['preco_atual']
         sinal = "🟢 COMPRA" if margem > 5 else "🟡 NEUTRO" if margem > 0 else "🔴 VENDA"
         return jsonify({
             "success": True,
             "data": {
-                "ticker": ticker,
+                "ticker": ticker.upper(),
                 "margem_seguranca": round(margem, 2),
                 "sinal": sinal,
-                "preco_teto": round(preco_teto, 2),
-                "preco_atual": round(preco_atual, 2)
+                "valor_justo": round(valor_justo, 2),
+                "preco_teto": round(valor_justo, 2),   # alias retrocompat
+                "faixa_min": vj['faixa_min'],
+                "faixa_max": vj['faixa_max'],
+                "perfil": vj['perfil'],
+                "preco_atual": round(preco_atual, 2),
             },
-            "message": f"Margem de segurança: {margem:.2f}% vs Teto R${preco_teto:.2f}"
+            "message": f"Margem de segurança: {margem:.2f}% vs Valor Justo R${valor_justo:.2f}"
         })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
@@ -84,11 +91,13 @@ def analisar_ativo(ticker):
     try:
         buy_score_result = calcular_buy_score(ticker)
         buy_score = buy_score_result['score']
-        margem, preco_teto = calcular_margem_seguranca(ticker)
+        vj = calcular_valor_justo(ativo)
+        margem = vj['margem_seguranca']
+        valor_justo = vj['valor_justo']
 
         try:
             z_score = calcular_zscore(ticker)
-        except:
+        except Exception:
             z_score = 0.0
 
         sinal = "COMPRAR" if buy_score >= 80 else "AGUARDAR" if buy_score >= 60 else "VENDER"
@@ -102,13 +111,17 @@ def analisar_ativo(ticker):
             "margem": round(margem, 2),
             "z_score": z_score,
             "sinal": sinal,
-            "preco_atual": float(ativo.preco_atual) if ativo.preco_atual else 0.0,
-            "preco_teto": float(preco_teto),
+            "preco_atual": vj['preco_atual'],
+            "preco_teto": round(valor_justo, 2),    # alias retrocompat
+            "valor_justo": round(valor_justo, 2),
+            "faixa_min": vj['faixa_min'],
+            "faixa_max": vj['faixa_max'],
+            "perfil_valuation": vj['perfil'],
             "dy": float(ativo.dividend_yield) if ativo.dividend_yield else 0.0,
             "pl": float(ativo.p_l) if ativo.p_l else 0.0,
             "pvp": float(ativo.p_vp) if ativo.p_vp else 0.0,
             "roe": float(ativo.roe) if ativo.roe else 0.0,
-            "tipo": ativo.tipo.value if ativo.tipo else "ACAO"
+            "tipo": ativo.tipo.value if ativo.tipo else "ACAO",
         }
 
         return jsonify({"success": True, "data": resultado}), 200

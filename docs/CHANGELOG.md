@@ -8,6 +8,47 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — BUG-VAL-005: valuation_service.py — agregação padrão de mercado (30/06/2026)
+
+**Problema:**
+- `calculos_blueprint.py` usava média aritmética simples de Bazin+Graham+Gordon+DCF
+- Outlier (ex: Graham com EPS errado → R$499) inflacionava o valor justo
+- `buy_signals_service.py` usava `ativo.preco_teto` estático para margem — divergia do card
+- FIIs só tinham Cap Rate via DY; FFO/AFFO não eram usados para valuation
+
+**Solução:**
+- Novo `backend/app/services/valuation_service.py`: pipeline de 6 etapas
+  1. Parâmetros regionais via `parametros_macro_service`
+  2. Classificação de perfil (dividendos/bancos/value/growth/fii/padrão)
+  3. Métodos por perfil: ações (Bazin/Graham/Gordon/DCF); FIIs (cap_rate + FFO + AFFO condicionais)
+  4. Filtro de inválidos (pt ≤ 0 descartado)
+  5. Remoção de outliers por ratio (valor > 4× ou < 1/4× da mediana → removido)
+  6. Mediana ponderada por perfil → valor_justo + faixa_min/faixa_max
+- `calculos_blueprint.py`: delega 100% para `valuation_service`; API expõe `faixa_min`, `faixa_max`, `perfil`, `metodos_agregados`, `outliers_removidos`
+- `buy_signals_service.py`: `calcular_margem_seguranca()` usa `valor_justo` calculado (não `preco_teto` estático)
+- `buy_signals_blueprint.py`: endpoints `/margem-seguranca` e `/analisar` incluem `faixa_min`, `faixa_max`, `valor_justo`, `perfil_valuation`
+- `buy_signals_v2.html`: card Valor Justo exibe faixa "min – max (perfil)"
+- Retrocompat: `pt_medio` é alias de `valor_justo`; `preco_teto` é alias nos endpoints buy signals
+- 26 novos testes unitários em `test_valuation_service.py`; `test_buy_signals_endpoints.py` atualizado
+- `MANUAL_USUARIO_DRAFT.md` revisado com pipeline, fórmulas, exemplos numéricos, tabela de perfis/pesos, distinção `preco_teto_usuario` vs `valor_justo`
+
+**Resultado ITUB4:** R$ 47 (mediana ponderada) vs R$ 499 (média antiga com EPS fallback inflado)
+**Resultado HGLG11:** R$ 140,22 (dy_anual/cap_rate) — BUG-VAL-006 já garantia isso; BUG-VAL-005 adiciona faixa e perfil
+
+**Arquivos criados/modificados:**
+- `backend/app/services/valuation_service.py` (novo)
+- `backend/tests/test_valuation_service.py` (novo, 26 testes)
+- `backend/app/blueprints/calculos_blueprint.py`
+- `backend/app/services/buy_signals_service.py`
+- `backend/app/blueprints/buy_signals_blueprint.py`
+- `backend/tests/test_buy_signals_endpoints.py`
+- `frontend/app/templates/analises/buy_signals_v2.html`
+- `docs/MANUAL_USUARIO_DRAFT.md`
+
+**BUG-VAL-004** (rename DDL `preco_teto` → `preco_teto_usuario`) permanece aberto.
+
+---
+
 ### Fix — BUG-VAL-006: Corrigir fórmula Cap Rate para FIIs/REITs (30/06/2026)
 
 **Problema:**

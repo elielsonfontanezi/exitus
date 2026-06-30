@@ -6,6 +6,7 @@ from app.models import Ativo
 from app.services.portfolio_service import PortfolioService
 from app.services.parametros_macro_service import get_parametros_macro
 from app.services.rfcalc_service import RFCalcService
+from app.services.valuation_service import calcular_valor_justo
 
 calculos_bp = Blueprint('calculos', __name__, url_prefix='/api/calculos')
 
@@ -43,9 +44,7 @@ def calcular_portfolio():
 @calculos_bp.route('/preco_teto/<string:ticker>', methods=['GET'])
 @jwt_required()
 def calcular_preco_teto(ticker):
-    """Preço Teto MULTI-MERCADO - Parâmetros REGIONAIS dinâmicos"""
-    usuario_id = get_jwt_identity()
-
+    """Preço Teto MULTI-MERCADO — delegado para valuation_service (BUG-VAL-005)."""
     ativo = db.session.query(Ativo).filter(
         Ativo.ticker == ticker.upper()
     ).first()
@@ -53,89 +52,25 @@ def calcular_preco_teto(ticker):
     if not ativo:
         return jsonify({"erro": f"Ativo {ticker} não encontrado"}), 404
 
-    # Parâmetros macroeconômicos regionais dinâmicos
-    params = get_parametros_macro(ativo.mercado, ativo.mercado)
-    k = params['taxa_livre_risco']      # Taxa livre de risco regional
-    g = params['crescimento_medio']     # Crescimento médio regional
-    wacc = params['custo_capital']      # WACC regional
-
-    tipo_raw = getattr(ativo, 'tipo', 'acao')
-    tipo = (tipo_raw.value if hasattr(tipo_raw, 'value') else str(tipo_raw)).lower()
-    preco_atual = float(ativo.preco_atual or 30)
-    dy = float(ativo.dividend_yield or 0.06)
-
-    metodos = {}
-
-    if tipo in ['acao', 'acoes', 'stock', 'stock_intl', 'unit']:
-        # Ações: 4 métodos com parâmetros regionais
-        eps = float(ativo.eps) if ativo.eps is not None else 2.50
-        dpa = dy * preco_atual                                          # dividendo por ação (R$/USD)
-        pt_bazin = dpa / 0.06 if dy > 0 else 0.0                      # Bazin: DPA / 6% (threshold fixo Décio Bazin)
-        pt_graham = (eps * (8.5 + 2 * g * 100)) * 4.4 / (k * 100) if eps > 0 else 0.0  # Graham: k em % (não decimal)
-        d1 = dpa * (1 + g)                                             # Gordon: crescimento sobre DPA
-        pt_gordon = d1 / (k - g) if (k > g and dy > 0) else 0.0
-
-        fcf = float(ativo.fcf) if ativo.fcf is not None else 5.0
-        anos = 5
-        fluxos = [fcf * (1 + g)**i for i in range(1, anos + 1)]
-        valor_terminal = fluxos[-1] * 1.03 / (wacc - 0.03)
-        fluxos.append(valor_terminal)
-        pt_dcf = sum([fluxo / (1 + wacc)**(i+1) for i, fluxo in enumerate(fluxos)])
-
-        metodos = {
-            "bazin": {"pt": round(pt_bazin, 2), "k": f"{k:.1%}", "descricao": "DY Local"},
-            "graham": {"pt": round(pt_graham, 2), "descricao": "Graham Local"},
-            "gordon": {"pt": round(pt_gordon, 2), "descricao": "Gordon Local"},
-            "dcf": {"pt": round(pt_dcf, 2), "wacc": f"{wacc:.1%}", "descricao": "DCF Local"}
-        }
-        pt_medio = sum([v["pt"] for v in metodos.values()]) / 4
-
-    elif tipo in ['fii', 'reit']:
-        # FIIs/REITs: Preço Teto = dividendo anual por cota / cap_rate regional
-        # Fórmula: pt = (dy * preco_atual) / cap_rate_fii
-        # Exemplo: HGLG11 dy=8,2% preco=152,30 cap=8,9% → pt=(0.082×152.30)/0.089=R$140,22
-        cap_rate = params['cap_rate_fii']
-        if cap_rate > 0 and dy > 0:
-            dy_anual = dy * preco_atual
-            pt_cap_rate = dy_anual / cap_rate
-        else:
-            pt_cap_rate = 0.0
-
-        metodos = {
-            "cap_rate": {"pt": round(pt_cap_rate, 2), "cap_rate": f"{cap_rate:.1%}"}
-        }
-        pt_medio = pt_cap_rate
-
-    else:
-        pt_medio = preco_atual * 1.1
-        metodos = {"padrao": {"pt": round(pt_medio, 2)}}
-
-    # Sinal
-    margem = ((pt_medio - preco_atual) / pt_medio) * 100 if pt_medio > 0 else 0
-    if pt_medio > preco_atual * 1.2:
-        sinal = "🟢 COMPRA"
-        cor = "green"
-    elif pt_medio > preco_atual:
-        sinal = "🟡 NEUTRO"
-        cor = "yellow"
-    else:
-        sinal = "🔴 VENDA"
-        cor = "red"
+    vj = calcular_valor_justo(ativo)
 
     resultado = {
-        "ativo": ticker.upper(),
-        "mercado": getattr(ativo, 'mercado', 'BR'),
-        "preco_atual": round(preco_atual, 2),
-        "pt_medio": round(pt_medio, 2),
-        "margem_seguranca": round(margem, 1),
-        "parametros_regiao": {
-            "taxa_livre_risco": f"{k:.1%}",
-            "crescimento": f"{g:.1%}",
-            "wacc": f"{wacc:.1%}"
-        },
-        "metodos": metodos,
-        "sinal": sinal,
-        "cor": cor
+        "ativo":             ticker.upper(),
+        "mercado":           getattr(ativo, 'mercado', 'BR'),
+        "preco_atual":       vj['preco_atual'],
+        "pt_medio":          vj['pt_medio'],           # retrocompat
+        "valor_justo":       vj['valor_justo'],
+        "faixa_min":         vj['faixa_min'],
+        "faixa_max":         vj['faixa_max'],
+        "margem_seguranca":  vj['margem_seguranca'],
+        "perfil":            vj['perfil'],
+        "parametros_regiao": vj['parametros_regiao'],
+        "metodos":           vj['metodos'],
+        "metodos_agregados": vj['metodos_agregados'],
+        "outliers_removidos":vj['outliers_removidos'],
+        "metodo_agregacao":  vj['metodo_agregacao'],
+        "sinal":             vj['sinal'],
+        "cor":               vj['cor'],
     }
 
     return jsonify(resultado), 200
