@@ -1,6 +1,6 @@
 # Índice da Documentação — Sistema Exitus
 
-> **Total:** 16 arquivos ativos + archive  
+> **Total:** 18 arquivos ativos + archive  
 > **Última atualização:** 29/06/2026  
 > **Versão:** v0.9.34
 
@@ -20,7 +20,7 @@
 
 ---
 
-## 📁 Documentação (16 arquivos)
+## 📁 Documentação (18 arquivos)
 
 ### 🔴 Core Operacional
 
@@ -34,6 +34,7 @@
 | **[ARCHITECTURE.md](ARCHITECTURE.md)** | Decisões arquiteturais, stack, containers |
 | **[CODING_STANDARDS.md](CODING_STANDARDS.md)** | Padrões obrigatórios (snake_case, SQLAlchemy) |
 | **[API_REFERENCE.md](API_REFERENCE.md)** | Contratos da API, endpoints |
+| **[API_FRONTEND_MAPPING.md](API_FRONTEND_MAPPING.md)** | Mapeamento API ↔ telas frontend (integração) |
 | **[OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md)** | Scripts, troubleshooting, procedimentos |
 | **[PERSONAS.md](PERSONAS.md)** | Manual da IA, comportamento esperado |
 | **[AI_OPERATIONS.md](AI_OPERATIONS.md)** | Plano de controle, modelos IA, MCPs, índice LESSONS |
@@ -48,6 +49,12 @@
 | **[SEEDS.md](SEEDS.md)** | Credenciais dev, dados de teste |
 | **[EXITUS_DB_STRUCTURE.txt](EXITUS_DB_STRUCTURE.txt)** | Schema completo (auto-gerado) |
 
+### 🟢 Documentação de Usuário
+
+| Arquivo | Descrição |
+|---------|-----------|
+| **[MANUAL_USUARIO_DRAFT.md](MANUAL_USUARIO_DRAFT.md)** | Manual do usuário (rascunho — navegação e funcionalidades) |
+
 ### 📚 Archive (`docs/archive/`)
 
 32 documentos históricos preservados: GAPs concluídos, roadmaps anteriores, análises de frontend, planos de teste. Acessíveis para consulta mas não fazem parte da documentação ativa.
@@ -59,9 +66,13 @@
 ### Para Desenvolvedores
 1. **CODING_STANDARDS.md** — Padrões obrigatórios
 2. **API_REFERENCE.md** — Contratos dos endpoints
-3. **ARCHITECTURE.md** — Decisões arquiteturais
-4. **ROADMAP.md** — O que falta implementar
-5. **CHANGELOG.md** — O que mudou recentemente
+3. **API_FRONTEND_MAPPING.md** — Qual API alimenta cada tela (frontend)
+4. **ARCHITECTURE.md** — Decisões arquiteturais
+5. **ROADMAP.md** — O que falta implementar
+6. **CHANGELOG.md** — O que mudou recentemente
+
+### Para Usuários / Product
+1. **MANUAL_USUARIO_DRAFT.md** — Guia de uso (rascunho)
 
 ### Para Operações/DevOps
 1. **OPERATIONS_RUNBOOK.md** — Comandos e troubleshooting
@@ -80,4 +91,4 @@
 ---
 
 *Atualizado: 29 de Junho de 2026*  
-*Versão: v0.9.34 — Documentação consolidada (16 arquivos)*
+*Versão: v0.9.34 — Documentação consolidada (18 arquivos)*
