@@ -140,6 +140,13 @@ def performance():
     return render_template('analises/performance_v2.html')
 
 
+@bp.route('/correlacao', methods=['GET'])
+@login_required
+def correlacao():
+    """Matriz de correlação entre ativos — NEW-15"""
+    return render_template('analises/correlacao_v2.html')
+
+
 @bp.route('/buy-signals', methods=['GET'])
 @login_required
 def buy_signals():

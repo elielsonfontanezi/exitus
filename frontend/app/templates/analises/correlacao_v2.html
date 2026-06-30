@@ -1,0 +1,133 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Correlação entre Ativos{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Matriz de correlação dos retornos diários da carteira (252 dias úteis)</p>{% endblock %}
+
+{% block page_actions %}
+<button class="btn-exitus btn-exitus-outline" @click="loadData()" :disabled="loading">
+    <i class="fas fa-sync-alt" :class="{'fa-spin': loading}"></i> Atualizar
+</button>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading && ativos.length > 0">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos na Matriz</div>
+        <div class="kpi-card-value" x-text="ativos.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Maior Correlação</div>
+        <div class="kpi-card-value" x-text="stats.max != null ? stats.max.toFixed(2) : '—'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Menor Correlação</div>
+        <div class="kpi-card-value" x-text="stats.min != null ? stats.min.toFixed(2) : '—'"></div>
+    </div>
+    <div class="kpi-card" x-show="stats.parMax">
+        <div class="kpi-card-label">Par mais correlacionado</div>
+        <div class="kpi-card-value" style="font-size:0.95rem;" x-text="stats.parMax"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="ativos.length > 0 && !loading" x-cloak>
+    <div class="section-box-title"><i class="fas fa-th"></i> Matriz de Correlação</div>
+    <p style="font-size:0.8rem; color:var(--exitus-text-muted); margin-bottom:1rem;">
+        Valores próximos de 1 = movem juntos; próximos de -1 = movem opostos; próximos de 0 = pouca relação.
+    </p>
+    <div style="overflow-x:auto;">
+        <table class="data-table" style="font-size:0.8rem;">
+            <thead>
+                <tr>
+                    <th style="position:sticky; left:0; background:white;"></th>
+                    <template x-for="a in ativos" :key="'h'+a">
+                        <th class="col-center" style="min-width:52px;" x-text="a"></th>
+                    </template>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="(row, i) in matriz" :key="'r'+i">
+                    <tr>
+                        <td style="font-weight:700; position:sticky; left:0; background:white;" x-text="ativos[i]"></td>
+                        <template x-for="(val, j) in row" :key="'c'+i+'-'+j">
+                            <td class="col-center"
+                                :style="cellStyle(val)"
+                                :title="ativos[i] + ' × ' + ativos[j] + ': ' + Number(val).toFixed(3)"
+                                x-text="Number(val).toFixed(2)"></td>
+                        </template>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="section-box" x-show="!loading && ativos.length === 0 && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-project-diagram"></i></div>
+        <div class="empty-state-title">Dados insuficientes</div>
+        <div class="empty-state-text">
+            É necessário ter posições com histórico de preços (≥10 dias) para calcular a correlação.
+        </div>
+    </div>
+</div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle text-red-500"></i></div>
+        <div class="empty-state-title">Erro ao carregar</div>
+        <div class="empty-state-text" x-text="error"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        ativos: [],
+        matriz: [],
+        stats: { min: null, max: null, parMax: '' },
+
+        async loadData() {
+            this.error = null;
+            try {
+                const res = await this.apiFetch('/api/performance/correlacao');
+                this.ativos = res?.ativos || [];
+                this.matriz = res?.correlacao || [];
+                this.calcularStats();
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar correlação';
+                this.ativos = [];
+                this.matriz = [];
+            }
+        },
+
+        calcularStats() {
+            let min = null, max = null, parMax = '';
+            for (let i = 0; i < this.matriz.length; i++) {
+                for (let j = i + 1; j < this.matriz[i].length; j++) {
+                    const v = this.matriz[i][j];
+                    if (min === null || v < min) min = v;
+                    if (max === null || v > max) {
+                        max = v;
+                        parMax = this.ativos[i] + ' / ' + this.ativos[j];
+                    }
+                }
+            }
+            this.stats = { min, max, parMax };
+        },
+
+        cellStyle(val) {
+            const v = Number(val);
+            const intensity = Math.min(Math.abs(v), 1);
+            if (v >= 0.7) return 'background:rgba(22,163,74,' + (0.15 + intensity * 0.35) + '); font-weight:600;';
+            if (v <= -0.7) return 'background:rgba(239,68,68,' + (0.15 + intensity * 0.35) + '); font-weight:600;';
+            if (Math.abs(v) < 0.3) return 'background:rgba(107,114,128,0.08);';
+            return 'background:rgba(163,140,101,' + (0.08 + intensity * 0.2) + ');';
+        }
+    };
+}
+</script>
+{% endblock %}
