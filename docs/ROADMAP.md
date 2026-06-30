@@ -1,9 +1,8 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 52/54 GAPs (96%) + REBALANCE-001 ✅ | **Testes:** 612/621 passando 🟡 — 3 failed pré-existentes, 6 skipped  
-> **Frontend V2.0:** 13 OK, 22 PARCIAL, 0 QUEBRADO (66%) | **alocacao_v2** → OK (metas + sugestões) | **Frontend API-Driven:** ✅ 8/8 Sprints Concluídos (09/06/2026)  
-> **Testes E2E v2:** ✅ 127/127 passando (Chromium) — branch `feature/testes-e2e-v2` | **Versão:** v0.9.36 | **Última atualização:** 30/06/2026
+> **Progresso Backend:** 52/54 GAPs (96%) + REBALANCE-001 ✅ | **Testes:** 634/644 passando 🟡 — 3 failed pré-existentes, 6 skipped  
+> **Frontend V2.0:** Lote 2 FEAT-010+ ✅ (NEW-05/06/10/12/22 + FEAT-010) | **Versão:** v0.9.46 | **Última atualização:** 30/06/2026
 
 ---
 

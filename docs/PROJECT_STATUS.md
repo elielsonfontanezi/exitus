@@ -1,10 +1,17 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 30/06/2026
-> **Status:** ✅ **NEW-04 — Saúde das Cotações concluído**
-> **Versão:** v0.9.41
+> **Status:** ✅ **Lote 2 FEAT-010+ concluído (NEW-05/06/10/12/22 + FEAT-010)**
+> **Versão:** v0.9.46
 
-### 🔧 Últimas entregas (30/06/2026)
+### 🔧 Últimas entregas (30/06/2026 — Lote 2)
+- **NEW-06 + FEAT-010 ✅ CONCLUÍDO:** `GET /api/indicadores/dashboard`; Dashboard consome CDI/IPCA/SELIC dinamicamente. 3 novos testes. Suite: **634 passed**.
+- **NEW-12 ✅ CONCLUÍDO:** Drawer resumo por ativo em `historico.html` via `/api/transacoes/resumo-ativo/<id>`.
+- **NEW-10 ✅ CONCLUÍDO:** Rota `/carteira/posicoes/<id>` + `posicao_detalhe_v2.html`.
+- **NEW-22 ✅ CONCLUÍDO:** Drill-down reconciliação por ativo em `reconciliacao.html`.
+- **NEW-05 ✅ CONCLUÍDO:** Tela `/carteira/cambio` com conversor, pares e histórico.
+
+### 🔧 Entregas anteriores (30/06/2026 — Lote 1)
 - **NEW-04 ✅ CONCLUÍDO:** Tela `/ferramentas/cotacoes` com health enriquecido + anomalias; KPIs, abas desatualizados/sem cotação/anomalias; refresh por ticker. 3 novos testes. Suite: **632 passed** (baseline +3).
 - **FEAT-009 ✅ CONCLUÍDO:** Import B3 retorna `tickers_importados` e `ativos_novos`; badges em `operacoes_v2.html`. 3 novos testes. Suite: **629 passed**.
 - **NEW-14 ✅ CONCLUÍDO:** Aba Venda em `planos_v2.html` integrada com dashboard, gatilhos e estatísticas. 5 novos testes. Suite: **626 passed**.

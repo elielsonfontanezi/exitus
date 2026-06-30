@@ -8,6 +8,31 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Lote 2 Frontend FEAT-010+ (30/06/2026)
+
+**NEW-06 + FEAT-010 — Indicadores macro dinâmicos no Dashboard**
+- `IndicadoresService.get_dashboard_indicadores()` — CDI/IPCA/SELIC via `parametros_macro`; Ibovespa via env
+- `GET /api/indicadores/dashboard` — agregador JWT
+- `index_v2.html` consome API; painel benchmark com IPCA e SELIC
+- 3 testes em `test_indicadores_dashboard.py`
+
+**NEW-12 — Resumo por ativo no Histórico**
+- Drawer lateral em `historico.html` via `GET /api/transacoes/resumo-ativo/<ativo_id>`
+- Clique no ticker ou menu "Resumo por Ativo"
+
+**NEW-10 — Detalhe de posição**
+- Rota `/carteira/posicoes/<uuid>` + `posicao_detalhe_v2.html`
+- Link "Detalhe da Posição" em `posicoes.html`
+
+**NEW-22 — Drill-down reconciliação**
+- Botão Detalhar em `reconciliacao.html` → painel com `GET /api/reconciliacao/ativo/<ativo_id>`
+
+**NEW-05 — Tela Câmbio**
+- Rota `/carteira/cambio` + `cambio_v2.html` — conversor, pares, histórico, atualizar taxas
+- Item no menu Carteira
+
+---
+
 ### Feat — NEW-04: Saúde das Cotações (30/06/2026)
 
 **Problema:** APIs `/api/cotacoes/health` e `/anomalias` existiam mas não havia tela para monitorar cotações desatualizadas ou inconsistentes.

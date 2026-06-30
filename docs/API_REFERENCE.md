@@ -1088,6 +1088,42 @@ GET /api/portfolios/rentabilidade?periodo=6m&benchmark=CDI
 
 Endpoints para verificação de consistência entre dados calculados e importados.
 
+---
+
+## Indicadores Macro (Dashboard)
+
+### GET /api/indicadores/dashboard
+
+Retorna indicadores de mercado para o painel de benchmark do Dashboard.
+
+**Auth:** Bearer JWT obrigatório.
+
+**Resposta:**
+```json
+{
+  "success": true,
+  "data": {
+    "cdi_anual": 10.5,
+    "ibovespa_anual": 8.32,
+    "ipca_anual": 4.5,
+    "selic_anual": 10.5,
+    "fontes": {
+      "cdi": "parametros_macro",
+      "ibovespa": "env",
+      "ipca": "parametros_macro",
+      "selic": "parametros_macro"
+    },
+    "atualizado_em": "2026-06-30T12:00:00+00:00"
+  }
+}
+```
+
+**Notas:**
+- CDI/IPCA/SELIC derivados de `parametros_macro` (BR/B3): `taxa_livre_risco`, `inflacao_anual`, `ytm_rf`
+- Ibovespa usa variável de ambiente `IBOVESPA_ANUAL` até fonte dedicada no banco
+
+---
+
 ### GET /api/reconciliacao/verificar
 
 Executa verificação completa de reconciliação (posições, saldos, integridade).

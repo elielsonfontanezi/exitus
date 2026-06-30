@@ -1,0 +1,238 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Câmbio{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Conversão de moedas e histórico de taxas</p>{% endblock %}
+
+{% block page_actions %}
+<button class="btn-exitus btn-exitus-primary" @click="atualizarTaxas()" :disabled="atualizando">
+    <i class="fas fa-sync-alt" :class="{'fa-spin': atualizando}"></i>
+    <span x-text="atualizando ? 'Atualizando...' : 'Atualizar Taxas'"></span>
+</button>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">USD → BRL</div>
+        <div class="kpi-card-value" x-text="taxaUsdBrl ? 'R$ ' + Number(taxaUsdBrl).toFixed(4) : '—'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">EUR → BRL</div>
+        <div class="kpi-card-value" x-text="taxaEurBrl ? 'R$ ' + Number(taxaEurBrl).toFixed(4) : '—'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Pares Disponíveis</div>
+        <div class="kpi-card-value" x-text="pares.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Resultado Conversão</div>
+        <div class="kpi-card-value positivo" x-text="resultadoConversao || '—'"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+    <div class="section-box">
+        <div class="section-box-title"><i class="fas fa-exchange-alt"></i> Conversor</div>
+        <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1rem;">
+            <div>
+                <label class="filter-label">Valor</label>
+                <input type="number" class="filter-input" x-model="valorConverter" min="0" step="0.01" style="width:100%;" @input="converter()">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:0.5rem; align-items:end;">
+                <div>
+                    <label class="filter-label">De</label>
+                    <select class="filter-select" x-model="moedaOrigem" style="width:100%;" @change="converter(); carregarHistorico()">
+                        <template x-for="m in moedas" :key="m">
+                            <option :value="m" x-text="m"></option>
+                        </template>
+                    </select>
+                </div>
+                <button class="btn-exitus btn-exitus-ghost" @click="inverterMoedas()" title="Inverter"><i class="fas fa-arrows-alt-h"></i></button>
+                <div>
+                    <label class="filter-label">Para</label>
+                    <select class="filter-select" x-model="moedaDestino" style="width:100%;" @change="converter(); carregarHistorico()">
+                        <template x-for="m in moedas" :key="'d'+m">
+                            <option :value="m" x-text="m"></option>
+                        </template>
+                    </select>
+                </div>
+            </div>
+            <div x-show="taxaAtual" style="font-size:0.85rem; color:var(--exitus-text-muted);">
+                Taxa: <strong x-text="taxaAtual"></strong>
+            </div>
+            <button class="btn-exitus btn-exitus-primary" @click="converter()" :disabled="convertendo">
+                <i class="fas fa-calculator"></i> Converter
+            </button>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <div class="section-box-title"><i class="fas fa-list"></i> Pares Disponíveis</div>
+        <table class="data-table" style="margin-top:1rem;" x-show="pares.length > 0">
+            <thead>
+                <tr><th>Par</th><th class="col-right">Taxa</th><th class="col-center">Data</th><th class="col-center">Ações</th></tr>
+            </thead>
+            <tbody>
+                <template x-for="par in pares" :key="par.par_moeda">
+                    <tr>
+                        <td x-text="par.par_moeda"></td>
+                        <td class="col-right cell-money" x-text="Number(par.taxa || 0).toFixed(4)"></td>
+                        <td class="col-center" x-text="formatDate(par.data_referencia)"></td>
+                        <td class="col-center">
+                            <button class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.2rem 0.5rem;"
+                                    @click="selecionarPar(par)">Usar</button>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+        <div x-show="pares.length === 0 && !loading" class="empty-state" style="padding:1.5rem;">
+            <div class="empty-state-text">Nenhum par de câmbio cadastrado</div>
+        </div>
+    </div>
+</div>
+
+<div class="section-box" style="margin-top:1.5rem;">
+    <div class="section-box-title"><i class="fas fa-history"></i> Histórico — <span x-text="parHistorico"></span></div>
+    <table class="data-table" style="margin-top:1rem;" x-show="historico.length > 0">
+        <thead>
+            <tr><th>Data</th><th class="col-right">Taxa</th><th>Fonte</th></tr>
+        </thead>
+        <tbody>
+            <template x-for="h in historico" :key="h.id || h.data_referencia">
+                <tr>
+                    <td x-text="formatDate(h.data_referencia)"></td>
+                    <td class="col-right" x-text="Number(h.taxa || 0).toFixed(4)"></td>
+                    <td x-text="h.fonte || 'manual'"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+    <div x-show="historico.length === 0 && !loadingHistorico" class="empty-state" style="padding:1.5rem;">
+        <div class="empty-state-text">Sem histórico para este par</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        moedas: ['BRL', 'USD', 'EUR'],
+        pares: [],
+        historico: [],
+        parHistorico: 'USD-BRL',
+        valorConverter: 100,
+        moedaOrigem: 'USD',
+        moedaDestino: 'BRL',
+        taxaUsdBrl: null,
+        taxaEurBrl: null,
+        taxaAtual: null,
+        resultadoConversao: null,
+        convertendo: false,
+        atualizando: false,
+        loadingHistorico: false,
+
+        async loadData() {
+            await Promise.all([
+                this.carregarPares(),
+                this.carregarTaxasReferencia(),
+                this.carregarHistorico()
+            ]);
+            await this.converter();
+        },
+
+        async carregarPares() {
+            try {
+                const res = await this.apiFetch('/api/cambio/pares');
+                this.pares = res?.data || [];
+            } catch (e) {
+                console.warn('pares:', e);
+                this.pares = [];
+            }
+        },
+
+        async carregarTaxasReferencia() {
+            for (const [de, para, field] of [['USD', 'BRL', 'taxaUsdBrl'], ['EUR', 'BRL', 'taxaEurBrl']]) {
+                try {
+                    const r = await fetch(API_BASE_URL + '/api/cambio/taxa-atual?de=' + de + '&para=' + para);
+                    const d = await r.json();
+                    if (d.success) this[field] = d.data?.taxa;
+                } catch (e) { console.warn('taxa-atual:', e); }
+            }
+        },
+
+        async carregarHistorico() {
+            this.loadingHistorico = true;
+            try {
+                const par = this.moedaOrigem + '-' + this.moedaDestino;
+                this.parHistorico = par;
+                const res = await this.apiFetch('/api/cambio/taxa/' + par + '/historico?limit=15');
+                this.historico = res?.data || [];
+            } catch (e) {
+                this.historico = [];
+            } finally {
+                this.loadingHistorico = false;
+            }
+        },
+
+        selecionarPar(par) {
+            const partes = (par.par_moeda || '').replace('/', '-').split(/[-/]/);
+            if (partes.length === 2) {
+                this.moedaOrigem = partes[0];
+                this.moedaDestino = partes[1];
+                this.converter();
+                this.carregarHistorico();
+            }
+        },
+
+        inverterMoedas() {
+            const tmp = this.moedaOrigem;
+            this.moedaOrigem = this.moedaDestino;
+            this.moedaDestino = tmp;
+            this.converter();
+            this.carregarHistorico();
+        },
+
+        async converter() {
+            if (!this.valorConverter || this.moedaOrigem === this.moedaDestino) {
+                this.resultadoConversao = this.valorConverter + ' ' + this.moedaOrigem;
+                return;
+            }
+            this.convertendo = true;
+            try {
+                const res = await this.apiFetch('/api/cambio/converter', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        valor: Number(this.valorConverter),
+                        moeda_origem: this.moedaOrigem,
+                        moeda_destino: this.moedaDestino
+                    })
+                });
+                const d = res?.data || {};
+                this.taxaAtual = '1 ' + this.moedaOrigem + ' = ' + Number(d.taxa || 0).toFixed(4) + ' ' + this.moedaDestino;
+                this.resultadoConversao = Number(d.valor_convertido || 0).toFixed(2) + ' ' + this.moedaDestino;
+            } catch (e) {
+                this.resultadoConversao = 'Erro na conversão';
+            } finally {
+                this.convertendo = false;
+            }
+        },
+
+        async atualizarTaxas() {
+            this.atualizando = true;
+            try {
+                await this.apiFetch('/api/cambio/atualizar', { method: 'POST', body: '{}' });
+                await this.loadData();
+            } catch (e) {
+                alert('Erro ao atualizar taxas: ' + (e.message || e));
+            } finally {
+                this.atualizando = false;
+            }
+        }
+    };
+}
+</script>
+{% endblock %}

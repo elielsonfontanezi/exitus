@@ -41,7 +41,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | # | Módulo | URL | Status | Problemas | Prioridade |
 |---|--------|-----|--------|-----------|-----------|
 | 1 | Login | `/auth/login` | ✅ | Redesenhado: UX_DESIGN_SYSTEM aplicado, credenciais removidas, link Esqueceu removido (EXITUS-LOGIN-001) | — |
-| 2 | Dashboard | `/dashboard/` | ✅ | CDI/Ibovespa via env vars (Config.CDI_ANUAL, Config.IBOVESPA_ANUAL); meta via API /api/auth/me (user.meta_patrimonio). FEAT-010 proposta: endpoint dinamico para CDI/Ibovespa/SELIC/IPCA | Baixa |
+| 2 | Dashboard | `/dashboard/` | ✅ | Indicadores CDI/IPCA/SELIC via `GET /api/indicadores/dashboard` (parametros_macro); Ibovespa via env; meta via `/api/auth/me` — NEW-06/FEAT-010 ✅ | Baixa |
 | 3 | Configurações — Perfil | `/configuracoes/perfil` | 🟡 | Somente leitura — sem edição de nome/email/senha | Média |
 | 4 | Configurações — Corretoras | `/configuracoes/corretoras` | ✅ | CRUD completo: botões criar/editar/excluir/sincronizar implementados (frontend + backend API) | — |
 | 5 | Operações — Import B3 | `/operacoes/` | ✅ | Import + lista de tickers importados e ativos novos (FEAT-009) | — |
@@ -224,7 +224,7 @@ Todos os 6 passos do plano executados. 9 artefatos modificados. Sistema respeita
 ---
 
 ### Tela 8 — Operações — Histórico (`/operacoes/historico`)
-**Status:** 🟡 PARCIAL
+**Status:** 🟡 PARCIAL (melhorado — NEW-12 ✅)
 
 **O que funciona (código):**
 - Herda `base_interna.html` ✅
@@ -234,10 +234,11 @@ Todos os 6 passos do plano executados. 9 artefatos modificados. Sistema respeita
 - Colunas clicáveis para ordenação ✅
 - Paginação (50 por página) ✅
 - Botão "Nova Operação" → `/operacoes/` ✅
+- **Editar/excluir transação** via menu ⋯ ✅ (FEAT-003)
+- **Resumo por ativo** — drawer lateral via `GET /api/transacoes/resumo-ativo/<ativo_id>` ✅ (NEW-12)
 
 **Problemas encontrados:**
-1. 🟡 **Sem editar/excluir transação** — menu de ações (⋯) só tem "Ver Ativo" e "Nova Operação". Não há opção de editar ou excluir uma transação registrada.
-2. 🟡 **Link "Ver Ativo"** aponta para `/dashboard/ativo/<ticker>` — verificar se essa rota existe.
+1. 🟡 **Link "Ver Ativo"** aponta para `/dashboard/ativo/<ticker>` — verificar se essa rota existe.
 
 **Validação visual (confirmada pelo usuário):**
 - [x] Tabela carrega com transações ✅
@@ -644,7 +645,7 @@ Detalhes de fórmulas: `docs/MANUAL_USUARIO_DRAFT.md` § Valuation.
 | ~~FEAT-007~~ | ~~Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona~~ | 34 | **RESOLVIDA**: modal com informações completas; botão Detalhes na tabela; carregamento via API específica |
 | ~~FEAT-008~~ | ~~Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível~~ | 14 | **RESOLVIDA**: botão "Confirmar" já implementado em calendario_v2.html; função confirmarPagamento() completa; API /api/calendario-dividendos/{id}/confirmar-pagamento funcional |
 | ~~FEAT-009~~ | ~~**Import B3 não lista os registros importados**~~ | 5 | **✅ RESOLVIDO (30/06/2026):** API retorna `tickers_importados` + `ativos_novos`; frontend exibe badges |
-| FEAT-010 | **Indicadores de mercado (CDI/Ibovespa) sem endpoint dinâmico** — atualmente valores vêm de variáveis de ambiente no frontend. **Fix:** criar backend `GET /api/indicadores` com CDI/Ibovespa atualizados automaticamente; dashboard consumir via API. **⚠️ ANÁLISE OBRIGATÓRIA:** Antes de implementar, fazer análise minuciosa do backend para confirmar que não há APIs existentes para os indicadores esperados (CDI, Ibovespa, SELIC, IPCA). Investigar: `/api/parametros-macro` (tem `taxa_livre_risco` ≈ CDI, `inflacao_anual` ≈ IPCA, mas sem CDI/Ibovespa específicos); `/api/portfolio/rentabilidade?benchmark=IBOV` (calcula vs IBOV mas não retorna valor do Ibovespa); tabela `parametros_macro` (campos: `taxa_livre_risco`, `crescimento_medio`, `custo_capital`, `inflacao_anual`, `cap_rate_fii`, `ytm_rf` — sem CDI/Ibovespa anuais). Conclusão preliminar: não há endpoint específico, mas confirmar exhaustivamente antes de criar novo | 2 |
+| FEAT-010 | ~~Indicadores de mercado sem endpoint dinâmico~~ **✅ RESOLVIDO (30/06/2026)** — `GET /api/indicadores/dashboard`; Dashboard consome CDI/IPCA/SELIC de `parametros_macro`; Ibovespa via env | 2 |
 | FEAT-011 | **Saldo de corretoras não é dinâmico** — `sincronizar-saldo` resolve manualmente. **Fix:** remover coluna `saldo_atual` e calcular saldo sempre a partir de movimentações de caixa, ou atualizar automaticamente via triggers/eventos ao inserir movimentação | 4 |
 | FEAT-012 | **Refinamentos edição/exclusão transações** — implementar validações (bloquear se já liquidada/IR), período de carência, auditoria de alterações, motivo obrigatório para exclusão, indicadores visuais de bloqueio | 6, 7, 8 |
 | FEAT-013 | **Validação de força de senha** — indicador visual (fraca/média/forte) com critérios claros (tamanho, maiúsculas, números, especiais) ao trocar senha | 3 |
@@ -1159,14 +1160,14 @@ curl -X POST http://localhost:5000/api/auth/login \
 | NEW-02 | **Métricas de Risco** | `/analises/risco` | `/api/portfolios/metricas-risco`, `/api/performance/*` | Sharpe, Drawdown máximo, VaR, correlação entre ativos |
 | ~~NEW-03~~ | ~~**Distribuição Detalhada**~~ | Expandir `/analises/alocacao` | `/api/portfolios/distribuicao/classes`, `/api/portfolios/distribuicao/setores` | ✅ IMPLEMENTADO (30/06/2026) — abas classe/segmento em alocacao_v2 |
 | ~~NEW-04~~ | ~~**Saúde das Cotações**~~ | `/ferramentas/cotacoes` | `/api/cotacoes/anomalias`, `/api/cotacoes/health` | **✅ RESOLVIDO (30/06/2026):** KPIs + abas desatualizados/anomalias; health enriquecido com listas |
-| NEW-05 | **Câmbio e Multimoeda** | Expandir Dashboard ou `/carteira/cambio` | `/api/cambio/converter`, `/api/cambio/historico`, `/api/cambio/pares` | Visualizar patrimônio em USD/EUR; histórico de taxas |
-| NEW-06 | **Indicadores Macroeconômicos** | Expandir Dashboard | `/api/parametros-macro/*` | CDI, Ibovespa, IPCA, Selic dinâmicos — resolve BUG-005 |
+| NEW-05 | ~~Câmbio e Multimoeda~~ **✅ RESOLVIDO (30/06/2026)** — `/carteira/cambio` + `cambio_v2.html` | `/api/cambio/*` | Conversor, pares, histórico |
+| NEW-06 | ~~Indicadores Macroeconômicos~~ **✅ RESOLVIDO (30/06/2026)** — `GET /api/indicadores/dashboard` | `/api/parametros-macro/*` | CDI, IPCA, SELIC dinâmicos |
 | NEW-07 | **Fontes de Dados** | `/configuracoes/fontes-dados` | `/api/fontes-dados/*` | Gerenciar provedores de cotação (B3, Yahoo, etc.) — tela administrativa |
 | NEW-08 | **Regras Fiscais** | `/configuracoes/regras-fiscais` | `/api/regras-fiscais/*` | Configurar alíquotas, isenções e regras de apuração |
 | NEW-09 | **Relatório Consolidado** | Expandir `/relatorios/exportar` | `/api/relatorios` | Endpoint único que gera relatório completo (PDF/Excel) com dados de todas as APIs |
-| NEW-10 | **Detalhe de Posição** | `/carteira/posicoes/<id>` | `/api/posicoes/<posicao_id>` | Histórico de preço médio, eventos, proventos recebidos por posição individual |
+| ~~NEW-10~~ | ~~**Detalhe de Posição**~~ | `/carteira/posicoes/<id>` | `/api/posicoes/<posicao_id>` | **✅ RESOLVIDO (30/06/2026):** `posicao_detalhe_v2.html` + link em posicoes |
 | NEW-11 | **Calculadora de Preço Teto** | Expandir `/ferramentas/calculadora-ir` ou nova `/ferramentas/preco-teto` | `/api/calculos/preco_teto`, `/api/calculos/fii`, `/api/calculos/portfolio` | Calcular preço teto por Bazin, Graham, FII Yield |
-| NEW-12 | **Resumo por Ativo** | Expandir `/operacoes/historico` | `/api/transacoes/resumo-ativo` | Ver todas as transações agrupadas por ativo com P&L acumulado |
+| ~~NEW-12~~ | ~~**Resumo por Ativo**~~ | Expandir `/operacoes/historico` | `/api/transacoes/resumo-ativo` | **✅ RESOLVIDO (30/06/2026):** drawer lateral com KPIs agregados |
 | ~~NEW-13~~ | ~~**Dashboard de Planos de Compra**~~ | `/planos-compra/` (aba Compra) | `/api/plano-compra/dashboard` | **✅ RESOLVIDO (30/06/2026):** KPIs + Próximos Aportes em `planos_v2.html`; alias `/planos-compra/dashboard` |
 | ~~NEW-14~~ | ~~**Plano de Venda — Dashboard + Gatilhos**~~ | `/planos-venda/` (aba Venda) | `/api/plano-venda/dashboard`, `/verificar-gatilhos`, `/estatisticas` | **✅ RESOLVIDO (30/06/2026):** KPIs, gatilhos disparados, datas limite e stats em `planos_v2.html`; alias `/planos-venda/dashboard` |
 | NEW-15 | **Correlação entre Ativos** | `/analises/correlacao` | `/api/performance/correlacao` | Matriz de correlação entre ativos da carteira — ver quais ativos se movem juntos ou ao contrário |
@@ -1176,7 +1177,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 | NEW-19 | **Gerenciamento de Portfólios** | `/configuracoes/portfolios` | `/api/portfolios` (CRUD: list, get, create, update, delete) | Criar múltiplos portfólios (ex: Previdência, Especulativo, Longo Prazo) e alternar entre eles |
 | NEW-20 | **Gerenciamento de Usuários** | `/admin/usuarios` | `/api/usuarios` (CRUD + change_password) | Painel admin para criar/editar/remover usuários e redefinir senhas — útil para multi-usuário familiar |
 | NEW-21 | **Editar / Excluir Transação** | Expandir `/operacoes/historico` | `/api/transacoes/<id>` (PUT, DELETE) | Corrigir lançamentos errados — **API existe mas FEAT-003 aponta que frontend não expõe esses botões** |
-| NEW-22 | **Saúde da Reconciliação por Ativo** | Expandir `/ferramentas/reconciliacao` | `/api/reconciliacao/ativo/<id>`, `/api/reconciliacao/integridade` | Drill-down por ativo específico para diagnosticar inconsistência de saldo — hoje só visão geral |
+| ~~NEW-22~~ | ~~**Saúde da Reconciliação por Ativo**~~ | Expandir `/ferramentas/reconciliacao` | `/api/reconciliacao/ativo/<id>` | **✅ RESOLVIDO (30/06/2026):** botão Detalhar + painel por corretora |
 
 ---
 
@@ -1460,17 +1461,18 @@ As seguintes novas telas propostas (NEW-XX) **não têm pré-requisito técnico*
 | ID | Tela | Motivo de independência |
 |----|------|------------------------|
 | ~~NEW-03~~ | Distribuição Detalhada | ✅ alocacao_v2.html — abas classe macro + segmento (tipo); APIs implementadas |
-| NEW-04 | Saúde das Cotações | APIs `/cotacoes/anomalias` e `/cotacoes/health` existem |
-| NEW-05 | Câmbio e Multimoeda | APIs `/cambio/converter`, `/cambio/historico` existem |
-| NEW-06 | Indicadores Macroeconômicos | API `/api/parametros-macro/*` existe; resolve BUG-005 (CDI/Ibovespa hardcoded) |
+| ~~NEW-04~~ | Saúde das Cotações | ✅ `/ferramentas/cotacoes` implementado |
+| ~~NEW-05~~ | Câmbio e Multimoeda | ✅ `/carteira/cambio` implementado |
+| ~~NEW-06~~ | Indicadores Macroeconômicos | ✅ `GET /api/indicadores/dashboard` |
 | NEW-07 | Fontes de Dados | API `/api/fontes-dados/*` existe |
 | NEW-09 | Relatório Consolidado | API `/api/relatorios` existe |
-| NEW-10 | Detalhe de Posição | API `/api/posicoes/<posicao_id>` existe |
+| ~~NEW-10~~ | Detalhe de Posição | ✅ `/carteira/posicoes/<id>` implementado |
 | NEW-11 | Calculadora Preço Teto | APIs `/api/calculos/preco_teto`, `/api/calculos/fii` existem |
+| ~~NEW-12~~ | Resumo por Ativo | ✅ drawer em historico.html |
 | NEW-19 | Gerenciamento de Portfólios | CRUD `/api/portfolios` completo |
 | NEW-20 | Gerenciamento de Usuários | CRUD `/api/usuarios` completo |
 | NEW-21 | Editar/Excluir Transação | APIs PUT/DELETE `/api/transacoes/<id>` existem (FEAT-003 já foi resolvida) |
-| NEW-22 | Saúde da Reconciliação por Ativo | APIs `/api/reconciliacao/ativo/<id>` e `/api/reconciliacao/integridade` existem |
+| ~~NEW-22~~ | Saúde da Reconciliação por Ativo | ✅ drill-down em reconciliacao.html |
 
 ### Sequência recomendada para desbloqueio geral
 
