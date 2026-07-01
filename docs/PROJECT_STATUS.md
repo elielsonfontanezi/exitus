@@ -1,10 +1,17 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 30/06/2026
-> **Status:** ✅ **Lote 4 Frontend concluído (NEW-08/16/19/20)**
-> **Versão:** v0.9.48
+> **Status:** ✅ **Lote 5 Frontend concluído (NEW-01/02, FIX-HIST-001)**
+> **Versão:** v0.9.49
 
-### 🔧 Últimas entregas (30/06/2026 — Lote 4)
+### 🔧 Últimas entregas (30/06/2026 — Lote 5)
+- **FIX-HIST-001 ✅ CONCLUÍDO:** filtro data histórico — BE `func.date` + FE sem dupla filtragem; tela 8 → OK.
+- **NEW-02 ✅ CONCLUÍDO:** `/analises/risco` — `get_metricas_risco()` + `risco_v2.html`; 2 testes.
+- **NEW-01 ✅ CONCLUÍDO:** `/analises/projecoes` — projeções patrimoniais; simulador → redirect.
+- **STALE-001 ✅ CONCLUÍDO:** telas 7, 10, 28, 35 revalidadas → OK.
+- Suite: **653 passed**, 3 failed pré-existentes, 6 skipped (+4 vs Lote 4).
+
+### 🔧 Entregas anteriores (30/06/2026 — Lote 4)
 - **NEW-19 ✅ CONCLUÍDO:** `/configuracoes/portfolios` — CRUD portfolios; tab bar + menu; 3 testes endpoint.
 - **NEW-20 ✅ CONCLUÍDO:** `/admin/usuarios` — CRUD usuários admin; menu Admin.
 - **NEW-08 ✅ CONCLUÍDO:** `/configuracoes/regras-fiscais` — CRUD regras (mutations admin); 3 testes endpoint.

@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Lote 5 Frontend NEW-01/02 + FIX-HIST-001 (30/06/2026)
+
+**FIX-HIST-001 — Filtro data no Histórico**
+- `TransacaoService.get_all` compara `func.date(data_transacao)` — inclui último dia do intervalo
+- `historico.html` remove filtro de data duplicado client-side; reset de página ao mudar datas
+- `test_transacoes_filtro_data.py` — 2 casos
+
+**NEW-02 — Métricas de Risco**
+- `PortfolioService.get_metricas_risco()` delegando a relatório performance
+- Rota `/analises/risco` + `risco_v2.html`; menu Análises
+- `test_metricas_risco_endpoint.py`
+
+**NEW-01 — Projeções Patrimoniais**
+- Rota `/analises/projecoes` + `projecoes_patrimonio_v2.html` — juros compostos, prefill dashboard, macros CDI/SELIC
+- `/ferramentas/simulador` → redirect para projeções
+
+**STALE-001 — Revalidação auditoria**
+- Telas 7, 10, 28, 35 promovidas PARCIAL → OK
+
+---
+
 ### Feat — Lote 4 Frontend NEW-08/16/19/20 (30/06/2026)
 
 **NEW-19 — Gerenciamento de Portfolios**
