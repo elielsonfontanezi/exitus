@@ -142,6 +142,17 @@
 </div>
 
 <!-- Empty / Error States -->
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao calcular rentabilidade</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="calcular()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+
 <div class="section-box" x-show="!loading && !dados && !error" x-cloak>
     <div class="empty-state">
         <div class="empty-state-icon"><i class="fas fa-chart-line"></i></div>
