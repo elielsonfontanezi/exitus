@@ -1,0 +1,232 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Gestão de Usuários{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Administração de contas — criar, editar e desativar usuários</p>{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Total</div>
+        <div class="kpi-card-value" x-text="usuarios.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos</div>
+        <div class="kpi-card-value positivo" x-text="usuariosAtivos"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" style="margin-bottom:1rem;">
+    <button class="btn-exitus btn-exitus-primary" @click="abrirModalNova()">
+        <i class="fas fa-plus"></i> Novo Usuário
+    </button>
+</div>
+
+<div class="section-box" x-show="usuarios.length > 0">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th class="col-center">Role</th>
+                <th class="col-center">Ativo</th>
+                <th class="col-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="u in usuarios" :key="u.id">
+                <tr>
+                    <td><span class="cell-ticker" x-text="u.username"></span></td>
+                    <td x-text="u.nome_completo || '-'"></td>
+                    <td x-text="u.email || '-'"></td>
+                    <td class="col-center">
+                        <span class="badge badge-neutro" x-text="roleLabel(u.role)"></span>
+                    </td>
+                    <td class="col-center">
+                        <span class="badge" :class="u.ativo ? 'badge-success' : 'badge-danger'"
+                              x-text="u.ativo ? 'Sim' : 'Não'"></span>
+                    </td>
+                    <td class="col-center">
+                        <div class="action-menu" x-data="{ open: false }">
+                            <button class="action-menu-btn" @click="open = !open" @click.away="open = false">⋯</button>
+                            <div class="action-menu-dropdown" :class="{ show: open }">
+                                <button class="action-menu-item" @click="editarUsuario(u)">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="action-menu-item action-menu-danger" @click="excluirUsuario(u)" :disabled="u.excluindo">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="!loading && usuarios.length === 0 && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-users"></i></div>
+        <div class="empty-state-title">Nenhum usuário encontrado</div>
+    </div>
+</div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar usuários</div>
+        <div class="empty-state-text" x-text="error"></div>
+    </div>
+</div>
+
+<div x-show="showModal" x-cloak
+     style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;">
+    <div @click.away="fecharModal()" style="background:white; padding:2rem; border-radius:8px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto;">
+        <h3 style="margin:0 0 1.5rem 0;" x-text="editando ? 'Editar Usuário' : 'Novo Usuário'"></h3>
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div x-show="!editando">
+                <label class="filter-label">Username</label>
+                <input type="text" class="filter-input" x-model="form.username" style="width:100%;">
+            </div>
+            <div>
+                <label class="filter-label">Nome Completo</label>
+                <input type="text" class="filter-input" x-model="form.nome_completo" style="width:100%;">
+            </div>
+            <div>
+                <label class="filter-label">E-mail</label>
+                <input type="email" class="filter-input" x-model="form.email" style="width:100%;">
+            </div>
+            <div x-show="!editando">
+                <label class="filter-label">Senha inicial</label>
+                <input type="password" class="filter-input" x-model="form.password" style="width:100%;" autocomplete="new-password">
+            </div>
+            <div>
+                <label class="filter-label">Role</label>
+                <select class="filter-input" x-model="form.role" style="width:100%;">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="readonly">Readonly</option>
+                </select>
+            </div>
+            <div x-show="editando">
+                <label class="filter-label">
+                    <input type="checkbox" x-model="form.ativo"> Ativo
+                </label>
+            </div>
+        </div>
+        <div style="display:flex; gap:0.5rem; margin-top:1.5rem; justify-content:flex-end;">
+            <button class="btn-exitus btn-exitus-ghost" @click="fecharModal()">Cancelar</button>
+            <button class="btn-exitus btn-exitus-primary" @click="salvar()" :disabled="salvando">
+                <i class="fas" :class="salvando ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+                <span x-text="salvando ? 'Salvando...' : 'Salvar'"></span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        usuarios: [],
+        usuariosAtivos: 0,
+        showModal: false,
+        editando: false,
+        salvando: false,
+        form: {},
+
+        async loadData() {
+            const res = await this.apiFetch('/api/usuarios?per_page=100');
+            const data = res?.data || res;
+            this.usuarios = data.usuarios || [];
+            this.usuariosAtivos = this.usuarios.filter(u => u.ativo).length;
+        },
+
+        roleLabel(role) {
+            const map = { admin: 'Admin', user: 'User', readonly: 'Readonly' };
+            return map[(role || '').toLowerCase()] || role || '-';
+        },
+
+        abrirModalNova() {
+            this.editando = false;
+            this.form = { username: '', nome_completo: '', email: '', password: '', role: 'user' };
+            this.showModal = true;
+        },
+
+        editarUsuario(u) {
+            this.editando = true;
+            this.form = {
+                id: u.id,
+                nome_completo: u.nome_completo || '',
+                email: u.email || '',
+                role: (u.role || 'user').toLowerCase(),
+                ativo: !!u.ativo,
+            };
+            this.showModal = true;
+        },
+
+        fecharModal() {
+            this.showModal = false;
+            this.form = {};
+        },
+
+        async salvar() {
+            this.salvando = true;
+            try {
+                if (this.editando) {
+                    await this.apiFetch('/api/usuarios/' + this.form.id, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome_completo: this.form.nome_completo,
+                            email: this.form.email,
+                            role: this.form.role,
+                            ativo: this.form.ativo,
+                        }),
+                    });
+                } else {
+                    if (!this.form.username || !this.form.email || !this.form.password) {
+                        alert('Username, e-mail e senha são obrigatórios.');
+                        return;
+                    }
+                    await this.apiFetch('/api/usuarios', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: this.form.username,
+                            email: this.form.email,
+                            password: this.form.password,
+                            nome_completo: this.form.nome_completo || null,
+                            role: this.form.role,
+                        }),
+                    });
+                }
+                await this.loadData();
+                this.fecharModal();
+            } catch (e) {
+                alert('Erro ao salvar usuário: ' + (e.message || ''));
+            } finally {
+                this.salvando = false;
+            }
+        },
+
+        async excluirUsuario(u) {
+            if (!confirm('Excluir usuário "' + u.username + '"?')) return;
+            u.excluindo = true;
+            try {
+                await this.apiFetch('/api/usuarios/' + u.id, { method: 'DELETE' });
+                await this.loadData();
+            } catch (e) {
+                alert('Erro ao excluir usuário.');
+            } finally {
+                u.excluindo = false;
+            }
+        },
+    };
+}
+</script>
+{% endblock %}

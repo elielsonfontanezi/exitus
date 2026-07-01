@@ -50,3 +50,10 @@ def assessoras_edit(assessora_id):
 def assessoras_stats(assessora_id):
     """Dashboard de métricas da assessora"""
     return render_template('admin/assessoras_stats.html', assessora_id=assessora_id)
+
+
+@admin_bp.route('/usuarios')
+@require_admin
+def usuarios_list():
+    """Gestão de usuários — NEW-20"""
+    return render_template('admin/usuarios_v2.html')
