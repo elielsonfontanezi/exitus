@@ -8,6 +8,29 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Lote 4 Frontend NEW-08/16/19/20 (30/06/2026)
+
+**NEW-19 — Gerenciamento de Portfolios**
+- Rota `/configuracoes/portfolios` + `portfolios_v2.html` — CRUD via `/api/portfolios`
+- Tab bar Config: Perfil | Corretoras | Fontes | Portfolios | Regras Fiscais
+- Links no menu Configurações
+- `test_portfolios_crud_endpoint.py` — auth + list/create
+
+**NEW-20 — Gerenciamento de Usuários (Admin)**
+- Rota `/admin/usuarios` + `usuarios_v2.html` — CRUD via `/api/usuarios`
+- Menu Admin (Assessoras + Usuários) visível para `role=admin`
+
+**NEW-08 — Regras Fiscais**
+- Rota `/configuracoes/regras-fiscais` + `regras_fiscais_v2.html` — listagem JWT; mutations admin-only no FE
+- `test_regras_fiscais_endpoint.py` — auth + list + create admin
+
+**NEW-16 — Benchmark Rentabilidade**
+- `rentabilidade_v2.html` validado — seletor CDI/IBOV/IFIX/SP500/IPCA6 via `GET /api/portfolios/rentabilidade?benchmark=`
+- Estado de erro com retry adicionado
+- `test_rentabilidade_benchmark.py` — estrutura resposta com campo `benchmark`
+
+---
+
 ### Ops — OPS-GIT-HTTPS-001 (30/06/2026)
 
 - Push do Lote 3 bloqueado por HTTP 401 (credencial HTTPS ausente no WSL)

@@ -8,7 +8,7 @@
 
 > **Nota de revalidação (27/06/2026):** BUG-014, BUG-015, BUG-017, BUG-009 (telas 20-21) RESOLVIDOS indiretamente via BUG-009v2 (separação `BROWSER_API_URL` / `BACKEND_API_URL`).
 >
-> **Nota de revalidação (30/06/2026):** Lote 3 Frontend (NEW-11/15/17/18/07). Contagem: **19 OK, 21 PARCIAL**, 0 QUEBRADO. Este arquivo é o **backlog operacional de frontend** enquanto houver telas PARCIAL ou P-items abertos (ver `AI_OPERATIONS.md` § Plano de controle).
+> **Nota de revalidação (30/06/2026):** Lote 4 Frontend (NEW-08/16/19/20). Contagem: **23 OK, 17 PARCIAL**, 0 QUEBRADO. Este arquivo é o **backlog operacional de frontend** enquanto houver telas PARCIAL ou P-items abertos (ver `AI_OPERATIONS.md` § Plano de controle).
 
 **Legenda de status:**
 - ✅ `OK` — funciona conforme esperado
@@ -22,8 +22,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 14 |
-| 🟡 PARCIAL | 22 |
+| ✅ OK | 23 |
+| 🟡 PARCIAL | 17 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -42,7 +42,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 |---|--------|-----|--------|-----------|-----------|
 | 1 | Login | `/auth/login` | ✅ | Redesenhado: UX_DESIGN_SYSTEM aplicado, credenciais removidas, link Esqueceu removido (EXITUS-LOGIN-001) | — |
 | 2 | Dashboard | `/dashboard/` | ✅ | Indicadores CDI/IPCA/SELIC via `GET /api/indicadores/dashboard` (parametros_macro); Ibovespa via env; meta via `/api/auth/me` — NEW-06/FEAT-010 ✅ | Baixa |
-| 3 | Configurações — Perfil | `/configuracoes/perfil` | 🟡 | Somente leitura — sem edição de nome/email/senha | Média |
+| 3 | Configurações — Perfil | `/configuracoes/perfil` | ✅ | Edição nome/e-mail (`PUT /api/auth/me`) e troca de senha (`POST /api/auth/change-password`) — EXITUS-PERFIL-001 ✅ | — |
 | 4 | Configurações — Corretoras | `/configuracoes/corretoras` | ✅ | CRUD completo: botões criar/editar/excluir/sincronizar implementados (frontend + backend API) | — |
 | 5 | Operações — Import B3 | `/operacoes/` | ✅ | Import + lista de tickers importados e ativos novos (FEAT-009) | — |
 | 6 | Operações — Compra | `/operacoes/` | ✅ | Toggle funciona ✅; busca de ativo com autocomplete funcionando (BUG-014 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`) | — |
@@ -59,7 +59,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 17 | Análises — Alocação | `/analises/alocacao` | ✅ | Metas + desvio + sugestões (REBALANCE-001) + distribuição por segmento (NEW-03) ✅ | — |
 | 18 | Análises — Buy Signals | `/analises/buy-signals` | ✅ | Watchlist com `valor_justo`, faixa min/max, perfil; margem coerente (BUG-VAL-004/005); busca ticker OK (BUG-017) | — |
 | 19 | Análises — Rentabilidade (legacy) | `/analises/rentabilidade` | 🟡 | Redirect para `/periodo` ✅ (EXITUS-ANALISES-001); código morto removido | — |
-| 19b | Análises — Rentabilidade por Período | `/analises/rentabilidade/periodo` | 🟡 | Acessível pelo menu como "Rentabilidade"; filtros de período OK; benchmark sem validação | Média |
+| 19b | Análises — Rentabilidade por Período | `/analises/rentabilidade/periodo` | ✅ | Seletor benchmark CDI/IBOV/IFIX/SP500/IPCA6 via `GET /api/portfolios/rentabilidade?benchmark=` — NEW-16 ✅ | — |
 | 20 | Fiscal — IR Mensal | `/imposto-renda/mensal` | ✅ | Carrega dados ✅; BUG-009/009v2 RESOLVIDO — `BROWSER_API_URL` separada de `BACKEND_API_URL` | — |
 | 21 | Fiscal — DARFs | `/imposto-renda/darfs` | ✅ | Carrega dados ✅; BUG-009/009v2 RESOLVIDO — `BROWSER_API_URL` separada de `BACKEND_API_URL` | — |
 | 22 | Fiscal — Histórico | `/imposto-renda/historico` | 🟡 | Carrega dados ✅ | Baixa |
@@ -80,13 +80,16 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 37 | Análises — Correlação | `/analises/correlacao` | ✅ | NEW-15 — heatmap matriz de correlação da carteira | — |
 | 38 | Análises — Projeções Renda | `/analises/projecoes/renda` | ✅ | NEW-17 — cenários conservador/moderado/otimista + recalcular 12 meses | — |
 | 39 | Configurações — Fontes de Dados | `/configuracoes/fontes-dados` | ✅ | NEW-07 — CRUD fontes externas, health, taxa sucesso | — |
+| 40 | Configurações — Portfolios | `/configuracoes/portfolios` | ✅ | NEW-19 — CRUD portfolios (nome, objetivo, ativo) | — |
+| 41 | Configurações — Regras Fiscais | `/configuracoes/regras-fiscais` | ✅ | NEW-08 — listagem + CRUD admin (alíquota, vigência, país) | — |
+| 42 | Admin — Usuários | `/admin/usuarios` | ✅ | NEW-20 — CRUD usuários (admin-only); criar com senha inicial | — |
 
 ---
 
 ## 🧭 Análise de Sessão — 27/06/2026 (BUG-014/015/017 ✅ RESOLVIDOS)
 
 ### Contexto
-- AUDITORIA_FUNCIONAL: status geral ✅ (19 OK, 21 PARCIAL, 0 QUEBRADO — atualizado 30/06/2026).
+- AUDITORIA_FUNCIONAL: status geral ✅ (23 OK, 17 PARCIAL, 0 QUEBRADO — atualizado 30/06/2026 Lote 4).
 - BUG-009v2 **resolvido em 27/06/2026**: separação `BROWSER_API_URL` (client-side) / `BACKEND_API_URL` (server-side) — ver `ARCHITECTURE.md` para 7 cenários de deploy.
 - BUG-014, BUG-015, BUG-017 **resolvidos indiretamente** pelo BUG-009v2 — todas as chamadas `apiFetch()` do Alpine.js agora usam `BROWSER_API_URL` (hostname resolúvel pelo browser).
 - Telas 20-21 (Fiscal IR Mensal/DARFs) também confirmadas como RESOLVIDAS.
@@ -167,21 +170,19 @@ Todos os 6 passos do plano executados. 9 artefatos modificados. Sistema respeita
 ---
 
 ### Tela 3 — Configurações — Perfil (`/configuracoes/perfil`)
-**Status:** 🟡 PARCIAL
+**Status:** ✅ OK
 
 **O que funciona (código):**
 - Herda `base_interna.html` ✅
-- Abas Perfil / Minhas Corretoras ✅
+- Abas Perfil / Minhas Corretoras / Fontes / Portfolios / Regras Fiscais ✅
 - Carrega dados via `GET /api/auth/me` ✅
-- Exibe nome, username, e-mail, status, data de cadastro ✅
-
-**Problemas encontrados:**
-1. 🔴 **Somente leitura** — não há formulário de edição. O roteiro diz "Editar perfil" mas a tela só exibe dados. Sem botão "Editar", sem campos de input, sem `PUT /api/auth/me`.
-2. 🟡 **Sem troca de senha** — nenhum campo ou fluxo para alterar senha
+- Formulário edição nome/e-mail via `PUT /api/auth/me` ✅
+- Troca de senha via `POST /api/auth/change-password` ✅
 
 **Validação visual (confirmada pelo usuário):**
 - [x] Dados do usuário aparecem corretamente ✅
 - [x] Aba "Minhas Corretoras" navega corretamente ✅
+- [x] Salvar perfil e trocar senha funcionam ✅ (EXITUS-PERFIL-001)
 
 ---
 
@@ -504,16 +505,19 @@ Em 24/06/2026 foram realizadas correções críticas nos ENUMs do banco:
 ---
 
 ### Tela 19b — Análises — Rentabilidade por Período (`/analises/rentabilidade/periodo`)
-**Status:** 🟡 PARCIAL
+**Status:** ✅ OK
 
 **O que funciona (código):**
 - Rota existe, renderiza `analises/rentabilidade_v2.html` (Alpine.js) ✅
 - Versão ativa — acessível pelo menu como "Rentabilidade" ✅
+- Filtros de período e benchmark (CDI, IBOV, IFIX, SP500, IPCA6) via `GET /api/portfolios/rentabilidade?benchmark=` ✅
+- KPIs TWR/MWR/Alpha e barras comparativas atualizam ao trocar benchmark ✅
+- Estado de erro com retry ✅ (NEW-16)
 
-**Validação visual (18/06/2026):**
+**Validação visual (18/06/2026 + 30/06/2026):**
 - [x] Tela abre e carrega dados ✅
 - [x] Filtros de período (1m, 3m, ...) funcionam ✅
-- [x] Filtro de benchmark presente 🟡 — não foi possível validar se funciona corretamente
+- [x] Filtro de benchmark funciona — KPIs e barra comparativa atualizam ✅
 
 ---
 
@@ -1167,7 +1171,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 | NEW-05 | ~~Câmbio e Multimoeda~~ **✅ RESOLVIDO (30/06/2026)** — `/carteira/cambio` + `cambio_v2.html` | `/api/cambio/*` | Conversor, pares, histórico |
 | NEW-06 | ~~Indicadores Macroeconômicos~~ **✅ RESOLVIDO (30/06/2026)** — `GET /api/indicadores/dashboard` | `/api/parametros-macro/*` | CDI, IPCA, SELIC dinâmicos |
 | NEW-07 | **Fontes de Dados** | `/configuracoes/fontes-dados` | `/api/fontes-dados/*` | Gerenciar provedores de cotação (B3, Yahoo, etc.) — tela administrativa |
-| NEW-08 | **Regras Fiscais** | `/configuracoes/regras-fiscais` | `/api/regras-fiscais/*` | Configurar alíquotas, isenções e regras de apuração |
+| ~~NEW-08~~ | ~~**Regras Fiscais**~~ | `/configuracoes/regras-fiscais` | `/api/regras-fiscais/*` | **✅ RESOLVIDO (30/06/2026):** CRUD em `regras_fiscais_v2.html`; mutations admin-only |
 | NEW-09 | **Relatório Consolidado** | Expandir `/relatorios/exportar` | `/api/relatorios` | Endpoint único que gera relatório completo (PDF/Excel) com dados de todas as APIs |
 | ~~NEW-10~~ | ~~**Detalhe de Posição**~~ | `/carteira/posicoes/<id>` | `/api/posicoes/<posicao_id>` | **✅ RESOLVIDO (30/06/2026):** `posicao_detalhe_v2.html` + link em posicoes |
 | NEW-11 | **Calculadora de Preço Teto** | Expandir `/ferramentas/calculadora-ir` ou nova `/ferramentas/preco-teto` | `/api/calculos/preco_teto`, `/api/calculos/fii`, `/api/calculos/portfolio` | Calcular preço teto por Bazin, Graham, FII Yield |
@@ -1175,11 +1179,11 @@ curl -X POST http://localhost:5000/api/auth/login \
 | ~~NEW-13~~ | ~~**Dashboard de Planos de Compra**~~ | `/planos-compra/` (aba Compra) | `/api/plano-compra/dashboard` | **✅ RESOLVIDO (30/06/2026):** KPIs + Próximos Aportes em `planos_v2.html`; alias `/planos-compra/dashboard` |
 | ~~NEW-14~~ | ~~**Plano de Venda — Dashboard + Gatilhos**~~ | `/planos-venda/` (aba Venda) | `/api/plano-venda/dashboard`, `/verificar-gatilhos`, `/estatisticas` | **✅ RESOLVIDO (30/06/2026):** KPIs, gatilhos disparados, datas limite e stats em `planos_v2.html`; alias `/planos-venda/dashboard` |
 | NEW-15 | **Correlação entre Ativos** | `/analises/correlacao` | `/api/performance/correlacao` | Matriz de correlação entre ativos da carteira — ver quais ativos se movem juntos ou ao contrário |
-| NEW-16 | **Comparação com Benchmark** | Expandir `/analises/rentabilidade/periodo` | `/api/performance/benchmark` | Comparar rentabilidade da carteira vs CDI, Ibovespa, IPCA — API existe separada do filtro atual |
+| ~~NEW-16~~ | ~~**Comparação com Benchmark**~~ | Expandir `/analises/rentabilidade/periodo` | `/api/portfolios/rentabilidade?benchmark=` | **✅ RESOLVIDO (30/06/2026):** seletor benchmark validado em `rentabilidade_v2.html` |
 | NEW-17 | **Projeções de Renda Passiva** | `/analises/projecoes/renda` | `/api/projecoes/renda`, `/api/projecoes/cenarios`, `/api/projecoes/recalcular` | Projetar dividendos futuros por cenário (conservador/moderado/agressivo) com metas de renda mensal |
 | NEW-18 | **Gerenciamento de Proventos** | Expandir `/proventos/calendario` | `/api/proventos` (CRUD completo: GET, POST, PUT, DELETE) | Criar, editar e excluir proventos manualmente — hoje só leitura via calendário |
-| NEW-19 | **Gerenciamento de Portfólios** | `/configuracoes/portfolios` | `/api/portfolios` (CRUD: list, get, create, update, delete) | Criar múltiplos portfólios (ex: Previdência, Especulativo, Longo Prazo) e alternar entre eles |
-| NEW-20 | **Gerenciamento de Usuários** | `/admin/usuarios` | `/api/usuarios` (CRUD + change_password) | Painel admin para criar/editar/remover usuários e redefinir senhas — útil para multi-usuário familiar |
+| ~~NEW-19~~ | ~~**Gerenciamento de Portfólios**~~ | `/configuracoes/portfolios` | `/api/portfolios` (CRUD) | **✅ RESOLVIDO (30/06/2026):** `portfolios_v2.html` — CRUD nome/objetivo/ativo |
+| ~~NEW-20~~ | ~~**Gerenciamento de Usuários**~~ | `/admin/usuarios` | `/api/usuarios` (CRUD) | **✅ RESOLVIDO (30/06/2026):** `usuarios_v2.html` — painel admin CRUD |
 | NEW-21 | **Editar / Excluir Transação** | Expandir `/operacoes/historico` | `/api/transacoes/<id>` (PUT, DELETE) | Corrigir lançamentos errados — **API existe mas FEAT-003 aponta que frontend não expõe esses botões** |
 | ~~NEW-22~~ | ~~**Saúde da Reconciliação por Ativo**~~ | Expandir `/ferramentas/reconciliacao` | `/api/reconciliacao/ativo/<id>` | **✅ RESOLVIDO (30/06/2026):** botão Detalhar + painel por corretora |
 
@@ -1469,6 +1473,7 @@ As seguintes novas telas propostas (NEW-XX) **não têm pré-requisito técnico*
 | ~~NEW-05~~ | Câmbio e Multimoeda | ✅ `/carteira/cambio` implementado |
 | ~~NEW-06~~ | Indicadores Macroeconômicos | ✅ `GET /api/indicadores/dashboard` |
 | ~~NEW-07~~ | Fontes de Dados | ✅ `/configuracoes/fontes-dados` implementado |
+| ~~NEW-08~~ | Regras Fiscais | ✅ `/configuracoes/regras-fiscais` implementado |
 | NEW-09 | Relatório Consolidado | API `/api/relatorios` existe |
 | ~~NEW-10~~ | Detalhe de Posição | ✅ `/carteira/posicoes/<id>` implementado |
 | ~~NEW-11~~ | Calculadora Preço Teto | ✅ `/ferramentas/preco-teto` implementado |
@@ -1476,8 +1481,9 @@ As seguintes novas telas propostas (NEW-XX) **não têm pré-requisito técnico*
 | ~~NEW-15~~ | Correlação entre Ativos | ✅ `/analises/correlacao` implementado |
 | ~~NEW-17~~ | Projeções de Renda Passiva | ✅ `/analises/projecoes/renda` + ProjecaoService enriquecido |
 | ~~NEW-18~~ | Gerenciamento de Proventos | ✅ CRUD em calendario_v2.html |
-| NEW-19 | Gerenciamento de Portfólios | CRUD `/api/portfolios` completo |
-| NEW-20 | Gerenciamento de Usuários | CRUD `/api/usuarios` completo |
+| ~~NEW-16~~ | Comparação com Benchmark | ✅ validado em `rentabilidade_v2.html` |
+| ~~NEW-19~~ | Gerenciamento de Portfólios | ✅ `/configuracoes/portfolios` implementado |
+| ~~NEW-20~~ | Gerenciamento de Usuários | ✅ `/admin/usuarios` implementado |
 | ~~NEW-21~~ | Editar/Excluir Transação | ✅ RESOLVIDO — menu ações em historico.html (FEAT-003) |
 | ~~NEW-22~~ | Saúde da Reconciliação por Ativo | ✅ drill-down em reconciliacao.html |
 

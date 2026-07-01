@@ -1,10 +1,17 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 30/06/2026
-> **Status:** ✅ **Lote 3 Frontend concluído (NEW-11/15/17/18/07)**
-> **Versão:** v0.9.47
+> **Status:** ✅ **Lote 4 Frontend concluído (NEW-08/16/19/20)**
+> **Versão:** v0.9.48
 
-### 🔧 Últimas entregas (30/06/2026 — Lote 3)
+### 🔧 Últimas entregas (30/06/2026 — Lote 4)
+- **NEW-19 ✅ CONCLUÍDO:** `/configuracoes/portfolios` — CRUD portfolios; tab bar + menu; 3 testes endpoint.
+- **NEW-20 ✅ CONCLUÍDO:** `/admin/usuarios` — CRUD usuários admin; menu Admin.
+- **NEW-08 ✅ CONCLUÍDO:** `/configuracoes/regras-fiscais` — CRUD regras (mutations admin); 3 testes endpoint.
+- **NEW-16 ✅ CONCLUÍDO:** Benchmark rentabilidade validado em `rentabilidade_v2.html`; estado de erro; 1 teste.
+- Suite: **649 passed**, 3 failed pré-existentes, 6 skipped (+7 vs Lote 3).
+
+### 🔧 Entregas anteriores (30/06/2026 — Lote 3)
 - **NEW-11 ✅ CONCLUÍDO:** `/ferramentas/preco-teto` — calculadora valor justo + métodos + FII.
 - **NEW-15 ✅ CONCLUÍDO:** `/analises/correlacao` — matriz heatmap; 2 testes endpoint.
 - **NEW-17 ✅ CONCLUÍDO:** `ProjecaoService` real + `/analises/projecoes/renda`; 4 testes.
