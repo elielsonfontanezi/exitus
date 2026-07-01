@@ -16,9 +16,9 @@ Consultar estes docs para **o que fazer** — não duplicar conteúdo aqui.
 | `docs/ROADMAP.md` | Qual GAP vem agora? Dependências? | Início de sessão; antes de propor implementação |
 | `docs/AUDITORIA_FUNCIONAL.md` | Quais telas PARCIAL/QUEBRADO? P-items/FEAT/NEW pendentes? | **Início de sessão com frontend**; toda tarefa de tela, UX ou integração; **atualizar no mesmo commit** quando status de tela ou P-item mudar |
 
-**`AUDITORIA_FUNCIONAL.md` é backlog operacional de frontend** enquanto existirem telas 🟡 PARCIAL ou itens FEAT/NEW abertos. Consultar junto com `ROADMAP.md` antes de propor trabalho. Quando todas as 36 telas forem ✅ OK e o backlog FEAT/NEW estiver esgotado, o arquivo pode ser arquivado (ver `docs/archive/`).
+**`AUDITORIA_FUNCIONAL.md`** registra o histórico de auditoria de telas. Backlog pós-MVP em **`docs/BACKLOG_PRODUTO.md`** (FEAT-011+). Critério de encerramento operacional: **0 telas PARCIAL/QUEBRADO** — atingido em 01/07/2026 (43 OK).
 
-Atualizar `AUDITORIA_FUNCIONAL.md` no commit quando resolver P-item, FEAT, mudar status de tela ou corrigir bug de frontend (REGRA #6).
+Atualizar `AUDITORIA_FUNCIONAL.md` no commit quando resolver bug de frontend ou mudar status de tela. Novas features de produto → `BACKLOG_PRODUTO.md`.
 
 ---
 

@@ -1,6 +1,6 @@
 # Auditoria Funcional — Sistema Exitus
 **Data:** 18/06/2026  
-**Revalidado:** 30/06/2026  
+**Revalidado:** 01/07/2026  
 **Auditor:** Cascade (análise de código + browser) — *registro histórico; operação atual via Cursor Agent (CURSORRULES-001)*  
 **Usuário de teste:** `e2e_user` / `e2e_senha_123`  
 **Frontend:** http://localhost:8080  
@@ -8,7 +8,7 @@
 
 > **Nota de revalidação (27/06/2026):** BUG-014, BUG-015, BUG-017, BUG-009 (telas 20-21) RESOLVIDOS indiretamente via BUG-009v2 (separação `BROWSER_API_URL` / `BACKEND_API_URL`).
 >
-> **Nota de revalidação (30/06/2026):** Lote 6 Frontend (REL-FIX-001, STALE-002, FISC-002, TOOL-001). Contagem: **41 OK, 2 PARCIAL**, 0 QUEBRADO (44 telas). Este arquivo é o **backlog operacional de frontend** enquanto houver telas PARCIAL ou P-items abertos (ver `AI_OPERATIONS.md` § Plano de controle).
+> **Nota de revalidação (01/07/2026):** Lote 7 Frontend (FEAT-IR-COT, SEED-EVENTOS-001). Contagem: **43 OK, 0 PARCIAL**, 0 QUEBRADO (44 telas). Backlog FEAT-011+ migrado para `docs/BACKLOG_PRODUTO.md`. Este arquivo permanece como registro histórico de auditoria; novas evoluções de produto → `BACKLOG_PRODUTO.md`.
 
 **Legenda de status:**
 - ✅ `OK` — funciona conforme esperado
@@ -22,8 +22,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 41 |
-| 🟡 PARCIAL | 2 |
+| ✅ OK | 43 |
+| 🟡 PARCIAL | 0 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -52,7 +52,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 10 | Carteira — Movimentações | `/carteira/movimentacoes` | ✅ | API e tabela OK; `x-model.lazy` em datas (BUG-013); badge aporte/resgate (STALE-001) | — |
 | 11 | Ativos — Catálogo | `/ativos/acoes` | ✅ | Tabela e categorias OK; busca por ticker funcionando (BUG-014 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`); detalhe carrega rápido (BUG-015 RESOLVIDO) | — |
 | 12 | Ativos — Detalhe | `/ativos/<TICKER>` | ✅ | KPI "Teto (Usuário)" = `preco_teto_usuario` manual; margem/Buy Score usam `valor_justo` calculado (BUG-VAL-004/005) | — |
-| 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | 🟡 | Carrega corretamente ✅; KPIs + filtros OK; link adicionado ao menu (EXITUS-ATIVOS-001); sem dados (ambiente dev sem eventos cadastrados) | Baixa |
+| 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | ✅ | KPIs + filtros OK; seed `eventos_corporativos` em test_full/test_e2e (SEED-EVENTOS-001) | — |
 | 14 | Proventos — Calendário | `/proventos/calendario` | ✅ | Abas Calendário + Proventos Registrados; CRUD manual (NEW-18); Gerar Automático + Confirmar ✅ | — |
 | 15 | Análises — Evolução | `/analises/evolucao` | ✅ | Error state + retry (STALE-002) ✅ | — |
 | 16 | Análises — Performance | `/analises/performance` | ✅ | Error state + retry (STALE-002) ✅ | — |
@@ -71,7 +71,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 28 | Relatórios — Exportação | `/relatorios/exportar` | ✅ | Download CSV via blob + `Content-Disposition` (FEAT-006); preview opcional — STALE-001 ✅ | — |
 | 29 | Ferramentas — Screener | `/ferramentas/screener` | ✅ | Links `/ativos/`, empty/error (TOOL-001) ✅ | — |
 | 30 | Ferramentas — Comparador | `/ferramentas/comparador` | ✅ | Botão "Comparar" funcionando (BUG-019 RESOLVIDO: parâmetro `limit` corrigido para `per_page`) | — |
-| 31 | Ferramentas — Calculadora IR | `/ferramentas/calculadora-ir` | 🟡 | Carrega dados ✅ | Baixa |
+| 31 | Ferramentas — Calculadora IR | `/ferramentas/calculadora-ir` | ✅ | Cotação automática via `GET /api/cotacoes/<ticker>` ao selecionar posição (FEAT-IR-COT) | — |
 | 32 | Ferramentas — Simulador | `/ferramentas/simulador` | ✅ | Redirect → `/analises/projecoes` (STALE-002) ✅ | — |
 | 33 | Ferramentas — Reconciliação | `/ferramentas/reconciliacao` | ✅ | Drill-down NEW-22 + error state (STALE-002) ✅ | — |
 | 34 | Estratégia — Planos | `/planos-compra/` | ✅ | Dashboard compra (NEW-13) + venda/gatilhos (NEW-14); abas compra/venda; modal detalhe | — |
@@ -643,58 +643,9 @@ Detalhes de fórmulas: `docs/MANUAL_USUARIO_DRAFT.md` § Valuation.
 
 ### 🟡 Pendências de funcionalidade (features ausentes)
 
-| ID | Problema | Tela(s) |
-|----|----------|---------|
-| ~~FEAT-001~~ | ~~Perfil somente leitura — sem editar nome/email nem trocar senha~~ | — | **RESOLVIDA em EXITUS-PERFIL-001**: backend `PUT /api/auth/me` e `POST /api/auth/change-password`; frontend `configuracoes/perfil.html` agora permite editar nome, e-mail e trocar senha |
-| ~~FEAT-002~~ | ~~Corretoras sem CRUD — sem criar, editar ou excluir corretora~~ | — | **RESOLVIDA em EXITUS-CORRETORA-002**: frontend `configuracoes/corretoras.html` agora oferece botões Nova/Editar/Excluir com modal de formulário; backend já possuía endpoints POST/PUT/DELETE `/api/corretoras/*` |
-| ~~FEAT-003~~ | ~~Transações sem editar/excluir após registro~~ | — | **RESOLVIDA em EXITUS-TRANSACOES-003**: tela `/operacoes/historico.html` agora oferece botões Editar/Excluir no menu de ações; modal de edição para data, tipo, quantidade, preço e custos; backend endpoints PUT/DELETE `/api/transacoes/<id>` consumidos |
-| ~~FEAT-004~~ | ~~Meta de patrimônio hardcoded (R$ 500k) — não configurável~~ | 2 | **RESOLVIDA em EXITUS-PERFIL-001**: campo `meta_patrimonio` adicionado ao modelo Usuario; dashboard exibe meta dinâmica via API `/api/auth/me`; perfil permite edição; API GET/PUT `/api/auth/me` funcionando |
-| ~~FEAT-005~~ | ~~Template `venda.html` legado ainda existe como rota separada~~ | 7 | **RESOLVIDA**: suporte a ?venda=true em operacoes_v2.html; rota /venda redireciona mantendo compatibilidade; modo venda inicializa automaticamente com posições carregadas |
-| ~~FEAT-006~~ | ~~Exportação CSV renderiza tabela HTML — sem download real do arquivo~~ | 28 | **RESOLVIDA**: download direto via HTTP headers; nova página /exportar com preview automático; compatibilidade mantida com ?preview=true |
-| ~~TECH-001~~ | ~~ValueError residual em 5 services — sem exceções tipadas~~ | — | **RESOLVIDO**: `ValueError` substituído por exceções tipadas em `parametros_macro_service.py` (ConflictError, NotFoundError), `rfcalc_service.py` (ValidationError), `cambio_service.py` (ValidationError), `ir_service.py` (ValidationError), `alerta_service.py` (NotFoundError, ValidationError). Testes atualizados: 565/574 passando (baseline 29/06/2026: 3 failed pré-existentes). |
-| ~~FEAT-007~~ | ~~Sem tela de detalhe de plano de compra — `/planos-compra/<id>` só redireciona~~ | 34 | **RESOLVIDA**: modal com informações completas; botão Detalhes na tabela; carregamento via API específica |
-| ~~FEAT-008~~ | ~~Sem botão "Confirmar Recebimento" de provento — apenas "Gerar Automático" disponível~~ | 14 | **RESOLVIDA**: botão "Confirmar" já implementado em calendario_v2.html; função confirmarPagamento() completa; API /api/calendario-dividendos/{id}/confirmar-pagamento funcional |
-| ~~FEAT-009~~ | ~~**Import B3 não lista os registros importados**~~ | 5 | **✅ RESOLVIDO (30/06/2026):** API retorna `tickers_importados` + `ativos_novos`; frontend exibe badges |
-| FEAT-010 | ~~Indicadores de mercado sem endpoint dinâmico~~ **✅ RESOLVIDO (30/06/2026)** — `GET /api/indicadores/dashboard`; Dashboard consome CDI/IPCA/SELIC de `parametros_macro`; Ibovespa via env | 2 |
-| FEAT-011 | **Saldo de corretoras não é dinâmico** — `sincronizar-saldo` resolve manualmente. **Fix:** remover coluna `saldo_atual` e calcular saldo sempre a partir de movimentações de caixa, ou atualizar automaticamente via triggers/eventos ao inserir movimentação | 4 |
-| FEAT-012 | **Refinamentos edição/exclusão transações** — implementar validações (bloquear se já liquidada/IR), período de carência, auditoria de alterações, motivo obrigatório para exclusão, indicadores visuais de bloqueio | 6, 7, 8 |
-| FEAT-013 | **Validação de força de senha** — indicador visual (fraca/média/forte) com critérios claros (tamanho, maiúsculas, números, especiais) ao trocar senha | 3 |
-| FEAT-014 | **Confirmação de e-mail** — enviar token de verificação após alteração de e-mail; bloquear acesso até confirmação | 3 |
-| FEAT-015 | **Histórico de alterações de perfil** — registrar data/hora/IP quando usuário altera nome, e-mail ou senha; tela de visualização do histórico | 3 |
-| FEAT-016 | **Avatar/foto de perfil** — upload de imagem; redimensionamento automático; exibição no dashboard e menu | 2, 3 |
-| FEAT-017 | **Preferências do usuário** — tema (claro/escuro), idioma (PT/EN), formato de data/moeda; persistir no perfil | 3 |
-| FEAT-018 | **Autenticação de dois fatores (2FA)** — opção para ativar TOTP; QR code para apps authenticator; códigos de backup | 3 |
-| FEAT-019 | **Logo da corretora** — upload de imagem para identificação visual; exibir na tabela de corretoras e dashboard | 4 |
-| FEAT-020 | **Integração automática de dados da corretora** — buscar dados via CNPJ (razão social, status); API Receita Federal ou serviço similar | 4 |
-| FEAT-021 | **Saldos automáticos das corretoras** — integrar com APIs das corretoras (B3, XP, Rico, etc.) para atualizar saldos automaticamente | 4 |
-| FEAT-022 | **Taxas e comissões por corretora** — configurar taxas padrão (corretagem, custódia, emolumentos); usar em cálculos de rentabilidade | 4 |
-| FEAT-023 | **Relatórios por corretora** — extrato de movimentações, posição consolidada, IR retido; exportação PDF/Excel | 4 |
-| FEAT-024 | **Status avançado da corretora** — indicadores de conexão/API ativa; última sincronização; erros de integração | 4 |
-| FEAT-025 | **Metas de patrimônio por período** — configurar metas anuais, trimestrais, mensais com projeções automáticas baseadas em aportes esperados | 2 |
-| ~~FEAT-026~~ | ~~Metas por classe de ativo — definir percentuais-alvo por classe; alertas de desvio~~ | 17 | **RESOLVIDA em REBALANCE-001 (30/06/2026)**: tabela `meta_alocacao`, `rebalance_service.py`, editor de metas em `alocacao_v2.html`, painel sugestões comprar/vender por classe |
-| FEAT-027 | **Alertas de progresso de meta** — notificar quando atingir X% da meta ou quando atrasar em relação ao planejado | 2 |
-| FEAT-028 | **Comparativo visual meta vs. realizado** — gráfico de linha mostrando projeção vs. patrimônio real ao longo do tempo | 2 |
-| FEAT-029 | **Migração automática template venda.html** — redirecionar para operacoes_v2.html com parâmetros ?tipo=venda&ticker=PETR4 | 7 |
-| FEAT-030 | **Exportação múltiplos formatos** — CSV, Excel (.xlsx), PDF com layout profissional; escolha do usuário | 28 |
-| FEAT-031 | **Exportação com colunas personalizáveis** — usuário seleciona quais campos incluir; salvar preferências | 28 |
-| FEAT-032 | **Exportação com filtros aplicados** — exportar já com os filtros ativos da tela; opção para incluir ou não | 28 |
-| FEAT-033 | **Agendamento de exportações** — exportações automáticas mensais/enviar por e-mail; histórico de exportações | 28 |
-| FEAT-034 | **Simulador "e se" do plano de compra** — calcular resultado se tivesse comprado X dias antes ou com diferentes aportes | 34 |
-| FEAT-035 | **Comparativo plano vs. realizado** — mostrar diferenças percentuais e absolutas entre planejado e executado | 34 |
-| FEAT-036 | **Ajuste automático de plano** — sugerir ajustes de aportes baseados na performance atual vs. meta | 34 |
-| FEAT-037 | **Importo automático de proventos** — ler e-mails de corretoras para detectar creditamentos; OCR de comprovantes | 14 |
-| FEAT-038 | **Rateio automático de proventos** — dividir valores proporcionalmente entre ativos do mesmo grupo (ex: fundos imobiliários) | 14 |
-| FEAT-039 | **Timeline de recebimentos** — histórico visual de todos os proventos com status (pendente/confirmado) | 14 |
-| FEAT-040 | **Validação prévia import B3** — preview dos dados antes de importar; opção para editar/corrigir | 5 |
-| FEAT-041 | **Mapeamento inteligente de colunas** — detectar automaticamente quais colunas correspondem a cada campo (data, ticker, etc.) | 5 |
-| FEAT-042 | **Deducação de duplicados** — identificar transações já existentes e oferecer opções (ignorar/sobrescrever) | 5 |
-| FEAT-043 | **Edição em lote pré-importação** — permitir editar múltiplos itens antes de confirmar importação | 5 |
-| FEAT-044 | **Mais indicadores de mercado** — Selic, IPCA, dólar, Bitcoin, ouro; fontes múltiplas (BC, B3, Yahoo Finance) | 2 |
-| FEAT-045 | **Histórico de indicadores** — gráfico de evolução dos indicadores ao longo do tempo; comparações | 2 |
-| FEAT-046 | **API pública de indicadores** — endpoint `/api/indicadores` para consumo por outros sistemas; cache automático | 2 |
-| FEAT-047 | **Saldo de corretoras em tempo real** — WebSocket para atualizações instantâneas quando houver movimentação | 4 |
-| FEAT-048 | **Conciliação bancária** — comparar saldos vs. extratos oficiais; destacar divergências | 4 |
-| FEAT-049 | **Regra de data-valor** — diferenciar data-lançamento vs. data-efeito financeiro; impactar cálculos de posição | 4 |
+> **Migrado para `docs/BACKLOG_PRODUTO.md` (01/07/2026).** FEAT-011 a FEAT-049 são evoluções pós-MVP — não bloqueiam encerramento da auditoria funcional.
+
+Itens resolvidos FEAT-001 a FEAT-010 e FEAT-026 permanecem documentados no histórico acima e em `CHANGELOG.md`.
 
 ---
 

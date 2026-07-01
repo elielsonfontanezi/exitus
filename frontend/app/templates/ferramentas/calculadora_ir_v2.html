@@ -35,8 +35,18 @@
         </div>
 
         <div style="margin-bottom:0.75rem;">
-            <label style="font-size:0.75rem; color:#6b7280;">Preço de Venda Simulado (R$)</label>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem;">
+                <label style="font-size:0.75rem; color:#6b7280;">Preço de Venda Simulado (R$)</label>
+                <button type="button" class="btn-exitus btn-exitus-ghost"
+                        style="font-size:0.7rem; padding:0.2rem 0.5rem;"
+                        :disabled="!tickerAtual || cotacaoLoading"
+                        @click="buscarCotacao(tickerAtual)">
+                    <i class="fas fa-sync-alt" :class="cotacaoLoading ? 'fa-spin' : ''"></i>
+                    Atualizar cotação
+                </button>
+            </div>
             <input type="number" class="filter-input" x-model="precoVenda" @input="calcular()" step="0.01" style="width:100%; margin-top:0.25rem;">
+            <p x-show="cotacaoInfo" style="font-size:0.7rem; color:#6b7280; margin-top:0.25rem;" x-text="cotacaoInfo"></p>
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
@@ -145,11 +155,14 @@ function pageDataExtend() {
     return {
         posicoes: [],
         selPosicao: '',
+        tickerAtual: '',
         precoMedio: '',
         quantidade: '',
         precoVenda: '',
         tipoOp: 'swing',
         corretagem: '0',
+        cotacaoLoading: false,
+        cotacaoInfo: '',
         resultado: null,
 
         async loadData() {
@@ -167,21 +180,51 @@ function pageDataExtend() {
             }
         },
 
-        preencherPosicao() {
+        async preencherPosicao() {
             const p = this.posicoes.find(x => x.ticker === this.selPosicao);
-            if (p) {
-                this.precoMedio = p.preco_medio;
-                this.quantidade = p.quantidade;
-                if (p.tipo === 'fii') this.tipoOp = 'fii';
-                this.calcular();
+            if (!p) {
+                this.tickerAtual = '';
+                this.cotacaoInfo = '';
+                return;
             }
-        },
-
-        usarPosicao(p) {
+            this.selPosicao = p.ticker;
+            this.tickerAtual = p.ticker;
             this.precoMedio = p.preco_medio;
             this.quantidade = p.quantidade;
             if (p.tipo === 'fii') this.tipoOp = 'fii';
+            await this.buscarCotacao(p.ticker);
             this.calcular();
+        },
+
+        async usarPosicao(p) {
+            this.selPosicao = p.ticker;
+            this.tickerAtual = p.ticker;
+            this.precoMedio = p.preco_medio;
+            this.quantidade = p.quantidade;
+            if (p.tipo === 'fii') this.tipoOp = 'fii';
+            await this.buscarCotacao(p.ticker);
+            this.calcular();
+        },
+
+        async buscarCotacao(ticker) {
+            if (!ticker) return;
+            this.cotacaoLoading = true;
+            this.cotacaoInfo = '';
+            try {
+                const res = await this.apiFetch(`/api/cotacoes/${ticker}`);
+                const preco = res?.data?.preco_atual;
+                if (preco != null && preco > 0) {
+                    this.precoVenda = parseFloat(preco).toFixed(2);
+                    const provider = res.data.provider || 'API';
+                    this.cotacaoInfo = `Cotação atual via ${provider}`;
+                } else {
+                    this.cotacaoInfo = 'Cotação indisponível — preencha o preço de venda manualmente';
+                }
+            } catch (_) {
+                this.cotacaoInfo = 'Não foi possível obter cotação — preencha o preço de venda manualmente';
+            } finally {
+                this.cotacaoLoading = false;
+            }
         },
 
         calcular() {

@@ -501,6 +501,42 @@
       "vigencia_inicio": "2016-01-01",
       "vigencia_fim": null,
       "ativa": true
+    },
+    {
+      "pais": "BR",
+      "tipo_ativo": null,
+      "tipo_operacao": "DIVIDENDO",
+      "aliquota_ir": 0.0,
+      "valor_isencao": 50000.00,
+      "incide_sobre": "provento",
+      "descricao": "Dividendo BR isento até R$50k/mês por empresa (2026+)",
+      "vigencia_inicio": "2026-01-01",
+      "vigencia_fim": null,
+      "ativa": true
+    },
+    {
+      "pais": "BR",
+      "tipo_ativo": null,
+      "tipo_operacao": "DIVIDENDO_TRIBUTADO",
+      "aliquota_ir": 10.0,
+      "valor_isencao": null,
+      "incide_sobre": "provento",
+      "descricao": "Dividendo BR tributado 10% acima do limite (2026+)",
+      "vigencia_inicio": "2026-01-01",
+      "vigencia_fim": null,
+      "ativa": true
+    },
+    {
+      "pais": "BR",
+      "tipo_ativo": null,
+      "tipo_operacao": "JCP",
+      "aliquota_ir": 17.5,
+      "valor_isencao": null,
+      "incide_sobre": "provento",
+      "descricao": "JCP IRRF 17,5% em 2026 (PLP 128/2025)",
+      "vigencia_inicio": "2026-01-01",
+      "vigencia_fim": null,
+      "ativa": true
     }
   ],
   "alertas": [
@@ -532,5 +568,11 @@
       "notificar_email": true,
       "mensagem": "HGLG11 pagou dividendos"
     }
+  ],
+  "eventos_corporativos": [
+    {"ativo_ticker":"ITUB4","tipo_evento":"split","data_evento":"2024-06-15","data_com":"2024-06-14","proporcao":"2:1","descricao":"Desdobramento de ações Itaú Unibanco — cada ação virou 2"},
+    {"ativo_ticker":"PETR4","tipo_evento":"bonificacao","data_evento":"2024-03-20","data_com":"2024-03-19","proporcao":"1:10","descricao":"Bonificação em ações Petrobras — 1 ação a cada 10 detidas"},
+    {"ativo_ticker":"VALE3","tipo_evento":"grupamento","data_evento":"2023-11-10","data_com":"2023-11-09","proporcao":"1:10","descricao":"Grupamento Vale ON — 10 ações antigas viraram 1"},
+    {"ativo_ticker":"HGLG11","tipo_evento":"split","data_evento":"2024-07-18","data_com":"2024-07-17","proporcao":"1:1.2","descricao":"Desdobramento cotas HGLG11 — proporção 1:1,2"}
   ]
 }

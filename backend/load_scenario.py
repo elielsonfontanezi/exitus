@@ -31,6 +31,7 @@ try:
     from app.models.calendario_dividendo import CalendarioDividendo
     from app.models.projecao_renda import ProjecaoRenda
     from app.models.regra_fiscal import RegraFiscal, IncidenciaImposto
+    from app.models.evento_corporativo import EventoCorporativo, TipoEventoCorporativo
     from werkzeug.security import generate_password_hash
 except ImportError as e:
     print(f"Erro ao importar módulos: {e}")
@@ -98,6 +99,7 @@ class ScenarioLoader:
                 self._seed_calendario_dividendo()
                 self._seed_projecoes_renda()
                 self._seed_regras_fiscais()
+                self._seed_eventos_corporativos()
                 
                 db.session.commit()
                 print("✅ Cenário carregado com sucesso!")
@@ -808,6 +810,59 @@ class ScenarioLoader:
             db.session.add(regra)
             print(f"✅ Regra fiscal criada: {item['pais']} {item.get('tipo_ativo')} {item.get('tipo_operacao')}")
         
+        db.session.flush()
+
+    def _seed_eventos_corporativos(self):
+        """Seed de eventos corporativos"""
+        eventos_data = self.scenario_data.get('eventos_corporativos', [])
+        if not eventos_data:
+            return
+
+        print(f"📋 Criando {len(eventos_data)} eventos corporativos...")
+
+        assessora_id = list(self.references['assessoras'].values())[0] if self.references['assessoras'] else None
+        tipo_map = {e.value: e for e in TipoEventoCorporativo}
+
+        for item in eventos_data:
+            ativo_id = self.references['ativos'].get(item['ativo_ticker'])
+            if not ativo_id:
+                print(f"⚠️  Ativo não encontrado para evento: {item['ativo_ticker']}")
+                continue
+
+            tipo_raw = item.get('tipo_evento', 'outro')
+            tipo_evento = tipo_map.get(tipo_raw)
+            if not tipo_evento:
+                print(f"⚠️  Tipo de evento inválido: {tipo_raw}")
+                continue
+
+            data_evento = datetime.strptime(item['data_evento'], '%Y-%m-%d').date()
+            data_com = (
+                datetime.strptime(item['data_com'], '%Y-%m-%d').date()
+                if item.get('data_com') else None
+            )
+
+            existing = EventoCorporativo.query.filter_by(
+                ativo_id=ativo_id,
+                tipo_evento=tipo_evento,
+                data_evento=data_evento,
+            ).first()
+            if existing:
+                print(f"⏭️  Evento já existe: {item['ativo_ticker']} {tipo_raw} {data_evento}")
+                continue
+
+            evento = EventoCorporativo(
+                ativo_id=ativo_id,
+                assessora_id=assessora_id,
+                tipo_evento=tipo_evento,
+                data_evento=data_evento,
+                data_com=data_com,
+                proporcao=item.get('proporcao'),
+                descricao=item['descricao'],
+                impacto_posicoes=item.get('impacto_posicoes', False),
+            )
+            db.session.add(evento)
+            print(f"✅ Evento corporativo criado: {item['ativo_ticker']} — {tipo_raw}")
+
         db.session.flush()
 
 

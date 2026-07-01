@@ -300,5 +300,13 @@
     {"usuario":"e2e_user","data":"2024-10-31","patrimonio_total":342800.00,"patrimonio_renda_variavel":295600.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":47200.00,"observacoes":"Vendas PETR4/ITUB4/TSLA34/AAPL lote grande (IR gerado) + aporte BRL"},
     {"usuario":"e2e_user","data":"2024-11-30","patrimonio_total":338450.00,"patrimonio_renda_variavel":286900.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":51550.00,"observacoes":"Vendas MSFT/HGLG11/DISB34/GOOGL + DARF pago R$ 685.50"},
     {"usuario":"e2e_user","data":"2024-12-31","patrimonio_total":330200.00,"patrimonio_renda_variavel":278800.00,"patrimonio_renda_fixa":0.00,"saldo_caixa":51400.00,"observacoes":"Vendas KNRI11/NVDA/BBAS3/GOGL34 + saque R$ 5K + DARF R$ 76 + proventos"}
+  ],
+  "eventos_corporativos": [
+    {"ativo_ticker":"ITUB4","tipo_evento":"split","data_evento":"2024-06-15","data_com":"2024-06-14","proporcao":"2:1","descricao":"Desdobramento de ações Itaú Unibanco — cada ação virou 2"},
+    {"ativo_ticker":"PETR4","tipo_evento":"bonificacao","data_evento":"2024-03-20","data_com":"2024-03-19","proporcao":"1:10","descricao":"Bonificação em ações Petrobras — 1 ação a cada 10 detidas"},
+    {"ativo_ticker":"VALE3","tipo_evento":"grupamento","data_evento":"2023-11-10","data_com":"2023-11-09","proporcao":"1:10","descricao":"Grupamento Vale ON — 10 ações antigas viraram 1"},
+    {"ativo_ticker":"BBDC4","tipo_evento":"split","data_evento":"2024-09-05","data_com":"2024-09-04","proporcao":"1:1.5","descricao":"Desdobramento Bradesco PN — proporção 1:1,5"},
+    {"ativo_ticker":"WEGE3","tipo_evento":"direito_sub","data_evento":"2024-05-12","data_com":"2024-05-11","proporcao":"5:1","descricao":"Direito de subscrição WEG — 1 direito a cada 5 ações"},
+    {"ativo_ticker":"TAEE11","tipo_evento":"desmembramento","data_evento":"2024-08-01","data_com":"2024-07-31","proporcao":"1:1","descricao":"Desmembramento UNIT Taesa em ações ordinárias e preferenciais"}
   ]
 }
