@@ -30,8 +30,8 @@ def calculadora_ir():
 @bp.route('/simulador', methods=['GET'])
 @login_required
 def simulador():
-    """Simulador de Aportes — Alpine.js"""
-    return render_template('ferramentas/simulador_v2.html')
+    """Alias — redireciona para projeções patrimoniais (NEW-01)"""
+    return redirect(url_for('analises.projecoes_patrimonio'))
 
 
 @bp.route('/reconciliacao')
