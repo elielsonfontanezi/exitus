@@ -75,9 +75,9 @@ backend/
 
 ---
 
-### 1. test_full.json - **CENÁRIO COMPLETO** ✅
+### 1. test_full.json - **CENÁRIO PRINCIPAL PYTEST** ✅
 
-**Descrição:** Cenário COMPLETO para TODAS as telas - cobertura 100% do sistema (com histórico de evolução patrimonial)
+**Descrição:** Cenário robusto para IR, RV/RF e regressão pytest — **não** cobre 100% das telas do menu com dados não-vazios (ver `test_menu_full` planejado em [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md)).
 
 **Conteúdo:**
 - **Usuários:** 3 (e2e_admin, e2e_user, e2e_viewer)
@@ -86,6 +86,24 @@ backend/
 - **Proventos:** 42 (32 RV + **10 RF** - DIVIDENDO, JCP, RENDIMENTO, JUROS)
 - **Movimentações:** 23 (15 gerais + **8 aportes RF específicos**)
 - **Portfolios:** 4 (Aposentadoria, Dividendos BR, Growth US)
+
+**Lacunas conhecidas vs menu 43 telas:** sem CRIPTO, LCI_LCA, BOND, ETF BR; sem blocos `calendario_dividendo`, `projecoes_renda`, `regras_fiscais` (presentes em `test_e2e`).
+
+---
+
+### 1b. test_menu_full.json - **PLANEJADO** 📋
+
+**GAP:** `SEED-MENU-001` — ver [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md).
+
+**Objetivo:** Massa única para walkthrough E2E/manual de todas as 43 telas do menu (BR/US/INTL, aportes, compras/vendas, IR).
+
+**Uso previsto:**
+```bash
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_menu_full
+podman exec exitus-backend python scripts/verify_menu_seed.py
+```
+
+**Status:** documentação aprovada; JSON e extensões do loader pendentes.
 
 ---
 

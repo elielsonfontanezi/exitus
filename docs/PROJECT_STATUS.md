@@ -1,10 +1,16 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 01/07/2026
-> **Status:** ✅ **Lote 7 Frontend concluído (FEAT-IR-COT, SEED-EVENTOS-001) + Trilha C (CONCENTRACAO-001)**
-> **Versão:** v0.9.51
+> **Status:** ✅ **Lote 7 + Trilha C concluídos; SEED-MENU-001 documentado**
+> **Versão:** v0.9.52
 
-### 🔧 Últimas entregas (01/07/2026 — Lote 7 + Trilha C)
+### 🔧 Últimas entregas (01/07/2026 — docs SEED-MENU-001)
+- **SEED-MENU-001 📋:** Plano massa `test_menu_full` — [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md).
+- **AUDITORIA:** § Critério Go-Live Menu 100%; distinção código ✅ vs seed.
+- **SEEDS.md:** `test_full` reclassificado; `test_menu_full` planejado.
+- **Trilha A bloqueada** até OK manual do usuário com massa completa.
+
+### 🔧 Entregas anteriores (01/07/2026 — Lote 7 + Trilha C)
 - **FEAT-IR-COT ✅:** Calculadora IR — cotação automática via `GET /api/cotacoes/<ticker>`; tela 31 → OK.
 - **SEED-EVENTOS-001 ✅:** `_seed_eventos_corporativos()` em `load_scenario.py`; 6 eventos test_full, 4 test_e2e; tela 13 → OK.
 - **AUDITORIA encerrada:** 43 OK, 0 PARCIAL, 0 QUEBRADO; FEAT-011+ → `BACKLOG_PRODUTO.md`.

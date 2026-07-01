@@ -9,6 +9,8 @@
 > **Nota de revalidação (27/06/2026):** BUG-014, BUG-015, BUG-017, BUG-009 (telas 20-21) RESOLVIDOS indiretamente via BUG-009v2 (separação `BROWSER_API_URL` / `BACKEND_API_URL`).
 >
 > **Nota de revalidação (01/07/2026):** Lote 7 Frontend (FEAT-IR-COT, SEED-EVENTOS-001). Contagem: **43 OK, 0 PARCIAL**, 0 QUEBRADO (44 telas). Backlog FEAT-011+ migrado para `docs/BACKLOG_PRODUTO.md`. Este arquivo permanece como registro histórico de auditoria; novas evoluções de produto → `BACKLOG_PRODUTO.md`.
+>
+> **Nota massa de dados (01/07/2026):** Status ✅ = **código da tela funciona**. Isso **não** garante massa de seed para walkthrough completo do menu. Cenário alvo: `test_menu_full` — ver § [Critério Go-Live](#critério-go-live--menu-100-e-massa-de-dados) e [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md).
 
 **Legenda de status:**
 - ✅ `OK` — funciona conforme esperado
@@ -26,6 +28,25 @@
 | 🟡 PARCIAL | 0 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
+
+## Critério Go-Live — Menu 100% e Massa de Dados
+
+**Trilha A (Go-Live)** — CICD-001, MONITOR-001, RATELIMIT-001, E2E multi-browser — **bloqueada** até:
+
+1. Cenário **`test_menu_full`** implementado e carregável via `reset_and_seed.py`
+2. Walkthrough manual das **43 telas** com `e2e_user` / dados não-vazios
+3. **OK explícito do usuário** de que o sistema executa todas as tarefas do menu
+
+| Legenda seed | Significado |
+|--------------|-------------|
+| **COBERTO** | `test_full` ou `test_menu_full` fornece dados mínimos |
+| **PARCIAL** | Tela carrega; dados incompletos ou vazios em abas/KPIs |
+| **FALTANDO** | Tipo de ativo ou entidade ausente no cenário atual |
+
+**Gap atual (`test_full`):** 7 áreas FALTANDO/PARCIAL — ver matriz em [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md).  
+**GAP de implementação:** `SEED-MENU-001` em [`ROADMAP.md`](ROADMAP.md).
+
+---
 
 **⚠️ ALERTA SISTÊMICO - 24/06/2026:**
 Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao`):

@@ -8,6 +8,13 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — SEED-MENU-001 plano massa de testes menu (01/07/2026)
+
+- `PLANO_MASSA_TESTES_MENU.md` — plano técnico `test_menu_full` (15 TipoAtivo, 43 telas, loader, E2E)
+- `AUDITORIA_FUNCIONAL.md` — § Critério Go-Live; nota código vs massa seed
+- `SEEDS.md` — `test_full` reclassificado; `test_menu_full` planejado
+- `ROADMAP.md` — GAP `SEED-MENU-001` antes de Go-Live; Trilha A condicionada a OK usuário
+
 ### Feat — Lote 7 Frontend FEAT-IR-COT / SEED-EVENTOS-001 (01/07/2026)
 
 **FEAT-IR-COT — Calculadora IR cotação automática**

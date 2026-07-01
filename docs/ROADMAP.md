@@ -2,7 +2,7 @@
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
 > **Progresso Backend:** 53/54 GAPs (98%) + CONCENTRACAO-001 ✅ | **Testes:** ver PROJECT_STATUS  
-> **Frontend V2.0:** Lote 7 ✅ (FEAT-IR-COT, SEED-EVENTOS-001) — 43 OK, 0 PARCIAL | **Versão:** v0.9.51 | **Última atualização:** 01/07/2026
+> **Frontend V2.0:** Lote 7 ✅ (FEAT-IR-COT, SEED-EVENTOS-001) — 43 OK, 0 PARCIAL | **Versão:** v0.9.52 | **Última atualização:** 01/07/2026
 
 ---
 
@@ -626,6 +626,12 @@ pt_cap_rate = dy_anual / cap_rate    # preço teto implícito
 - [ ] Merge `feature/testes-e2e-v3` → `main`
 
 ### ⏳ Fase 3: Validação Final e Go-Live (futuro)
+
+**Pré-requisito:** `SEED-MENU-001` + OK manual do usuário (menu 100%) — ver [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md) e [`AUDITORIA_FUNCIONAL.md`](AUDITORIA_FUNCIONAL.md) § Go-Live.
+
+| GAP ID | Funcionalidade | Prioridade | Status |
+|--------|---------------|------------|--------|
+| **SEED-MENU-001** | Cenário `test_menu_full` — massa para 43 telas do menu | 🔴 Alta | 📋 Planejado (doc 01/07/2026) |
 
 - [ ] Múltiplos usuários simultâneos
 - [ ] Grandes volumes de dados
