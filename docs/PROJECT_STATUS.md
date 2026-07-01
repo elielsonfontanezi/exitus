@@ -1,10 +1,15 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 01/07/2026
-> **Status:** ✅ **Lote 7 + Trilha C concluídos; SEED-MENU-001 documentado**
-> **Versão:** v0.9.52
+> **Status:** ✅ **Planos SEED-MENU-001 + VAL-PIPE-001 documentados**
+> **Versão:** v0.9.53
 
-### 🔧 Últimas entregas (01/07/2026 — docs SEED-MENU-001)
+### 🔧 Últimas entregas (01/07/2026 — docs VAL-PIPE-001)
+- **VAL-PIPE-001 📋:** Plano validação pipeline + Valor Justo — [`PLANO_VALIDACAO_VALOR_JUSTO.md`](PLANO_VALIDACAO_VALOR_JUSTO.md).
+- 4 camadas: cotações ≤15min, indicadores, histórico, golden datasets por perfil.
+- Lacunas V-GAP-01..07 catalogadas; implementação de testes pendente.
+
+### 🔧 Entregas anteriores (01/07/2026 — docs SEED-MENU-001)
 - **SEED-MENU-001 📋:** Plano massa `test_menu_full` — [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md).
 - **AUDITORIA:** § Critério Go-Live Menu 100%; distinção código ✅ vs seed.
 - **SEEDS.md:** `test_full` reclassificado; `test_menu_full` planejado.

@@ -8,6 +8,12 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — VAL-PIPE-001 validação Valor Justo (01/07/2026)
+
+- `PLANO_VALIDACAO_VALOR_JUSTO.md` — pipeline 4 camadas (cotações, indicadores, histórico, valuation)
+- `ROADMAP.md` — GAP `VAL-PIPE-001`; golden datasets; lacunas V-GAP-01..07
+- Critérios de certificação Valor Justo; dependência SEED-MENU-001 para massa com fundamentals
+
 ### Docs — SEED-MENU-001 plano massa de testes menu (01/07/2026)
 
 - `PLANO_MASSA_TESTES_MENU.md` — plano técnico `test_menu_full` (15 TipoAtivo, 43 telas, loader, E2E)

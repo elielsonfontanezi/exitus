@@ -3,7 +3,7 @@
 **Data:** 01/07/2026  
 **GAP:** `SEED-MENU-001`  
 **Status:** 📋 Planejado (documentação aprovada; implementação pendente)  
-**Relacionado:** [`AUDITORIA_FUNCIONAL.md`](AUDITORIA_FUNCIONAL.md) § Go-Live, [`SEEDS.md`](SEEDS.md), [`ROADMAP.md`](ROADMAP.md)
+**Relacionado:** [`AUDITORIA_FUNCIONAL.md`](AUDITORIA_FUNCIONAL.md) § Go-Live, [`SEEDS.md`](SEEDS.md), [`ROADMAP.md`](ROADMAP.md), [`PLANO_VALIDACAO_VALOR_JUSTO.md`](PLANO_VALIDACAO_VALOR_JUSTO.md)
 
 ---
 
