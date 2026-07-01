@@ -8,7 +8,7 @@
 
 > **Nota de revalidação (27/06/2026):** BUG-014, BUG-015, BUG-017, BUG-009 (telas 20-21) RESOLVIDOS indiretamente via BUG-009v2 (separação `BROWSER_API_URL` / `BACKEND_API_URL`).
 >
-> **Nota de revalidação (30/06/2026):** Lote 4 Frontend (NEW-08/16/19/20). Contagem: **23 OK, 17 PARCIAL**, 0 QUEBRADO. Este arquivo é o **backlog operacional de frontend** enquanto houver telas PARCIAL ou P-items abertos (ver `AI_OPERATIONS.md` § Plano de controle).
+> **Nota de revalidação (30/06/2026):** Lote 5 Frontend (NEW-01/02, FIX-HIST-001, STALE-001). Contagem: **30 OK, 12 PARCIAL**, 0 QUEBRADO (44 telas). Este arquivo é o **backlog operacional de frontend** enquanto houver telas PARCIAL ou P-items abertos (ver `AI_OPERATIONS.md` § Plano de controle).
 
 **Legenda de status:**
 - ✅ `OK` — funciona conforme esperado
@@ -22,8 +22,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 23 |
-| 🟡 PARCIAL | 17 |
+| ✅ OK | 30 |
+| 🟡 PARCIAL | 12 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -46,10 +46,10 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 4 | Configurações — Corretoras | `/configuracoes/corretoras` | ✅ | CRUD completo: botões criar/editar/excluir/sincronizar implementados (frontend + backend API) | — |
 | 5 | Operações — Import B3 | `/operacoes/` | ✅ | Import + lista de tickers importados e ativos novos (FEAT-009) | — |
 | 6 | Operações — Compra | `/operacoes/` | ✅ | Toggle funciona ✅; busca de ativo com autocomplete funcionando (BUG-014 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`) | — |
-| 7 | Operações — Venda | `/operacoes/` | 🟡 | Toggle funciona ✅; modo venda acessível e formulário exibido corretamente | Média |
-| 8 | Operações — Histórico | `/operacoes/historico` | 🟡 | Filtro por data com bug; filtro ticker OK; editar/excluir via menu ações ✅ (NEW-21/FEAT-003) | Média |
+| 7 | Operações — Venda | `/operacoes/` | ✅ | Modo venda via toggle em `operacoes_v2.html`; `/operacoes/venda` redireciona `?venda=true` (FEAT-005) — STALE-001 ✅ | — |
+| 8 | Operações — Histórico | `/operacoes/historico` | ✅ | Filtro data server-side corrigido (FIX-HIST-001); editar/excluir via menu ✅ | — |
 | 9 | Carteira — Posições | `/carteira/posicoes` | ✅ | Validado visualmente: KPIs, filtros (ticker/tipo/mercado) e botão Recalcular funcionam | — |
-| 10 | Carteira — Movimentações | `/carteira/movimentacoes` | 🟡 | BUG-021 resolvido: API e tabela exibem movimentações ✅. BUG-013 resolvido (25/06/2026): `x-model.lazy` nos filtros de data — sem piscar ao digitar ✅. Badge cor corrigido (aporte/resgate) ✅ | — |
+| 10 | Carteira — Movimentações | `/carteira/movimentacoes` | ✅ | API e tabela OK; `x-model.lazy` em datas (BUG-013); badge aporte/resgate (STALE-001) | — |
 | 11 | Ativos — Catálogo | `/ativos/acoes` | ✅ | Tabela e categorias OK; busca por ticker funcionando (BUG-014 RESOLVIDO indiretamente via BUG-009v2 — `BROWSER_API_URL`); detalhe carrega rápido (BUG-015 RESOLVIDO) | — |
 | 12 | Ativos — Detalhe | `/ativos/<TICKER>` | ✅ | KPI "Teto (Usuário)" = `preco_teto_usuario` manual; margem/Buy Score usam `valor_justo` calculado (BUG-VAL-004/005) | — |
 | 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | 🟡 | Carrega corretamente ✅; KPIs + filtros OK; link adicionado ao menu (EXITUS-ATIVOS-001); sem dados (ambiente dev sem eventos cadastrados) | Baixa |
@@ -68,14 +68,16 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 25 | Relatórios — Anual | `/relatorios/anual` | 🟡 | Carrega dados ✅ | Baixa |
 | 26 | Relatórios — Extrato | `/relatorios/extrato` | 🟡 | Carrega dados ✅ | Baixa |
 | 27 | Relatórios — IR Completo | `/relatorios/ir` | 🟡 | Carrega dados ✅ | Baixa |
-| 28 | Relatórios — Exportação | `/relatorios/exportar` | 🟡 | Carrega dados ✅; export CSV renderiza HTML em vez de download (FEAT-006) | Média |
+| 28 | Relatórios — Exportação | `/relatorios/exportar` | ✅ | Download CSV via blob + `Content-Disposition` (FEAT-006); preview opcional — STALE-001 ✅ | — |
 | 29 | Ferramentas — Screener | `/ferramentas/screener` | 🟡 | Carrega dados ✅ | Baixa |
 | 30 | Ferramentas — Comparador | `/ferramentas/comparador` | ✅ | Botão "Comparar" funcionando (BUG-019 RESOLVIDO: parâmetro `limit` corrigido para `per_page`) | — |
 | 31 | Ferramentas — Calculadora IR | `/ferramentas/calculadora-ir` | 🟡 | Carrega dados ✅ | Baixa |
 | 32 | Ferramentas — Simulador | `/ferramentas/simulador` | 🟡 | Carrega dados ✅ | Baixa |
 | 33 | Ferramentas — Reconciliação | `/ferramentas/reconciliacao` | 🟡 | Carrega dados ✅ | Baixa |
 | 34 | Estratégia — Planos | `/planos-compra/` | ✅ | Dashboard compra (NEW-13) + venda/gatilhos (NEW-14); abas compra/venda; modal detalhe | — |
-| 35 | Alertas | `/alertas/` | 🟡 | Acessível pelo menu; lista de alertas carrega ✅ | Baixa |
+| 35 | Alertas | `/alertas/` | ✅ | CRUD completo em `lista_v2.html`; KPIs e filtros — STALE-001 ✅ | — |
+| 43 | Análises — Risco | `/analises/risco` | ✅ | NEW-02 — Sharpe, drawdown via `GET /api/portfolios/metricas-risco` | — |
+| 44 | Análises — Projeções Patrimoniais | `/analises/projecoes` | ✅ | NEW-01 — juros compostos; prefill dashboard; `/ferramentas/simulador` → redirect | — |
 | 36 | Ferramentas — Preço Teto | `/ferramentas/preco-teto` | ✅ | NEW-11 — KPIs, métodos Bazin/Graham/Gordon/DCF, branch FII | — |
 | 37 | Análises — Correlação | `/analises/correlacao` | ✅ | NEW-15 — heatmap matriz de correlação da carteira | — |
 | 38 | Análises — Projeções Renda | `/analises/projecoes/renda` | ✅ | NEW-17 — cenários conservador/moderado/otimista + recalcular 12 meses | — |
@@ -89,7 +91,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 ## 🧭 Análise de Sessão — 27/06/2026 (BUG-014/015/017 ✅ RESOLVIDOS)
 
 ### Contexto
-- AUDITORIA_FUNCIONAL: status geral ✅ (23 OK, 17 PARCIAL, 0 QUEBRADO — atualizado 30/06/2026 Lote 4).
+- AUDITORIA_FUNCIONAL: status geral ✅ (30 OK, 12 PARCIAL, 0 QUEBRADO — atualizado 30/06/2026 Lote 5).
 - BUG-009v2 **resolvido em 27/06/2026**: separação `BROWSER_API_URL` (client-side) / `BACKEND_API_URL` (server-side) — ver `ARCHITECTURE.md` para 7 cenários de deploy.
 - BUG-014, BUG-015, BUG-017 **resolvidos indiretamente** pelo BUG-009v2 — todas as chamadas `apiFetch()` do Alpine.js agora usam `BROWSER_API_URL` (hostname resolúvel pelo browser).
 - Telas 20-21 (Fiscal IR Mensal/DARFs) também confirmadas como RESOLVIDAS.
@@ -1164,8 +1166,8 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 | ID | Tela proposta | Módulo/URL sugerida | APIs a integrar | Valor para o usuário |
 |----|---------------|---------------------|-----------------|----------------------|
-| NEW-01 | **Projeções Patrimoniais** | `/analises/projecoes` | `/api/projecoes/*` | Simular crescimento do patrimônio com aportes, juros e inflação — substitui o Simulador client-side atual |
-| NEW-02 | **Métricas de Risco** | `/analises/risco` | `/api/portfolios/metricas-risco`, `/api/performance/*` | Sharpe, Drawdown máximo, VaR, correlação entre ativos |
+| NEW-01 | ~~**Projeções Patrimoniais**~~ | `/analises/projecoes` | `/api/portfolios/dashboard`, `/api/indicadores/dashboard` | **✅ RESOLVIDO (30/06/2026):** `projecoes_patrimonio_v2.html`; simulador → redirect |
+| ~~NEW-02~~ | ~~**Métricas de Risco**~~ | `/analises/risco` | `/api/portfolios/metricas-risco` | **✅ RESOLVIDO (30/06/2026):** `risco_v2.html` + `get_metricas_risco()` |
 | ~~NEW-03~~ | ~~**Distribuição Detalhada**~~ | Expandir `/analises/alocacao` | `/api/portfolios/distribuicao/classes`, `/api/portfolios/distribuicao/setores` | ✅ IMPLEMENTADO (30/06/2026) — abas classe/segmento em alocacao_v2 |
 | ~~NEW-04~~ | ~~**Saúde das Cotações**~~ | `/ferramentas/cotacoes` | `/api/cotacoes/anomalias`, `/api/cotacoes/health` | **✅ RESOLVIDO (30/06/2026):** KPIs + abas desatualizados/anomalias; health enriquecido com listas |
 | NEW-05 | ~~Câmbio e Multimoeda~~ **✅ RESOLVIDO (30/06/2026)** — `/carteira/cambio` + `cambio_v2.html` | `/api/cambio/*` | Conversor, pares, histórico |
@@ -1474,6 +1476,8 @@ As seguintes novas telas propostas (NEW-XX) **não têm pré-requisito técnico*
 | ~~NEW-06~~ | Indicadores Macroeconômicos | ✅ `GET /api/indicadores/dashboard` |
 | ~~NEW-07~~ | Fontes de Dados | ✅ `/configuracoes/fontes-dados` implementado |
 | ~~NEW-08~~ | Regras Fiscais | ✅ `/configuracoes/regras-fiscais` implementado |
+| ~~NEW-01~~ | Projeções Patrimoniais | ✅ `/analises/projecoes` implementado |
+| ~~NEW-02~~ | Métricas de Risco | ✅ `/analises/risco` implementado |
 | NEW-09 | Relatório Consolidado | API `/api/relatorios` existe |
 | ~~NEW-10~~ | Detalhe de Posição | ✅ `/carteira/posicoes/<id>` implementado |
 | ~~NEW-11~~ | Calculadora Preço Teto | ✅ `/ferramentas/preco-teto` implementado |
