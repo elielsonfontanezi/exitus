@@ -70,6 +70,17 @@
     </div>
 </div>
 
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar extrato</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="recarregar()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+
 <div class="section-box" x-show="transacoes.length === 0 && !loading && !error">
     <div class="empty-state">
         <div class="empty-state-icon"><i class="fas fa-receipt"></i></div>
@@ -93,15 +104,24 @@ function pageDataExtend() {
         async loadData() { await this.recarregar(); },
 
         async recarregar() {
-            let params = `?page=${this.page}&limit=50`;
-            if (this.tipo) params += `&tipo=${this.tipo}`;
-            if (this.dataInicio) params += `&data_inicio=${this.dataInicio}`;
-            if (this.dataFim) params += `&data_fim=${this.dataFim}`;
+            this.error = '';
+            try {
+                let params = `?page=${this.page}&per_page=50`;
+                if (this.tipo) params += `&tipo=${this.tipo}`;
+                if (this.dataInicio) params += `&data_inicio=${this.dataInicio}`;
+                if (this.dataFim) params += `&data_fim=${this.dataFim}`;
 
-            const res = await this.apiFetch('/api/transacoes' + params);
-            if (res?.data) {
-                this.transacoes = res.data.transacoes || res.transacoes || [];
-                this.total = res.data.total || this.transacoes.length;
+                const res = await this.apiFetch('/api/transacoes' + params);
+                const data = res?.data || res;
+                const items = data.transacoes || [];
+                if (this.page > 1) {
+                    this.transacoes = this.transacoes.concat(items);
+                } else {
+                    this.transacoes = items;
+                }
+                this.total = data.total || this.transacoes.length;
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar extrato';
             }
         }
     };

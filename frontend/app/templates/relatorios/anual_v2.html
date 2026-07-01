@@ -76,6 +76,17 @@
     <div x-show="transacoes.length > 50" style="text-align:center; font-size:0.75rem; color:#9ca3af; padding:0.5rem;">Exibindo 50 de <span x-text="transacoes.length"></span></div>
 </div>
 
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar relatório anual</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="recarregar()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+
 <div class="section-box" x-show="historico.length === 0 && transacoes.length === 0 && !loading && !error">
     <div class="empty-state">
         <div class="empty-state-icon"><i class="fas fa-calendar-alt"></i></div>
@@ -97,15 +108,25 @@ function pageDataExtend() {
         async loadData() { await this.recarregar(); },
 
         async recarregar() {
-            const params = `?ano=${this.anoFiltro}`;
-            const [r1, r2, r3] = await Promise.all([
-                this.apiFetch('/api/ir/historico' + params),
-                this.apiFetch('/api/transacoes' + params),
-                this.apiFetch('/api/proventos' + params),
-            ]);
-            this.historico = r1?.data?.meses || r1?.meses || [];
-            this.transacoes = r2?.data?.transacoes || r2?.transacoes || [];
-            this.proventos = r3?.data?.proventos || r3?.proventos || [];
+            this.error = '';
+            try {
+                const range = this.rangeFromYear(this.anoFiltro);
+                const trxParams = `?data_inicio=${range.data_inicio}&data_fim=${range.data_fim}&per_page=200`;
+                const [r1, r2, r3] = await Promise.all([
+                    this.apiFetch(`/api/ir/historico?ano=${this.anoFiltro}`),
+                    this.apiFetch('/api/transacoes' + trxParams),
+                    this.apiFetch(`/api/proventos?ano=${this.anoFiltro}&per_page=200`),
+                ]);
+                this.historico = r1?.data?.meses || r1?.meses || [];
+                this.transacoes = r2?.data?.transacoes || r2?.transacoes || [];
+                this.proventos = r3?.data?.proventos || r3?.data?.items || r3?.proventos || [];
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar relatório anual';
+            }
+        },
+
+        rangeFromYear(yyyy) {
+            return { data_inicio: `${yyyy}-01-01`, data_fim: `${yyyy}-12-31` };
         },
 
         totalIR() { return this.historico.reduce((s, m) => s + (m.ir_total || 0), 0); }

@@ -89,6 +89,17 @@
     </table>
 </div>
 
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar relatório de IR</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="recarregar()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+
 <div class="section-box" x-show="historico.length === 0 && !loading && !error">
     <div class="empty-state">
         <div class="empty-state-icon"><i class="fas fa-file-invoice-dollar"></i></div>
@@ -107,20 +118,30 @@ function pageDataExtend() {
         anoFiltro: String(new Date().getFullYear()),
         anos: Array.from({length: 5}, (_, i) => String(new Date().getFullYear() - i)),
 
-        async loadData() { await this.recarregar(); },
+        mesApuracao: '',
+
+        async loadData() {
+            const now = new Date();
+            this.mesApuracao = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            await this.recarregar();
+        },
 
         async recarregar() {
-            const params = `?ano=${this.anoFiltro}`;
-            const now = new Date();
-            const mesAtual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-            const [r1, r2, r3] = await Promise.all([
-                this.apiFetch('/api/ir/historico' + params),
-                this.apiFetch('/api/ir/dirpf' + params),
-                this.apiFetch(`/api/ir/apuracao?ano=${this.anoFiltro}&mes=${mesAtual}`),
-            ]);
-            this.historico = r1?.data?.meses || r1?.meses || [];
-            this.dirpf = r2?.data || r2 || {};
-            this.apuracao = r3?.data || r3 || {};
+            this.error = '';
+            try {
+                const params = `?ano=${this.anoFiltro}`;
+                const mes = this.mesApuracao || `${this.anoFiltro}-12`;
+                const [r1, r2, r3] = await Promise.all([
+                    this.apiFetch('/api/ir/historico' + params),
+                    this.apiFetch('/api/ir/dirpf' + params),
+                    this.apiFetch(`/api/ir/apuracao?mes=${mes}`),
+                ]);
+                this.historico = r1?.data?.meses || r1?.meses || [];
+                this.dirpf = r2?.data || r2 || {};
+                this.apuracao = r3?.data || r3 || {};
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar IR completo';
+            }
         },
 
         totalIR() { return this.historico.reduce((s, m) => s + (m.ir_total || 0), 0); }

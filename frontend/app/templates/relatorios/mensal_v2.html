@@ -69,6 +69,17 @@
     </table>
 </div>
 
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar relatório</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="recarregar()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+
 <div class="section-box" x-show="transacoes.length === 0 && proventos.length === 0 && !loading && !error">
     <div class="empty-state">
         <div class="empty-state-icon"><i class="fas fa-file-alt"></i></div>
@@ -93,19 +104,43 @@ function pageDataExtend() {
         },
 
         async recarregar() {
-            const [ano, mes] = (this.mesFiltro || '').split('-');
-            const params = ano ? `?ano=${ano}&mes=${this.mesFiltro}` : '';
+            this.error = '';
+            try {
+                const range = this.rangeFromMonth(this.mesFiltro);
+                const [ano] = (this.mesFiltro || '').split('-');
+                const trxParams = `?data_inicio=${range.data_inicio}&data_fim=${range.data_fim}&per_page=100`;
+                const provParams = ano ? `?ano=${ano}&per_page=200` : '?per_page=200';
+                const irParams = `?mes=${this.mesFiltro}`;
 
-            const [r1, r2, r3] = await Promise.all([
-                this.apiFetch('/api/transacoes' + params),
-                this.apiFetch('/api/proventos' + params),
-                this.apiFetch('/api/ir/apuracao' + params),
-            ]);
+                const [r1, r2, r3] = await Promise.all([
+                    this.apiFetch('/api/transacoes' + trxParams),
+                    this.apiFetch('/api/proventos' + provParams),
+                    this.apiFetch('/api/ir/apuracao' + irParams),
+                ]);
 
-            this.transacoes = r1?.data?.transacoes || r1?.transacoes || [];
-            this.proventos = r2?.data?.proventos || r2?.proventos || [];
-            this.resumoIR = r3?.data || r3 || {};
-        }
+                this.transacoes = r1?.data?.transacoes || r1?.transacoes || [];
+                const todosProventos = r2?.data?.proventos || r2?.data?.items || r2?.proventos || [];
+                const prefix = this.mesFiltro;
+                this.proventos = prefix
+                    ? todosProventos.filter(p => String(p.data_pagamento || '').substring(0, 7) === prefix)
+                    : todosProventos;
+                this.resumoIR = r3?.data || r3 || {};
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar dados do mês';
+            }
+        },
+
+        rangeFromMonth(yyyyMm) {
+            const parts = (yyyyMm || '').split('-');
+            const y = parseInt(parts[0], 10);
+            const m = parseInt(parts[1], 10);
+            const last = new Date(y, m, 0).getDate();
+            const mm = String(m).padStart(2, '0');
+            return {
+                data_inicio: `${y}-${mm}-01`,
+                data_fim: `${y}-${mm}-${String(last).padStart(2, '0')}`,
+            };
+        },
     };
 }
 </script>
