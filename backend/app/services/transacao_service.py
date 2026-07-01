@@ -6,7 +6,8 @@
 import logging
 from uuid import UUID
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, date
+from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from app.database import db
@@ -47,9 +48,11 @@ class TransacaoService:
             if corretora_id:
                 query = query.filter_by(corretora_id=corretora_id)
             if data_inicio:
-                query = query.filter(Transacao.data_transacao >= data_inicio)
+                inicio = data_inicio.date() if isinstance(data_inicio, datetime) else data_inicio
+                query = query.filter(func.date(Transacao.data_transacao) >= inicio)
             if data_fim:
-                query = query.filter(Transacao.data_transacao <= data_fim)
+                fim = data_fim.date() if isinstance(data_fim, datetime) else data_fim
+                query = query.filter(func.date(Transacao.data_transacao) <= fim)
             query = query.order_by(Transacao.data_transacao.desc())
             return query.paginate(page=page, per_page=per_page, error_out=False)
         except Exception as e:

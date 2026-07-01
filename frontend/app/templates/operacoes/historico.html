@@ -40,9 +40,9 @@
         <option value="compra">Compras</option>
         <option value="venda">Vendas</option>
     </select>
-    <input type="date" class="filter-input" x-model="filtroDataInicio" @change="loadData()">
+    <input type="date" class="filter-input" x-model="filtroDataInicio" @change="currentPage = 1; loadData()">
     <span class="filter-label">até</span>
-    <input type="date" class="filter-input" x-model="filtroDataFim" @change="loadData()">
+    <input type="date" class="filter-input" x-model="filtroDataFim" @change="currentPage = 1; loadData()">
     <span class="filter-label" style="margin-left:auto;" x-show="transacoesFiltradas.length !== transacoes.length"
           x-text="transacoesFiltradas.length + ' de ' + transacoes.length"></span>
 </div>
@@ -347,14 +347,8 @@ function pageDataExtend() {
             if (this.filtroTipo) {
                 result = result.filter(t => t.tipo === this.filtroTipo);
             }
-            if (this.filtroDataInicio) {
-                result = result.filter(t => (t.data_transacao || '').substring(0, 10) >= this.filtroDataInicio);
-            }
-            if (this.filtroDataFim) {
-                result = result.filter(t => (t.data_transacao || '').substring(0, 10) <= this.filtroDataFim);
-            }
 
-            // Ordenar
+            // Datas filtradas no servidor (loadData) — evita dupla filtragem client-side
             result.sort((a, b) => {
                 let va, vb;
                 if (this.ordenarPor === 'ticker') {
