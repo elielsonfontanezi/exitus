@@ -68,7 +68,7 @@
         <tbody>
             <template x-for="a in filtrados().slice(0, 100)" :key="a.ticker || a.id">
                 <tr>
-                    <td><a :href="'/dashboard/ativo/' + a.ticker" style="font-weight:700; color:#a38c65; text-decoration:none; font-family:monospace;" x-text="a.ticker"></a></td>
+                    <td><a :href="'/ativos/' + a.ticker" style="font-weight:700; color:#a38c65; text-decoration:none; font-family:monospace;" x-text="a.ticker"></a></td>
                     <td style="font-size:0.85rem;" x-text="(a.nome || '').substring(0, 30)"></td>
                     <td class="col-center"><span class="badge badge-neutro" style="text-transform:capitalize; font-size:0.7rem;" x-text="(a.tipo || '').replace('_', ' ')"></span></td>
                     <td class="col-right" :style="dyColor(a.dividend_yield)" x-text="fmtPct(a.dividend_yield)"></td>
@@ -90,6 +90,17 @@
         <div class="empty-state-icon"><i class="fas fa-search"></i></div>
         <div class="empty-state-title">Nenhum ativo encontrado</div>
         <div class="empty-state-text">Tente ampliar os critérios de busca ou limpar os filtros.</div>
+    </div>
+</div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar ativos</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadData()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
     </div>
 </div>
 
@@ -129,9 +140,14 @@ function pageDataExtend() {
         },
 
         async loadData() {
-            const res = await this.apiFetch('/api/ativos?limit=200');
-            if (res?.data) {
-                this.ativos = res.data.ativos || [];
+            this.error = '';
+            try {
+                const res = await this.apiFetch('/api/ativos?per_page=200');
+                if (res?.data) {
+                    this.ativos = res.data.ativos || [];
+                }
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar ativos';
             }
         },
 
