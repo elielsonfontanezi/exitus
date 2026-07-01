@@ -1,0 +1,233 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Meus Portfolios{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Organize carteiras por objetivo — Previdência, Especulativo, Longo Prazo</p>{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Total</div>
+        <div class="kpi-card-value" x-text="portfolios.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativos</div>
+        <div class="kpi-card-value positivo" x-text="portfoliosAtivos"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tabs %}
+<div class="tab-bar">
+    <a href="/configuracoes/perfil" class="tab-item">Perfil</a>
+    <a href="/configuracoes/corretoras" class="tab-item">Minhas Corretoras</a>
+    <a href="/configuracoes/fontes-dados" class="tab-item">Fontes de Dados</a>
+    <a href="/configuracoes/portfolios" class="tab-item active">Portfolios</a>
+    <a href="/configuracoes/regras-fiscais" class="tab-item">Regras Fiscais</a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" style="margin-bottom:1rem;">
+    <button class="btn-exitus btn-exitus-primary" @click="abrirModalNova()">
+        <i class="fas fa-plus"></i> Novo Portfolio
+    </button>
+</div>
+
+<div class="section-box" x-show="portfolios.length > 0">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Objetivo</th>
+                <th>Descrição</th>
+                <th class="col-center">Ativo</th>
+                <th class="col-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="p in portfolios" :key="p.id">
+                <tr>
+                    <td><span class="cell-ticker" x-text="p.nome"></span></td>
+                    <td x-text="p.objetivo || '-'"></td>
+                    <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis;" x-text="p.descricao || '-'"></td>
+                    <td class="col-center">
+                        <button class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                @click="toggleAtivo(p)" :disabled="p.toggling">
+                            <span class="badge" :class="p.ativo ? 'badge-success' : 'badge-danger'"
+                                  x-text="p.ativo ? 'Sim' : 'Não'"></span>
+                        </button>
+                    </td>
+                    <td class="col-center">
+                        <div style="display:flex; gap:0.25rem; justify-content:center;">
+                            <button class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                    @click="editarPortfolio(p)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-exitus btn-exitus-ghost btn-exitus-danger" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                    @click="excluirPortfolio(p)" :disabled="p.excluindo">
+                                <i class="fas" :class="p.excluindo ? 'fa-spinner fa-spin' : 'fa-trash'"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="!loading && portfolios.length === 0 && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-briefcase"></i></div>
+        <div class="empty-state-title">Nenhum portfolio cadastrado</div>
+        <div class="empty-state-text">Crie portfolios para separar estratégias e objetivos de investimento.</div>
+    </div>
+</div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar dados</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadData()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
+
+<div x-show="showModal" x-cloak
+     style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;">
+    <div @click.away="fecharModal()" style="background:white; padding:2rem; border-radius:8px; max-width:520px; width:100%;">
+        <h3 style="margin:0 0 1.5rem 0;" x-text="editando ? 'Editar Portfolio' : 'Novo Portfolio'"></h3>
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div>
+                <label class="filter-label">Nome</label>
+                <input type="text" class="filter-input" x-model="form.nome" style="width:100%;" placeholder="Ex: Previdência">
+            </div>
+            <div>
+                <label class="filter-label">Objetivo</label>
+                <input type="text" class="filter-input" x-model="form.objetivo" style="width:100%;" placeholder="Ex: Renda passiva">
+            </div>
+            <div>
+                <label class="filter-label">Descrição</label>
+                <textarea class="filter-input" x-model="form.descricao" rows="2" style="width:100%;"></textarea>
+            </div>
+            <div>
+                <label class="filter-label">
+                    <input type="checkbox" x-model="form.ativo"> Ativo
+                </label>
+            </div>
+        </div>
+        <div style="display:flex; gap:0.5rem; margin-top:1.5rem; justify-content:flex-end;">
+            <button class="btn-exitus btn-exitus-ghost" @click="fecharModal()">Cancelar</button>
+            <button class="btn-exitus btn-exitus-primary" @click="salvar()" :disabled="salvando">
+                <i class="fas" :class="salvando ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+                <span x-text="salvando ? 'Salvando...' : 'Salvar'"></span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        portfolios: [],
+        portfoliosAtivos: 0,
+        showModal: false,
+        editando: false,
+        salvando: false,
+        form: {},
+
+        async loadData() {
+            const res = await this.apiFetch('/api/portfolios?per_page=100');
+            const data = res?.data || res;
+            this.portfolios = data.portfolios || [];
+            this.portfoliosAtivos = this.portfolios.filter(p => p.ativo).length;
+        },
+
+        abrirModalNova() {
+            this.editando = false;
+            this.form = { nome: '', objetivo: '', descricao: '', ativo: true };
+            this.showModal = true;
+        },
+
+        editarPortfolio(p) {
+            this.editando = true;
+            this.form = { ...p };
+            this.showModal = true;
+        },
+
+        fecharModal() {
+            this.showModal = false;
+            this.form = {};
+        },
+
+        async salvar() {
+            if (!this.form.nome || this.form.nome.length < 3) {
+                alert('Nome deve ter pelo menos 3 caracteres.');
+                return;
+            }
+            this.salvando = true;
+            try {
+                const payload = {
+                    nome: this.form.nome,
+                    objetivo: this.form.objetivo || null,
+                    descricao: this.form.descricao || null,
+                    ativo: !!this.form.ativo,
+                };
+                if (this.editando) {
+                    await this.apiFetch('/api/portfolios/' + this.form.id, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+                } else {
+                    await this.apiFetch('/api/portfolios', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+                }
+                await this.loadData();
+                this.fecharModal();
+            } catch (e) {
+                alert('Erro ao salvar portfolio: ' + (e.message || ''));
+            } finally {
+                this.salvando = false;
+            }
+        },
+
+        async toggleAtivo(p) {
+            p.toggling = true;
+            try {
+                await this.apiFetch('/api/portfolios/' + p.id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ativo: !p.ativo }),
+                });
+                p.ativo = !p.ativo;
+                this.portfoliosAtivos = this.portfolios.filter(x => x.ativo).length;
+            } catch (e) {
+                alert('Erro ao alterar status.');
+            } finally {
+                p.toggling = false;
+            }
+        },
+
+        async excluirPortfolio(p) {
+            if (!confirm('Desativar portfolio "' + p.nome + '"?')) return;
+            p.excluindo = true;
+            try {
+                await this.apiFetch('/api/portfolios/' + p.id, { method: 'DELETE' });
+                await this.loadData();
+            } catch (e) {
+                alert('Erro ao excluir portfolio.');
+            } finally {
+                p.excluindo = false;
+            }
+        },
+    };
+}
+</script>
+{% endblock %}
