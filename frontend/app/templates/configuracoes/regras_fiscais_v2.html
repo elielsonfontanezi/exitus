@@ -1,0 +1,308 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Regras Fiscais{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Alíquotas e vigência por país e tipo de ativo — mutações restritas a administradores</p>{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Total</div>
+        <div class="kpi-card-value" x-text="regras.length"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Ativas</div>
+        <div class="kpi-card-value positivo" x-text="regrasAtivas"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tabs %}
+<div class="tab-bar">
+    <a href="/configuracoes/perfil" class="tab-item">Perfil</a>
+    <a href="/configuracoes/corretoras" class="tab-item">Minhas Corretoras</a>
+    <a href="/configuracoes/fontes-dados" class="tab-item">Fontes de Dados</a>
+    <a href="/configuracoes/portfolios" class="tab-item">Portfolios</a>
+    <a href="/configuracoes/regras-fiscais" class="tab-item active">Regras Fiscais</a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+{% if not is_admin %}
+<div style="padding:0.75rem 1rem; background:#fef3c7; border-radius:0.5rem; border:1px solid #fcd34d; font-size:0.85rem; color:#92400e; margin-bottom:1rem;">
+    <i class="fas fa-lock"></i> Visualização apenas. Criar, editar e excluir regras exige perfil <strong>admin</strong>.
+</div>
+{% endif %}
+
+<div class="section-box" style="margin-bottom:1rem;" x-show="isAdmin">
+    <button class="btn-exitus btn-exitus-primary" @click="abrirModalNova()">
+        <i class="fas fa-plus"></i> Nova Regra
+    </button>
+</div>
+
+<div class="section-box" x-show="regras.length > 0">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>País</th>
+                <th>Tipo Ativo</th>
+                <th class="col-right">Alíquota IR</th>
+                <th>Incide Sobre</th>
+                <th>Vigência</th>
+                <th class="col-center">Ativa</th>
+                <th class="col-center" x-show="isAdmin">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="r in regras" :key="r.id">
+                <tr>
+                    <td><span class="cell-ticker" x-text="r.pais"></span></td>
+                    <td x-text="r.tipo_ativo || '-'"></td>
+                    <td class="col-right" x-text="formatAliquota(r.aliquota_ir)"></td>
+                    <td x-text="r.incide_sobre || '-'"></td>
+                    <td>
+                        <span x-text="formatDate(r.vigencia_inicio)"></span>
+                        <template x-if="r.vigencia_fim">
+                            <span> — <span x-text="formatDate(r.vigencia_fim)"></span></span>
+                        </template>
+                    </td>
+                    <td class="col-center">
+                        <span class="badge" :class="r.ativa ? 'badge-success' : 'badge-danger'"
+                              x-text="r.ativa ? 'Sim' : 'Não'"></span>
+                    </td>
+                    <td class="col-center" x-show="isAdmin">
+                        <div style="display:flex; gap:0.25rem; justify-content:center;">
+                            <button class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                    @click="editarRegra(r)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-exitus btn-exitus-ghost btn-exitus-danger" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                    @click="excluirRegra(r)" :disabled="r.excluindo">
+                                <i class="fas" :class="r.excluindo ? 'fa-spinner fa-spin' : 'fa-trash'"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<div class="section-box" x-show="!loading && regras.length === 0 && !error">
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-balance-scale"></i></div>
+        <div class="empty-state-title">Nenhuma regra fiscal cadastrada</div>
+    </div>
+</div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar regras</div>
+        <div class="empty-state-text" x-text="error"></div>
+    </div>
+</div>
+
+<div x-show="showModal" x-cloak
+     style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;">
+    <div @click.away="fecharModal()" style="background:white; padding:2rem; border-radius:8px; max-width:560px; width:100%; max-height:90vh; overflow-y:auto;">
+        <h3 style="margin:0 0 1.5rem 0;" x-text="editando ? 'Editar Regra Fiscal' : 'Nova Regra Fiscal'"></h3>
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div>
+                    <label class="filter-label">País (ISO-2)</label>
+                    <input type="text" maxlength="2" class="filter-input" x-model="form.pais" style="width:100%;" placeholder="BR">
+                </div>
+                <div>
+                    <label class="filter-label">Alíquota IR (%)</label>
+                    <input type="number" step="0.01" min="0" max="100" class="filter-input" x-model="form.aliquota_ir" style="width:100%;">
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div>
+                    <label class="filter-label">Tipo Ativo</label>
+                    <input type="text" class="filter-input" x-model="form.tipo_ativo" style="width:100%;" placeholder="acao, fii...">
+                </div>
+                <div>
+                    <label class="filter-label">Tipo Operação</label>
+                    <input type="text" class="filter-input" x-model="form.tipo_operacao" style="width:100%;">
+                </div>
+            </div>
+            <div>
+                <label class="filter-label">Incide Sobre</label>
+                <select class="filter-input" x-model="form.incide_sobre" style="width:100%;">
+                    <option value="lucro">Lucro</option>
+                    <option value="receita">Receita</option>
+                    <option value="provento">Provento</option>
+                    <option value="operacao">Operação</option>
+                </select>
+            </div>
+            <div>
+                <label class="filter-label">Descrição</label>
+                <input type="text" class="filter-input" x-model="form.descricao" style="width:100%;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div>
+                    <label class="filter-label">Vigência Início</label>
+                    <input type="date" class="filter-input" x-model="form.vigencia_inicio" style="width:100%;">
+                </div>
+                <div>
+                    <label class="filter-label">Vigência Fim</label>
+                    <input type="date" class="filter-input" x-model="form.vigencia_fim" style="width:100%;">
+                </div>
+            </div>
+            <div>
+                <label class="filter-label">Valor Isenção</label>
+                <input type="number" step="0.01" class="filter-input" x-model="form.valor_isencao" style="width:100%;">
+            </div>
+            <div>
+                <label class="filter-label">
+                    <input type="checkbox" x-model="form.ativa"> Ativa
+                </label>
+            </div>
+        </div>
+        <div style="display:flex; gap:0.5rem; margin-top:1.5rem; justify-content:flex-end;">
+            <button class="btn-exitus btn-exitus-ghost" @click="fecharModal()">Cancelar</button>
+            <button class="btn-exitus btn-exitus-primary" @click="salvar()" :disabled="salvando">
+                <i class="fas" :class="salvando ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+                <span x-text="salvando ? 'Salvando...' : 'Salvar'"></span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        regras: [],
+        regrasAtivas: 0,
+        isAdmin: {{ 'true' if is_admin else 'false' }},
+        showModal: false,
+        editando: false,
+        salvando: false,
+        form: {},
+
+        async loadData() {
+            const res = await this.apiFetch('/api/regras-fiscais?per_page=100');
+            const data = res?.data || res;
+            this.regras = data.regras || [];
+            this.regrasAtivas = this.regras.filter(r => r.ativa).length;
+        },
+
+        formatAliquota(v) {
+            return v != null ? Number(v).toFixed(2) + '%' : '-';
+        },
+
+        formatDate(d) {
+            if (!d) return '-';
+            const parts = String(d).split('T')[0].split('-');
+            if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+            return d;
+        },
+
+        abrirModalNova() {
+            if (!this.isAdmin) return;
+            this.editando = false;
+            const hoje = new Date().toISOString().slice(0, 10);
+            this.form = {
+                pais: 'BR',
+                aliquota_ir: 15,
+                tipo_ativo: '',
+                tipo_operacao: '',
+                incide_sobre: 'lucro',
+                descricao: '',
+                vigencia_inicio: hoje,
+                vigencia_fim: '',
+                valor_isencao: '',
+                ativa: true,
+            };
+            this.showModal = true;
+        },
+
+        editarRegra(r) {
+            if (!this.isAdmin) return;
+            this.editando = true;
+            this.form = {
+                id: r.id,
+                pais: r.pais || 'BR',
+                aliquota_ir: r.aliquota_ir,
+                tipo_ativo: r.tipo_ativo || '',
+                tipo_operacao: r.tipo_operacao || '',
+                incide_sobre: r.incide_sobre || 'lucro',
+                descricao: r.descricao || '',
+                vigencia_inicio: r.vigencia_inicio ? String(r.vigencia_inicio).split('T')[0] : '',
+                vigencia_fim: r.vigencia_fim ? String(r.vigencia_fim).split('T')[0] : '',
+                valor_isencao: r.valor_isencao ?? '',
+                ativa: !!r.ativa,
+            };
+            this.showModal = true;
+        },
+
+        fecharModal() {
+            this.showModal = false;
+            this.form = {};
+        },
+
+        buildPayload() {
+            const p = {
+                pais: (this.form.pais || '').toUpperCase(),
+                aliquota_ir: parseFloat(this.form.aliquota_ir),
+                incide_sobre: this.form.incide_sobre,
+                descricao: this.form.descricao,
+                vigencia_inicio: this.form.vigencia_inicio,
+                ativa: !!this.form.ativa,
+            };
+            if (this.form.tipo_ativo) p.tipo_ativo = this.form.tipo_ativo;
+            if (this.form.tipo_operacao) p.tipo_operacao = this.form.tipo_operacao;
+            if (this.form.vigencia_fim) p.vigencia_fim = this.form.vigencia_fim;
+            if (this.form.valor_isencao !== '' && this.form.valor_isencao != null) {
+                p.valor_isencao = parseFloat(this.form.valor_isencao);
+            }
+            return p;
+        },
+
+        async salvar() {
+            if (!this.isAdmin) return;
+            this.salvando = true;
+            try {
+                const payload = this.buildPayload();
+                if (this.editando) {
+                    await this.apiFetch('/api/regras-fiscais/' + this.form.id, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+                } else {
+                    await this.apiFetch('/api/regras-fiscais', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+                }
+                await this.loadData();
+                this.fecharModal();
+            } catch (e) {
+                alert('Erro ao salvar regra: ' + (e.message || ''));
+            } finally {
+                this.salvando = false;
+            }
+        },
+
+        async excluirRegra(r) {
+            if (!this.isAdmin) return;
+            if (!confirm('Excluir regra fiscal de ' + r.pais + '?')) return;
+            r.excluindo = true;
+            try {
+                await this.apiFetch('/api/regras-fiscais/' + r.id, { method: 'DELETE' });
+                await this.loadData();
+            } catch (e) {
+                alert('Erro ao excluir regra.');
+            } finally {
+                r.excluindo = false;
+            }
+        },
+    };
+}
+</script>
+{% endblock %}

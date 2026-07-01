@@ -2,7 +2,7 @@
 """
 Exitus Frontend - Blueprint Configurações
 Rotas: /configuracoes/perfil, /configuracoes/corretoras, /configuracoes/fontes-dados,
-        /configuracoes/portfolios
+        /configuracoes/portfolios, /configuracoes/regras-fiscais
 Fase 3 — Telas novas usando base_interna.html
 """
 from functools import wraps
@@ -46,3 +46,13 @@ def fontes_dados():
 def portfolios():
     """Configurações — Portfolios (API: GET /api/portfolios) — NEW-19"""
     return render_template('configuracoes/portfolios_v2.html')
+
+
+@bp.route('/regras-fiscais')
+@login_required
+def regras_fiscais():
+    """Configurações — Regras Fiscais (API: GET /api/regras-fiscais) — NEW-08"""
+    return render_template(
+        'configuracoes/regras_fiscais_v2.html',
+        is_admin=session.get('role') == 'admin',
+    )
