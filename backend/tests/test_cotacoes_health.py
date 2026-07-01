@@ -51,7 +51,7 @@ class TestCotacoesHealth:
             ativos.append(_criar_ativo(t_old, '30.00', now - timedelta(hours=2)))
             ativos.append(_criar_ativo(t_none, None, None))
 
-            saude = CotacoesService.get_saude_cotacoes(ttl_minutes=15)
+            saude = CotacoesService.get_saude_cotacoes(ttl_minutes=15, limite_lista=5000)
             tickers_old = [a['ticker'] for a in saude['desatualizados']]
             tickers_none = [a['ticker'] for a in saude['sem_cotacao']]
             assert t_old in tickers_old

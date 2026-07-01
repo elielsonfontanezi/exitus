@@ -35,6 +35,56 @@
 
 {% block page_content %}
 
+<!-- Concentração por ativo (CONCENTRACAO-001) -->
+<div class="section-box" x-show="concentracao && concentracao.qtd_posicoes > 0" style="margin-bottom:1.5rem;">
+    <div class="section-box-title">
+        <i class="fas fa-bullseye"></i> Concentração por Ativo
+        <span x-show="concentracao?.concentrado"
+              style="font-size:0.7rem; background:#fee2e2; color:#dc2626; border-radius:4px; padding:0.1rem 0.5rem; margin-left:0.5rem; font-weight:600;">
+            Carteira concentrada
+        </span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.75rem; margin-bottom:1rem;">
+        <div style="background:#f8fafc; border-radius:8px; padding:0.75rem; text-align:center;">
+            <div style="font-size:0.7rem; color:#6b7280;">Maior posição</div>
+            <div style="font-size:1.1rem; font-weight:700;" x-text="(concentracao?.top1_percentual || 0).toFixed(1) + '%'"></div>
+            <div style="font-size:0.7rem; color:#6b7280;" x-text="concentracao?.top1_ticker || '—'"></div>
+        </div>
+        <div style="background:#f8fafc; border-radius:8px; padding:0.75rem; text-align:center;">
+            <div style="font-size:0.7rem; color:#6b7280;">Top 5</div>
+            <div style="font-size:1.1rem; font-weight:700;" x-text="(concentracao?.top5_percentual || 0).toFixed(1) + '%'"></div>
+        </div>
+        <div style="background:#f8fafc; border-radius:8px; padding:0.75rem; text-align:center;">
+            <div style="font-size:0.7rem; color:#6b7280;">Índice HHI</div>
+            <div style="font-size:1.1rem; font-weight:700;" x-text="(concentracao?.hhi || 0).toFixed(0)"></div>
+        </div>
+    </div>
+    <template x-for="alerta in (concentracao?.alertas || [])" :key="alerta.tipo">
+        <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:0.5rem 0.75rem; font-size:0.8rem; color:#991b1b; margin-bottom:0.5rem;"
+             x-text="alerta.mensagem"></div>
+    </template>
+    <table class="data-table" x-show="(concentracao?.ativos || []).length > 0">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Nome</th>
+                <th class="col-right">Valor</th>
+                <th class="col-right">%</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="a in (concentracao?.ativos || [])" :key="a.ticker">
+                <tr>
+                    <td style="font-weight:700; font-family:monospace;" x-text="a.ticker"></td>
+                    <td x-text="(a.nome || '').substring(0, 28)"></td>
+                    <td class="col-right" x-text="formatMoney(a.valor)"></td>
+                    <td class="col-right" x-text="a.percentual.toFixed(1) + '%'"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
 <!-- Editor de metas -->
 <div class="section-box" style="margin-bottom:1.5rem;">
     <div class="section-box-title">
@@ -334,19 +384,21 @@ function pageDataExtend() {
         metas: [],
         distribClasses: null,
         distribSetores: [],
+        concentracao: null,
         visaoAtiva: 'macro',
         salvandoMetas: false,
         metasSalvas: false,
         metasErro: null,
 
         async loadData() {
-            const [r1, r2, r3, r4, r5, r6] = await Promise.all([
+            const [r1, r2, r3, r4, r5, r6, r7] = await Promise.all([
                 this.apiFetch('/api/portfolios/alocacao'),
                 this.apiFetch('/api/performance/desvio-alocacao'),
                 this.apiFetch('/api/portfolios/rebalanceamento/sugestao'),
                 this.apiFetch('/api/portfolios/meta-alocacao'),
                 this.apiFetch('/api/portfolios/distribuicao/classes'),
                 this.apiFetch('/api/portfolios/distribuicao/setores'),
+                this.apiFetch('/api/portfolios/concentracao'),
             ]);
             this.alocacao = r1 || {};
             this.desvio = r2 || {};
@@ -355,6 +407,7 @@ function pageDataExtend() {
             this.metas = Array.isArray(rawMetas) ? rawMetas : [];
             this.distribClasses = r5?.data || r5 || null;
             this.distribSetores = r6?.data?.setores || r6?.setores || [];
+            this.concentracao = r7?.data || r7 || null;
         },
 
         somaTargets() {

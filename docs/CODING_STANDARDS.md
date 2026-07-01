@@ -202,7 +202,7 @@ db.session.execute(text("ALTER SEQUENCE usuario_id_seq RESTART WITH 1"))
 
 **📚 Contexto:**
 - **Objetivo:** "Seed controlado" = limpar dados, não estrutura
-- **Schema:** Gerenciado por Alembic migrations
+- **Schema:** Gerenciado por Flask-Migrate em `backend/migrations/versions/` (legado `backend/archive/alembic_legacy/` — não usar)
 - **Resultado:** Dados limpos, estrutura intacta
 
 **🔍 Pergunta-Chave:** "O que realmente preciso resetar?"

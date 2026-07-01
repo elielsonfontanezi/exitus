@@ -183,10 +183,15 @@ def get_circuit_breaker(name: str, failure_threshold: int = 3, recovery_timeout:
             failure_threshold=failure_threshold,
             recovery_timeout=recovery_timeout,
         )
+    else:
+        cb = _registry[name]
+        cb.failure_threshold = failure_threshold
+        cb.recovery_timeout = recovery_timeout
     return _registry[name]
 
 
 def reset_all():
     """Reseta todos os circuit breakers — útil em testes."""
-    for cb in _registry.values():
+    for cb in list(_registry.values()):
         cb.reset()
+    _registry.clear()

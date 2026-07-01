@@ -1,8 +1,8 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 52/54 GAPs (96%) + REBALANCE-001 ✅ | **Testes:** 655/664 passando 🟡 — 3 failed pré-existentes, 6 skipped  
-> **Frontend V2.0:** Lote 6 ✅ (REL-FIX-001, STALE-002, FISC-002, TOOL-001) | **Versão:** v0.9.50 | **Última atualização:** 30/06/2026
+> **Progresso Backend:** 53/54 GAPs (98%) + CONCENTRACAO-001 ✅ | **Testes:** ver PROJECT_STATUS  
+> **Frontend V2.0:** Lote 7 ✅ (FEAT-IR-COT, SEED-EVENTOS-001) — 43 OK, 0 PARCIAL | **Versão:** v0.9.51 | **Última atualização:** 01/07/2026
 
 ---
 
@@ -12,8 +12,8 @@
  Backend Fases 1-6: Concluídas ✅
  Backend Fase 7: Produção 🎯 (próxima)
  Backend Fase 8: Futuro 📋
- Frontend V2.0: 41 OK, 2 PARCIAL, 0 QUEBRADO (93%)
- Frontend UX Evolution: 41 OK, 2 PARCIAL, 0 QUEBRADO (93%)
+ Frontend V2.0: 43 OK, 0 PARCIAL, 0 QUEBRADO (100%)
+ Frontend UX Evolution: 43 OK, 0 PARCIAL, 0 QUEBRADO (100%)
  Frontend API-Driven: 8/8 Sprints ✅ (09/06/2026) — 33 telas, 27 APIs
  Testes E2E v2: 127/127 Chromium ✅ — Firefox/Mobile 🎯 (próximo)
  Backend Fase 7: MONITOR-001, RATELIMIT-001, CICD-001, HIST-002 📋
@@ -196,7 +196,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | 🔴 Alta | **E2E multi-browser** | Firefox + Mobile Chrome: `npx playwright test --project=firefox` |
 | 🔴 Alta | **Merge feature/testes-e2e-v2 → main** | Após validação multi-browser |
 | 🟡 Média | **Dados fundamentalistas nulos no Screener** | Muitos ativos têm `dividend_yield=null`, `p_vp=null` — verificar pipeline |
-| 🟡 Média | **Calculadora IR: cotação automática** | Integrar `GET /api/cotacoes/<ticker>` para pré-preencher preço de venda sugerido |
+| 🟡 Média | **Calculadora IR: cotação automática** | ✅ Concluído (01/07/2026) — `GET /api/cotacoes/<ticker>` em `calculadora_ir_v2.html` |
 
 ---
 
@@ -205,7 +205,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | GAP ID | Funcionalidade | Status |
 |--------|---------------|--------|
 | **VALUATION-001** | Adicionar EPS e FCF ao modelo Ativo | ✅ Concluído (28/06/2026) |
-| **CLEANUP-MIGRATIONS-001** | Remover diretório alembic/ duplicado (dívida técnica) | 📋 Planejado |
+| **CLEANUP-MIGRATIONS-001** | Remover diretório alembic/ duplicado (dívida técnica) | ✅ Concluído (01/07/2026) |
 | **CURSORRULES-001** | Reestruturar `.cursorrules` v3.0 + `docs/AI_OPERATIONS.md`; remover `.windsurfrules` | ✅ Concluído (29/06/2026) |
 | **CURSORRULES-001.1** | Plano de controle: ROADMAP + AUDITORIA_FUNCIONAL + índice LESSONS | ✅ Concluído (29/06/2026) |
 | **CURSORRULES-001.2** | REGRA #2 Plan/Agent; PERSONAS/INDEX; commit template; validação | ✅ Concluído (29/06/2026) |
@@ -219,7 +219,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | **BUG-VAL-005** | Metodologia de agregação: padrão de mercado (valuation_service.py) | ✅ Concluído (30/06/2026) |
 | **BUG-VAL-006** | FII: fórmula cap_rate incorreta (1/cap_rate) | ✅ Concluído (30/06/2026) |
 | **REBALANCE-001** | Rebalanceamento automático por classe | ✅ Concluído (30/06/2026) |
-| CONCENTRACAO-001 | Análise de concentração | 📋 Planejado |
+| CONCENTRACAO-001 | Análise de concentração | ✅ Concluído (01/07/2026) |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |
 
 ### VALUATION-001 — Adicionar EPS e FCF ao modelo Ativo (✅ Concluído 28/06/2026)
@@ -248,21 +248,11 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 - Implementar busca de EPS/FCF via API externa (yfinance) para eliminar fallback
 - Unificar Buy Score engine para usar `pt_medio` dinâmico em vez de `ativo.preco_teto`
 
-### CLEANUP-MIGRATIONS-001 — Remover diretório alembic/ duplicado (📋 Planejado)
+### CLEANUP-MIGRATIONS-001 — Diretório alembic/ arquivado (✅ Concluído 01/07/2026)
 
-**Problema identificado (28/06/2026):**
-- Projeto tem dois diretórios de migration: `backend/alembic/` (standalone) e `backend/migrations/` (Flask-Migrate)
-- Apenas `migrations/` é ativo (Flask-Migrate via `flask db upgrade`)
-- `alembic/` é resquício histórico que causa confusão — migration criada lá não é aplicada
+- `backend/alembic/` movido para `backend/archive/alembic_legacy/`
+- Diretório ativo: **`backend/migrations/versions/`** (Flask-Migrate)
 - Ver L-DB-015 em `LESSONS_LEARNED.md`
-
-**Plano de implementação:**
-1. Confirmar que `alembic/versions/` não tem migrations não aplicadas (comparar cadeias)
-2. Arquivar `backend/alembic/` para `backup/` ou remover se seguro
-3. Documentar em `ARCHITECTURE.md` que apenas `migrations/` é ativo
-4. Atualizar `CODING_STANDARDS.md` com regra: migrations sempre em `migrations/versions/`
-
-**Prioridade:** Baixa | **Risco:** Baixo
 
 ### VALUATION-002 — Popular EPS/FCF reais no banco (🔴 Alta)
 

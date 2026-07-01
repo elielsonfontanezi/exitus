@@ -8,6 +8,34 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — Lote 7 Frontend FEAT-IR-COT / SEED-EVENTOS-001 (01/07/2026)
+
+**FEAT-IR-COT — Calculadora IR cotação automática**
+- `calculadora_ir_v2.html` — `buscarCotacao()` via `GET /api/cotacoes/<ticker>` ao selecionar posição; botão Atualizar cotação
+- Tela 31 → OK na auditoria
+
+**SEED-EVENTOS-001 — Eventos corporativos nos cenários**
+- `load_scenario.py` — `_seed_eventos_corporativos()`
+- `test_full.json` (6 eventos) e `test_e2e.json` (4 eventos)
+- Tela 13 → OK na auditoria
+
+**Docs — encerramento backlog operacional**
+- `AUDITORIA_FUNCIONAL.md` — 43 OK, 0 PARCIAL; FEAT-011+ → `BACKLOG_PRODUTO.md`
+- `AI_OPERATIONS.md` — critério de arquivamento atualizado
+
+### Fix — Qualidade técnica Trilha C (01/07/2026)
+
+**C1 — Testes**
+- `circuit_breaker.py` — `get_circuit_breaker` atualiza params; `reset_all()` limpa registry
+- `test_ir_integration.py` — fixture `cenario_proventos_2026` cria regras fiscais 2026+
+
+**C2 — CLEANUP-MIGRATIONS-001**
+- `backend/alembic/` → `backend/archive/alembic_legacy/`
+
+**CONCENTRACAO-001**
+- `concentracao_service.py` + `GET /api/portfolios/concentracao`
+- Painel em `alocacao_v2.html`; `test_concentracao.py`
+
 ### Fix — Lote 6 Frontend REL-FIX-001 / STALE-002 / FISC-002 / TOOL-001 (30/06/2026)
 
 **REL-FIX-001 — Params API relatórios 24–27**

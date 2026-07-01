@@ -1,15 +1,23 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 30/06/2026
-> **Status:** ✅ **Lote 6 Frontend concluído (REL-FIX-001, STALE-002, FISC-002, TOOL-001)**
-> **Versão:** v0.9.50
+> **Data:** 01/07/2026
+> **Status:** ✅ **Lote 7 Frontend concluído (FEAT-IR-COT, SEED-EVENTOS-001) + Trilha C (CONCENTRACAO-001)**
+> **Versão:** v0.9.51
 
-### 🔧 Últimas entregas (30/06/2026 — Lote 6)
+### 🔧 Últimas entregas (01/07/2026 — Lote 7 + Trilha C)
+- **FEAT-IR-COT ✅:** Calculadora IR — cotação automática via `GET /api/cotacoes/<ticker>`; tela 31 → OK.
+- **SEED-EVENTOS-001 ✅:** `_seed_eventos_corporativos()` em `load_scenario.py`; 6 eventos test_full, 4 test_e2e; tela 13 → OK.
+- **AUDITORIA encerrada:** 43 OK, 0 PARCIAL, 0 QUEBRADO; FEAT-011+ → `BACKLOG_PRODUTO.md`.
+- **CONCENTRACAO-001 ✅:** `concentracao_service.py`, `GET /api/portfolios/concentracao`, painel em `alocacao_v2.html`; 5 testes.
+- **CLEANUP-MIGRATIONS-001 ✅:** `backend/alembic/` arquivado em `backend/archive/alembic_legacy/`.
+- **Fix testes:** circuit breaker registry + fixture IR 2026+ com regras fiscais.
+
+### 🔧 Entregas anteriores (30/06/2026 — Lote 6)
 - **REL-FIX-001 ✅ CONCLUÍDO:** relatórios 24–27 — params `data_inicio`/`data_fim`, `mes=YYYY-MM`, `per_page`; error states; 2 testes smoke.
 - **STALE-002 ✅ CONCLUÍDO:** error states em evolução/performance; telas 15, 16, 19, 32, 33 → OK.
 - **FISC-002 ✅ CONCLUÍDO:** histórico IR error state + retry; tela 22 → OK.
 - **TOOL-001 ✅ CONCLUÍDO:** screener links `/ativos/`, empty/error; tela 29 → OK.
-- Suite: **655 passed**, 3 failed pré-existentes, 6 skipped (+2 vs Lote 5).
+- Suite: **663 passed**, 0 failed, 6 skipped (+8 vs Lote 6).
 
 ### 🔧 Entregas anteriores (30/06/2026 — Lote 5)
 - **FIX-HIST-001 ✅ CONCLUÍDO:** filtro data histórico — BE `func.date` + FE sem dupla filtragem; tela 8 → OK.

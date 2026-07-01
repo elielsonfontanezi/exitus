@@ -595,6 +595,48 @@ def cenario_proventos_2026(app, auth_client, ativo_seed):
     db.session.add(corretora)
     db.session.flush()
 
+    from datetime import date
+    from app.models.regra_fiscal import RegraFiscal, IncidenciaImposto
+
+    regras_ids = []
+
+    def _criar_regra_2026(tipo_operacao, aliquota_ir, valor_isencao, descricao):
+        regra = RegraFiscal(
+            pais='BR',
+            tipo_ativo=None,
+            tipo_operacao=tipo_operacao,
+            aliquota_ir=Decimal(str(aliquota_ir)),
+            valor_isencao=Decimal(str(valor_isencao)) if valor_isencao is not None else None,
+            incide_sobre=IncidenciaImposto.PROVENTO,
+            descricao=descricao,
+            vigencia_inicio=date(2026, 1, 1),
+            vigencia_fim=None,
+            ativa=True,
+        )
+        db.session.add(regra)
+        db.session.flush()
+        regras_ids.append(regra.id)
+        return regra
+
+    _criar_regra_2026(
+        'DIVIDENDO',
+        0,
+        50000,
+        'Dividendo BR isento até R$50k/mês por empresa (Lei 15.270/2025)',
+    )
+    _criar_regra_2026(
+        'DIVIDENDO_TRIBUTADO',
+        10,
+        None,
+        'Dividendo BR tributado 10% acima do limite mensal por empresa (2026+)',
+    )
+    _criar_regra_2026(
+        'JCP',
+        17.5,
+        None,
+        'JCP com IRRF 17,5% em 2026 (PLP 128/2025)',
+    )
+
     def _criar_provento_2026(tipo_str, ativo_id, valor, imposto_retido):
         val = Decimal(str(valor))
         imp = Decimal(str(imposto_retido))
@@ -629,10 +671,13 @@ def cenario_proventos_2026(app, auth_client, ativo_seed):
         't_jcp': t_jcp,
         't_div_br': t_div_br,
         'corretora_id': corretora.id,
+        'regras_ids': regras_ids,
     }
 
     for tid in [t_jcp.id, t_div_br.id]:
         Transacao.query.filter_by(id=tid).delete()
+    for rid in regras_ids:
+        RegraFiscal.query.filter_by(id=rid).delete()
     Corretora.query.filter_by(id=corretora.id).delete()
     db.session.commit()
 

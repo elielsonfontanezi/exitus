@@ -433,3 +433,17 @@ def get_sugestao_rebalanceamento():
     except Exception as e:
         logger.error(f"Erro ao calcular sugestão de rebalanceamento: {e}")
         return error_response(str(e), 500)
+
+
+@portfolio_bp.route('/concentracao', methods=['GET'])
+@jwt_required()
+def get_concentracao():
+    """Análise de concentração da carteira por ativo (CONCENTRACAO-001)."""
+    try:
+        from app.services.concentracao_service import ConcentracaoService
+        usuario_id = UUID(get_jwt_identity())
+        dados = ConcentracaoService.calcular_concentracao(usuario_id)
+        return success_response(data=dados, message="Concentração calculada")
+    except Exception as e:
+        logger.error(f"Erro ao calcular concentração: {e}")
+        return error_response(str(e), 500)

@@ -3,7 +3,7 @@
 **APENAS PARA AMBIENTE DE DESENVOLVIMENTO** ⚠️
 
 > **v0.9.23** — Base de teste 100% completa com Renda Fixa Brasil  
-> **Atualização:** 23/06/2026 - Adicionada Renda Fixa Brasil completa ao test_full
+> **Atualização:** 01/07/2026 — Eventos corporativos nos cenários test_full (6) e test_e2e (4)
 
 ---
 
