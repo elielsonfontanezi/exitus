@@ -8,7 +8,7 @@
 
 > **Nota de revalidação (27/06/2026):** BUG-014, BUG-015, BUG-017, BUG-009 (telas 20-21) RESOLVIDOS indiretamente via BUG-009v2 (separação `BROWSER_API_URL` / `BACKEND_API_URL`).
 >
-> **Nota de revalidação (30/06/2026):** Lote 5 Frontend (NEW-01/02, FIX-HIST-001, STALE-001). Contagem: **30 OK, 12 PARCIAL**, 0 QUEBRADO (44 telas). Este arquivo é o **backlog operacional de frontend** enquanto houver telas PARCIAL ou P-items abertos (ver `AI_OPERATIONS.md` § Plano de controle).
+> **Nota de revalidação (30/06/2026):** Lote 6 Frontend (REL-FIX-001, STALE-002, FISC-002, TOOL-001). Contagem: **41 OK, 2 PARCIAL**, 0 QUEBRADO (44 telas). Este arquivo é o **backlog operacional de frontend** enquanto houver telas PARCIAL ou P-items abertos (ver `AI_OPERATIONS.md` § Plano de controle).
 
 **Legenda de status:**
 - ✅ `OK` — funciona conforme esperado
@@ -22,8 +22,8 @@
 
 | Status | Quantidade |
 |--------|-----------|
-| ✅ OK | 30 |
-| 🟡 PARCIAL | 12 |
+| ✅ OK | 41 |
+| 🟡 PARCIAL | 2 |
 | 🔴 QUEBRADO | 0 |
 | ⬜ NÃO TESTADO | 0 |
 
@@ -54,26 +54,26 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 12 | Ativos — Detalhe | `/ativos/<TICKER>` | ✅ | KPI "Teto (Usuário)" = `preco_teto_usuario` manual; margem/Buy Score usam `valor_justo` calculado (BUG-VAL-004/005) | — |
 | 13 | Ativos — Eventos Corp. | `/ativos/eventos-corporativos` | 🟡 | Carrega corretamente ✅; KPIs + filtros OK; link adicionado ao menu (EXITUS-ATIVOS-001); sem dados (ambiente dev sem eventos cadastrados) | Baixa |
 | 14 | Proventos — Calendário | `/proventos/calendario` | ✅ | Abas Calendário + Proventos Registrados; CRUD manual (NEW-18); Gerar Automático + Confirmar ✅ | — |
-| 15 | Análises — Evolução | `/analises/evolucao` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
-| 16 | Análises — Performance | `/analises/performance` | 🟡 | Carrega dados e gráficos ✅ | Baixa |
+| 15 | Análises — Evolução | `/analises/evolucao` | ✅ | Error state + retry (STALE-002) ✅ | — |
+| 16 | Análises — Performance | `/analises/performance` | ✅ | Error state + retry (STALE-002) ✅ | — |
 | 17 | Análises — Alocação | `/analises/alocacao` | ✅ | Metas + desvio + sugestões (REBALANCE-001) + distribuição por segmento (NEW-03) ✅ | — |
 | 18 | Análises — Buy Signals | `/analises/buy-signals` | ✅ | Watchlist com `valor_justo`, faixa min/max, perfil; margem coerente (BUG-VAL-004/005); busca ticker OK (BUG-017) | — |
-| 19 | Análises — Rentabilidade (legacy) | `/analises/rentabilidade` | 🟡 | Redirect para `/periodo` ✅ (EXITUS-ANALISES-001); código morto removido | — |
+| 19 | Análises — Rentabilidade (legacy) | `/analises/rentabilidade` | ✅ | Redirect para `/periodo` (EXITUS-ANALISES-001); STALE-002 ✅ | — |
 | 19b | Análises — Rentabilidade por Período | `/analises/rentabilidade/periodo` | ✅ | Seletor benchmark CDI/IBOV/IFIX/SP500/IPCA6 via `GET /api/portfolios/rentabilidade?benchmark=` — NEW-16 ✅ | — |
 | 20 | Fiscal — IR Mensal | `/imposto-renda/mensal` | ✅ | Carrega dados ✅; BUG-009/009v2 RESOLVIDO — `BROWSER_API_URL` separada de `BACKEND_API_URL` | — |
 | 21 | Fiscal — DARFs | `/imposto-renda/darfs` | ✅ | Carrega dados ✅; BUG-009/009v2 RESOLVIDO — `BROWSER_API_URL` separada de `BACKEND_API_URL` | — |
-| 22 | Fiscal — Histórico | `/imposto-renda/historico` | 🟡 | Carrega dados ✅ | Baixa |
+| 22 | Fiscal — Histórico | `/imposto-renda/historico` | ✅ | Error state + retry (FISC-002) ✅ | — |
 | 23 | Fiscal — DIRPF | `/imposto-renda/declaracao` | ✅ | Carrega dados ✅; `dados`/`erro` passados ao template via `window.__DIRPF_DADOS__` (BUG-010 RESOLVIDO — já estava correto no código); BUG-009 RESOLVIDO | — |
-| 24 | Relatórios — Mensal | `/relatorios/mensal` | 🟡 | Carrega dados ✅ | Baixa |
-| 25 | Relatórios — Anual | `/relatorios/anual` | 🟡 | Carrega dados ✅ | Baixa |
-| 26 | Relatórios — Extrato | `/relatorios/extrato` | 🟡 | Carrega dados ✅ | Baixa |
-| 27 | Relatórios — IR Completo | `/relatorios/ir` | 🟡 | Carrega dados ✅ | Baixa |
+| 24 | Relatórios — Mensal | `/relatorios/mensal` | ✅ | Params `data_inicio`/`data_fim` + `mes=YYYY-MM` (REL-FIX-001) ✅ | — |
+| 25 | Relatórios — Anual | `/relatorios/anual` | ✅ | Range anual transações (REL-FIX-001) ✅ | — |
+| 26 | Relatórios — Extrato | `/relatorios/extrato` | ✅ | `per_page` + error state (REL-FIX-001) ✅ | — |
+| 27 | Relatórios — IR Completo | `/relatorios/ir` | ✅ | Apuração `?mes=YYYY-MM` (REL-FIX-001) ✅ | — |
 | 28 | Relatórios — Exportação | `/relatorios/exportar` | ✅ | Download CSV via blob + `Content-Disposition` (FEAT-006); preview opcional — STALE-001 ✅ | — |
-| 29 | Ferramentas — Screener | `/ferramentas/screener` | 🟡 | Carrega dados ✅ | Baixa |
+| 29 | Ferramentas — Screener | `/ferramentas/screener` | ✅ | Links `/ativos/`, empty/error (TOOL-001) ✅ | — |
 | 30 | Ferramentas — Comparador | `/ferramentas/comparador` | ✅ | Botão "Comparar" funcionando (BUG-019 RESOLVIDO: parâmetro `limit` corrigido para `per_page`) | — |
 | 31 | Ferramentas — Calculadora IR | `/ferramentas/calculadora-ir` | 🟡 | Carrega dados ✅ | Baixa |
-| 32 | Ferramentas — Simulador | `/ferramentas/simulador` | 🟡 | Carrega dados ✅ | Baixa |
-| 33 | Ferramentas — Reconciliação | `/ferramentas/reconciliacao` | 🟡 | Carrega dados ✅ | Baixa |
+| 32 | Ferramentas — Simulador | `/ferramentas/simulador` | ✅ | Redirect → `/analises/projecoes` (STALE-002) ✅ | — |
+| 33 | Ferramentas — Reconciliação | `/ferramentas/reconciliacao` | ✅ | Drill-down NEW-22 + error state (STALE-002) ✅ | — |
 | 34 | Estratégia — Planos | `/planos-compra/` | ✅ | Dashboard compra (NEW-13) + venda/gatilhos (NEW-14); abas compra/venda; modal detalhe | — |
 | 35 | Alertas | `/alertas/` | ✅ | CRUD completo em `lista_v2.html`; KPIs e filtros — STALE-001 ✅ | — |
 | 43 | Análises — Risco | `/analises/risco` | ✅ | NEW-02 — Sharpe, drawdown via `GET /api/portfolios/metricas-risco` | — |
@@ -91,7 +91,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 ## 🧭 Análise de Sessão — 27/06/2026 (BUG-014/015/017 ✅ RESOLVIDOS)
 
 ### Contexto
-- AUDITORIA_FUNCIONAL: status geral ✅ (30 OK, 12 PARCIAL, 0 QUEBRADO — atualizado 30/06/2026 Lote 5).
+- AUDITORIA_FUNCIONAL: status geral ✅ (41 OK, 2 PARCIAL, 0 QUEBRADO — atualizado 30/06/2026 Lote 6).
 - BUG-009v2 **resolvido em 27/06/2026**: separação `BROWSER_API_URL` (client-side) / `BACKEND_API_URL` (server-side) — ver `ARCHITECTURE.md` para 7 cenários de deploy.
 - BUG-014, BUG-015, BUG-017 **resolvidos indiretamente** pelo BUG-009v2 — todas as chamadas `apiFetch()` do Alpine.js agora usam `BROWSER_API_URL` (hostname resolúvel pelo browser).
 - Telas 20-21 (Fiscal IR Mensal/DARFs) também confirmadas como RESOLVIDAS.

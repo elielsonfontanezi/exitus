@@ -1,10 +1,17 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 30/06/2026
-> **Status:** ✅ **Lote 5 Frontend concluído (NEW-01/02, FIX-HIST-001)**
-> **Versão:** v0.9.49
+> **Status:** ✅ **Lote 6 Frontend concluído (REL-FIX-001, STALE-002, FISC-002, TOOL-001)**
+> **Versão:** v0.9.50
 
-### 🔧 Últimas entregas (30/06/2026 — Lote 5)
+### 🔧 Últimas entregas (30/06/2026 — Lote 6)
+- **REL-FIX-001 ✅ CONCLUÍDO:** relatórios 24–27 — params `data_inicio`/`data_fim`, `mes=YYYY-MM`, `per_page`; error states; 2 testes smoke.
+- **STALE-002 ✅ CONCLUÍDO:** error states em evolução/performance; telas 15, 16, 19, 32, 33 → OK.
+- **FISC-002 ✅ CONCLUÍDO:** histórico IR error state + retry; tela 22 → OK.
+- **TOOL-001 ✅ CONCLUÍDO:** screener links `/ativos/`, empty/error; tela 29 → OK.
+- Suite: **655 passed**, 3 failed pré-existentes, 6 skipped (+2 vs Lote 5).
+
+### 🔧 Entregas anteriores (30/06/2026 — Lote 5)
 - **FIX-HIST-001 ✅ CONCLUÍDO:** filtro data histórico — BE `func.date` + FE sem dupla filtragem; tela 8 → OK.
 - **NEW-02 ✅ CONCLUÍDO:** `/analises/risco` — `get_metricas_risco()` + `risco_v2.html`; 2 testes.
 - **NEW-01 ✅ CONCLUÍDO:** `/analises/projecoes` — projeções patrimoniais; simulador → redirect.

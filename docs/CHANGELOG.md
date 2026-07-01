@@ -8,6 +8,27 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — Lote 6 Frontend REL-FIX-001 / STALE-002 / FISC-002 / TOOL-001 (30/06/2026)
+
+**REL-FIX-001 — Params API relatórios 24–27**
+- `mensal_v2.html` — transações via `data_inicio`/`data_fim`; IR `?mes=YYYY-MM`; proventos filtrados por mês no FE
+- `anual_v2.html` — transações com range anual; error state + retry
+- `ir_completo_v2.html` — apuração `?mes=YYYY-MM` (sem `ano` duplicado)
+- `extrato_v2.html` — `limit` → `per_page`; error state + retry
+- `test_relatorios_periodo_params.py` — smoke auth transações + apuração IR
+
+**STALE-002 — Revalidação telas stale**
+- `evolucao_v2.html` / `performance_v2.html` — error state + retry
+- Telas 15, 16, 19, 32, 33 promovidas → OK na auditoria
+
+**FISC-002 — Histórico IR**
+- `historico_v2.html` — error state + retry; tela 22 → OK
+
+**TOOL-001 — Screener**
+- Links `/dashboard/ativo/` → `/ativos/`; `per_page=200`; error state; tela 29 → OK
+
+---
+
 ### Feat — Lote 5 Frontend NEW-01/02 + FIX-HIST-001 (30/06/2026)
 
 **FIX-HIST-001 — Filtro data no Histórico**

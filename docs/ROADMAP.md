@@ -1,8 +1,8 @@
 # 🚀 Exitus — Roadmap Consolidado
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
-> **Progresso Backend:** 52/54 GAPs (96%) + REBALANCE-001 ✅ | **Testes:** 653/662 passando 🟡 — 3 failed pré-existentes, 6 skipped  
-> **Frontend V2.0:** Lote 5 ✅ (NEW-01/02, FIX-HIST-001) | **Versão:** v0.9.49 | **Última atualização:** 30/06/2026
+> **Progresso Backend:** 52/54 GAPs (96%) + REBALANCE-001 ✅ | **Testes:** 655/664 passando 🟡 — 3 failed pré-existentes, 6 skipped  
+> **Frontend V2.0:** Lote 6 ✅ (REL-FIX-001, STALE-002, FISC-002, TOOL-001) | **Versão:** v0.9.50 | **Última atualização:** 30/06/2026
 
 ---
 
@@ -12,8 +12,8 @@
  Backend Fases 1-6: Concluídas ✅
  Backend Fase 7: Produção 🎯 (próxima)
  Backend Fase 8: Futuro 📋
- Frontend V2.0: 30 OK, 12 PARCIAL, 0 QUEBRADO (71%) �
- Frontend UX Evolution: 30 OK, 12 PARCIAL, 0 QUEBRADO (71%) �
+ Frontend V2.0: 41 OK, 2 PARCIAL, 0 QUEBRADO (93%)
+ Frontend UX Evolution: 41 OK, 2 PARCIAL, 0 QUEBRADO (93%)
  Frontend API-Driven: 8/8 Sprints ✅ (09/06/2026) — 33 telas, 27 APIs
  Testes E2E v2: 127/127 Chromium ✅ — Firefox/Mobile 🎯 (próximo)
  Backend Fase 7: MONITOR-001, RATELIMIT-001, CICD-001, HIST-002 📋
