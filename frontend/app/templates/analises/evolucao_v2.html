@@ -72,6 +72,17 @@
         <div class="empty-state-title">Nenhum dado de evolução patrimonial disponível</div>
     </div>
 </div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar evolução</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadData()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
 {% endblock %}
 
 {% block page_scripts %}
@@ -82,10 +93,15 @@ function pageDataExtend() {
         maxVal: 0,
 
         async loadData() {
-            const res = await this.apiFetch('/api/portfolios/evolucao');
-            if (res?.data) {
-                this.serie = res.data.evolucao || res.data || [];
-                this.maxVal = Math.max(...this.serie.map(s => s.valor || 0), 1);
+            this.error = '';
+            try {
+                const res = await this.apiFetch('/api/portfolios/evolucao');
+                if (res?.data) {
+                    this.serie = res.data.evolucao || res.data || [];
+                    this.maxVal = Math.max(...this.serie.map(s => s.valor || 0), 1);
+                }
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar evolução patrimonial';
             }
         },
 

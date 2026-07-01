@@ -103,6 +103,17 @@
         <div class="empty-state-title">Nenhum dado de performance disponível</div>
     </div>
 </div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar performance</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadData()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
 {% endblock %}
 
 {% block page_scripts %}
@@ -113,10 +124,15 @@ function pageDataExtend() {
         resultado: null,
 
         async loadData() {
-            const res = await this.apiFetch('/api/performance/performance');
-            if (res) {
-                this.dados = res;
-                this.resultado = res.resultado_json || res.data?.resultado_json || {};
+            this.error = '';
+            try {
+                const res = await this.apiFetch('/api/performance/performance');
+                if (res) {
+                    this.dados = res;
+                    this.resultado = res.resultado_json || res.data?.resultado_json || {};
+                }
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar performance';
             }
         },
 
