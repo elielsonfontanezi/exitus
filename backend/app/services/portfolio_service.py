@@ -548,3 +548,33 @@ class PortfolioService:
             for h in historico
         ]
 
+    @staticmethod
+    def get_metricas_risco(usuario_id):
+        """Métricas de risco agregadas — delega ao relatório de performance (NEW-02)."""
+        from uuid import UUID
+        from datetime import date, timedelta
+        from app.services.relatorio_service import RelatorioService
+
+        uid = UUID(str(usuario_id))
+        data_fim = date.today()
+        data_inicio = data_fim - timedelta(days=365)
+
+        relatorio = RelatorioService.gerar_relatorio_performance(
+            usuario_id=uid,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            filtros={},
+        )
+        resultado = relatorio.get('resultado_json') or {}
+
+        return {
+            'periodo': resultado.get('periodo'),
+            'sharpe_ratio': resultado.get('sharpe_ratio'),
+            'max_drawdown': resultado.get('max_drawdown'),
+            'volatilidade_anualizada': resultado.get('volatilidade_anualizada'),
+            'beta_ibov': resultado.get('beta_ibov'),
+            'rentabilidade_bruta': resultado.get('rentabilidade_bruta'),
+            'rentabilidade_liquida': resultado.get('rentabilidade_liquida'),
+            'posicoes_ativas': resultado.get('posicoes_ativas'),
+        }
+

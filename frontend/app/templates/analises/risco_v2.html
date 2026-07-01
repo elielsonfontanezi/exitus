@@ -1,0 +1,109 @@
+{% extends "components/base_interna.html" %}
+
+{% block page_title %}Métricas de Risco{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Sharpe, drawdown e indicadores de risco da carteira</p>{% endblock %}
+
+{% block page_actions %}
+<a href="/analises/correlacao" class="btn-exitus btn-exitus-ghost"><i class="fas fa-project-diagram"></i> Correlação</a>
+<a href="/analises/performance" class="btn-exitus btn-exitus-ghost"><i class="fas fa-bolt"></i> Performance</a>
+{% endblock %}
+
+{% block kpi_bar %}
+<div class="kpi-bar" x-show="!loading && metricas">
+    <div class="kpi-card">
+        <div class="kpi-card-label">Sharpe Ratio</div>
+        <div class="kpi-card-value" style="color:#7c3aed;" x-text="metricas?.sharpe_ratio ?? '—'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Max Drawdown</div>
+        <div class="kpi-card-value negativo" x-text="metricas?.max_drawdown || '—'"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Volatilidade Anual</div>
+        <div class="kpi-card-value" x-text="formatPct(metricas?.volatilidade_anualizada)"></div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-card-label">Beta Ibovespa</div>
+        <div class="kpi-card-value" x-text="metricas?.beta_ibov ?? '—'"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="section-box" x-show="metricas" x-cloak>
+    <div class="section-box-title"><i class="fas fa-shield-alt"></i> Resumo de Risco</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem;">
+        <div style="background:#faf5ff; border-radius:8px; padding:1rem;">
+            <div style="font-weight:700; color:#7c3aed; margin-bottom:0.25rem;">
+                Sharpe: <span x-text="metricas?.sharpe_ratio ?? 'N/D'"></span>
+            </div>
+            <div style="font-size:0.85rem; color:#4b5563;" x-text="sharpeInterpretacao()"></div>
+        </div>
+        <div style="background:#fef2f2; border-radius:8px; padding:1rem;">
+            <div style="font-weight:700; color:#dc2626; margin-bottom:0.25rem;">
+                Drawdown: <span x-text="metricas?.max_drawdown || 'N/D'"></span>
+            </div>
+            <div style="font-size:0.85rem; color:#4b5563;">Maior queda em relação ao pico anterior no período analisado.</div>
+        </div>
+        <div style="background:#eff6ff; border-radius:8px; padding:1rem;">
+            <div style="font-weight:700; color:#1d4ed8; margin-bottom:0.25rem;">
+                Rentab. Bruta: <span x-text="metricas?.rentabilidade_bruta || 'N/D'"></span>
+            </div>
+        </div>
+        <div style="background:#f0fdf4; border-radius:8px; padding:1rem;">
+            <div style="font-weight:700; color:#16a34a; margin-bottom:0.25rem;">
+                Rentab. Líquida: <span x-text="metricas?.rentabilidade_liquida || 'N/D'"></span>
+            </div>
+        </div>
+    </div>
+    <p style="margin-top:1rem; font-size:0.8rem; color:#6b7280;" x-show="metricas?.periodo">
+        Período: <span x-text="metricas.periodo"></span>
+    </p>
+</div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar métricas</div>
+        <div class="empty-state-text" x-text="error"></div>
+    </div>
+</div>
+
+<div class="section-box" x-show="!loading && !metricas && !error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="empty-state-title">Sem dados de risco</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function pageDataExtend() {
+    return {
+        metricas: null,
+
+        async loadData() {
+            const res = await this.apiFetch('/api/portfolios/metricas-risco');
+            this.metricas = res?.data || res;
+        },
+
+        formatPct(v) {
+            if (v == null || v === '') return '—';
+            const n = Number(v);
+            if (Number.isNaN(n)) return String(v);
+            return (n <= 1 ? n * 100 : n).toFixed(2) + '%';
+        },
+
+        sharpeInterpretacao() {
+            const s = parseFloat(this.metricas?.sharpe_ratio);
+            if (Number.isNaN(s)) return 'Dados insuficientes para cálculo';
+            if (s >= 2) return 'Excelente — retorno ajustado ao risco muito alto';
+            if (s >= 1) return 'Bom — retorno adequado para o risco assumido';
+            if (s >= 0) return 'Aceitável — retorno positivo mas baixo para o risco';
+            return 'Negativo — retorno abaixo do ativo livre de risco';
+        },
+    };
+}
+</script>
+{% endblock %}

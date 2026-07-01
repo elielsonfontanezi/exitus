@@ -147,6 +147,20 @@ def correlacao():
     return render_template('analises/correlacao_v2.html')
 
 
+@bp.route('/risco', methods=['GET'])
+@login_required
+def risco():
+    """Métricas de risco da carteira — NEW-02"""
+    return render_template('analises/risco_v2.html')
+
+
+@bp.route('/projecoes', methods=['GET'])
+@login_required
+def projecoes_patrimonio():
+    """Projeções patrimoniais com juros compostos — NEW-01"""
+    return render_template('analises/projecoes_patrimonio_v2.html')
+
+
 @bp.route('/projecoes/renda', methods=['GET'])
 @login_required
 def projecoes_renda():
