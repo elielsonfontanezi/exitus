@@ -75,6 +75,17 @@
         <div class="empty-state-text" x-text="'Ano: ' + anoAtual"></div>
     </div>
 </div>
+
+<div class="section-box" x-show="error" x-cloak>
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="empty-state-title">Erro ao carregar histórico de IR</div>
+        <div class="empty-state-text" x-text="error"></div>
+        <button class="btn-exitus btn-exitus-primary" style="margin-top:1rem;" @click="loadData()">
+            <i class="fas fa-redo"></i> Tentar novamente
+        </button>
+    </div>
+</div>
 {% endblock %}
 
 {% block page_scripts %}
@@ -85,8 +96,13 @@ function pageDataExtend() {
         anoAtual: String(new Date().getFullYear()),
 
         async loadData() {
-            const res = await this.apiFetch(`/api/ir/historico?ano=${this.anoAtual}`);
-            if (res?.data) this.dados = res.data;
+            this.error = '';
+            try {
+                const res = await this.apiFetch(`/api/ir/historico?ano=${this.anoAtual}`);
+                if (res?.data) this.dados = res.data;
+            } catch (e) {
+                this.error = e.message || 'Erro ao carregar histórico de IR';
+            }
         },
 
         totalIR() { return (this.dados?.meses || []).reduce((s, m) => s + (m.ir_total || 0), 0); },
