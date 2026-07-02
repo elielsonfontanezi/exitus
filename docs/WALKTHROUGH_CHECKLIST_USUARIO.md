@@ -2,7 +2,9 @@
 
 **Data:** 02/07/2026 | **Cenário:** `test_menu_full` | **Login:** `e2e_user` / `e2e_senha_123`
 
-**Correções 02/07/2026 (revalidar):** logout `/auth/logout`; dashboard % pt-BR + macro API; corretoras seed `e2e_user`; CRUD ícones; 9 fontes; portfolios sem duplicata; meta patrimônio BR; regras DAY_TRADE/US/EU.
+**Correções 02/07/2026 round 2 (revalidar):** CDI benchmark ~14% (não 0,05%); action-menu CRUD corretoras/portfolios/regras/fontes; fontes **admin-only**; dedupe portfolios no seed; regras US/EU/AS expandidas.
+
+**Correções 02/07/2026 round 1:** logout `/auth/logout`; dashboard % pt-BR + macro API; corretoras seed `e2e_user`; 9 fontes; meta patrimônio BR; regras DAY_TRADE/US/EU.
 
 Legenda de camadas da automação:
 - **AUTO_OK** — página/redirect validado sem interação

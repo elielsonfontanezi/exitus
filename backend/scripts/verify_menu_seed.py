@@ -16,7 +16,9 @@ from app.models.saldo_prejuizo import SaldoPrejuizo
 from app.models.calendario_dividendo import CalendarioDividendo
 from app.models.projecao_renda import ProjecaoRenda
 from app.models.regra_fiscal import RegraFiscal
+from app.models.portfolio import Portfolio
 from app.models.transacao import Transacao, TipoTransacao
+from app.models.usuario import Usuario
 
 REQUIRED_TIPOS = {
     TipoAtivo.ACAO, TipoAtivo.FII, TipoAtivo.UNIT, TipoAtivo.CDB, TipoAtivo.LCI_LCA,
@@ -69,6 +71,14 @@ def verify():
         for count, minimum, label in checks:
             if count < minimum:
                 errors.append(f'{label}: esperado >= {minimum}, encontrado {count}')
+
+        e2e_user = Usuario.query.filter_by(username='e2e_user').first()
+        if e2e_user:
+            ativos_count = Portfolio.query.filter_by(usuario_id=e2e_user.id, ativo=True).count()
+            if ativos_count > 4:
+                errors.append(
+                    f'portfolios ativos e2e_user: esperado <= 4, encontrado {ativos_count}'
+                )
 
     print('=== verify_menu_seed ===')
     if warnings:

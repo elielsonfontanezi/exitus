@@ -102,7 +102,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | 36 | Ferramentas — Preço Teto | `/ferramentas/preco-teto` | ✅ | NEW-11 — KPIs, métodos Bazin/Graham/Gordon/DCF, branch FII | — |
 | 37 | Análises — Correlação | `/analises/correlacao` | ✅ | NEW-15 — heatmap matriz de correlação da carteira | — |
 | 38 | Análises — Projeções Renda | `/analises/projecoes/renda` | ✅ | NEW-17 — cenários conservador/moderado/otimista + recalcular 12 meses | — |
-| 39 | Configurações — Fontes de Dados | `/configuracoes/fontes-dados` | ✅ | NEW-07 — CRUD fontes externas, health, taxa sucesso | — |
+| 39 | Configurações — Fontes de Dados | `/configuracoes/fontes-dados` | ✅ | NEW-07 — listagem todos; CRUD **admin-only** (banner read-only + `@admin_required`) | — |
 | 40 | Configurações — Portfolios | `/configuracoes/portfolios` | ✅ | NEW-19 — CRUD portfolios (nome, objetivo, ativo) | — |
 | 41 | Configurações — Regras Fiscais | `/configuracoes/regras-fiscais` | ✅ | NEW-08 — listagem + CRUD admin (alíquota, vigência, país) | — |
 | 42 | Admin — Usuários | `/admin/usuarios` | ✅ | NEW-20 — CRUD usuários (admin-only); criar com senha inicial | — |

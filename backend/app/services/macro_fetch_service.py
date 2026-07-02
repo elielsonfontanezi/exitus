@@ -17,9 +17,12 @@ _CACHE_TTL_SECONDS = 3600
 _BCB_BASE = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs'
 _BCB_SERIES = {
     'selic': 432,
-    'cdi': 4391,
+    'cdi': 4389,
     'ipca': 13522,
 }
+
+_MIN_ANNUAL_RATE = 1.0
+_MAX_ANNUAL_RATE = 50.0
 
 
 def _cache_get(key: str) -> Optional[Dict[str, float]]:
@@ -34,6 +37,13 @@ def _cache_get(key: str) -> Optional[Dict[str, float]]:
 
 def _cache_set(key: str, data: Dict[str, float]) -> None:
     _CACHE[key] = {'ts': time.time(), 'data': data}
+
+
+def _is_plausible_annual_rate(value: Optional[float]) -> bool:
+    """Rejeita taxas diárias (~0,05) exibidas como anuais."""
+    if value is None:
+        return False
+    return _MIN_ANNUAL_RATE <= float(value) <= _MAX_ANNUAL_RATE
 
 
 def _fetch_bcb_series(serie_id: int, timeout: int = 8) -> Optional[float]:
@@ -88,10 +98,14 @@ def fetch_macro_indicators() -> Optional[Dict[str, float]]:
     if cached:
         return cached
 
-    selic = _fetch_bcb_series(_BCB_SERIES['selic'])
-    cdi = _fetch_bcb_series(_BCB_SERIES['cdi'])
-    ipca = _fetch_bcb_series(_BCB_SERIES['ipca'])
+    selic_raw = _fetch_bcb_series(_BCB_SERIES['selic'])
+    cdi_raw = _fetch_bcb_series(_BCB_SERIES['cdi'])
+    ipca_raw = _fetch_bcb_series(_BCB_SERIES['ipca'])
     ibov = _fetch_ibovespa_12m()
+
+    selic = selic_raw if _is_plausible_annual_rate(selic_raw) else None
+    cdi = cdi_raw if _is_plausible_annual_rate(cdi_raw) else None
+    ipca = ipca_raw if _is_plausible_annual_rate(ipca_raw) else None
 
     partial = {
         k: v for k, v in {

@@ -57,9 +57,7 @@
                 <tr>
                     <td>
                         <span class="cell-ticker" x-text="c.nome"></span>
-                        <template x-if="c.observacoes">
-                            <br><small class="text-gray-500" x-text="c.observacoes"></small>
-                        </template>
+                        <br><small class="text-gray-500" x-show="c.observacoes" x-text="c.observacoes"></small>
                         <br><small class="text-gray-400" x-text="formatDate(c.created_at)"></small>
                     </td>
                     <td x-text="tipoLabel(c.tipo)"></td>
@@ -71,19 +69,25 @@
                               x-text="c.ativa ? 'Ativa' : 'Inativa'"></span>
                     </td>
                     <td class="col-center">
-                        <div style="display:flex; gap:0.25rem; justify-content:center;">
-                            <button type="button" class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
-                                    @click.stop="editarCorretora(c)" :disabled="c.editando">
-                                <i class="fas" :class="c.editando ? 'fa-spinner fa-spin' : 'fa-edit'"></i>
-                            </button>
-                            <button type="button" class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
-                                    @click.stop="sincronizarSaldo(c)" :disabled="c.sincronizando">
-                                <i class="fas" :class="c.sincronizando ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
-                            </button>
-                            <button type="button" class="btn-exitus btn-exitus-ghost btn-exitus-danger" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
-                                    @click.stop="excluirCorretora(c)" :disabled="c.excluindo">
-                                <i class="fas" :class="c.excluindo ? 'fa-spinner fa-spin' : 'fa-trash'"></i>
-                            </button>
+                        <div class="action-menu">
+                            <button type="button" class="action-menu-btn"
+                                    @click.stop="menuAberto = (menuAberto === c.id ? null : c.id)">⋯</button>
+                            <div class="action-menu-dropdown" :class="{ show: menuAberto === c.id }">
+                                <button type="button" class="action-menu-item"
+                                        @click.stop="editarCorretora(c); menuAberto = null">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button type="button" class="action-menu-item"
+                                        @click.stop="sincronizarSaldo(c); menuAberto = null"
+                                        :disabled="c.sincronizando">
+                                    <i class="fas fa-sync-alt"></i> Sincronizar saldo
+                                </button>
+                                <button type="button" class="action-menu-item action-menu-danger"
+                                        @click.stop="excluirCorretora(c); menuAberto = null"
+                                        :disabled="c.excluindo">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -114,10 +118,11 @@
         </button>
     </div>
 </div>
+{% endblock %}
 
-<!-- Modal Nova/Editar Corretora -->
-<template x-if="showModal">
-<div style="position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;"
+{% block page_modals %}
+<div x-show="showModal" x-cloak
+     style="position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;"
      @click.self="fecharModal()" @keydown.escape.window="fecharModal()">
     <div @click.stop style="background:white; padding:2rem; border-radius:8px; max-width:500px; width:100%; margin:1rem;">
         <h3 style="margin:0 0 1.5rem 0;">
@@ -167,7 +172,6 @@
         </div>
     </div>
 </div>
-</template>
 {% endblock %}
 
 {% block page_scripts %}
@@ -181,6 +185,7 @@ function pageDataExtend() {
         showModal: false,
         editando: false,
         salvando: false,
+        menuAberto: null,
         form: {},
 
         async loadData() {

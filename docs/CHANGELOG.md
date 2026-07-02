@@ -8,6 +8,25 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — Walkthrough round 2 (02/07/2026)
+
+**Frontend**
+- CRUD config: action-menu por linha (padrão `usuarios_v2`); modais em `{% block page_modals %}` fora do `loading`
+- Corretoras, Portfolios, Regras Fiscais: remover `x-if` dentro de `<tr>` (cliques mortos)
+- Fontes de Dados: admin-only — banner read-only, ocultar ações para não-admin (como Regras Fiscais)
+- `base_interna.html`: bootstrap `session.access_token` → `localStorage` via `data-session-token`
+
+**Backend**
+- `macro_fetch_service.py` — CDI série BCB **4389** (acumulado ~14%); rejeita taxa diária < 1%
+- `indicadores_service.py` — validação de plausibilidade para taxas anuais
+- `fonte_dados_blueprint.py` — `@admin_required` em POST/PUT/DELETE
+- Testes: `test_macro_fetch_service` (+sanity), `test_create_fonte_dados_requires_admin` (403 user)
+
+**Seed**
+- `load_scenario.py` — `_dedupe_portfolios()` desativa duplicatas por `(usuario_id, nome)`
+- `test_menu_full.json` — regras US (STOCK/REIT/BOND/ETF), EU/AS (STOCK_INTL/ETF_INTL)
+- `verify_menu_seed.py` — assert portfolios ativos `e2e_user` ≤ 4
+
 ### Fix — Walkthrough OBRIGATÓRIO feedback (02/07/2026)
 
 **Frontend**

@@ -31,9 +31,15 @@ class IndicadoresService:
         ipca_db = round(float(params['inflacao_anual']) * 100, 2)
         selic_db = round(float(params.get('ytm_rf', params['taxa_livre_risco'])) * 100, 2)
 
-        cdi = api_data.get('cdi_anual') if api_data else None
-        ipca = api_data.get('ipca_anual') if api_data else None
-        selic = api_data.get('selic_anual') if api_data else None
+        def _valid_annual(val):
+            if val is None:
+                return None
+            v = float(val)
+            return v if 1.0 <= v <= 50.0 else None
+
+        cdi = _valid_annual(api_data.get('cdi_anual')) if api_data else None
+        ipca = _valid_annual(api_data.get('ipca_anual')) if api_data else None
+        selic = _valid_annual(api_data.get('selic_anual')) if api_data else None
         ibov = api_data.get('ibovespa_anual') if api_data else None
 
         fonte_cdi = 'api_externa' if cdi is not None else 'parametros_macro'

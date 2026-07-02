@@ -99,6 +99,7 @@ class ScenarioLoader:
                 self._seed_proventos()
                 self._seed_movimentacoes_caixa()
                 self._seed_portfolios()
+                self._dedupe_portfolios()
                 self._seed_meta_alocacao()
                 self._seed_alertas()
                 self._seed_planos_compra()
@@ -532,6 +533,33 @@ class ScenarioLoader:
             print(f"✅ Portfolio criado: {port_data['nome']}")
         
         db.session.flush()
+
+    def _dedupe_portfolios(self):
+        """Desativa portfolios duplicados por (usuario_id, nome), mantendo o mais recente."""
+        usuarios = list(self.references.get('usuarios', {}).values())
+        if not usuarios:
+            return
+
+        dupes = 0
+        for usuario_id in usuarios:
+            portfolios = (
+                Portfolio.query.filter_by(usuario_id=usuario_id)
+                .order_by(Portfolio.created_at.desc(), Portfolio.id.desc())
+                .all()
+            )
+            seen = set()
+            for portfolio in portfolios:
+                key = (portfolio.nome or '').strip().lower()
+                if key in seen:
+                    if portfolio.ativo:
+                        portfolio.ativo = False
+                        dupes += 1
+                else:
+                    seen.add(key)
+
+        if dupes:
+            db.session.flush()
+            print(f"🧹 Portfolios duplicados desativados: {dupes}")
     
     def _seed_alertas(self):
         """Seed de alertas"""

@@ -52,6 +52,29 @@ def auth_headers(app):
     db.session.commit()
 
 
+@pytest.fixture
+def user_headers(app):
+    """Headers de usuário comum (não-admin) para testes de permissão."""
+    import uuid
+    from app.models.usuario import Usuario, UserRole
+    from flask_jwt_extended import create_access_token
+    suffix = str(uuid.uuid4())[:8]
+    username = f'newapi_user_{suffix}'
+    user = Usuario(
+        username=username,
+        email=f'{username}@test.exitus',
+        nome_completo='Test User NEWAPI',
+        role=UserRole.USER,
+    )
+    user.set_password('test123')
+    db.session.add(user)
+    db.session.commit()
+    token = create_access_token(identity=str(user.id))
+    yield {'Authorization': f'Bearer {token}'}
+    db.session.delete(user)
+    db.session.commit()
+
+
 _PARES_PM = [
     ('AU', 'TSX'), ('CA', 'LSE'), ('CN', 'Shanghai'), ('GB', 'Tokyo'),
     ('JP', 'Euronext'), ('EU', 'NASDAQ'), ('US', 'NYSE'),
@@ -241,7 +264,7 @@ class TestFonteDadosAPI:
         assert isinstance(data['fontes_dados'], list)
     
     def test_create_fonte_dados(self, client, auth_headers, sample_fonte_dados):
-        """Cria nova fonte de dados"""
+        """Cria nova fonte de dados (admin)"""
         response = client.post('/api/fontes-dados',
             json=sample_fonte_dados, headers=auth_headers)
         assert response.status_code == 201
@@ -252,6 +275,15 @@ class TestFonteDadosAPI:
         # cleanup
         if 'id' in data:
             client.delete(f'/api/fontes-dados/{data["id"]}', headers=auth_headers)
+
+    def test_create_fonte_dados_requires_admin(self, client, user_headers, sample_fonte_dados):
+        """Usuário comum não pode criar fonte de dados"""
+        response = client.post(
+            '/api/fontes-dados',
+            json=sample_fonte_dados,
+            headers=user_headers,
+        )
+        assert response.status_code == 403
     
     def test_create_fonte_dados_duplicate(self, client, auth_headers, sample_fonte_dados):
         """Tenta criar fonte duplicada"""

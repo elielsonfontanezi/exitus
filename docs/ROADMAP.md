@@ -2,7 +2,7 @@
 
 > **Status atual:** Fases 1-6 ✅ Concluídas | **Próxima:** Fase 7 (Produção)  
 > **Progresso Backend:** 53/54 GAPs (98%) + CONCENTRACAO-001 ✅ | **Testes:** ver PROJECT_STATUS  
-> **Frontend V2.0:** Lote 7 ✅ — 43 OK, 0 PARCIAL | **Versão:** v0.9.53 | **Última atualização:** 01/07/2026
+> **Frontend V2.0:** Lote 7 ✅ — 43 OK, 0 PARCIAL | **Versão:** v0.9.56 | **Última atualização:** 02/07/2026
 
 ---
 
@@ -219,7 +219,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | **BUG-VAL-005** | Metodologia de agregação: padrão de mercado (valuation_service.py) | ✅ Concluído (30/06/2026) |
 | **BUG-VAL-006** | FII: fórmula cap_rate incorreta (1/cap_rate) | ✅ Concluído (30/06/2026) |
 | **VAL-PIPE-001** | Validação pipeline dados + Valor Justo (4 camadas) | 📋 Planejado (doc 01/07/2026) — ver [`PLANO_VALIDACAO_VALOR_JUSTO.md`](PLANO_VALIDACAO_VALOR_JUSTO.md) |
-| **SEED-MENU-001** | Cenário `test_menu_full` — massa 43 telas do menu | 🟡 Implementado (02/07/2026) — fixes walkthrough OBRIGATÓRIO (logout, macro API, seed corretoras/fontes, CRUD); revalidação manual — [`WALKTHROUGH_CHECKLIST_USUARIO.md`](WALKTHROUGH_CHECKLIST_USUARIO.md) |
+| **SEED-MENU-001** | Cenário `test_menu_full` — massa 43 telas do menu | 🟡 Implementado (02/07/2026) — round 2: CDI benchmark, CRUD action-menu, fontes admin-only, dedupe portfolios, regras US/EU/AS; revalidação manual — [`WALKTHROUGH_CHECKLIST_USUARIO.md`](WALKTHROUGH_CHECKLIST_USUARIO.md) |
 | **REBALANCE-001** | Rebalanceamento automático por classe | ✅ Concluído (30/06/2026) |
 | CONCENTRACAO-001 | Análise de concentração | ✅ Concluído (01/07/2026) |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |

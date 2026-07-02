@@ -58,15 +58,20 @@
                         </button>
                     </td>
                     <td class="col-center">
-                        <div style="display:flex; gap:0.25rem; justify-content:center;">
-                            <button type="button" class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
-                                    @click.stop="editarPortfolio(p)">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button type="button" class="btn-exitus btn-exitus-ghost btn-exitus-danger" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
-                                    @click.stop="excluirPortfolio(p)" :disabled="p.excluindo">
-                                <i class="fas" :class="p.excluindo ? 'fa-spinner fa-spin' : 'fa-trash'"></i>
-                            </button>
+                        <div class="action-menu">
+                            <button type="button" class="action-menu-btn"
+                                    @click.stop="menuAberto = (menuAberto === p.id ? null : p.id)">⋯</button>
+                            <div class="action-menu-dropdown" :class="{ show: menuAberto === p.id }">
+                                <button type="button" class="action-menu-item"
+                                        @click.stop="editarPortfolio(p); menuAberto = null">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button type="button" class="action-menu-item action-menu-danger"
+                                        @click.stop="excluirPortfolio(p); menuAberto = null"
+                                        :disabled="p.excluindo">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -93,7 +98,9 @@
         </button>
     </div>
 </div>
+{% endblock %}
 
+{% block page_modals %}
 <div x-show="showModal" x-cloak
      style="position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;"
      @click.self="fecharModal()" @keydown.escape.window="fecharModal()">
@@ -138,6 +145,7 @@ function pageDataExtend() {
         showModal: false,
         editando: false,
         salvando: false,
+        menuAberto: null,
         form: {},
 
         async loadData() {

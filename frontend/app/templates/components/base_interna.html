@@ -24,7 +24,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-container" x-data="pageData()" x-init="init()">
+<div class="page-container" x-data="pageData()" x-init="init()"
+     data-session-token="{{ session.get('access_token', '') }}">
 
     {# --- HEADER DA PÁGINA --- #}
     <div class="page-header">
@@ -64,6 +65,9 @@
         {% block page_content %}{% endblock %}
     </div>
 
+    {# --- MODAIS (fora do loading — evita overlay preso) --- #}
+    {% block page_modals %}{% endblock %}
+
 </div>
 {% endblock %}
 
@@ -78,6 +82,10 @@
             error: null,
 
             async init() {
+                const sessToken = this.$el?.dataset?.sessionToken;
+                if (sessToken && !localStorage.getItem('access_token')) {
+                    localStorage.setItem('access_token', sessToken);
+                }
                 try {
                     await this.loadData();
                 } catch (e) {

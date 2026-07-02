@@ -31,7 +31,13 @@
 {% endblock %}
 
 {% block page_content %}
-<div class="section-box" style="margin-bottom:1rem;">
+{% if not is_admin %}
+<div style="padding:0.75rem 1rem; background:#fef3c7; border-radius:0.5rem; border:1px solid #fcd34d; font-size:0.85rem; color:#92400e; margin-bottom:1rem;">
+    <i class="fas fa-lock"></i> Visualização apenas. Criar, editar e excluir fontes de dados exige perfil <strong>admin</strong>.
+</div>
+{% endif %}
+
+<div class="section-box" style="margin-bottom:1rem;" x-show="isAdmin">
     <button class="btn-exitus btn-exitus-primary" @click="abrirModalNova()">
         <i class="fas fa-plus"></i> Nova Fonte
     </button>
@@ -47,7 +53,7 @@
                 <th class="col-center">Prioridade</th>
                 <th class="col-center">Health</th>
                 <th class="col-right">Taxa Sucesso</th>
-                <th class="col-center">Ações</th>
+                <th class="col-center" x-show="isAdmin">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -55,33 +61,38 @@
                 <tr>
                     <td>
                         <span class="cell-ticker" x-text="f.nome"></span>
-                        <template x-if="f.url_base">
-                            <br><small class="text-gray-400" x-text="f.url_base"></small>
-                        </template>
+                        <br><small class="text-gray-400" x-show="f.url_base" x-text="f.url_base"></small>
                     </td>
                     <td x-text="tipoLabel(f.tipo_fonte)"></td>
                     <td class="col-center">
-                        <button class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
-                                @click="toggleAtiva(f)" :disabled="f.toggling">
+                        <button type="button" x-show="isAdmin" class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                @click.stop="toggleAtiva(f)" :disabled="f.toggling">
                             <span class="badge" :class="f.ativa ? 'badge-success' : 'badge-danger'"
                                   x-text="f.ativa ? 'Sim' : 'Não'"></span>
                         </button>
+                        <span x-show="!isAdmin" class="badge" :class="f.ativa ? 'badge-success' : 'badge-danger'"
+                              x-text="f.ativa ? 'Sim' : 'Não'"></span>
                     </td>
                     <td class="col-center" x-text="f.prioridade"></td>
                     <td class="col-center">
                         <span class="badge" :class="healthBadge(f.health_status)" x-text="f.health_status || '-'"></span>
                     </td>
                     <td class="col-right" x-text="formatTaxa(f.taxa_sucesso)"></td>
-                    <td class="col-center">
-                        <div style="display:flex; gap:0.25rem; justify-content:center;">
-                            <button type="button" class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
-                                    @click.stop="editarFonte(f)" :disabled="f.editando">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button type="button" class="btn-exitus btn-exitus-ghost btn-exitus-danger" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
-                                    @click.stop="excluirFonte(f)" :disabled="f.excluindo">
-                                <i class="fas" :class="f.excluindo ? 'fa-spinner fa-spin' : 'fa-trash'"></i>
-                            </button>
+                    <td class="col-center" x-show="isAdmin">
+                        <div class="action-menu">
+                            <button type="button" class="action-menu-btn"
+                                    @click.stop="menuAberto = (menuAberto === f.id ? null : f.id)">⋯</button>
+                            <div class="action-menu-dropdown" :class="{ show: menuAberto === f.id }">
+                                <button type="button" class="action-menu-item"
+                                        @click.stop="editarFonte(f); menuAberto = null">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button type="button" class="action-menu-item action-menu-danger"
+                                        @click.stop="excluirFonte(f); menuAberto = null"
+                                        :disabled="f.excluindo">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -108,7 +119,9 @@
         </button>
     </div>
 </div>
+{% endblock %}
 
+{% block page_modals %}
 <div x-show="showModal" x-cloak
      style="position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;"
      @click.self="fecharModal()" @keydown.escape.window="fecharModal()">
@@ -176,9 +189,11 @@ function pageDataExtend() {
         fontes: [],
         fontesAtivas: 0,
         fontesSaudaveis: 0,
+        isAdmin: {{ 'true' if is_admin else 'false' }},
         showModal: false,
         editando: false,
         salvando: false,
+        menuAberto: null,
         form: {},
 
         async loadData() {
@@ -206,6 +221,7 @@ function pageDataExtend() {
         },
 
         abrirModalNova() {
+            if (!this.isAdmin) return;
             this.editando = false;
             this.form = {
                 nome: '',
@@ -221,6 +237,7 @@ function pageDataExtend() {
         },
 
         editarFonte(fonte) {
+            if (!this.isAdmin) return;
             this.editando = true;
             this.form = { ...fonte };
             this.showModal = true;
@@ -232,6 +249,7 @@ function pageDataExtend() {
         },
 
         async salvar() {
+            if (!this.isAdmin) return;
             this.salvando = true;
             try {
                 const payload = {
@@ -267,6 +285,7 @@ function pageDataExtend() {
         },
 
         async toggleAtiva(fonte) {
+            if (!this.isAdmin) return;
             fonte.toggling = true;
             try {
                 await this.apiFetch('/api/fontes-dados/' + fonte.id, {
@@ -284,6 +303,7 @@ function pageDataExtend() {
         },
 
         async excluirFonte(fonte) {
+            if (!this.isAdmin) return;
             if (!confirm('Excluir fonte "' + fonte.nome + '"?')) return;
             fonte.excluindo = true;
             try {

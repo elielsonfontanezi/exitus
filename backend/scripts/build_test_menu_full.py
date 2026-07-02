@@ -33,6 +33,62 @@ def _monthly_prices(ticker, base_price, months=12, start_year=2024, start_month=
     return rows
 
 
+def _regras_internacionais():
+    """Regras fiscais referenciais US/EU/AS por TipoAtivo (walkthrough 1.41)."""
+    base = {
+        'valor_isencao': None,
+        'incide_sobre': 'lucro',
+        'vigencia_inicio': '2020-01-01',
+        'vigencia_fim': None,
+        'ativa': True,
+    }
+    rules = []
+    us_matrix = [
+        ('STOCK', 'VENDA', 15.0, 'US capital gains — long-term (referência)'),
+        ('STOCK', 'DAY_TRADE', 22.0, 'US short-term gains (referência day trade)'),
+        ('REIT', 'VENDA', 15.0, 'US REIT capital gains (referência)'),
+        ('BOND', 'VENDA', 15.0, 'US bond ETF gains (referência)'),
+        ('ETF', 'VENDA', 15.0, 'US ETF capital gains (referência)'),
+    ]
+    for tipo_ativo, tipo_operacao, aliquota, descricao in us_matrix:
+        rules.append({
+            **base,
+            'pais': 'US',
+            'tipo_ativo': tipo_ativo,
+            'tipo_operacao': tipo_operacao,
+            'aliquota_ir': aliquota,
+            'descricao': descricao,
+        })
+
+    for tipo_ativo, aliquota, descricao in (
+        ('STOCK_INTL', 26.0, 'Europa — ações internacionais (referência)'),
+        ('ETF_INTL', 26.0, 'Europa — ETF internacional (referência)'),
+    ):
+        rules.append({
+            **base,
+            'pais': 'EU',
+            'tipo_ativo': tipo_ativo,
+            'tipo_operacao': 'VENDA',
+            'aliquota_ir': aliquota,
+            'descricao': descricao,
+        })
+
+    for tipo_ativo, aliquota, descricao in (
+        ('STOCK_INTL', 20.0, 'Ásia/outros — ações internacionais (referência)'),
+        ('ETF_INTL', 20.0, 'Ásia/outros — ETF internacional (referência)'),
+    ):
+        rules.append({
+            **base,
+            'pais': 'AS',
+            'tipo_ativo': tipo_ativo,
+            'tipo_operacao': 'VENDA',
+            'aliquota_ir': aliquota,
+            'descricao': descricao,
+        })
+
+    return rules
+
+
 def build():
     with open(SCENARIOS / 'test_full.json', encoding='utf-8') as f:
         data = deepcopy(json.load(f))
@@ -137,7 +193,7 @@ def build():
 
     data['calendario_dividendo'] = e2e.get('calendario_dividendo', [])
     data['projecoes_renda'] = e2e.get('projecoes_renda', [])
-    data['regras_fiscais'] = e2e.get('regras_fiscais', [])
+    data['regras_fiscais'] = e2e.get('regras_fiscais', []) + _regras_internacionais()
 
     data['meta_alocacao'] = [
         {'usuario': 'e2e_user', 'classe': 'renda_variavel', 'percentual_target': 70.0, 'tolerancia_pct': 2.0},

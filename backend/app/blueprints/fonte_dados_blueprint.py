@@ -13,6 +13,7 @@ from app.schemas.fonte_dados_schema import (
     FonteDadosListSchema
 )
 from app.services.fonte_dados_service import FonteDadosService
+from app.utils.decorators import admin_required
 
 
 bp = Blueprint('fonte_dados', __name__, url_prefix='/api/fontes-dados')
@@ -43,7 +44,7 @@ def list_fontes_dados():
 
 
 @bp.route('', methods=['POST'])
-@jwt_required()
+@admin_required
 def create_fonte_dados():
     """Cria nova fonte de dados"""
     try:
@@ -80,7 +81,7 @@ def get_fonte_dados(fonte_id):
 
 
 @bp.route('/<uuid:fonte_id>', methods=['PUT'])
-@jwt_required()
+@admin_required
 def update_fonte_dados(fonte_id):
     """Atualiza fonte existente"""
     try:
@@ -101,7 +102,7 @@ def update_fonte_dados(fonte_id):
 
 
 @bp.route('/<uuid:fonte_id>', methods=['DELETE'])
-@jwt_required()
+@admin_required
 def delete_fonte_dados(fonte_id):
     """Remove fonte de dados"""
     try:

@@ -38,7 +38,10 @@ def corretoras():
 @login_required
 def fontes_dados():
     """Configurações — Fontes de Dados (API: GET /api/fontes-dados)"""
-    return render_template('configuracoes/fontes_dados_v2.html')
+    return render_template(
+        'configuracoes/fontes_dados_v2.html',
+        is_admin=session.get('role') == 'admin',
+    )
 
 
 @bp.route('/portfolios')

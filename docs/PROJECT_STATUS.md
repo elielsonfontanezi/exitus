@@ -1,10 +1,17 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 02/07/2026
-> **Status:** 🟡 **Walkthrough OBRIGATÓRIO — correções aplicadas; revalidação manual pendente**
-> **Versão:** v0.9.55
+> **Status:** 🟡 **Walkthrough round 2 — correções CRUD/CDI/seed; revalidação manual pendente**
+> **Versão:** v0.9.56
 
-### 🔧 Últimas entregas (02/07/2026 — walkthrough fixes)
+### 🔧 Últimas entregas (02/07/2026 — walkthrough round 2)
+- **Dashboard:** CDI benchmark série BCB 4389 (~14%); sanity check rejeita taxa diária
+- **CRUD config:** action-menu + modais fora do loading (corretoras/portfolios/regras/fontes)
+- **Fontes:** admin-only (banner + `@admin_required` POST/PUT/DELETE)
+- **Seed:** dedupe portfolios duplicados; regras US/EU/AS por `TipoAtivo`
+- **Testes:** suite **671 passed**, 2 failed pré-existentes (+1 admin fontes, +1 macro sanity)
+
+### 🔧 Entregas anteriores (02/07/2026 — walkthrough fixes)
 - **Logout:** link menu → `/auth/logout`
 - **Dashboard:** `formatPercent()` pt-BR; indicadores macro via BCB+brapi com fallback
 - **Seed:** corretoras `e2e_user`; upsert portfolios; 9 fontes API; regras US/EU
