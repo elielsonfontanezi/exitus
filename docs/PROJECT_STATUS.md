@@ -1,10 +1,18 @@
 # 🚀 Exitus — Status do Projeto
 
 > **Data:** 02/07/2026
-> **Status:** 🟡 **SEED-MENU-001 implementado — aguarda walkthrough manual do usuário**
-> **Versão:** v0.9.54
+> **Status:** 🟡 **Walkthrough OBRIGATÓRIO — correções aplicadas; revalidação manual pendente**
+> **Versão:** v0.9.55
 
-### 🔧 Últimas entregas (02/07/2026 — walkthrough checklist)
+### 🔧 Últimas entregas (02/07/2026 — walkthrough fixes)
+- **Logout:** link menu → `/auth/logout`
+- **Dashboard:** `formatPercent()` pt-BR; indicadores macro via BCB+brapi com fallback
+- **Seed:** corretoras `e2e_user`; upsert portfolios; 9 fontes API; regras US/EU
+- **CRUD config:** ícones editar/excluir (modais + `apiFetch`); portfolios `?ativo=true`
+- **Perfil:** meta patrimônio máscara BR
+- **Testes:** +3 (`test_macro_fetch_service` + mock indicadores); suite **667 passed**, 3 failed pré-existentes
+
+### 🔧 Entregas anteriores (02/07/2026 — walkthrough checklist)
 - **Walkthrough browser:** `walkthrough_menu_browser.py` + [`WALKTHROUGH_CHECKLIST_USUARIO.md`](WALKTHROUGH_CHECKLIST_USUARIO.md) (16 obrigatórias / 7 recomendadas / 19 amostra).
 - Gate Go-Live: usuário valida no ritmo próprio; correções reportadas → commit por item.
 

@@ -100,7 +100,9 @@ backend/
 **Conteúdo (02/07/2026):**
 - **Ativos:** 47 (incl. BOVA11, SMAL11, LCI_LCA, BOND, CRIPTO)
 - **Transações:** 67
-- **Blocos:** `calendario_dividendo`, `projecoes_renda`, `regras_fiscais`, `meta_alocacao`, `fontes_dados`, `taxas_cambio`, `historico_preco`, `saldo_prejuizo`
+- **Blocos:** `calendario_dividendo`, `projecoes_renda`, `regras_fiscais` (9 regras BR/US/EU), `meta_alocacao`, `fontes_dados` (**9 APIs**), `taxas_cambio`, `historico_preco`, `saldo_prejuizo`
+- **Corretoras:** associadas a `e2e_user` (não mais ao primeiro usuário do JSON)
+- **Portfolios:** upsert por `(usuario_id, nome)` — usar `--clean` após upgrades do cenário
 
 **Uso:**
 ```bash

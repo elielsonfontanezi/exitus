@@ -57,16 +57,16 @@
         <div class="kpi-card">
             <div class="kpi-card-label">Patrimônio Total</div>
             <div class="kpi-card-value" x-text="formatMoney(dados.resumo.patrimonio_total)"></div>
-            <div class="kpi-card-change badge-positivo" x-show="dados.resumo.rentabilidade_geral > 0" x-text="dados.resumo.rentabilidade_geral.toFixed(2) + '%'"></div>
+            <div class="kpi-card-change badge-positivo" x-show="dados.resumo.rentabilidade_geral > 0" x-text="formatPercent(dados.resumo.rentabilidade_geral)"></div>
         </div>
         <div class="kpi-card">
             <div class="kpi-card-label">Rentabilidade</div>
-            <div class="kpi-card-value" :class="dados.resumo.rentabilidade_geral >= 0 ? 'positivo' : 'negativo'" x-text="dados.resumo.rentabilidade_geral.toFixed(2) + '%'"></div>
+            <div class="kpi-card-value" :class="dados.resumo.rentabilidade_geral >= 0 ? 'positivo' : 'negativo'" x-text="formatPercent(dados.resumo.rentabilidade_geral)"></div>
             <div class="kpi-card-change">Sobre Custo</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-card-label">Rentab. Total</div>
-            <div class="kpi-card-value positivo" x-text="dados.resumo.rentabilidade_total ? dados.resumo.rentabilidade_total.toFixed(2) + '%' : '0%'"></div>
+            <div class="kpi-card-value positivo" x-text="dados.resumo.rentabilidade_total ? formatPercent(dados.resumo.rentabilidade_total) : '0,00%'"></div>
             <div class="kpi-card-change">Inclui Proventos</div>
         </div>
         <div class="kpi-card">
@@ -98,9 +98,9 @@
                 <div style="font-size:1.35rem; font-weight:700; color:var(--exitus-text); margin-bottom:4px;"
                      x-text="formatMoney(dados.por_mercado[mercado.key].patrimonio)"></div>
                 <div style="font-size:0.8rem; color:var(--exitus-text-muted); margin-bottom:4px;"
-                     x-text="dados.por_mercado[mercado.key].percentual.toFixed(1) + '% do total'"></div>
+                     x-text="formatPercent(dados.por_mercado[mercado.key].percentual, 1) + ' do total'"></div>
                 <div :class="dados.por_mercado[mercado.key].rentabilidade >= 0 ? 'badge-positivo' : 'badge-negativo'">
-                    <span x-text="Math.abs(dados.por_mercado[mercado.key].rentabilidade).toFixed(2) + '%'"></span>
+                    <span x-text="formatPercent(Math.abs(dados.por_mercado[mercado.key].rentabilidade))"></span>
                 </div>
             </div>
         </template>
@@ -140,7 +140,7 @@
                                 <td class="col-right" x-text="formatMoney(ativo.valor)"></td>
                                 <td class="col-right" :style="ativo.rentabilidade >= 0 ? 'color:#16a34a;' : 'color:#ef4444;'">
                                     <span x-text="ativo.rentabilidade >= 0 ? '▲' : '▼'"></span>
-                                    <span x-text="Math.abs(ativo.rentabilidade).toFixed(2) + '%'"></span>
+                                    <span x-text="formatPercent(Math.abs(ativo.rentabilidade))"></span>
                                 </td>
                             </tr>
                         </template>
@@ -212,7 +212,7 @@
                          :style="'width: ' + Math.min((dados.resumo.patrimonio_total / (user?.meta_patrimonio || 500000)) * 100, 100) + '%'"></div>
                 </div>
                 <div style="text-align:center; margin-top:8px; font-size:0.875rem; font-weight:600; color:var(--exitus-primary);"
-                     x-text="((dados.resumo.patrimonio_total / (user?.meta_patrimonio || 500000)) * 100).toFixed(1) + '% alcançado'"></div>
+                     x-text="formatPercent((dados.resumo.patrimonio_total / (user?.meta_patrimonio || 500000)) * 100, 1) + ' alcançado'"></div>
             </div>
 
             <!-- BENCHMARK -->
@@ -227,31 +227,31 @@
                 <div style="display:flex; flex-direction:column; gap:8px;">
                     <div class="dash-row">
                         <span>Sua Carteira</span>
-                        <span class="badge-positivo" x-text="dados.resumo.rentabilidade_geral.toFixed(2) + '%'"></span>
+                        <span class="badge-positivo" x-text="formatPercent(dados.resumo.rentabilidade_geral)"></span>
                     </div>
                     <div class="dash-row">
                         <span>CDI (12m)</span>
-                        <span class="badge-neutro" x-text="indicadores.cdi_anual.toFixed(2) + '%'"></span>
+                        <span class="badge-neutro" x-text="formatPercent(indicadores.cdi_anual)"></span>
                     </div>
                     <div class="dash-row">
                         <span>Ibovespa (12m)</span>
-                        <span class="badge-neutro" x-text="indicadores.ibovespa_anual.toFixed(2) + '%'"></span>
+                        <span class="badge-neutro" x-text="formatPercent(indicadores.ibovespa_anual)"></span>
                     </div>
                     <div class="dash-row">
                         <span>IPCA (12m)</span>
-                        <span class="badge-neutro" x-text="indicadores.ipca_anual.toFixed(2) + '%'"></span>
+                        <span class="badge-neutro" x-text="formatPercent(indicadores.ipca_anual)"></span>
                     </div>
                     <div class="dash-row">
                         <span>SELIC (ref.)</span>
-                        <span class="badge-neutro" x-text="indicadores.selic_anual.toFixed(2) + '%'"></span>
+                        <span class="badge-neutro" x-text="formatPercent(indicadores.selic_anual)"></span>
                     </div>
                     <div style="margin-top:4px; padding-top:8px; border-top:1px solid var(--exitus-border); text-align:center; font-size:0.875rem;"
                          :class="dados.resumo.rentabilidade_geral > indicadores.cdi_anual ? 'badge-positivo' : 'badge-neutro'">
                         <span x-show="dados.resumo.rentabilidade_geral > indicadores.cdi_anual">🎉 Acima do CDI!</span>
                         <span x-show="dados.resumo.rentabilidade_geral <= indicadores.cdi_anual">📈 Meta: superar o CDI</span>
                     </div>
-                    <div x-show="indicadores.fontes?.cdi === 'parametros_macro'" style="font-size:0.7rem; color:var(--exitus-text-muted); text-align:center;">
-                        Indicadores via parâmetros macro
+                    <div x-show="indicadores.fontes?.cdi && indicadores.fontes.cdi !== 'api_externa'" style="font-size:0.7rem; color:var(--exitus-text-muted); text-align:center;">
+                        Indicadores via parâmetros macro (fallback)
                     </div>
                 </div>
             </div>
@@ -458,6 +458,14 @@ function dashboardV2() {
 
         formatMoney(value) {
             return 'R$ ' + (value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+
+        formatPercent(value, digits = 2) {
+            if (value == null || isNaN(value)) return '0,00%';
+            return new Intl.NumberFormat('pt-BR', {
+                minimumFractionDigits: digits,
+                maximumFractionDigits: digits
+            }).format(value) + '%';
         },
 
         formatDate(dateStr) {

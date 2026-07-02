@@ -2765,6 +2765,42 @@
       "vigencia_inicio": "2026-01-01",
       "vigencia_fim": null,
       "ativa": true
+    },
+    {
+      "pais": "US",
+      "tipo_ativo": "ACAO",
+      "tipo_operacao": "VENDA",
+      "aliquota_ir": 15.0,
+      "valor_isencao": null,
+      "incide_sobre": "lucro",
+      "descricao": "US capital gains — long-term (referência)",
+      "vigencia_inicio": "2020-01-01",
+      "vigencia_fim": null,
+      "ativa": true
+    },
+    {
+      "pais": "US",
+      "tipo_ativo": "ACAO",
+      "tipo_operacao": "DAY_TRADE",
+      "aliquota_ir": 22.0,
+      "valor_isencao": null,
+      "incide_sobre": "lucro",
+      "descricao": "US short-term gains (referência day trade)",
+      "vigencia_inicio": "2020-01-01",
+      "vigencia_fim": null,
+      "ativa": true
+    },
+    {
+      "pais": "EU",
+      "tipo_ativo": "ACAO",
+      "tipo_operacao": "VENDA",
+      "aliquota_ir": 26.0,
+      "valor_isencao": null,
+      "incide_sobre": "lucro",
+      "descricao": "Europa — ganho de capital (referência DE/FR)",
+      "vigencia_inicio": "2020-01-01",
+      "vigencia_fim": null,
+      "ativa": true
     }
   ],
   "meta_alocacao": [
@@ -2835,6 +2871,66 @@
       "total_consultas": 150,
       "total_erros": 5,
       "observacoes": "US mercado"
+    },
+    {
+      "nome": "FMP",
+      "tipo_fonte": "api",
+      "url_base": "https://financialmodelingprep.com/api/v3",
+      "requer_autenticacao": true,
+      "rate_limit": "250/day",
+      "ativa": true,
+      "prioridade": 5,
+      "total_consultas": 80,
+      "total_erros": 3,
+      "observacoes": "Financial Modeling Prep"
+    },
+    {
+      "nome": "Polygon.io",
+      "tipo_fonte": "api",
+      "url_base": "https://api.polygon.io",
+      "requer_autenticacao": true,
+      "rate_limit": "5/minute",
+      "ativa": true,
+      "prioridade": 6,
+      "total_consultas": 60,
+      "total_erros": 2,
+      "observacoes": "Dados históricos US"
+    },
+    {
+      "nome": "Twelve Data",
+      "tipo_fonte": "api",
+      "url_base": "https://api.twelvedata.com",
+      "requer_autenticacao": true,
+      "rate_limit": "8/minute",
+      "ativa": true,
+      "prioridade": 7,
+      "total_consultas": 90,
+      "total_erros": 4,
+      "observacoes": "Séries globais"
+    },
+    {
+      "nome": "Marketstack",
+      "tipo_fonte": "api",
+      "url_base": "https://api.marketstack.com/v1",
+      "requer_autenticacao": true,
+      "rate_limit": "100/month",
+      "ativa": true,
+      "prioridade": 8,
+      "total_consultas": 40,
+      "total_erros": 1,
+      "observacoes": "EOD global"
+    },
+    {
+      "nome": "HG Finance",
+      "tipo_fonte": "api",
+      "url_base": "https://api.hgbrasil.com/finance",
+      "requer_autenticacao": true,
+      "rate_limit": "1000/day",
+      "ativa": true,
+      "prioridade": 9,
+      "total_consultas": 300,
+      "total_erros": 8,
+      "observacoes": "Cotações BR (HG Brasil)"
     }
   ],
   "taxas_cambio": [

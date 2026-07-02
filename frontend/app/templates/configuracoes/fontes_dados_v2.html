@@ -74,12 +74,12 @@
                     <td class="col-right" x-text="formatTaxa(f.taxa_sucesso)"></td>
                     <td class="col-center">
                         <div style="display:flex; gap:0.25rem; justify-content:center;">
-                            <button class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
-                                    @click="editarFonte(f)" :disabled="f.editando">
+                            <button type="button" class="btn-exitus btn-exitus-ghost" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                    @click.stop="editarFonte(f)" :disabled="f.editando">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn-exitus btn-exitus-ghost btn-exitus-danger" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
-                                    @click="excluirFonte(f)" :disabled="f.excluindo">
+                            <button type="button" class="btn-exitus btn-exitus-ghost btn-exitus-danger" style="font-size:0.75rem; padding:0.25rem 0.5rem;"
+                                    @click.stop="excluirFonte(f)" :disabled="f.excluindo">
                                 <i class="fas" :class="f.excluindo ? 'fa-spinner fa-spin' : 'fa-trash'"></i>
                             </button>
                         </div>
@@ -110,8 +110,9 @@
 </div>
 
 <div x-show="showModal" x-cloak
-     style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;">
-    <div @click.away="fecharModal()" style="background:white; padding:2rem; border-radius:8px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto;">
+     style="position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999;"
+     @click.self="fecharModal()" @keydown.escape.window="fecharModal()">
+    <div @click.stop style="background:white; padding:2rem; border-radius:8px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto; margin:1rem;">
         <h3 style="margin:0 0 1.5rem 0;" x-text="editando ? 'Editar Fonte' : 'Nova Fonte'"></h3>
         <div style="display:flex; flex-direction:column; gap:1rem;">
             <div>

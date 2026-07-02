@@ -8,6 +8,26 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Fix — Walkthrough OBRIGATÓRIO feedback (02/07/2026)
+
+**Frontend**
+- Logout menu: `/logout` → `/auth/logout`
+- Dashboard: percentuais via `formatPercent()` (pt-BR)
+- CRUD corretoras/fontes/portfolios: `@click.stop`, modais sem overlay fantasma, `apiFetch` com corpo vazio
+- Perfil: meta patrimônio com máscara BR (`50.000.000,00`)
+- Regras fiscais: coluna tipo + operação (DAY_TRADE vs VENDA)
+
+**Backend**
+- `macro_fetch_service.py` — BCB SGS + brapi Ibovespa; cache 1h
+- `indicadores_service.py` — cascata API → parametros_macro → env
+- `seed_parametros_macro.py` — fallback jul/2026 (CDI 14,75%, SELIC 14,25%, IPCA 4,72%)
+- `portfolio_blueprint` — filtro `?ativo=true` na listagem
+- Testes: `test_macro_fetch_service.py` (+2), `test_indicadores_dashboard` mock API
+
+**Seed**
+- `load_scenario.py` — corretoras para `e2e_user`; upsert portfolios por `(usuario_id, nome)`
+- `test_menu_full.json` — 9 fontes (FMP, Polygon, Twelve Data, Marketstack, HG Finance); regras US/EU
+
 ### Docs — Walkthrough browser + checklist usuário (02/07/2026)
 
 - `walkthrough_menu_browser.py` — classificação AUTO_OK / VERIFY_UI / NEEDS_MANUAL por tela (sessão + API)

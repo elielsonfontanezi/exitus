@@ -2,6 +2,8 @@
 
 **Data:** 02/07/2026 | **Cenário:** `test_menu_full` | **Login:** `e2e_user` / `e2e_senha_123`
 
+**Correções 02/07/2026 (revalidar):** logout `/auth/logout`; dashboard % pt-BR + macro API; corretoras seed `e2e_user`; CRUD ícones; 9 fontes; portfolios sem duplicata; meta patrimônio BR; regras DAY_TRADE/US/EU.
+
 Legenda de camadas da automação:
 - **AUTO_OK** — página/redirect validado sem interação
 - **AUTO_OK_VERIFY_UI** — API retornou dados; UI renderizada só no browser

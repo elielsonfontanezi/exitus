@@ -62,7 +62,7 @@ Atualização crítica de ENUMs realizada (`movimentacao_caixa.tipo_movimentacao
 | # | Módulo | URL | Status | Problemas | Prioridade |
 |---|--------|-----|--------|-----------|-----------|
 | 1 | Login | `/auth/login` | ✅ | Redesenhado: UX_DESIGN_SYSTEM aplicado, credenciais removidas, link Esqueceu removido (EXITUS-LOGIN-001) | — |
-| 2 | Dashboard | `/dashboard/` | ✅ | Indicadores CDI/IPCA/SELIC via `GET /api/indicadores/dashboard` (parametros_macro); Ibovespa via env; meta via `/api/auth/me` — NEW-06/FEAT-010 ✅ | Baixa |
+| 2 | Dashboard | `/dashboard/` | ✅ | Indicadores via BCB+brapi (`macro_fetch_service`) + fallback; % pt-BR `formatPercent` — walkthrough fix 02/07 | Baixa |
 | 3 | Configurações — Perfil | `/configuracoes/perfil` | ✅ | Edição nome/e-mail (`PUT /api/auth/me`) e troca de senha (`POST /api/auth/change-password`) — EXITUS-PERFIL-001 ✅ | — |
 | 4 | Configurações — Corretoras | `/configuracoes/corretoras` | ✅ | CRUD completo: botões criar/editar/excluir/sincronizar implementados (frontend + backend API) | — |
 | 5 | Operações — Import B3 | `/operacoes/` | ✅ | Import + lista de tickers importados e ativos novos (FEAT-009) | — |

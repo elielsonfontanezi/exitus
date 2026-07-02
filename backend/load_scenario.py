@@ -299,15 +299,28 @@ class ScenarioLoader:
         
         print(f"🏦 Criando {len(corretoras_data)} corretoras...")
         
-        # Obter primeiro usuário para associar
-        usuario_id = list(self.references['usuarios'].values())[0] if self.references['usuarios'] else None
+        default_usuario = (
+            self.references['usuarios'].get('e2e_user')
+            or (list(self.references['usuarios'].values())[0] if self.references['usuarios'] else None)
+        )
         assessora_id = list(self.references['assessoras'].values())[0] if self.references['assessoras'] else None
         
         for corretora_data in corretoras_data:
-            existing = Corretora.query.filter_by(nome=corretora_data['nome']).first()
+            usuario_id = self.references['usuarios'].get(
+                corretora_data.get('usuario', 'e2e_user'),
+                default_usuario,
+            )
+            if not usuario_id:
+                print(f"⚠️  Usuário não encontrado para corretora: {corretora_data.get('nome')}")
+                continue
+
+            existing = Corretora.query.filter_by(
+                usuario_id=usuario_id,
+                nome=corretora_data['nome'],
+            ).first()
             if existing:
                 self.references['corretoras'][corretora_data['nome']] = existing.id
-                print(f"⚠️  Corretora {corretora_data['nome']} já existe")
+                print(f"⏭️  Corretora já existe para usuário: {corretora_data['nome']}")
                 continue
             
             corretora = Corretora(
@@ -496,6 +509,14 @@ class ScenarioLoader:
             
             if not usuario_id:
                 print(f"⚠️  Usuário não encontrado para portfolio: {port_data['usuario']}")
+                continue
+
+            existing = Portfolio.query.filter_by(
+                usuario_id=usuario_id,
+                nome=port_data['nome'],
+            ).first()
+            if existing:
+                print(f"⏭️  Portfolio já existe: {port_data['nome']}")
                 continue
             
             portfolio = Portfolio(

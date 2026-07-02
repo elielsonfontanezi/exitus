@@ -211,9 +211,12 @@ def list_portfolios():
         usuario_id = UUID(get_jwt_identity())
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 20, type=int), 100)
+        ativo_param = request.args.get('ativo')
+        ativo = None
+        if ativo_param is not None:
+            ativo = ativo_param.lower() == 'true'
         
-        # CORREÇÃO: Usar get_all_for_user (nome correto do método no service)
-        pagination = PortfolioService.get_all(usuario_id, page, per_page)
+        pagination = PortfolioService.get_all(usuario_id, page, per_page, ativo=ativo)
         
         return success_response(  # CORREÇÃO: snake_case
             data={

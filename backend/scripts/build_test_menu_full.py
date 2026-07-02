@@ -158,6 +158,21 @@ def build():
         {'nome': 'Finnhub', 'tipo_fonte': 'api', 'url_base': 'https://finnhub.io/api/v1',
          'requer_autenticacao': True, 'rate_limit': '60/minute', 'ativa': True, 'prioridade': 4,
          'total_consultas': 150, 'total_erros': 5, 'observacoes': 'US mercado'},
+        {'nome': 'FMP', 'tipo_fonte': 'api', 'url_base': 'https://financialmodelingprep.com/api/v3',
+         'requer_autenticacao': True, 'rate_limit': '250/day', 'ativa': True, 'prioridade': 5,
+         'total_consultas': 80, 'total_erros': 3, 'observacoes': 'Financial Modeling Prep'},
+        {'nome': 'Polygon.io', 'tipo_fonte': 'api', 'url_base': 'https://api.polygon.io',
+         'requer_autenticacao': True, 'rate_limit': '5/minute', 'ativa': True, 'prioridade': 6,
+         'total_consultas': 60, 'total_erros': 2, 'observacoes': 'Dados históricos US'},
+        {'nome': 'Twelve Data', 'tipo_fonte': 'api', 'url_base': 'https://api.twelvedata.com',
+         'requer_autenticacao': True, 'rate_limit': '8/minute', 'ativa': True, 'prioridade': 7,
+         'total_consultas': 90, 'total_erros': 4, 'observacoes': 'Séries globais'},
+        {'nome': 'Marketstack', 'tipo_fonte': 'api', 'url_base': 'https://api.marketstack.com/v1',
+         'requer_autenticacao': True, 'rate_limit': '100/month', 'ativa': True, 'prioridade': 8,
+         'total_consultas': 40, 'total_erros': 1, 'observacoes': 'EOD global'},
+        {'nome': 'HG Finance', 'tipo_fonte': 'api', 'url_base': 'https://api.hgbrasil.com/finance',
+         'requer_autenticacao': True, 'rate_limit': '1000/day', 'ativa': True, 'prioridade': 9,
+         'total_consultas': 300, 'total_erros': 8, 'observacoes': 'Cotações BR (HG Brasil)'},
     ]
 
     taxas = []

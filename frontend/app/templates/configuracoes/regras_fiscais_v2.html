@@ -44,7 +44,7 @@
         <thead>
             <tr>
                 <th>País</th>
-                <th>Tipo Ativo</th>
+                <th>Tipo Ativo / Operação</th>
                 <th class="col-right">Alíquota IR</th>
                 <th>Incide Sobre</th>
                 <th>Vigência</th>
@@ -56,7 +56,7 @@
             <template x-for="r in regras" :key="r.id">
                 <tr>
                     <td><span class="cell-ticker" x-text="r.pais"></span></td>
-                    <td x-text="r.tipo_ativo || '-'"></td>
+                    <td x-text="formatTipoOperacao(r)"></td>
                     <td class="col-right" x-text="formatAliquota(r.aliquota_ir)"></td>
                     <td x-text="r.incide_sobre || '-'"></td>
                     <td>
@@ -192,6 +192,22 @@ function pageDataExtend() {
 
         formatAliquota(v) {
             return v != null ? Number(v).toFixed(2) + '%' : '-';
+        },
+
+        formatTipoOperacao(r) {
+            const tipo = r.tipo_ativo || 'GERAL';
+            const op = r.tipo_operacao || '';
+            const opLabels = {
+                VENDA: 'Venda',
+                DAY_TRADE: 'Day Trade',
+                DIVIDENDO: 'Dividendo',
+                DIVIDENDO_TRIBUTADO: 'Dividendo trib.',
+                JCP: 'JCP',
+            };
+            const opLabel = opLabels[op] || op;
+            if (op && op !== 'VENDA') return tipo + ' — ' + opLabel;
+            if (op === 'VENDA' && tipo !== 'GERAL') return tipo + ' — Venda';
+            return tipo;
         },
 
         formatDate(d) {

@@ -112,9 +112,20 @@
                         window.location.href = '/auth/login';
                         return;
                     }
-                    throw new Error(`API Error: ${response.status}`);
+                    let detail = `API Error: ${response.status}`;
+                    try {
+                        const errBody = await response.json();
+                        detail = errBody.message || errBody.error || detail;
+                    } catch (_) { /* corpo vazio */ }
+                    throw new Error(detail);
                 }
-                return response.json();
+                const text = await response.text();
+                if (!text) return { success: true };
+                try {
+                    return JSON.parse(text);
+                } catch (_) {
+                    return { success: true, raw: text };
+                }
             },
 
             formatMoney(value, currency = 'BRL') {

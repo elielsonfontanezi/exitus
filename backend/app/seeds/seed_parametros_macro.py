@@ -19,12 +19,12 @@ logger = logging.getLogger(__name__)
 PARAMETROS = [
     {
         'pais': 'BR', 'mercado': 'B3',
-        'taxa_livre_risco': Decimal('0.105000'),
+        'taxa_livre_risco': Decimal('0.147500'),
         'crescimento_medio': Decimal('0.050000'),
         'custo_capital':     Decimal('0.120000'),
-        'inflacao_anual':    Decimal('0.045000'),
+        'inflacao_anual':    Decimal('0.047200'),
         'cap_rate_fii':      Decimal('0.080000'),
-        'ytm_rf':            Decimal('0.115000'),
+        'ytm_rf':            Decimal('0.142500'),
     },
     {
         'pais': 'US', 'mercado': 'NYSE',

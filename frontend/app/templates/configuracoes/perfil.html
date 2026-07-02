@@ -47,7 +47,12 @@
         <!-- Meta de Patrimônio -->
         <div>
             <label class="filter-label" style="display:block; margin-bottom:0.25rem;">Meta de Patrimônio (R$)</label>
-            <input type="number" class="filter-input" x-model="perfil.meta_patrimonio" step="0.01" min="0" style="width:100%;">
+            <input type="text" inputmode="decimal" class="filter-input"
+                   x-model="metaPatrimonioDisplay"
+                   @input="onMetaPatrimonioInput($event)"
+                   @blur="formatMetaPatrimonioBlur()"
+                   placeholder="50.000.000,00"
+                   style="width:100%;">
             <small style="color:#6b7280; font-size:0.75rem; margin-top:0.25rem; display:block;">
                 Valor alvo para sua meta de patrimônio. Usado no dashboard para calcular progresso.
             </small>
@@ -115,6 +120,7 @@
 function pageDataExtend() {
     return {
         perfil: {},
+        metaPatrimonioDisplay: '',
         senhaAtual: '',
         novaSenha: '',
         confirmarSenha: '',
@@ -126,11 +132,41 @@ function pageDataExtend() {
         async loadData() {
             const res = await this.apiFetch('/api/auth/me');
             this.perfil = res?.data || {};
+            this.metaPatrimonioDisplay = this.formatBrMoney(this.perfil.meta_patrimonio);
+        },
+
+        parseBrMoney(str) {
+            if (!str || typeof str !== 'string') return null;
+            const cleaned = str.replace(/\./g, '').replace(',', '.').replace(/[^\d.]/g, '');
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? null : num;
+        },
+
+        formatBrMoney(value) {
+            if (value == null || value === '') return '';
+            const num = typeof value === 'number' ? value : parseFloat(value);
+            if (isNaN(num)) return '';
+            return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+
+        onMetaPatrimonioInput(event) {
+            const raw = event.target.value.replace(/[^\d,]/g, '');
+            this.metaPatrimonioDisplay = raw;
+            const parsed = this.parseBrMoney(raw);
+            if (parsed !== null) this.perfil.meta_patrimonio = parsed;
+        },
+
+        formatMetaPatrimonioBlur() {
+            if (this.perfil.meta_patrimonio != null) {
+                this.metaPatrimonioDisplay = this.formatBrMoney(this.perfil.meta_patrimonio);
+            }
         },
 
         async salvarPerfil() {
             this.salvando = true;
             this.mensagemPerfil = null;
+            const meta = this.parseBrMoney(this.metaPatrimonioDisplay);
+            if (meta !== null) this.perfil.meta_patrimonio = meta;
             try {
                 const res = await this.apiFetch('/api/auth/me', {
                     method: 'PUT',
@@ -141,6 +177,7 @@ function pageDataExtend() {
                     })
                 });
                 this.perfil = res?.data || this.perfil;
+                this.metaPatrimonioDisplay = this.formatBrMoney(this.perfil.meta_patrimonio);
                 this.mensagemPerfil = { tipo: 'sucesso', texto: 'Perfil salvo com sucesso!' };
             } catch (e) {
                 this.mensagemPerfil = { tipo: 'erro', texto: e.message || 'Erro ao salvar perfil' };
