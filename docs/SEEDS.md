@@ -3,7 +3,7 @@
 **APENAS PARA AMBIENTE DE DESENVOLVIMENTO** ⚠️
 
 > **v0.9.23** — Base de teste 100% completa com Renda Fixa Brasil  
-> **Atualização:** 01/07/2026 — Eventos corporativos nos cenários test_full (6) e test_e2e (4)
+> **Atualização:** 02/07/2026 — Cenário `test_menu_full` implementado (SEED-MENU-001)
 
 ---
 
@@ -12,7 +12,7 @@
 | Seção | O que encontrar |
 |-------|------------------|
 | **Credenciais** | Usuários/senhas para acesso |
-| **Cenários JSON** | test_full, test_e2e, test_ir, test_stress |
+| **Cenários JSON** | test_full, test_e2e, test_ir, test_stress, **test_menu_full** |
 | **Comandos** | Reset, seed, verificação |
 | **Troubleshooting** | Problemas comuns e soluções |
 | **Histórico Patrimonial** | 16 meses de evolução (R$ 0 → R$ 58.050) |
@@ -91,19 +91,27 @@ backend/
 
 ---
 
-### 1b. test_menu_full.json - **PLANEJADO** 📋
+### 1b. test_menu_full.json - **MASSA MENU 43 TELAS** 🟡
 
 **GAP:** `SEED-MENU-001` — ver [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md).
 
-**Objetivo:** Massa única para walkthrough E2E/manual de todas as 43 telas do menu (BR/US/INTL, aportes, compras/vendas, IR).
+**Descrição:** Expande `test_full` com 15/15 `TipoAtivo`, blocos auxiliares e massa para walkthrough do menu principal.
 
-**Uso previsto:**
+**Conteúdo (02/07/2026):**
+- **Ativos:** 47 (incl. BOVA11, SMAL11, LCI_LCA, BOND, CRIPTO)
+- **Transações:** 67
+- **Blocos:** `calendario_dividendo`, `projecoes_renda`, `regras_fiscais`, `meta_alocacao`, `fontes_dados`, `taxas_cambio`, `historico_preco`, `saldo_prejuizo`
+
+**Uso:**
 ```bash
 podman exec exitus-backend python reset_and_seed.py --clean --scenario test_menu_full
 podman exec exitus-backend python scripts/verify_menu_seed.py
+podman exec exitus-backend python scripts/walkthrough_menu_api.py
 ```
 
-**Status:** documentação aprovada; JSON e extensões do loader pendentes.
+**Status:** implementado; walkthrough API 36/36 OK; **aguarda validação visual manual do usuário** para gate Go-Live.
+
+**Loader:** `load_scenario.py` — `_seed_fontes_dados`, `_seed_taxas_cambio`, `_seed_meta_alocacao`, `_seed_historico_preco`, `_seed_saldo_prejuizo`.
 
 ---
 

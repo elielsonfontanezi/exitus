@@ -8,6 +8,15 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Feat — SEED-MENU-001 cenário test_menu_full (02/07/2026)
+
+- `load_scenario.py` — 5 novos `_seed_*`: `fontes_dados`, `taxas_cambio`, `meta_alocacao`, `historico_preco`, `saldo_prejuizo`; fix `preco_teto_usuario` e `corretora_destino_id`
+- `seed_data/scenarios/test_menu_full.json` — 47 ativos, 67 transações, 15/15 `TipoAtivo`
+- `scripts/build_test_menu_full.py`, `verify_menu_seed.py`, `walkthrough_menu_api.py`
+- `tests/test_scenario_loader.py` — 4 testes integridade JSON + loader
+- Walkthrough API: **36 checks, 0 erros, 0 vazios** (após seed `e2e_user`)
+- Gate Go-Live: validação visual manual do usuário ainda pendente
+
 ### Docs — VAL-PIPE-001 validação Valor Justo (01/07/2026)
 
 - `PLANO_VALIDACAO_VALOR_JUSTO.md` — pipeline 4 camadas (cotações, indicadores, histórico, valuation)

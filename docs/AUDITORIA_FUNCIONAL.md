@@ -43,8 +43,8 @@
 | **PARCIAL** | Tela carrega; dados incompletos ou vazios em abas/KPIs |
 | **FALTANDO** | Tipo de ativo ou entidade ausente no cenário atual |
 
-**Gap atual (`test_full`):** 7 áreas FALTANDO/PARCIAL — ver matriz em [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md).  
-**GAP de implementação:** `SEED-MENU-001` em [`ROADMAP.md`](ROADMAP.md).
+**Gap atual (`test_full`):** 7 áreas FALTANDO/PARCIAL — cobertas por **`test_menu_full`** (ver [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md)).  
+**GAP `SEED-MENU-001`:** implementado (02/07/2026) — walkthrough API 36/36; **aguarda OK manual do usuário** para liberar Trilha A.
 
 ---
 

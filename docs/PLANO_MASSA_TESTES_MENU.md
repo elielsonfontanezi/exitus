@@ -2,7 +2,7 @@
 
 **Data:** 01/07/2026  
 **GAP:** `SEED-MENU-001`  
-**Status:** 📋 Planejado (documentação aprovada; implementação pendente)  
+**Status:** 🟡 Implementado — walkthrough API 36/36 OK; aguarda OK manual do usuário  
 **Relacionado:** [`AUDITORIA_FUNCIONAL.md`](AUDITORIA_FUNCIONAL.md) § Go-Live, [`SEEDS.md`](SEEDS.md), [`ROADMAP.md`](ROADMAP.md), [`PLANO_VALIDACAO_VALOR_JUSTO.md`](PLANO_VALIDACAO_VALOR_JUSTO.md)
 
 ---
@@ -160,7 +160,27 @@ podman exec exitus-backend python scripts/verify_menu_seed.py
 | 3 | `test_menu_full.json` incremental | 2–3 sessões |
 | 4 | `verify_menu_seed.py` + testes loader | 0,5 sessão |
 | 5 | E2E v4 alinhado | 2 sessões |
-| 6 | Validação manual usuário | contínuo |
+| 6 | Validação manual usuário | contínuo — **pendente** |
+
+---
+
+## Walkthrough API (02/07/2026)
+
+Após `reset_and_seed.py --clean --scenario test_menu_full` e `scripts/walkthrough_menu_api.py`:
+
+| Resultado | Valor |
+|-----------|-------|
+| Checks API | 36 |
+| Erros | 0 |
+| Vazios | 0 |
+
+**Nota:** smoke cobre endpoints principais das 43 telas; validação visual no browser permanece como gate Go-Live.
+
+```bash
+podman exec exitus-backend python reset_and_seed.py --clean --scenario test_menu_full
+podman exec exitus-backend python scripts/verify_menu_seed.py
+podman exec exitus-backend python scripts/walkthrough_menu_api.py
+```
 
 ---
 
@@ -184,4 +204,5 @@ Demais telas: **COBERTO** ou **PARCIAL** com `test_full` (detalhe na auditoria).
 
 | Data | Versão | Nota |
 |------|--------|------|
+| 02/07/2026 | 1.1 | Cenário `test_menu_full` implementado; walkthrough API 36/36 |
 | 01/07/2026 | 1.0 | Plano documentado; implementação pendente |

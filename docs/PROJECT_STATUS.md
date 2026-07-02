@@ -1,10 +1,16 @@
 # 🚀 Exitus — Status do Projeto
 
-> **Data:** 01/07/2026
-> **Status:** ✅ **Planos SEED-MENU-001 + VAL-PIPE-001 documentados**
-> **Versão:** v0.9.53
+> **Data:** 02/07/2026
+> **Status:** 🟡 **SEED-MENU-001 implementado — aguarda walkthrough manual do usuário**
+> **Versão:** v0.9.54
 
-### 🔧 Últimas entregas (01/07/2026 — docs VAL-PIPE-001)
+### 🔧 Últimas entregas (02/07/2026 — SEED-MENU-001)
+- **SEED-MENU-001 🟡:** Cenário `test_menu_full` — loader estendido, JSON 47 ativos, scripts verify + walkthrough API.
+- Walkthrough API: **36/36 OK** com `e2e_user` / `e2e_senha_123`.
+- **4 testes** `test_scenario_loader.py`; suite **664 passed** (+4), falhas pré-existentes inalteradas.
+- **Trilha A** permanece bloqueada até OK explícito do usuário no browser.
+
+### 🔧 Entregas anteriores (01/07/2026 — docs VAL-PIPE-001)
 - **VAL-PIPE-001 📋:** Plano validação pipeline + Valor Justo — [`PLANO_VALIDACAO_VALOR_JUSTO.md`](PLANO_VALIDACAO_VALOR_JUSTO.md).
 - 4 camadas: cotações ≤15min, indicadores, histórico, golden datasets por perfil.
 - Lacunas V-GAP-01..07 catalogadas; implementação de testes pendente.

@@ -32,6 +32,11 @@ try:
     from app.models.projecao_renda import ProjecaoRenda
     from app.models.regra_fiscal import RegraFiscal, IncidenciaImposto
     from app.models.evento_corporativo import EventoCorporativo, TipoEventoCorporativo
+    from app.models.meta_alocacao import MetaAlocacao
+    from app.models.taxa_cambio import TaxaCambio
+    from app.models.fonte_dados import FonteDados, TipoFonteDados
+    from app.models.historico_preco import HistoricoPreco
+    from app.models.saldo_prejuizo import SaldoPrejuizo
     from werkzeug.security import generate_password_hash
 except ImportError as e:
     print(f"Erro ao importar módulos: {e}")
@@ -87,15 +92,20 @@ class ScenarioLoader:
                 self._seed_assessoras()
                 self._seed_usuarios()
                 self._seed_ativos()
+                self._seed_fontes_dados()
+                self._seed_taxas_cambio()
                 self._seed_corretoras()
                 self._seed_transacoes()
                 self._seed_proventos()
                 self._seed_movimentacoes_caixa()
                 self._seed_portfolios()
+                self._seed_meta_alocacao()
                 self._seed_alertas()
                 self._seed_planos_compra()
                 self._seed_planos_venda()
                 self._seed_historico_patrimonio()
+                self._seed_historico_preco()
+                self._seed_saldo_prejuizo()
                 self._seed_calendario_dividendo()
                 self._seed_projecoes_renda()
                 self._seed_regras_fiscais()
@@ -263,10 +273,14 @@ class ScenarioLoader:
                 classe=classe_map.get(ativo_data.get('classe', 'RENDA_VARIAVEL'), ClasseAtivo.RENDA_VARIAVEL),
                 moeda=ativo_data.get('moeda', 'BRL'),
                 preco_atual=ativo_data.get('preco_atual'),
-                preco_teto=ativo_data.get('preco_teto'),
+                preco_teto_usuario=ativo_data.get('preco_teto_usuario') or ativo_data.get('preco_teto'),
                 dividend_yield=ativo_data.get('dividend_yield'),
                 p_l=ativo_data.get('p_l'),
                 p_vp=ativo_data.get('p_vp'),
+                eps=ativo_data.get('eps'),
+                fcf=ativo_data.get('fcf'),
+                ffo_por_cota=ativo_data.get('ffo_por_cota'),
+                affo_por_cota=ativo_data.get('affo_por_cota'),
                 observacoes=ativo_data.get('observacoes'),
                 ativo=ativo_data.get('ativo', True),
                 deslistado=False
@@ -446,9 +460,14 @@ class ScenarioLoader:
                 'outro': TipoMovimentacao.OUTRO
             }
             
+            corretora_destino_id = None
+            if mov_data.get('corretora_destino'):
+                corretora_destino_id = self.references['corretoras'].get(mov_data['corretora_destino'])
+
             movimentacao = MovimentacaoCaixa(
                 usuario_id=usuario_id,
                 corretora_id=corretora_id,
+                corretora_destino_id=corretora_destino_id,
                 assessora_id=assessora_id,
                 tipo_movimentacao=tipo_map.get(mov_data['tipo'], TipoMovimentacao.APORTE),
                 valor=Decimal(str(mov_data['valor'])),
@@ -862,6 +881,179 @@ class ScenarioLoader:
             )
             db.session.add(evento)
             print(f"✅ Evento corporativo criado: {item['ativo_ticker']} — {tipo_raw}")
+
+        db.session.flush()
+
+    def _seed_fontes_dados(self):
+        """Seed de fontes de dados externas"""
+        fontes_data = self.scenario_data.get('fontes_dados', [])
+        if not fontes_data:
+            return
+
+        tipo_map = {
+            'api': TipoFonteDados.API,
+            'scraper': TipoFonteDados.SCRAPER,
+            'manual': TipoFonteDados.MANUAL,
+            'arquivo': TipoFonteDados.ARQUIVO,
+            'outro': TipoFonteDados.OUTRO,
+        }
+
+        print(f"🔌 Criando {len(fontes_data)} fontes de dados...")
+
+        for item in fontes_data:
+            existing = FonteDados.query.filter_by(nome=item['nome']).first()
+            if existing:
+                print(f"⏭️  Fonte já existe: {item['nome']}")
+                continue
+
+            fonte = FonteDados(
+                nome=item['nome'],
+                tipo_fonte=tipo_map.get(item.get('tipo_fonte', 'api'), TipoFonteDados.API),
+                url_base=item.get('url_base'),
+                requer_autenticacao=item.get('requer_autenticacao', False),
+                rate_limit=item.get('rate_limit'),
+                ativa=item.get('ativa', True),
+                prioridade=item.get('prioridade', 100),
+                total_consultas=item.get('total_consultas', 0),
+                total_erros=item.get('total_erros', 0),
+                observacoes=item.get('observacoes'),
+            )
+            db.session.add(fonte)
+            print(f"✅ Fonte criada: {item['nome']}")
+
+        db.session.flush()
+
+    def _seed_taxas_cambio(self):
+        """Seed de taxas de câmbio históricas"""
+        taxas_data = self.scenario_data.get('taxas_cambio', [])
+        if not taxas_data:
+            return
+
+        print(f"💱 Criando {len(taxas_data)} taxas de câmbio...")
+
+        for item in taxas_data:
+            data_ref = datetime.strptime(item['data_referencia'], '%Y-%m-%d').date()
+            existing = TaxaCambio.query.filter_by(
+                par_moeda=item['par_moeda'],
+                data_referencia=data_ref,
+            ).first()
+            if existing:
+                continue
+
+            taxa = TaxaCambio(
+                par_moeda=item['par_moeda'],
+                moeda_base=item['moeda_base'],
+                moeda_cotacao=item['moeda_cotacao'],
+                taxa=Decimal(str(item['taxa'])),
+                data_referencia=data_ref,
+                fonte=item.get('fonte', 'manual'),
+            )
+            db.session.add(taxa)
+
+        db.session.flush()
+        print(f"✅ Taxas de câmbio inseridas")
+
+    def _seed_meta_alocacao(self):
+        """Seed de metas de alocação por classe"""
+        metas_data = self.scenario_data.get('meta_alocacao', [])
+        if not metas_data:
+            return
+
+        assessora_id = list(self.references['assessoras'].values())[0] if self.references['assessoras'] else None
+        print(f"🎯 Criando {len(metas_data)} metas de alocação...")
+
+        for item in metas_data:
+            usuario_id = self.references['usuarios'].get(item['usuario'])
+            if not usuario_id:
+                continue
+
+            existing = MetaAlocacao.query.filter_by(
+                usuario_id=usuario_id,
+                classe=item['classe'],
+            ).first()
+            if existing:
+                continue
+
+            meta = MetaAlocacao(
+                usuario_id=usuario_id,
+                assessora_id=assessora_id,
+                classe=item['classe'],
+                percentual_target=Decimal(str(item['percentual_target'])),
+                tolerancia_pct=Decimal(str(item.get('tolerancia_pct', 2.0))),
+            )
+            db.session.add(meta)
+            print(f"✅ Meta alocação: {item['usuario']} — {item['classe']}")
+
+        db.session.flush()
+
+    def _seed_historico_preco(self):
+        """Seed de histórico de preços"""
+        hist_data = self.scenario_data.get('historico_preco', [])
+        if not hist_data:
+            return
+
+        assessora_id = list(self.references['assessoras'].values())[0] if self.references['assessoras'] else None
+        print(f"📉 Criando {len(hist_data)} registros de histórico de preços...")
+
+        for item in hist_data:
+            ativo_id = self.references['ativos'].get(item['ativo_ticker'])
+            if not ativo_id:
+                continue
+
+            data_ref = datetime.strptime(item['data'], '%Y-%m-%d').date()
+            existing = HistoricoPreco.query.filter_by(
+                ativoid=ativo_id,
+                data=data_ref,
+            ).first()
+            if existing:
+                continue
+
+            hist = HistoricoPreco(
+                ativoid=ativo_id,
+                assessora_id=assessora_id,
+                data=data_ref,
+                preco_abertura=Decimal(str(item['preco_abertura'])) if item.get('preco_abertura') else None,
+                preco_fechamento=Decimal(str(item['preco_fechamento'])),
+                preco_minimo=Decimal(str(item['preco_minimo'])) if item.get('preco_minimo') else None,
+                preco_maximo=Decimal(str(item['preco_maximo'])) if item.get('preco_maximo') else None,
+                volume=item.get('volume'),
+            )
+            db.session.add(hist)
+
+        db.session.flush()
+        print(f"✅ Histórico de preços inserido")
+
+    def _seed_saldo_prejuizo(self):
+        """Seed de saldos de prejuízo para compensação IR"""
+        saldos_data = self.scenario_data.get('saldo_prejuizo', [])
+        if not saldos_data:
+            return
+
+        assessora_id = list(self.references['assessoras'].values())[0] if self.references['assessoras'] else None
+        print(f"📊 Criando {len(saldos_data)} saldos de prejuízo...")
+
+        for item in saldos_data:
+            usuario_id = self.references['usuarios'].get(item['usuario'])
+            if not usuario_id:
+                continue
+
+            existing = SaldoPrejuizo.query.filter_by(
+                usuario_id=usuario_id,
+                categoria=item['categoria'],
+                ano_mes=item['ano_mes'],
+            ).first()
+            if existing:
+                continue
+
+            saldo = SaldoPrejuizo(
+                usuario_id=usuario_id,
+                assessora_id=assessora_id,
+                categoria=item['categoria'],
+                ano_mes=item['ano_mes'],
+                saldo=Decimal(str(item['saldo'])),
+            )
+            db.session.add(saldo)
+            print(f"✅ Saldo prejuízo: {item['categoria']} {item['ano_mes']}")
 
         db.session.flush()
 
