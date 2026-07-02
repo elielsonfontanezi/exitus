@@ -184,6 +184,25 @@ podman exec exitus-backend python scripts/walkthrough_menu_api.py
 
 ---
 
+## Walkthrough browser + checklist usuário (02/07/2026)
+
+Script: `backend/scripts/walkthrough_menu_browser.py` (sessão Flask + validação API por tela).
+
+**Checklist:** [`WALKTHROUGH_CHECKLIST_USUARIO.md`](WALKTHROUGH_CHECKLIST_USUARIO.md)
+
+| Tier | Qtd | Ação sua |
+|------|-----|----------|
+| OBRIGATÓRIO | 16 | Abrir todas (CRUD, forms, export, admin) |
+| RECOMENDADO | 7 | Gráficos/KPIs — confirmar visual |
+| AMOSTRA | 19 | Escolher 5–8 listas read-only |
+| PODE PULAR | 3 | Login + redirects (já OK) |
+
+```bash
+cd backend && python3 scripts/walkthrough_menu_browser.py
+```
+
+---
+
 ## Matriz resumida — telas com gap em `test_full`
 
 | # | Tela | Seed `test_full` | Ação em `test_menu_full` |

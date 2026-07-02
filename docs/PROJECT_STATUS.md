@@ -4,7 +4,11 @@
 > **Status:** 🟡 **SEED-MENU-001 implementado — aguarda walkthrough manual do usuário**
 > **Versão:** v0.9.54
 
-### 🔧 Últimas entregas (02/07/2026 — SEED-MENU-001)
+### 🔧 Últimas entregas (02/07/2026 — walkthrough checklist)
+- **Walkthrough browser:** `walkthrough_menu_browser.py` + [`WALKTHROUGH_CHECKLIST_USUARIO.md`](WALKTHROUGH_CHECKLIST_USUARIO.md) (16 obrigatórias / 7 recomendadas / 19 amostra).
+- Gate Go-Live: usuário valida no ritmo próprio; correções reportadas → commit por item.
+
+### 🔧 Entregas anteriores (02/07/2026 — SEED-MENU-001)
 - **SEED-MENU-001 🟡:** Cenário `test_menu_full` — loader estendido, JSON 47 ativos, scripts verify + walkthrough API.
 - Walkthrough API: **36/36 OK** com `e2e_user` / `e2e_senha_123`.
 - **4 testes** `test_scenario_loader.py`; suite **664 passed** (+4), falhas pré-existentes inalteradas.

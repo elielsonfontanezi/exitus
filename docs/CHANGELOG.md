@@ -8,6 +8,13 @@ e este projeto adere semanticamente à versão v0.8.0.
 
 ## [Unreleased]
 
+### Docs — Walkthrough browser + checklist usuário (02/07/2026)
+
+- `walkthrough_menu_browser.py` — classificação AUTO_OK / VERIFY_UI / NEEDS_MANUAL por tela (sessão + API)
+- `WALKTHROUGH_CHECKLIST_USUARIO.md` — tiers OBRIGATÓRIO (16) / RECOMENDADO (7) / AMOSTRA (19) / PODE PULAR (3)
+- `PLANO_MASSA_TESTES_MENU.md` — seção walkthrough browser + link ao checklist
+- `walkthrough_browser_report.json` — relatório JSON da última execução
+
 ### Feat — SEED-MENU-001 cenário test_menu_full (02/07/2026)
 
 - `load_scenario.py` — 5 novos `_seed_*`: `fontes_dados`, `taxas_cambio`, `meta_alocacao`, `historico_preco`, `saldo_prejuizo`; fix `preco_teto_usuario` e `corretora_destino_id`

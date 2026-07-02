@@ -219,7 +219,7 @@ Implementar **todas as telas prometidas no menu horizontal**, consumindo as 156 
 | **BUG-VAL-005** | Metodologia de agregação: padrão de mercado (valuation_service.py) | ✅ Concluído (30/06/2026) |
 | **BUG-VAL-006** | FII: fórmula cap_rate incorreta (1/cap_rate) | ✅ Concluído (30/06/2026) |
 | **VAL-PIPE-001** | Validação pipeline dados + Valor Justo (4 camadas) | 📋 Planejado (doc 01/07/2026) — ver [`PLANO_VALIDACAO_VALOR_JUSTO.md`](PLANO_VALIDACAO_VALOR_JUSTO.md) |
-| **SEED-MENU-001** | Cenário `test_menu_full` — massa 43 telas do menu | 🟡 Implementado (02/07/2026) — walkthrough API OK; aguarda OK usuário — ver [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md) |
+| **SEED-MENU-001** | Cenário `test_menu_full` — massa 43 telas do menu | 🟡 Implementado (02/07/2026) — walkthrough API OK; checklist [`WALKTHROUGH_CHECKLIST_USUARIO.md`](WALKTHROUGH_CHECKLIST_USUARIO.md); aguarda OK usuário — ver [`PLANO_MASSA_TESTES_MENU.md`](PLANO_MASSA_TESTES_MENU.md) |
 | **REBALANCE-001** | Rebalanceamento automático por classe | ✅ Concluído (30/06/2026) |
 | CONCENTRACAO-001 | Análise de concentração | ✅ Concluído (01/07/2026) |
 | **PLANOVENDA-001** | Planos de Venda Disciplinada | ✅ Concluído (16/03/2026) |

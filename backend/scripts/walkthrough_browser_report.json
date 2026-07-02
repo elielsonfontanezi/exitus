@@ -1,0 +1,1324 @@
+{
+  "summary": {
+    "total": 45,
+    "auto_ok_pure": 3,
+    "needs_manual": 44,
+    "auto_fail": 0
+  },
+  "checklist_usuario": [
+    {
+      "num": 2,
+      "name": "Dashboard",
+      "url": "http://localhost:8080/dashboard/",
+      "tier": "RECOMENDADO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "prioridade": "RECOMENDADO"
+    },
+    {
+      "num": 3,
+      "name": "Config Perfil",
+      "url": "http://localhost:8080/configuracoes/perfil",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Validação visual de formulários"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 4,
+      "name": "Config Corretoras",
+      "url": "http://localhost:8080/configuracoes/corretoras",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 5,
+      "name": "Operações",
+      "url": "http://localhost:8080/operacoes/",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado",
+        "Validação visual de formulários"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 6,
+      "name": "Operações Venda",
+      "url": "http://localhost:8080/operacoes/?venda=true",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado",
+        "Validação visual de formulários"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 8,
+      "name": "Operações Histórico",
+      "url": "http://localhost:8080/operacoes/historico",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 9,
+      "name": "Carteira Posições",
+      "url": "http://localhost:8080/carteira/posicoes",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 10,
+      "name": "Carteira Movimentações",
+      "url": "http://localhost:8080/carteira/movimentacoes",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": null,
+      "name": "Carteira Câmbio",
+      "url": "http://localhost:8080/carteira/cambio",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Validação visual de formulários"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 11,
+      "name": "Ativos Catálogo",
+      "url": "http://localhost:8080/ativos/acoes",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 12,
+      "name": "Ativos Detalhe PETR4",
+      "url": "http://localhost:8080/ativos/PETR4",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 13,
+      "name": "Eventos Corporativos",
+      "url": "http://localhost:8080/ativos/eventos-corporativos",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 14,
+      "name": "Proventos Calendário",
+      "url": "http://localhost:8080/proventos/calendario",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 15,
+      "name": "Análises Evolução",
+      "url": "http://localhost:8080/analises/evolucao",
+      "tier": "RECOMENDADO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "prioridade": "RECOMENDADO"
+    },
+    {
+      "num": 16,
+      "name": "Análises Performance",
+      "url": "http://localhost:8080/analises/performance",
+      "tier": "RECOMENDADO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "prioridade": "RECOMENDADO"
+    },
+    {
+      "num": 17,
+      "name": "Análises Alocação",
+      "url": "http://localhost:8080/analises/alocacao",
+      "tier": "RECOMENDADO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "prioridade": "RECOMENDADO"
+    },
+    {
+      "num": 18,
+      "name": "Buy Signals",
+      "url": "http://localhost:8080/analises/buy-signals",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 19,
+      "name": "Rentabilidade legacy",
+      "url": "http://localhost:8080/analises/rentabilidade",
+      "tier": "PODE_PULAR",
+      "motivo": [
+        "Confirmar redirect visualmente"
+      ],
+      "prioridade": "PODE_PULAR"
+    },
+    {
+      "num": 19,
+      "name": "Rentabilidade Período",
+      "url": "http://localhost:8080/analises/rentabilidade/periodo",
+      "tier": "RECOMENDADO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "prioridade": "RECOMENDADO"
+    },
+    {
+      "num": 20,
+      "name": "IR Mensal",
+      "url": "http://localhost:8080/imposto-renda/mensal",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 21,
+      "name": "DARFs",
+      "url": "http://localhost:8080/imposto-renda/darfs",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 22,
+      "name": "IR Histórico",
+      "url": "http://localhost:8080/imposto-renda/historico",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 23,
+      "name": "DIRPF",
+      "url": "http://localhost:8080/imposto-renda/declaracao",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 24,
+      "name": "Relatório Mensal",
+      "url": "http://localhost:8080/relatorios/mensal",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 25,
+      "name": "Relatório Anual",
+      "url": "http://localhost:8080/relatorios/anual",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 26,
+      "name": "Relatório Extrato",
+      "url": "http://localhost:8080/relatorios/extrato",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 27,
+      "name": "Relatório IR",
+      "url": "http://localhost:8080/relatorios/ir",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 28,
+      "name": "Relatório Exportar",
+      "url": "http://localhost:8080/relatorios/exportar",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Download de arquivo não testado"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 29,
+      "name": "Screener",
+      "url": "http://localhost:8080/ferramentas/screener",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 30,
+      "name": "Comparador",
+      "url": "http://localhost:8080/ferramentas/comparador",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Validação visual de formulários"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 31,
+      "name": "Calculadora IR",
+      "url": "http://localhost:8080/ferramentas/calculadora-ir",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Validação visual de formulários"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 32,
+      "name": "Simulador",
+      "url": "http://localhost:8080/ferramentas/simulador",
+      "tier": "PODE_PULAR",
+      "motivo": [
+        "Confirmar redirect visualmente"
+      ],
+      "prioridade": "PODE_PULAR"
+    },
+    {
+      "num": 33,
+      "name": "Reconciliação",
+      "url": "http://localhost:8080/ferramentas/reconciliacao",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 34,
+      "name": "Planos",
+      "url": "http://localhost:8080/planos-compra/",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 35,
+      "name": "Alertas",
+      "url": "http://localhost:8080/alertas/",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 36,
+      "name": "Preço Teto",
+      "url": "http://localhost:8080/ferramentas/preco-teto",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Validação visual de formulários"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 37,
+      "name": "Correlação",
+      "url": "http://localhost:8080/analises/correlacao",
+      "tier": "RECOMENDADO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "prioridade": "RECOMENDADO"
+    },
+    {
+      "num": 38,
+      "name": "Projeções Renda",
+      "url": "http://localhost:8080/analises/projecoes/renda",
+      "tier": "AMOSTRA",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "prioridade": "AMOSTRA"
+    },
+    {
+      "num": 39,
+      "name": "Fontes Dados",
+      "url": "http://localhost:8080/configuracoes/fontes-dados",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 40,
+      "name": "Portfolios",
+      "url": "http://localhost:8080/configuracoes/portfolios",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 41,
+      "name": "Regras Fiscais",
+      "url": "http://localhost:8080/configuracoes/regras-fiscais",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado",
+        "Mutations admin / permissões"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 43,
+      "name": "Análises Risco",
+      "url": "http://localhost:8080/analises/risco",
+      "tier": "RECOMENDADO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "prioridade": "RECOMENDADO"
+    },
+    {
+      "num": 44,
+      "name": "Projeções Patrimônio",
+      "url": "http://localhost:8080/analises/projecoes",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Validação visual de formulários"
+      ],
+      "prioridade": "OBRIGATORIO"
+    },
+    {
+      "num": 42,
+      "name": "Admin Usuários",
+      "url": "http://localhost:8080/admin/usuarios",
+      "tier": "OBRIGATORIO",
+      "motivo": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado",
+        "Mutations admin / permissões",
+        "Admin: decorator require_admin usa session.logged_in — confirmar acesso visual"
+      ],
+      "prioridade": "OBRIGATORIO"
+    }
+  ],
+  "tiers": {
+    "OBRIGATORIO": [
+      {
+        "num": 3,
+        "name": "Config Perfil",
+        "path": "/configuracoes/perfil"
+      },
+      {
+        "num": 4,
+        "name": "Config Corretoras",
+        "path": "/configuracoes/corretoras"
+      },
+      {
+        "num": 5,
+        "name": "Operações",
+        "path": "/operacoes/"
+      },
+      {
+        "num": 6,
+        "name": "Operações Venda",
+        "path": "/operacoes/?venda=true"
+      },
+      {
+        "num": null,
+        "name": "Carteira Câmbio",
+        "path": "/carteira/cambio"
+      },
+      {
+        "num": 14,
+        "name": "Proventos Calendário",
+        "path": "/proventos/calendario"
+      },
+      {
+        "num": 28,
+        "name": "Relatório Exportar",
+        "path": "/relatorios/exportar"
+      },
+      {
+        "num": 30,
+        "name": "Comparador",
+        "path": "/ferramentas/comparador"
+      },
+      {
+        "num": 31,
+        "name": "Calculadora IR",
+        "path": "/ferramentas/calculadora-ir"
+      },
+      {
+        "num": 35,
+        "name": "Alertas",
+        "path": "/alertas/"
+      },
+      {
+        "num": 36,
+        "name": "Preço Teto",
+        "path": "/ferramentas/preco-teto"
+      },
+      {
+        "num": 39,
+        "name": "Fontes Dados",
+        "path": "/configuracoes/fontes-dados"
+      },
+      {
+        "num": 40,
+        "name": "Portfolios",
+        "path": "/configuracoes/portfolios"
+      },
+      {
+        "num": 41,
+        "name": "Regras Fiscais",
+        "path": "/configuracoes/regras-fiscais"
+      },
+      {
+        "num": 44,
+        "name": "Projeções Patrimônio",
+        "path": "/analises/projecoes"
+      },
+      {
+        "num": 42,
+        "name": "Admin Usuários",
+        "path": "/admin/usuarios"
+      }
+    ],
+    "RECOMENDADO": [
+      {
+        "num": 2,
+        "name": "Dashboard",
+        "path": "/dashboard/"
+      },
+      {
+        "num": 15,
+        "name": "Análises Evolução",
+        "path": "/analises/evolucao"
+      },
+      {
+        "num": 16,
+        "name": "Análises Performance",
+        "path": "/analises/performance"
+      },
+      {
+        "num": 17,
+        "name": "Análises Alocação",
+        "path": "/analises/alocacao"
+      },
+      {
+        "num": 19,
+        "name": "Rentabilidade Período",
+        "path": "/analises/rentabilidade/periodo"
+      },
+      {
+        "num": 37,
+        "name": "Correlação",
+        "path": "/analises/correlacao"
+      },
+      {
+        "num": 43,
+        "name": "Análises Risco",
+        "path": "/analises/risco"
+      }
+    ],
+    "AMOSTRA": [
+      {
+        "num": 8,
+        "name": "Operações Histórico",
+        "path": "/operacoes/historico"
+      },
+      {
+        "num": 9,
+        "name": "Carteira Posições",
+        "path": "/carteira/posicoes"
+      },
+      {
+        "num": 10,
+        "name": "Carteira Movimentações",
+        "path": "/carteira/movimentacoes"
+      },
+      {
+        "num": 11,
+        "name": "Ativos Catálogo",
+        "path": "/ativos/acoes"
+      },
+      {
+        "num": 12,
+        "name": "Ativos Detalhe PETR4",
+        "path": "/ativos/PETR4"
+      },
+      {
+        "num": 13,
+        "name": "Eventos Corporativos",
+        "path": "/ativos/eventos-corporativos"
+      },
+      {
+        "num": 18,
+        "name": "Buy Signals",
+        "path": "/analises/buy-signals"
+      },
+      {
+        "num": 20,
+        "name": "IR Mensal",
+        "path": "/imposto-renda/mensal"
+      },
+      {
+        "num": 21,
+        "name": "DARFs",
+        "path": "/imposto-renda/darfs"
+      },
+      {
+        "num": 22,
+        "name": "IR Histórico",
+        "path": "/imposto-renda/historico"
+      },
+      {
+        "num": 23,
+        "name": "DIRPF",
+        "path": "/imposto-renda/declaracao"
+      },
+      {
+        "num": 24,
+        "name": "Relatório Mensal",
+        "path": "/relatorios/mensal"
+      },
+      {
+        "num": 25,
+        "name": "Relatório Anual",
+        "path": "/relatorios/anual"
+      },
+      {
+        "num": 26,
+        "name": "Relatório Extrato",
+        "path": "/relatorios/extrato"
+      },
+      {
+        "num": 27,
+        "name": "Relatório IR",
+        "path": "/relatorios/ir"
+      },
+      {
+        "num": 29,
+        "name": "Screener",
+        "path": "/ferramentas/screener"
+      },
+      {
+        "num": 33,
+        "name": "Reconciliação",
+        "path": "/ferramentas/reconciliacao"
+      },
+      {
+        "num": 34,
+        "name": "Planos",
+        "path": "/planos-compra/"
+      },
+      {
+        "num": 38,
+        "name": "Projeções Renda",
+        "path": "/analises/projecoes/renda"
+      }
+    ],
+    "PODE_PULAR": [
+      {
+        "num": 1,
+        "name": "Login",
+        "path": "/auth/login"
+      },
+      {
+        "num": 19,
+        "name": "Rentabilidade legacy",
+        "path": "/analises/rentabilidade"
+      },
+      {
+        "num": 32,
+        "name": "Simulador",
+        "path": "/ferramentas/simulador"
+      }
+    ]
+  },
+  "results": [
+    {
+      "num": 1,
+      "name": "Login",
+      "path": "/auth/login",
+      "http": 200,
+      "auto_status": "AUTO_OK",
+      "detail": "página pública",
+      "manual_reasons": [],
+      "needs_you": false,
+      "tier": "PODE_PULAR"
+    },
+    {
+      "num": 2,
+      "name": "Dashboard",
+      "path": "/dashboard/",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "needs_you": true,
+      "tier": "RECOMENDADO"
+    },
+    {
+      "num": 3,
+      "name": "Config Perfil",
+      "path": "/configuracoes/perfil",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "shell OK",
+      "manual_reasons": [
+        "Validação visual de formulários"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 4,
+      "name": "Config Corretoras",
+      "path": "/configuracoes/corretoras",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 5,
+      "name": "Operações",
+      "path": "/operacoes/",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado",
+        "Validação visual de formulários"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 6,
+      "name": "Operações Venda",
+      "path": "/operacoes/?venda=true",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado",
+        "Validação visual de formulários"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 8,
+      "name": "Operações Histórico",
+      "path": "/operacoes/historico",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 9,
+      "name": "Carteira Posições",
+      "path": "/carteira/posicoes",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 10,
+      "name": "Carteira Movimentações",
+      "path": "/carteira/movimentacoes",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": null,
+      "name": "Carteira Câmbio",
+      "path": "/carteira/cambio",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Validação visual de formulários"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 11,
+      "name": "Ativos Catálogo",
+      "path": "/ativos/acoes",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 12,
+      "name": "Ativos Detalhe PETR4",
+      "path": "/ativos/PETR4",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 13,
+      "name": "Eventos Corporativos",
+      "path": "/ativos/eventos-corporativos",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 14,
+      "name": "Proventos Calendário",
+      "path": "/proventos/calendario",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 15,
+      "name": "Análises Evolução",
+      "path": "/analises/evolucao",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "needs_you": true,
+      "tier": "RECOMENDADO"
+    },
+    {
+      "num": 16,
+      "name": "Análises Performance",
+      "path": "/analises/performance",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "needs_you": true,
+      "tier": "RECOMENDADO"
+    },
+    {
+      "num": 17,
+      "name": "Análises Alocação",
+      "path": "/analises/alocacao",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "needs_you": true,
+      "tier": "RECOMENDADO"
+    },
+    {
+      "num": 18,
+      "name": "Buy Signals",
+      "path": "/analises/buy-signals",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 19,
+      "name": "Rentabilidade legacy",
+      "path": "/analises/rentabilidade",
+      "http": 200,
+      "auto_status": "AUTO_OK",
+      "detail": "redirect período OK",
+      "manual_reasons": [
+        "Confirmar redirect visualmente"
+      ],
+      "needs_you": true,
+      "tier": "PODE_PULAR"
+    },
+    {
+      "num": 19,
+      "name": "Rentabilidade Período",
+      "path": "/analises/rentabilidade/periodo",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "needs_you": true,
+      "tier": "RECOMENDADO"
+    },
+    {
+      "num": 20,
+      "name": "IR Mensal",
+      "path": "/imposto-renda/mensal",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 21,
+      "name": "DARFs",
+      "path": "/imposto-renda/darfs",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 22,
+      "name": "IR Histórico",
+      "path": "/imposto-renda/historico",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 23,
+      "name": "DIRPF",
+      "path": "/imposto-renda/declaracao",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 24,
+      "name": "Relatório Mensal",
+      "path": "/relatorios/mensal",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 25,
+      "name": "Relatório Anual",
+      "path": "/relatorios/anual",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 26,
+      "name": "Relatório Extrato",
+      "path": "/relatorios/extrato",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 27,
+      "name": "Relatório IR",
+      "path": "/relatorios/ir",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 28,
+      "name": "Relatório Exportar",
+      "path": "/relatorios/exportar",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "shell OK",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Download de arquivo não testado"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 29,
+      "name": "Screener",
+      "path": "/ferramentas/screener",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 30,
+      "name": "Comparador",
+      "path": "/ferramentas/comparador",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "shell OK",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Validação visual de formulários"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 31,
+      "name": "Calculadora IR",
+      "path": "/ferramentas/calculadora-ir",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "shell OK",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Validação visual de formulários"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 32,
+      "name": "Simulador",
+      "path": "/ferramentas/simulador",
+      "http": 200,
+      "auto_status": "AUTO_OK",
+      "detail": "redirect → http://localhost:8080/analises/projecoes",
+      "manual_reasons": [
+        "Confirmar redirect visualmente"
+      ],
+      "needs_you": true,
+      "tier": "PODE_PULAR"
+    },
+    {
+      "num": 33,
+      "name": "Reconciliação",
+      "path": "/ferramentas/reconciliacao",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 34,
+      "name": "Planos",
+      "path": "/planos-compra/",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 35,
+      "name": "Alertas",
+      "path": "/alertas/",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 36,
+      "name": "Preço Teto",
+      "path": "/ferramentas/preco-teto",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Validação visual de formulários"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 37,
+      "name": "Correlação",
+      "path": "/analises/correlacao",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "needs_you": true,
+      "tier": "RECOMENDADO"
+    },
+    {
+      "num": 38,
+      "name": "Projeções Renda",
+      "path": "/analises/projecoes/renda",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas"
+      ],
+      "needs_you": true,
+      "tier": "AMOSTRA"
+    },
+    {
+      "num": 39,
+      "name": "Fontes Dados",
+      "path": "/configuracoes/fontes-dados",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 40,
+      "name": "Portfolios",
+      "path": "/configuracoes/portfolios",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 41,
+      "name": "Regras Fiscais",
+      "path": "/configuracoes/regras-fiscais",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado",
+        "Mutations admin / permissões"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 43,
+      "name": "Análises Risco",
+      "path": "/analises/risco",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Gráfico: precisão dos dados não verificável sem browser"
+      ],
+      "needs_you": true,
+      "tier": "RECOMENDADO"
+    },
+    {
+      "num": 44,
+      "name": "Projeções Patrimônio",
+      "path": "/analises/projecoes",
+      "http": 200,
+      "auto_status": "AUTO_OK_VERIFY_UI",
+      "detail": "API 200 dados",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Validação visual de formulários"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    },
+    {
+      "num": 42,
+      "name": "Admin Usuários",
+      "path": "/admin/usuarios",
+      "http": 200,
+      "auto_status": "NEEDS_MANUAL",
+      "detail": "http://localhost:8080/auth/login",
+      "manual_reasons": [
+        "Dados carregam via JavaScript (apiFetch) — HTML inicial não prova KPIs/tabelas",
+        "Criar/editar/excluir não testado",
+        "Mutations admin / permissões",
+        "Admin: decorator require_admin usa session.logged_in — confirmar acesso visual"
+      ],
+      "needs_you": true,
+      "tier": "OBRIGATORIO"
+    }
+  ]
+}
